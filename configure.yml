@@ -5,9 +5,9 @@
         name: stackhpc.nfs
       vars:
         nfs_enable:
-          server:  "{{ inventory_hostname in groups['testohpc_login'] | first }}"
-          clients: "{{ inventory_hostname in groups['testohpc_compute'] }}"
-        nfs_server: "{{ hostvars[groups['testohpc_login'] | first ]['server_networks']['ilab'][0] }}"
+          server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
+          clients: "{{ inventory_hostname in groups['cluster_compute'] }}"
+        nfs_server: "{{ hostvars[groups['cluster_login'] | first ]['server_networks']['ilab'][0] }}"
         nfs_export: "/mnt/nfs/"
         nfs_client_mnt_point: "/mnt/nfs/"
     
@@ -17,11 +17,11 @@
         - slurm
       vars:
         openhpc_enable:
-          control: "{{ inventory_hostname in groups['testohpc_login'] }}"
-          batch: "{{ inventory_hostname in groups['testohpc_compute'] }}"
+          control: "{{ inventory_hostname in groups['cluster_login'] }}"
+          batch: "{{ inventory_hostname in groups['cluster_compute'] }}"
           runtime: true
         openhpc_slurm_service_enabled: true
-        openhpc_slurm_control_host: "{{ groups['testohpc_login'] | first }}"
+        openhpc_slurm_control_host: "{{ groups['cluster_login'] | first }}"
         openhpc_slurm_partitions:
          - name: "compute"
         openhpc_cluster_name: testohpc
