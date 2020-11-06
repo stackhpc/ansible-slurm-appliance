@@ -1,0 +1,35 @@
+- hosts: cluster
+  become: yes
+  tasks:
+    - import_role:
+        name: stackhpc.nfs
+      vars:
+        nfs_enable:
+          server:  "{{ inventory_hostname in groups['testohpc_login'] | first }}"
+          clients: "{{ inventory_hostname in groups['testohpc_compute'] }}"
+        nfs_server: "{{ hostvars[groups['testohpc_login'] | first ]['server_networks']['ilab'][0] }}"
+        nfs_export: "/mnt/nfs/"
+        nfs_client_mnt_point: "/mnt/nfs/"
+    
+    - import_role:
+        name: ansible-role-openhpc
+      tags:
+        - slurm
+      vars:
+        openhpc_enable:
+          control: "{{ inventory_hostname in groups['testohpc_login'] }}"
+          batch: "{{ inventory_hostname in groups['testohpc_compute'] }}"
+          runtime: true
+        openhpc_slurm_service_enabled: true
+        openhpc_slurm_control_host: "{{ groups['testohpc_login'] | first }}"
+        openhpc_slurm_partitions:
+         - name: "compute"
+        openhpc_cluster_name: testohpc
+        openhpc_packages: []
+        openhpc_slurm_conf:
+          location: /mnt/nfs/etc/slurm/slurm.conf
+          shared_fs: false
+        openhpc_munge_key:
+          location: /mnt/nfs/etc/munge/munge.key
+          shared_fs: false
+        openhpc_slurm_configless: true
