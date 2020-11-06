@@ -1,0 +1,9 @@
+---
+- src: stackhpc.nfs
+# - src: stackhpc.openhpchttps://github.com/stackhpc/ansible-role-openhpc
+- src: cloudalchemy.node-exporter
+- src: cloudalchemy.blackbox-exporter
+- src: cloudalchemy.prometheus
+- src: cloudalchemy.alertmanager
+- src: cloudalchemy.grafana
+...

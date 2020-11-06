@@ -1,0 +1,46 @@
+# Prometheus: http://{login-ip}:9090/
+
+---
+- name: Deploy node_exporter
+  hosts: all
+  tags: node_exporter
+  tasks:
+    - import_role: name=cloudalchemy.node-exporter
+  
+- name: Setup core monitoring software
+  hosts: cluster_login[0]
+  tags: prometheus
+  tasks:
+    - import_role: name=cloudalchemy.blackbox-exporter
+    - import_role:
+        name: cloudalchemy.prometheus
+      vars:
+        prometheus_targets:
+          node:
+          - targets:
+              "{{ groups['all'] | map('extract', hostvars, ['ansible_host']) | map('regex_replace', '$', ':9100') | list }}"
+            labels:
+              env: demo
+    #- import_role: name=cloudalchemy.alertmanager # TODO: set this up?
+  
+- name: Deploy grafana
+  hosts: cluster_login[0]
+  tags: grafana
+  tasks:
+    - import_role:
+        name: cloudalchemy.grafana
+      vars:
+        grafana_datasources:
+          - name: prometheus
+            type: prometheus
+            url: "{{ ansible_host }}:9090" # default prometheus port
+            basicAuth: false
+        grafana_dashboards:
+          - dashboard_id: 1860 # node exporter, full
+            datasource: prometheus
+            revision_id: 21
+        grafana_security:
+            admin_user: grafana
+            admin_password: G4ImLdPOTq6QLHpE
+
+...
