@@ -12,7 +12,10 @@ A simple test/demo case for StackHPC's `openhpc` role using VMs on `alaska`.
     ansible-galaxy install -r requirements.yml -p roles
     cd roles
     git clone git@github.com:stackhpc/ansible-role-openhpc.git # for development
-
+    cd ..
+    yum install terraform
+    terraform init
+    
 # Usage
 
 Activate the virtualenv:
