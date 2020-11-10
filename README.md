@@ -25,7 +25,7 @@ Create the instances (on an existing network):
 
 Configure a slurm cluster:
 
-    ansible-playbook -i inventory configure.yml
+    ansible-playbook -i inventory slurm-simple.yml
 
 Add monitoring with grafana on port 3000 and prometheus on port 9090 of login node (see `monitoring.yml` for grafana credentials):
 
