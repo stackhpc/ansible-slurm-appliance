@@ -13,7 +13,7 @@
         group: "{{ ansible_user }}"
     - name: Create sbatch script for IMB pingpong
       copy:
-        dest: "/mnt/nfs//ping.sh"
+        dest: "/mnt/nfs/ping.sh"
         content: |
           #!/usr/bin/bash
 
@@ -28,10 +28,21 @@
 
           srun --mpi=pmix_v3 IMB-MPI1 pingpong
       run_once: True
+
+- hosts: cluster_login[0]
+  tags: mpirun
+  tasks:
     - name: Run pingpong
-      shell: sbatch ping.sh
+      shell: sbatch --wait ping.sh
       become: no
       args:
         chdir: "/mnt/nfs/"
     
-    # TODO: retrieve results
+    - name: Slurp output
+      slurp:
+        src: /mnt/nfs/ping.sh.out
+      register: ping_out
+    
+    - debug:
+        msg: "{{ ping_out['content'] | b64decode }}"
+  
