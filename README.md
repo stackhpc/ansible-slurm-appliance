@@ -10,6 +10,8 @@ A simple test/demo case for StackHPC's `openhpc` role using VMs on `alaska`.
     pip install -U setuptools
     pip install -r requirements.txt
     ansible-galaxy install -r requirements.yml -p roles
+    cd roles
+    git clone git@github.com:stackhpc/ansible-role-openhpc.git # for development
 
 # Usage
 
