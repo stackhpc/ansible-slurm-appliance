@@ -26,17 +26,29 @@ Activate the virtualenv:
 
 Create the instances (on an existing network):
 
-    terraform apply --autoapprove
+    terraform apply --auto-approve
 
 Configure a slurm cluster:
 
     ansible-playbook -i inventory slurm-simple.yml
 
-Add monitoring with grafana on port 3000 and prometheus on port 9090 of login node (see `monitoring.yml` for grafana credentials):
+Add monitoring:
 
-    ansible-playbook -i inventory monitoring.yml
+    ansible-playbook -i inventory -e grafana_password=<password> monitoring.yml
 
+now you can access:
+    - grafana: `http://<login_ip>:3000` - username `grafana`, password as set above
+    - prometheus: `http://<login_ip>:9090`
+
+NB: if grafana's yum repos are down you will see `Errors during downloading metadata for repository 'grafana' ...`. You can work around this using:
+
+    ssh centos@<login_ip>
+    sudo rm -rf /etc/yum.repos.d/grafana.repo
+    wget https://dl.grafana.com/oss/release/grafana-7.3.1-1.x86_64.rpm
+    sudo yum install grafana-7.3.1-1.x86_64.rpm
+    exit
+    ansible-playbook -i inventory monitoring.yml -e grafana_password=<password> --skip-tags grafana_install
 
 When finished, run:
 
-    terraform destroy --autoapprove
+    terraform destroy --auto-approve
