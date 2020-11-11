@@ -15,6 +15,10 @@ variable "cluster_name" {
   default = "testohpc"
 }
 
+variable "key_pair" {
+  default = "centos_at_sb-mol"
+}
+
 variable "node_image" {
   #default = "CentOS-7-x86_64-GenericCloud-2020-04-22"
   default = "CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64"
@@ -26,7 +30,7 @@ resource "openstack_compute_instance_v2" "login" {
   name = "${var.cluster_name}-login-0"
   image_name = var.node_image
   flavor_name = "general.v1.small"
-  key_pair = "id-rsa-alaska"
+  key_pair = var.key_pair
   network {
     name = "ilab"
   }
@@ -41,7 +45,7 @@ resource "openstack_compute_instance_v2" "compute" {
   image_name = var.node_image
   flavor_name = "general.v1.small"
   #flavor_name = "compute-A"
-  key_pair = "id-rsa-alaska"
+  key_pair = var.key_pair
   network {
     name = "ilab"
   }

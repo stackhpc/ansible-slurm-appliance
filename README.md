@@ -18,6 +18,8 @@ A simple test/demo case for StackHPC's `openhpc` role using VMs on `alaska`.
     
 # Usage
 
+Modify the keypair in `main.tf`.
+
 Activate the virtualenv:
 
     . venv/bin/activate
