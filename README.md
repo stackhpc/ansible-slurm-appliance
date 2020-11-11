@@ -52,3 +52,15 @@ NB: if grafana's yum repos are down you will see `Errors during downloading meta
 When finished, run:
 
     terraform destroy --auto-approve
+
+# Image build
+
+WIP: based on lightly-modified `https://github.com/mrsipan/packer-centos-8` - doesn't currently run ansible, uses root user w/ hardcoded password.
+
+    mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out
+    PACKER_LOG=1 packer build main.json
+
+In another terminal, watch the output installation:
+
+    cat /tmp/qemu-serial.out
+    
