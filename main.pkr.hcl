@@ -2,28 +2,26 @@
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
 source "qemu" "openhpc2" {
-  accelerator      = "kvm"
-  boot_command     = ["<tab> console=ttyS0 text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos-8.ks<enter><wait>"]
-  boot_wait        = "10s"
-  disk_interface   = "virtio"
-  disk_size        = "3072M"
-  format           = "qcow2"
+  iso_url = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2"
+  iso_checksum = "sha256:d8984b9baee57b127abce310def0f4c3c9d5b3cea7ea8451fc4ffcbc9935b640"
+  disk_image = true
+  shutdown_command  = "echo 'packer' | sudo -S shutdown -P now"
+  disk_compression = true
+  accelerator      = "kvm" # default, if avaialable
+  ssh_username = "centos"
+  ssh_timeout = "20m"
+  net_device       = "virtio-net" # default
+  disk_interface   = "virtio" # default
+  qemu_binary      = "/usr/libexec/qemu-kvm" # fixes GLib-WARNING **: 13:48:38.600: gmem.c:489: custom memory allocation vtable not supported
   headless         = true
-  http_directory   = "http"
-  iso_checksum     = "sha256:c67876a5602faa17f68b40ccf2628799b87454aa67700f0f57eec15c6ccdd98c"
-  iso_url          = "http://mirror.cs.vt.edu/pub/CentOS/8/isos/x86_64/CentOS-8.2.2004-x86_64-boot.iso"
-  net_device       = "virtio-net"
   output_directory = "build"
-  qemu_binary      = "/usr/libexec/qemu-kvm"
+  ssh_private_key_file = "~/.ssh/id_rsa"
   qemuargs         = [
     ["-monitor", "unix:qemu-monitor.sock,server,nowait"],
     ["-serial", "pipe:/tmp/qemu-serial"], ["-m", "896M"],
+    ["-cdrom", "config-drive.iso"]
     ]
-  shutdown_command = "systemctl poweroff"
-  ssh_username     = "root"
-  ssh_password     = "passwd"
-  ssh_timeout      = "10m"
-  vm_name          = "centos-8-amd64-${local.timestamp}.qcow2"
+  vm_name          = "openhpc2-${local.timestamp}"
 }
 
 build {

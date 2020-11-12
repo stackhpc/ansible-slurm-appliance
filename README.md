@@ -4,7 +4,7 @@ A simple test/demo case for StackHPC's `openhpc` role using VMs on `alaska`.
 
     git clone  git@github.com:stackhpc/openhpc-tests.git
     cd openhpc-tests
-    virtualenv --python $(which python3) venv
+    virtualenv --system-site-packages --python $(which python3) venv
     . venv/bin/activate
     pip install -U pip
     pip install -U setuptools
@@ -55,10 +55,12 @@ When finished, run:
 
 # Image build
 
-WIP: based on lightly-modified `https://github.com/mrsipan/packer-centos-8` - doesn't currently run ansible, uses root user w/ hardcoded password.
+WIP: doesn't currently run ansible!
 
     mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out
-    PACKER_LOG=1 packer build main.json
+    . venv/bin/activate
+    ansible-playbook config-drive.yml
+    PACKER_LOG=1 packer build main.pkr.hcl
 
 In another terminal, watch the output installation:
 
