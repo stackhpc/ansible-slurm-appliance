@@ -1,0 +1,7 @@
+---
+
+template:
+  mode: 0600
+
+notify:
+  - Restart filebeat container

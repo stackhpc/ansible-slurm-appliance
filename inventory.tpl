@@ -20,3 +20,18 @@ ${cluster_name}_login
 
 [cluster_compute:children]
 ${cluster_name}_compute
+
+[elastic:children]
+${cluster_name}_login
+
+[kibana:children]
+${cluster_name}_login
+
+[slurm_stats:children]
+${cluster_name}_login
+
+[podman:children]
+elastic
+kibana
+slurm_stats
+

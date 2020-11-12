@@ -1,0 +1,47 @@
+---
+
+- name: Assert that parameters are defined
+  assert:
+    that:
+      - template_src is defined
+      - template_dest is defined
+
+- name: Ensure parent directory exists
+  file:
+    state: directory
+    path: "{{ (template_dest + '/' + item.path) | dirname }}"
+    owner: "1000"
+    group: "1000"
+    mode: 0770
+  with_filetree:
+    # item.path contains relative path
+    - "{{ template_src }}/"
+  when: item.state == 'file'
+  become: true
+
+- name: Template configuration files
+  vars:
+    defaults:
+      src: "{{ item['src'] }}"
+      dest: "{{ template_dest + '/' + item.path }}"
+      owner: "1000"
+      group: "1000"
+      mode: 0660
+  template: "{{ defaults | combine((item.src ~ '.meta' | readfile | from_yaml).template | default({})) }}"
+  with_filetree:
+    # item.path contains relative path
+    - "{{ template_src }}/"
+  when:
+    - item.state == 'file'
+    - (item.src | basename | splitext)[-1] != ".meta"
+  register: template_result
+  become: true
+
+- name: Notify handlers
+  # https://github.com/ansible/ansible/issues/22579
+  vars:
+    handlers: "{{ template_result.results | select('changed') | map(attribute='item') | map(attribute='src') | map('regex_replace', '^(.*)$', '\\1.meta') | map('readfile') | map('from_yaml') | map(attribute='notify') | select('defined') | sum(start=[]) | unique | list }}"
+  debug:
+    msg: "Notifiying handlers: {{ handlers }}"
+  notify: "{{ handlers }}"
+  changed_when: template_result is changed

@@ -1,9 +1,15 @@
 ---
+collections:
+- name: containers.podman
+roles:
 - src: stackhpc.nfs
-# - src: stackhpc.openhpchttps://github.com/stackhpc/ansible-role-openhpc
+- src: https://github.com/stackhpc/ansible-role-openhpc
+  name: stackhpc.openhpc
+  version: feature/accounting
 - src: cloudalchemy.node-exporter
 - src: cloudalchemy.blackbox-exporter
 - src: cloudalchemy.prometheus
 - src: cloudalchemy.alertmanager
 - src: cloudalchemy.grafana
+- name: geerlingguy.mysql
 ...

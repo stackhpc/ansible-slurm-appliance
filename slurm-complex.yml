@@ -1,0 +1,157 @@
+---
+
+- name: Install dependenices
+  hosts: podman
+  tasks:
+    - name: Install OS packages
+      yum:
+        name:
+          - podman
+          - python3
+        state: installed
+      become: true
+
+    - name: Up default resource limits
+      copy:
+        content: |
+          # WARNING: This file is managed by ansible, do not modify.
+          # This is so non-root containers can use more resources. This is useful
+          # for opendistro.
+          * soft memlock unlimited
+          * hard memlock unlimited
+          * soft nofile 65536
+          * hard nofile 65536
+        dest: /etc/security/limits.d/custom.conf
+      become: true
+
+    - name: Setup a pod
+      containers.podman.podman_pod:
+        name: elastic
+        state: started
+        ports:
+          - 9200:9200
+          - 9600:9600
+          - 5601:5601
+
+- name: Setup elasticsearch
+  hosts: elastic
+  tasks:
+    - name: Setup volume for opendistro
+      containers.podman.podman_volume:
+        state: present
+        name: opendistro
+
+    - name: Setup opendistro
+      containers.podman.podman_container:
+        name: opendistro
+        image: amazon/opendistro-for-elasticsearch:1.11.0
+        state: started
+        pod: elastic
+        restart_policy: "always"
+        ulimit:
+          - memlock=-1:-1
+          # maximum number of open files for the Elasticsearch user, set to at least 65536 on modern systems
+          - nofile=65536:65536
+        volume:
+          - opendistro:/usr/share/elasticsearch/data
+        env:
+          node.name: opendistro
+          discovery.type: single-node
+          bootstrap.memory_lock: "true" # along with the memlock settings below, disables swapping
+          ES_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+
+- name: Setup kibana
+  hosts: kibana
+  tasks:
+    - name: Setup volume for kibana
+      containers.podman.podman_volume:
+        state: present
+        name: kibana
+
+    - name: Setup kibana
+      containers.podman.podman_container:
+        image: amazon/opendistro-for-elasticsearch-kibana:1.11.0
+        name: kibana
+        state: started
+        pod: elastic
+        restart_policy: "always"
+        expose:
+          - "5601"
+        env:
+          # FIXME: assumes same host as elastic
+          ELASTICSEARCH_URL: https://localhost:9200
+          ELASTICSEARCH_HOSTS: https://localhost:9200
+
+- name: Setup slurm stats
+  hosts: slurm_stats
+  tasks:
+    - include_role:
+        name: template
+      vars:
+        template_src: conf/filebeat
+        template_dest: /etc/filebeat
+
+    - include_role:
+        name: slurm-stats
+
+    - name: Setup file beat
+      containers.podman.podman_container:
+        image: docker.elastic.co/beats/filebeat-oss:7.9.3
+        name: filebeat
+        state: started
+        # FIXME: /usr/share/filebeat/filebeat is owned by root:root and 0750 - podman only?
+        # Unsure how this works in docker as the permissions are identical.
+        user: root
+        pod: elastic
+        restart_policy: "always"
+        security_opt:
+          # Required to read /var/log. There might be a better solution, see:https://github.com/containers/podman/issues/3683
+          - label=disable
+        volumes:
+          - /var/log/:/logs:ro
+          - /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+        command: -e -strict.perms=false -d "*"
+
+  handlers:
+    - name: Restart filebeat container
+      command: podman restart filebeat
+
+- name: Setup DB
+  hosts: cluster_login
+  vars:
+    ansible_become: true
+    # Slurm recommends larger than default values: https://slurm.schedmd.com/accounting.html
+    mysql_innodb_buffer_pool_size: 1024M
+    mysql_innodb_lock_wait_timeout: 900
+    mysql_root_password: super-secure-password
+    mysql_databases:
+      - name: slurm_acct_db
+    mysql_users:
+      - name: slurm
+        host: "%"
+        password: secure-password
+        priv: "slurm_acct_db.*:ALL"
+  tasks:
+    - include_role:
+        name:  geerlingguy.mysql
+
+- hosts: cluster
+  become: yes
+  tasks:
+   - import_role:
+        name: stackhpc.openhpc
+     vars:
+        openhpc_enable:
+          control: "{{ inventory_hostname in groups['cluster_login'] }}"
+          batch: "{{ inventory_hostname in groups['cluster_compute'] }}"
+          database: "{{ inventory_hostname in groups['cluster_login'] }}"
+          runtime: true
+        openhpc_slurm_service_enabled: true
+        openhpc_slurm_accounting_storage_type: 'accounting_storage/slurmdbd'
+        openhpc_slurmdbd_mysql_database: slurm_acct_db
+        openhpc_slurmdbd_mysql_password: secure-password
+        openhpc_slurmdbd_mysql_username: slurm
+        openhpc_slurm_control_host: "{{ groups['cluster_login'] | first }}"
+        openhpc_slurm_partitions:
+          - name: "compute"
+        openhpc_cluster_name: wjs-ohpc

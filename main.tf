@@ -2,9 +2,8 @@ terraform {
   required_version = ">= 0.13"
 }
 
-provider "openstack" { # uses clouds.yml
-  cloud = "alaska"
-  version = "~> 1.25"
+provider "openstack" {
+
 }
 
 variable "compute_names" {
@@ -12,7 +11,7 @@ variable "compute_names" {
 }
 
 variable "cluster_name" {
-  default = "testohpc"
+  default = "wjs-ohpc"
 }
 
 variable "node_image" {
@@ -21,15 +20,39 @@ variable "node_image" {
   #default = "CentOS7.8" #-OpenHPC"
 }
 
+resource "openstack_networking_secgroup_v2" "secgroup_slurm_login" {
+  name        = "secgroup_slurm_login"
+  description = "Rules for the slurm login node"
+  # Fully manage with terraform
+  delete_default_rules = true
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_egress_v4" {
+  direction         = "egress"
+  ethertype         = "IPv4"
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_tcp_v4" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  # FIXME: only allow ports needed
+  port_range_min    = 1
+  protocol          = "tcp"
+  port_range_max    = 65535
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
+}
+
 resource "openstack_compute_instance_v2" "login" {
 
   name = "${var.cluster_name}-login-0"
   image_name = var.node_image
   flavor_name = "general.v1.small"
-  key_pair = "id-rsa-alaska"
+  key_pair = "ilab_sclt100"
   network {
     name = "ilab"
   }
+  security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_login.id]
 }
 
 
@@ -41,7 +64,7 @@ resource "openstack_compute_instance_v2" "compute" {
   image_name = var.node_image
   flavor_name = "general.v1.small"
   #flavor_name = "compute-A"
-  key_pair = "id-rsa-alaska"
+  key_pair = "ilab_sclt100"
   network {
     name = "ilab"
   }

@@ -1,4 +1,5 @@
 roles/
+collections
 terraform.tfstate*
 .terraform
 inventory
