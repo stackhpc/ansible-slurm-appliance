@@ -55,14 +55,29 @@ When finished, run:
 
 # Image build
 
-WIP: doesn't currently run ansible!
+Currently WIP!
+
+First:
+- Ensure `stackhpc.openhpc` role is using `packer` branch.
+- Configure terraform `main.tf` to use centos8 cloud image.
+- Configure `slurm-simple.yml` to use `openhpc_slurm_configless: true`
+- Run terraform with -target to only create control host
+- Run ansible with --limit to only configure control host
+- Retrieve the generated munge key from the control/login node and save here as `munge.key`.
+
+Build an image:
 
     mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out
     . venv/bin/activate
     ansible-playbook config-drive.yml
-    PACKER_LOG=1 packer build main.pkr.hcl
-
-In another terminal, watch the output installation:
+    PACKER_LOG=1 packer build main.pkr.hcl # may also find `--on-error=ask` useful
+    
+In another terminal, watch the image startup:
 
     cat /tmp/qemu-serial.out
-    
+
+Upload the image:
+
+    openstack image create --file build/*.qcow2 --disk-format qcow2 $(basename build/*.qcow2)
+
+Then create the compute VMs e.g. from terraform.

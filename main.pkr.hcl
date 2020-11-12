@@ -1,13 +1,12 @@
 # "timestamp" template function replacement:s
-locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
+locals { timestamp = formatdate("YYMMDD-hhmm", timestamp())}
 
 source "qemu" "openhpc2" {
   iso_url = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2"
   iso_checksum = "sha256:d8984b9baee57b127abce310def0f4c3c9d5b3cea7ea8451fc4ffcbc9935b640"
-  disk_image = true
-  shutdown_command  = "echo 'packer' | sudo -S shutdown -P now"
+  disk_image = true # as above is .qcow2 not .iso
   disk_compression = true
-  accelerator      = "kvm" # default, if avaialable
+  accelerator      = "kvm" # default, if available
   ssh_username = "centos"
   ssh_timeout = "20m"
   net_device       = "virtio-net" # default
@@ -21,10 +20,19 @@ source "qemu" "openhpc2" {
     ["-serial", "pipe:/tmp/qemu-serial"], ["-m", "896M"],
     ["-cdrom", "config-drive.iso"]
     ]
-  vm_name          = "openhpc2-${local.timestamp}"
+  vm_name          = "openhpc2-${local.timestamp}.qcow2"
 }
 
 build {
   sources = ["source.qemu.openhpc2"]
-
+  provisioner "ansible" {
+    playbook_file = "slurm-simple.yml"
+    host_alias = "builder"
+    groups = ["cluster", "cluster_compute"]
+    extra_arguments = ["-i", "inventory", "--limit", "builder",
+                       "--extra-vars", "openhpc_slurm_service_started=false nfs_client_mnt_state=present", # crucial to avoid trying to start services
+                       "-v"]
+    keep_inventory_file = true # for debugging
+    use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
+  }
 }

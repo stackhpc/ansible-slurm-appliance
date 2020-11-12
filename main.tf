@@ -42,7 +42,7 @@ resource "openstack_compute_instance_v2" "compute" {
   for_each = toset(var.compute_names)
 
   name = "${var.cluster_name}-${each.value}"
-  image_name = var.node_image
+  image_name = "openhpc2-201112-1730.qcow2"
   flavor_name = "general.v1.small"
   #flavor_name = "compute-A"
   key_pair = var.key_pair

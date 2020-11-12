@@ -2,7 +2,7 @@
   become: yes
   tasks:
     - import_role:
-        name: stackhpc.nfs
+        name: ansible-role-cluster-nfs # need `nfs_client_mnt_state`
       vars:
         nfs_enable:
           server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
