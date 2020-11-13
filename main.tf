@@ -2,8 +2,9 @@ terraform {
   required_version = ">= 0.13"
 }
 
-provider "openstack" {
-
+provider "openstack" { # uses clouds.yml
+  cloud = "alaska"
+  version = "~> 1.25"
 }
 
 variable "compute_names" {
@@ -11,7 +12,7 @@ variable "compute_names" {
 }
 
 variable "cluster_name" {
-  default = "wjs-ohpc"
+  default = "testohpc"
 }
 
 variable "key_pair" {
