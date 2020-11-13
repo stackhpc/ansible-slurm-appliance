@@ -5,6 +5,7 @@ source "qemu" "openhpc2" {
   iso_url = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2"
   iso_checksum = "sha256:d8984b9baee57b127abce310def0f4c3c9d5b3cea7ea8451fc4ffcbc9935b640"
   disk_image = true # as above is .qcow2 not .iso
+  disk_size = "20G" # needs to match compute VM
   disk_compression = true
   accelerator      = "kvm" # default, if available
   ssh_username = "centos"
