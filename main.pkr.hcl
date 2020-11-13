@@ -22,6 +22,7 @@ source "qemu" "openhpc2" {
     ["-cdrom", "config-drive.iso"]
     ]
   vm_name          = "openhpc2-${local.timestamp}.qcow2"
+  shutdown_command = "sudo shutdown -P now"
 }
 
 build {
