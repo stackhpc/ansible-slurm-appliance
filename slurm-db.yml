@@ -1,0 +1,41 @@
+---
+
+- name: Setup DB
+  hosts: cluster_login
+  vars:
+    ansible_become: true
+    # Slurm recommends larger than default values: https://slurm.schedmd.com/accounting.html
+    mysql_innodb_buffer_pool_size: 1024M
+    mysql_innodb_lock_wait_timeout: 900
+    mysql_root_password: super-secure-password
+    mysql_databases:
+      - name: slurm_acct_db
+    mysql_users:
+      - name: slurm
+        host: "%"
+        password: secure-password
+        priv: "slurm_acct_db.*:ALL"
+  tasks:
+    - include_role:
+        name:  geerlingguy.mysql
+
+- hosts: cluster
+  become: yes
+  tasks:
+   - import_role:
+        name: stackhpc.openhpc
+     vars:
+        openhpc_enable:
+          control: "{{ inventory_hostname in groups['cluster_login'] }}"
+          batch: "{{ inventory_hostname in groups['cluster_compute'] }}"
+          database: "{{ inventory_hostname in groups['cluster_login'] }}"
+          runtime: true
+        openhpc_slurm_service_enabled: true
+        openhpc_slurm_accounting_storage_type: 'accounting_storage/slurmdbd'
+        openhpc_slurmdbd_mysql_database: slurm_acct_db
+        openhpc_slurmdbd_mysql_password: secure-password
+        openhpc_slurmdbd_mysql_username: slurm
+        openhpc_slurm_control_host: "{{ groups['cluster_login'] | first }}"
+        openhpc_slurm_partitions:
+          - name: "compute"
+        openhpc_cluster_name: testohpc
