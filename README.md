@@ -59,25 +59,33 @@ Currently WIP!
 
 First:
 - Ensure `stackhpc.openhpc` role is using `packer` branch.
-- Configure terraform `main.tf` to use centos8 cloud image.
+- Ensure terraform `main.tf` configured to use centos8 cloud image for login node.
 - Configure `slurm-simple.yml` to use `openhpc_slurm_configless: true`
-- Run terraform with -target to only create control host
-- Run ansible with --limit to only configure control host
-- Retrieve the generated munge key from the control/login node and save here as `munge.key`.
-
-Build an image:
+- Run terraform and ansible to create and configure all nodes (as above).*
+- Retrieve the generated munge key from the control/login node and save in this directory as `munge.key`.
+- Build an image:
 
     mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out
     . venv/bin/activate
     ansible-playbook config-drive.yml
     PACKER_LOG=1 packer build main.pkr.hcl # may also find `--on-error=ask` useful
     
-In another terminal, watch the image startup:
+- In another terminal, watch the image startup:
 
     cat /tmp/qemu-serial.out
 
-Upload the image:
+- Upload the image:
 
     openstack image create --file build/*.qcow2 --disk-format qcow2 $(basename build/*.qcow2)
 
-Then create the compute VMs e.g. from terraform.
+- Then create the compute VMs e.g. from terraform.
+
+Points to note:
+- We want ansible to ssh proxy via the control node for the compute nodes (don't actually need it here as all on one network, but in the general case only the control node will be reachable directly). But we DON'T want packer's "builder" host to get this proxy, so the proxy has to be added to `[${cluster_name}_compute:vars]`, not `[cluster_compute:vars]`.
+- You can't use `-target` (terraform) / `--limit` (ansible) as the `openhpc` role needs all nodes in the play to be able to define `slurm.conf`. If you don't want to configure the entire cluster up-front then alternatives are:
+  - Define/create a smaller cluster in terraform/ansible, create that and build an image, then change the cluster definition to the real one, limiting the ansible play to just `cluster_login`.
+  - Work the other way around:
+    - Create the control/login node with TF only (would need some inventory changes as currently the implicit dependency on `computes` will create those too, even with `-limit`)
+    - Build the image <-- NO - that needs munge key
+    - Launch compute nodes w/ TF using that (slurm won't start)
+    - Configure control node using `--limit`
