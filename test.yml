@@ -120,6 +120,7 @@
 - hosts: cluster_login[0]
   name: HPL (individual nodes)
   # NB: This uses the precompiled HPL provided with MKL so runs a single MPI process per node, with TBB threads added automatically by MKL to use all cores
+  # See https://software.intel.com/content/www/us/en/develop/documentation/mkl-windows-developer-guide/top/intel-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/ease-of-use-command-line-parameters.html
   become: yes
   tags: hpl-solo
   vars:
@@ -127,6 +128,15 @@
     impi_ver: 2019.6-088
     mkl_ver: 2020.0-088
   tasks:
+    - name: Get compute memory (in MB)
+      command: free --mega
+      delegate_to: "{{ groups['cluster_compute'][0] }}" # TODO: no way to deal with groups? Better to use `sinfo` but memory not set propery!
+      register: free
+      connection: local # except this doesn't work
+    - debug:
+        msg: "{{ free.stdout_lines[1].split()[1] }}"
+    - meta: end_play
+    
     - name: Install gnu 9 + openmpi (w/ ucx) + performance tools
       yum:
         name: ohpc-gnu9-openmpi4-perf-tools
@@ -149,11 +159,12 @@
         path: "{{ jobdir }}"
         state: directory
         owner: "{{ ansible_user }}"
+    # https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/
+    #N = 0.8 * sqrt(tot_mem_bytes / 8)
     - name: Get info about compute nodes
       shell: sinfo -Nh
       register:
         num_compute
-    - meta: end_play
     - name: Create sbatch script
       copy:
         dest: "{{ jobdir }}/hpl-solo.sh"
@@ -166,14 +177,15 @@
 
           module load gnu9/9.3.0
           module load openmpi4/4.0.4
-          source /opt/intel/compilers_and_libraries_{{ impi_ver | replace('-', '.') }}/linux/mpi/intel64/bin/mpivars.sh
-          source /opt/intel/compilers_and_libraries_{{ mkl_ver | replace('-', '.') }}/linux/mkl/bin/mklvars.sh intel64
+          source /opt/intel/compilers_and_libraries/linux/mpi/intel64/bin/mpivars.sh
+          source /opt/intel/compilers_and_libraries/linux/mkl/bin/mklvars.sh intel64
           export I_MPI_DEBUG=4
           #export UCX_NET_DEVICES=mlx5_0:1
 
           # TODO: output rank name
           mpirun -perhost 1 -np 1 --mpi=pmix_v3 $MKLROOT/benchmarks/mp_linpack/xhpl_intel64_dynamic
 
+    - meta: end_play
     - name: Run hpl
       shell: sbatch --array=0-{{ num_compute.stdout_lines | count }} --wait hpl-solo.sh
       become: no
