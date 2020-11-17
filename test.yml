@@ -14,12 +14,6 @@
         nfs_server: "{{ hostvars[groups['cluster_login'] | first ]['server_networks']['ilab'][0] }}"
         nfs_export: "/opt/ohpc/"
         nfs_client_mnt_point: "/opt/ohpc/"
-    - name: Make centos nfs share owner
-      file:
-        path: /mnt/nfs
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      run_once: true
 
 - hosts: cluster_login[0]
   name: IMB PingPong (2x scheduler-selected nodes)
@@ -36,6 +30,7 @@
       file:
         path: "{{ jobdir }}"
         state: directory
+        owner: "{{ ansible_user }}"
     - name: Create sbatch script for IMB pingpong
       copy:
         dest: "{{ jobdir }}/ping.sh"
