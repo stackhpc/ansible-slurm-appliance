@@ -1,19 +1,44 @@
 # NB: this only works on centos 8 / ohpc v2 as we want UCX
-- hosts: all
+# TODO: add support for groups/partitions
+
+- hosts: cluster
+  name: Export/mount /opt/ohpc via NFS
   become: yes
   tasks:
-    - name: Install gnu 9 + openmpi (w/ ucx) + performance tools
-      yum:
-        name: ohpc-gnu9-openmpi4-perf-tools
-        state: present
+    - import_role:
+        name: ansible-role-cluster-nfs
+      vars:
+        nfs_enable:
+          server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
+          clients: "{{ inventory_hostname in groups['cluster_compute'] }}"
+        nfs_server: "{{ hostvars[groups['cluster_login'] | first ]['server_networks']['ilab'][0] }}"
+        nfs_export: "/opt/ohpc/"
+        nfs_client_mnt_point: "/opt/ohpc/"
     - name: Make centos nfs share owner
       file:
         path: /mnt/nfs
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
+      run_once: true
+
+- hosts: cluster_login[0]
+  name: IMB PingPong (2x scheduler-selected nodes)
+  become: yes
+  tags: pingpong
+  vars:
+    jobdir: /mnt/nfs/pingpong
+  tasks:
+    - name: Install gnu 9 + openmpi (w/ ucx) + performance tools
+      yum:
+        name: ohpc-gnu9-openmpi4-perf-tools
+        state: present
+    - name: Make directory
+      file:
+        path: "{{ jobdir }}"
+        state: directory
     - name: Create sbatch script for IMB pingpong
       copy:
-        dest: "/mnt/nfs/ping.sh"
+        dest: "{{ jobdir }}/ping.sh"
         content: |
           #!/usr/bin/bash
 
@@ -27,22 +52,24 @@
           module load imb/2019.6
 
           srun --mpi=pmix_v3 IMB-MPI1 pingpong
-      run_once: True
-
-- hosts: cluster_login[0]
-  tags: mpirun
-  tasks:
     - name: Run pingpong
       shell: sbatch --wait ping.sh
       become: no
       args:
-        chdir: "/mnt/nfs/"
-    
+        chdir: "{{ jobdir }}"
     - name: Slurp output
       slurp:
-        src: /mnt/nfs/ping.sh.out
+        src: "{{ jobdir }}/ping.sh.out"
       register: ping_out
-    
     - debug:
         msg: "{{ ping_out['content'] | b64decode }}"
-  
+
+# - hosts: cluster_login[0]
+#   name: ping matrix (entire cluster)
+#   become: yes
+#   tags: pingmatrix
+#   vars:
+#     jobdir: /mnt/nfs/pingmatrix
+#   tasks:
+#     - name: 
+
