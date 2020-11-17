@@ -132,12 +132,12 @@
         name: ohpc-gnu9-openmpi4-perf-tools
         state: present
     - name: Add Intel repos
-      # See https://software.intel.com/content/www/us/en/develop/articles/installing-intel-free-libs-and-python-yum-repo.html
-      yum_repository:
-        name: intelproducts
-        baseurl: https://yum.repos.intel.com/setup/intelproducts.repo
-        gpgkey: https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-        description: Intel repositories
+      command: yum-config-manager --add-repo https://yum.repos.intel.com/setup/intelproducts.repo
+      args:
+        creates: /etc/yum.repos.d/intelproducts.repo
+    - name: Import Intel GPG keys
+      command: rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+      # TODO: make idempotent
     - name: Install Intel MPI
       yum:
         name: "intel-mpi-{{ impi_ver }}"
