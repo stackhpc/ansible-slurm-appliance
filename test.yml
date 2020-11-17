@@ -31,7 +31,7 @@
         path: "{{ jobdir }}"
         state: directory
         owner: "{{ ansible_user }}"
-    - name: Create sbatch script for IMB pingpong
+    - name: Create sbatch script
       copy:
         dest: "{{ jobdir }}/ping.sh"
         content: |
@@ -59,12 +59,59 @@
     - debug:
         msg: "{{ ping_out['content'] | b64decode }}"
 
-# - hosts: cluster_login[0]
-#   name: ping matrix (entire cluster)
-#   become: yes
-#   tags: pingmatrix
-#   vars:
-#     jobdir: /mnt/nfs/pingmatrix
-#   tasks:
-#     - name: 
+- hosts: cluster_login[0]
+  name: Ping matrix (all nodes)
+  become: yes
+  tags: pingmatrix
+  vars:
+    jobdir: /mnt/nfs/pingmatrix
+  tasks:
+    - name: Install gnu 9 + openmpi (w/ ucx) + performance tools
+      yum:
+        name: ohpc-gnu9-openmpi4-perf-tools
+        state: present
+    - name: Make directory
+      file:
+        path: "{{ jobdir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+    - name: Get info about compute nodes
+      shell: sinfo -Nh
+      register:
+        num_compute
+    - name: Download source code
+      get_url:
+        dest: "{{ jobdir }}/mpi_nxnlatbw.c"
+        url: https://raw.githubusercontent.com/stackhpc/hpc-tests/master/apps/nxnlatbw/src/mpi_nxnlatbw.c
+    - name: Compile
+      shell: . /etc/profile && module load gnu9 openmpi4 && mpicc -o nxnlatbw *.c
+      args:
+        executable: /usr/bin/bash
+        chdir: "{{ jobdir }}"
+        creates: nxnlatbw
+    - name: Create sbatch script
+      copy:
+        dest: "{{ jobdir }}/pingmatrix.sh"
+        content: |
+          #!/usr/bin/bash
 
+          #SBATCH --ntasks={{ num_compute.stdout_lines | count }}
+          #SBATCH --ntasks-per-node=1
+          #SBATCH --output=%x.out
+          #SBATCH --error=%x.out
+
+          module load gnu9/9.3.0
+          module load openmpi4/4.0.4
+
+          srun --mpi=pmix_v3 nxnlatbw    
+    - name: Run ping matrix
+      shell: sbatch --wait pingmatrix.sh
+      become: no
+      args:
+        chdir: "{{ jobdir }}"
+    - name: Slurp output
+      slurp:
+        src: "{{ jobdir }}/pingmatrix.sh.out"
+      register: ping_out
+    - debug:
+        msg: "{{ ping_out['content'] | b64decode }}"
