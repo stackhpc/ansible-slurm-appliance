@@ -115,3 +115,73 @@
       register: ping_out
     - debug:
         msg: "{{ ping_out['content'] | b64decode }}"
+
+
+- hosts: cluster_login[0]
+  name: HPL (individual nodes)
+  # NB: This uses the precompiled HPL provided with MKL so runs a single MPI process per node, with TBB threads added automatically by MKL to use all cores
+  become: yes
+  tags: hpl-solo
+  vars:
+    jobdir: /mnt/nfs/hpl-solo
+    impi_ver: 2019.6-088
+    mkl_ver: 2020.0-088
+  tasks:
+    - name: Install gnu 9 + openmpi (w/ ucx) + performance tools
+      yum:
+        name: ohpc-gnu9-openmpi4-perf-tools
+        state: present
+    - name: Add Intel repos
+      # See https://software.intel.com/content/www/us/en/develop/articles/installing-intel-free-libs-and-python-yum-repo.html
+      yum_repository:
+        name: intelproducts
+        baseurl: https://yum.repos.intel.com/setup/intelproducts.repo
+        gpgkey: https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+        description: Intel repositories
+    - name: Install Intel MPI
+      yum:
+        name: "intel-mpi-{{ impi_ver }}"
+    - name: Install MKL
+      yum:
+        name: "intel-mkl-{{ mkl_ver }}"
+    - name: Make directory
+      file:
+        path: "{{ jobdir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+    - name: Get info about compute nodes
+      shell: sinfo -Nh
+      register:
+        num_compute
+    - meta: end_play
+    - name: Create sbatch script
+      copy:
+        dest: "{{ jobdir }}/hpl-solo.sh"
+        content: |
+          #!/usr/bin/bash
+
+          #SBATCH --ntasks=1
+          #SBATCH --output=%x.%a.out
+          #SBATCH --error=%x.%a.out
+
+          module load gnu9/9.3.0
+          module load openmpi4/4.0.4
+          source /opt/intel/compilers_and_libraries_{{ impi_ver | replace('-', '.') }}/linux/mpi/intel64/bin/mpivars.sh
+          source /opt/intel/compilers_and_libraries_{{ mkl_ver | replace('-', '.') }}/linux/mkl/bin/mklvars.sh intel64
+          export I_MPI_DEBUG=4
+          #export UCX_NET_DEVICES=mlx5_0:1
+
+          # TODO: output rank name
+          mpirun -perhost 1 -np 1 --mpi=pmix_v3 $MKLROOT/benchmarks/mp_linpack/xhpl_intel64_dynamic
+
+    - name: Run hpl
+      shell: sbatch --array=0-{{ num_compute.stdout_lines | count }} --wait hpl-solo.sh
+      become: no
+      args:
+        chdir: "{{ jobdir }}"
+    - name: Slurp output
+      slurp:
+        src: "{{ jobdir }}/hpl-solo.sh.out"
+      register: ping_out
+    - debug:
+        msg: "{{ ping_out['content'] | b64decode }}"
