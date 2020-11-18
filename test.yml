@@ -1,13 +1,15 @@
 # NB: this only works on centos 8 / ohpc v2 as we want UCX
 # TODO: add support for groups/partitions
+# Currently need to run with something like:
+#   ANSIBLE_LIBRARY=. ansible-playbook -i inventory test.yml
 
 - hosts: cluster
   name: Export/mount /opt via NFS for ohcp and intel packages
   become: yes
-  tags: nfs
   tasks:
     - import_role:
         name: ansible-role-cluster-nfs
+      tags: nfs
       vars:
         nfs_enable:
           server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
@@ -17,196 +19,9 @@
         nfs_client_mnt_point: "/opt"
         
 - hosts: cluster_login[0]
-  name: IMB PingPong (2x scheduler-selected nodes)
-  become: yes
-  tags: pingpong
-  vars:
-    jobdir: /mnt/nfs/pingpong
+  name: Run tests
+  tags: test
   tasks:
-    - name: Install gnu 9 + openmpi (w/ ucx) + performance tools
-      yum:
-        name: ohpc-gnu9-openmpi4-perf-tools
-        state: present
-    - name: Make directory
-      file:
-        path: "{{ jobdir }}"
-        state: directory
-        owner: "{{ ansible_user }}"
-    - name: Create sbatch script
-      copy:
-        dest: "{{ jobdir }}/ping.sh"
-        content: |
-          #!/usr/bin/bash
-
-          #SBATCH --ntasks=2
-          #SBATCH --ntasks-per-node=1
-          #SBATCH --output=%x.out
-          #SBATCH --error=%x.out
-          
-          #export UCX_NET_DEVICES=mlx5_0:1
-          module load gnu9/9.3.0
-          module load openmpi4/4.0.4
-          module load imb/2019.6
-
-          srun --mpi=pmix_v3 IMB-MPI1 pingpong
-    - name: Run pingpong
-      shell: sbatch --wait ping.sh
-      become: no
-      args:
-        chdir: "{{ jobdir }}"
-    - name: Read pingpong
-      tags: pp
-      read_pingpong:
-        path: "{{ jobdir }}/ping.sh.out"
-      register: ping_out
-    - tags: pp
-      debug:
-        msg: |
-          Summary:
-            - Zero-size msg latency: {{ ping_out['columns']['latency'][0] }} us
-            - Max bandwidth: {{ ping_out['columns']['bandwidth'] | max }} Mbytes/s
-          Charts:
-            - Latency: https://image-charts.com/chart?cht=lc&chs=700x400&chd=t:{{ ping_out['columns']['latency'] | join(',') }}&chdl=latency(us)&chg=1,1,1,1,333333&chxt=y
-
-- hosts: cluster_login[0]
-  name: Ping matrix (all nodes)
-  become: yes
-  tags: pingmatrix
-  vars:
-    jobdir: /mnt/nfs/pingmatrix
-  tasks:
-    - name: Install gnu 9 + openmpi (w/ ucx) + performance tools
-      yum:
-        name: ohpc-gnu9-openmpi4-perf-tools
-        state: present
-    - name: Make directory
-      file:
-        path: "{{ jobdir }}"
-        state: directory
-        owner: "{{ ansible_user }}"
-    - name: Get info about compute nodes
-      shell: sinfo -Nh
-      register:
-        num_compute
-    - name: Download source code
-      get_url:
-        dest: "{{ jobdir }}/mpi_nxnlatbw.c"
-        url: https://raw.githubusercontent.com/stackhpc/hpc-tests/master/apps/nxnlatbw/src/mpi_nxnlatbw.c
-    - name: Compile
-      shell: . /etc/profile && module load gnu9 openmpi4 && mpicc -o nxnlatbw *.c
-      args:
-        executable: /usr/bin/bash
-        chdir: "{{ jobdir }}"
-        creates: nxnlatbw
-    - name: Create sbatch script
-      copy:
-        dest: "{{ jobdir }}/pingmatrix.sh"
-        content: |
-          #!/usr/bin/bash
-
-          #SBATCH --ntasks={{ num_compute.stdout_lines | count }}
-          #SBATCH --ntasks-per-node=1
-          #SBATCH --output=%x.out
-          #SBATCH --error=%x.out
-
-          #export UCX_NET_DEVICES=mlx5_0:1
-          module load gnu9/9.3.0
-          module load openmpi4/4.0.4
-
-          srun --mpi=pmix_v3 nxnlatbw    
-    - name: Run ping matrix
-      shell: sbatch --wait pingmatrix.sh
-      become: no
-      args:
-        chdir: "{{ jobdir }}"
-    - name: Slurp output
-      slurp:
-        src: "{{ jobdir }}/pingmatrix.sh.out"
-      register: ping_out
-    - debug:
-        msg: "{{ ping_out['content'] | b64decode }}"
-
-
-- hosts: cluster_login[0]
-  name: HPL (individual nodes)
-  # NB: This uses the precompiled HPL provided with MKL so runs a single MPI process per node, with TBB threads added automatically by MKL to use all cores
-  # See https://software.intel.com/content/www/us/en/develop/documentation/mkl-windows-developer-guide/top/intel-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/ease-of-use-command-line-parameters.html
-  become: yes
-  tags: hpl-solo
-  vars:
-    jobdir: /mnt/nfs/hpl-solo
-    impi_ver: 2019.6-088
-    mkl_ver: 2020.0-088
-    hpl_NB: 192 # See https://software.intel.com/content/www/us/en/develop/documentation/mkl-linux-developer-guide/top/intel-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/configuring-parameters.html
-  tasks:
-    - name: Add Intel repos
-      command: yum-config-manager --add-repo https://yum.repos.intel.com/setup/intelproducts.repo
-      args:
-        creates: /etc/yum.repos.d/intelproducts.repo
-    - name: Import Intel GPG keys
-      command: rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-      # TODO: make idempotent
-    - name: Install Intel MPI
-      yum:
-        name: "intel-mpi-{{ impi_ver }}"
-    - name: Install MKL
-      yum:
-        name: "intel-mkl-{{ mkl_ver }}"
-    - name: Make directory
-      file:
-        path: "{{ jobdir }}"
-        state: directory
-        owner: "{{ ansible_user }}"
-    # https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/
-    #N = 0.8 * sqrt(tot_mem_bytes / 8)
-    - name: Get info about compute nodes
-      shell: sinfo -Nh
-      register:
-        num_compute
-    - name: Get compute memory (in megabytes)
-      command: free --mega
-      delegate_to: "{{ groups['cluster_compute'][0] }}" # TODO: no way to deal with groups? Better to use `sinfo` but memory not set propery!
-      register: free
-      connection: local # except this doesn't work
-    - name: Create sbatch script
-      copy:
-        dest: "{{ jobdir }}/hpl-solo.sh"
-        content: |
-          #!/usr/bin/bash
-
-          #SBATCH --ntasks=1
-          #SBATCH --output=%x.out
-          #SBATCH --error=%x.out
-
-          source /opt/intel/compilers_and_libraries/linux/mpi/intel64/bin/mpivars.sh
-          source /opt/intel/compilers_and_libraries/linux/mkl/bin/mklvars.sh intel64
-          export I_MPI_DEBUG=4 # puts Node name in output
-          #export UCX_NET_DEVICES=mlx5_0:1 # TODO: 
-          
-          cp $MKLROOT/benchmarks/mp_linpack/HPL.dat .
-          mpirun -perhost 1 -np 1 $MKLROOT/benchmarks/mp_linpack/xhpl_intel64_dynamic -m {{ (free.stdout_lines[1].split()[1] | int * 0.8)}} -b {{ hpl_NB }} -p 1 -q 1
-
-    # - meta: end_play
-    - name: Run hpl
-      #shell: sbatch --array=0-{{ num_compute.stdout_lines | count }} --wait hpl-solo.sh
-      shell: sbatch --wait hpl-solo.sh
-      become: no
-      register:
-      args:
-        chdir: "{{ jobdir }}"
-    - name: Check HPL completed OK
-      tags: grep
-      shell: "grep '1 tests completed and passed residual checks' *.out"
-      args:
-        chdir: "{{ jobdir }}"
-      changed_when: false
-    - name: Extract performance
-      tags: grep
-      shell: "grep '^W[R|C]' *.out"
-      args:
-        chdir: "{{ jobdir }}"
-      changed_when: false
-      register: hpl_gflops
-    - tags: grep
-      debug:
-        msg: "Gflops: {{ hpl_gflops.stdout.split()[6] }}"
+    - import_role:
+        name: stackhpc.slurm_tools.openhpc_tests
+    
