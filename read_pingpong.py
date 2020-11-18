@@ -70,37 +70,13 @@ def run_module():
                         break
                     for ix, v in enumerate(line.split()):
                         columns[ix].append(CONVERTERS[ix](v))
-
-    # build data in format for chart.js scatterchart: https://www.chartjs.org/docs/2.8.0/charts/scatter.html
-    datasets = []
-    xs = columns[0]
-    for ic, ys in enumerate(columns[2:], start=2):
-        dataset = {
-            'label': COLUMNS[ic],
-            'showLine': True,
-            'fill': False,
-            'data': [{'x':x, 'y': y} for x, y in zip(xs, ys)]
-        }
-        datasets.append(dataset)
-    chart = {
-        'type': 'scatter',
-        'data': {
-            'datasets': datasets
-        },
-        'options': {
-            'scales': {
-                'xAxes': [{'type': 'logarithmic'}]
-            }
-        }
-    }
-
+    
     result['columns'] = {
         'bytes': columns[0],
         'repetitions': columns[1],
         'latency': columns[2],
         'bandwidth': columns[3],
     }
-    result['chart'] = json.dumps(chart)
     module.exit_json(**result)
 
 
