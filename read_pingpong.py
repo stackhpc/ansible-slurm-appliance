@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Copyright: (c) 2020, StackHPC
 # Apache 2 License
@@ -14,35 +14,27 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = """
 ---
-module: sacct_cluster
-short_description: Manages clusters in the accounting database
-version_added: "2.9"
+module: read_imb_pingpong
+short_description: Read output files from Intel MPI Benchmarks IMB-MPI1 pingpong
+version_added: "0.0"
 description:
-    - "Adds/removes a cluster from the accounting database"
+    - "Read output files from Intel MPI Benchmarks IMB-MPI1 pingpong"
 options:
-    name:
+    path:
         description:
-            - Name of the cluster
+            - Path to output file
         required: true
         type: str
-    state:
-        description:
-        - If C(present), cluster will be added if it does't already exist
-        - If C(absent), cluster will be removed if it exists
-        type: str
-        required: true
-        choices: [ absent, present]
 requirements:
     - "python >= 3.6"
 author:
-    - Will Szumski, StackHPC
+    - Steve Brasier, StackHPC
 """
 
 EXAMPLES = """
-- name: Create a cluster
-  slurm_acct:
-    name: test123
-    state: present
+- name: Read pingpong
+  read_imb_pingpong:
+    path: /mnt/nfs/examples/pingpong.out
 """
 
 CONVERTERS = (int, int, float, float)
@@ -82,7 +74,6 @@ def run_module():
 
 def main():
     run_module()
-
 
 if __name__ == "__main__":
     main()
