@@ -54,12 +54,27 @@
       become: no
       args:
         chdir: "{{ jobdir }}"
-    - name: Slurp output
-      slurp:
-        src: "{{ jobdir }}/ping.sh.out"
+    - name: Read pingpong
+      tags: pp
+      read_pingpong:
+        path: "{{ jobdir }}/ping.sh.out"
       register: ping_out
-    - debug:
-        msg: "{{ ping_out['content'] | b64decode }}"
+    - tags: pp
+      debug:
+        msg: "0-size msg latency {{ ping_out['columns']['latency'][0] }} us, max bandwidth {{ ping_out['columns']['bandwidth'] | max }} Mbytes/s"
+    - tags: pp
+      debug:
+        msg: "https://image-charts.com/chart.js/2.8.0?bkg=white&c={{ ping_out['chart'] | urlencode}}"
+        # - tags: pp
+    #   debug:
+    #     msg: "See plot at https://image-charts.com/chart?cht=lxy&chs=700x200&chd=t:{{ ping_out['columns']['bytes'] | join(',') }}|{{ ping_out['columns']['latency'] | join(',') }}"
+    
+    #     - name: Slurp output
+    #   slurp:
+    #     src: "{{ jobdir }}/ping.sh.out"
+    #   register: ping_out
+    # - debug:
+    #     msg: "{{ ping_out['content'] | b64decode }}"
 
 - hosts: cluster_login[0]
   name: Ping matrix (all nodes)
@@ -161,15 +176,6 @@
       delegate_to: "{{ groups['cluster_compute'][0] }}" # TODO: no way to deal with groups? Better to use `sinfo` but memory not set propery!
       register: free
       connection: local # except this doesn't work
-    # - name: Calculate block size NB
-      # TODO: see /opt/intel/compilers_and_libraries/linux/mkl/benchmarks/mp_linpack/readme.txt
-# Intel(R) Xeon(R) Processor X56*/E56*/E7-*/E7*/X7*                             : 256
-# Intel(R) Xeon(R) Processor E26*/E26* v2                                       : 256
-# Intel(R) Xeon(R) Processor E26* v3/E26* v4                                    : 192
-# Intel(R) Core(TM) i3/5/7-6* Processor                                         : 192
-# Intel(R) Xeon Phi(TM) Processor 72*                                           : 336
-# Intel(R) Xeon(R) Scalabile Processors                                         : 384
-
     - name: Create sbatch script
       copy:
         dest: "{{ jobdir }}/hpl-solo.sh"
@@ -212,4 +218,3 @@
     - tags: grep
       debug:
         msg: "Gflops: {{ hpl_gflops.stdout.split()[6] }}"
-        
