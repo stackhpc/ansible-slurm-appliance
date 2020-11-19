@@ -40,15 +40,6 @@
               regex:         '(.*):.*'
               target_label:  'instance'
               replacement:   '${1}'
-            params:
-              collect[]:
-                # Reduced default set, added cpufreq
-                # https://github.com/prometheus/node_exporter#enabled-by-default
-                - netdev
-                - cpu
-                - meminfo
-                - infiniband
-                - cpufreq
 
     #- import_role: name=cloudalchemy.alertmanager # TODO: set this up?
 
