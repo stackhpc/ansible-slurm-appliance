@@ -1,0 +1,20 @@
+# Required for openhpc dashboard
+
+groups:
+- name: opehnpc
+  interval: 60s
+  rules:
+  - record: node_cpu_system_seconds:record
+    expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="system",job="node"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node"}[60s])))
+  - record: node_cpu_user_seconds:record
+    expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="user",job="node"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node"}[60s])))
+  - record: node_cpu_iowait_seconds:record
+    expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="iowait",job="node"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node"}[60s])))
+  - record: node_cpu_other_seconds:record
+    expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode!="idle",mode!="user",mode!="system",mode!="iowait",job="node"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node"}[60s])))
+  - record: node_cpu_scaling_frequency_hertz_avg:record
+    expr: avg by (instance) (node_cpu_scaling_frequency_hertz)
+  - record: node_cpu_scaling_frequency_hertz_min:record
+    expr: min by (instance) (node_cpu_scaling_frequency_hertz)
+  - record: node_cpu_scaling_frequency_hertz_max:record
+    expr: max by (instance) (node_cpu_scaling_frequency_hertz)
