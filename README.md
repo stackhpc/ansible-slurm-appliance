@@ -2,7 +2,7 @@
 
 This repo contains ansible playbooks to demonstrate the `stackhpc.openhpc` role and functionality from `stackhpc.slurm_openstack_tools` collection.
 
-All demos use a terraform-deployed cluster with a single control/login node and two compute nodes.
+All demos use a terraform-deployed cluster with a single control/login node and two compute nodes, all running Centos8 with OpenHPC v2.
 
 # Installation
 
@@ -34,30 +34,30 @@ Note that this terraform deploys instances onto an existing network - for produc
 
 # Create and configure cluster with Ansible
 
-|Playbook | Previous plays required	| Notes |
-|-------- |	----------------------- | ----- |
-| slurm-simple.yml	| |
-| slurm-db.yml | |
-| monitoring.yml | slurm-simple.yml or slurm-db.yml	| Needs Wills changes for slurm-stats merged |
-| slurm-stats.yml |	monitoring.yml | Rename slurm-stats to just "stats"? |
-| rebuild.yml |	slurm-simple.yml or slurm-db.yml | |
-| config-drive.yml | slurm-simple.yml or slurm-db.yml | |
-| main.pkr.hcl*	|config-drive.yml | |
+Now run one or more playbooks using:
 
-    
+    ansible-playbook -i inventory <playbook.yml>
 
+Available playbooks are:
 
-Configure a slurm cluster:
+- `slurm-simple.yml`: A basic slurm cluster.
+- `slurm-db.yml`: The basic slurm cluster plus slurmdbd backed by mariadb on the login/control node, which provides more detailed accounting.
+- `monitoring.yml`: Add basic monitoring, with prometheus and grafana on the login/control node providing graphical dashboards (over http) showing cpu/network/memory/etc usage for each cluster node. Run either `slurm-simple.yml` or `slurm-db.yml` first.
+- `stats.yml`: Extend monitoring to include statistics and dashboards for Slurm jobs. Run `slurm-db.yml` and `monitoring.yml` first.
+- `rebuild.yml`: Deploy scripts to enable the reimaging compute nodes controlled by Slurm's `scontrol` command.
+- `config-drive.yml` and `main.pkr.hcl`: Packer-based build of compute note images - see separate section below.
 
-    ansible-playbook -i inventory slurm-simple.yml
+For additional details see sections below.
 
-Add monitoring:
+# monitoring.yml
+
+Run this using:
 
     ansible-playbook -i inventory -e grafana_password=<password> monitoring.yml
 
-now you can access:
-    - grafana: `http://<login_ip>:3000` - username `grafana`, password as set above
-    - prometheus: `http://<login_ip>:9090`
+This provides:
+- grafana at `http://<login_ip>:3000` - username `grafana`, password as set above
+- prometheus at `http://<login_ip>:9090`
 
 NB: if grafana's yum repos are down you will see `Errors during downloading metadata for repository 'grafana' ...`. You can work around this using:
 
@@ -68,6 +68,8 @@ NB: if grafana's yum repos are down you will see `Errors during downloading meta
     exit
     ansible-playbook -i inventory monitoring.yml -e grafana_password=<password> --skip-tags grafana_install
 
+# Destroying the cluster
+
 When finished, run:
 
-    terraform destroy --auto-approve
+    terraform destroy
