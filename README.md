@@ -44,7 +44,6 @@ Available playbooks are:
 - `slurm-db.yml`: The basic slurm cluster plus slurmdbd backed by mariadb on the login/control node, which provides more detailed accounting.
 - `monitoring-simple.yml`: Add basic monitoring, with prometheus and grafana on the login/control node providing graphical dashboards (over http) showing cpu/network/memory/etc usage for each cluster node. Run `slurm-simple.yml` first.
 - `monitoring-db.yml`: Basic monitoring plus statistics and dashboards for Slurm jobs . Run `slurm-db.yml` first.
-- `stats.yml`: Extend monitoring to include statistics and dashboards for Slurm jobs. Run `slurm-db.yml` and `monitoring.yml` first.
 - `rebuild.yml`: Deploy scripts to enable the reimaging compute nodes controlled by Slurm's `scontrol` command.
 - `config-drive.yml` and `main.pkr.hcl`: Packer-based build of compute note images - see separate section below.
 
