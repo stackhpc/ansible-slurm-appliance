@@ -1,4 +1,8 @@
-A simple test/demo case for StackHPC's `openhpc` role using VMs on `alaska`.
+# Demos for OpenHPC on OpenStack
+
+This repo contains ansible playbooks to demonstrate the `stackhpc.openhpc` role and functionality from `stackhpc.slurm_openstack_tools` collection.
+
+All demos use a terraform-deployed cluster with a single control/login node and two compute nodes, all running Centos8 with OpenHPC v2.
 
 # Installation
 
@@ -9,36 +13,51 @@ A simple test/demo case for StackHPC's `openhpc` role using VMs on `alaska`.
     pip install -U pip
     pip install -U setuptools
     pip install -r requirements.txt
-    ansible-galaxy install -r requirements.yml -p roles
+    ansible-galaxy install -r requirements.yml -p roles # FIXME - needs git nfs role too currently
     cd roles
-    git clone git@github.com:stackhpc/ansible-role-openhpc.git # for development
+    git clone git@github.com:stackhpc/ansible-role-openhpc.git # FIXME
     cd ..
     yum install terraform
     terraform init
-    
-# Usage
 
-Modify the keypair in `main.tf`.
+# Deploy nodes with Terraform
 
-Activate the virtualenv:
+- Modify the keypair in `main.tf` and ensure the required Centos images are available on OpenStack.
+- Activate the virtualenv and create the instances:
 
-    . venv/bin/activate
+      . venv/bin/activate
+      terraform apply
 
-Create the instances (on an existing network):
+This creates an ansible inventory file `./inventory`.
 
-    terraform apply --auto-approve
+Note that this terraform deploys instances onto an existing network - for production use you probably want to create a network for the cluster.
 
-Configure a slurm cluster:
+# Create and configure cluster with Ansible
 
-    ansible-playbook -i inventory slurm-simple.yml
+Now run one or more playbooks using:
 
-Add monitoring:
+    ansible-playbook -i inventory <playbook.yml>
+
+Available playbooks are:
+
+- `slurm-simple.yml`: A basic slurm cluster.
+- `slurm-db.yml`: The basic slurm cluster plus slurmdbd backed by mariadb on the login/control node, which provides more detailed accounting.
+- `monitoring-simple.yml`: Add basic monitoring, with prometheus and grafana on the login/control node providing graphical dashboards (over http) showing cpu/network/memory/etc usage for each cluster node. Run `slurm-simple.yml` first.
+- `monitoring-db.yml`: Basic monitoring plus statistics and dashboards for Slurm jobs . Run `slurm-db.yml` first.
+- `rebuild.yml`: Deploy scripts to enable the reimaging compute nodes controlled by Slurm's `scontrol` command.
+- `config-drive.yml` and `main.pkr.hcl`: Packer-based build of compute note images - see separate section below.
+
+For additional details see sections below.
+
+# monitoring.yml
+
+Run this using:
 
     ansible-playbook -i inventory -e grafana_password=<password> monitoring.yml
 
-now you can access:
-    - grafana: `http://<login_ip>:3000` - username `grafana`, password as set above
-    - prometheus: `http://<login_ip>:9090`
+This provides:
+- grafana at `http://<login_ip>:3000` - username `grafana`, password as set above
+- prometheus at `http://<login_ip>:9090`
 
 NB: if grafana's yum repos are down you will see `Errors during downloading metadata for repository 'grafana' ...`. You can work around this using:
 
@@ -49,6 +68,8 @@ NB: if grafana's yum repos are down you will see `Errors during downloading meta
     exit
     ansible-playbook -i inventory monitoring.yml -e grafana_password=<password> --skip-tags grafana_install
 
+# Destroying the cluster
+
 When finished, run:
 
-    terraform destroy --auto-approve
+    terraform destroy
