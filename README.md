@@ -6,21 +6,24 @@ All demos use a terraform-deployed cluster with a single control/login node and 
 
 # Installation
 
-    git clone  git@github.com:stackhpc/openhpc-tests.git
-    cd openhpc-tests
+    git clone  git@github.com:stackhpc/openhpc-demo.git
+    cd openhpc-demo
     virtualenv --system-site-packages --python $(which python3) venv
     . venv/bin/activate
     pip install -U pip
     pip install -U setuptools
     pip install -r requirements.txt
-    ansible-galaxy install -r requirements.yml -p roles # FIXME - needs git nfs role too currently
+    ansible-galaxy install -r requirements.yml # TODO: fix openhpc role once pushed to galaxy
     cd roles
-    git clone git@github.com:stackhpc/ansible-role-openhpc.git # FIXME
     cd ..
     yum install terraform
     terraform init
 
-    # TODO: need to add collection in here too.
+NB: For development of roles/collections you may want to use this alternative to `ansible-galaxy ...`:
+
+    ansible-galaxy role install -r requirements.yml -p roles
+    ansible-galaxy collection install -r requirements.yml -p collections
+
 
 # Deploy nodes with Terraform
 
