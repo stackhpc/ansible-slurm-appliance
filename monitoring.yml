@@ -53,17 +53,57 @@
     - import_role:
         name: cloudalchemy.grafana
       vars:
-        grafana_datasources:
-          - name: prometheus
-            type: prometheus
-            url: "{{ ansible_host }}:9090" # default prometheus port
-            basicAuth: false
-        grafana_dashboards:
-          - dashboard_id: 1860 # node exporter, full
-            datasource: prometheus
-            revision_id: 21
         grafana_security:
             admin_user: grafana
             admin_password: "{{ grafana_password }}"
+
+- name: Initialise grafana
+  hosts: cluster_login[0]
+  tags: grafana-init
+  vars:
+    # No idea why we don't set this for the grafana playbook above
+    grafana_address: "{{ ansible_host }}"
+    grafana_dashboards:
+      # node exporter slurm:
+      - dashboard_id: 13427
+        replacements:
+          - placeholder: DS_PROMETHEUS
+            replacement: prometheus
+          - placeholder: DS_ELASTICSEARCH
+            replacement: slurmstats
+        revision_id: 1
+      # openhpc slurm:
+      - dashboard_id: 13426
+        replacements:
+          - placeholder: DS_PROMETHEUS
+            replacement: prometheus
+          - placeholder: DS_ELASTICSEARCH
+            replacement: slurmstats
+        revision_id: 1
+    grafana_security:
+        admin_user: grafana
+        admin_password: "{{ grafana_password }}"
+    grafana_datasources:
+      - name: prometheus
+        ds_type: prometheus
+        ds_url: "{{ ansible_host }}:9090" # default prometheus port
+      - name: slurmstats
+        ds_type: elasticsearch
+        ds_url: "https://localhost:9200"
+        basic_auth_user: admin
+        basic_auth_password: admin
+        with_credentials: true
+        tls_skip_verify: true
+        time_field: "@timestamp"
+        database: "filebeat-*"
+        es_version: 70
+  tasks:
+    - assert:
+        that: grafana_password is defined
+        fail_msg: "Must define grafana_password - use `ansible-playbook -e grafana_password=MYPASSWORD ...` "
+    - import_role:
+        name: grafana-datasources
+    - import_role:
+        name: grafana-dashboards
 
 ...

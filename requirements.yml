@@ -1,6 +1,7 @@
 ---
 collections:
 - name: containers.podman
+- name: community.grafana
 roles:
 - src: stackhpc.nfs
 - src: https://github.com/stackhpc/ansible-role-openhpc

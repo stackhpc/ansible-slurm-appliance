@@ -1,0 +1,112 @@
+---
+# The MIT License (MIT)
+
+# Copyright (c) 2017-2018 Pawel Krupa, Roman Demachkovych
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+- become: false
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Create local grafana dashboard directory
+      tempfile:
+        state: directory
+      register: _tmp_dashboards
+      changed_when: false
+      check_mode: false
+
+    # Use curl to solve issue #77
+    - name: download grafana dashboard from grafana.net to local directory
+      command: >
+        curl --fail --compressed
+        https://grafana.com/api/dashboards/{{ item.dashboard_id }}/revisions/{{ item.revision_id }}/download
+        -o {{ _tmp_dashboards.path }}/{{ item.dashboard_id }}.json
+      args:
+        creates: "{{ _tmp_dashboards.path }}/{{ item.dashboard_id }}.json"
+        warn: false
+      register: _download_dashboards
+      until: _download_dashboards is succeeded
+      retries: 5
+      delay: 2
+      with_items: "{{ grafana_dashboards }}"
+      when: grafana_dashboards | length > 0
+      changed_when: false
+      check_mode: false
+      tags:
+        - skip_ansible_lint
+
+    # As noted in [1] an exported dashboard replaces the exporter's datasource
+    # name with a representative name, something like 'DS_GRAPHITE'. The name
+    # is different for each datasource plugin, but always begins with 'DS_'.
+    # In the rest of the data, the same name is used, but captured in braces,
+    # for example: '${DS_GRAPHITE}'.
+    #
+    # [1] http://docs.grafana.org/reference/export_import/#import-sharing-with-grafana-2-x-or-3-0
+    #
+    # The data structure looks (massively abbreviated) something like:
+    #
+    #   "name": "DS_GRAPHITE",
+    #   "datasource": "${DS_GRAPHITE}",
+    #
+    # If we import the downloaded dashboard verbatim, it will not automatically
+    # be connected to the data source like we want it. The Grafana UI expects
+    # us to do the final connection by hand, which we do not want to do.
+    # So, in the below task we ensure that we replace instances of this string
+    # with the data source name we want.
+    # To make sure that we're not being too greedy with the regex replacement
+    # of the data source to use for each dashboard that's uploaded, we make the
+    # regex match very specific by using the following:
+    #
+    # 1. Literal boundaries for " on either side of the match.
+    # 2. Non-capturing optional group matches for the ${} bits which may, or
+    #    or may not, be there..
+    # 3. A case-sensitive literal match for DS .
+    # 4. A one-or-more case-sensitive match for the part that follows the
+    #    underscore, with only A-Z, 0-9 and - or _ allowed.
+    #
+    # This regex can be tested and understood better by looking at the
+    # matches and non-matches in https://regex101.com/r/f4Gkvg/6
+
+    - name: Set the correct data source name in the dashboard
+      replace:
+        dest: "{{ _tmp_dashboards.path }}/{{ item.0.dashboard_id }}.json"
+        regexp: '"(?:\${)?{{ item.1.placeholder }}(?:})?"'
+        replace: '"{{ item.1.replacement }}"'
+      changed_when: false
+      with_subelements:
+        - "{{ grafana_dashboards }}"
+        - replacements
+      when:
+        - grafana_dashboards | length > 0
+
+    - name: import grafana dashboards
+      community.grafana.grafana_dashboard:
+        grafana_url: "{{ grafana_api_url }}"
+        grafana_user: "{{ grafana_security.admin_user }}"
+        grafana_password: "{{ grafana_security.admin_password }}"
+        path: "{{ item }}"
+        # message renamed to commit_message (Be aware if using old ansible)
+        # https://github.com/ansible/ansible/pull/60051
+        #commit_message: Updated by ansible
+        state: present
+        overwrite: true
+      #no_log: true
+      with_fileglob:
+        - "{{ _tmp_dashboards.path }}/*"
