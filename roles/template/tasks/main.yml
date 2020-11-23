@@ -40,7 +40,7 @@
 - name: Notify handlers
   # https://github.com/ansible/ansible/issues/22579
   vars:
-    handlers: "{{ template_result.results | select('changed') | map(attribute='item') | map(attribute='src') | map('regex_replace', '^(.*)$', '\\1.meta') | map('readfile') | map('from_yaml') | map(attribute='notify') | select('defined') | sum(start=[]) | unique | list }}"
+    handlers: "{{ template_result.results | select('changed') | map(attribute='item') | map(attribute='src') | map('regex_replace', '^(.*)$', '\\1.meta') | map('readfile') | map('from_yaml') | map(attribute='notify') | select('defined') | flatten | unique | list }}"
   debug:
     msg: "Notifiying handlers: {{ handlers }}"
   notify: "{{ handlers }}"
