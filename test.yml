@@ -9,7 +9,9 @@
   tasks:
     - import_role:
         name: ansible-role-cluster-nfs
-      tags: nfs
+      tags:
+        - nfs
+        - always
       vars:
         nfs_enable:
           server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
