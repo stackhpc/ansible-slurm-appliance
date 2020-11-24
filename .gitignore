@@ -2,4 +2,4 @@ roles/
 collections
 terraform.tfstate*
 .terraform
-inventory
+inventory/hosts

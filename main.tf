@@ -84,5 +84,5 @@ resource "local_file" "hosts" {
                             "computes": openstack_compute_instance_v2.compute,
                           },
                           )
-  filename = "${path.module}/inventory"
+  filename = "${path.module}/inventory/hosts"
 }
