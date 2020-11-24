@@ -85,6 +85,8 @@
 
 - name: Setup slurm stats
   hosts: slurm_stats
+  collections:
+    - stackhpc.slurm_openstack_tools
   tasks:
     - include_role:
         name: template
@@ -94,6 +96,9 @@
 
     - include_role:
         name: slurm-stats
+        apply:
+          # Collection currently requires root for all tasks.
+          become: true
 
     - name: Setup file beat
       containers.podman.podman_container:

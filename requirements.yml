@@ -2,6 +2,10 @@
 collections:
 - name: containers.podman
 - name: community.grafana
+- name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
+  type: git
+  # FIXME: use galaxy/master once merged
+  version: feature/slurm-stats
 roles:
 - src: stackhpc.nfs
 - src: https://github.com/stackhpc/ansible-role-openhpc
