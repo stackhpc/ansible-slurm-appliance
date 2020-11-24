@@ -1,0 +1,109 @@
+# Prometheus: http://{login-ip}:9090/
+
+---
+- name: Deploy node_exporter
+  hosts: all
+  tags: node_exporter
+  tasks:
+    - import_role: name=cloudalchemy.node-exporter
+
+- name: Setup core monitoring software
+  hosts: cluster_login[0]
+  tags: prometheus
+  tasks:
+    - import_role: name=cloudalchemy.blackbox-exporter
+    - import_role:
+        name: cloudalchemy.prometheus
+      vars:
+        prometheus_alert_rules_files:
+          - conf/prometheus/rules/*.rules
+        prometheus_targets:
+          node:
+          - targets:
+              "{{ groups['all'] | reject('equalto', 'localhost') | map('extract', hostvars, ['inventory_hostname']) | map('regex_replace', '$', ':9100') | list }}"
+            labels:
+              env: demo
+        prometheus_scrape_configs:
+          - job_name: "prometheus"
+            metrics_path: "{{ prometheus_metrics_path }}"
+            static_configs:
+              - targets:
+                  - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+          - job_name: "node"
+            file_sd_configs:
+            - files:
+              - "/etc/prometheus/file_sd/node.yml"
+            relabel_configs:
+            # strip off port
+            - source_labels: ['__address__']
+              separator:     ':'
+              regex:         '(.*):.*'
+              target_label:  'instance'
+              replacement:   '${1}'
+
+    #- import_role: name=cloudalchemy.alertmanager # TODO: set this up?
+
+- name: Deploy grafana
+  hosts: cluster_login[0]
+  tags: grafana
+  tasks:
+    - assert:
+        that: grafana_password is defined
+        fail_msg: "Must define grafana_password - use `ansible-playbook -e grafana_password=MYPASSWORD ...` "
+    - import_role:
+        name: cloudalchemy.grafana
+      vars:
+        grafana_security:
+            admin_user: grafana
+            admin_password: "{{ grafana_password }}"
+
+- name: Initialise grafana
+  hosts: cluster_login[0]
+  tags: grafana-init
+  vars:
+    # No idea why we don't set this for the grafana playbook above
+    grafana_address: "{{ ansible_host }}"
+    grafana_dashboards:
+      # node exporter slurm:
+      - dashboard_id: 13427
+        replacements:
+          - placeholder: DS_PROMETHEUS
+            replacement: prometheus
+          - placeholder: DS_ELASTICSEARCH
+            replacement: slurmstats
+        revision_id: 1
+      # openhpc slurm:
+      - dashboard_id: 13426
+        replacements:
+          - placeholder: DS_PROMETHEUS
+            replacement: prometheus
+          - placeholder: DS_ELASTICSEARCH
+            replacement: slurmstats
+        revision_id: 1
+    grafana_security:
+        admin_user: grafana
+        admin_password: "{{ grafana_password }}"
+    grafana_datasources:
+      - name: prometheus
+        ds_type: prometheus
+        ds_url: "{{ ansible_host }}:9090" # default prometheus port
+      - name: slurmstats
+        ds_type: elasticsearch
+        ds_url: "https://localhost:9200"
+        basic_auth_user: admin
+        basic_auth_password: admin
+        with_credentials: true
+        tls_skip_verify: true
+        time_field: "@timestamp"
+        database: "filebeat-*"
+        es_version: 70
+  tasks:
+    - assert:
+        that: grafana_password is defined
+        fail_msg: "Must define grafana_password - use `ansible-playbook -e grafana_password=MYPASSWORD ...` "
+    - import_role:
+        name: grafana-datasources
+    - import_role:
+        name: grafana-dashboards
+
+...
