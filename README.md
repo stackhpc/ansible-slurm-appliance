@@ -106,6 +106,32 @@ Then run:
 
 Results will be reported in the ansible stdout - the pingmatrix test also writes an html results file onto the ansible host.
 
+If you have an existing cluster (not deployed using the above) you can still use the tests - simply create an appropriate `inventory` file, e.g:
+
+    [all:vars]
+    ansible_user=centos
+
+    [cluster:children]
+    cluster_login
+    cluster_compute
+
+    [cluster_login]
+    slurm-control
+
+    [cluster_compute]
+    cpu-h21a5-u3-svn2
+    cpu-h21a5-u3-svn4
+    ...
+
+If you want to run tests only on a group from this inventory, rather than an entire partition, you can set the `openhpc_tests_nodes` role variable by firstly creating a file eg. `nodes.yml` which references an inventory group:
+
+   openhpc_tests_nodes: "{{ groups['cluster_compute'] | join(',') }}"
+
+Then running the tests passing this file as extra_vars:
+
+   ansible-playbook -i inventory test.yml -e @nodes.yml
+
+
 # Packer-based image build
 
 This workflow uses Packer to build an image for a compute node. Key aspects of this are:
