@@ -8,7 +8,7 @@
   become: yes
   tasks:
     - import_role:
-        name: ansible-role-cluster-nfs
+        name: stackhpc.nfs
       tags:
         - nfs
         - always
@@ -16,7 +16,7 @@
         nfs_enable:
           server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
           clients: "{{ inventory_hostname in groups['cluster_compute'] }}"
-        nfs_server: "{{ hostvars[groups['cluster_login'] | first ]['server_networks']['ilab'][0] }}"
+        nfs_server: "{{ hostvars[groups['cluster_login'] | first ].ansible_default_ipv4.address }}"
         nfs_export: "/opt"
         nfs_client_mnt_point: "/opt"
         
@@ -28,5 +28,14 @@
         name: stackhpc.slurm_openstack_tools.test
       vars:
         openhpc_tests_rootdir: /mnt/nfs/ohcp-tests
-        openhpc_tests_hpl_NB: 192
-    
+        openhpc_tests_hpl_NB: 384
+
+- hosts: cluster_compute
+  name: Unmount /opt from compute
+  become: yes
+  tags: unmount, always
+  tasks:
+    - mount:
+        path: "/opt"
+        state: unmounted
+
