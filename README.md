@@ -8,19 +8,20 @@ All demos use a terraform-deployed cluster with a single control/login node and 
 
     git clone  git@github.com:stackhpc/openhpc-demo.git
     cd openhpc-demo
+    sudo yum install -y virtualenv
     virtualenv --system-site-packages --python $(which python3) venv
     . venv/bin/activate
     pip install -U pip
     pip install -U setuptools
     pip install -r requirements.txt
     ansible-galaxy install -r requirements.yml # TODO: fix openhpc role once pushed to galaxy
-    cd roles
-    cd ..
     yum install terraform
     terraform init
 
 NB: For development of roles/collections you may want to use this alternative to `ansible-galaxy ...`:
 
+    mkdir roles
+    mkdir collections
     ansible-galaxy role install -r requirements.yml -p roles
     ansible-galaxy collection install -r requirements.yml -p collections
 

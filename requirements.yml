@@ -1,7 +1,7 @@
 ---
 roles:
   - src: stackhpc.nfs
-    version: 20.11.1 # need mount state for packer
+    version: v20.11.1 # need mount state for packer
   - src: https://github.com/stackhpc/ansible-role-openhpc # FIXME: once updated on galaxy
     name: stackhpc.openhpc
   - src: cloudalchemy.node-exporter
@@ -11,7 +11,6 @@ roles:
   - src: cloudalchemy.grafana
 
 collections:
-  - name: stackhpc.slurm_openstack_tools
-    source: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
-    type: url
+  - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools # TODO: change once on galaxy
+    type: git
 ...
