@@ -1,0 +1,8 @@
+---
+
+- name: Template passwords
+  template:
+    src: passwords.yml
+    dest: "{{ role_path }}/../../inventory/group_vars/all/passwords.yml"
+  delegate_to: localhost
+  run_once: true
