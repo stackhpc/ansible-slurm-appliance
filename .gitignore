@@ -3,3 +3,4 @@ terraform.tfstate*
 .terraform
 inventory
 config-drive.iso
+venv
