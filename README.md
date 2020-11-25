@@ -106,7 +106,7 @@ Then run:
 
 Results will be reported in the ansible stdout - the pingmatrix test also writes an html results file onto the ansible host.
 
-If you have an existing cluster (not deployed using the above) you can still use the tests - simply create an appropriate `inventory` file, e.g:
+Note that you can still use the `test.yml` playbook even if the terraform/ansible in this repo wasn't used to deploy the cluster - as long as it's running OpenHPC v2. Simply create an appropriate `inventory` file, e.g:
 
     [all:vars]
     ansible_user=centos
@@ -123,7 +123,7 @@ If you have an existing cluster (not deployed using the above) you can still use
     cpu-h21a5-u3-svn4
     ...
 
-If you want to run tests only on a group from this inventory, rather than an entire partition, you can set the `openhpc_tests_nodes` role variable by firstly creating a file eg. `nodes.yml` which references an inventory group:
+And run the `test.yml` playbook as described above. If you want to run tests only on a group from this inventory, rather than an entire partition, you can set the `openhpc_tests_nodes` role variable by firstly creating a file eg. `nodes.yml` which references an inventory group:
 
     openhpc_tests_nodes: "{{ groups['cluster_compute'] | join(',') }}"
 
