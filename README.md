@@ -8,19 +8,20 @@ All demos use a terraform-deployed cluster with a single control/login node and 
 
     git clone  git@github.com:stackhpc/openhpc-demo.git
     cd openhpc-demo
+    sudo yum install -y virtualenv
     virtualenv --system-site-packages --python $(which python3) venv
     . venv/bin/activate
     pip install -U pip
     pip install -U setuptools
     pip install -r requirements.txt
     ansible-galaxy install -r requirements.yml # TODO: fix openhpc role once pushed to galaxy
-    cd roles
-    cd ..
     yum install terraform
     terraform init
 
 NB: For development of roles/collections you may want to use this alternative to `ansible-galaxy ...`:
 
+    mkdir roles
+    mkdir collections
     ansible-galaxy role install -r requirements.yml -p roles
     ansible-galaxy collection install -r requirements.yml -p collections
 
@@ -95,15 +96,41 @@ This runs MPI-based tests on the cluster:
 - `pingmatrix`: Runs a similar pingpong test but between all pairs of nodes. Reports zero-size message latency & maximum bandwidth.
 - `hpl-solo`: Runs HPL **separately** on all nodes, using 80% of memory, reporting Gflops on each node.
 
-For full details see the [role's README](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/blob/main/roles/test/README.md).
+These names can be used as tags to run only a subset of tests. For full details see the [role's README](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/blob/main/roles/test/README.md).
 
-First set `openhpc_tests_hpl_NB` in [test.yml](test.yml) to the appropriate the HPL blocksize 'NB' for the compute node processor - for Intel CPUs see [here](https://software.intel.com/content/www/us/en/develop/documentation/mkl-linux-developer-guide/top/intel-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/configuring-parameters.html).
+To achieve best performance for HPL set `openhpc_tests_hpl_NB` in [test.yml](test.yml) to the appropriate the HPL blocksize 'NB' for the compute node processor - for Intel CPUs see [here](https://software.intel.com/content/www/us/en/develop/documentation/mkl-linux-developer-guide/top/intel-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/configuring-parameters.html).
 
 Then run:
 
     ansible-playbook -i inventory test.yml
 
 Results will be reported in the ansible stdout - the pingmatrix test also writes an html results file onto the ansible host.
+
+Note that you can still use the `test.yml` playbook even if the terraform/ansible in this repo wasn't used to deploy the cluster - as long as it's running OpenHPC v2. Simply create an appropriate `inventory` file, e.g:
+
+    [all:vars]
+    ansible_user=centos
+
+    [cluster:children]
+    cluster_login
+    cluster_compute
+
+    [cluster_login]
+    slurm-control
+
+    [cluster_compute]
+    cpu-h21a5-u3-svn2
+    cpu-h21a5-u3-svn4
+    ...
+
+And run the `test.yml` playbook as described above. If you want to run tests only on a group from this inventory, rather than an entire partition, you can set the `openhpc_tests_nodes` role variable by firstly creating a file eg. `nodes.yml` which references an inventory group:
+
+    openhpc_tests_nodes: "{{ groups['cluster_compute'] | join(',') }}"
+
+Then running the tests passing this file as extra_vars:
+
+    ansible-playbook -i inventory test.yml -e @nodes.yml
+
 
 # Packer-based image build
 
