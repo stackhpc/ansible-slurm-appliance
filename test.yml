@@ -28,7 +28,7 @@
         name: stackhpc.slurm_openstack_tools.test
       vars:
         openhpc_tests_rootdir: /mnt/nfs/ohcp-tests
-        openhpc_tests_hpl_NB: 384
+        openhpc_tests_hpl_NB: 192
 
 - hosts: cluster_compute
   name: Unmount /opt from compute
