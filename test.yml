@@ -11,7 +11,6 @@
         name: stackhpc.nfs
       tags:
         - nfs
-        - always
       vars:
         nfs_enable:
           server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
@@ -19,6 +18,11 @@
         nfs_server: "{{ hostvars[groups['cluster_login'] | first ].ansible_default_ipv4.address }}"
         nfs_export: "/opt"
         nfs_client_mnt_point: "/opt"
+    - name: install libpmi for slurm (needed for srun with intel mpi)
+      tags: pmi
+      yum:
+        name: slurm-libpmi-ohpc
+        state: present
         
 - hosts: cluster_login[0]
   name: Run tests
@@ -33,7 +37,7 @@
 - hosts: cluster_compute
   name: Unmount /opt from compute
   become: yes
-  tags: unmount, always
+  tags: unmount
   tasks:
     - mount:
         path: "/opt"

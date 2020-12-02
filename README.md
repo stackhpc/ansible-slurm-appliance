@@ -4,6 +4,8 @@ This repo contains ansible playbooks to demonstrate the `stackhpc.openhpc` role 
 
 All demos use a terraform-deployed cluster with a single control/login node and two compute nodes, all running Centos8 with OpenHPC v2.
 
+NB: Working DNS is a requirement.
+
 # Installation
 
     git clone  git@github.com:stackhpc/openhpc-demo.git
