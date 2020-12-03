@@ -6,11 +6,10 @@
 - hosts: cluster
   name: Export/mount /opt via NFS for ohcp and intel packages
   become: yes
+  tags: setup
   tasks:
     - import_role:
         name: stackhpc.nfs
-      tags:
-        - nfs
       vars:
         nfs_enable:
           server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
@@ -19,7 +18,6 @@
         nfs_export: "/opt"
         nfs_client_mnt_point: "/opt"
     - name: install libpmi for slurm (needed for srun with intel mpi)
-      tags: pmi
       yum:
         name: slurm-libpmi-ohpc
         state: present
@@ -37,9 +35,22 @@
 - hosts: cluster_compute
   name: Unmount /opt from compute
   become: yes
-  tags: unmount
+  tags: cleanup
   tasks:
     - mount:
         path: "/opt"
         state: unmounted
 
+# NB: cleanup is not perfect - leaves NFS running (b/c might not just be /opt) and leaves slurm-libpmi-ohpc installed (b/c it might have been)
+- hosts: cluster_login[0]
+  name: Remove /opt export
+  tags: cleanup
+  become: yes
+  tasks:
+  - name: update exports file
+    lineinfile:
+      path: /etc/exports
+      regexp: "/opt"
+      state: absent
+  - name: update exported filesystems
+    command: exportfs -r

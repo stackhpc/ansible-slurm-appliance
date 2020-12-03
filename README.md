@@ -98,6 +98,13 @@ This runs MPI-based tests on the cluster:
 - `pingmatrix`: Runs a similar pingpong test but between all pairs of nodes. Reports zero-size message latency & maximum bandwidth.
 - `hpl-solo`: Runs HPL **separately** on all nodes, using 80% of memory, reporting Gflops on each node.
 
+Note these are intended as post-deployment tests for a cluster to which you have root access - they are **not** intended for use on a system running production jobs:
+- Test directories are created within `openhpc_tests_rootdir` (here `/mnt/nfs/ohcp-tests`) which must be on a shared filesystem (read/write from login/control and compute nodes)
+- Generally, packages are only installed on the control/login node, and `/opt` is exported via NFS to the compute nodes.
+- The exception is the `slurm-libpmi-ohpc` package (required for `srun` with Intel MPI) which is installed on all nodes.
+- Cleanup is not perfect: `/opt` is unmounted on compute nodes and un-exported from the control/login node but the NFS service is left running and `slurm-libpmi-ohpc` is not uninstalled, as both these cases
+  may be valid for the cluster anyway.
+
 These names can be used as tags to run only a subset of tests. For full details see the [role's README](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/blob/main/roles/test/README.md).
 
 To achieve best performance for HPL set `openhpc_tests_hpl_NB` in [test.yml](test.yml) to the appropriate the HPL blocksize 'NB' for the compute node processor - for Intel CPUs see [here](https://software.intel.com/content/www/us/en/develop/documentation/mkl-linux-developer-guide/top/intel-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/configuring-parameters.html).
