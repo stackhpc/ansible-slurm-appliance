@@ -1,0 +1,23 @@
+---
+# See: https://aws.amazon.com/blogs/opensource/change-passwords-open-distro-for-elasticsearch/
+
+# This is the internal user database
+# The hash value is a bcrypt hash and can be generated with plugin/tools/hash.sh
+
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+# Define your internal users here
+
+admin:
+  hash: "{{ openhpc_elasticsearch_admin_password | password_hash('bcrypt') }}"
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "Admin user"
+
+kibanaserver:
+  hash: "{{ openhpc_elasticsearch_kibana_password | password_hash('bcrypt') }}"
+  reserved: true
+  description: "Used by kibana to connect to elastic"

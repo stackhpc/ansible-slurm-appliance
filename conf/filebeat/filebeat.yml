@@ -53,4 +53,4 @@ output.elasticsearch:
   protocol: "https"
   ssl.verification_mode: none
   username: "admin"
-  password: "admin"
+  password: "{{ openhpc_elasticsearch_admin_password }}"

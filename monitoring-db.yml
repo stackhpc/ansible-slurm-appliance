@@ -11,7 +11,6 @@
   hosts: cluster_login[0]
   tags: prometheus
   tasks:
-    - import_role: name=cloudalchemy.blackbox-exporter
     - import_role:
         name: cloudalchemy.prometheus
       vars:
@@ -48,14 +47,14 @@
   tags: grafana
   tasks:
     - assert:
-        that: grafana_password is defined
-        fail_msg: "Must define grafana_password - use `ansible-playbook -e grafana_password=MYPASSWORD ...` "
+        that: openhpc_grafana_admin_password is defined
+        fail_msg: "Must define openhpc_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
     - import_role:
         name: cloudalchemy.grafana
       vars:
         grafana_security:
             admin_user: grafana
-            admin_password: "{{ grafana_password }}"
+            admin_password: "{{ openhpc_grafana_admin_password }}"
 
 - name: Initialise grafana
   hosts: cluster_login[0]
@@ -82,7 +81,7 @@
         revision_id: 1
     grafana_security:
         admin_user: grafana
-        admin_password: "{{ grafana_password }}"
+        admin_password: "{{ openhpc_grafana_admin_password }}"
     grafana_datasources:
       - name: prometheus
         ds_type: prometheus
@@ -91,7 +90,7 @@
         ds_type: elasticsearch
         ds_url: "https://localhost:9200"
         basic_auth_user: admin
-        basic_auth_password: admin
+        basic_auth_password: "{{ openhpc_elasticsearch_admin_password }}"
         with_credentials: true
         tls_skip_verify: true
         time_field: "@timestamp"
@@ -99,8 +98,8 @@
         es_version: 70
   tasks:
     - assert:
-        that: grafana_password is defined
-        fail_msg: "Must define grafana_password - use `ansible-playbook -e grafana_password=MYPASSWORD ...` "
+        that: openhpc_grafana_admin_password is defined
+        fail_msg: "Must define openhpc_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
     - import_role:
         name: grafana-datasources
     - import_role:

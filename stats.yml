@@ -37,6 +37,13 @@
 - name: Setup elasticsearch
   hosts: elastic
   tasks:
+    - name: Template the configuration files
+      include_role:
+        name: template
+      vars:
+        template_src: conf/elastic
+        template_dest: /etc/elastic
+
     - name: Setup volume for opendistro
       containers.podman.podman_volume:
         state: present
@@ -55,6 +62,8 @@
           - nofile=65536:65536
         volume:
           - opendistro:/usr/share/elasticsearch/data
+          - /etc/elastic/internal_users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml
+          - /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
         env:
           node.name: opendistro
           discovery.type: single-node
@@ -82,6 +91,8 @@
           # FIXME: assumes same host as elastic
           ELASTICSEARCH_URL: https://localhost:9200
           ELASTICSEARCH_HOSTS: https://localhost:9200
+          ELASTICSEARCH_USERNAME: admin
+          ELASTICSEARCH_PASSWORD: "{{ openhpc_elasticsearch_admin_password }}"
 
 - name: Setup slurm stats
   hosts: slurm_stats
