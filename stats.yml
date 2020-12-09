@@ -92,7 +92,7 @@
           ELASTICSEARCH_URL: https://localhost:9200
           ELASTICSEARCH_HOSTS: https://localhost:9200
           ELASTICSEARCH_USERNAME: admin
-          ELASTICSEARCH_PASSWORD: "{{ openhpc_elasticsearch_admin_password }}"
+          ELASTICSEARCH_PASSWORD: "{{ secrets_openhpc_elasticsearch_admin_password }}"
 
 - name: Setup slurm stats
   hosts: slurm_stats

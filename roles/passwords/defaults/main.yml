@@ -1,8 +1,8 @@
 ---
 
 openhpc_passwords:
-  openhpc_grafana_admin_password: "{{ openhpc_grafana_admin_password | default(lookup('password', '/dev/null')) }}"
-  openhpc_elasticsearch_admin_password: "{{ openhpc_elasticsearch_admin_password | default(lookup('password', '/dev/null')) }}"
-  openhpc_elasticsearch_kibana_password: "{{ openhpc_elasticsearch_kibana_password | default(lookup('password', '/dev/null')) }}"
-  openhpc_mysql_root_password: "{{ openhpc_mysql_root_password | default(lookup('password', '/dev/null')) }}"
-  openhpc_mysql_slurm_password: "{{ openhpc_mysql_slurm_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_grafana_admin_password: "{{ secrets_openhpc_grafana_admin_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_elasticsearch_admin_password: "{{ secrets_openhpc_elasticsearch_admin_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_elasticsearch_kibana_password: "{{ secrets_openhpc_elasticsearch_kibana_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_mysql_root_password: "{{ secrets_openhpc_mysql_root_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_mysql_slurm_password: "{{ secrets_openhpc_mysql_slurm_password | default(lookup('password', '/dev/null')) }}"
