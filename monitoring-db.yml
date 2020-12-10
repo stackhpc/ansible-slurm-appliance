@@ -15,7 +15,7 @@
         name: cloudalchemy.prometheus
       vars:
         prometheus_alert_rules_files:
-          - conf/prometheus/rules/*.rules
+          - config/prometheus/rules/*.rules
         prometheus_targets:
           node:
           - targets:
@@ -73,6 +73,14 @@
         revision_id: 1
       # openhpc slurm:
       - dashboard_id: 13426
+        replacements:
+          - placeholder: DS_PROMETHEUS
+            replacement: prometheus
+          - placeholder: DS_ELASTICSEARCH
+            replacement: slurmstats
+        revision_id: 2
+      # slurm jobs overview
+      - dashboard_id: 13535
         replacements:
           - placeholder: DS_PROMETHEUS
             replacement: prometheus
