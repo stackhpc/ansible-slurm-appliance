@@ -1,5 +1,7 @@
 roles/
-collections
 terraform.tfstate*
 .terraform
-inventory/hosts
+inventory
+config-drive.iso
+venv
+collections

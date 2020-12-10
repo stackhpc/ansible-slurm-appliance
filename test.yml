@@ -1,48 +1,56 @@
 # NB: this only works on centos 8 / ohpc v2 as we want UCX
-- hosts: all
+# TODO: add support for groups/partitions
+# Currently need to run with something like:
+#   ANSIBLE_LIBRARY=. ansible-playbook -i inventory test.yml
+
+- hosts: cluster
+  name: Export/mount /opt via NFS for ohcp and intel packages
+  become: yes
+  tags: setup
+  tasks:
+    - import_role:
+        name: stackhpc.nfs
+      vars:
+        nfs_enable:
+          server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
+          clients: "{{ inventory_hostname in groups['cluster_compute'] }}"
+        nfs_server: "{{ hostvars[groups['cluster_login'] | first ].ansible_default_ipv4.address }}"
+        nfs_export: "/opt"
+        nfs_client_mnt_point: "/opt"
+    - name: install libpmi for slurm (needed for srun with intel mpi)
+      yum:
+        name: slurm-libpmi-ohpc
+        state: present
+        
+- hosts: cluster_login[0]
+  name: Run tests
+  tags: test
+  tasks:
+    - import_role:
+        name: stackhpc.slurm_openstack_tools.test
+      vars:
+        openhpc_tests_rootdir: /mnt/nfs/ohcp-tests
+        openhpc_tests_hpl_NB: 192
+
+- hosts: cluster_compute
+  name: Unmount /opt from compute
+  become: yes
+  tags: cleanup
+  tasks:
+    - mount:
+        path: "/opt"
+        state: unmounted
+
+# NB: cleanup is not perfect - leaves NFS running (b/c might not just be /opt) and leaves slurm-libpmi-ohpc installed (b/c it might have been)
+- hosts: cluster_login[0]
+  name: Remove /opt export
+  tags: cleanup
   become: yes
   tasks:
-    - name: Install gnu 9 + openmpi (w/ ucx) + performance tools
-      yum:
-        name: ohpc-gnu9-openmpi4-perf-tools
-        state: present
-    - name: Make centos nfs share owner
-      file:
-        path: /mnt/nfs
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-    - name: Create sbatch script for IMB pingpong
-      copy:
-        dest: "/mnt/nfs/ping.sh"
-        content: |
-          #!/usr/bin/bash
-
-          #SBATCH --ntasks=2
-          #SBATCH --ntasks-per-node=1
-          #SBATCH --output=%x.out
-          #SBATCH --error=%x.out
-
-          module load gnu9/9.3.0
-          module load openmpi4/4.0.4
-          module load imb/2019.6
-
-          srun --mpi=pmix_v3 IMB-MPI1 pingpong
-      run_once: True
-
-- hosts: cluster_login[0]
-  tags: mpirun
-  tasks:
-    - name: Run pingpong
-      shell: sbatch --wait ping.sh
-      become: no
-      args:
-        chdir: "/mnt/nfs/"
-    
-    - name: Slurp output
-      slurp:
-        src: /mnt/nfs/ping.sh.out
-      register: ping_out
-    
-    - debug:
-        msg: "{{ ping_out['content'] | b64decode }}"
-  
+  - name: update exports file
+    lineinfile:
+      path: /etc/exports
+      regexp: "/opt"
+      state: absent
+  - name: update exported filesystems
+    command: exportfs -r
