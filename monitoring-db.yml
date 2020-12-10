@@ -76,7 +76,7 @@
         replacements:
           - placeholder: DS_PROMETHEUS
             replacement: prometheus
-          - placeholder: DS_ELASTICSEARCH
+          - placeholder: DS_SLURMSTATS
             replacement: slurmstats
         revision_id: 2
       # slurm jobs overview
@@ -84,7 +84,7 @@
         replacements:
           - placeholder: DS_PROMETHEUS
             replacement: prometheus
-          - placeholder: DS_ELASTICSEARCH
+          - placeholder: DS_SLURMSTATS
             replacement: slurmstats
         revision_id: 1
     grafana_security:
