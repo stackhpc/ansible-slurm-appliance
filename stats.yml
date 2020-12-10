@@ -124,7 +124,7 @@
         force_basic_auth: yes
       register: response
       until: "'kbn_name' in response and response.status == 200"
-      retries: 1
+      retries: 30
       delay: 5
 
     - name: Add filebeat index
