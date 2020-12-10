@@ -15,7 +15,33 @@ A simple test/demo case for StackHPC's `openhpc` role using VMs on `alaska`.
     cd ..
     yum install terraform
     terraform init
-    
+
+# Passwords
+
+Prior to running any other playbooks, you need to define a set of passwords. You can
+use the `generate-passwords.yml` playbook to automate this process:
+
+```
+ansible-playbook generate-passwords.yml
+```
+
+This will output a set of passwords <`repository root>/inventory/group_vars/all/passwords.yml`.
+Placing them in the inventory means that they will be defined for all playbooks.
+
+It is recommended to encrypt the contents of this file prior to commiting to git:
+
+```
+ansible-vault encrypt inventory/group_vars/all/passwords.yml
+```
+
+You will then need to provide a password when running the playbooks e.g:
+
+```
+ansible-playbook monitoring-db.yml --tags grafana --ask-vault-password
+```
+
+See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
+
 # Usage
 
 Modify the keypair in `main.tf`.
