@@ -39,6 +39,13 @@
               regex:         '(.*):.*'
               target_label:  'instance'
               replacement:   '${1}'
+              params:
+                collect[]:
+                  - netdev
+                  - cpu
+                  - meminfo
+                  - infiniband
+                  - cpufreq
 
     #- import_role: name=cloudalchemy.alertmanager # TODO: set this up?
 
