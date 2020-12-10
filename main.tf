@@ -37,6 +37,13 @@ resource "openstack_networking_secgroup_v2" "secgroup_slurm_login" {
   delete_default_rules = true
 }
 
+resource "openstack_networking_secgroup_v2" "secgroup_slurm_compute" {
+  name        = "secgroup_slurm_compute"
+  description = "Rules for the slurm compute node"
+  # Fully manage with terraform
+  delete_default_rules = true
+}
+
 resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_egress_v4" {
   direction         = "egress"
   ethertype         = "IPv4"
@@ -46,11 +53,28 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_egre
 resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_tcp_v4" {
   direction         = "ingress"
   ethertype         = "IPv4"
-  # FIXME: only allow ports needed
+  # NOTE: You will want to lock down the ports in a production environment. This will require
+  # setting of static ports for the NFS server see:
+  # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/storage_administration_guide/s2-nfs-nfs-firewall-config
   port_range_min    = 1
   protocol          = "tcp"
   port_range_max    = 65535
   security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_compute_rule_egress_v4" {
+  direction         = "egress"
+  ethertype         = "IPv4"
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_compute.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_compute_rule_ingress_tcp_v4" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  port_range_min    = 1
+  protocol          = "tcp"
+  port_range_max    = 65535
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_compute.id
 }
 
 resource "openstack_compute_instance_v2" "login" {
@@ -78,6 +102,7 @@ resource "openstack_compute_instance_v2" "compute" {
   network {
     name = "ilab"
   }
+  security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_compute.id]
 }
 
 # TODO: needs fixing for case where creation partially fails resulting in "compute.network is empty list of object"
