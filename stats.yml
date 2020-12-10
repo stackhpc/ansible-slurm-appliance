@@ -25,15 +25,6 @@
         dest: /etc/security/limits.d/custom.conf
       become: true
 
-    - name: Setup a pod
-      containers.podman.podman_pod:
-        name: elastic
-        state: started
-        ports:
-          - 9200:9200
-          - 9600:9600
-          - 5601:5601
-
 - name: Setup elasticsearch
   hosts: elastic
   tasks:
@@ -51,8 +42,8 @@
           src: config/elastic/internal_users.yml
           dest: /etc/elastic/internal_users.yml
           owner: "1000"
-          group: "1000"
-          mode: 0600
+          group: "1"
+          mode: 0660
       # This needs to smarter as bcrypt hash changes everytime
       notify: Restart opendistro container
       become: true
@@ -67,15 +58,17 @@
         name: opendistro
         image: amazon/opendistro-for-elasticsearch:1.11.0
         state: started
-        pod: elastic
         restart_policy: "always"
+        ports:
+          - "9200:9200"
+        userns: keep-id
         ulimit:
           - memlock=-1:-1
           # maximum number of open files for the Elasticsearch user, set to at least 65536 on modern systems
           - nofile=65536:65536
         volume:
           - opendistro:/usr/share/elasticsearch/data
-          - /etc/elastic/internal_users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml
+          - /etc/elastic/internal_users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml:ro
         env:
           node.name: opendistro
           discovery.type: single-node
@@ -99,14 +92,12 @@
         image: amazon/opendistro-for-elasticsearch-kibana:1.11.0
         name: kibana
         state: started
-        pod: elastic
         restart_policy: "always"
-        expose:
-          - "5601"
+        ports:
+          - "5601:5601"
         env:
-          # FIXME: assumes same host as elastic
-          ELASTICSEARCH_URL: https://localhost:9200
-          ELASTICSEARCH_HOSTS: https://localhost:9200
+          ELASTICSEARCH_URL: https://{{ groups.elastic.0 }}:9200
+          ELASTICSEARCH_HOSTS: https://{{ groups.elastic.0 }}:9200
           ELASTICSEARCH_USERNAME: admin
           ELASTICSEARCH_PASSWORD: "{{ secrets_openhpc_elasticsearch_admin_password }}"
 
@@ -180,10 +171,8 @@
         image: docker.elastic.co/beats/filebeat-oss:7.9.3
         name: filebeat
         state: started
-        # FIXME: /usr/share/filebeat/filebeat is owned by root:root and 0750 - podman only?
-        # Unsure how this works in docker as the permissions are identical.
+        userns: keep-id
         user: root
-        pod: elastic
         restart_policy: "always"
         security_opt:
           # Required to read /var/log. There might be a better solution, see:https://github.com/containers/podman/issues/3683
