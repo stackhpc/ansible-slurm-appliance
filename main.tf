@@ -2,32 +2,40 @@ terraform {
   required_version = ">= 0.13"
 }
 
+variable "cloud" {
+  type = string
+  description = "Name of openstack cloud to use, from clouds.yaml file"
+}
+
 provider "openstack" { # uses clouds.yml
-  cloud = "alaska"
+  cloud = var.cloud
   version = "~> 1.25"
 }
 
 variable "compute_names" {
-  default = ["compute-0", "compute-1"]
+  type = list(string)
+  description = "List of compute node hostname suffixes"
+  default = []
 }
 
 variable "cluster_name" {
-  default = "testohpc"
+  type = string
+  description = "Name of cluster (used as prefix)"
 }
 
 variable "key_pair" {
-  default = "centos_at_sb-mol"
+  type = string
+  description = "Name of keypair in openstack"
 }
 
 variable "login_image" {
-  #default = "CentOS-7-x86_64-GenericCloud-2020-04-22"
-  default = "CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64"
-  #default = "CentOS7.8" #-OpenHPC"
+  type = string
+  description = "Name of image in openstack to use for login/control node"
 }
 
 variable "compute_image" {
-  #default = "CentOS-7-x86_64-GenericCloud-2020-04-22"
-  default = "CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64"
+  type = string
+  description = "Name of image in openstack to use for compute nodes"
 }
 
 resource "openstack_compute_instance_v2" "login" {
