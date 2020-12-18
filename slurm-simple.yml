@@ -7,7 +7,7 @@
         nfs_enable:
           server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
           clients: "{{ inventory_hostname in groups['cluster_compute'] }}"
-        nfs_server: "{{ hostvars[groups['cluster_login'] | first ]['server_networks']['ilab'][0] }}"
+        nfs_server: "{{ groups['cluster_login'] | first }}"
         nfs_export: "/mnt/nfs/"
         nfs_client_mnt_point: "/mnt/nfs/"
     
