@@ -20,7 +20,7 @@
           control: "{{ inventory_hostname in groups['cluster_login'] }}"
           batch: "{{ inventory_hostname in groups['cluster_compute'] }}"
           runtime: true
-        openhpc_slurm_service_enabled: true
+        openhpc_slurm_service_started: true
         openhpc_slurm_control_host: "{{ groups['cluster_login'] | first }}"
         openhpc_slurm_partitions:
          - name: "compute"
