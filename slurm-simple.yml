@@ -5,7 +5,7 @@
         name: ansible-role-cluster-nfs # need `nfs_client_mnt_state`
       vars:
         nfs_enable:
-          server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
+          server:  "{{ inventory_hostname in groups['cluster_login'] }}"
           clients: "{{ inventory_hostname in groups['cluster_compute'] }}"
         nfs_server: "{{ groups['cluster_login'] | first }}"
         nfs_export: "/mnt/nfs/"

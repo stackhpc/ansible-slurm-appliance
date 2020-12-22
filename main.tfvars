@@ -1,5 +1,5 @@
 cloud = "alaska"
-#compute_names = ["compute-0", "compute-1"]
+compute_names = ["compute-0", "compute-1"]
 cluster_name  = "testohpc"
 key_pair = "centos_at_sb-mol"
 
