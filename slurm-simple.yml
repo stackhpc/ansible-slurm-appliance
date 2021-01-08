@@ -5,9 +5,9 @@
         name: ansible-role-cluster-nfs # need `nfs_client_mnt_state`
       vars:
         nfs_enable:
-          server:  "{{ inventory_hostname in groups['cluster_login'] | first }}"
+          server:  "{{ inventory_hostname in groups['cluster_login'] }}"
           clients: "{{ inventory_hostname in groups['cluster_compute'] }}"
-        nfs_server: "{{ hostvars[groups['cluster_login'] | first ]['server_networks']['ilab'][0] }}"
+        nfs_server: "{{ groups['cluster_login'] | first }}"
         nfs_export: "/mnt/nfs/"
         nfs_client_mnt_point: "/mnt/nfs/"
     
@@ -20,7 +20,7 @@
           control: "{{ inventory_hostname in groups['cluster_login'] }}"
           batch: "{{ inventory_hostname in groups['cluster_compute'] }}"
           runtime: true
-        openhpc_slurm_service_enabled: true
+        openhpc_slurm_service_started: true
         openhpc_slurm_control_host: "{{ groups['cluster_login'] | first }}"
         openhpc_slurm_partitions:
          - name: "compute"
