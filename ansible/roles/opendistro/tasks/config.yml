@@ -1,0 +1,21 @@
+---
+
+- name: Ensure parent directory exists
+  file:
+    state: directory
+    path: "/etc/elastic"
+    owner: "1000"
+    group: "1000"
+    mode: 0770
+  become: true
+
+- name: Template configuration files
+  template:
+      src: "{{ opendistro_internal_users_path }}"
+      dest: /etc/elastic/internal_users.yml
+      owner: "1000"
+      group: "1"
+      mode: 0660
+  # This needs to smarter as bcrypt hash changes everytime
+  notify: Restart opendistro container
+  become: true

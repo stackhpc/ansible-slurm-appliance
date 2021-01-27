@@ -1,0 +1,4 @@
+---
+
+# You must define this variable.
+#filebeat_config_path: undefined

@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  vars:
+    ssh_public_key_path: ~/.ssh/id_rsa.pub
+  pre_tasks:
+    - name: Ensure dependencies are installed
+      shell: yum install -y genisoimage gzip coreutils
+      become: true
+  roles:
+    - role: jriguera.configdrive
+      configdrive_os_family: "RedHat"
+      configdrive_uuid: "openhpc2"
+      configdrive_fqdn: "test.example.com"
+      configdrive_name: "openhpc2"
+      configdrive_ssh_public_key: "{{ lookup('file', ssh_public_key_path) }}"
+      configdrive_config_dir: "/tmp/configdrive/"
+      configdrive_volume_path: "{{ playbook_dir }}"
+      configdrive_config_dir_delete: True
+      configdrive_network_device_list: []
+      # Broken on Centos 7 / python 3
+      configdrive_check_required_packages: false
+  tasks:
+    - name: Ensure configdrive is decoded and decompressed
+      shell: >
+          base64 -d {{ playbook_dir }}/openhpc2.gz
+          | gunzip
+          > {{ playbook_dir }}/config-drive.iso

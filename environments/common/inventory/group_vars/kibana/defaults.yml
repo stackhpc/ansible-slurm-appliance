@@ -1,0 +1,10 @@
+---
+
+kibana_indexes:
+  - name: filebeat-*
+    definition:
+      attributes:
+        title: "filebeat-*"
+        timeFieldName: "@timestamp"
+
+kibana_admin_password: "{{ secrets_openhpc_elasticsearch_admin_password }}"

@@ -1,0 +1,5 @@
+terraform.tfstate*
+.terraform
+config-drive.iso
+venv
+*.pyc

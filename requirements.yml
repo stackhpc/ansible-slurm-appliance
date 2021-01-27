@@ -1,0 +1,22 @@
+---
+roles:
+  - src: stackhpc.nfs
+    version: v20.11.1 # need mount state for packer
+  - src: https://github.com/stackhpc/ansible-role-openhpc # FIXME: once updated on galaxy
+    name: stackhpc.openhpc
+    version: master
+  - src: cloudalchemy.node-exporter
+  - src: cloudalchemy.blackbox-exporter
+  - src: cloudalchemy.prometheus
+  - src: cloudalchemy.alertmanager
+  - src: cloudalchemy.grafana
+  - src: geerlingguy.mysql
+
+collections:
+- name: containers.podman
+- name: community.grafana
+- name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
+  type: git
+  # FIXME: use galaxy/master once merged
+  version: feature/slurm-stats
+...

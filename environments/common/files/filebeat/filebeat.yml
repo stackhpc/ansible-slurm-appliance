@@ -1,0 +1,56 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+setup.ilm:
+  # Failed to connect to backoff(elasticsearch(https://localhost:9200)): Connection marked as failed because
+  # the onConnect callback failed: request checking for ILM availability failed: 500 Internal Server Error:
+  #  {"error":{"root_cause":[{"type":"security_exception","reason":"Unexpected exception indices:admin/get"}],
+  # "type":"security_exception","reason":"Unexpected exception indices:admin/get"},"status":500}
+  enabled: false
+  rollover_alias: "filebeat"
+  pattern: "{now/d}-000001"
+
+filebeat.inputs:
+  - type: log
+    json.add_error_key: true
+    paths:
+      - '/logs/slurm-stats/*.json'
+    fields:
+      event.kind: event
+    fields_under_root: true
+
+processors:
+  - timestamp:
+      field: json.End
+      layouts:
+        - '2006-01-02T15:04:05'
+      test:
+        - '2020-06-17T10:17:48'
+  - timestamp:
+      target_field: 'event.end'
+      field: json.End
+      layouts:
+        - '2006-01-02T15:04:05'
+      test:
+        - '2020-06-17T10:17:48'
+  - timestamp:
+      target_field: 'event.start'
+      field: json.Start
+      layouts:
+        - '2006-01-02T15:04:05'
+      test:
+        - '2020-06-17T10:17:48'
+  - convert:
+      fields:
+        - {from: "json.NNodes", type: "integer"}
+        - {from: "json.NCPUS", type: "integer"}
+        - {from: "json.ElapsedRaw", type: "integer"}
+
+output.elasticsearch:
+  hosts: ["{{ groups.elasticsearch.0 }}:9200"]
+  protocol: "https"
+  ssl.verification_mode: none
+  username: "admin"
+  password: "{{ secrets_openhpc_elasticsearch_admin_password }}"

@@ -1,0 +1,17 @@
+---
+# Miscellaneous
+ansible_user: centos
+appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
+appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+
+# Address(ip/dns) for internal communication between services. This is
+# normally traffic you do no want to expose to users.
+internal_address: "{{ ansible_host }}"
+# Address(ip/dns) for user facing services e.g grafana. Can be set to
+# `internal_address`
+api_address: "{{ ansible_host }}"
+
+# Service endpoints
+grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
+elasticsearch_address: "{{ hostvars[groups['elasticsearch'].0].api_address }}"
+prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"

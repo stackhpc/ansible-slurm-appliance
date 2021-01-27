@@ -1,0 +1,7 @@
+---
+
+kibana_indexes: []
+kibana_address: localhost
+kibana_port: 5601
+kibana_admin_user: admin
+kibana_admin_password: admin

@@ -1,0 +1,16 @@
+---
+
+openhpc_passwords:
+  secrets_openhpc_grafana_admin_password: "{{ secrets_openhpc_grafana_admin_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_elasticsearch_admin_password: "{{ secrets_openhpc_elasticsearch_admin_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_elasticsearch_kibana_password: "{{ secrets_openhpc_elasticsearch_kibana_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_mysql_root_password: "{{ secrets_openhpc_mysql_root_password | default(lookup('password', '/dev/null')) }}"
+  secrets_openhpc_mysql_slurm_password: "{{ secrets_openhpc_mysql_slurm_password | default(lookup('password', '/dev/null')) }}"
+  # TODO: Might be cleaner to write this to a file, but needs modification of the role
+  secrets_openhpc_mungekey: "{{ secrets_openhpc_mungekey | default(secrets_openhpc_mungekey_default) }}"
+
+secrets_openhpc_mungekey_default:
+  content: "{{ lookup('pipe', 'dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64') }}"
+
+openhpc_passwords_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') | default(undefined, true) | mandatory('You must define the APPLIANCES_ENVIRONMENT_ROOT environment variable') }}/inventory/group_vars/all/secrets.yml"
+#openhpc_passwords_mungekey_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') | default(undefined, true) | mandatory('You must define the APPLIANCES_ENVIRONMENT_ROOT environment variable') }}/secrets/slurm/munge.key"

@@ -1,0 +1,20 @@
+---
+
+- name: Setup volume for kibana
+  containers.podman.podman_volume:
+    state: present
+    name: kibana
+
+- name: Setup kibana
+  containers.podman.podman_container:
+    image: amazon/opendistro-for-elasticsearch-kibana:1.11.0
+    name: kibana
+    state: started
+    restart_policy: "always"
+    ports:
+      - "5601:5601"
+    env:
+      ELASTICSEARCH_URL: https://{{ elasticsearch_address }}:9200
+      ELASTICSEARCH_HOSTS: https://{{ elasticsearch_address }}:9200
+      ELASTICSEARCH_USERNAME: admin
+      ELASTICSEARCH_PASSWORD: "{{ secrets_openhpc_elasticsearch_admin_password }}"

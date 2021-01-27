@@ -1,0 +1,18 @@
+collections
+roles/*
+*.pyc
+# Whitelist roles that are checked into this repository.
+!roles/filebeat/
+!roles/filebeat/**
+!roles/opendistro/
+!roles/opendistro/**
+!roles/podman/
+!roles/podman/**
+!roles/kibana/
+!roles/kibana/**
+!roles/grafana-dashboards/
+!roles/grafana-dashboards/**
+!roles/grafana-datasources/
+!roles/grafana-datasources/**
+!roles/passwords/
+!roles/passwords/**

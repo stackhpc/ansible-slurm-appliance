@@ -1,0 +1,4 @@
+---
+
+- name: Restart filebeat container
+  command: podman restart filebeat
