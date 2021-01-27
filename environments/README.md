@@ -44,7 +44,7 @@ Skeleton directory that is used as a template to create a new environemnt.
 To define an environment called `production` you simply copy the skeleton directory
 to a directory with than name.
 
-    cp skeleton production
+    cookiecutter skeleton
 
 Follow the README in the new directory to perform initial configuration.
 

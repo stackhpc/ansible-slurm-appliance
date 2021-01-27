@@ -4,3 +4,4 @@ openstacksdk
 python-openstackclient
 jmespath
 passlib[bcrypt]
+cookiecutter
