@@ -1,6 +1,6 @@
 # Libvirt-Example cluster
 
-Demo cluster
+Run a demo cluster on a single machine with libvirt.
 
 # Directory structure
 
