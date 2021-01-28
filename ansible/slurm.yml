@@ -18,11 +18,10 @@
     - include_role:
         name: stackhpc.nfs
       vars:
-        nfs_enable: "{{ item.nfs_enable }}"
-        nfs_server: "{{ item.nfs_server }}"
-        nfs_export: "{{ item.nfs_export }}"
-        nfs_client_mnt_point: "{{ item.nfs_client_mnt_point }}"
-      with_items: "{{ nfs_configurations }}"
+        nfs_enable: "{{ nfs_configuration.nfs_enable }}"
+        nfs_server: "{{ nfs_configuration.nfs_server }}"
+        nfs_export: "{{ nfs_configuration.nfs_export }}"
+        nfs_client_mnt_point: "{{ nfs_configuration.nfs_client_mnt_point }}"
 
 - name: Setup slurm
   hosts: openhpc
