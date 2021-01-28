@@ -36,26 +36,31 @@ resource "libvirt_pool" "storage-pool" {
 }
 
 # Create storage for each machine
-resource "libvirt_volume" "login" {
-  name   = "login"
+resource "libvirt_volume" "base" {
+  name   = "${var.cluster_name}"
   pool   = libvirt_pool.storage-pool.name
   source = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64.qcow2"
   format = "qcow2"
 }
 
+# Create storage for each machine
+resource "libvirt_volume" "login" {
+  name   = "login"
+  pool   = libvirt_pool.storage-pool.name
+  base_volume_id   = libvirt_volume.base.id
+}
+
 resource "libvirt_volume" "control" {
   name   = "control"
   pool   = libvirt_pool.storage-pool.name
-  source = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64.qcow2"
-  format = "qcow2"
+  base_volume_id   = libvirt_volume.base.id
 }
 
 resource "libvirt_volume" "compute" {
   for_each = toset(var.compute_names)
   name   = each.value
   pool   = libvirt_pool.storage-pool.name
-  source = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64.qcow2"
-  format = "qcow2"
+  base_volume_id   = libvirt_volume.base.id
 }
 
 data "template_file" "user_data" {
