@@ -16,3 +16,4 @@ openhpc_packages:
   - slurm-libpmi-ohpc
 slurm_munge_key: "{{ secrets_openhpc_mungekey }}"
 openhpc_slurm_configless: true
+openhpc_login_only_nodes: login
