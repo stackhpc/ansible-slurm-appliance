@@ -10,25 +10,8 @@ jobs:
       - name: Setup environment
         run: dev/setup-env.sh
 
-      - name: Activate python environment
-        run: . venv/bin/activate
+      - name: Provision infrastructure
+        run: dev/vagrant-example-provision.sh
 
-      - name: Activate slurm environment
-        run: . environments/vagrant-example/activate
-
-      - name: Install required vagrant plugins
-        run: vagrant plugin install vagrant-hosts
-
-      - name: Provision machines
-        run: vagrant up
-        working-directory: environments/vagrant-example/vagrant
-
-      - name: Create inventory
-        run: vagranttoansible | tee $APPLIANCES_ENVIRONMENT_ROOT/inventory/hosts
-        working-directory: environments/vagrant-example/vagrant
-
-      - name: Run ansible
-        run: ansible ansible/adhoc/generate-secrets.yml
-
-      - name: Run ansible
-        run: ansible ansible/site.yml
+      - name: Configure infrastructure
+        run: dev/vagrant-example-configure.sh
