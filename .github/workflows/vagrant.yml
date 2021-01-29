@@ -7,6 +7,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install coreutils (for realpath on osx)
+        run: sudo brew install coreutils
+
+      - name: Add coreutils to path
+        run: echo "/usr/local/opt/coreutils/libexec/gnubin" >> $GITHUB_PATH
+
       - name: Setup environment
         run: dev/setup-env.sh
 
