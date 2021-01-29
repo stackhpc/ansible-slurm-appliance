@@ -1,0 +1,4 @@
+---
+
+internal_address: "{{ ansible_eth1.ipv4.address }}"
+api_address: "{{ internal_address }}"
