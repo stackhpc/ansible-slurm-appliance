@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+# This tool always you to ssh into a host using the ansible inventory.
+# Example: ansible-ssh computes[0] -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
+
+import sys
+import subprocess
+import shlex
+import json
+import os
+from collections import defaultdict
+
+def _optional_arg(prototype, *values):
+    # returns empty string if any of the the values are falsey
+    filtered = [value for value in values if value]
+    return prototype.format(*values) if len(values) == len(filtered) else ""
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        msg = (f"Usage: {sys.argv[0]} <inventory_hostname> [args to pass to ssh]")
+        print(msg, file=sys.stderr)
+        sys.exit(-1)
+
+    # Quote to prevent shell injection
+    host = shlex.quote(sys.argv[1])
+
+    try:
+        output = subprocess.check_output(f'ansible-inventory --export --host { host }', shell=True)
+    except (subprocess.CalledProcessError) as e:
+        msg = (f"Error: Is {host} missing from the inventory?")
+        print(msg, file=sys.stderr)
+        sys.exit(-1)
+
+    meta = defaultdict(str, json.loads(output))
+
+    port = _optional_arg("-p {}", meta['ansible_ssh_port'])
+    identity = _optional_arg("-i {}", meta['ansible_ssh_private_key_file'])
+    host = _optional_arg("{}@{}", meta["ansible_ssh_user"], meta["ansible_ssh_host"])
+    opts = meta['ansible_ssh_common_args']
+
+    # Handle case where user is not set
+    if not host:
+        host = meta['ansible_ssh_host']
+
+    if not host:
+        # if we get here, "ansible_ssh_host" is not set.
+        msg = f"Could not determine the host"
+        print(msg, file=sys.stderr)
+        sys.exit(-1)
+
+    base = shlex.split(f'ssh {port} {identity} {opts}')
+    extras = sys.argv[2:]
+    cmd = base + extras + [host]
+    print(cmd)
+    os.execvp(cmd[0],cmd)
+
+
