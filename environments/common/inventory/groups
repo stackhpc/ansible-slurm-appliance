@@ -49,7 +49,7 @@ computes
 
 [exporters]
 
-[elasticsearch]
+[opendistro]
 
 [kibana]
 

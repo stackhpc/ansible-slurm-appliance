@@ -16,8 +16,8 @@
       tags: config
 
 - name: Setup elasticsearch
-  hosts: elasticsearch
-  tags: elasticsearch
+  hosts: opendistro
+  tags: opendistro
   tasks:
     - import_role:
         name: opendistro

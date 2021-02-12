@@ -13,7 +13,7 @@ api_address: "{{ ansible_host }}"
 
 # Service endpoints
 grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
-elasticsearch_address: "{{ hostvars[groups['elasticsearch'].0].api_address }}"
+elasticsearch_address: "{{ hostvars[groups['opendistro'].0].api_address }}"
 prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 
 ############################# bootstrap: local user configuration #########################

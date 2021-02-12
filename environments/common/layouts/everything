@@ -25,9 +25,6 @@ control
 [node_exporter:children]
 cluster
 
-[elasticsearch:children]
-control
-
 [opendistro:children]
 control
 
