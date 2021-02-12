@@ -80,9 +80,11 @@ that variable in the more specific inventory.
 ### role variables
 
 The pattern we use is that the role is run against an ansible inventory group matching
-the name of the role. The role variables are defined only for that group (unless the variable)
-needs to be shared. This convention makes it easier to find where the varibles are set e.g
-role variables for the `stackhpc.nfs` role can be found in `common/group_vars/nfs/defaults.yml`.
+the name of the role. The role variables are defined as group variables in a file matching
+the role name. These files are in placed in `group_vars/all` so that they have the lowest
+precedence and more easily overridable. This convention makes it easier to find where the
+varibles are set e.g role variables for the `stackhpc.nfs` role can be found in
+`common/group_vars/all/nfs.yml`.
 
 ## Parent pointers
 
