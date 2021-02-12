@@ -6,8 +6,8 @@
 - name: Set facts containing group_ids
   set_fact:
     # Elastic search user is 1000
-    opendistro_host_user_id: "{{ ansible_facts.subuid[opendistro_user]['start'] + 1000 - 1 }}"
-    opendistro_host_group_id: "{{ ansible_facts.subgid[opendistro_user]['start'] + 1000 - 1 }}"
+    opendistro_host_user_id: "{{ ansible_facts.subuid[opendistro_podman_user]['start'] + 1000 - 1 }}"
+    opendistro_host_group_id: "{{ ansible_facts.subgid[opendistro_podman_user]['start'] + 1000 - 1 }}"
 
 - name: Ensure parent directory exists
   file:
@@ -25,7 +25,7 @@
       owner: "{{ opendistro_host_user_id }}"
       # NOTE: root user in container maps to user on host, so this will appear as
       # owned by root in the container.
-      group: "{{ opendistro_user }}"
+      group: "{{ opendistro_podman_user }}"
       mode: 0660
   # This needs to smarter as bcrypt hash changes everytime
   notify: Restart opendistro container

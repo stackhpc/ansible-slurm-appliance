@@ -4,7 +4,7 @@
     state: present
     name: opendistro
   become: true
-  become_user: "{{ opendistro_user }}"
+  become_user: "{{ opendistro_podman_user }}"
 
 - name: Setup opendistro
   containers.podman.podman_container:
@@ -28,4 +28,4 @@
       bootstrap.memory_lock: "true" # along with the memlock settings below, disables swapping
       ES_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
   become: true
-  become_user: "{{ opendistro_user }}"
+  become_user: "{{ opendistro_podman_user }}"

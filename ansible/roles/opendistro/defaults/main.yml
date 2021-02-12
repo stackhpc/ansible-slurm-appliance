@@ -2,4 +2,4 @@
 # Used to set passwords
 #opendistro_internal_users_path:
 
-opendistro_user: "{{ ansible_user }}"
+opendistro_podman_user: "{{ ansible_user }}"
