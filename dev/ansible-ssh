@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # This tool always you to ssh into a host using the ansible inventory.
-# Example: ansible-ssh computes[0] -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
+# Example: ansible-ssh compute[0] -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
 
 import sys
 import subprocess

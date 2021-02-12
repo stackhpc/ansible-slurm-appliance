@@ -17,5 +17,5 @@ testohpc_login
 [control:children]
 testohpc_control
 
-[computes:children]
+[compute:children]
 testohpc_compute

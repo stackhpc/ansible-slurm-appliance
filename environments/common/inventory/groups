@@ -16,7 +16,7 @@
 
 [control]
 
-[computes]
+[compute]
 
 [builder]
 
@@ -30,14 +30,14 @@ baremetal_login
 vm_control
 baremetal_control
 
-[computes:children]
+[compute:children]
 baremetal_compute
 vm_compute
 
 [cluster:children]
 login
 control
-computes
+compute
 
 [podman]
 

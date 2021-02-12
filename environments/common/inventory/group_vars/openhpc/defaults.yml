@@ -1,7 +1,7 @@
 ---
 openhpc_enable:
   control: "{{ inventory_hostname in groups['control'] }}"
-  batch: "{{ inventory_hostname in groups['computes'] }}"
+  batch: "{{ inventory_hostname in groups['compute'] }}"
   database: "{{ inventory_hostname in groups['control'] }}"
   runtime: true
 openhpc_slurm_service_enabled: true

@@ -6,7 +6,7 @@
 # - slurm-libpmi-ohpc package
 # - shared fs mounted at /opt
 
-- hosts: computes
+- hosts: compute
   name: Run tests
   tags: test
   gather_facts: false
@@ -17,6 +17,6 @@
       vars:
         openhpc_tests_rootdir: /mnt/nfs/ohcp-tests
         openhpc_tests_hpl_NB: 192
-        openhpc_tests_nodes: "{{ groups['computes'] | intersect(play_hosts) | join(',') }}"
+        openhpc_tests_nodes: "{{ groups['compute'] | intersect(play_hosts) | join(',') }}"
       run_once: true
       delegate_to: "{{ groups['login'][0] }}"
