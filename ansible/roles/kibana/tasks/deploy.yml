@@ -4,10 +4,12 @@
   containers.podman.podman_volume:
     state: present
     name: kibana
+  become: true
+  become_user: "{{ kibana_podman_user }}"
 
 - name: Setup kibana
   containers.podman.podman_container:
-    image: amazon/opendistro-for-elasticsearch-kibana:1.11.0
+    image: amazon/opendistro-for-elasticsearch-kibana:1.12.0
     name: kibana
     state: started
     restart_policy: "always"
@@ -18,3 +20,5 @@
       ELASTICSEARCH_HOSTS: https://{{ elasticsearch_address }}:9200
       ELASTICSEARCH_USERNAME: admin
       ELASTICSEARCH_PASSWORD: "{{ secrets_openhpc_elasticsearch_admin_password }}"
+  become_user: "{{ kibana_podman_user }}"
+  become: true

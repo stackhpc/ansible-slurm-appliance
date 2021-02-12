@@ -4,7 +4,6 @@
     image: docker.elastic.co/beats/filebeat-oss:7.9.3
     name: filebeat
     state: started
-    userns: keep-id
     user: root
     restart_policy: "always"
     security_opt:
@@ -14,3 +13,5 @@
       - /var/log/:/logs:ro
       - /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
     command: -e -strict.perms=false -d "*"
+  become: true
+  become_user: "{{ filebeat_podman_user }}"

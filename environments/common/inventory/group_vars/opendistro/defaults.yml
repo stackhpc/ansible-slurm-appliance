@@ -1,2 +1,3 @@
 ---
 opendistro_internal_users_path: "{{ appliances_repository_root }}/environments/common/files/elastic/internal_users.yml"
+opendistro_user: podman

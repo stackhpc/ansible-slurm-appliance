@@ -2,3 +2,5 @@
 
 - name: Restart opendistro container
   command: podman restart opendistro
+  become: true
+  become_user: "{{ opendistro_user }}"

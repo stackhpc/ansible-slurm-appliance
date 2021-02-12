@@ -3,16 +3,18 @@
   containers.podman.podman_volume:
     state: present
     name: opendistro
+  become: true
+  become_user: "{{ opendistro_user }}"
 
 - name: Setup opendistro
   containers.podman.podman_container:
     name: opendistro
-    image: amazon/opendistro-for-elasticsearch:1.11.0
+    image: amazon/opendistro-for-elasticsearch:1.12.0
     state: started
     restart_policy: "always"
     ports:
       - "9200:9200"
-    userns: keep-id
+    user: elasticsearch
     ulimit:
       - memlock=-1:-1
       # maximum number of open files for the Elasticsearch user, set to at least 65536 on modern systems
@@ -25,3 +27,5 @@
       discovery.type: single-node
       bootstrap.memory_lock: "true" # along with the memlock settings below, disables swapping
       ES_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+  become: true
+  become_user: "{{ opendistro_user }}"
