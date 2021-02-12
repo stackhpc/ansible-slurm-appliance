@@ -27,7 +27,7 @@ if __name__ == "__main__":
     try:
         output = subprocess.check_output(f'ansible-inventory --export --host { host }', shell=True)
     except (subprocess.CalledProcessError) as e:
-        msg = (f"Error: Is {host} missing from the inventory?")
+        msg = (f"[ERROR]: Is {host} missing from the inventory?")
         print(msg, file=sys.stderr)
         sys.exit(-1)
 
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     base = shlex.split(f'ssh {port} {identity} {opts}')
     extras = sys.argv[2:]
     cmd = base + extras + [host]
-    print(cmd)
+    print(f"[INFO]: Running: { subprocess.list2cmdline(cmd) }")
     os.execvp(cmd[0],cmd)
 
 
