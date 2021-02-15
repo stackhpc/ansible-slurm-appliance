@@ -21,3 +21,5 @@ jobs:
 
       - name: Configure infrastructure
         run: dev/vagrant-example-configure.sh
+        env:
+          ANSIBLE_FORCE_COLOR: True
