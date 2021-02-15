@@ -30,5 +30,6 @@ appliances_local_users_podman:
       comment: Used for running all containers
       # Would like to set subuid so that we that we know what will appear in /etc/subuid
       # See: https://github.com/ansible/ansible/issues/68199
+      home: "{{ appliances_local_users_podman_home }}"
 
 ###########################################################################################
