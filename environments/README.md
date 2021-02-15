@@ -41,10 +41,14 @@ Skeleton directory that is used as a template to create a new environemnt.
 
 ## Defining an environment
 
-To define an environment called `production` you simply copy the skeleton directory
-to a directory with than name.
+To define an environment using cookiecutter:
 
     cookiecutter skeleton
+
+This will present you with a series of questions which you must answer.
+Once you have answered all questions, a new environment directory will
+be created. The directory will be named according to the answer you gave
+for `environment`.
 
 Follow the README in the new directory to perform initial configuration.
 
