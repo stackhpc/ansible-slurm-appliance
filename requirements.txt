@@ -3,3 +3,6 @@ os-client-config
 openstacksdk
 python-openstackclient
 jmespath
+passlib[bcrypt]
+cookiecutter
+vagranttoansible

@@ -1,0 +1,5 @@
+---
+
+# You must define this variable.
+#filebeat_config_path: undefined
+filebeat_podman_user: "{{ ansible_user }}"

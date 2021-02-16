@@ -1,0 +1,11 @@
+[exporters:children]
+cluster
+
+[nfs:children]
+cluster
+
+[openhpc:children]
+cluster
+
+[mysql:children]
+control

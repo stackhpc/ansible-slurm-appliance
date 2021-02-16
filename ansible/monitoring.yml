@@ -1,0 +1,116 @@
+# ---
+# # NOTE: Requires slurmdbd
+
+- name: Setup podman
+  hosts: podman
+  tags: podman
+  tasks:
+    - import_role:
+        name: podman
+        tasks_from: prereqs.yml
+      tags: prereqs
+
+    - import_role:
+        name: podman
+        tasks_from: config.yml
+      tags: config
+
+- name: Setup elasticsearch
+  hosts: opendistro
+  tags: opendistro
+  tasks:
+    - import_role:
+        name: opendistro
+        tasks_from: config.yml
+      tags: config
+
+    - import_role:
+        name: opendistro
+        tasks_from: deploy.yml
+      tags: deploy
+
+- name: Setup kibana
+  hosts: kibana
+  tags: kibana
+  tasks:
+    - import_role:
+        name: kibana
+        tasks_from: config.yml
+      tags: config
+
+    - import_role:
+        name: kibana
+        tasks_from: deploy.yml
+      tags: deploy
+
+    - import_role:
+        name: kibana
+        tasks_from: post.yml
+      tags: post
+
+- name: Setup slurm stats
+  hosts: slurm_stats
+  tags: slurm_stats
+  collections:
+    - stackhpc.slurm_openstack_tools
+  tasks:
+    - include_role:
+        name: slurm-stats
+        apply:
+          # Collection currently requires root for all tasks.
+          become: true
+
+- name: Setup filebeat
+  hosts: filebeat
+  tags: filebeat
+  tasks:
+    - import_role:
+        name: filebeat
+        tasks_from: config.yml
+      tags: config
+
+    - import_role:
+        name: filebeat
+        tasks_from: deploy.yml
+      tags: deploy
+
+- name: Deploy node_exporter
+  hosts: node_exporter
+  tags: node_exporter
+  tasks:
+    - import_role: name=cloudalchemy.node-exporter
+
+- name: Setup core monitoring software
+  hosts: prometheus
+  tags: prometheus
+  tasks:
+    - import_role:
+        name: cloudalchemy.prometheus
+
+- name: Deploy grafana
+  hosts: grafana
+  tags: grafana
+  tasks:
+    - assert:
+        that: secrets_openhpc_grafana_admin_password is defined
+        fail_msg: "Must define secrets_openhpc_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
+    - import_role:
+        name: cloudalchemy.grafana
+      vars:
+        # We use internal roles to register the datasources and dashboards as the roles
+        # does not support all options that we require.
+        grafana_dashboards: []
+        grafana_datasources: []
+
+- name: Initialise grafana
+  hosts: grafana
+  tags:
+    - grafana-init
+  tasks:
+    - assert:
+        that: secrets_openhpc_grafana_admin_password is defined
+        fail_msg: "Must define secrets_openhpc_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
+    - import_role:
+        name: grafana-datasources
+    - import_role:
+        name: grafana-dashboards

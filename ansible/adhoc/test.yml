@@ -1,0 +1,22 @@
+# NB: this only works on centos 8 / ohpc v2 as we want UCX
+# TODO: add support for groups/partitions
+# Currently need to run with something like:
+#   ANSIBLE_LIBRARY=. ansible-playbook -i inventory test.yml
+# Prequisites:
+# - slurm-libpmi-ohpc package
+# - shared fs mounted at /opt
+
+- hosts: compute
+  name: Run tests
+  tags: test
+  gather_facts: false
+  tasks:
+    # NOTE: Requires group, cluster_compute, to defined.
+    - import_role:
+        name: stackhpc.slurm_openstack_tools.test
+      vars:
+        openhpc_tests_rootdir: /mnt/nfs/ohcp-tests
+        openhpc_tests_hpl_NB: 192
+        openhpc_tests_nodes: "{{ groups['compute'] | intersect(play_hosts) | join(',') }}"
+      run_once: true
+      delegate_to: "{{ groups['login'][0] }}"

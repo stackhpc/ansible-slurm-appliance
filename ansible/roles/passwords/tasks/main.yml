@@ -1,0 +1,20 @@
+---
+
+- name: Template passwords
+  template:
+    src: passwords.yml
+    dest: "{{ openhpc_passwords_output_path }}"
+  delegate_to: localhost
+  run_once: true
+
+# - name: Ensure munge key directory exists
+#   file:
+#     state: directory
+#     recurse: true
+#     path: "{{ openhpc_passwords_mungekey_output_path | dirname }}"
+
+# - name: Create a munge key
+#   copy:
+#     content:  "{{ lookup('password', '/dev/null chars=ascii_letters,digits,hexdigits,punctuation') }}"
+#     dest: "{{ openhpc_passwords_mungekey_output_path }}"
+#     force: false

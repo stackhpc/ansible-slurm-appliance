@@ -1,0 +1,9 @@
+---
+
+- hosts: cluster
+  gather_facts: false
+  tasks:
+    - name: Add users
+      ansible.builtin.user: "{{ item }}"
+      with_items: "{{ appliances_local_users }}"
+      become: true

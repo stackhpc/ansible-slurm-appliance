@@ -1,0 +1,6 @@
+---
+# NOTE: Might be better of as extra vars or in a builder specific inventory as
+# as dependent on alphabetical ordering of groups, so if these variables are
+# defined elsewhere the group that is ordered lower will determine the values.
+openhpc_slurm_service_started: false
+nfs_client_mnt_state: present

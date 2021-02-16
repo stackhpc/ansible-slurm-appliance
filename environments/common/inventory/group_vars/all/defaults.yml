@@ -1,0 +1,35 @@
+---
+# Miscellaneous
+ansible_user: centos
+appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
+appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+
+# Address(ip/dns) for internal communication between services. This is
+# normally traffic you do no want to expose to users.
+internal_address: "{{ ansible_host }}"
+# Address(ip/dns) for user facing services e.g grafana. Can be set to
+# `internal_address`
+api_address: "{{ ansible_host }}"
+
+# Service endpoints
+grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
+elasticsearch_address: "{{ hostvars[groups['opendistro'].0].api_address }}"
+prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
+
+############################# bootstrap: local user configuration #########################
+
+appliances_local_users_default: "{{ [appliances_local_users_podman] if appliances_local_users_podman_enable else [] + appliances_local_users_extra }}"
+# Overide this to add extra users whilst keeping the defaults.
+appliances_local_users_extra: []
+appliances_local_users: "{{ appliances_local_users_default + appliances_local_users_extra }}"
+
+appliances_local_users_podman_enable: "{{ groups['podman'] | length > 0 }}"
+appliances_local_users_podman_home: /var/lib/podman
+appliances_local_users_podman:
+    - name: podman
+      comment: Used for running all containers
+      # Would like to set subuid so that we that we know what will appear in /etc/subuid
+      # See: https://github.com/ansible/ansible/issues/68199
+      home: "{{ appliances_local_users_podman_home }}"
+
+###########################################################################################

@@ -1,0 +1,33 @@
+---
+
+- name: Setup DB
+  hosts: mysql
+  become: true
+  tags:
+    - mysql
+  tasks:
+    - include_role:
+        name:  geerlingguy.mysql
+
+- name: Setup NFS
+  hosts: nfs
+  become: true
+  tags:
+    - nfs
+  tasks:
+    - include_role:
+        name: stackhpc.nfs
+      vars:
+        nfs_enable: "{{ nfs_configuration.nfs_enable }}"
+        nfs_server: "{{ nfs_configuration.nfs_server }}"
+        nfs_export: "{{ nfs_configuration.nfs_export }}"
+        nfs_client_mnt_point: "{{ nfs_configuration.nfs_client_mnt_point }}"
+
+- name: Setup slurm
+  hosts: openhpc
+  become: yes
+  tags:
+    - openhpc
+  tasks:
+   - import_role:
+        name: stackhpc.openhpc

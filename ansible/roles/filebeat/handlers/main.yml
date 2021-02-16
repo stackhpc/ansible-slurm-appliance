@@ -1,0 +1,6 @@
+---
+
+- name: Restart filebeat container
+  command: podman restart filebeat
+  become: true
+  become_user: "{{ filebeat_podman_user }}"
