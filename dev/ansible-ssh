@@ -25,7 +25,7 @@ if __name__ == "__main__":
     host = shlex.quote(sys.argv[1])
 
     try:
-        output = subprocess.check_output(f'ansible-inventory --export --host { host }', shell=True)
+        output = subprocess.check_output(f'ansible-inventory --host { host }', shell=True)
     except (subprocess.CalledProcessError) as e:
         msg = (f"[ERROR]: Is {host} missing from the inventory?")
         print(msg, file=sys.stderr)
