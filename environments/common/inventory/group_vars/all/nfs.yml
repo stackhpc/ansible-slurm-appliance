@@ -5,7 +5,10 @@ nfs_server_default: "{{ hostvars[groups['control'] | first ].internal_address }}
 nfs_configuration:
   nfs_enable:
       server:  "{{ inventory_hostname in groups['control'] }}"
-      clients: "{{ inventory_hostname in groups['compute'] or inventory_hostname in groups['login']  }}"
+      # Don't mount share on same server as client...
+      # Could do something like nfs_clients: '"nfs_servers" not in group_names' instead.
+      # See also constructed inventory: https://docs.ansible.com/ansible/devel/collections/ansible/builtin/constructed_inventory.html
+      clients: "{{ inventory_hostname in groups['compute'] or (inventory_hostname in groups['login'] and not inventory_hostname in groups['control']) }}"
   nfs_server: "{{ nfs_server_default }}"
   nfs_export: "/mnt/nfs/"
   nfs_client_mnt_point: "/mnt/nfs/"
