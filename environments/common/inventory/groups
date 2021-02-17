@@ -1,17 +1,5 @@
 [cluster]
 
-[baremetal_compute]
-
-[baremetal_login]
-
-[baremetal_control]
-
-[vm_compute]
-
-[vm_login]
-
-[vm_control]
-
 [login]
 
 [control]
@@ -19,20 +7,6 @@
 [compute]
 
 [builder]
-
-[login]
-
-[login:children]
-vm_login
-baremetal_login
-
-[control:children]
-vm_control
-baremetal_control
-
-[compute:children]
-baremetal_compute
-vm_compute
 
 [cluster:children]
 login
