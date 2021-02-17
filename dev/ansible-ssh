@@ -33,11 +33,13 @@ if __name__ == "__main__":
 
     meta = defaultdict(str, json.loads(output))
 
-    ansible_ssh_host = meta.get('ansible_ssh_host') or meta.get('ansible_host')
-    ansible_ssh_user = meta.get('ansible_ssh_user') or meta.get('ansible_user')
+    ansible_ssh_host = meta['ansible_ssh_host'] or meta['ansible_host']
+    ansible_ssh_user = meta['ansible_ssh_user'] or meta['ansible_user']
+    ansible_ssh_port = meta['ansible_ssh_port']
+    ansible_ssh_private_key_file = meta['ansible_ssh_private_key_file']
 
-    port = _optional_arg("-p {}", meta['ansible_ssh_port'])
-    identity = _optional_arg("-i {}", meta['ansible_ssh_private_key_file'])
+    port = _optional_arg("-p {}", ansible_ssh_port)
+    identity = _optional_arg("-i {}", ansible_ssh_private_key_file)
     host = _optional_arg("{}@{}", ansible_ssh_user, ansible_ssh_host)
     opts = meta['ansible_ssh_common_args']
 
