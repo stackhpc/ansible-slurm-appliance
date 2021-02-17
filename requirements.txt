@@ -6,3 +6,4 @@ jmespath
 passlib[bcrypt]
 cookiecutter
 vagranttoansible
+selinux # this is a shim to avoid having to use --system-site-packages, you still need sudo yum install libselinux-python3
