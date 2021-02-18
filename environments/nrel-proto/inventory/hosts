@@ -1,0 +1,19 @@
+[all:vars]
+ansible_user=centos
+#proxy_addr=${fip.address} 
+#ansible_ssh_common_args='-o ProxyCommand="ssh {{ ansible_user }}@{{ proxy_addr }} -W %h:%p"'
+openhpc_cluster_name=nrel
+
+[control]
+nrel-control ansible_host=10.109.3.87 server_networks='{"public-109": "10.109.3.87"}'
+
+[login]
+nrel-login-0 ansible_host=10.109.0.139 server_networks='{"public-109": "10.109.0.139"}'
+
+[compute]
+nrel-compute-0 ansible_host=10.109.0.89 server_networks='{"public-109": "10.109.0.89"}'
+nrel-compute-1 ansible_host=10.109.1.120 server_networks='{"public-109": "10.109.1.120"}'
+
+# define slurm partitions:
+[nrel_compute:children]
+compute
