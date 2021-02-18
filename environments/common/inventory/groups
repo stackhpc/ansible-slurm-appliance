@@ -13,7 +13,10 @@ login
 control
 compute
 
-[podman]
+[podman:children]
+opendistro
+kibana
+filebeat
 
 [prometheus]
 
