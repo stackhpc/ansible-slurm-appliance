@@ -17,6 +17,7 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- import_playbook: filesystems.yml
 - import_playbook: slurm.yml
 - import_playbook: monitoring.yml
 

@@ -1,0 +1,15 @@
+---
+
+- name: Setup NFS
+  hosts: nfs
+  become: true
+  tags:
+    - nfs
+  tasks:
+    - include_role:
+        name: stackhpc.nfs
+      vars:
+        nfs_enable: "{{ nfs_configuration.nfs_enable }}"
+        nfs_server: "{{ nfs_configuration.nfs_server }}"
+        nfs_export: "{{ nfs_configuration.nfs_export }}"
+        nfs_client_mnt_point: "{{ nfs_configuration.nfs_client_mnt_point }}"
