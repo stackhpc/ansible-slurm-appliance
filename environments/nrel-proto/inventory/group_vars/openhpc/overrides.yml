@@ -1,5 +1,7 @@
-openhpc_packages:
-  - slurm-libpmi-ohpc
-  - openmpi4-gnu9-ohpc
-  - ohpc-gnu9-perf-tools
-  - lmod-defaults-gnu9-openmpi4-ohpc
+openhpc_packages: []
+  # - slurm-libpmi-ohpc # is installed by role anyway
+  # - openmpi4-gnu9-ohpc
+  # - ohpc-gnu9-perf-tools
+  # - lmod-defaults-gnu9-openmpi4-ohpc
+openhpc_slurm_partitions:
+  - name: "hpc"
