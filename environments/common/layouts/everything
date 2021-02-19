@@ -10,9 +10,6 @@ cluster
 [mysql:children]
 control
 
-[podman:children]
-cluster
-
 [prometheus:children]
 control
 
