@@ -1,7 +1,4 @@
-openhpc_packages: []
-  # - slurm-libpmi-ohpc # is installed by role anyway
-  # - openmpi4-gnu9-ohpc
-  # - ohpc-gnu9-perf-tools
-  # - lmod-defaults-gnu9-openmpi4-ohpc
 openhpc_slurm_partitions:
   - name: "hpc"
+
+openhpc_tests_hpl_NB: 256 # Xeon(R) CPU E5-2680 v2, ivybridge
