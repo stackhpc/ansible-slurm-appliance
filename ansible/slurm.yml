@@ -15,5 +15,11 @@
   tags:
     - openhpc
   tasks:
-   - import_role:
+    - import_role:
         name: stackhpc.openhpc
+    - name: set memory limits
+      lineinfile:
+        path: /etc/security/limits.conf
+        regexp: '\* soft memlock unlimited'
+        line: "* soft memlock unlimited"
+      when: "'control' not in group_names"
