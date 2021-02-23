@@ -1,17 +1,15 @@
 - name: Create /etc/hosts
   hosts: cluster
   become: true
-  tags:
-    - etc_hosts
   tasks:
-    - name: Generate /etc/hosts file content
+    
+    - name: Internal DNS workaround - generate /etc/hosts file content
       set_fact: # TODO: define which network to use below:
         etc_hosts_content: |
           {% for host in ansible_play_hosts %}{{ hostvars[host]['ansible_default_ipv4']['address'] }} {{ host }}.novalocal {{ host }}
           {% endfor %}
       run_once: true
-
-    - name: Create entries in /etc/hosts for all nodes
+    - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
       blockinfile:
         path: /etc/hosts
         create: no # TODO: ??
