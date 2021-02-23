@@ -14,7 +14,7 @@ control
 control
 
 [grafana:children]
-control
+login
 
 [alertmanager:children]
 control
