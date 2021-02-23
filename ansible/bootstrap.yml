@@ -23,10 +23,6 @@
             regexp: "{{ connection_user.home }}"
             replace: "{{ ansible_user_home }}"
           register: etc_passwd
-         # NB: reboot is not always needed - not clear yet which service is causing problems
-        - name: reboot
-          reboot:
-          when: etc_passwd.changed
         # TODO: delete old homedir
       when:
         - ansible_user_home is defined # TODO: and defined etc etc
