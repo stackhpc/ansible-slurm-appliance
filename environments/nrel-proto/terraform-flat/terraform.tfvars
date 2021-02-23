@@ -1,4 +1,4 @@
-compute_names = ["hpc-0", "hpc-1", "hpc-2", "hpc-3"]
+compute_names = ["hpc-0", "hpc-1", "hpc-2", "hpc-3", "express-0", "express-1"]
 cluster_name  = "nrel" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 key_pair = "centos_at_deploy"
 cluster_network = "public-109"
