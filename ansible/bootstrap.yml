@@ -1,9 +1,38 @@
 ---
 
 - hosts: cluster
-  gather_facts: false
+  gather_facts: true
+  become: yes
   tasks:
+    - name: Get homedir for ansible_user # note ansible_env.HOME is /root when using become!
+      user:
+        name: "{{ ansible_user }}"
+        state: present
+      register: connection_user
+    - block:
+        - name: Copy ansible_user homedir
+          ansible.posix.synchronize:
+            src: "{{ connection_user.home }}/" # trailing-/ needed so we don't copy the directory itself, just contents
+            dest: "{{ ansible_user_home }}"
+            delete: yes
+            recursive: yes
+          delegate_to: "{{ inventory_hostname }}"
+        - name: modify /etc/passwd
+          replace:
+            path: /etc/passwd
+            regexp: "{{ connection_user.home }}"
+            replace: "{{ ansible_user_home }}"
+          register: etc_passwd
+         # NB: reboot is not always needed - not clear yet which service is causing problems
+        - name: reboot
+          reboot:
+          when: etc_passwd.changed
+        # TODO: delete old homedir
+      when:
+        - ansible_user_home is defined # TODO: and defined etc etc
+        - "connection_user.home != ansible_user_home"
+    - meta: reset_connection # needed for previous only but does not support conditional
+
     - name: Add users
       ansible.builtin.user: "{{ item }}"
       with_items: "{{ appliances_local_users }}"
-      become: true
