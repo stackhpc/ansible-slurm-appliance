@@ -1,7 +1,7 @@
 ---
 roles:
   - src: stackhpc.nfs
-    version: v20.11.1 # need mount state for packer
+    version: feature/multiconfigs # TODO: change when merged
   - src: https://github.com/stackhpc/ansible-role-openhpc # FIXME: once updated on galaxy
     name: stackhpc.openhpc
     version: master
