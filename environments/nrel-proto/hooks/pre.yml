@@ -15,3 +15,22 @@
         create: no # TODO: ??
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
+    
+    - name: Create scratch directory - should be on local SSD on real cluster
+      file:
+        path: /tmp/scratch
+        state: directory
+
+    - name: Turn off hyperthreading to give consistent core count (else nodes get downed by Slurm) # some have it on, some have it off
+      shell: echo off > /sys/devices/system/cpu/smt/control
+    
+    # - name: Check processor count for compute nodes
+    #   set_fact:
+    #     pre_total_cores: "{{ dict(groups['compute'] | zip(groups['compute'] | map('extract', hostvars) | map(attribute='ansible_processor_vcpus') )) }}"
+    #   run_once: true
+    
+    # - assert:
+    #     that: pre_total_cores | unique | length == 1
+    #     fail_msg: "Different numbers of cores in 'compute' nodes:\n{{ pre_total_cores | to_nice_yaml }}"
+    #     success_msg: "Core counts ok"
+    #   run_once: true
