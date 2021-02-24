@@ -30,6 +30,8 @@
     - name: Turn off hyperthreading to give consistent core count (else nodes get downed by Slurm) # some have it on, some have it off
       shell: echo off > /sys/devices/system/cpu/smt/control
       when: "smt.stdout != 'off'"
+    - name: rerun facts
+      setup:
     
     # - name: Check processor count for compute nodes
     #   set_fact:
