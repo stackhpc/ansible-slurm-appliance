@@ -1,7 +1,9 @@
 openhpc_slurm_partitions:
   - name: "hpc"
-    default: NO
-  - name: "express"
     default: YES
-
+    maxtime: "3-0" # 3 days 0 hours
+  - name: "express"
+    default: NO
+    maxtime: "1:0:0" # 1 hour 0m 0s
+  
 openhpc_tests_hpl_NB: 256 # Xeon(R) CPU E5-2680 v2, ivybridge
