@@ -1,8 +1,7 @@
-- name: Create /etc/hosts
+- name: nrel-proto fixes - all nodes
   hosts: cluster
   become: true
   tasks:
-    
     - name: Internal DNS workaround - generate /etc/hosts file content
       set_fact: # TODO: define which network to use below:
         etc_hosts_content: |
@@ -15,14 +14,22 @@
         create: no # TODO: ??
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
-    
+
+- name: nrel-proto fixes - compute nodes
+  hosts: compute
+  become: true
+  tasks:
     - name: Create scratch directory - should be on local SSD on real cluster
       file:
         path: /tmp/scratch
         state: directory
-
+    - name: Check hyperthreading
+      command: "cat /sys/devices/system/cpu/smt/control"
+      register: smt
+      changed_when: false
     - name: Turn off hyperthreading to give consistent core count (else nodes get downed by Slurm) # some have it on, some have it off
       shell: echo off > /sys/devices/system/cpu/smt/control
+      when: "smt.stdout != 'off'"
     
     # - name: Check processor count for compute nodes
     #   set_fact:
