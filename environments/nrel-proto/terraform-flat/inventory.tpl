@@ -6,7 +6,9 @@ openhpc_cluster_name=${cluster_name}
 ${control.name} ansible_host=${control.network[0].fixed_ip_v4} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}'
 
 [login]
+%{ for login in logins ~}
 ${login.name} ansible_host=${login.network[0].fixed_ip_v4} server_networks='${jsonencode({for net in login.network: net.name => [ net.fixed_ip_v4 ] })}'
+%{ endfor ~}
 
 [compute]
 %{ for compute in computes ~}

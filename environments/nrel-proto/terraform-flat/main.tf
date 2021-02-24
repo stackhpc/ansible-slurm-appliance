@@ -10,7 +10,13 @@ terraform {
 variable "compute_names" {
     type = list(string)
     default = ["compute-0", "compute-1"]
-    description = "A list of hostnames for the compute nodes"
+    description = "A list of hostnames for the compute nodes (will be prefixed by cluster_name)"
+}
+
+variable "login_names" {
+  type = list(string)
+  default = ["login-0"]
+  description = "A list of hostnames for the login nodes (will be prefixed by cluster_name)"
 }
 
 variable "cluster_name" {
@@ -80,8 +86,11 @@ resource "openstack_compute_instance_v2" "control" {
 
 }
 
-resource "openstack_compute_instance_v2" "login" {
-  name = "${var.cluster_name}-login-0"
+resource "openstack_compute_instance_v2" "logins" {
+
+  for_each = toset(var.login_names)
+
+  name = "${var.cluster_name}-${each.value}"
   image_name = var.login_image
   flavor_name = var.login_flavor
   key_pair = var.key_pair
@@ -133,7 +142,7 @@ resource "local_file" "hosts" {
                           {
                             "cluster_name": var.cluster_name
                             "control": openstack_compute_instance_v2.control,
-                            "login": openstack_compute_instance_v2.login,
+                            "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.compute,
                             # "fip": openstack_networking_floatingip_v2.login
                           },
