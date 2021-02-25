@@ -2,39 +2,42 @@
   become: yes
   tags:
     - post
+  name: Setup login node authorized_keys for external access
   tasks:
-    - name: get authorised_keys for centos user on deploy host
+    - name: Get authorised_keys for centos user on deploy host
       slurp:
         path: /home/centos/.ssh/authorized_keys
       register: deploy_authed_keys
       delegate_to: localhost
       run_once: true
-    - name: add keys to authorised_keys for centos user on login nodes
+    - name: Add keys to authorised_keys for centos user on login nodes
       blockinfile:
-        path: /home/centos/.ssh/authorized_keys
+        path: /var/lib/centos/.ssh/authorized_keys
         block: "{{ deploy_authed_keys.content | b64decode }}"
       
 - hosts: cluster
   become: yes
   tags:
     - post
+  name: Setup non-privileged test user
   tasks:
-    - name: create test user
+    - name: Create test user
       user:
         name: test
         comment: non-priviledged test user
-    - name: create ~/.ssh directory for test user
+    - name: Create ~/.ssh directory for test user
       file:
         path: /home/test/.ssh
         state: directory
         owner: test
         group: test
+        mode: 0700
       run_once: true # as on nfs
-    - name: enable test user login using local centos public key
+    - name: Enable test user login using key for centos user on deploy host
       copy:
         src: /home/centos/.ssh/id_rsa.pub
         dest: /home/test/.ssh/authorized_keys
         owner: test
         group: test
-        mode: 0644
+        mode: 0600
       run_once: true # TODO: not a general solution, but avoids race error as this is nfs-mounted        

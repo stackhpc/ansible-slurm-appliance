@@ -116,6 +116,14 @@ NB: if grafana's yum repos are down you will see `Errors during downloading meta
     exit
     ansible-playbook -i inventory monitoring.yml -e grafana_password=<password> --skip-tags grafana_install
 
+# Slurm partitions
+
+- The cluster name is defined by `openhpc_cluster_name` in `environments/nrel-proto/inventory/hosts`.
+- Define an ansible inventory group for each partition as `<cluster_name>_<group_name>` in `environments/nrel-proto/inventory/slurm_partitions`
+- Define the partition(s) in `environments/nrel-proto/inventory/group_vars/openhpc/overrides.yml`
+
+See the ([openhpc role docs](https://github.com/stackhpc/ansible-role-openhpc#slurmconf]) for more help.
+
 # rebuild.yml
 
 # FIXME: outdated
