@@ -1,11 +1,14 @@
 ---
 
 - hosts: cluster
-  gather_facts: false
+  gather_facts: true
   tasks:
     - name: Add users
       ansible.builtin.user: "{{ item }}"
       with_items: "{{ appliances_local_users }}"
+      become_method: "sudo"
+      # Need to change working directory otherwise we try to switch back to non-existent directory.
+      become_flags: '-i'
       become: true
 
 - hosts: selinux
