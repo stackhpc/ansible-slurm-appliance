@@ -7,3 +7,11 @@
       ansible.builtin.user: "{{ item }}"
       with_items: "{{ appliances_local_users }}"
       become: true
+
+- hosts: selinux
+  gather_facts: false
+  become: yes
+  tasks:
+    - ansible.posix.selinux:
+        state: "{{ selinux_state }}"
+        policy: "{{ selinux_policy }}"

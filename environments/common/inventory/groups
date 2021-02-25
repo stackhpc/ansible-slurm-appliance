@@ -44,3 +44,6 @@ filebeat
 
 [openhpc_tests:children]
 cluster
+
+[selinux:children]
+cluster
