@@ -22,13 +22,18 @@
             path: /etc/passwd
             regexp: "{{ connection_user.home }}"
             replace: "{{ ansible_user_home }}"
-          register: etc_passwd
-        # TODO: delete old homedir
       when:
-        - ansible_user_home is defined # TODO: and defined etc etc
+        - ansible_user_home is defined
         - "connection_user.home != ansible_user_home"
-    - meta: reset_connection # needed for previous only but does not support conditional
-
+    - meta: reset_connection # needed for same "when" conditions but does not support conditional
+    - name: delete old homedir
+      file:
+        path: "{{ connection_user.home }}"
+        state: absent
+      when:
+        - ansible_user_home is defined
+        - "connection_user.home != ansible_user_home"
+        
     - name: Add users
       ansible.builtin.user: "{{ item }}"
       with_items: "{{ appliances_local_users }}"
