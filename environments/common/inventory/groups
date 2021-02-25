@@ -41,3 +41,6 @@ filebeat
 [mysql]
 
 [node_exporter]
+
+[openhpc_tests:children]
+cluster
