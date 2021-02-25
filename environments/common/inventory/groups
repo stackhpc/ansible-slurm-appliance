@@ -43,7 +43,8 @@ filebeat
 [node_exporter]
 
 [openhpc_tests:children]
-cluster
+login
+compute
 
 [selinux:children]
 cluster
