@@ -15,5 +15,19 @@
   tags:
     - openhpc
   tasks:
-   - import_role:
+    - import_role:
         name: stackhpc.openhpc
+
+- name: Set locked memory limits on user-facing nodes
+  hosts:
+    - compute
+    - login
+  become: yes
+  tags:
+    - openhpc
+  tasks:
+    - name: set memory limits
+      lineinfile:
+        path: /etc/security/limits.conf
+        regexp: '\* soft memlock unlimited'
+        line: "* soft memlock unlimited"
