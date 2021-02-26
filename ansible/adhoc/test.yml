@@ -4,9 +4,15 @@
 # Prequisites:
 # - slurm-libpmi-ohpc package - installed by default by openhpc role
 
+# Use tags like this to run specific tests:
+#   ansible-playbook ansible/adhoc/test.yml --tags pingmatrix
+#
+# Only works for default partition. If this isn't the entire set of compute nodes you must also limit it
+# to those nodes, e.g.:
+#   ansible-playbook ansible/adhoc/test.yml --tags pingmatrix openhpc_tests_nodes=hpc-[0-3]
+
 - hosts: openhpc_tests
   name: Run tests
-  tags: test
   gather_facts: true
   tasks:
     - import_role:
