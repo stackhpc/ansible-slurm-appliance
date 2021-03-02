@@ -30,39 +30,33 @@ These instructions assume the deployment host is running Centos 8:
     ansible-galaxy role install -r requirements.yml -p ansible/roles
     ansible-galaxy collection install -r requirements.yml -p ansible/collections # ignore the path warning here
 
+
 ## Overview of directory structure
 
 Further information on each of these is provided in the relevent directory's `README.md`.
 
-### environments
+- `environments/`: Contains configurations for both a "common" environment and one or more environments derived from this for your site. These define ansible inventory and may also contain provisioning automation such as Terraform or OpenStack HEAT templates.
+- `ansible/`: Contains the ansible playbooks to configure the infrastruture.
+- `packer/`: Contains automation to use Packer to build compute nodes for an enviromment.
 
-Contains configurations for both a "common" environment and one or more environments derived from this for your site.
+## Creating a Slurm appliance
 
-Environments define ansible inventory and may also contain provisioning code such as Terraform or OpenStack HEAT templates.
+NB: This section describes generic instructions - check for any environment-specific instructions in `environments/<environment>/README.md` before starting.
 
-**NB:** All commands described below require an environment to be "activated" to set appropriate environment variables:
+1. Activate the environment - this is REQUIRED before any other commands are run:
 
     source environments/<environment>activate
 
-How to create and modify an environment is described below.
+2. Deploy instances - see environment-specific instructions.
 
-### ansible
+3. Generate passwords:
 
-Contains the ansible playbooks to configure the infrastruture.
+    ansible-playbook ansible/adhoc/generate-passwords.yml
 
-Once an environment has been activated as above, the following will run all configuration:
+4. Deploy the appliance:
 
     ansible-playbook ansible/site.yml
 
-### packer
-
-Images for the compute nodes can be built using the Packer in this director These can be used for upgrading an
-existing cluster or for initial deployment of a set of compute nodes. Once an environment has been activated, run:
-
-    cd packer
-     ~/.local/bin/packer build --on-error=ask main.pkr.hcl
-
-See `packer/README.md` for more details.
 
 ## Environments
 
@@ -85,3 +79,6 @@ TODO:
 ### Groups
 
 TODO:
+
+# TODO
+Document passwords
