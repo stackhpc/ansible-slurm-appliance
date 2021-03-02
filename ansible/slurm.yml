@@ -31,3 +31,24 @@
         path: /etc/security/limits.conf
         regexp: '\* soft memlock unlimited'
         line: "* soft memlock unlimited"
+
+- name: Block ssh to compute nodes for non-privileged users without running jobs
+  hosts: compute
+  become: yes
+  tags:
+    - openhpc
+  tasks:
+    - name: Configure sshd pam module
+      blockinfile:
+        path: /etc/pam.d/sshd
+        insertafter: 'account\s+required\s+pam_nologin.so'
+        block: |
+          account    sufficient   pam_access.so
+          account    required     pam_slurm.so
+    - name: Configure login access control
+      blockinfile:
+        path: /etc/security/access.conf
+        block: |
+          +:wheel:ALL
+          +:centos:ALL
+          -:ALL:ALL
