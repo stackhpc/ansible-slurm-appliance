@@ -81,6 +81,8 @@ This repository generally follows a convention where:
 - Functionality is defined in terms of ansible roles applied to a a group of the same name, e.g. `openhpc` or `grafana`. The empty groups in the `common` invenvory mean that functionality is disabled by default, and must be enabled for a specific environment by adding hosts or child groups to the group in an environment-specific `environments/<environment>/inventory/groups` file. The meaning of the groups is described below.
 - Environment-specific variables for each role/group can be defined in a group_vars directory of the same name in `environments/<environment>/inventory/group_vars/<group_name>/overrides.yml`. These override any default values specified in `environments/common/inventory/group_vars/all/<group_name>.yml` (the use of `all` here is due to ansible's precedence rules).
 
+TODO: Document hooks
+
 ### Creating a new environment
 
 TODO: and  mention layout files.
@@ -89,9 +91,17 @@ TODO: and  mention layout files.
 
 TODO:
 
-### Groups
+### Environment-specific inventory
 
-TODO:
+This section describes how to structure an environment
 
-# TODO
-Document passwords
+- The hosts should be listed in a file `environments/<environment>/inventory/hosts`. This is usually created by the deployment automation and should define the following groups:
+    - `control`: A single host for the Slurm control node. Multiple (high availability) control nodes are not supported.
+    - `login`: One or more hosts for Slurm login nodes. Combined control/login nodes are not supported.
+    - `compute`: Hosts for all Slurm compute nodes.
+- The cluster name must be defined for all hosts using `openhpc_cluster_name`. Setting this in the above hosts file using `[all:vars]` is usually convenient.
+- Each Slurm partition must contain a homogeneous set of hosts. For each partition:
+    - Define an ansible inventory group for each partition as `<cluster_name>_<partition_name>`.
+    - Define the partition by setting openhpc_slurm_partitions in `environments/<environment>/inventory/group_vars/openhpc/overrides.yml`.
+  
+  See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
