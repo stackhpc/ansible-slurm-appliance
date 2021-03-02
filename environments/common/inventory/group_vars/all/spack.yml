@@ -1,0 +1,3 @@
+spack_root: /mnt/nfs/spack
+spack_version: HEAD
+spack_packages: []

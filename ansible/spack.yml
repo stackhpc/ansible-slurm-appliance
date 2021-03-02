@@ -1,0 +1,8 @@
+- name: Setup spack
+  hosts: spack
+  become: yes
+  tags:
+    - spack
+  tasks:
+    - import_role:
+        name: stackhpc.spack

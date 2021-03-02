@@ -33,3 +33,6 @@ control
 
 [filebeat:children]
 slurm_stats
+
+[spack:children]
+login

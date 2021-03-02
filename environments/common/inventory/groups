@@ -49,5 +49,4 @@ compute
 [selinux:children]
 cluster
 
-[selinux:children]
-cluster
+[spack]
