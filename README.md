@@ -45,17 +45,30 @@ NB: This section describes generic instructions - check for any environment-spec
 
 1. Activate the environment - this is REQUIRED before any other commands are run:
 
-    source environments/<environment>activate
+        source environments/<environment>activate
 
 2. Deploy instances - see environment-specific instructions.
 
 3. Generate passwords:
 
-    ansible-playbook ansible/adhoc/generate-passwords.yml
+        ansible-playbook ansible/adhoc/generate-passwords.yml
+
+    This will output a set of passwords in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
+
+        ansible-vault encrypt inventory/group_vars/all/secrets.yml
+   
+    See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
+
 
 4. Deploy the appliance:
 
-    ansible-playbook ansible/site.yml
+        ansible-playbook ansible/site.yml
+
+   or if you have encrypted secrets use:
+
+        ansible-playbook ansible/site.yml --ask-vault-password
+
+    Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
 
 
 ## Environments
