@@ -1,15 +1,15 @@
 # StackHPC Slurm Appliance
 
-This repository contains playbooks and configuration to define a Slurm-based HPC environment, including:
-- A Centos 8 and OpenHPC v2-based Slurm cluster with production-ready configuration.
-- Shared fileystem(s using NFS (with servers within or external to the cluster).
+This repository contains playbooks and configuration to define a Slurm-based HPC environment including:
+- A Centos 8 and OpenHPC v2-based Slurm cluster.
+- Shared fileystem(s) using NFS (with servers within or external to the cluster).
 - Slurm accounting using a MySQL backend.
-- A monitoring backend using Prometheus and an ElasticSearch.
+- A monitoring backend using Prometheus and ElasticSearch.
 - Grafana with dashboards for both individual nodes and Slurm jobs.
 - Production-ready Slurm defaults for access and memory.
 - A Packer-based build pipeline for compute node images.
 
-The repository is designed to be forked once for a specific use-case/HPC site containing multiple environments (e.g. development, staging and production). It has been designed to be modular and extensible, so if you add features for your HPC site please feel free to submit PRs back upstream to us!
+The repository is designed to be forked for a specific use-case/HPC site but can contain multiple environments (e.g. development, staging and production). It has been designed to be modular and extensible, so if you add features for your HPC site please feel free to submit PRs back upstream to us!
 
 ## Pre-requisites
 
@@ -33,17 +33,15 @@ These instructions assume the deployment host is running Centos 8:
 
 ## Overview of directory structure
 
-Further information on each of these is provided in the relevent directory's `README.md`.
-
 - `environments/`: Contains configurations for both a "common" environment and one or more environments derived from this for your site. These define ansible inventory and may also contain provisioning automation such as Terraform or OpenStack HEAT templates.
 - `ansible/`: Contains the ansible playbooks to configure the infrastruture.
-- `packer/`: Contains automation to use Packer to build compute nodes for an enviromment.
+- `packer/`: Contains automation to use Packer to build compute nodes for an enviromment - see the README in this directory for further information.
 
 ## Creating a Slurm appliance
 
 NB: This section describes generic instructions - check for any environment-specific instructions in `environments/<environment>/README.md` before starting.
 
-1. Activate the environment - this is REQUIRED before any other commands are run:
+1. Activate the environment - this **must be done** before any other commands are run:
 
         source environments/<environment>activate
 
@@ -71,23 +69,23 @@ NB: This section describes generic instructions - check for any environment-spec
     Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
 
 
-5. TODO: testing? and other ad-hoc?
+5. **TODO:** testing? and other ad-hoc?
 
 ## Environments
 
-An environment is a directory which defines all the configuration for instantiations of this Slurm appliance at one site. A cookiecutter command is described below provided to create a new environment from a template.
+An environment is a directory which defines all the configuration for a single instantiation of this Slurm appliance. A `cookiecutter` command is described below to create a new environment from a template.
 
-Amongst other things, an environments's `activate` script defines the path to a custom `ansible.cfg` which itself defines the paths to inventory directories. Therefore no inventory paths need to be specified to ansible once an environment is activated. All environments include `environments/common/inventory` as the first inventory searched, with the environment-specific inventory then overriding parts of this.
+Amongst other things, an environments's `activate` script defines the path to a custom `ansible.cfg` which itself defines the paths to ansible inventory directories. Therefore no inventory paths need to be specified on the command-line once an environment is activated. All environments load `environments/common/inventory` first, with an environment-specific inventory then overriding parts of this as required.
 
 This repository generally follows a convention where:
-- Functionality is defined in terms of ansible roles applied to a a group of the same name, e.g. `openhpc` or `grafana`. The empty groups in the `common` invenvory mean that functionality is disabled by default, and must be enabled for a specific environment by adding hosts or child groups to the group in an environment-specific `environments/<environment>/inventory/groups` file. The meaning of the groups is described below.
-- Environment-specific variables for each role/group can be defined in a group_vars directory of the same name in `environments/<environment>/inventory/group_vars/<group_name>/overrides.yml`. These override any default values specified in `environments/common/inventory/group_vars/all/<group_name>.yml` (the use of `all` here is due to ansible's precedence rules).
+- Functionality is defined in terms of ansible roles applied to a a group of the same name, e.g. `openhpc` or `grafana`. The empty groups in the `common` invenvory mean that functionality is disabled by default, and must be enabled for a specific environment by adding hosts (or child groups) to the relevant group in an environment-specific `environments/<environment>/inventory/groups` file. The purpose of each group is described below.
+- Environment-specific variables for each role/group can be defined in a `group_vars/` directory of the same name in `environments/<environment>/inventory/group_vars/<group_name>/overrides.yml`. These override any default values specified in `environments/common/inventory/group_vars/all/<group_name>.yml` (the use of `all` here is due to ansible's precedence rules).
 
 An environment may also contain "hooks" which are ansible playbooks to run before or after the tasks defined in `ansible/site.yml`.
 
 ### Creating a new environment
 
-This repo contains a `cookiecutter` template which can be used to create a new environment from scratch. Run [installation on deployment host](#Installation-on-deployment-host) instructions above, then in the repo root run:
+This repo contains a `cookiecutter` template which can be used to create a new environment from scratch. Run the [installation on deployment host](#Installation-on-deployment-host) instructions above, then in the repo root run:
 
     . venv/bin/activate
     cookiecutter environments/skeleton
@@ -96,10 +94,9 @@ and follow the prompts to complete the environment name and description.
 
 Alternatively, you could copy an existing environment directory.
 
-Now add deployment automation, if required, and then complete the [environment-specific inventory](#Environment-specific-inventory). 
+Now add deployment automation if required, and then complete the [environment-specific inventory](#Environment-specific-inventory). 
 
-TODO: and  mention layout files.
-
+TODO:  mention layout files.
 
 ### Environment-specific inventory
 
