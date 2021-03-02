@@ -1,4 +1,8 @@
-spack_root: /srv/nopt/spack
-spack_version: v0.16.1
+spack_root: /nopt/spack
+spack_version: develop
+spack_users:
+  - centos
+  - test
 spack_packages:
-  - "openmpi@3.1.6 %gcc@9.3.0 fabrics=ucx schedulers=auto"
+  - "openmpi@4.0.5 %gcc@9.3.0 fabrics=ucx schedulers=auto"
+  - "gromacs@2016.6" # need 2016 for HECBioSim benchmarks, this is latest
