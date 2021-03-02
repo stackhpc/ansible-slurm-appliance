@@ -63,3 +63,25 @@ existing cluster or for initial deployment of a set of compute nodes. Once an en
      ~/.local/bin/packer build --on-error=ask main.pkr.hcl
 
 See `packer/README.md` for more details.
+
+## Environments
+
+An environment is a directory which defines all the configuration for instantiations of this Slurm appliance at one site. A cookiecutter command is described below provided to create a new environment from a template.
+
+Amongst other things, an environments's `activate` script defines the path to a custom `ansible.cfg` which itself defines the paths to inventory directories. Therefore no inventory paths need to be specified to ansible once an environment is activated. All environments include `environments/common/inventory` as the first inventory searched, with the environment-specific inventory then overriding parts of this.
+
+This repository generally follows a convention where:
+- Functionality is defined in terms of ansible roles applied to a a group of the same name, e.g. `openhpc` or `grafana`. The empty groups in the `common` invenvory mean that functionality is disabled by default, and must be enabled for a specific environment by adding hosts or child groups to the group in an environment-specific `environments/<environment>/inventory/groups` file. The meaning of the groups is described below.
+- Environment-specific variables for each role/group can be defined in a group_vars directory of the same name in `environments/<environment>/inventory/group_vars/<group_name>/overrides.yml`. These override any default values specified in `environments/common/inventory/group_vars/all/<group_name>.yml` (the use of `all` here is due to ansible's precedence rules).
+
+### Creating a new environment
+
+TODO: and  mention layout files.
+
+### Modifying an environment
+
+TODO:
+
+### Groups
+
+TODO:
