@@ -1,0 +1,22 @@
+- hosts: compute,login
+  become: yes
+  gather_facts: no
+  tasks:
+    - service:
+        name: slurmd
+        state: stopped
+- hosts: control
+  become: yes
+  gather_facts: no
+  tasks:
+    - service:
+        name: slurmctld
+        state: restarted
+- hosts: compute,login
+  become: yes
+  gather_facts: no
+  tasks:
+    - service:
+        name: slurmd
+        state: started
+
