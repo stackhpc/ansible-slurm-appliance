@@ -68,20 +68,26 @@ NB: This section describes generic instructions - check for any environment-spec
 
     Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
 
+5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
 
-5. **TODO:** testing? and other ad-hoc?
+        ansible-playbook ansible/adhoc/<playbook name>
+
+   Currently they include:
+    - `test.yml`: MPI-based post-deployment tests for latency, bandwidth and floating point performance. See `ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/test/README.md` for full details. Note that you may wish to reconfigure the Slurm compute nodes into a single partition before running this.
+    **IMPORTANT: Do not use these tests on a cluster in production as the reconfiguration it performs will crash running jobs.**
+    - `update-packages.yml`: Update all packages on the cluster.
 
 ## Environments
 
-An environment is a directory which defines all the configuration for a single instantiation of this Slurm appliance. A `cookiecutter` command is described below to create a new environment from a template.
+### Overview
 
-Amongst other things, an environments's `activate` script defines the path to a custom `ansible.cfg` which itself defines the paths to ansible inventory directories. Therefore no inventory paths need to be specified on the command-line once an environment is activated. All environments load `environments/common/inventory` first, with an environment-specific inventory then overriding parts of this as required.
+An environment defines the configuration for a single instantiation of this Slurm appliance. Each environment is a directory in `environments/', containing:
+- Any deployment automation required - e.g. Terraform configuration or HEAT templates.
+- An ansible `inventory/` directory.
+- An `activate` script which sets environment variables to point to this configuration.
+- Optionally, additional playbooks in `/hooks` to run before or after the main tasks.
 
-This repository generally follows a convention where:
-- Functionality is defined in terms of ansible roles applied to a a group of the same name, e.g. `openhpc` or `grafana`. The empty groups in the `common` invenvory mean that functionality is disabled by default, and must be enabled for a specific environment by adding hosts (or child groups) to the relevant group in an environment-specific `environments/<environment>/inventory/groups` file. The purpose of each group is described below.
-- Environment-specific variables for each role/group can be defined in a `group_vars/` directory of the same name in `environments/<environment>/inventory/group_vars/<group_name>/overrides.yml`. These override any default values specified in `environments/common/inventory/group_vars/all/<group_name>.yml` (the use of `all` here is due to ansible's precedence rules).
-
-An environment may also contain "hooks" which are ansible playbooks to run before or after the tasks defined in `ansible/site.yml`.
+All environments load the inventory from the `common` environment first, with the environment-specific inventory then overriding parts of this as required.
 
 ### Creating a new environment
 
@@ -94,25 +100,32 @@ and follow the prompts to complete the environment name and description.
 
 Alternatively, you could copy an existing environment directory.
 
-Now add deployment automation if required, and then complete the [environment-specific inventory](#Environment-specific-inventory). 
+Now add deployment automation if required, and then complete the environment-specific inventory as described below.
 
-TODO:  mention layout files.
+### Environment-specific inventory structure
 
-### Environment-specific inventory
+The ansible inventory for the environment is in `environments/<environment>/inventory/`. It should generally contain:
+- A `hosts` file. This defines the hosts in the appliance. Generally it should be templated out by the deployment automation so it is also a convenient place to define variables which depend on the deployed hosts such as connection variables, IP addresses, ssh proxy arguments etc.
+- A `groups` file defining ansible groups, which essentially controls which features of the appliance are enabled and where they are deployed. This repository generally follows a convention where functionality is defined using ansible roles applied to a a group of the same name, e.g. `openhpc` or `grafana`. The meaning and use of each group is described in comments in `environments/common/inventory/groups`. As the groups defined there for the common environment are empty, functionality is disabled by default and must be enabled in a specific environment's `groups` file. Two template examples are provided in `environments/commmon/layouts/` demonstrating a minimal appliance with only the Slurm cluster itself, and an appliance with all functionality.
+- Optionally, group variable files in `group_vars/<group_name>/overrides.yml`, where the group names match the functional groups described above. These can be used to override the default configuration for each functionality, which are defined in `environments/common/inventory/group_vars/all/<group_name>.yml` (the use of `all` here is due to ansible's precedence rules).
 
-This section describes how to structure the inventory in an environment.
+Although most of the inventory uses the group convention described above there are a few special cases:
+- The `control`, `login` and `compute` groups are special as they need to contain actual hosts rather than child groups, and so should generally be defined in the templated-out `hosts` file.
+- The cluster name must be set on all hosts using `openhpc_cluster_name`. Using an  `[all:vars]` section in the `hosts` file is usually convenient.
+- `environments/common/inventory/group_vars/all/defaults.yml` contains some variables which are not associated with a specific role/feature. These are unlikely to need changing, but if necessary that could be done using a `environments/<environment>/inventory/group_vars/all/overrides.yml` file.
+- Each Slurm partition must have:
+    - An inventory group `<cluster_name>_<partition_name>` defining the hosts it contains - these must be homogenous w.r.t CPU and memory.
+    - An entry in the `openhpc_slurm_partitions` mapping in `environments/<environment>/inventory/group_vars/openhpc/overrides.yml`.
+    See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
 
-1. The hosts should be listed in a file `environments/<environment>/inventory/hosts`. This is usually created by the deployment automation and should define the following groups:
+
+# TO MOVE
+
+
+
     - `control`: A single host for the Slurm control node. Multiple (high availability) control nodes are not supported.
     - `login`: One or more hosts for Slurm login nodes. Combined control/login nodes are not supported.
     - `compute`: Hosts for all Slurm compute nodes.
-1. The cluster name must be defined for all hosts using `openhpc_cluster_name`. Setting this in the above hosts file using `[all:vars]` is usually convenient.
-1. Each Slurm partition must contain a homogeneous set of hosts. For each partition:
-    - Define an ansible inventory group for each partition as `<cluster_name>_<partition_name>`.
-    - Define the partition by setting openhpc_slurm_partitions in `environments/<environment>/inventory/group_vars/openhpc/overrides.yml`.
-  
-  See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
-1. The required groups must be defined in `environments/<environment>/inventory/groups` as described TODO. Note that `environments/common/layouts/` contains `minimal` and `everything` example groups files which should generally form a good basis for a new environment.
 
 ## Inventory groups
 
