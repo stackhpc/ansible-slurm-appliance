@@ -127,37 +127,11 @@ Although most of the inventory uses the group convention described above there a
     - `login`: One or more hosts for Slurm login nodes. Combined control/login nodes are not supported.
     - `compute`: Hosts for all Slurm compute nodes.
 
-## Inventory groups
-
-This repo defines the following groups:
-- `control`: A single Slurm control node. Multiple (high availability) control nodes are not supported.
-- `login`: One Slurm login nodes. Combined control/login nodes are not supported.
-- `compute`: All Slurm compute nodes.
-- `openhpc`: All Slurm nodes - default is the union of `control`, `login` and `compute` groups.
-- `cluster`: All nodes in the cluster - default is as for `openhpc` but this allows for e.g. separate monitoring nodes.
-- `nfs`: NFS servers or clients, e.g. might be `openhpc` group.
-- `builder`: Host to use to optionally build compute images - see separate documentation TODO:
-- `podman`: Hosts running containers via [podman](https://podman.io/) - defaults to union of `opendistro`, `kibana`, `filebeat` groups.
-- `prometheus`: Host for the [Prometheus monitoring server](https://prometheus.io/docs/introduction/overview/#architecture).
-- `grafana`: Host for the [Grafana visualisation server](https://grafana.com/docs/grafana/latest/getting-started/)
-- `alertmanager`: TODO:
-- `exporters`: TODO: delete, unused
-- `opendistro`: Host running ElasticSearch.
-- `kibana`: TODO:
-- `slurm_stats`: Host running tools to integrate Slurm's accounting information with ElasticSearch. Host must be in both groups `openhpc` group (for `sacct` command) and `opendistro`.
-- `filebeat`: TODO:
-- `mysql`: TODO:
-- `node_exporter`: Hosts to export hardware and OS metrics from using the [Prometheus node exporter](https://github.com/prometheus/node_exporter)
-- `openhpc_tests`: TODO: default: login + compute
-- `selinux`: TODO: default `cluster`
-
 
 ## Adding new functionality
-TODO: this is just rough notes.
-Update:
-- READMEs
-- `environments/common/inventory/groups`
-- Example groups file in `environments/common/layouts/everything`
-- default group vars
-
-
+TODO: this is just rough notes:
+- Add new plays into existing playbook, or add a new playbook and update `site.yml`.
+- Add new group into `environments/common/inventory/groups`
+- Add new default group vars.
+- Update example groups file `environments/common/layouts/everything`
+- Update READMEs.
