@@ -29,7 +29,7 @@
       changed_when: false
     - name: Turn off hyperthreading to give consistent core count (else nodes get downed by Slurm) # some have it on, some have it off
       shell: echo off > /sys/devices/system/cpu/smt/control
-      when: "smt.stdout != 'off'"
+      when: "smt.stdout == 'on'" # deals with notsupported case in packer VM
     - name: rerun facts
       setup:
     
