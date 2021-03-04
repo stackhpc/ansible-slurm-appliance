@@ -20,7 +20,7 @@ control
 compute
 
 [builder]
-# Host for (optionally) building compute images - see separate documentation.
+# VM used to (optionally) build compute images - do not add hosts. See packer/README.md.
 
 [podman:children]
 # Hosts running containers for below services:
