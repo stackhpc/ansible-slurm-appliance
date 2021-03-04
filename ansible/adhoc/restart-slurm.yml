@@ -1,3 +1,9 @@
+# Restart all slurm daemons e.g. after changing configuration. Note that:
+# - `scontrol reconfigure` will handle most reconfiguration - see https://slurm.schedmd.com/scontrol.html#OPT_reconfigure
+#   for which options need a restart
+# - Adding or removing nodes by changing the `openhpc_` configuration and rerunning ansible/site.yml will automatically
+#   restart daemons as required.
+
 - hosts: compute,login
   become: yes
   gather_facts: no
