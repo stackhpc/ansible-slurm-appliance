@@ -42,7 +42,7 @@ build {
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
     host_alias = "packer"
-    groups = ["computes", "builder"]
+    groups = ["compute", "builder"]
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     # TODO: use completely separate inventory, which just shares common? This will ensure
