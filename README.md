@@ -119,15 +119,6 @@ Although most of the inventory uses the group convention described above there a
     See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
 
 
-# TO MOVE
-
-
-
-    - `control`: A single host for the Slurm control node. Multiple (high availability) control nodes are not supported.
-    - `login`: One or more hosts for Slurm login nodes. Combined control/login nodes are not supported.
-    - `compute`: Hosts for all Slurm compute nodes.
-
-
 ## Adding new functionality
 TODO: this is just rough notes:
 - Add new plays into existing playbook, or add a new playbook and update `site.yml`.
