@@ -81,7 +81,7 @@ NB: This section describes generic instructions - check for any environment-spec
 
 ### Overview
 
-An environment defines the configuration for a single instantiation of this Slurm appliance. Each environment is a directory in `environments/', containing:
+An environment defines the configuration for a single instantiation of this Slurm appliance. Each environment is a directory in `environments/`, containing:
 - Any deployment automation required - e.g. Terraform configuration or HEAT templates.
 - An ansible `inventory/` directory.
 - An `activate` script which sets environment variables to point to this configuration.
