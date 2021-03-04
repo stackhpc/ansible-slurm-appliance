@@ -36,6 +36,7 @@ These instructions assume the deployment host is running Centos 8:
 - `environments/`: Contains configurations for both a "common" environment and one or more environments derived from this for your site. These define ansible inventory and may also contain provisioning automation such as Terraform or OpenStack HEAT templates.
 - `ansible/`: Contains the ansible playbooks to configure the infrastruture.
 - `packer/`: Contains automation to use Packer to build compute nodes for an enviromment - see the README in this directory for further information.
+- `dev/`: Contains development tools.
 
 ## Creating a Slurm appliance
 
