@@ -1,193 +1,75 @@
-# Nrel-Dev cluster
+# NREL prototype Slurm appliance
 
-NREL development environment
+Prototype for the Slurm appliance on the NREL Vermilion system.
 
-# Directory structure
+While the real system will use VMs on AMD Epyc hypervisors with RoCE, this prototype uses baremetal blade instances with a variety of processors and IP over Ethernet.
 
-## terraform
+This README is supplimentary to the main readme at ../../README.md so only differences/additinoal information is noted here. Paths are relative to this environment unless otherwise noted.
 
-Contains terraform configuration to deploy infrastructure.
+## Pre-requisites
+- The lab does not provide internal DNS hence `hooks/pre.yml` will populate `/etc/hosts` for all hosts.
 
-## inventory
+## Installation on deployment host
+See main README.
 
-Ansible inventory for configuring the infrastructure.
+Additionally install `terraform` following its [documentation](https://learn.hashicorp.com/tutorials/terraform/install-cli).
 
-# Initial Setup
+## Overview of directory structure
+See main README.
 
-On your deployment host (assuming Centos8) run:
+## Creating a Slurm appliance
 
-    git clone  git@github.com:stackhpc/openhpc-demo.git nrel-slurm-app
-    cd nrel-slurm-app
-    git checkout -b nrel
-    python3 -m venv venv
-    . venv/bin/activate
-    pip install -U pip
-    pip install -r requirements.txt
-    
-    # Install terraform:
-    sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
-    sudo yum -y install terraform
+In addition to main README:
 
-    # Install ansible dependencies - don't worry about collection paths warning:
-    ansible-galaxy role install -r requirements.yml -p ansible/roles
-    ansible-galaxy collection install -r requirements.yml -p ansible/collections
+2. Deploy instances using Terraform:
 
-# Activating the environment
+   Two terraform configurations are provided:
+   - `terraform-flat/`: Deploys all instances onto a single preexisting network which has a router to the external network (in the Admin project). This is the currently-used approach as the lab environment does not currently support the necessary VLANs for additional networks. You will need to manually add floating IPs where necessary after running this.
+   - `terraform-flat/`: Deploys all instances into a cluster-specific private network and creates a router to a designated external network. This is intended to provide an example of a more production-like configuration, and is untested.
 
-There is a small environment file that you must `source` which defines environment
-variables that reference the configuration path. This is so that we can locate
-resources relative the environment directory.
+   In either case:
+   - Modify variables in `terraform*/terraform.tfvars` to define the cluster size and cloud environment.
+   - Ensure the appropriate images (Centos 8.2 or 8.3) and SSH keys are available in OpenStack.
+   
+   Then run:
 
-    . environments/nrel-dev/activate
+        cd <terraform directory>
+        terraform apply
 
-The pattern we use is that all resources referenced in the inventory
-are located in the environment directory containing the inventory that
-references them.
+3. Passwords are not currently encrypted or commited.
 
-# Common configuration
+## Environments
 
-Configuarion is shared by specifiying multiple inventories. We reference the `common`
-inventory from `ansible.cfg`, including it before the environment specific
-inventory, located at `./inventory`.
+This section describes this environment as currently previsioned using `terraform-flat/`. For general notes on how environments work see the main README.
 
-Inventories specified later in the list can override values set in the inventories
-that appear earlier. This allows you to override values set by the `common` inventory.
-
-Any variables that would be identical for all environments should be defined in the `common` inventory.
-
-# Passwords
-
-Prior to running any other playbooks, you need to define a set of passwords. You can
-use the `generate-passwords.yml` playbook to automate this process:
+Note the deployment host is on the same network as the cluster and is the only instance with a floating IP. To access the cluster you should therefore configure SSH to proxy through this and forward a port for a SOCKS proxy. An example is given below but usernames should be advised and IPs may change:
 
 ```
-ansible-playbook ansible/adhoc/generate-passwords.yml
+Host nrel-vglab-login-0
+  HostName 10.109.1.228
+  User centos
+  ProxyJump nrel-vglab-deploy
+  DynamicForward 8080
+
+Host nrel-vglab-deploy
+  HostName 185.45.78.153
+  User centos
+  DynamicForward 8080
 ```
 
-This will output a set of passwords `inventory/group_vars/all/secrets.yml`.
-Placing them in the inventory means that they will be defined for all playbooks.
+This environment defines:
 
-It is recommended to encrypt the contents of this file prior to commiting to git:
+- 2x login nodes `nrel-login-{0,1}` - see `inventory/hosts` for IP addresses.
+- 4x node "hpc" partition with 3-day timelimit. Intended to represent a partition for production MPI application runs.
+- 2x node "express" partition with a 1-hour timelimit. Intended to represent a partition for development of (multi-node) MPI-based Python data science programs.
+- Monitoring dashboards available via Grafana on `nrel-login-0` - use a SOCKS proxy as above to access this. Grafana can be used without login in read-only mode, or use username: `grafana` and password given in `inventory/group_vars/all/secrets.yml` to login in admin mode.
+- All other services running on the Slurm controller `nrel-control`.
+- `/home/` mounted over NFS from `nrel-control` on login and compute nodes (note `centos` and other system users have local home directories in `/var/lib/`).
+- The following filesystems mounted over NFS on all hosts from a separate instance not managed by this environment (see `home/centos/nrel-filer/` on the deploy host for code):
+    - `/scratch`: Cluster shared scratch
+    - `/projects`: Cluster shared storage
+    - `/nopt`: Network applications.
+   These are intended to prototype CephFS-backed shared fileystems in the production environment.
+- `/tmp/scratch` is provided on ephemeral disk as a prototype for an SSD-based volume in the production environment.
 
-```
-ansible-vault encrypt inventory/group_vars/all/secrets.yml
-```
-
-You will then need to provide a password when running the playbooks e.g:
-
-```
-ansible-playbook ../ansible/site.yml --tags grafana --ask-vault-password
-```
-
-See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
-
-
-# Deploy nodes with Terraform
-
-- Modify the keypair in `main.tf` and ensure the required Centos images are available on OpenStack.
-- Activate the virtualenv and create the instances:
-
-      . venv/bin/activate
-      cd environments/nrel-dev/terraform
-      terraform init # only needed on first use
-      terraform apply
-
-This creates an ansible inventory file `./inventory`.
-
-Note that this terraform deploys instances onto an existing network - for production use you probably want to create a network for the cluster.
-
-# Create and configure cluster with Ansible
-
-Now run one or more playbooks using:
-
-    cd <repo root>
-    ansible-playbook ansible/site.yml
-
-This provides:
-- grafana at `http://<login_ip>:3000` - username `grafana`, password as set above
-- prometheus at `http://<login_ip>:9090`
-
-NB: if grafana's yum repos are down you will see `Errors during downloading metadata for repository 'grafana' ...`. You can work around this using:
-
-    ssh centos@<login_ip>
-    sudo rm -rf /etc/yum.repos.d/grafana.repo
-    wget https://dl.grafana.com/oss/release/grafana-7.3.1-1.x86_64.rpm
-    sudo yum install grafana-7.3.1-1.x86_64.rpm
-    exit
-    ansible-playbook -i inventory monitoring.yml -e grafana_password=<password> --skip-tags grafana_install
-
-# Slurm partitions
-
-- The cluster name is defined by `openhpc_cluster_name` in `environments/nrel-proto/inventory/hosts`.
-- Define an ansible inventory group for each partition as `<cluster_name>_<group_name>` in `environments/nrel-proto/inventory/slurm_partitions`
-- Define the partition(s) in `environments/nrel-proto/inventory/group_vars/openhpc/overrides.yml`
-
-See the ([openhpc role docs](https://github.com/stackhpc/ansible-role-openhpc#slurmconf]) for more help.
-
-# rebuild.yml
-
-# FIXME: outdated
-
-Enable the compute nodes of a Slurm-based OpenHPC cluster on Openstack to be reimaged from Slurm.
-
-For full details including the Slurm commmands to use see the [role's README](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/blob/main/roles/rebuild/README.md)
-
-Ensure you have `~/.config/openstack/clouds.yaml` defining authentication for a a single Openstack cloud (see above README to change location).
-
-Then run:
-
-    ansible-playbook -i inventory rebuild.yml
-
-Note this does not rebuild the nodes, only deploys the tools to do so.
-
-# test.yml
-
-This runs MPI-based tests on the cluster:
-- `pingpong`: Runs Intel MPI Benchmark's IMB-MPI1 pingpong between a pair of (scheduler-selected) nodes. Reports zero-size message latency and maximum bandwidth.
-- `pingmatrix`: Runs a similar pingpong test but between all pairs of nodes. Reports zero-size message latency & maximum bandwidth.
-- `hpl-solo`: Runs HPL **separately** on all nodes, using 80% of memory, reporting Gflops on each node.
-
-These names can be used as tags to run only a subset of tests. For full details see the [role's README](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/blob/main/roles/test/README.md).
-
-Note these are intended as post-deployment tests for a cluster to which you have root access - they are **not** intended for use on a system running production jobs:
-- Test directories are created within `openhpc_tests_rootdir` (here `/mnt/nfs/ohcp-tests`) which must be on a shared filesystem (read/write from login/control and compute nodes)
-- Generally, packages are only installed on the control/login node, and `/opt` is exported via NFS to the compute nodes.
-- The exception is the `slurm-libpmi-ohpc` package (required for `srun` with Intel MPI) which is installed on all nodes.
-
-To achieve best performance for HPL set `openhpc_tests_hpl_NB` in [test.yml](test.yml) to the appropriate the HPL blocksize 'NB' for the compute node processor - for Intel CPUs see [here](https://software.intel.com/content/www/us/en/develop/documentation/mkl-linux-developer-guide/top/intel-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/configuring-parameters.html).
-
-Then run:
-
-    ansible-playbook ../ansible/adhoc/test.yml
-
-Results will be reported in the ansible stdout - the pingmatrix test also writes an html results file onto the ansible host.
-
-Note that you can still use the `test.yml` playbook even if the terraform/ansible in this repo wasn't used to deploy the cluster - as long as it's running OpenHPC v2. Simply create an appropriate `inventory` file, e.g:
-
-    [all:vars]
-    ansible_user=centos
-
-    [cluster:children]
-    cluster_login
-    cluster_compute
-
-    [cluster_login]
-    slurm-control
-
-    [cluster_compute]
-    cpu-h21a5-u3-svn2
-    cpu-h21a5-u3-svn4
-    ...
-
-And run the `test.yml` playbook as described above. If you want to run tests only on a group from this inventory, rather than an entire partition, you can
-use ``--limit``
-
-Then running the tests passing this file as extra_vars:
-
-    ansible-playbook ../ansible/test.yml --limit group-in-inventory
-
-# Destroying the cluster
-
-When finished, run:
-
-    terraform destroy --auto-approve
+Note that non-privileged users cannot log into compute nodes unless they have a running job.
