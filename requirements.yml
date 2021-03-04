@@ -8,7 +8,7 @@ roles:
   - src: cloudalchemy.alertmanager
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
-  - src: git@github.com:stackhpc/ansible_role_spack.git
+  - src: https://github.com/stackhpc/ansible_role_spack
     name: stackhpc.spack
     version: HEAD
 
