@@ -11,6 +11,7 @@ roles:
   - src: https://github.com/stackhpc/ansible_role_spack
     name: stackhpc.spack
     version: HEAD
+  - src: jriguera.configdrive
 
 collections:
 - name: containers.podman
