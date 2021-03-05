@@ -8,4 +8,6 @@ spack_packages:
   # Have to specify ucx flags to avoid spec clash
   #- "gromacs@2016.6 %gcc@9.3.0 ^openmpi fabrics=ucx schedulers=auto ^ucx +thread_multiple"
   #- "cp2k %gcc@9.3.0 ^openmpi@4.0.5 ~atomics~cuda~cxx~cxx_exceptions+gpfs~internal-hwloc~java~legacylaunchers~lustre~memchecker~pmi~singularity~sqlite3+static~thread_multiple+vt+wrapper-rpath fabrics=ucx schedulers=auto"
+  - "intel-mpi-benchmarks ^openmpi@4.0.5 fabrics=ucx schedulers=auto"
   - "cp2k ^openmpi@4.0.5 fabrics=ucx schedulers=auto ^fftw+openmp ^openblas threads=openmp"
+  - "miniconda3"
