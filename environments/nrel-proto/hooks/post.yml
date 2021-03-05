@@ -1,43 +1,44 @@
-- hosts: login
-  become: yes
-  tags:
-    - post
-  name: Setup login node authorized_keys for external access
-  tasks:
-    - name: Get authorised_keys for centos user on deploy host
-      slurp:
-        path: /home/centos/.ssh/authorized_keys
-      register: deploy_authed_keys
-      delegate_to: localhost
-      run_once: true
-    - name: Add keys to authorised_keys for centos user on login nodes
-      blockinfile:
-        path: /var/lib/centos/.ssh/authorized_keys
-        block: "{{ deploy_authed_keys.content | b64decode }}"
-      
 - hosts: cluster
   become: yes
   tags:
     - post
-  name: Setup non-privileged test user
   tasks:
-    - name: Create test user
+    - name: Create user groups
+      group:
+        name: "{{ item.name }}"
+        gid: "{{ item.id }}"
+      loop: "{{ cluster_users }}"  
+    - name: Create users on control with homedirectories and ssh keys
       user:
-        name: test
-        comment: non-priviledged test user
-    - name: Create ~/.ssh directory for test user
-      file:
-        path: /home/test/.ssh
-        state: directory
-        owner: test
-        group: test
-        mode: 0700
-      run_once: true # as on nfs
-    - name: Enable test user login using key for centos user on deploy host
-      copy:
-        src: /home/centos/.ssh/id_rsa.pub
-        dest: /home/test/.ssh/authorized_keys
-        owner: test
-        group: test
+        name: "{{ item.name }}"
+        uid: "{{ item.id }}"
+        group: "{{ item.name }}"
+        comment: "{{ item.comment }}"
+        create_home: yes
+        generate_ssh_key: yes
+        shell: /usr/sbin/nologin # prevents users logging into control
+      loop: "{{ cluster_users }}"
+      delegate_to: "{{ groups['control'] | first }}"
+      run_once: true
+    - name: Create users on all other nodes
+      user:
+        name: "{{ item.name }}"
+        uid: "{{ item.id }}"
+        group: "{{ item.name }}"
+        comment: "{{ item.comment }}"
+        create_home: no
+        generate_ssh_key: no
+      loop: "{{ cluster_users }}"
+      delegate_to: "{{ groups['control'] | first }}"
+      when: "'control' not in group_names"
+    - name: Add authorized key
+      blockinfile:
+        path: "/home/{{ item.name }}/.ssh/authorized_keys"
+        block: "{{ item.key }}"
+        create: yes
         mode: 0600
-      run_once: true # TODO: not a general solution, but avoids race error as this is nfs-mounted        
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+      loop: "{{ cluster_users }}"
+      delegate_to: "{{ groups['control'] | first }}"
+      run_once: true
