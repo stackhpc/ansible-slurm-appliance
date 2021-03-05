@@ -1,0 +1,16 @@
+# Rebuild hosts with a specified image from OpenStack.
+# 
+# Use ansible's -v output to see output.
+# Use --limit to control which hosts to rebuild (either specific hosts or the <cluster_name>_<partition_name> groups defining partitions).
+# Optionally, supply `-e rebuild_image=<image_name_or_id>` to define a specific image, otherwise the current image is reused.
+#
+# Example:
+#   ansible-playbook -v --limit ohpc_compute ansible/adhoc/rebuild.yml -e rebuild_image=openhpc_v2.3
+
+- hosts: cluster
+  become: no
+  gather_facts: no
+  tasks:
+    - command: "openstack server rebuild {{ inventory_hostname }}{% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}"
+      delegate_to: localhost
+
