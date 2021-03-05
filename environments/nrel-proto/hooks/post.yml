@@ -29,7 +29,6 @@
         create_home: no
         generate_ssh_key: no
       loop: "{{ cluster_users }}"
-      delegate_to: "{{ groups['control'] | first }}"
       when: "'control' not in group_names"
     - name: Add authorized key
       blockinfile:
