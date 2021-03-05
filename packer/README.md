@@ -9,26 +9,43 @@ This workflow uses Packer to build an image for a compute node. Key aspects of t
 
 Steps:
 
+- Ensure hardware virtualisation is enabled:
+
+      egrep 'vmx|svm' /proc/cpuinfo
+
+- Follow the standard installation instructions in the main README.
+
 - Install packer and qemu-kvm:
 
       sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
       sudo yum -y install packer
-      sudo yum -y install qemu
+      #sudo yum -y install qemu # not available on Centos8, not sure we need it?
       sudo yum -y install qemu-kvm
 
-- Activate the venv.
-- Create a cluster using terraform and `slurm-simple.yml` as above (`slurm-db.yml` should also work, but the playbook used is hardcoded in `main.pkr.hcl`).
+- Activate the venv and the relevant environment.
+- TODO: UPDATE THIS: Create a cluster using terraform and `slurm-simple.yml` as above (`slurm-db.yml` should also work, but the playbook used is hardcoded in `main.pkr.hcl`).
 - Ensure you have a public/private keypair as `~/.ssh/id_rsa[.pub]`.
 - Create a config drive which sets this public key for the `centos` user, so that Packer can login to the VM:
 
-    ansible-playbook config-drive.yml # creates config-drive.iso
+    ansible-playbook packer/config-drive.yml # creates packer/config-drive.iso
 
 - Build an image (using that config drive), output to `build/`:
 
         mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out
-        PACKER_LOG=1 packer build main.pkr.hcl # may also find `--on-error=ask` useful during development
+        cd packer
+        PACKER_LOG=1 packer build main.pkr.hcl
+        # or during development:
+        PACKER_LOG=1 packer build --on-error=ask main.pkr.hcl
 
-- You can watch the image startup in another terminal using
+- To login to the VM over ssh look for the following line in the Packer output:
+
+        Executing /usr/libexec/qemu-kvm: ...  "-netdev", "user,id=user.0,hostfwd=tcp::2922-:22", ... 
+
+  which specifies the ssh port forwarding Packer is using to log-in to the VM, so in this case login using:
+
+        ssh -p 2922 centos@127.0.0.1
+
+- You can watch the console output from the VM startup in another terminal using:
 
         cat /tmp/qemu-serial.out
 
