@@ -78,7 +78,7 @@
   hosts: node_exporter
   tags: node_exporter
   tasks:
-    - import_role: name=cloudalchemy.node-exporter
+    - import_role: name=cloudalchemy.node_exporter
 
 - name: Setup core monitoring software
   hosts: prometheus
