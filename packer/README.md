@@ -1,11 +1,8 @@
 # Packer-based image build
 
-This workflow uses Packer to build an image for a compute node. Key aspects of this are:
-- QEMU and KVM are used to create a VM using a Centos8 base image.
-- Packer runs the same ansible we use to create the cluster normally, but with this VM in a "builder" ansible group which is also in the "compute" group.
-- As Packer cannot (necessary) contact the cluster login node to get the munge key, the key is injected into the image from a local copy.
-- A "configless" slurm mode is used so that the image does not need to contain the slurm config, and hence the image can be used for any number of nodes.
-- The ansible playbooks are configured so that the slurm, munge and NFS services are enabled but not started.
+This workflow uses Packer with `qemu-kvm` to build an image for a compute node based on a CentOS 8.2 cloud image. The same `ansible/site.yml` playbook is run inside Packer as for the normal cluster creation.
+
+This image creation pipeline requires at least the control node to have been created using the normal ansible playbook.
 
 Steps:
 
@@ -23,13 +20,16 @@ Steps:
       sudo yum -y install qemu-kvm
 
 - Activate the venv and the relevant environment.
-- TODO: UPDATE THIS: Create a cluster using terraform and `slurm-simple.yml` as above (`slurm-db.yml` should also work, but the playbook used is hardcoded in `main.pkr.hcl`).
+- Ensure you have generated passwords using:
+
+        ansible-playbook ansible/adhoc/generate-passwords.yml
+
 - Ensure you have a public/private keypair as `~/.ssh/id_rsa[.pub]`.
 - Create a config drive which sets this public key for the `centos` user, so that Packer can login to the VM:
 
-    ansible-playbook packer/config-drive.yml # creates packer/config-drive.iso
+        ansible-playbook packer/config-drive.yml # creates packer/config-drive.iso
 
-- Build an image (using that config drive), output to `build/`:
+- Build an image (using that config drive):
 
         mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out
         cd packer
@@ -37,7 +37,7 @@ Steps:
         # or during development:
         PACKER_LOG=1 packer build --on-error=ask main.pkr.hcl
 
-- To login to the VM over ssh look for the following line in the Packer output:
+- For debugging, you can login to the VM over ssh by finding the line like the following in the Packer output:
 
         Executing /usr/libexec/qemu-kvm: ...  "-netdev", "user,id=user.0,hostfwd=tcp::2922-:22", ... 
 
@@ -45,15 +45,27 @@ Steps:
 
         ssh -p 2922 centos@127.0.0.1
 
-- You can watch the console output from the VM startup in another terminal using:
+- You can also watch the console output from the VM startup in another terminal using:
 
         cat /tmp/qemu-serial.out
 
+- The image will be created in `environments/<environment>/images`
+
 - Upload the image to Openstack:
 
-        openstack image create --file build/*.qcow2 --disk-format qcow2 $(basename build/*.qcow2)
+        openstack image create --file $PKR_VAR_environment_root/images/*.qcow2 --disk-format qcow2 $(basename $PKR_VAR_environment_root/images/*.qcow2)
 
-- Then recreate the compute VMs with the new image e.g. by changing the compute image name in `main.tf` and rerunning terraform. **NB:** You may need to restart `slurmctld` if the nodes come up and then go down again.
+You can now recreate the compute VMs with the new image e.g. by changing the compute image name in the deployment automation.
+**NB:** You may need to restart `slurmctld` if the nodes come up and then go down again.
+
+# Notes for developers
+
+The Packer build VM is added to both groups `compute` and `builder`, with the latter allowing `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically 
+for the VM where the real cluster may not be contactable (depending on where the build is run from). Currently this means:
+- Enabling but not starting `slurmd`.
+- Setting NFS mounts to `present` but not `mounted`
+
+Note that in this appliance the munge key is pre-created in the environment's "all" group vars, so this aspect needs no special handling.
 
 Some more subtle points to note if developing code based off this:
 - In general, we should assume that ansible needs to ssh proxy to the compute nodes via the control node (not actually the case in these demos as everything is on one network). However we **don't** want packer's "builder" host to use this proxy, so the proxy has to be added to the group `[${cluster_name}_compute:vars]`, not `[cluster_compute:vars]`.

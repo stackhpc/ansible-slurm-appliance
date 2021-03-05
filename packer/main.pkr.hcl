@@ -1,12 +1,12 @@
 # "timestamp" template function replacement:s
 locals { timestamp = formatdate("YYMMDD-hhmm", timestamp())}
 
-# Path pointing to root of repository
+# Path pointing to root of repository - set by environment variable PKR_VAR_repo_root
 variable "repo_root" {
   type = string
 }
 
-# Path pointing to environment directory
+# Path pointing to environment directory - set by environment variable PKR_VAR_environment_root
 variable "environment_root" {
   type = string
 }
@@ -33,7 +33,7 @@ source "qemu" "openhpc-compute" {
     ["-m", "896M"],
     ["-cdrom", "config-drive.iso"]
     ]
-  vm_name          = "testohpc-compute.qcow2" # image name
+  vm_name          = "ohpc-compute.qcow2" # image name
   shutdown_command = "sudo shutdown -P now"
 }
 
