@@ -6,4 +6,6 @@ spack_packages:
   # Need gromacs 2016 for HECBioSim benchmarks, this is latest (have to specify version to avoid "no hash" complaint)
   # Have to specify openmpi variant to use the above one again
   # Have to specify ucx flags to avoid spec clash
-  - "gromacs@2016.6 %gcc@9.3.0 ^openmpi fabrics=ucx schedulers=auto ^ucx +thread_multiple"
+  #- "gromacs@2016.6 %gcc@9.3.0 ^openmpi fabrics=ucx schedulers=auto ^ucx +thread_multiple"
+  #- "cp2k %gcc@9.3.0 ^openmpi@4.0.5 ~atomics~cuda~cxx~cxx_exceptions+gpfs~internal-hwloc~java~legacylaunchers~lustre~memchecker~pmi~singularity~sqlite3+static~thread_multiple+vt+wrapper-rpath fabrics=ucx schedulers=auto"
+  - "cp2k ^openmpi@4.0.5 fabrics=ucx schedulers=auto ^fftw+openmp ^openblas threads=openmp"
