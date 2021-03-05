@@ -2,6 +2,22 @@
   hosts: cluster
   become: true
   tasks:
+    - name: Add elrepo repository
+      yum_repository:
+        name: elrepo
+        description: ELRepo.org Community Enterprise Linux Repository - el8
+        baseurl:
+          - http://elrepo.org/linux/elrepo/el8/$basearch/
+          - http://mirrors.coreix.net/elrepo/elrepo/el8/$basearch/
+          - http://mirror.rackspace.com/elrepo/elrepo/el8/$basearch/
+          - http://linux-mirrors.fnal.gov/linux/elrepo/elrepo/el8/$basearch/
+        mirrorlist: http://mirrors.elrepo.org/mirrors-elrepo.el8
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+    - name: Add HPE Emulex drivers
+      yum:
+        name: kmod-be2net
     - name: Internal DNS workaround - generate /etc/hosts file content
       set_fact: # TODO: define which network to use below:
         etc_hosts_content: |
