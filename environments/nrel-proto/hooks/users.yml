@@ -1,0 +1,25 @@
+- name: Create user groups
+  group:
+    name: "{{ item.name }}"
+    gid: "{{ item.id }}"
+  loop: "{{ cluster_users }}"
+- name: Create users
+  user:
+    name: "{{ item.name }}"
+    uid: "{{ item.id }}"
+    group: "{{ item.name }}"
+    groups: "{{ item.get('groups', '') }}"
+    comment: "{{ item.comment }}"
+    create_home: yes
+    generate_ssh_key: yes
+    shell: "{{ '/usr/sbin/nologin' if 'control' in group_names else '/bin/bash' }}" # prevents users logging into control
+  loop: "{{ cluster_users }}"
+- name: Add authorized key
+  blockinfile:
+    path: "/home/{{ item.name }}/.ssh/authorized_keys"
+    block: "{{ item.key }}"
+    create: yes
+    mode: 0600
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  loop: "{{ cluster_users }}"

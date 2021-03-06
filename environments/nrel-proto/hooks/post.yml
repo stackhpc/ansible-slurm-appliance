@@ -1,43 +1,19 @@
-- hosts: cluster
+- hosts: localhost
+  name: Create users on deploy host as jumphost
   become: yes
-  tags:
-    - post
   tasks:
-    - name: Create user groups
-      group:
-        name: "{{ item.name }}"
-        gid: "{{ item.id }}"
-      loop: "{{ cluster_users }}"  
-    - name: Create users on control with homedirectories and ssh keys
-      user:
-        name: "{{ item.name }}"
-        uid: "{{ item.id }}"
-        group: "{{ item.name }}"
-        comment: "{{ item.comment }}"
-        create_home: yes
-        generate_ssh_key: yes
-        shell: /usr/sbin/nologin # prevents users logging into control
-      loop: "{{ cluster_users }}"
-      delegate_to: "{{ groups['control'] | first }}"
-      run_once: true
-    - name: Create users on all other nodes
-      user:
-        name: "{{ item.name }}"
-        uid: "{{ item.id }}"
-        group: "{{ item.name }}"
-        comment: "{{ item.comment }}"
-        create_home: no
-        generate_ssh_key: no
-      loop: "{{ cluster_users }}"
-      when: "'control' not in group_names"
-    - name: Add authorized key
-      blockinfile:
-        path: "/home/{{ item.name }}/.ssh/authorized_keys"
-        block: "{{ item.key }}"
-        create: yes
-        mode: 0600
-        owner: "{{ item.name }}"
-        group: "{{ item.name }}"
-      loop: "{{ cluster_users }}"
-      delegate_to: "{{ groups['control'] | first }}"
-      run_once: true
+    - import_tasks: users.yml
+
+- hosts: control
+  name: Create users on control + homedirectories & ssh keys
+  become: yes
+  tasks:
+    - import_tasks: users.yml
+
+- hosts:
+    - login
+    - compute
+  name: Create users on other Slurm nodes
+  become: yes
+  tasks:
+    - import_tasks: users.yml
