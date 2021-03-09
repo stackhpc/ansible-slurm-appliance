@@ -11,15 +11,16 @@
     groups: "{{ item.get('groups', '') }}"
     comment: "{{ item.comment }}"
     create_home: yes
-    generate_ssh_key: yes
+    generate_ssh_key: "{{ 'control' in group_names }}"
     shell: "{{ '/usr/sbin/nologin' if 'control' in group_names else '/bin/bash' }}" # prevents users logging into control
   loop: "{{ cluster_users }}"
-- name: Add authorized key
-  blockinfile:
-    path: "/home/{{ item.name }}/.ssh/authorized_keys"
-    block: "{{ item.key }}"
-    create: yes
-    mode: 0600
-    owner: "{{ item.name }}"
-    group: "{{ item.name }}"
-  loop: "{{ cluster_users }}"
+- name: Enable passwordless sudo for wheel group
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '#? ?%wheel\s+ALL=\(ALL\)\s+NOPASSWD: ALL$' # single-quotes to use backslashes
+    line: "%wheel\tALL=(ALL)\tNOPASSWD: ALL" # double-quotes to interpolate \t
+- name: Disable passworded sudo for wheel group
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '^#?%wheel\s+ALL=\(ALL\)\s+ALL$'
+    line: "# %wheel\tALL=(ALL)\tALL"

@@ -1,15 +1,27 @@
 - hosts: localhost
-  name: Create users on deploy host as jumphost
+  name: Add users to localhost (as jumphost)
   become: yes
   tasks:
     - import_tasks: users.yml
+    - name: Add supplied public key
+      blockinfile:
+        path: "/home/{{ item.name }}/.ssh/authorized_keys"
+        block: "{{ item.key }}"
+        create: yes
+        mode: 0600
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+      loop: "{{ cluster_users }}"
+      loop_control:
+        label: "{{ item.name }}"
 
+# NB: the below runs as 2 separate plays so we only create homedirs and ssh keys ONCE, with no race condition between hosts
 - hosts: control
   name: Create users on control + homedirectories & ssh keys
   become: yes
   tasks:
     - import_tasks: users.yml
-
+    
 - hosts:
     - login
     - compute
@@ -17,3 +29,26 @@
   become: yes
   tasks:
     - import_tasks: users.yml
+    - name: Get cluster generated key
+      slurp:
+        src: "/home/{{ item.name }}/.ssh/id_rsa.pub"
+      register: cluster_ssh_key
+      loop: "{{ cluster_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: "{{ groups['control'] | first }}"
+    # - debug:
+    #     var: cluster_ssh_key
+    #   run_once: true
+    # - meta: end_play
+    - name: Add cluster generated key
+      blockinfile:
+        path: "/home/{{ item.item.name }}/.ssh/authorized_keys"
+        block: "{{ item.content | b64decode }}"
+        create: yes
+        mode: 0600
+        owner: "{{ item.item.name }}"
+        group: "{{ item.item.name }}"
+      loop: "{{ cluster_ssh_key.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
