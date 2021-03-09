@@ -1,6 +1,7 @@
 - hosts: localhost
   name: Add users to localhost (as jumphost)
   become: yes
+  gather_facts: no
   tasks:
     - import_tasks: users.yml
     - name: Add supplied public key
@@ -20,14 +21,7 @@
 - hosts: control
   name: Create users on control + homedirectories & ssh keys
   become: yes
-  tasks:
-    - import_tasks: users.yml
-    
-- hosts:
-    - login
-    - compute
-  name: Create users on other Slurm nodes
-  become: yes
+  gather_facts: no
   tasks:
     - import_tasks: users.yml
     - name: Get cluster generated key
@@ -39,10 +33,13 @@
         label: "{{ item.name }}"
       when: "item.state == 'present'"
       delegate_to: "{{ groups['control'] | first }}"
-    - name: Add cluster generated key
+      run_once: true
+    - name: Add generated + supplied keys to authorized_keys
       blockinfile:
         path: "/home/{{ item.item.name }}/.ssh/authorized_keys"
-        block: "{{ item.content | b64decode }}"
+        block: |
+          {{ item.content | b64decode }}
+          {{ item.item.key }}
         create: yes
         mode: 0600
         owner: "{{ item.item.name }}"
