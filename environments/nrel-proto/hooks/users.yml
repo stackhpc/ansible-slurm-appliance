@@ -2,6 +2,7 @@
   group:
     name: "{{ item.name }}"
     gid: "{{ item.id }}"
+    state: "{{ item.state }}"
   loop: "{{ cluster_users }}"
 - name: Create users
   user:
@@ -13,6 +14,7 @@
     create_home: yes
     generate_ssh_key: "{{ 'control' in group_names }}"
     shell: "{{ '/usr/sbin/nologin' if 'control' in group_names else '/bin/bash' }}" # prevents users logging into control
+    state: present
   loop: "{{ cluster_users }}"
 - name: Enable passwordless sudo for wheel group
   lineinfile:

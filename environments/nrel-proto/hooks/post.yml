@@ -11,6 +11,7 @@
         mode: 0600
         owner: "{{ item.name }}"
         group: "{{ item.name }}"
+        state: "{{ item.state }}"
       loop: "{{ cluster_users }}"
       loop_control:
         label: "{{ item.name }}"
@@ -36,11 +37,8 @@
       loop: "{{ cluster_users }}"
       loop_control:
         label: "{{ item.name }}"
+      when: "item.state == 'present'"
       delegate_to: "{{ groups['control'] | first }}"
-    # - debug:
-    #     var: cluster_ssh_key
-    #   run_once: true
-    # - meta: end_play
     - name: Add cluster generated key
       blockinfile:
         path: "/home/{{ item.item.name }}/.ssh/authorized_keys"
