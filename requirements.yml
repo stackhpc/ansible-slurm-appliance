@@ -2,7 +2,7 @@
 roles:
   - src: stackhpc.nfs
   - src: stackhpc.openhpc
-  - src: cloudalchemy.node-exporter
+  - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
   - src: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
