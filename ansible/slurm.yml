@@ -17,6 +17,8 @@
   tasks:
     - import_role:
         name: stackhpc.openhpc
+    - import_role:
+        name: stackhpc.slurm_openstack_tools.rebuild
 
 - name: Set locked memory limits on user-facing nodes
   hosts:

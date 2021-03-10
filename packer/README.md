@@ -55,7 +55,11 @@ Steps:
 
         openstack image create --file $PKR_VAR_environment_root/images/*.qcow2 --disk-format qcow2 $(basename $PKR_VAR_environment_root/images/*.qcow2)
 
-You can now recreate the compute VMs with the new image e.g. by changing the compute image name in the deployment automation.
+You can now recreate the compute VMs with the new image using one of the following methods:
+- By changing the compute image name in the deployment automation.
+- Using the playbook `ansible/adhoc/rebuild.yml`.
+- Using a Slurm-driven reimage - see `ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md` for details.
+
 **NB:** You may need to restart `slurmctld` if the nodes come up and then go down again.
 
 # Notes for developers
