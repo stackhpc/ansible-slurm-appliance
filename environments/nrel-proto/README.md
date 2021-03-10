@@ -73,3 +73,9 @@ This environment defines:
 - `/tmp/scratch` is provided on ephemeral disk as a prototype for an SSD-based volume in the production environment.
 
 Note that non-privileged users cannot log into compute nodes unless they have a running job.
+
+# Installing software
+
+- Packages available from enabled repos (CentOS, OpenHPC, elrepo) can be installed on **all** cluster nodes by adding them to `openhpc_packages` in `environments/nrel-proto/inventory/group_vars/openhpc/overrides.yml`.
+- Packages can be installed manually using spack commands into the spack installation in `/nopt`. Run `sudo su` first, rather than using `sudo spack install ...` due to the way paths etc are set up.
+- Packages can be added to the automated spack install by adding specs to `spack_packages` in `environments/nrel-proto/inventory/group_vars/spack/overrides.yml`.
