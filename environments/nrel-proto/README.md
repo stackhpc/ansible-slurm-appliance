@@ -38,6 +38,12 @@ In addition to main README:
 
 3. Passwords are not currently encrypted or commited.
 
+6. Spack can be installed, configured, and pre-determined packages installed by running:
+
+        ansible-playbook ansible/spack.yml
+
+   This installs Spack at `/nopt/spack` which is an NFS share from an external instance (which is not defined by this repo). See [Installing Software](#Installing-Software) below for more.
+
 ## Environments
 
 This section describes this environment as currently previsioned using `terraform-flat/`. For general notes on how environments work see the main README.
