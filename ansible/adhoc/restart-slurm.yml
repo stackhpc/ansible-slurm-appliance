@@ -11,6 +11,7 @@
     - service:
         name: slurmd
         state: stopped
+
 - hosts: control
   become: yes
   gather_facts: no
@@ -25,4 +26,3 @@
     - service:
         name: slurmd
         state: started
-
