@@ -47,3 +47,6 @@ cluster
 
 [selinux:children]
 cluster
+
+[rebuild]
+# nodes in 'compute' group which can be rebuilt from slurm (on an OpenStack cloud)
