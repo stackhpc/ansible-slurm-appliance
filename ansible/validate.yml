@@ -30,7 +30,7 @@
       tags: validate
 
 - name: Validate rebuild configuration
-  hosts: openhpc
+  hosts: rebuild
   gather_facts: false
   tags: rebuild
   tasks:
