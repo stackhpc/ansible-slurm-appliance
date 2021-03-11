@@ -1,5 +1,5 @@
-[nrel_hpc]
-nrel-hpc-[0:3]
+[proto_hpc]
+proto-hpc-[0:3]
 
-[nrel_express]
-nrel-express-[0:1]
+[proto_express]
+proto-express-[0:1]

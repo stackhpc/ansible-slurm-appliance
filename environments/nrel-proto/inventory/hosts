@@ -1,18 +1,18 @@
 [all:vars]
 ansible_user=centos
-openhpc_cluster_name=nrel
+openhpc_cluster_name=proto
 
 [control]
-nrel-control ansible_host=10.109.0.21 server_networks='{"public-109":["10.109.0.21"]}'
+proto-control ansible_host=10.109.0.140 server_networks='{"public-109":["10.109.0.140"]}'
 
 [login]
-nrel-login-0 ansible_host=10.109.1.228 server_networks='{"public-109":["10.109.1.228"]}'
-nrel-login-1 ansible_host=10.109.2.196 server_networks='{"public-109":["10.109.2.196"]}'
+proto-login-0 ansible_host=10.109.2.164 server_networks='{"public-109":["10.109.2.164"]}'
+proto-login-1 ansible_host=10.109.3.109 server_networks='{"public-109":["10.109.3.109"]}'
 
 [compute]
-nrel-express-0 ansible_host=10.109.1.144 server_networks='{"public-109":["10.109.1.144"]}'
-nrel-express-1 ansible_host=10.109.1.56 server_networks='{"public-109":["10.109.1.56"]}'
-nrel-hpc-0 ansible_host=10.109.3.56 server_networks='{"public-109":["10.109.3.56"]}'
-nrel-hpc-1 ansible_host=10.109.1.106 server_networks='{"public-109":["10.109.1.106"]}'
-nrel-hpc-2 ansible_host=10.109.2.20 server_networks='{"public-109":["10.109.2.20"]}'
-nrel-hpc-3 ansible_host=10.109.1.167 server_networks='{"public-109":["10.109.1.167"]}'
+proto-express-0 ansible_host=10.109.0.172 server_networks='{"public-109":["10.109.0.172"]}'
+proto-express-1 ansible_host=10.109.1.66 server_networks='{"public-109":["10.109.1.66"]}'
+proto-hpc-0 ansible_host=10.109.2.201 server_networks='{"public-109":["10.109.2.201"]}'
+proto-hpc-1 ansible_host=10.109.1.91 server_networks='{"public-109":["10.109.1.91"]}'
+proto-hpc-2 ansible_host=10.109.2.254 server_networks='{"public-109":["10.109.2.254"]}'
+proto-hpc-3 ansible_host=10.109.2.132 server_networks='{"public-109":["10.109.2.132"]}'
