@@ -37,5 +37,5 @@ slurm_stats
 [spack:children]
 login
 
-[rebuild]
+[rebuild:children]
 compute
