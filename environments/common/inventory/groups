@@ -1,49 +1,68 @@
-[cluster]
-
 [login]
+# Slurm login nodes. Combined control/login nodes are not supported.
 
 [control]
+# A single Slurm control node. Multiple (high availability) control nodes are not supported.
 
 [compute]
+# All Slurm compute nodes (in all partitions).
 
-[builder]
+[openhpc]
+# All Slurm nodes
+
+[cluster]
+# All nodes in the appliance - this allows for e.g. specific service nodes not running Slurm.
+# See default below.
 
 [cluster:children]
 login
 control
 compute
 
+[builder]
+# VM used to (optionally) build compute images - do not add hosts. See packer/README.md.
+
 [podman:children]
+# Hosts running containers for below services:
 opendistro
 kibana
 filebeat
 
 [prometheus]
+# Monitoring server(s)
 
 [grafana]
+# Dashboard server(s)
 
 [alertmanager]
-
-[exporters]
+# TODO:
 
 [opendistro]
+# ElasticSearch server, used for Slurm monitoring.
 
 [kibana]
+# TODO:
 
 [slurm_stats]
+# Runs tools to integrate Slurm's accounting information with ElasticSearch.
+# NB: Host must be in `openhpc` group (for `sacct` command) and `opendistro` group.
 
 [filebeat]
+# TODO:
 
 [nfs]
-
-[openhpc]
+# NFS servers or clients.
 
 [mysql]
+# Runs database used for Slurm accounting.
 
 [node_exporter]
+# Monitor these hosts for hardware and OS metrics
 
 [openhpc_tests:children]
-cluster
+# Run post-deploy MPI-based tests using ansible/adhoc/test.yml
+cluster # TODO: FIXME in branch
 
 [selinux:children]
+# Define selinux status for these
 cluster
