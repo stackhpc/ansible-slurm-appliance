@@ -16,7 +16,6 @@ Steps:
 
       sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
       sudo yum -y install packer
-      #sudo yum -y install qemu # not available on Centos8, not sure we need it?
       sudo yum -y install qemu-kvm
 
 - Activate the venv and the relevant environment.
