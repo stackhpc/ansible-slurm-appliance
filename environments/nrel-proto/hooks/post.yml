@@ -47,3 +47,12 @@
       loop: "{{ cluster_ssh_key.results }}"
       loop_control:
         label: "{{ item.item.name }}"
+
+- hosts:
+    - login
+    - compute
+  name: Create users on other Slurm nodes
+  # keys and authorized keys already in place via NFS /home
+  become: yes
+  tasks:
+    - import_tasks: users.yml
