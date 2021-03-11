@@ -11,3 +11,4 @@ spack_packages:
   - "intel-mpi-benchmarks ^openmpi@4.0.5 fabrics=ucx schedulers=auto"
   - "cp2k ^openmpi@4.0.5 fabrics=ucx schedulers=auto ^fftw+openmp ^openblas threads=openmp"
   - "miniconda3"
+  - "reframe"
