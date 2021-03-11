@@ -34,19 +34,7 @@
   gather_facts: false
   tags: rebuild
   tasks:
-    - block:
-      - stat:
-          path: "{{ openhpc_rebuild_clouds }}"
-        register: openhpc_clouds_path
-      - name: Check OpenRC file (openhpc_rebuild_clouds) exists
-        assert:
-          that: openhpc_clouds_path.stat.exists
-          fail_msg: "openrc file {{ openhpc_rebuild_clouds }} on localhost (specified by `openhpc_rebuild_clouds`) does not exist"
-      - name: Check OpenRC file (openhpc_rebuild_clouds) is usable
-        shell: |
-          source {{ openhpc_rebuild_clouds }}
-          openstack token issue
-        changed_when: false
-      delegate_to: localhost
-      delegate_facts: true
-      run_once: true
+    - import_role:
+        name: stackhpc.slurm_openstack_tools.rebuild
+        tasks_from: validate.yml
+      tags: validate
