@@ -17,6 +17,13 @@
   tasks:
     - import_role:
         name: stackhpc.openhpc
+
+- name: Setup slurm-driven reimage
+  hosts: rebuild
+  become: yes
+  tags:
+    - rebuild
+  tasks:
     - import_role:
         name: stackhpc.slurm_openstack_tools.rebuild
 

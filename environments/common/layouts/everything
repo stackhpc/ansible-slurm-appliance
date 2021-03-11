@@ -36,3 +36,6 @@ control
 
 [filebeat:children]
 slurm_stats
+
+[rebuild]
+# nodes which can be rebuilt via slurm (on an OpenStack cloud)
