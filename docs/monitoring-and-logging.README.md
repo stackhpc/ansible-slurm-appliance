@@ -210,9 +210,9 @@ The internal `opendistro` role is ued to configure the service. The list of vari
 
 > [ansible/roles/opendistro/defaults/main.yml](../ansible/roles/opendistro/defaults/main.yml)
 
-The variables that intended to be customisable are defined in:
+The appliance defaults are in the following file:
 
-> [ansible/roles/opendistro/defaults/main.yml](../ansible/roles/opendistro/defaults/main.yml)
+> [environments/common/inventory/group_vars/all/opendistro.yml](../environments/common/inventory/group_vars/all/opendistro.yml)
 
 ### Placement
 
