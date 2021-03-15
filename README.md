@@ -130,3 +130,7 @@ TODO: this is just rough notes:
 - Update example groups file `environments/common/layouts/everything`
 - Update default Packer build variables in `environments/common/inventory/group_vars/builder/defaults.yml`.
 - Update READMEs.
+
+## Monitoring and logging
+
+Please see the [monitoring-and-logging.README.md](docs/monitoring-and-logging.README.md) for details.
