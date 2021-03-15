@@ -55,11 +55,11 @@ This section details the configuration of filebeat.
 
 Filebeat is configured by the internal `filebeat` role which can be found here:
 
-> ansible/roles/filebeat
+> [ansible/roles/filebeat](../ansible/roles/filebeat)
 
 The appliance defaults for the `filebeat` role can be found at the following location:
 
-> environments/common/inventory/group_vars/all/filebeat.yml
+> [environments/common/inventory/group_vars/all/filebeat.yml](../environments/common/inventory/group_vars/all/filebeat.yml)
 
 ### Overview
 
@@ -71,7 +71,7 @@ This is exposed to the `filebeat` container through a volume which mounts `/var/
 
 Filebeat is configured to read this log file and post the data to elasticsearch via:
 
-> environments/common/files/filebeat/filebeat.yml
+> [environments/common/files/filebeat/filebeat.yml](../environments/common/files/filebeat/filebeat.yml)
 
 This file is configurable by the `filebeat_config_path` variable.
 
@@ -93,7 +93,7 @@ This section details the configuration of grafana.
 Internally, we use the [cloudalchemy.grafana](https://github.com/cloudalchemy/ansible-grafana) role. You can customise any of the variables that the role supports. For a full list, please see the
 [upstream documentation](https://github.com/cloudalchemy/ansible-grafana). The appliance defaults can be found here:
 
-> environments/common/inventory/group_vars/all/grafana.yml
+> [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml)
 
 ### Placement
 
@@ -173,11 +173,11 @@ This section details the configuration of kibana.
 The internal `kibana` role is ued to configure the service. The list of variables that can be
 customised can found in:
 
-> ansible/roles/kibana/defaults/main.yml
+> [ansible/roles/kibana/defaults/main.yml](../ansible/roles/kibana/defaults/main.yml)
 
 The appliance defaults can be found here:
 
-> environments/common/inventory/group_vars/all/kibana.yml
+> [environments/common/inventory/group_vars/all/kibana.yml](../environments/common/inventory/group_vars/all/kibana.yml)
 
 ### Placement
 
@@ -208,11 +208,11 @@ This section details the configuration of Open Distro.
 
 The internal `opendistro` role is ued to configure the service. The list of variables that can be customised can found in:
 
-> ansible/roles/opendistro/defaults/main.yml
+> [ansible/roles/opendistro/defaults/main.yml](../ansible/roles/opendistro/defaults/main.yml)
 
 The variables that intended to be customisable are defined in:
 
-> ansible/roles/opendistro/defaults/main.yml
+> [ansible/roles/opendistro/defaults/main.yml](../ansible/roles/opendistro/defaults/main.yml)
 
 ### Placement
 
@@ -228,7 +228,7 @@ be separated by overriding `kibana_address`.
 
 The default set of users is defined in:
 
-> environments/common/files/opendistro/internal_users.yml
+> [environments/common/files/opendistro/internal_users.yml](../environments/common/files/opendistro/internal_users.yml)
 
 This defines an the following accounts:
 
@@ -245,12 +245,12 @@ the credentials should be treated with extreme care.
 
 To override the default set of users, you can customize the variable:
 
-> environments/common/files/opendistro/internal_users.yml
+> [environments/common/files/opendistro/internal_users.yml](../environments/common/files/opendistro/internal_users.yml)
 
 You can change this file by modifying the variable, `opendistro_internal_users_path`, where the default can be
 found in:
 
-> environments/common/inventory/group_vars/all/opendistro.yml
+> [environments/common/inventory/group_vars/all/opendistro.yml](../environments/common/inventory/group_vars/all/opendistro.yml)
 
 ## Prometheus
 
@@ -261,7 +261,7 @@ This section details the configuration of prometheus.
 Internally, we use the [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role. You can customise any of the variables that the role supports. For a full list, please see the
 [upstream documentation](https://github.com/cloudalchemy/ansible-prometheus). The appliance defaults can be found here:
 
-> environments/common/inventory/group_vars/all/prometheus.yml
+> [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml)
 
 ### Placement
 
@@ -283,14 +283,14 @@ The upstream documentation can be found [here](https://prometheus.io/docs/promet
 
 This appliance provides a default set of recording rules which can be found here:
 
-> environments/common/files/prometheus/rules/precompute.rules
+> [environments/common/files/prometheus/rules/precompute.rules](../environments/common/files/prometheus/rules/precompute.rules)
 
 The intended purpose is to pre-compute some expensive queries that are used
 in the reference set of grafana dashboards.
 
 To add new, or to remove rules you will be to adjust the `prometheus_alert_rules_files` variable. The default value can be found in:
 
-> environments/common/inventory/group_vars/all/prometheus.yml
+> [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml)
 
 You can extend this variable in your environment specific configuration to reference extra files or to remove the defaults. The reference set of dashboards expect these variables to be defined, so if you remove them, you
 will also have to update your dashboards.
@@ -313,7 +313,7 @@ This appliance customises the default set of collectors to a minimal set, these 
 
 The list can be customised by overriding the `collect[]` parameter of the `node` job in the `prometheus_scrape_configs` dictionary. The defaults can be found in:
 
-> environments/common/inventory/group_vars/all/prometheus.yml
+> [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml).
 
 Variables in this file should *not* be customised directly, but should be overridden in your `environment`. See [README.md](../README.md#environments) which details the process of overriding default variables in more detail.
 
