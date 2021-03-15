@@ -61,7 +61,7 @@ The appliance defaults for the `filebeat` role can be found at the following loc
 
 > environments/common/inventory/group_vars/all/filebeat.yml
 
-### Configuration
+### Overview
 
 Filebeat is configured to scrape the output of slurm stats. Slurm stats produces a json log file in the following location on the host:
 
