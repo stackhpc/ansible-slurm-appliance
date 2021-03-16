@@ -156,11 +156,11 @@ The default configuration configures the following datasources:
 
 1. elasticsearch
 
- Connects to the `opendistro` service that is deployed by this appliance.
+   Connects to the `opendistro` service that is deployed by this appliance.
 
 2. prometheus
 
- Connects to the `prometheus` service that is deployed by this appliance.
+   Connects to the `prometheus` service that is deployed by this appliance.
 
 This can be customised with the `grafana_datasources` variable.
 
