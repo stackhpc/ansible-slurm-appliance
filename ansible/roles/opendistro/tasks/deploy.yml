@@ -69,3 +69,10 @@
       LimitNOFILE=65536
       LimitMEMLOCK=infinity
   become: true
+
+- name: Enable user lingering
+  command:
+    cmd: "loginctl enable-linger {{ opendistro_podman_user }}"
+    creates: "/var/lib/systemd/linger/{{ opendistro_podman_user }}"
+  become: yes
+  
