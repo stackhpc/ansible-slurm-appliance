@@ -95,7 +95,8 @@ All environments load the inventory from the `common` environment first, with th
 This repo contains a `cookiecutter` template which can be used to create a new environment from scratch. Run the [installation on deployment host](#Installation-on-deployment-host) instructions above, then in the repo root run:
 
     . venv/bin/activate
-    cookiecutter environments/skeleton
+    cd environments
+    cookiecutter skeleton
 
 and follow the prompts to complete the environment name and description.
 
