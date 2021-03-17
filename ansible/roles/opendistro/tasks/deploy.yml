@@ -10,7 +10,7 @@
   containers.podman.podman_container:
     name: opendistro
     image: amazon/opendistro-for-elasticsearch:1.12.0
-    state: started
+    state: created
     restart_policy: "always"
     ports:
       - "9200:9200"
@@ -29,3 +29,43 @@
       ES_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
   become: true
   become_user: "{{ opendistro_podman_user }}"
+
+- name: Create systemd unit file content
+  command:
+    cmd: podman generate systemd opendistro --restart-policy=always --name
+  become: true
+  become_user: "{{ opendistro_podman_user }}"
+  register: _podman_systemd
+  changed_when: false
+
+- name: Create systemd unit files on disk
+  copy:
+    dest: /etc/systemd/system/opendistro.service
+    content: "{{ _podman_systemd.stdout }}"
+  become: true
+
+- name: Get podman user ID
+  command: "id -u {{ opendistro_podman_user }}"
+  register: _podman_userid
+  changed_when: false
+
+- name: Create systemd unit override directory
+  file:
+    path: /etc/systemd/system/opendistro.service.d/
+    state: directory
+  become: true
+
+- name: Override limits for systemd unit
+  copy:
+    dest: /etc/systemd/system/opendistro.service.d/overrides.conf
+    content: |
+      [Unit]
+      BindsTo=user@{{ _podman_userid.stdout.strip() }}.service
+      After=user@{{ _podman_userid.stdout.strip() }}.service
+
+      [Service]
+      User={{ opendistro_podman_user }}
+      Group={{ opendistro_podman_user }}
+      LimitNOFILE=65536
+      LimitMEMLOCK=infinity
+  become: true
