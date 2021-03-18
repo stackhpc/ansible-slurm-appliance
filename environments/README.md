@@ -81,6 +81,8 @@ to your target environment. It is sometimes necessary to overide a particular se
 inventories that are specified later in the chain take precedence, you can simply redefine
 that variable in the more specific inventory.
 
+Pull requests are welcome to split variables into smaller components to make it easier to partially override some elements of a larger data structure e.g making it possible to set `prometheus_node_exporter_collectors` instead of overriding the whole of the `prometheus_scrape_configs` dictionary.
+
 ### role variables
 
 The pattern we use is that the role is run against an ansible inventory group matching

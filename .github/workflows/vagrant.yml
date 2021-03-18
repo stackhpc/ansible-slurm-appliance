@@ -1,6 +1,8 @@
 
 name: Test vagrant with ansible
-on: [push]
+on:
+  push:
+  pull_request:
 jobs:
   vagrant-example:
     runs-on: macos-latest

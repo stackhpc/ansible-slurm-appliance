@@ -8,6 +8,7 @@ roles:
   - src: cloudalchemy.alertmanager
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
+  - src: jriguera.configdrive
 
 collections:
 - name: containers.podman

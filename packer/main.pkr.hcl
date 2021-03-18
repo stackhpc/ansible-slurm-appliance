@@ -1,12 +1,12 @@
 # "timestamp" template function replacement:s
 locals { timestamp = formatdate("YYMMDD-hhmm", timestamp())}
 
-# Path pointing to root of repository
+# Path pointing to root of repository - set by environment variable PKR_VAR_repo_root
 variable "repo_root" {
   type = string
 }
 
-# Path pointing to environment directory
+# Path pointing to environment directory - set by environment variable PKR_VAR_environment_root
 variable "environment_root" {
   type = string
 }
@@ -33,7 +33,7 @@ source "qemu" "openhpc-compute" {
     ["-m", "896M"],
     ["-cdrom", "config-drive.iso"]
     ]
-  vm_name          = "testohpc-compute.qcow2" # image name
+  vm_name          = "ohpc-compute.qcow2" # image name
   shutdown_command = "sudo shutdown -P now"
 }
 
@@ -42,7 +42,7 @@ build {
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
     host_alias = "packer"
-    groups = ["computes", "builder"]
+    groups = ["compute", "builder"]
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     # TODO: use completely separate inventory, which just shares common? This will ensure

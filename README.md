@@ -1,14 +1,24 @@
-# Demos for OpenHPC on OpenStack
+# StackHPC Slurm Appliance
 
-Example slurm configuration demonstrating a production/development split. This deploys
-a battries included OpenHPC based slurm environment running on CentOS 8, along with
-a monitoring stack.
+This repository contains playbooks and configuration to define a Slurm-based HPC environment including:
+- A Centos 8 and OpenHPC v2-based Slurm cluster.
+- Shared fileystem(s) using NFS (with servers within or external to the cluster).
+- Slurm accounting using a MySQL backend.
+- A monitoring backend using Prometheus and ElasticSearch.
+- Grafana with dashboards for both individual nodes and Slurm jobs.
+- Production-ready Slurm defaults for access and memory.
+- A Packer-based build pipeline for compute node images.
+
+The repository is designed to be forked for a specific use-case/HPC site but can contain multiple environments (e.g. development, staging and production). It has been designed to be modular and extensible, so if you add features for your HPC site please feel free to submit PRs back upstream to us!
 
 ## Pre-requisites
 
 - Working DNS so that we can use the ansible inventory name as the address for connecting to services.
+- Bootable images based on Centos 8 Cloud images.
 
-## Installation
+## Installation on deployment host
+
+These instructions assume the deployment host is running Centos 8:
 
     git clone  git@github.com:stackhpc/openhpc-demo.git
     cd openhpc-demo
@@ -18,44 +28,110 @@ a monitoring stack.
     pip install -r requirements.txt
     # Install ansible dependencies ...
     ansible-galaxy role install -r requirements.yml -p ansible/roles
-    ansible-galaxy collection install -r requirements.yml -p ansible/collections
+    ansible-galaxy collection install -r requirements.yml -p ansible/collections # ignore the path warning here
 
-## Directory structure
 
-NOTE: This is just an overview, please see the `README.md` in the relevant directory
-for more details.
+## Overview of directory structure
 
-### environments
+- `environments/`: Contains configurations for both a "common" environment and one or more environments derived from this for your site. These define ansible inventory and may also contain provisioning automation such as Terraform or OpenStack HEAT templates.
+- `ansible/`: Contains the ansible playbooks to configure the infrastruture.
+- `packer/`: Contains automation to use Packer to build compute nodes for an enviromment - see the README in this directory for further information.
+- `dev/`: Contains development tools.
 
-This repository contains the configuration for multiple different environments. The
-configurations can be found in this directory.
+## Creating a Slurm appliance
 
-### ansible
+NB: This section describes generic instructions - check for any environment-specific instructions in `environments/<environment>/README.md` before starting.
 
-Prerequisite: You must have provisioned the infrastructure prior to running this step. See
-`README.md` in environment folder for details.
+1. Activate the environment - this **must be done** before any other commands are run:
 
-Contains all the ansible playbooks to configure the infrastruture.
+        source environments/<environment>activate
 
-You must `activate` an environment prior to running any scripts.
-This sets environment variables which allow the scripts to locate the
-environment specific config. For example, to activate the `minimal` environment:
+2. Deploy instances - see environment-specific instructions.
 
-    source environments/minimal/activate
-    ansible-playbook ansible/site.yml
+3. Generate passwords:
 
-### packer
+        ansible-playbook ansible/adhoc/generate-passwords.yml
 
-Images for the compute nodes can be built in advance. This contains the packer
-configuration to build the compute images. These can be used for upgrading an
-existing cluster or for deploying the original set of compute nodes.
+    This will output a set of passwords in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
 
-You must `activate` an environment prior to running any scripts.
-This sets environment variables which allow the scripts to locate the
-environment specific config. For example, to activate the `minimal` environment:
+        ansible-vault encrypt inventory/group_vars/all/secrets.yml
+   
+    See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
 
-    source environments/minimal/activate
-    cd packer
-     ~/.local/bin/packer build --on-error=ask main.pkr.hcl
 
-See `packer/README.md` for more details.
+4. Deploy the appliance:
+
+        ansible-playbook ansible/site.yml
+
+   or if you have encrypted secrets use:
+
+        ansible-playbook ansible/site.yml --ask-vault-password
+
+    Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
+
+5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
+
+        ansible-playbook ansible/adhoc/<playbook name>
+
+   Currently they include:
+    - `test.yml`: MPI-based post-deployment tests for latency, bandwidth and floating point performance. See `ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/test/README.md` for full details. Note that you may wish to reconfigure the Slurm compute nodes into a single partition before running this.
+    **IMPORTANT: Do not use these tests on a cluster in production as the reconfiguration it performs will crash running jobs.**
+    - `update-packages.yml`: Update all packages on the cluster.
+
+## Environments
+
+### Overview
+
+An environment defines the configuration for a single instantiation of this Slurm appliance. Each environment is a directory in `environments/`, containing:
+- Any deployment automation required - e.g. Terraform configuration or HEAT templates.
+- An ansible `inventory/` directory.
+- An `activate` script which sets environment variables to point to this configuration.
+- Optionally, additional playbooks in `/hooks` to run before or after the main tasks.
+
+All environments load the inventory from the `common` environment first, with the environment-specific inventory then overriding parts of this as required.
+
+### Creating a new environment
+
+This repo contains a `cookiecutter` template which can be used to create a new environment from scratch. Run the [installation on deployment host](#Installation-on-deployment-host) instructions above, then in the repo root run:
+
+    . venv/bin/activate
+    cd environments
+    cookiecutter skeleton
+
+and follow the prompts to complete the environment name and description.
+
+Alternatively, you could copy an existing environment directory.
+
+Now add deployment automation if required, and then complete the environment-specific inventory as described below.
+
+### Environment-specific inventory structure
+
+The ansible inventory for the environment is in `environments/<environment>/inventory/`. It should generally contain:
+- A `hosts` file. This defines the hosts in the appliance. Generally it should be templated out by the deployment automation so it is also a convenient place to define variables which depend on the deployed hosts such as connection variables, IP addresses, ssh proxy arguments etc.
+- A `groups` file defining ansible groups, which essentially controls which features of the appliance are enabled and where they are deployed. This repository generally follows a convention where functionality is defined using ansible roles applied to a a group of the same name, e.g. `openhpc` or `grafana`. The meaning and use of each group is described in comments in `environments/common/inventory/groups`. As the groups defined there for the common environment are empty, functionality is disabled by default and must be enabled in a specific environment's `groups` file. Two template examples are provided in `environments/commmon/layouts/` demonstrating a minimal appliance with only the Slurm cluster itself, and an appliance with all functionality.
+- Optionally, group variable files in `group_vars/<group_name>/overrides.yml`, where the group names match the functional groups described above. These can be used to override the default configuration for each functionality, which are defined in `environments/common/inventory/group_vars/all/<group_name>.yml` (the use of `all` here is due to ansible's precedence rules).
+
+Although most of the inventory uses the group convention described above there are a few special cases:
+- The `control`, `login` and `compute` groups are special as they need to contain actual hosts rather than child groups, and so should generally be defined in the templated-out `hosts` file.
+- The cluster name must be set on all hosts using `openhpc_cluster_name`. Using an  `[all:vars]` section in the `hosts` file is usually convenient.
+- `environments/common/inventory/group_vars/all/defaults.yml` contains some variables which are not associated with a specific role/feature. These are unlikely to need changing, but if necessary that could be done using a `environments/<environment>/inventory/group_vars/all/overrides.yml` file.
+- The `ansible/adhoc/generate-passwords.yml` playbook sets secrets for all hosts in `environments/<environent>/inventory/group_vars/all/secrets.yml`.
+- The Packer-based pipeline for building compute images creates a VM in groups `builder` and `compute`, allowing build-specific properties to be set in `environments/common/inventory/group_vars/builder/defaults.yml` or the equivalent inventory-specific path.
+- Each Slurm partition must have:
+    - An inventory group `<cluster_name>_<partition_name>` defining the hosts it contains - these must be homogenous w.r.t CPU and memory.
+    - An entry in the `openhpc_slurm_partitions` mapping in `environments/<environment>/inventory/group_vars/openhpc/overrides.yml`.
+    See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
+
+
+## Adding new functionality
+TODO: this is just rough notes:
+- Add new plays into existing playbook, or add a new playbook and update `site.yml`.
+- Add new empty group into `environments/common/inventory/groups`
+- Add new default group vars.
+- Update example groups file `environments/common/layouts/everything`
+- Update default Packer build variables in `environments/common/inventory/group_vars/builder/defaults.yml`.
+- Update READMEs.
+
+## Monitoring and logging
+
+Please see the [monitoring-and-logging.README.md](docs/monitoring-and-logging.README.md) for details.
