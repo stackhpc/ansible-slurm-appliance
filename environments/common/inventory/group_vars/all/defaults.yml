@@ -23,7 +23,7 @@ appliances_local_users_default: "{{ (appliances_local_users_podman if appliances
 appliances_local_users_extra: []
 appliances_local_users: "{{ appliances_local_users_default + appliances_local_users_extra }}"
 
-appliances_local_users_ansible_user_name: "{{ ansible_user_id }}"
+appliances_local_users_ansible_user_name: "{{ ansible_ssh_user | default(ansible_user) }}"
 appliances_local_users_ansible_user_home: /var/lib/{{ appliances_local_users_ansible_user_name }}
 appliances_local_users_ansible_user:
     name: "{{ appliances_local_users_ansible_user_name }}"

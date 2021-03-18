@@ -1,7 +1,7 @@
 ---
 
 - hosts: cluster
-  gather_facts: true
+  gather_facts: false
   tasks:
     - name: Add users
       ansible.builtin.user: "{{ item }}"
