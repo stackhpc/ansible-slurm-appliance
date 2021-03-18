@@ -2,12 +2,13 @@
 roles:
   - src: stackhpc.nfs
   - src: stackhpc.openhpc
-  - src: cloudalchemy.node-exporter
+  - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
   - src: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
+  - src: jriguera.configdrive
 
 collections:
 - name: containers.podman
