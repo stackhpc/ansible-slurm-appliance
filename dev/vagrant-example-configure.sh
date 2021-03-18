@@ -26,7 +26,7 @@ cat > /tmp/vagrant-example/openstack <<EOL
 echo "fake openstack command"
 EOL
 chmod u+x /tmp/vagrant-example/openstack
-PATH=/tmp/vagrant-example:$PATH
+export PATH=/tmp/vagrant-example:$PATH
 
 echo "Running site.yml"
 
