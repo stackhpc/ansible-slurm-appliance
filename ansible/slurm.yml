@@ -52,4 +52,4 @@
           +:wheel:ALL
           +:{{ ansible_ssh_user | default(ansible_user) }}:ALL
           -:ALL:ALL
-      # vagrant uses (depreciated) ansible_ssh_user
+      # vagrant uses (deprecated) ansible_ssh_user
