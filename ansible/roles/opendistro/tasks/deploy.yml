@@ -19,10 +19,6 @@
 #   register: _podman_userid
 #   changed_when: false
 
-# [Service]
-# User={{ opendistro_podman_user }}
-# Group={{ opendistro_podman_user }}
-
 # - name: Enable user lingering
 #   command:
 #     cmd: "loginctl enable-linger {{ opendistro_podman_user }}"
