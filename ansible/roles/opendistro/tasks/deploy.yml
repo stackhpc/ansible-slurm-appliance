@@ -5,73 +5,26 @@
     name: opendistro
   become: true
   become_user: "{{ opendistro_podman_user }}"
+  notify: Restart opendistro container
 
-- name: Setup opendistro
-  containers.podman.podman_container:
-    name: opendistro
-    image: amazon/opendistro-for-elasticsearch:1.12.0
-    state: created
-    restart_policy: "no"
-    ports:
-      - "9200:9200"
-    user: elasticsearch
-    ulimit:
-      - memlock=-1:-1
-      # maximum number of open files for the Elasticsearch user, set to at least 65536 on modern systems
-      - nofile=65536:65536
-    volume:
-      - opendistro:/usr/share/elasticsearch/data
-      - /etc/elastic/internal_users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml:ro
-    env:
-      node.name: opendistro
-      discovery.type: single-node
-      bootstrap.memory_lock: "true" # along with the memlock settings below, disables swapping
-      ES_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
-  become: true
-  become_user: "{{ opendistro_podman_user }}"
-
-- name: Create systemd unit file content
-  command:
-    cmd: podman generate systemd opendistro --restart-policy=always --name
-  become: true
-  become_user: "{{ opendistro_podman_user }}"
-  register: _podman_systemd
-  changed_when: false
-
-- name: Create systemd unit files on disk
-  copy:
+- name: Create systemd unit file
+  template:
     dest: /etc/systemd/system/opendistro.service
-    content: "{{ _podman_systemd.stdout }}"
+    src: opendistro.service.j2
   become: true
+  notify: Restart opendistro container
 
-- name: Get podman user ID
-  command: "id -u {{ opendistro_podman_user }}"
-  register: _podman_userid
-  changed_when: false
+# - name: Get podman user ID
+#   command: "id -u {{ opendistro_podman_user }}"
+#   register: _podman_userid
+#   changed_when: false
 
-- name: Create systemd unit override directory
-  file:
-    path: /etc/systemd/system/opendistro.service.d/
-    state: directory
-  become: true
+# [Service]
+# User={{ opendistro_podman_user }}
+# Group={{ opendistro_podman_user }}
 
-- name: Override limits for systemd unit
-  copy:
-    dest: /etc/systemd/system/opendistro.service.d/overrides.conf
-    content: |
-      [Unit]
-      BindsTo=user@{{ _podman_userid.stdout.strip() }}.service
-      After=user@{{ _podman_userid.stdout.strip() }}.service
-
-      [Service]
-      User={{ opendistro_podman_user }}
-      Group={{ opendistro_podman_user }}
-      LimitNOFILE=65536
-      LimitMEMLOCK=infinity
-  become: true
-
-- name: Enable user lingering
-  command:
-    cmd: "loginctl enable-linger {{ opendistro_podman_user }}"
-    creates: "/var/lib/systemd/linger/{{ opendistro_podman_user }}"
-  become: yes
+# - name: Enable user lingering
+#   command:
+#     cmd: "loginctl enable-linger {{ opendistro_podman_user }}"
+#     creates: "/var/lib/systemd/linger/{{ opendistro_podman_user }}"
+#   become: yes
