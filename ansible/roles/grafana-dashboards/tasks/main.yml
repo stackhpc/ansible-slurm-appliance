@@ -22,7 +22,6 @@
 # SOFTWARE.
 
 - become: false
-  delegate_to: localhost
   run_once: true
   block:
     - name: Create local grafana dashboard directory
@@ -101,12 +100,11 @@
         grafana_url: "{{ grafana_api_url }}"
         grafana_user: "{{ grafana_security.admin_user }}"
         grafana_password: "{{ grafana_security.admin_password }}"
-        path: "{{ item }}"
+        path: "{{ _tmp_dashboards.path }}/{{ item.dashboard_id }}.json"
         # message renamed to commit_message (Be aware if using old ansible)
         # https://github.com/ansible/ansible/pull/60051
         #commit_message: Updated by ansible
         state: present
         overwrite: true
       #no_log: true
-      with_fileglob:
-        - "{{ _tmp_dashboards.path }}/*"
+      with_items: "{{ grafana_dashboards }}"

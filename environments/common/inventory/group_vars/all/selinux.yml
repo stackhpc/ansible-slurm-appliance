@@ -1,2 +1,3 @@
+---
 selinux_state: permissive
 selinux_policy: targeted

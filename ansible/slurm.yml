@@ -59,5 +59,6 @@
         path: /etc/security/access.conf
         block: |
           +:wheel:ALL
-          +:centos:ALL
+          +:{{ ansible_ssh_user | default(ansible_user) }}:ALL
           -:ALL:ALL
+      # vagrant uses (deprecated) ansible_ssh_user
