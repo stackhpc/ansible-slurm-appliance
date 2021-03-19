@@ -18,6 +18,8 @@ Type=notify
 NotifyAccess=all
 LimitNOFILE=65536
 LimitMEMLOCK=infinity
+User={{ opendistro_podman_user }}
+Group={{ opendistro_podman_user }}
 TimeoutStartSec=180
 
 [Install]

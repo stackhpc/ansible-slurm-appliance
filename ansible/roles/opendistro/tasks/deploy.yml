@@ -13,14 +13,3 @@
     src: opendistro.service.j2
   become: true
   notify: Restart opendistro container
-
-# - name: Get podman user ID
-#   command: "id -u {{ opendistro_podman_user }}"
-#   register: _podman_userid
-#   changed_when: false
-
-# - name: Enable user lingering
-#   command:
-#     cmd: "loginctl enable-linger {{ opendistro_podman_user }}"
-#     creates: "/var/lib/systemd/linger/{{ opendistro_podman_user }}"
-#   become: yes
