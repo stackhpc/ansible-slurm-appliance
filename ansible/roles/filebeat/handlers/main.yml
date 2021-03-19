@@ -1,6 +1,9 @@
 ---
 
 - name: Restart filebeat container
-  command: podman restart filebeat
+  systemd:
+    name: filebeat.service
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
   become: true
-  become_user: "{{ filebeat_podman_user }}"

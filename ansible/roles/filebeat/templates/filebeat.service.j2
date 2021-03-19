@@ -1,0 +1,26 @@
+# container-filebeat.service
+# based off
+#   podman generate systemd filebeat --restart-policy always --new --name
+# with pid/cidfiles replaced with --sdnotify=conmon approach
+
+[Unit]
+Description=Podman container-filebeat.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network.target
+After=network-online.target
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=always
+ExecStart=/usr/bin/podman run --sdnotify=conmon --cgroups=no-conmon --replace --name filebeat --user root --restart=always --security-opt label=disable --volume /var/log/:/logs:ro --volume /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro --detach=True docker.elastic.co/beats/filebeat-oss:7.9.3 -e -strict.perms=false -d "*"
+ExecStop=/usr/bin/podman stop --ignore filebeat -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f filebeat
+KillMode=none
+Type=notify
+NotifyAccess=all
+User={{ filebeat_podman_user }}
+Group={{ filebeat_podman_user }}
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target default.target
