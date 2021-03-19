@@ -1,8 +1,8 @@
 ---
 
-- name: Restart opendistro container
+- name: Restart kibana container
   systemd:
-    name: opendistro.service
+    name: kibana.service
     state: restarted
     enabled: yes
     daemon_reload: yes
