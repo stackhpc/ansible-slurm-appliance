@@ -1,17 +1,7 @@
 ---
-- name: Setup file beat
-  containers.podman.podman_container:
-    image: docker.elastic.co/beats/filebeat-oss:7.9.3
-    name: filebeat
-    state: started
-    user: root
-    restart_policy: "always"
-    security_opt:
-      # Required to read /var/log. There might be a better solution, see:https://github.com/containers/podman/issues/3683
-      - label=disable
-    volumes:
-      - /var/log/:/logs:ro
-      - /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-    command: -e -strict.perms=false -d "*"
+- name: Create systemd unit file
+  template:
+    dest: /etc/systemd/system/filebeat.service
+    src: filebeat.service.j2
   become: true
-  become_user: "{{ filebeat_podman_user }}"
+  notify: Restart filebeat container
