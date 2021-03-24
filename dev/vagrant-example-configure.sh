@@ -18,16 +18,6 @@ echo "Running generate-passwords.yml"
 
 ansible-playbook ansible/adhoc/generate-passwords.yml
 
-echo "Mocking openstack command for rebuild functionality"
-# we don't need to mock the cloud file as it only needs to exist
-mkdir /tmp/vagrant-example
-cat > /tmp/vagrant-example/openstack <<EOL
-#!/usr/bin/bash
-echo "fake openstack command"
-EOL
-chmod u+x /tmp/vagrant-example/openstack
-export PATH=/tmp/vagrant-example:$PATH
-
 echo "Running site.yml"
 
 ansible-playbook -vvvv ansible/site.yml -e "openhpc_rebuild_clouds=/tmp/vagrant-example/openstack"

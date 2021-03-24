@@ -36,6 +36,3 @@ control
 
 [filebeat:children]
 slurm_stats
-
-[rebuild:children]
-compute
