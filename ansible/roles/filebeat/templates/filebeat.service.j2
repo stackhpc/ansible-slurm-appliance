@@ -15,6 +15,7 @@ Restart=always
 ExecStart=/usr/bin/podman run --sdnotify=conmon --cgroups=no-conmon --replace --name filebeat --user root --restart=always --security-opt label=disable --volume /var/log/:/logs:ro --volume /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro --detach=True docker.elastic.co/beats/filebeat-oss:7.9.3 -e -strict.perms=false -d "*"
 ExecStop=/usr/bin/podman stop --ignore filebeat -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f filebeat
+ExecStopPost=/bin/sh -c 'if [[ "$$EXIT_STATUS" == "*126*" ]]; then podman system renumber; fi'
 KillMode=none
 Type=notify
 NotifyAccess=all
