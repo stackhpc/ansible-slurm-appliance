@@ -13,6 +13,8 @@ ExecStart=/usr/bin/podman run --sdnotify=conmon --cgroups=no-conmon -d --replace
 ExecStop=/usr/bin/podman stop --ignore opendistro -t 10
 # note for some reason this returns status=143 which makes systemd show the unit as failed, not stopped
 ExecStopPost=/usr/bin/podman rm --ignore -f opendistro
+ExecStopPost=/bin/sh -c 'if [[ "$$EXIT_STATUS" == "*126*" ]]; then podman system renumber; fi'
+SuccessExitStatus=143 SIGTERM
 KillMode=none
 Type=notify
 NotifyAccess=all
