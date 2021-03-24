@@ -1,16 +1,14 @@
 ---
 roles:
   - src: stackhpc.nfs
-    version: v20.11.1 # need mount state for packer
-  - src: https://github.com/stackhpc/ansible-role-openhpc # FIXME: once updated on galaxy
-    name: stackhpc.openhpc
-    version: master
-  - src: cloudalchemy.node-exporter
+  - src: stackhpc.openhpc
+  - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
   - src: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
+  - src: jriguera.configdrive
 
 collections:
 - name: containers.podman

@@ -11,7 +11,19 @@
 - hosts: selinux
   gather_facts: false
   become: yes
+  tags:
+    - selinux
   tasks:
-    - ansible.posix.selinux:
+    - name: Set SELinux state and policy
+      ansible.posix.selinux:
         state: "{{ selinux_state }}"
         policy: "{{ selinux_policy }}"
+      register: sestatus
+    - name: Reboot if required to change SELinux state
+      reboot:
+      when: sestatus.reboot_required
+    - name: Wait for hosts to be reachable
+      wait_for_connection:
+        delay: 30
+        sleep: 5
+      when: sestatus.reboot_required
