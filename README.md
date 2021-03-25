@@ -121,7 +121,7 @@ Although most of the inventory uses the group convention described above there a
     - An inventory group `<cluster_name>_<partition_name>` defining the hosts it contains - these must be homogenous w.r.t CPU and memory.
     - An entry in the `openhpc_slurm_partitions` mapping in `environments/<environment>/inventory/group_vars/openhpc/overrides.yml`.
     See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
-
+- On an OpenStack cloud, rebuilding/reimaging compute nodes from Slurm can be enabled by defining a `rebuild` group containing the relevant compute hosts (e.g. in the generated `hosts` file).
 
 ## Adding new functionality
 TODO: this is just rough notes:

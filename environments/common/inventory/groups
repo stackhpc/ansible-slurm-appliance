@@ -66,3 +66,6 @@ cluster # TODO: FIXME in branch
 [selinux:children]
 # Define selinux status for these
 cluster
+
+[rebuild]
+# nodes in 'compute' group which can be rebuilt from slurm (on an OpenStack cloud)
