@@ -2,6 +2,23 @@
 
 # Fail early if configuration is invalid
 
+- name: Validate podman configuration
+  hosts: podman
+  gather_facts: false
+  tags:
+    - podman
+    - validate
+  tasks:
+    - name: Get tmp directory filesystem type
+      command: stat -f -c %T {{ podman_tmp_dir_root }}
+      register: podman_tmp_fstype
+      changed_when: false
+    
+    - name: Check tmp directory is on tmpfs
+      assert:
+        that: podman_tmp_fstype.stdout == 'tmpfs'
+        fail_msg: "{{ podman_tmp_fstype }} (variable podman_tmp_fstype) must be on tmpfs"
+
 - name: Validate filebeat configuration
   hosts: filebeat
   tags: filebeat

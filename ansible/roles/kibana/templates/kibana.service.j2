@@ -12,7 +12,6 @@ Restart=always
 ExecStart=/usr/bin/podman run --sdnotify=conmon --cgroups=no-conmon -d --replace --name kibana --restart=no --env ELASTICSEARCH_URL=https://10.109.0.140:9200 --env ELASTICSEARCH_HOSTS=https://10.109.0.140:9200 --env ELASTICSEARCH_USERNAME=admin --env ELASTICSEARCH_PASSWORD=6OWm,Uog1mft3rEpQeTC --publish 5601:5601 --detach=True amazon/opendistro-for-elasticsearch-kibana:1.12.0
 ExecStop=/usr/bin/podman stop --ignore kibana -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f kibana
-ExecStopPost=/bin/sh -c 'if [[ "$$EXIT_STATUS" == "*126*" ]]; then podman system renumber; fi'
 KillMode=none
 Type=notify
 NotifyAccess=all
