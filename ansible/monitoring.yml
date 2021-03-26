@@ -20,8 +20,8 @@
         path: /etc/tmpfiles.d/podman.conf
         create: yes
         block: |
-          d {{ podman_tmp_dir_root }}/{{ item.name }}/libpod/tmp 0755 podman podman
-          Z {{ podman_tmp_dir_root }}/{{ item.name }}            0755 podman podman
+          d {{ podman_tmp_dir_root }}/{{ item.name }}/libpod/tmp 0755 {{ item.name }} {{ item.name }}
+          Z {{ podman_tmp_dir_root }}/{{ item.name }}            0755 {{ item.name }} {{ item.name }}
       become: yes
       loop: "{{ appliances_local_users_podman }}"
       register: podman_tmp_dirs
