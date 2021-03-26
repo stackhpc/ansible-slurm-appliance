@@ -60,6 +60,7 @@ filebeat
 # Monitor these hosts for hardware and OS metrics
 
 [openhpc_tests:children]
+# Run post-deploy MPI-based tests using ansible/adhoc/test.yml
 login
 compute
 
@@ -67,4 +68,5 @@ compute
 # Define selinux status for these
 cluster
 
-[spack]
+[rebuild]
+# nodes in 'compute' group which can be rebuilt from slurm (on an OpenStack cloud)

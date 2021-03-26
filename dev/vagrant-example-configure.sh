@@ -20,4 +20,4 @@ ansible-playbook ansible/adhoc/generate-passwords.yml
 
 echo "Running site.yml"
 
-ansible-playbook ansible/site.yml
+ansible-playbook -vvvv ansible/site.yml -e "openhpc_rebuild_clouds=/tmp/vagrant-example/openstack"
