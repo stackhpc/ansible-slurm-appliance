@@ -56,7 +56,7 @@
     - name: Reset podman database
       # otherwise old config overrides!
       command:
-        cmd: podman system reset
+        cmd: podman system reset --force
       become: yes
       become_user: "{{ item.item.name }}"
       when: item.changed
