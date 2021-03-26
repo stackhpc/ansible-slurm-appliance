@@ -57,3 +57,6 @@
         delay: 30
         sleep: 5
       when: sestatus.reboot_required
+    - name: update facts
+      setup:
+      when: sestatus.changed
