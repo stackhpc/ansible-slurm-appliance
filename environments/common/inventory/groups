@@ -61,7 +61,8 @@ filebeat
 
 [openhpc_tests:children]
 # Run post-deploy MPI-based tests using ansible/adhoc/test.yml
-cluster # TODO: FIXME in branch
+login
+compute
 
 [selinux:children]
 # Define selinux status for these
