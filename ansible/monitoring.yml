@@ -16,11 +16,12 @@
       tags: config
 
     - name: Define tmp directories on tmpfs
-      lineinfile:
+      blockinfile:
         path: /etc/tmpfiles.d/podman.conf
         create: yes
-        line: "d {{ podman_tmp_dir_root }}/{{ item.name }}/libpod/tmp 0755 podman podman"
-        regexp: "d {{ podman_tmp_dir_root }}/{{ item.name }}/libpod/tmp 0755 podman podman"
+        block: |
+          d {{ podman_tmp_dir_root }}/{{ item.name }}/libpod/tmp 0755 podman podman
+          Z {{ podman_tmp_dir_root }}/{{ item.name }}            0755 podman podman
       become: yes
       loop: "{{ appliances_local_users_podman }}"
       register: podman_tmp_dirs
