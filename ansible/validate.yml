@@ -4,20 +4,12 @@
 
 - name: Validate podman configuration
   hosts: podman
-  gather_facts: false
-  tags:
-    - podman
-    - validate
+  tags: podman
   tasks:
-    - name: Get tmp directory filesystem type
-      command: stat -f -c %T {{ podman_tmp_dir_root }}
-      register: podman_tmp_fstype
-      changed_when: false
-    
-    - name: Check tmp directory is on tmpfs
-      assert:
-        that: podman_tmp_fstype.stdout == 'tmpfs'
-        fail_msg: "{{ podman_tmp_fstype }} (variable podman_tmp_fstype) must be on tmpfs"
+    - import_role:
+        name: podman
+        tasks_from: validate.yml
+      tags: validate
 
 - name: Validate filebeat configuration
   hosts: filebeat

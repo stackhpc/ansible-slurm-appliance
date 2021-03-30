@@ -1,1 +1,1 @@
-podman_tmp_dir_root: /run # this MUST be on a tmpfs
+podman_users: "{{ appliances_local_users_podman }}"
