@@ -48,21 +48,6 @@ In addition to main README:
 
 This section describes this environment as currently previsioned using `terraform-flat/`. For general notes on how environments work see the main README.
 
-Note the deployment host is on the same network as the cluster and is the only instance with a floating IP. To access the cluster you should therefore configure SSH to proxy through this and forward a port for a SOCKS proxy. An example is given below but usernames should be advised and IPs may change:
-
-```
-Host nrel-vglab-login-0
-  HostName 10.109.1.228
-  User centos
-  ProxyJump nrel-vglab-deploy
-  DynamicForward 8080
-
-Host nrel-vglab-deploy
-  HostName 185.45.78.153
-  User centos
-  DynamicForward 8080
-```
-
 This environment defines:
 
 - 2x login nodes `nrel-login-{0,1}` - see `inventory/hosts` for IP addresses.
