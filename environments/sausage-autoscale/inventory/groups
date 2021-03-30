@@ -1,0 +1,17 @@
+[control:children]
+login
+
+[nfs:children]
+cluster
+
+[openhpc:children]
+cluster
+
+[mysql:children]
+control
+
+[rebuild:children]
+compute
+
+[autoscale:children]
+login # actually controller

@@ -35,6 +35,14 @@
     - import_role:
         name: stackhpc.slurm_openstack_tools.rebuild
 
+- name: Setup autoscaling suspend/resume programs
+  hosts: autoscale # this is the *controller*
+  become: yes
+  tags:
+    - autoscale
+  tasks:
+    - import_tasks: autoscale.yml
+
 - name: Set locked memory limits on user-facing nodes
   hosts:
     - compute

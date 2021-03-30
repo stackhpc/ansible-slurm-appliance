@@ -1,0 +1,24 @@
+- name: Copy out clouds.yaml
+  copy:
+    src: "{{ openhpc_autoscale_clouds }}"
+    dest: /etc/openstack/clouds.yaml
+    owner: slurm
+    group: slurm
+    mode: '0400'
+- name: Setup slurm tools
+  include_role:
+    name: stackhpc.slurm_openstack_tools.pytools
+- name: Create SuspendProgram
+  template:
+    src: suspend.j2
+    dest: /opt/slurm-tools/bin/suspend.sh
+    owner: slurm
+    group: slurm
+    mode: u=rwx,go=
+- name: Create ResumeProgram
+  template:
+    src: resume.j2
+    dest: /opt/slurm-tools/bin/resume
+    owner: slurm
+    group: slurm
+    mode: u=rwx,go=

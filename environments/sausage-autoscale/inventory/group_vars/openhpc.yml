@@ -1,0 +1,19 @@
+openhpc_login_only_nodes: ''
+openhpc_slurm_conf:
+  SlurmctldDebug: debug5
+  SlurmctldLogFile: /var/log/slurmctld.log
+  SlurmdDebug: debug5
+  SlurmdLogFile: /var/log/slurmd.log
+  SuspendExcNodes: "{{ groups['compute'] | join(',') }}" # i.e. all tf-defined nodes in the partition
+  # BELOW FOR TESTING ONLY, NOT PRODUCTION VALUES!
+  SuspendTime: 120
+  SuspendTimeout: 300
+  SuspendProgram: /opt/slurm/suspend.sh
+  ResumeProgram: /opt/slurm/resume.sh
+  ResumeTimeout: 300
+  SlurmctldParameters: enable_configless,idle_on_node_suspend,cloud_dns,power_save_interval=10,power_save_min_interval=0
+  NOTES:
+  # enable_configless: required (as set in template)
+  # cloud_dns: requires working DNS
+  # power_save_*interval: options are defaults but should enable changes
+  # reboot_from_controller: should be really useful but actually we're already setup for rebuild on computes, so use that

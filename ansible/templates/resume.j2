@@ -1,0 +1,22 @@
+#!/opt/slurm-tools/bin/python3
+""" Create OpenStack instances """
+
+import sys, subprocess
+
+# configure logging to syslog - by default only "info"
+# and above categories appear
+logger = logging.getLogger("syslogger")
+logger.setLevel(logging.DEBUG)
+handler = logging.handlers.SysLogHandler("/dev/log")
+logger.addHandler(handler)
+
+def expand_nodes(hostlist_expr):
+    scontrol = subprocess.run(['scontrol', 'show', 'hostnames', hostlist_expr], stdout=subprocess.PIPE, universal_newlines=True) # TODO: pass full path to binary
+    return scontrol.stdout.strip().split('\n')
+
+def launch():
+   hostlist_expr = sys.argv[1:]
+   logger.info(f"Resume invoked for %{hostexphostlist_expr}")
+   nodes = expand_nodes(hostlist_expr)
+   for node in nodes:
+      logger.info(f"TODO: Resume node %{node}")
