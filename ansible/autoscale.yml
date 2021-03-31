@@ -18,10 +18,11 @@
 - name: Create SuspendProgram
   template:
     src: suspend.j2
-    dest: /opt/slurm-tools/bin/suspend.sh
+    dest: /opt/slurm-tools/bin/suspend
     owner: slurm
     group: slurm
     mode: u=rwx,go=
+  tags: suspend
 - name: Create ResumeProgram
   template:
     src: resume.j2

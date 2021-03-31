@@ -1,8 +1,35 @@
-#!/bin/bash
-# Example SuspendProgram
-echo "`date` Suspend invoked $0 $*" >>/var/log/power_save.log
-hosts=`scontrol show hostnames $1`
-for host in $hosts
-do
-   openstack server delete $host
-done
+#!/opt/slurm-tools/bin/python3
+""" Delete openstack instances """
+
+import sys, subprocess, logging, logging.handlers
+import openstack
+import pprint
+
+# configure logging to syslog - by default only "info" and above categories appear
+logger = logging.getLogger("syslogger")
+logger.setLevel(logging.DEBUG)
+handler = logging.handlers.SysLogHandler("/dev/log")
+logger.addHandler(handler)
+
+def expand_nodes(hostlist_expr):
+    scontrol = subprocess.run(['scontrol', 'show', 'hostnames', hostlist_expr], stdout=subprocess.PIPE, universal_newlines=True)
+    return scontrol.stdout.strip().split('\n')
+
+def delete_server(conn, name):
+    server = conn.compute.find_server(name)
+    conn.compute.delete_server(server)
+
+def suspend():
+    hostlist_expr = sys.argv[1]
+    logger.info(f"Slurmctld invoked suspend {hostlist_expr}")
+    remove_nodes = expand_nodes(hostlist_expr)
+
+    conn = openstack.connection.from_config()
+    logger.info(f"Got openstack connection {conn}")
+
+    for node in remove_nodes:
+        logger.info(f"deleting node {node}")
+        delete_server(conn, node)
+
+if __name__ == "__main__":
+    sys.exit(suspend())

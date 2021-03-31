@@ -1,1 +1,6 @@
 openhpc_autoscale_clouds: /home/centos/steveb-clouds.yaml
+# TODO: change below to be defined somewhere else
+openhpc_autoscale_image: CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64 # TODO change to built image
+openhpc_autoscale_network: stackhpc
+openhpc_autoscale_flavor: chipolata
+openhpc_autoscale_keypair: steveb-local

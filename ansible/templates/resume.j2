@@ -1,22 +1,52 @@
 #!/opt/slurm-tools/bin/python3
 """ Create OpenStack instances """
 
-import sys, subprocess
+import sys, subprocess, logging.handlers
+import openstack
+import pprint
 
-# configure logging to syslog - by default only "info"
-# and above categories appear
+# all take a name or ID:
+IMAGE = "{{ openhpc_autoscale_image }}"
+NETWORK = "{{ openhpc_autoscale_network }}"
+FLAVOR = "{{ openhpc_autoscale_flavor }}"
+KEYPAIR = "{{ openhpc_autoscale_keypair }}"
+
+# configure logging to syslog - by default only "info" and above categories appear
 logger = logging.getLogger("syslogger")
 logger.setLevel(logging.DEBUG)
 handler = logging.handlers.SysLogHandler("/dev/log")
 logger.addHandler(handler)
 
 def expand_nodes(hostlist_expr):
-    scontrol = subprocess.run(['scontrol', 'show', 'hostnames', hostlist_expr], stdout=subprocess.PIPE, universal_newlines=True) # TODO: pass full path to binary
+    scontrol = subprocess.run(['scontrol', 'show', 'hostnames', hostlist_expr], stdout=subprocess.PIPE, universal_newlines=True)
     return scontrol.stdout.strip().split('\n')
 
-def launch():
-   hostlist_expr = sys.argv[1:]
-   logger.info(f"Resume invoked for %{hostexphostlist_expr}")
-   nodes = expand_nodes(hostlist_expr)
-   for node in nodes:
-      logger.info(f"TODO: Resume node %{node}")
+def create_server(conn, name):
+
+    image = conn.compute.find_image(IMAGE)
+    flavor = conn.compute.find_flavor(FLAVOR)
+    network = conn.network.find_network(NETWORK)
+    keypair = conn.compute.find_keypair(KEYPAIR)
+
+    server = conn.compute.create_server(
+        name=name, image_id=image.id, flavor_id=flavor.id,
+        networks=[{"uuid": network.id}], key_name=keypair.name)
+    
+    #server = conn.compute.wait_for_server(server)
+    return server
+
+def resume():
+    hostlist_expr = sys.argv[1]
+    logger.info(f"Slurmctld invoked resume {hostlist_expr}")
+    new_nodes = expand_nodes(hostlist_expr)
+
+    conn = openstack.connection.from_config()
+    logger.info(f"Got openstack connection {conn}")
+
+    for node in new_nodes:
+        logger.info(f"creating node {node}")
+        server = create_server(conn, node)
+        logger.info(f"server: {server}")
+
+if __name__ == "__main__":
+    sys.exit(resume())
