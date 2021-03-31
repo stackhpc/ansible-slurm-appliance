@@ -1,4 +1,7 @@
 openhpc_login_only_nodes: ''
+openhpc_slurm_partitions:
+  - name: "compute"
+    cloud_nodes: 2
 openhpc_packages:
   - slurm-libpmi-ohpc
   - wget
@@ -13,8 +16,8 @@ openhpc_slurm_conf:
   # BELOW FOR TESTING ONLY, NOT PRODUCTION VALUES!
   SuspendTime: 120
   SuspendTimeout: 300
-  SuspendProgram: /opt/slurm/suspend.sh
-  ResumeProgram: /opt/slurm/resume.sh
+  SuspendProgram: /opt/slurm-tools/bin/suspend.sh
+  ResumeProgram: /opt/slurm-tools/bin/resume
   ResumeTimeout: 300
   SlurmctldParameters: enable_configless,idle_on_node_suspend,cloud_dns,power_save_interval=10,power_save_min_interval=0
   NOTES:
