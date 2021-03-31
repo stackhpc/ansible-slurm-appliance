@@ -1,1 +1,1 @@
-openhpc_autoscale_clouds: ~/steveb-openrc.sh
+openhpc_autoscale_clouds: /home/centos/steveb-clouds.yaml
