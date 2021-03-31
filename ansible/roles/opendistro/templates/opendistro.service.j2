@@ -1,0 +1,27 @@
+# container-opendistro.service
+
+[Unit]
+Description=Podman container-opendistro.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network.target
+After=network-online.target
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=always
+ExecStart=/usr/bin/podman run --sdnotify=conmon --cgroups=no-conmon -d --replace --name opendistro --restart=no --user elasticsearch --ulimit memlock=-1:-1 --ulimit nofile=65536:65536 --volume opendistro:/usr/share/elasticsearch/data --volume /etc/elastic/internal_users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml:ro --env node.name=opendistro --env discovery.type=single-node --env bootstrap.memory_lock=true --env "ES_JAVA_OPTS=-Xms512m -Xmx512m" --publish 9200:9200 amazon/opendistro-for-elasticsearch:1.12.0
+ExecStop=/usr/bin/podman stop --ignore opendistro -t 10
+# note for some reason this returns status=143 which makes systemd show the unit as failed, not stopped
+ExecStopPost=/usr/bin/podman rm --ignore -f opendistro
+SuccessExitStatus=143 SIGTERM
+KillMode=none
+Type=notify
+NotifyAccess=all
+LimitNOFILE=65536
+LimitMEMLOCK=infinity
+User={{ opendistro_podman_user }}
+Group={{ opendistro_podman_user }}
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target default.target

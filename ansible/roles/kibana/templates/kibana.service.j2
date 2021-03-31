@@ -1,0 +1,23 @@
+# container-kibana.service
+
+[Unit]
+Description=Podman container-kibana.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network.target
+After=network-online.target
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=always
+ExecStart=/usr/bin/podman run --sdnotify=conmon --cgroups=no-conmon -d --replace --name kibana --restart=no --env ELASTICSEARCH_URL=https://{{ elasticsearch_address }}:9200 --env ELASTICSEARCH_HOSTS=https://{{ elasticsearch_address}}:9200 --env ELASTICSEARCH_USERNAME=admin --env ELASTICSEARCH_PASSWORD="{{ secrets_openhpc_elasticsearch_admin_password }}" --publish 5601:5601 --detach=True amazon/opendistro-for-elasticsearch-kibana:1.12.0
+ExecStop=/usr/bin/podman stop --ignore kibana -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f kibana
+KillMode=none
+Type=notify
+NotifyAccess=all
+User={{ kibana_podman_user }}
+Group={{ kibana_podman_user }}
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target default.target

@@ -2,6 +2,15 @@
 
 # Fail early if configuration is invalid
 
+- name: Validate podman configuration
+  hosts: podman
+  tags: podman
+  tasks:
+    - import_role:
+        name: podman
+        tasks_from: validate.yml
+      tags: validate
+
 - name: Validate filebeat configuration
   hosts: filebeat
   tags: filebeat

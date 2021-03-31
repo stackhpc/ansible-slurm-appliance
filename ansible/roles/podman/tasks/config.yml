@@ -15,3 +15,60 @@
 
 - name: reset ssh connection to allow user changes to affect 'current login user'
   meta: reset_connection
+
+- name: Ensure podman users exist
+  user: "{{ item }}"
+  with_items: "{{ podman_users }}"
+  register: podman_user_info
+
+- name: Define tmp directories on tmpfs
+  blockinfile:
+    path: /etc/tmpfiles.d/podman.conf
+    create: yes
+    block: |
+      d {{ podman_tmp_dir_root }}/{{ item.name }}/libpod/tmp 0755 {{ item.name }} {{ item.name }}
+      Z {{ podman_tmp_dir_root }}/{{ item.name }}            0755 {{ item.name }} {{ item.name }}
+  become: yes
+  loop: "{{ podman_users }}"
+  register: podman_tmp_dirs
+
+- name: Create tmp directories
+  command: systemd-tmpfiles --create
+  become: true
+  when: podman_tmp_dirs.results | selectattr('changed') | list | length > 0 # when: any changed
+
+- name: Create podman configuration directories
+  file:
+    path: "{{ item.home }}/.config/containers/"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  become: yes
+  loop: "{{ podman_user_info.results }}"
+
+- name: Set podman to use temp directories
+  community.general.ini_file:
+    path: "{{ item.home }}/.config/containers/containers.conf"
+    section: engine
+    option: tmp_dir
+    value: '"{{ podman_tmp_dir_root }}/{{ item.name }}/libpod/tmp"'
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    create: yes
+  loop: "{{ podman_user_info.results }}"
+  become: yes
+  register: podman_tmp
+
+- debug:
+    var: podman_tmp
+
+- name: Reset podman database
+  # otherwise old config overrides!
+  command:
+    cmd: podman system reset --force
+  become: yes
+  become_user: "{{ item.item.name }}"
+  when: item.changed
+  loop: "{{ podman_tmp.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
