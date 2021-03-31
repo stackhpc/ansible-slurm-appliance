@@ -1,4 +1,9 @@
 openhpc_login_only_nodes: ''
+openhpc_packages:
+  - slurm-libpmi-ohpc
+  - wget
+  - lmod-defaults-gnu9-openmpi4-ohpc
+  - imb-gnu9-openmpi4-ohpc
 openhpc_slurm_conf:
   SlurmctldDebug: debug5
   SlurmctldLogFile: /var/log/slurmctld.log
