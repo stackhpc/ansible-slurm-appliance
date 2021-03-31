@@ -5,6 +5,13 @@
     owner: slurm
     group: slurm
     mode: '0400'
+- name: Ensure /etc/openstack/ is readable by slurm # TODO: think this clashes with rebuild?
+  file:
+    path: /etc/openstack/
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: u=rx
 - name: Setup slurm tools
   include_role:
     name: stackhpc.slurm_openstack_tools.pytools
@@ -22,3 +29,4 @@
     owner: slurm
     group: slurm
     mode: u=rwx,go=
+  tags: resume
