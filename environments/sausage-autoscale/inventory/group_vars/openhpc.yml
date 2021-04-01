@@ -10,7 +10,8 @@ openhpc_packages:
 openhpc_slurm_conf:
   SlurmctldDebug: debug5
   SlurmctldLogFile: /var/log/slurmctld.log
-  SlurmdDebug: debug5
+  # SlurmdDebug: debug5
+  DebugFlags: PowerSave
   SlurmdLogFile: /var/log/slurmd.log
   SuspendExcNodes: "{{ groups['compute'] | join(',') }}" # i.e. all tf-defined nodes in the partition
   # BELOW FOR TESTING ONLY, NOT PRODUCTION VALUES!
