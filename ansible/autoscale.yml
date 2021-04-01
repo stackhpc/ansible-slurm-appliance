@@ -1,3 +1,10 @@
+- name: Ensure /etc/openstack/ exists and is readable by slurm # TODO: think this clashes with rebuild?
+  file:
+    path: /etc/openstack/
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: u=rx
 - name: Copy out clouds.yaml
   copy:
     src: "{{ openhpc_autoscale_clouds }}"
@@ -5,13 +12,6 @@
     owner: slurm
     group: slurm
     mode: '0400'
-- name: Ensure /etc/openstack/ is readable by slurm # TODO: think this clashes with rebuild?
-  file:
-    path: /etc/openstack/
-    state: directory
-    owner: slurm
-    group: slurm
-    mode: u=rx
 - name: Setup slurm tools
   include_role:
     name: stackhpc.slurm_openstack_tools.pytools
