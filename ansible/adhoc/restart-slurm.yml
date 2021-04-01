@@ -20,7 +20,7 @@
         name: slurmctld
         state: restarted
 
-- hosts: compute,login
+- hosts: compute,login # FIXME: doesn't work if using `login` as combined slurmctld
   become: yes
   gather_facts: no
   tasks:
