@@ -4,3 +4,4 @@
 # defined elsewhere the group that is ordered lower will determine the values.
 openhpc_slurm_service_started: false
 nfs_client_mnt_state: present
+openhpc_rebuild_reconfigure: false
