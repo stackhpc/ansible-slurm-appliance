@@ -2,6 +2,7 @@
 roles:
   - src: stackhpc.nfs
   - src: stackhpc.openhpc
+    version: feature/autoscale
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
   - src: cloudalchemy.prometheus
