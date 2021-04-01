@@ -37,6 +37,10 @@ Steps:
         # or during development:
         PACKER_LOG=1 packer build --on-error=ask main.pkr.hcl
 
+  By default this creates a 20GB image. For nodes with smaller disks pass `disk_size` to packer ([docs](https://www.packer.io/docs/builders/qemu#disk_size)), e.g:
+
+        packer build -var 'disk_size=10G' ...
+  
 - For debugging, you can login to the VM over ssh by finding the line like the following in the Packer output:
 
         Executing /usr/libexec/qemu-kvm: ...  "-netdev", "user,id=user.0,hostfwd=tcp::2922-:22", ... 
