@@ -12,11 +12,12 @@ Steps:
 
 - Follow the standard installation instructions in the main README.
 
-- Install packer and qemu-kvm:
+- Install packer and qemu-kvm, and ensure libgcrypt is updated:
 
       sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
       sudo yum -y install packer
       sudo yum -y install qemu-kvm
+      sudo yum -y install libgcrypt
 
 - Activate the venv and the relevant environment.
 - Ensure you have generated passwords using:
