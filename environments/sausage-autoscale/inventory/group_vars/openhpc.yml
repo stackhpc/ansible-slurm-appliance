@@ -20,6 +20,7 @@ openhpc_slurm_conf:
   ResumeProgram: /opt/slurm-tools/bin/resume
   ResumeTimeout: 300
   SlurmctldParameters: enable_configless,idle_on_node_suspend,cloud_dns
+  CommunicationParameters: NoAddrCache
   # FIXME: need to set TreeWidth to >= number of nodes (default: 50)
   # NOTES:
   # enable_configless: required (as set in template)
