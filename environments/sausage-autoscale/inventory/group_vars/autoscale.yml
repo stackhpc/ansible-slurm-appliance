@@ -1,6 +1,6 @@
 openhpc_autoscale_clouds: /home/centos/steveb-clouds.yaml
 # TODO: change below to be defined somewhere else
-openhpc_autoscale_image: 1c3025f4-8384-4f3f-946e-8ce3b8e32292
+openhpc_autoscale_image: ohpc-compute-210406-1108.qcow2
 openhpc_autoscale_network: stackhpc
 openhpc_autoscale_flavor: chipolata
 openhpc_autoscale_keypair: steveb-local
