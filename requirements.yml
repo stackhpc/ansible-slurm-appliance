@@ -1,7 +1,9 @@
 ---
 roles:
   - src: stackhpc.nfs
-  - src: stackhpc.openhpc
+  - src: https://github.com/stackhpc/ansible-role-openhpc
+    name: stackhpc.openhpc
+    version: feature/support-reboot
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
   - src: cloudalchemy.prometheus
@@ -15,5 +17,5 @@ collections:
 - name: community.grafana
 - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
   type: git
-  version: main
+  version: rebuild/from_controller
 ...
