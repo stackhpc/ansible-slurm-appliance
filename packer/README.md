@@ -37,17 +37,22 @@ Steps:
         # or during development:
         PACKER_LOG=1 packer build --on-error=ask main.pkr.hcl
 
-  By default this creates a 20GB image. For nodes with smaller disks pass `disk_size` to packer ([docs](https://www.packer.io/docs/builders/qemu#disk_size)), e.g:
+  The following variables may also be set:
 
-        packer build -var 'disk_size=10G' ...
-  
-- For debugging, you can login to the VM over ssh by finding the line like the following in the Packer output:
+  - `disk_size`: Set the image size ([docs](https://www.packer.io/docs/builders/qemu#disk_size)). Defaults to 20G, so for smaller VMs use e.g: `packer build -var 'disk_size=10G' ...`
+  - `groups`: List of ansible groups the packer VM is added to, to control which nodes to build an image for. Defaults to `["compute"]` to build a generic compute node image. The first element of this list is used as part of the image name. Examples:
+
+     - Build an image for a login node: `packer build -var 'groups=["login"]' ...`
+
+  Note the VM is also always added to the `builder` group to differentiate it from a real node - see developer notes below.
+
+- For debugging, you can login to the VM over ssh by looking in the Packer output for lines showing the IP and ssh port forwarding, e.g.:
 
         Executing /usr/libexec/qemu-kvm: ...  "-netdev", "user,id=user.0,hostfwd=tcp::2922-:22", ... 
 
-  which specifies the ssh port forwarding Packer is using to log-in to the VM, so in this case login using:
+  so in this case login using:
 
-        ssh -p 2922 centos@127.0.0.1
+        ssh -p 2922 centos@<ip address>
 
 - You can also watch the console output from the VM startup in another terminal using:
 
@@ -68,8 +73,7 @@ You can now recreate the compute VMs with the new image using one of the followi
 
 # Notes for developers
 
-The Packer build VM is added to both groups `compute` and `builder`, with the latter allowing `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically 
-for the VM where the real cluster may not be contactable (depending on where the build is run from). Currently this means:
+The Packer build VM is added to both the `builder` group and the groups specified in the packer `groups` variable, with the former allowing `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the VM where the real cluster may not be contactable (depending on where the build is run from). Currently this means:
 - Enabling but not starting `slurmd`.
 - Setting NFS mounts to `present` but not `mounted`
 
