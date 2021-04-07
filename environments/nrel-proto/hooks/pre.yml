@@ -1,6 +1,7 @@
-- name: nrel-proto fixes - all nodes
+- name: Drivers for baremetal SMS labs nodes
   hosts: cluster
   become: true
+  tags: drivers
   tasks:
     - name: Add elrepo repository
       yum_repository:
@@ -18,6 +19,12 @@
     - name: Add HPE Emulex drivers
       yum:
         name: kmod-be2net
+
+- name: Workaround no internal DNS
+  hosts: cluster
+  become: true
+  tags: etc_hosts
+  tasks:
     - name: Internal DNS workaround - generate /etc/hosts file content
       set_fact: # TODO: define which network to use below:
         etc_hosts_content: |
