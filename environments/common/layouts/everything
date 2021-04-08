@@ -1,6 +1,3 @@
-[exporters:children]
-cluster
-
 [nfs:children]
 cluster
 
