@@ -35,4 +35,5 @@ slurm_stats
 login
 
 [rebuild:children]
+control
 compute
