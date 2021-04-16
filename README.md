@@ -54,7 +54,7 @@ NB: This section describes generic instructions - check for any environment-spec
 
     This will output a set of passwords in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
 
-        ansible-vault encrypt inventory/group_vars/all/secrets.yml
+        ansible-vault encrypt $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/secrets.yml
    
     See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
 
