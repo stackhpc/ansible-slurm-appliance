@@ -23,9 +23,7 @@ In addition to main README:
 
 2. Deploy instances using Terraform:
 
-   Two terraform configurations are provided:
-   - `terraform-flat/`: Deploys all instances onto a single preexisting network which has a router to the external network (in the Admin project). This is the currently-used approach as the lab environment does not currently support the necessary VLANs for additional networks. You will need to manually add floating IPs where necessary after running this.
-   - `terraform-flat/`: Deploys all instances into a cluster-specific private network and creates a router to a designated external network. This is intended to provide an example of a more production-like configuration, and is untested.
+   An example terraform configuration is provided in `terraform-flat/`. This deploys all instances onto a single preexisting network which has a router to the external network (in the Admin project). This is the currently-used approach as the lab environment does not currently support the necessary VLANs for additional networks. You will need to manually add floating IPs where necessary after running this.
 
    In either case:
    - Modify variables in `terraform*/terraform.tfvars` to define the cluster size and cloud environment.
