@@ -2,6 +2,15 @@
 
 # Fail early if configuration is invalid
 
+- name: Validate podman configuration
+  hosts: podman
+  tags: podman
+  tasks:
+    - import_role:
+        name: podman
+        tasks_from: validate.yml
+      tags: validate
+
 - name: Validate filebeat configuration
   hosts: filebeat
   tags: filebeat
@@ -26,5 +35,15 @@
   tasks:
     - import_role:
         name: opendistro
+        tasks_from: validate.yml
+      tags: validate
+
+- name: Validate rebuild configuration
+  hosts: rebuild
+  gather_facts: false
+  tags: rebuild
+  tasks:
+    - import_role:
+        name: stackhpc.slurm_openstack_tools.rebuild
         tasks_from: validate.yml
       tags: validate

@@ -1,0 +1,3 @@
+podman_users:
+  - name: "{{ ansible_user }}"
+podman_tmp_dir_root: /run # MUST be on a tmpfs

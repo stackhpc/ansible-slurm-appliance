@@ -1,21 +1,27 @@
 # "timestamp" template function replacement:s
 locals { timestamp = formatdate("YYMMDD-hhmm", timestamp())}
 
-# Path pointing to root of repository
+# Path pointing to root of repository - set by environment variable PKR_VAR_repo_root
 variable "repo_root" {
   type = string
 }
 
-# Path pointing to environment directory
+# Path pointing to environment directory - set by environment variable PKR_VAR_environment_root
 variable "environment_root" {
   type = string
+}
+
+# VM disk size - needs to match compute VM image
+variable "disk_size" {
+  type = string
+  default = "20G"
 }
 
 source "qemu" "openhpc-compute" {
   iso_url = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2"
   iso_checksum = "sha256:d8984b9baee57b127abce310def0f4c3c9d5b3cea7ea8451fc4ffcbc9935b640"
   disk_image = true # as above is .qcow2 not .iso
-  disk_size = "20G" # needs to match compute VM
+  disk_size = var.disk_size
   disk_compression = true
   accelerator      = "kvm" # default, if available
   ssh_username = "centos"
@@ -33,7 +39,7 @@ source "qemu" "openhpc-compute" {
     ["-m", "896M"],
     ["-cdrom", "config-drive.iso"]
     ]
-  vm_name          = "testohpc-compute.qcow2" # image name
+  vm_name          = "ohpc-compute.qcow2" # image name
   shutdown_command = "sudo shutdown -P now"
 }
 
@@ -42,7 +48,7 @@ build {
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
     host_alias = "packer"
-    groups = ["computes", "builder"]
+    groups = ["compute", "builder"]
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     # TODO: use completely separate inventory, which just shares common? This will ensure

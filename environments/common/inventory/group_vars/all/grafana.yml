@@ -1,5 +1,8 @@
 ---
 
+# See: https://github.com/cloudalchemy/ansible-grafana
+# for variable definitions.
+
 grafana_dashboards:
   # node exporter slurm:
   - dashboard_id: 13427

@@ -11,3 +11,5 @@
   tasks:
     - import_role:
         name: stackhpc.slurm_openstack_tools.test
+      # TODO: FIXME: need to fix /opt mount so that it only overrides /opt/intel and /opt/ohpc
+      # TODO: FIXME: need to fix /opt unmount so it works
