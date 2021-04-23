@@ -30,3 +30,16 @@
     - name: update facts
       setup:
       when: sestatus.changed
+
+- hosts: update
+  gather_facts: false
+  become: yes
+  tags:
+    - update
+  tasks:
+    - name: Update selected packages
+      yum:
+        name: "{{ update_name }}"
+        state: "{{ update_state }}"
+        exclude: "{{ update_exclude }}"
+      when: "update_enable | default('false') | bool"
