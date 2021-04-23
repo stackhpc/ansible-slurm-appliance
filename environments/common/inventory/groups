@@ -70,3 +70,6 @@ cluster
 
 [rebuild]
 # Enable rebuild of nodes on an OpenStack cloud; add 'control' group plus 'compute' group or a subset of it.
+
+[update]
+# Nodes to run yum update on
