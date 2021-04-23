@@ -14,7 +14,7 @@
     - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
       blockinfile:
         path: /etc/hosts
-        create: no # TODO: ??
+        create: yes
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
 
