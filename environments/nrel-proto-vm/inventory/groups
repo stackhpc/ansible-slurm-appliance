@@ -37,3 +37,6 @@ login
 [rebuild:children]
 control
 compute
+
+[update:children]
+cluster
