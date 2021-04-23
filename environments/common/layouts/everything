@@ -34,9 +34,6 @@ control
 [filebeat:children]
 slurm_stats
 
-[spack:children]
-login
-
 # NB: [rebuild] not defined here as this template is used in CI, which does not run in openstack
 
 [update:children]
