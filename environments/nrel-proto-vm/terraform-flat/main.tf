@@ -45,6 +45,12 @@ variable "login_image" {
     description = "Name of image for login node(s)"
 }
 
+variable "login_availability_zone" {
+    type = string
+    description = "Availability zone to use for login node(s)"
+    default = null
+}
+
 variable "control_flavor" {
     type = string
     description = "Name of instance flavor for control node"
@@ -53,6 +59,12 @@ variable "control_flavor" {
 variable "control_image" {
     type = string
     description = "Name of image for compute node"
+}
+
+variable "control_availability_zone" {
+    type = string
+    description = "Availability zone to use for control node(s)"
+    default = null
 }
 
 variable "compute_flavor" {
@@ -65,6 +77,12 @@ variable "compute_image" {
     description = "Name of image for compute node(s)"
 }
 
+variable "compute_availability_zone" {
+    type = string
+    description = "Availability zone to use for compute node(s)"
+    default = null
+}
+
 data "openstack_networking_network_v2" "cluster" {
   name = var.cluster_network
 }
@@ -74,6 +92,7 @@ resource "openstack_compute_instance_v2" "control" {
   image_name = var.control_image
   flavor_name = var.control_flavor
   key_pair = var.key_pair
+  availability_zone = var.control_availability_zone
   
   network {
     uuid = data.openstack_networking_network_v2.cluster.id
@@ -94,6 +113,7 @@ resource "openstack_compute_instance_v2" "logins" {
   image_name = var.login_image
   flavor_name = var.login_flavor
   key_pair = var.key_pair
+  availability_zone = var.login_availability_zone
 
   network {
     uuid = data.openstack_networking_network_v2.cluster.id
@@ -114,6 +134,7 @@ resource "openstack_compute_instance_v2" "compute" {
   image_name = var.compute_image
   flavor_name = var.compute_flavor
   key_pair = var.key_pair
+  availability_zone = var.compute_availability_zone
 
   network {
     uuid = data.openstack_networking_network_v2.cluster.id
