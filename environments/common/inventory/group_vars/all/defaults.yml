@@ -18,10 +18,19 @@ prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 
 ############################# bootstrap: local user configuration #########################
 
-appliances_local_users_default: "{{ [appliances_local_users_podman] if appliances_local_users_podman_enable else [] + appliances_local_users_extra }}"
+appliances_local_users_default: "{{ ([appliances_local_users_podman] if appliances_local_users_podman_enable else []) + [appliances_local_users_ansible_user] + appliances_local_users_extra }}"
+
 # Overide this to add extra users whilst keeping the defaults.
 appliances_local_users_extra: []
 appliances_local_users: "{{ appliances_local_users_default + appliances_local_users_extra }}"
+
+appliances_local_users_ansible_user_name: "{{ ansible_ssh_user | default(ansible_user) }}"
+appliances_local_users_ansible_user_home: /var/lib/{{ appliances_local_users_ansible_user_name }}
+appliances_local_users_ansible_user:
+    name: "{{ appliances_local_users_ansible_user_name }}"
+    home: "{{ appliances_local_users_ansible_user_home }}"
+    move_home: true
+    local: true
 
 appliances_local_users_podman_enable: "{{ groups['podman'] | length > 0 }}"
 appliances_local_users_podman_home: /var/lib/podman
