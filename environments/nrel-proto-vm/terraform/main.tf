@@ -8,77 +8,99 @@ terraform {
 }
 
 
-data "openstack_networking_network_v2" "external_network" {
+data "openstack_networking_network_v2" "external" {
   name = var.external_network
 }
 
-data "openstack_networking_network_v2" "provider_networks" {
-  for_each = toset(var.provider_networks)
-
-  name = each.key
+data "openstack_networking_network_v2" "storage" {
+  name = var.storage_network
 }
 
 resource "openstack_networking_network_v2" "cluster" {
-    name           = var.cluster_name
-    description = "Network for openhpc cluster ${var.cluster_name}"
-    admin_state_up = "true"
-    segments {
-      network_type = "vlan"
-    }
+  name = var.cluster_network
+  admin_state_up = "true"
+  segments {
+    network_type = var.cluster_network_type
+  }
 }
 
 resource "openstack_networking_subnet_v2" "cluster" {
-    name            = var.cluster_name
-    network_id      = openstack_networking_network_v2.cluster.id
-    cidr            = var.cidr
-    ip_version      = 4
+
+  name = var.cluster_network
+  network_id = openstack_networking_network_v2.cluster.id
+  cidr = var.cluster_network_cidr
+  ip_version = 4
 }
 
-resource "openstack_networking_port_v2" "control" {
-  name = "${var.cluster_name}-control"
+resource "openstack_networking_port_v2" "control_cluster" {
+
+  name = "control-${var.cluster_network}"
   network_id = openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
   binding {
-    vnic_type = "direct"
-    profile = jsonencode({capabilities = ["switchdev"]})
+    vnic_type = var.cluster_network_vnic_type
+    profile = jsonencode(var.cluster_network_profile)
+  }
+}
+
+resource "openstack_networking_port_v2" "control_storage" {
+
+  name = "control-${var.storage_network}"
+  network_id = data.openstack_networking_network_v2.storage.id
+  admin_state_up = "true"
+
+  binding {
+    vnic_type = var.storage_network_vnic_type
+    profile = jsonencode(var.storage_network_profile)
   }
 }
 
 resource "openstack_compute_instance_v2" "control" {
+  
   name = "${var.cluster_name}-control"
   image_name = var.control_image
   flavor_name = var.control_flavor
   key_pair = var.key_pair
   
   network {
-    port = openstack_networking_port_v2.control.id
+    port = openstack_networking_port_v2.control_cluster.id
   }
-
-  dynamic "network" { # TODO update?
-    for_each = data.openstack_networking_network_v2.provider_networks
   
-    content {
-      uuid = network.value["id"]
-    }
+  network {
+    port = openstack_networking_port_v2.control_storage.id
   }
 
 }
 
-resource "openstack_networking_port_v2" "logins" {
+resource "openstack_networking_port_v2" "login_cluster" {
 
   for_each = toset(var.login_names)
 
-  name = each.value
+  #name = "${each.key}-${var.cluster_network}"
+  name = each.key
   network_id = openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
   binding {
-    vnic_type = "direct"
-    profile = jsonencode({capabilities = ["switchdev"]})
+    vnic_type = var.cluster_network_vnic_type
+    profile = jsonencode(var.cluster_network_profile)
   }
 }
 
+resource "openstack_networking_port_v2" "login_storage" {
+
+  for_each = toset(var.login_names)
+
+  name = each.key
+  network_id = data.openstack_networking_network_v2.storage.id
+  admin_state_up = "true"
+
+  binding {
+    vnic_type = var.storage_network_vnic_type
+    profile = jsonencode(var.storage_network_profile)
+  }
+}
 
 resource "openstack_compute_instance_v2" "logins" {
 
@@ -90,35 +112,45 @@ resource "openstack_compute_instance_v2" "logins" {
   key_pair = var.key_pair
 
   network {
-    port = openstack_networking_port_v2.logins[each.value].id
+    port = openstack_networking_port_v2.login_cluster[each.key].id
   }
-
-  dynamic "network" { # TODO update?
-    for_each = data.openstack_networking_network_v2.provider_networks
   
-    content {
-      uuid = network.value["id"]
-    }
+  network {
+    port = openstack_networking_port_v2.login_storage[each.key].id
   }
 
 }
 
-resource "openstack_networking_port_v2" "computes" {
-  
+resource "openstack_networking_port_v2" "compute_cluster" {
+
   for_each = toset(var.compute_names)
 
-  name = each.value
+  name = each.key
   network_id = openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
   binding {
-    vnic_type = "direct"
-    profile = jsonencode({capabilities = ["switchdev"]})
+    vnic_type = var.cluster_network_vnic_type
+    profile = jsonencode(var.cluster_network_profile)
+  }
+}
+
+resource "openstack_networking_port_v2" "compute_storage" {
+
+  for_each = toset(var.compute_names)
+
+  name = each.key
+  network_id = data.openstack_networking_network_v2.storage.id
+  admin_state_up = "true"
+
+  binding {
+    vnic_type = var.storage_network_vnic_type
+    profile = jsonencode(var.storage_network_profile)
   }
 }
 
 
-resource "openstack_compute_instance_v2" "compute" {
+resource "openstack_compute_instance_v2" "computes" {
 
   for_each = toset(var.compute_names)
 
@@ -128,15 +160,11 @@ resource "openstack_compute_instance_v2" "compute" {
   key_pair = var.key_pair
 
   network {
-    port = openstack_networking_port_v2.computes[each.value].id
+    port = openstack_networking_port_v2.compute_cluster[each.key].id
   }
-
-  dynamic "network" {# TODO: update?
-    for_each = data.openstack_networking_network_v2.provider_networks
   
-    content {
-      uuid = network.value["id"]
-    }
+  network {
+    port = openstack_networking_port_v2.compute_storage[each.key].id
   }
 
 }
@@ -154,7 +182,7 @@ resource "openstack_networking_floatingip_v2" "logins" {
 
   for_each = toset(var.login_names)
 
-  pool = data.openstack_networking_network_v2.external_network.name
+  pool = data.openstack_networking_network_v2.external.name
 }
 
 resource "openstack_compute_floatingip_associate_v2" "logins" {
@@ -171,7 +199,7 @@ resource "local_file" "hosts" {
                             "cluster_name": var.cluster_name
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
-                            "computes": openstack_compute_instance_v2.compute,
+                            "computes": openstack_compute_instance_v2.computes,
                             # "fip": openstack_networking_floatingip_v2.login
                           },
                           )

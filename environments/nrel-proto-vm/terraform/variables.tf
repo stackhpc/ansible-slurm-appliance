@@ -20,6 +20,45 @@ variable "cluster_network" {
     description = "Name of network to use for cluster"
 }
 
+variable "cluster_network_type" {
+    type = string
+    description = "Type of network to use for cluster, e.g. vlan or geneve"
+    default = "vlan"
+}
+
+variable "cluster_network_vnic_type" {
+    type = string
+    default = "direct"
+    description = "VNIC type for ports on this network, see `binding` in docs for openstack_networking_port_v2"
+}
+
+variable "cluster_network_profile" {
+    type = map
+    description = "Custom binding information, as terraform map"
+    default = {
+        capabilities = ["switchdev"]
+    }
+}
+
+variable "storage_network" {
+    type = string
+    description = "Name of pre-existing external network"
+}
+
+variable "storage_network_vnic_type" {
+    type = string
+    default = "direct"
+    description = "VNIC type for ports on this network, see `binding` in docs for openstack_networking_port_v2"
+}
+
+variable "storage_network_profile" {
+    type = map
+    description = "Custom binding information, as terraform map"
+    default = {
+        capabilities = ["switchdev"]
+    }
+}
+
 variable "key_pair" {
     type = string
     description = "Name of an existing keypair in OpenStack"
@@ -55,7 +94,7 @@ variable "compute_image" {
     description = "Name of image for compute node(s)"
 }
 
-variable "cidr" {
+variable "cluster_network_cidr" {
     type = string
     default = "192.168.42.0/24"
     description = "Range in CIDR notation for cluster subnet"
@@ -71,8 +110,6 @@ variable "external_router" {
   description = "Name of pre-existing router on external network"
 }
 
-variable "provider_networks" {
-  type = list(string)
-  description = "Name of pre-existing networks to additionally connect to cluster instances"
-  default = []
-}
+
+
+
