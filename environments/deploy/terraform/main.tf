@@ -20,30 +20,22 @@ data "openstack_networking_subnet_v2" "storage" {
   name = var.storage_subnet
 }
 
-resource "openstack_networking_network_v2" "cluster" {
+data "openstack_networking_network_v2" "cluster" {
   name = var.cluster_network
-  admin_state_up = "true"
-  segments {
-    network_type = var.cluster_network_type
-  }
 }
 
-resource "openstack_networking_subnet_v2" "cluster" {
-
-  name = var.cluster_network
-  network_id = openstack_networking_network_v2.cluster.id
-  cidr = var.cluster_network_cidr
-  ip_version = 4
+data "openstack_networking_subnet_v2" "cluster" {
+  name = var.cluster_subnet
 }
 
 resource "openstack_networking_port_v2" "control_cluster" {
 
   name = "control-${var.cluster_network}"
-  network_id = openstack_networking_network_v2.cluster.id
+  network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = openstack_networking_subnet_v2.cluster.id
+    subnet_id = data.openstack_networking_subnet_v2.cluster.id
   }
 
   binding {
@@ -92,11 +84,11 @@ resource "openstack_networking_port_v2" "login_cluster" {
 
   #name = "${each.key}-${var.cluster_network}"
   name = each.key
-  network_id = openstack_networking_network_v2.cluster.id
+  network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = openstack_networking_subnet_v2.cluster.id
+    subnet_id = data.openstack_networking_subnet_v2.cluster.id
   }
 
   binding {
@@ -148,11 +140,11 @@ resource "openstack_networking_port_v2" "compute_cluster" {
   for_each = toset(var.compute_names)
 
   name = each.key
-  network_id = openstack_networking_network_v2.cluster.id
+  network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = openstack_networking_subnet_v2.cluster.id
+    subnet_id = data.openstack_networking_subnet_v2.cluster.id
   }
 
   binding {
@@ -206,7 +198,7 @@ data "openstack_networking_router_v2" "external" {
 
 resource "openstack_networking_router_interface_v2" "cluster" {
   router_id = data.openstack_networking_router_v2.external.id
-  subnet_id = openstack_networking_subnet_v2.cluster.id
+  subnet_id = data.openstack_networking_subnet_v2.cluster.id
 }
 
 resource "openstack_networking_floatingip_v2" "logins" {

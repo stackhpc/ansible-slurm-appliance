@@ -17,13 +17,12 @@ variable "cluster_name" {
 
 variable "cluster_network" {
     type = string
-    description = "Name of network to use for cluster"
+    description = "Name of pre-existing vnet to use for cluster"
 }
 
-variable "cluster_network_type" {
+variable "cluster_subnet" {
     type = string
-    description = "Type of network to use for cluster, e.g. vlan or geneve"
-    default = "vlan"
+    description = "Name of subnet to use for cluster"
 }
 
 variable "cluster_network_vnic_type" {
