@@ -12,6 +12,7 @@ roles:
     name: stackhpc.spack
     version: HEAD
   - src: jriguera.configdrive
+  - src: stackhpc.os-manila-mount
 
 collections:
 - name: containers.podman

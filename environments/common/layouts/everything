@@ -38,3 +38,9 @@ login
 
 [update:children]
 cluster
+
+[os_manila:children]
+cluster
+
+[openstack:children]
+localhost
