@@ -209,19 +209,19 @@ resource "openstack_networking_router_interface_v2" "cluster" {
   subnet_id = openstack_networking_subnet_v2.cluster.id
 }
 
-// resource "openstack_networking_floatingip_v2" "logins" {
+resource "openstack_networking_floatingip_v2" "logins" {
 
-//   for_each = toset(var.login_names)
+  for_each = toset(var.login_names)
 
-//   pool = data.openstack_networking_network_v2.external.name
-// }
+  pool = data.openstack_networking_network_v2.external.name
+}
 
-// resource "openstack_compute_floatingip_associate_v2" "logins" {
-//   for_each = toset(var.login_names)
+resource "openstack_compute_floatingip_associate_v2" "logins" {
+  for_each = toset(var.login_names)
 
-//   floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
-//   instance_id = openstack_compute_instance_v2.logins[each.key].id
-// }
+  floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
+  instance_id = openstack_compute_instance_v2.logins[each.key].id
+}
 
 # TODO: needs fixing for case where creation partially fails resulting in "compute.network is empty list of object"
 resource "local_file" "hosts" {
