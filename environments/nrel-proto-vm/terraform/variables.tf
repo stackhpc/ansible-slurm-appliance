@@ -45,6 +45,11 @@ variable "storage_network" {
     description = "Name of pre-existing external network"
 }
 
+variable "storage_subnet" {
+    type = string
+    description = "Name of pre-existing storage network"
+}
+
 variable "storage_network_vnic_type" {
     type = string
     default = "direct"

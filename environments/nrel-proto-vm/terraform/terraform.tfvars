@@ -6,6 +6,7 @@ key_pair = "centos_at_nrel-deploy-vm"
 cluster_network = "nrel2"
 cluster_network_cidr = "10.99.0.0/16"
 storage_network = "ceph"
+storage_subnet = "ceph"
 external_network = "external"
 external_router = "nrel"
 

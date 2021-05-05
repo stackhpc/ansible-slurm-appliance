@@ -16,6 +16,10 @@ data "openstack_networking_network_v2" "storage" {
   name = var.storage_network
 }
 
+data "openstack_networking_subnet_v2" "storage" {
+  name = var.storage_subnet
+}
+
 resource "openstack_networking_network_v2" "cluster" {
   name = var.cluster_network
   admin_state_up = "true"
@@ -38,6 +42,10 @@ resource "openstack_networking_port_v2" "control_cluster" {
   network_id = openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.cluster.id
+  }
+
   binding {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
@@ -49,6 +57,10 @@ resource "openstack_networking_port_v2" "control_storage" {
   name = "control-${var.storage_network}"
   network_id = data.openstack_networking_network_v2.storage.id
   admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.storage.id
+  }
 
   binding {
     vnic_type = var.storage_network_vnic_type
@@ -82,6 +94,10 @@ resource "openstack_networking_port_v2" "login_cluster" {
   network_id = openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.cluster.id
+  }
+
   binding {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
@@ -95,6 +111,10 @@ resource "openstack_networking_port_v2" "login_storage" {
   name = each.key
   network_id = data.openstack_networking_network_v2.storage.id
   admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.storage.id
+  }
 
   binding {
     vnic_type = var.storage_network_vnic_type
@@ -129,6 +149,10 @@ resource "openstack_networking_port_v2" "compute_cluster" {
   network_id = openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.cluster.id
+  }
+
   binding {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
@@ -142,6 +166,10 @@ resource "openstack_networking_port_v2" "compute_storage" {
   name = each.key
   network_id = data.openstack_networking_network_v2.storage.id
   admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.storage.id
+  }
 
   binding {
     vnic_type = var.storage_network_vnic_type
@@ -178,19 +206,19 @@ resource "openstack_networking_router_interface_v2" "cluster" {
   subnet_id = openstack_networking_subnet_v2.cluster.id
 }
 
-resource "openstack_networking_floatingip_v2" "logins" {
+// resource "openstack_networking_floatingip_v2" "logins" {
 
-  for_each = toset(var.login_names)
+//   for_each = toset(var.login_names)
 
-  pool = data.openstack_networking_network_v2.external.name
-}
+//   pool = data.openstack_networking_network_v2.external.name
+// }
 
-resource "openstack_compute_floatingip_associate_v2" "logins" {
-  for_each = toset(var.login_names)
+// resource "openstack_compute_floatingip_associate_v2" "logins" {
+//   for_each = toset(var.login_names)
 
-  floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
-  instance_id = openstack_compute_instance_v2.logins[each.key].id
-}
+//   floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
+//   instance_id = openstack_compute_instance_v2.logins[each.key].id
+// }
 
 # TODO: needs fixing for case where creation partially fails resulting in "compute.network is empty list of object"
 resource "local_file" "hosts" {
@@ -200,7 +228,6 @@ resource "local_file" "hosts" {
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,
-                            # "fip": openstack_networking_floatingip_v2.login
                           },
                           )
   filename = "../inventory/hosts"
