@@ -13,4 +13,4 @@
   tasks:
     - command: "openstack server rebuild {{ inventory_hostname }}{% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}"
       delegate_to: localhost
-
+    - wait_for_connection:
