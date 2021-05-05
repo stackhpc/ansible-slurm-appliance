@@ -3,7 +3,7 @@
 # See: https://github.com/stackhpc/ansible-role-cluster-nfs
 # for variable definitions
 
-nfs_server_default: "{{ groups['control'] | first }}"
+nfs_server_default: "{{ hostvars[groups['control'] | first ].internal_address }}"
 
 nfs_configurations:
   - nfs_enable:
