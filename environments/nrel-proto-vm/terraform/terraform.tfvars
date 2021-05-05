@@ -22,7 +22,7 @@ compute_flavor = "general.v1.small"
 # remove this block in the real environment:
 cluster_network_type = "geneve"
 cluster_network_vnic_type = "normal"
-cluster_network_profile = null
+cluster_network_profile = {}
 storage_network_vnic_type = "normal"
-storage_network_profile = null
+storage_network_profile = {}
 # end of non-default lab config
