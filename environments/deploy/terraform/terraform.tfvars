@@ -17,7 +17,7 @@ control_image = "CentOS8.3"
 control_flavor = "gen.c8m15"
 
 compute_image = "CentOS8.3"
-compute_flavor = "gen.c8m15"
+compute_flavor = "compute.c16m60"
 
 # remove this block in the real environment:
 // cluster_network_type = "geneve"
