@@ -1,0 +1,28 @@
+compute_names = ["hpc-0", "hpc-1", "hpc-2", "hpc-3", "express-0", "express-1"]
+login_names = ["login-0"] #, "login-1"]
+cluster_name  = "protovm" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+key_pair = "kb"
+
+cluster_network = "vermillion"
+cluster_network_cidr = "192.168.11.0/24"
+storage_network = "storage"
+storage_subnet = "storage"
+external_network = "external"
+external_router = "demo"
+
+login_image = "CentOS8.3"
+login_flavor = "gen.c8m15"
+
+control_image = "CentOS8.3"
+control_flavor = "gen.c8m15"
+
+compute_image = "CentOS8.3"
+compute_flavor = "gen.c8m15"
+
+# remove this block in the real environment:
+cluster_network_type = "geneve"
+cluster_network_vnic_type = "normal"
+cluster_network_profile = {}
+#storage_network_vnic_type = "normal"
+#storage_network_profile = {}
+# end of non-default lab config
