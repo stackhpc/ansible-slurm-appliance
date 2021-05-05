@@ -1,0 +1,18 @@
+
+os_manila_mount_share_name: ceph # lookup
+# os_manila_mount_share_user: "{{ cluster_ceph_client }}" # lookup
+os_manila_mount_auth_type: cloud # lookup
+# os_manila_mount_auth: "{{ openstack_auth }}" # lookup
+
+os_manila_mount_host: "{{ hostvars['openstack']['os_manila_mount_host'] }}"
+os_manila_mount_access_key: "{{ hostvars['openstack']['os_manila_mount_access_key'] }}"
+os_manila_mount_export: "{{ hostvars['openstack']['os_manila_mount_export'] }}"
+
+os_manila_mount_user: root
+os_manila_mount_group: root
+
+os_manila_mount_path: /mnt/ceph
+os_manila_mount_mode: 0775
+
+os_manila_mount_share_protocol: CEPHFS
+os_manila_mount_fuse: no
