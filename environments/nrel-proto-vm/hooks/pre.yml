@@ -27,8 +27,8 @@
       register: ip_route
       changed_when: false
     - command:
-        cmd: "ip route add 10.109.0.0/16 via 192.68.67.1"
-      when: "'10.109.0.0/16 via 192.68.67.1' not in ip_route.stdout"
+        cmd: "ip route add 10.109.0.0/16 via 10.8.0.1"
+      when: "'10.109.0.0/16 via 10.8.0.1' not in ip_route.stdout"
 
 - name: nrel-proto fixes - compute nodes
   hosts: compute
