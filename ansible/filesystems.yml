@@ -16,10 +16,6 @@
     - include_role: stackhpc.os-manila-mount
       vars:
         os_manila_mount_action: lookup
-      # os_manila_mount_share_name: "{{ cluster_fileshare }}"
-      # os_manila_mount_share_user: "{{ cluster_ceph_client }}"
-      # os_manila_mount_auth_type: "{{ openstack_auth_type }}"
-      # os_manila_mount_auth: "{{ openstack_auth }}"
     - debug:
         var: os_manila_mount_host
     - debug:
@@ -53,14 +49,6 @@
       include_role: stackhpc.os-manila-mount
       vars:
         os_manila_mount_action: "mount"
-      
-      # os_manila_mount_host: "{{ hostvars['localhost']['os_manila_mount_host'] }}"
-      # os_manila_mount_access_key: "{{ hostvars['localhost']['os_manila_mount_access_key'] }}"
-      # os_manila_mount_export: "{{ hostvars['localhost']['os_manila_mount_export'] }}"
-      # os_manila_mount_share_name: "{{ cluster_fileshare }}"
-      # os_manila_mount_share_user: "{{ cluster_ceph_client }}"
-      # os_manila_mount_share_protocol: "CEPHFS"
-      # os_manila_mount_path: "{{ cluster_homedir }}"
-      # os_manila_mount_user: "root"
-      # os_manila_mount_group: "root"
-      # os_manila_mount_fuse: no
+        os_manila_mount_host: "{{ hostvars[groups['openstack'][0]]['os_manila_mount_host'] }}"
+        os_manila_mount_access_key: "{{ hostvars[groups['openstack'][0]]['os_manila_mount_access_key'] }}"
+        os_manila_mount_export: "{{ hostvars[groups['openstack'[0]]['os_manila_mount_export'] }}"

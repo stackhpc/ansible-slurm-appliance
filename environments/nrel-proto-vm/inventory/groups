@@ -40,3 +40,9 @@ compute
 
 [update:children]
 cluster
+
+[openstack]
+localhost
+
+[os_manila:children]
+openhpc
