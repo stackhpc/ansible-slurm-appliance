@@ -34,9 +34,5 @@ slurm_stats
 [spack:children]
 login
 
-[rebuild:children]
-control
-compute
-
 [update:children]
 cluster
