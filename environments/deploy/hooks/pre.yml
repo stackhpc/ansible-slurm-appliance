@@ -1,7 +1,6 @@
 - name: nrel-proto fixes - workaround no internal DNS
   hosts:
     - cluster
-    - localhost
   become: true
   tags: etc_hosts
   tasks:
