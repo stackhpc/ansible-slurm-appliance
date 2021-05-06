@@ -1,3 +1,9 @@
+# Variables for mounting OpenStack Manila shares (using CephFS as the backed)
+# See https://github.com/stackhpc/ansible-role-os-manila-mount for full documentation
+# Set groups as follows:
+# `openstack`: A node with access to openstack, e.g. localhost
+# `os_manila`: Nodes to mount the share
+
 # These will always need overriding:
 os_manila_mount_share_name: # ceph
 os_manila_mount_share_user: # cephuser
