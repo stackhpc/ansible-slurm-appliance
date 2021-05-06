@@ -23,11 +23,11 @@ In addition to main README:
 
 2. Deploy instances using Terraform:
 
-   An example terraform configuration is provided in `terraform-flat/`. This deploys all instances onto a single preexisting network which has a router to the external network (in the Admin project). This is the currently-used approach as the lab environment does not currently support the necessary VLANs for additional networks. You will need to manually add floating IPs where necessary after running this.
+   An example terraform configuration is provided in `terraform/`. This deploys all instances onto two preexisting `vlan`-type networks (storage and compute) with SR-IOV ports on both. It assumes there is an external network with a router. It will create floating IPs on the login node(s).
 
    In either case:
-   - Modify variables in `terraform*/terraform.tfvars` to define the cluster size and cloud environment.
-   - Ensure the appropriate images (Centos 8.2 or 8.3) and SSH keys are available in OpenStack.
+   - Modify variables in `terraform/terraform.tfvars` to define the cluster size and cloud environment.
+   - Ensure the appropriate images (Centos 8.3) and SSH keys are available in OpenStack.
    
    Then run:
 
