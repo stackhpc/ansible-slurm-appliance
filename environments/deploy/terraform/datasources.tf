@@ -23,5 +23,5 @@ data "openstack_networking_subnet_v2" "cluster" {
 }
 
 data "openstack_networking_subnet_v2" "control" {
-  name = var.control_network
+  name = var.control_subnet
 }
