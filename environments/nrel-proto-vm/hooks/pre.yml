@@ -6,9 +6,10 @@
   tags: etc_hosts
   tasks:
     - name: Internal DNS workaround - generate /etc/hosts file content
-      set_fact: # TODO: define which network to use below:
+      # which interface is used as ansible_host is defined by terraform (see `access_network`) so this is deterministic for multi-rail hosts
+      set_fact:
         etc_hosts_content: |
-          {% for host in groups['cluster'] %}{{ hostvars[host]['ansible_default_ipv4']['address'] }} {{ host }}.novalocal {{ host }}
+          {% for host in groups['cluster'] %}{{ hostvars[host]['ansible_host'] }} {{ host }}.novalocal {{ host }}
           {% endfor %}
       run_once: true
     - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
