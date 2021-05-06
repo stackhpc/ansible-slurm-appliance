@@ -254,7 +254,7 @@ resource "openstack_compute_floatingip_associate_v2" "logins" {
 
   floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
   instance_id = openstack_compute_instance_v2.logins[each.key].id
-  fixed_ip = openstack_compute_instance_v2.logins[each.key].network.3.fixed_ip_v4
+  fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
 }
 
 # --- template ---
