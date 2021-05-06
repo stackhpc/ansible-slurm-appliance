@@ -1,18 +1,26 @@
 
-os_manila_mount_share_name: ceph # lookup
-# os_manila_mount_share_user: "{{ cluster_ceph_client }}" # lookup
-os_manila_mount_auth_type: cloud # lookup
-# os_manila_mount_auth: "{{ openstack_auth }}" # lookup
+# needed for lookup:
+os_manila_mount_share_name: ceph
+os_manila_mount_share_user: cephuser
+os_manila_mount_auth_type: password # assumes openrc sourced
 
+# needed for mount:
 os_manila_mount_host: "{{ hostvars['openstack']['os_manila_mount_host'] }}"
 os_manila_mount_access_key: "{{ hostvars['openstack']['os_manila_mount_access_key'] }}"
 os_manila_mount_export: "{{ hostvars['openstack']['os_manila_mount_export'] }}"
+os_manila_mount_path: /mnt/ceph
 
+# optional:
 os_manila_mount_user: root
 os_manila_mount_group: root
-
-os_manila_mount_path: /mnt/ceph
 os_manila_mount_mode: 0775
-
 os_manila_mount_share_protocol: CEPHFS
 os_manila_mount_fuse: no
+
+os_manila_mount_auth: # as os_manila_mount_auth_type: password
+  project_domain_name: "{{ lookup('env', 'OS_PROJECT_DOMAIN_NAME') }}"
+  user_domain_name: "{{ lookup('env', 'OS_USER_DOMAIN_NAME') }}"
+  project_name: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
+  username: "{{ lookup('env', 'OS_USERNAME') }}"
+  password: "{{ lookup('env', 'OS_PASSWORD') }}"
+  auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
