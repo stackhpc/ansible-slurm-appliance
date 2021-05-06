@@ -1,4 +1,5 @@
 - hosts: update
+  become: yes
   tasks:
     - name: Update selected packages
       yum:
