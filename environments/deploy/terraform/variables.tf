@@ -63,6 +63,28 @@ variable "storage_network_profile" {
     }
 }
 
+variable "control_network" {
+    type = string
+    description = "Name of pre-existing vnet to use for cluster"
+}
+
+variable "control_subnet" {
+    type = string
+    description = "Name of subnet to use for cluster"
+}
+
+variable "control_network_vnic_type" {
+    type = string
+    default = "normal"
+    description = "VNIC type for ports on this network, see `binding` in docs for openstack_networking_port_v2"
+}
+
+variable "control_network_profile" {
+    type = map
+    description = "Custom binding information, as terraform map"
+    default = {}
+}
+
 variable "key_pair" {
     type = string
     description = "Name of an existing keypair in OpenStack"
@@ -108,12 +130,3 @@ variable "external_network" {
   type = string
   description = "Name of pre-existing external network"
 }
-
-variable "external_router" {
-  type = string
-  description = "Name of pre-existing router on external network"
-}
-
-
-
-

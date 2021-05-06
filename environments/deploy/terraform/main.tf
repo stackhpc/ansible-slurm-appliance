@@ -7,30 +7,11 @@ terraform {
   }
 }
 
-
-data "openstack_networking_network_v2" "external" {
-  name = var.external_network
-}
-
-data "openstack_networking_network_v2" "storage" {
-  name = var.storage_network
-}
-
-data "openstack_networking_subnet_v2" "storage" {
-  name = var.storage_subnet
-}
-
-data "openstack_networking_network_v2" "cluster" {
-  name = var.cluster_network
-}
-
-data "openstack_networking_subnet_v2" "cluster" {
-  name = var.cluster_subnet
-}
+# --- slurm controller ---
 
 resource "openstack_networking_port_v2" "control_cluster" {
 
-  name = "control-${var.cluster_network}"
+  name = "control"
   network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
@@ -46,7 +27,7 @@ resource "openstack_networking_port_v2" "control_cluster" {
 
 resource "openstack_networking_port_v2" "control_storage" {
 
-  name = "control-${var.storage_network}"
+  name = "control"
   network_id = data.openstack_networking_network_v2.storage.id
   admin_state_up = "true"
 
@@ -60,6 +41,23 @@ resource "openstack_networking_port_v2" "control_storage" {
   }
 }
 
+resource "openstack_networking_port_v2" "control_control" {
+
+  name = "control"
+  network_id = data.openstack_networking_network_v2.control.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.control.id
+  }
+
+  binding {
+    vnic_type = var.control_network_vnic_type
+    profile = jsonencode(var.control_network_profile)
+  }
+}
+
+
 resource "openstack_compute_instance_v2" "control" {
   
   name = "${var.cluster_name}-control"
@@ -69,20 +67,25 @@ resource "openstack_compute_instance_v2" "control" {
   
   network {
     port = openstack_networking_port_v2.control_cluster.id
-    access_network = true
   }
   
   network {
     port = openstack_networking_port_v2.control_storage.id
   }
 
+  network {
+    port = openstack_networking_port_v2.control_control.id
+    access_network = true
+  }
+
 }
+
+# --- slurm logins ---
 
 resource "openstack_networking_port_v2" "login_cluster" {
 
   for_each = toset(var.login_names)
 
-  #name = "${each.key}-${var.cluster_network}"
   name = each.key
   network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
@@ -115,6 +118,24 @@ resource "openstack_networking_port_v2" "login_storage" {
   }
 }
 
+resource "openstack_networking_port_v2" "login_control" {
+
+  for_each = toset(var.login_names)
+
+  name = each.key
+  network_id = data.openstack_networking_network_v2.control.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.control.id
+  }
+
+  binding {
+    vnic_type = var.control_network_vnic_type
+    profile = jsonencode(var.control_network_profile)
+  }
+}
+
 resource "openstack_compute_instance_v2" "logins" {
 
   for_each = toset(var.login_names)
@@ -126,14 +147,20 @@ resource "openstack_compute_instance_v2" "logins" {
 
   network {
     port = openstack_networking_port_v2.login_cluster[each.key].id
-    access_network = true
   }
   
   network {
     port = openstack_networking_port_v2.login_storage[each.key].id
   }
 
+  network {
+    port = openstack_networking_port_v2.login_control[each.key].id
+    access_network = true
+  }
+
 }
+
+# --- slurm compute ---
 
 resource "openstack_networking_port_v2" "compute_cluster" {
 
@@ -171,6 +198,23 @@ resource "openstack_networking_port_v2" "compute_storage" {
   }
 }
 
+resource "openstack_networking_port_v2" "compute_control" {
+
+  for_each = toset(var.compute_names)
+
+  name = each.key
+  network_id = data.openstack_networking_network_v2.control.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.control.id
+  }
+
+  binding {
+    vnic_type = var.control_network_vnic_type
+    profile = jsonencode(var.control_network_profile)
+  }
+}
 
 resource "openstack_compute_instance_v2" "computes" {
 
@@ -183,23 +227,20 @@ resource "openstack_compute_instance_v2" "computes" {
 
   network {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
-    access_network = true
   }
   
   network {
     port = openstack_networking_port_v2.compute_storage[each.key].id
   }
 
+  network {
+    port = openstack_networking_port_v2.compute_control[each.key].id
+    access_network = true
+  }
+
 }
 
-data "openstack_networking_router_v2" "external" {
-  name = var.external_router
-}
-
-resource "openstack_networking_router_interface_v2" "cluster" {
-  router_id = data.openstack_networking_router_v2.external.id
-  subnet_id = data.openstack_networking_subnet_v2.cluster.id
-}
+# --- floating ips ---
 
 resource "openstack_networking_floatingip_v2" "logins" {
 
@@ -215,11 +256,14 @@ resource "openstack_compute_floatingip_associate_v2" "logins" {
   instance_id = openstack_compute_instance_v2.logins[each.key].id
 }
 
+# --- template ---
+
 # TODO: needs fixing for case where creation partially fails resulting in "compute.network is empty list of object"
 resource "local_file" "hosts" {
   content  = templatefile("${path.module}/inventory.tpl",
                           {
                             "cluster_name": var.cluster_name
+                            "proxy_fip": openstack_networking_floatingip_v2.logins[var.login_names[0]].address
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,
