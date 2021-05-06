@@ -1,7 +1,7 @@
-- name: Updates
-  hosts: cluster
+- hosts: update
   tasks:
-    - package:
-        name: "*"
-        state: latest
-      become: true
+    - name: Update selected packages
+      yum:
+        name: "{{ update_name }}"
+        state: "{{ update_state }}"
+        exclude: "{{ update_exclude }}"
