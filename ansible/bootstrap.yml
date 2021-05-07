@@ -32,7 +32,7 @@
       when: sestatus.reboot_required
     - name: update facts
       setup:
-      when: sestatus.changed
+      when: sestatus.reboot_required
 
 - hosts: update
   gather_facts: false
