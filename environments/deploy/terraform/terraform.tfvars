@@ -1,14 +1,15 @@
 compute_names = ["hpc-0", "hpc-1", "hpc-2", "hpc-3", "express-0", "express-1"]
 login_names = ["login-0"] #, "login-1"]
 cluster_name  = "protovm" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
-key_pair = "kb"
+key_pair = "slurmdeploy"
 
 cluster_network = "compute"
 cluster_subnet = "compute-subnet"
 storage_network = "storage"
 storage_subnet = "storage"
 external_network = "external"
-external_router = "demo"
+control_network = "control"
+control_subnet = "control-subnet"
 
 login_image = "CentOS8.3"
 login_flavor = "gen.c8m15"
