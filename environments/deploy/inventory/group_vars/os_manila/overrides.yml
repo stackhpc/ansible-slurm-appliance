@@ -1,0 +1,3 @@
+os_manila_mount_share_name: # ceph
+os_manila_mount_share_user: # cephuser
+os_manila_mount_path: # /mnt/ceph
