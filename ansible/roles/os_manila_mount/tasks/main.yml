@@ -1,8 +1,8 @@
 ---
 - name: Add Ceph reposity
   yum_repository:
-    name: centos-ceph-luminous
-    description: CentOS Storage SIG repo for ceph luminous
+    name: "centos-ceph-{{ os_manila_mount_ceph_version }}"
+    description: CentOS Storage SIG repo for ceph
     baseurl: "{{ os_manila_mount_ceph_repo_base }}"
     gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
   become: yes
