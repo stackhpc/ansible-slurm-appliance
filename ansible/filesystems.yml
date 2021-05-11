@@ -12,5 +12,4 @@
 - name: Mount Openstack Manila share
   hosts: os_manila
   tasks:
-    - name: Mount Manila share
-      include_role: os_manila_ceph
+    - include_role: os_manila_ceph
