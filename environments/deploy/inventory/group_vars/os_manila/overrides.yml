@@ -1,5 +1,19 @@
-os_manila_mount_share_name: home
-os_manila_mount_share_user: "{{ ansible_user }}"
-os_manila_mount_path: /home
-os_manila_mount_user: root
-os_manila_mount_group: root
+os_manila_mount_access_key: "{{ secrets_os_manila_mount_access_key }}" # TODO:
+os_manila_mount_host: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789
+os_manila_mount_share_user: nrel
+os_manila_mount_configurations: # nopt scratch home
+  - os_manila_mount_export: /volumes/_nogroup/572f375c-7b29-486f-8e12-aecbd3b4cfb4
+    os_manila_mount_path: /nopt
+    os_manila_mount_user: root
+    os_manila_mount_group: root
+    os_manila_mount_mode: 0775
+  - os_manila_mount_export: /volumes/_nogroup/15071be0-2c8f-46be-ae0f-d2ecc0c89430
+    os_manila_mount_path: "{{ todo }}" # TODO:
+    os_manila_mount_user: root
+    os_manila_mount_group: root
+    os_manila_mount_mode: 0775
+  - os_manila_mount_export: /volumes/_nogroup/efea823b-b78a-46bb-9e37-6e4f10e59462
+    os_manila_mount_path: /home
+    os_manila_mount_user: root
+    os_manila_mount_group: root
+    os_manila_mount_mode: 0775
