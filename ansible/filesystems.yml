@@ -46,9 +46,4 @@
         state: present
       become: yes
     - name: Mount Manila share
-      include_role: stackhpc.os-manila-mount
-      vars:
-        os_manila_mount_action: "mount"
-        os_manila_mount_host: "{{ hostvars[groups['openstack'][0]]['os_manila_mount_host'] }}"
-        os_manila_mount_access_key: "{{ hostvars[groups['openstack'][0]]['os_manila_mount_access_key'] }}"
-        os_manila_mount_export: "{{ hostvars[groups['openstack'[0]]['os_manila_mount_export'] }}"
+      include_role: os_manila_ceph

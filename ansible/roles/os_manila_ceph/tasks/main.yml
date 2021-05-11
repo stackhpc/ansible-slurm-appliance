@@ -1,0 +1,70 @@
+---
+- name: Add Ceph reposity
+  yum_repository:
+    name: centos-ceph-luminous
+    description: CentOS Storage SIG repo for ceph luminous
+    baseurl: "{{ os_manila_mount_ceph_repo_base }}"
+    gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
+  become: yes
+
+- name: Install packages for ceph
+  yum:
+  name:
+    - epel-release
+    - ceph-common
+  become: yes
+
+- name: Ensure ceph conf directory exists
+  file:
+    path: "{{ os_manila_mount_ceph_conf_path }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  become: yes
+
+- name: Configure ceph.conf using os_manila_mount_host
+  template:
+    src: ceph.conf.j2
+    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.conf"
+    owner: root
+    group: root
+    mode: 0600
+  become: yes
+
+- name: Ensure mount directory exists
+  file:
+    path: "{{ os_manila_mount_path }}"
+    state: directory
+    owner: "{{ os_manila_mount_user }}"
+    group: "{{ os_manila_mount_group }}"
+    mode: "{{ os_manila_mount_mode }}"
+  become: yes
+
+- name: Write Ceph client secret
+  copy:
+    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.secret"
+    content: "{{ os_manila_mount_access_key }}"
+    mode: 0600
+    owner: root
+    group: root
+  become: yes
+- name: FS-Mount the share from the Ceph cluster
+  mount:
+    path: "{{ os_manila_mount_path }}"
+    src: "{{ os_manila_mount_host }}:{{ os_manila_mount_export }}"
+    fstype: ceph
+    state: mounted
+    opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
+      secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.secret"
+    boot: yes
+  become: yes
+
+- name: Ensure mounted directory has correct permissions
+  file:
+    path: "{{ os_manila_mount_path }}"
+    state: directory
+    owner: "{{ os_manila_mount_user }}"
+    group: "{{ os_manila_mount_group }}"
+    mode: "{{ os_manila_mount_mode }}"
+  become: yes
