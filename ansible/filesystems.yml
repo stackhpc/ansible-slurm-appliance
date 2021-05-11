@@ -9,41 +9,8 @@
     - include_role:
         name: stackhpc.nfs
 
-# Access a pre-existing filesystem with a pre-existing key
-- name: Gather facts about OpenStack Manila share
-  hosts: openstack
-  tasks:
-    - include_role: stackhpc.os-manila-mount
-      vars:
-        os_manila_mount_action: lookup
-    - debug:
-        var: os_manila_mount_host
-    - debug:
-        var: os_manila_mount_export
-    - debug:
-        var: os_manila_mount_access_key
-
 - name: Mount Openstack Manila share
   hosts: os_manila
   tasks:
-    - name: Ensure the cluster home dir mount point exists
-      file:
-        path: "{{ cluster_homedir }}"
-        state: directory
-        recurse: yes
-        owner: root
-        group: root
-        mode: 0755
-      become: yes
-    - name: Ensure the CentOS Ceph package archive is present
-      package:
-        name: "centos-release-ceph-octopus"
-        state: present
-      become: yes
-    - name: Ensure the Ceph client packages are present
-      package:
-        name: "ceph-common"
-        state: present
-      become: yes
     - name: Mount Manila share
       include_role: os_manila_ceph
