@@ -1,0 +1,27 @@
+---
+# By setting these environment parameters in a dict we circumvent the confusing
+# way that default(omit) is externally presented by Ansible.
+- name: Set OpenStack credentials
+  set_fact:
+    os_manila_mount_credentials:
+      OS_CLOUD: "{{ (os_manila_mount_os_config_name | default(omit)) if os_manila_mount_auth_type == 'cloud' else omit }}"
+      OS_PROJECT_DOMAIN_NAME: "{{ os_manila_mount_auth.project_domain_name | default(omit) }}"
+      OS_USER_DOMAIN_NAME: "{{ os_manila_mount_auth.user_domain_name | default(omit) }}"
+      OS_PROJECT_NAME: "{{ os_manila_mount_auth.project_name | default(omit) }}"
+      OS_USERNAME: "{{ os_manila_mount_auth.username | default(omit) }}"
+      OS_PASSWORD: "{{ os_manila_mount_auth.password | default(omit) }}"
+      OS_AUTH_URL: "{{ os_manila_mount_auth.auth_url | default(omit) }}"
+
+- name: Get manila access info
+  os_manila_share:
+    name: "{{ os_manila_mount_share_name }}"
+    user: "{{ os_manila_mount_share_user }}"
+    protocol: "{{ os_manila_mount_share_protocol }}"
+  environment: "{{ os_manila_mount_credentials }}"
+  register: os_manila_mount_share
+
+- name: Take facts from manila
+  set_fact:
+    os_manila_mount_host: "{{ os_manila_mount_share.details.host }}"
+    os_manila_mount_access_key: "{{ os_manila_mount_share.details.access_key }}"
+    os_manila_mount_export: "{{ os_manila_mount_share.details.path }}"
