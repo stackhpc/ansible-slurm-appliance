@@ -1,3 +1,5 @@
-os_manila_mount_share_name: # ceph
-os_manila_mount_share_user: # cephuser
-os_manila_mount_path: # /mnt/ceph
+os_manila_mount_share_name: home
+os_manila_mount_share_user: "{{ ansible_user }}"
+os_manila_mount_path: /home
+os_manila_mount_user: root
+os_manila_mount_group: root
