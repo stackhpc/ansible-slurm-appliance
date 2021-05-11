@@ -56,7 +56,7 @@
     path: "{{ item.os_manila_mount_path }}"
     src: "{{ os_manila_mount_host }}:{{ item.os_manila_mount_export }}"
     fstype: ceph
-    state: mounted
+    state: "{{ os_manila_mount_state }}"
     opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
       secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.secret"
     boot: yes
