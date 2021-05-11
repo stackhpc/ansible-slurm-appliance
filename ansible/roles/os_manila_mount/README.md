@@ -62,6 +62,7 @@ In either case, the following key/value pairs must be set in the mappings in `os
 Ceph package repo and configuration options:
 
 * `os_manila_mount_ceph_version`: Version of Ceph client package to install. Default `octopus`.
+* `os_manila_mount_state`: State of mounts, default `mounted`, See Ansible `mount` module parameter `state` for options.
 * `os_manila_mount_pkgs_install`: Install repos and client packages needed for Ceph?
   Defaults to `True`.
 * `os_manila_mount_ceph_repo_base`: Package repository to use.

@@ -15,7 +15,8 @@ os_manila_mount_configurations:
     mount_user: root
     mount_group: root
     mount_mode: 0775
-    
+
+os_manila_mount_state: mounted
 os_manila_mount_auth_type: cloud
 os_manila_mount_auth: {}
 
