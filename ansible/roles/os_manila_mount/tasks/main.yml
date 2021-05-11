@@ -32,6 +32,15 @@
     mode: 0600
   become: yes
 
+- name: Write Ceph client secret
+  copy:
+    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.secret"
+    content: "{{ os_manila_mount_access_key }}"
+    mode: 0600
+    owner: root
+    group: root
+  become: yes
+
 - name: Ensure mount directory exists
   file:
     path: "{{ os_manila_mount_path }}"
@@ -41,14 +50,6 @@
     mode: "{{ os_manila_mount_mode }}"
   become: yes
 
-- name: Write Ceph client secret
-  copy:
-    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.secret"
-    content: "{{ os_manila_mount_access_key }}"
-    mode: 0600
-    owner: root
-    group: root
-  become: yes
 - name: FS-Mount the share from the Ceph cluster
   mount:
     path: "{{ os_manila_mount_path }}"
