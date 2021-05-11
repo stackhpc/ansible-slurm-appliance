@@ -1,17 +1,30 @@
 ---
-- name: Add Ceph reposity
-  yum_repository:
-    name: "centos-ceph-{{ os_manila_mount_ceph_version }}"
-    description: CentOS Storage SIG repo for ceph
-    baseurl: "{{ os_manila_mount_ceph_repo_base }}"
-    gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
-  become: yes
+# Perform a lookup if this module has not previously been invoked in that mode.
+- include: "lookup.yml"
+  when: os_manila_mount_host is not defined or
+        os_manila_mount_export is not defined or
+        os_manila_mount_access_key is not defined
 
-- name: Install packages for ceph
-  yum:
-  name:
-    - epel-release
-    - ceph-common
+- name: Ensure supported protocol requested
+  fail:
+    msg: "Sorry, we only support CEPHFS right now."
+  when: os_manila_mount_share_protocol != "CEPHFS"
+
+- block:
+    - name: Add Ceph reposity
+      yum_repository:
+        name: "centos-ceph-{{ os_manila_mount_ceph_version }}"
+        description: CentOS Storage SIG repo for ceph luminous
+        baseurl: "{{ os_manila_mount_ceph_repo_base }}"
+        gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
+    - name: Install relevant yum packages
+      yum:
+        name:
+          - epel-release
+          - ceph-common
+  when:
+    - ansible_os_family == 'RedHat'
+    - os_manila_mount_pkgs_install | default(true) | bool
   become: yes
 
 - name: Ensure ceph conf directory exists
@@ -32,15 +45,6 @@
     mode: 0600
   become: yes
 
-- name: Write Ceph client secret
-  copy:
-    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.secret"
-    content: "{{ os_manila_mount_access_key }}"
-    mode: 0600
-    owner: root
-    group: root
-  become: yes
-
 - name: Ensure mount directory exists
   file:
     path: "{{ item.os_manila_mount_path }}"
@@ -51,12 +55,24 @@
   become: yes
   loop: "{{ os_manila_mount_configurations }}"
 
+# Using _netdev as a filesystem option prevents the mount from blocking early boot
+# before networking is initialised
+
+- name: Write Ceph client secret
+  copy:
+    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.secret"
+    content: "{{ os_manila_mount_access_key }}"
+    mode: 0600
+    owner: root
+    group: root
+  become: yes
+
 - name: FS-Mount the share from the Ceph cluster
   mount:
     path: "{{ item.os_manila_mount_path }}"
     src: "{{ os_manila_mount_host }}:{{ item.os_manila_mount_export }}"
     fstype: ceph
-    state: "{{ os_manila_mount_state }}"
+    state: mounted
     opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
       secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.secret"
     boot: yes
