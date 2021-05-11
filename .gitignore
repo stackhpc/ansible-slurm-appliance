@@ -1,6 +1,99 @@
 terraform.tfstate*
-.terraform*
+.terraform
 config-drive.iso
 venv
 *.pyc
 ansible-vault.pass
+._*
+*.DS_Store
+*.py[cod]
+
+# editor stuff
+###############################
+*.komodoproject
+*.wpr
+*.sublime-*
+.idea
+.idea/*
+*venv*
+.vscode
+*.code-*
+.cache
+*.sublime*
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+*.EGG-INFO
+
+#No Ansible Retry Files
+*.retry
+
+# py stuff
+dist
+build
+eggs
+parts
+#bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+
+#build and log files
+###############################
+*.o
+*.pyc
+*.pyo
+*.out
+*.log
+*.tmp
+
+# version control
+###############################
+.svn
+.bzr
+.hgsvn
+.hg
+
+#Apple / Mac stuff
+###############################
+.DS_Store
+._*
+.Trash
+
+
+# obvious backup files
+###############################
+*.orig
+*.bak
+*~
+~*
+*.tmp*
+
+## Local Testing Files
+test.yml
+test_inventory
+
