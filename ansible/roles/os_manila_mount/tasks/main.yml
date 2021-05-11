@@ -43,29 +43,32 @@
 
 - name: Ensure mount directory exists
   file:
-    path: "{{ os_manila_mount_path }}"
+    path: "{{ item.os_manila_mount_path }}"
     state: directory
-    owner: "{{ os_manila_mount_user }}"
-    group: "{{ os_manila_mount_group }}"
-    mode: "{{ os_manila_mount_mode }}"
+    owner: "{{ item.os_manila_mount_user }}"
+    group: "{{ item.os_manila_mount_group }}"
+    mode: "{{ item.os_manila_mount_mode }}"
   become: yes
+  loop: "{{ os_manila_mount_configurations }}"
 
 - name: FS-Mount the share from the Ceph cluster
   mount:
-    path: "{{ os_manila_mount_path }}"
-    src: "{{ os_manila_mount_host }}:{{ os_manila_mount_export }}"
+    path: "{{ item.os_manila_mount_path }}"
+    src: "{{ os_manila_mount_host }}:{{ item.os_manila_mount_export }}"
     fstype: ceph
     state: mounted
     opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
       secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.secret"
     boot: yes
   become: yes
+  loop: "{{ os_manila_mount_configurations }}"
 
 - name: Ensure mounted directory has correct permissions
   file:
-    path: "{{ os_manila_mount_path }}"
+    path: "{{ item.os_manila_mount_path }}"
     state: directory
-    owner: "{{ os_manila_mount_user }}"
-    group: "{{ os_manila_mount_group }}"
-    mode: "{{ os_manila_mount_mode }}"
+    owner: "{{ item.os_manila_mount_user }}"
+    group: "{{ item.os_manila_mount_group }}"
+    mode: "{{ item.os_manila_mount_mode }}"
   become: yes
+  loop: "{{ os_manila_mount_configurations }}"
