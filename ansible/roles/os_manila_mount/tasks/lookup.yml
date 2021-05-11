@@ -14,14 +14,14 @@
 
 - name: Get manila access info
   os_manila_share:
-    name: "{{ os_manila_mount_share_name }}"
+    name: "{{ item.key }}"
     user: "{{ os_manila_mount_share_user }}"
     protocol: "{{ os_manila_mount_share_protocol }}"
   environment: "{{ os_manila_mount_credentials }}"
   register: os_manila_mount_share
+  loop: "{{ os_manila_mount_configurations | dict2items }}"
 
 - name: Take facts from manila
   set_fact:
-    os_manila_mount_host: "{{ os_manila_mount_share.details.host }}"
-    os_manila_mount_access_key: "{{ os_manila_mount_share.details.access_key }}"
-    os_manila_mount_export: "{{ os_manila_mount_share.details.path }}"
+    os_manila_mount_facts: "{{ os_manila_mount_facts | default({}) | combine( { item.details.name : item.details }}" # a dict of results from library/os_manila_share, keyed by share name
+  loop: "{{ os_manila_mount_share.results}}"

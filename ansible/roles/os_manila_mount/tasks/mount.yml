@@ -47,44 +47,45 @@
 
 - name: Ensure mount directory exists
   file:
-    path: "{{ item.os_manila_mount_path }}"
+    path: "{{ value.mount_path }}"
     state: directory
-    owner: "{{ item.os_manila_mount_user }}"
-    group: "{{ item.os_manila_mount_group }}"
-    mode: "{{ item.os_manila_mount_mode }}"
+    owner: "{{ value.mount_user }}"
+    group: "{{ value._mount_group }}"
+    mode: "{{ value.mount_mode }}"
   become: yes
-  loop: "{{ os_manila_mount_configurations }}"
+  loop: "{{ os_manila_mount_configurations | dict2items }}"
 
 # Using _netdev as a filesystem option prevents the mount from blocking early boot
 # before networking is initialised
 
 - name: Write Ceph client secret
   copy:
-    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.secret"
-    content: "{{ os_manila_mount_access_key }}"
+    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.{{ item.key }}.secret"
+    content: "{{ item.value.access_key }}"
     mode: 0600
     owner: root
     group: root
   become: yes
+  loop: "{{ os_manila_mount_facts | dict2items }}"
 
 - name: FS-Mount the share from the Ceph cluster
   mount:
-    path: "{{ item.os_manila_mount_path }}"
-    src: "{{ os_manila_mount_host }}:{{ item.os_manila_mount_export }}"
+    path: "{{ os_manila_mount_configurations[item.key].mount_path }}"
+    src: "{{ item.host }}:{{ item.export }}"
     fstype: ceph
     state: mounted
     opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
-      secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.secret"
+      secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.{{ item.key }}.secret"
     boot: yes
   become: yes
-  loop: "{{ os_manila_mount_configurations }}"
+  loop: "{{ os_manila_mount_facts | dict2items }}"
 
 - name: Ensure mounted directory has correct permissions
   file:
-    path: "{{ item.os_manila_mount_path }}"
+    path: "{{ value.mount_path }}"
     state: directory
-    owner: "{{ item.os_manila_mount_user }}"
-    group: "{{ item.os_manila_mount_group }}"
-    mode: "{{ item.os_manila_mount_mode }}"
+    owner: "{{ value.mount_user }}"
+    group: "{{ value.mount_group }}"
+    mode: "{{ value.mount_mode }}"
   become: yes
-  loop: "{{ os_manila_mount_configurations }}"
+  loop: "{{ os_manila_mount_configurations | dict2items }}"
