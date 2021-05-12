@@ -1,9 +1,7 @@
 ---
 # Perform a lookup if this module has not previously been invoked in that mode.
 - include: "lookup.yml"
-  when: os_manila_mount_host is not defined or
-        os_manila_mount_export is not defined or
-        os_manila_mount_access_key is not defined
+  when: os_manila_mount_facts is not defined
 
 - name: Ensure supported protocol requested
   fail:
@@ -43,15 +41,17 @@
     owner: root
     group: root
     mode: 0600
+  # vars:
+  #     os_manila_mount_host: "{{ (os_manila_mount_configurations.values() | list)[0].host }}" # TODO: FIXME: cope with different shares having different hosts
   become: yes
 
 - name: Ensure mount directory exists
   file:
-    path: "{{ value.mount_path }}"
+    path: "{{ item.value.mount_path }}"
     state: directory
-    owner: "{{ value.mount_user }}"
-    group: "{{ value._mount_group }}"
-    mode: "{{ value.mount_mode }}"
+    owner: "{{ item.value.mount_user }}"
+    group: "{{ item.value.mount_group }}"
+    mode: "{{ item.value.mount_mode }}"
   become: yes
   loop: "{{ os_manila_mount_configurations | dict2items }}"
 
@@ -68,10 +68,13 @@
   become: yes
   loop: "{{ os_manila_mount_facts | dict2items }}"
 
+- debug:
+    msg: "{{ os_manila_mount_facts | dict2items }}"
+
 - name: FS-Mount the share from the Ceph cluster
   mount:
     path: "{{ os_manila_mount_configurations[item.key].mount_path }}"
-    src: "{{ item.host }}:{{ item.export }}"
+    src: "{{ item.value.host }}:{{ item.value.export }}"
     fstype: ceph
     state: "{{ os_manila_mount_state }}"
     opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
@@ -82,10 +85,10 @@
 
 - name: Ensure mounted directory has correct permissions
   file:
-    path: "{{ value.mount_path }}"
+    path: "{{ item.value.mount_path }}"
     state: directory
-    owner: "{{ value.mount_user }}"
-    group: "{{ value.mount_group }}"
-    mode: "{{ value.mount_mode }}"
+    owner: "{{ item.value.mount_user }}"
+    group: "{{ item.value.mount_group }}"
+    mode: "{{ item.value.mount_mode }}"
   become: yes
   loop: "{{ os_manila_mount_configurations | dict2items }}"

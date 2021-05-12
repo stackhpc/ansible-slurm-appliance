@@ -8,6 +8,23 @@ import os_client_config
 
 ANSIBLE_METADATA = {'metadata_version': '1.0'}
 
+SHARE_MOCK_DATA = {
+    "id": 'fakeshare-id',
+    "size" : 'fakeshare-size',
+    "protocol": 'CEPHFS',
+    "type": 'fakeshare-type',
+    "type_id": 'fakeshare-id',
+    'export': '/volumes/fakeshare/export/',
+    'path': '?TODO?/',
+    'host': '198.51.100.0:1234,198.51.100.1:2345,198.51.100.2:3456',
+    'access_key': 'ThIsIsaFakeSecretKey'
+}
+
+
+def fake_data(share_name):
+    fake_share = SHARE_MOCK_DATA
+    fake_share['name'] = share_name
+    return fake_share
 
 def get_share_client(module):
     # NOTE: set OS_CLOUD environment variable to choose a named entry from clouds.yaml
@@ -38,6 +55,7 @@ def get_share_details(share_client, share_name):
         # TODO - we could create the share, if given enough info
         raise Exception("Unable to find requested share.")
 
+    print('DEBUG from os_manila_share, raw_shares:', raw_shares)
     raw_share = raw_shares[0]
 
     share = {
@@ -87,6 +105,7 @@ def main():
             protocol=dict(required=False, type='str'),
             size_gb=dict(required=False, type='int'), # only checks the size
             type=dict(required=False, type='str'),  # unused - for creation
+            mock=dict(required=False, type='str'), # set non-empty to use as a part of fake data
         ),
         supports_check_mode=False
     )
@@ -94,6 +113,10 @@ def main():
     share_client = get_share_client(module)
 
     share_name = module.params['name']
+
+    if module.params['mock']:
+        module.exit_json(changed=False, details=fake_data(module.params['name']))
+    
     share = get_share_details(share_client, share_name)
 
     user = module.params['user']

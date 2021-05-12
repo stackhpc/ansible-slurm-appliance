@@ -14,7 +14,7 @@ os_manila_mount_configurations:
     mount_path: /home
     mount_user: root
     mount_group: root
-    mount_mode: 0775
+    mount_mode: '0775'
 
 os_manila_mount_state: mounted
 os_manila_mount_auth_type: cloud
@@ -23,6 +23,6 @@ os_manila_mount_auth: {}
 # CEPH specific defaults
 os_manila_mount_ceph_version: octopus
 os_manila_mount_pkgs_install: True
-os_manila_mount_ceph_repo_base: "http://mirror.centos.org/centos/$releasever/storage/x86_64/ceph-{{ os_manila_mount_ceph_version }/"
+os_manila_mount_ceph_repo_base: "http://mirror.centos.org/centos/$releasever/storage/x86_64/ceph-{{ os_manila_mount_ceph_version }}/"
 os_manila_mount_ceph_repo_key: "https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage"
 os_manila_mount_ceph_conf_path: "/etc/ceph"
