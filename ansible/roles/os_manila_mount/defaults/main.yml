@@ -14,7 +14,7 @@ os_manila_mount_configurations:
     mount_path: /home
     mount_user: root
     mount_group: root
-    mount_mode: '0775'
+    mount_mode: '0775' # NB quote this else it gets mangled
 
 os_manila_mount_state: mounted
 os_manila_mount_auth_type: cloud
