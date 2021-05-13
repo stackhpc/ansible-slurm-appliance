@@ -1,6 +1,5 @@
 ---
 
-nfs_filer_addr: 10.109.3.87 # see centos@deploy:/home/centos/nrel-filer
 
 nfs_configurations:
   - comment: Home directories served from slurm control node
@@ -11,24 +10,4 @@ nfs_configurations:
     nfs_server: "{{ nfs_server_default }}"
     nfs_export: "/home"
     nfs_client_mnt_point: "/home"
-  - comment: Shared scratch from external filer
-    nfs_enable:
-      server: false
-      clients: "{{ inventory_hostname in groups['cluster'] }}"
-    nfs_server: "{{ nfs_filer_addr }}"
-    nfs_export: "/srv/scratch"
-    nfs_client_mnt_point: "/scratch"
-  - comment: Shared projects from external filer
-    nfs_enable:
-      server: false
-      clients: "{{ inventory_hostname in groups['cluster'] }}"
-    nfs_server: "{{ nfs_filer_addr }}"
-    nfs_export: "/srv/projects"
-    nfs_client_mnt_point: "/projects"
-  - comment: Shared apps and libs from external filer
-    nfs_enable:
-      server: false
-      clients: "{{ inventory_hostname in groups['cluster'] }}"
-    nfs_server: "{{ nfs_filer_addr }}"
-    nfs_export: "/srv/nopt"
-    nfs_client_mnt_point: "/nopt"
+

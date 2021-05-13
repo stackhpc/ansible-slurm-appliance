@@ -1,2 +1,2 @@
-openhpc_tests_rootdir: /scratch/ohcp-tests
+openhpc_tests_rootdir: /home/ohcp-tests
 openhpc_tests_hpl_NB: 256 # ivy bridge E5-2680 v2
