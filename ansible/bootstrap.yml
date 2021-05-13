@@ -64,10 +64,11 @@
         msg: "setstatus:{{ (sestatus.reboot_required | default(false)) }} packages: {{ (update_reboot_required.stat.exists | bool) }}"
     - name: Reboot if required from SELinux state change or package upgrades
       reboot:
+        post_reboot_delay: 30
       when: (sestatus['reboot_required'] | default(false)) or (update_reboot_required.stat.exists | bool)
     - name: Wait for hosts to be reachable
       wait_for_connection:
         sleep: 15
     - name: update facts
       setup:
-      when: sestatus.changed | default(false)
+      when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
