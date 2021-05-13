@@ -74,6 +74,7 @@ resource "openstack_compute_instance_v2" "control" {
   image_name = var.control_image
   flavor_name = var.control_flavor
   key_pair = var.key_pair
+  config_drive = true
   
   network {
     port = openstack_networking_port_v2.control_cluster.id
@@ -131,6 +132,7 @@ resource "openstack_compute_instance_v2" "logins" {
   image_name = var.login_image
   flavor_name = var.login_flavor
   key_pair = var.key_pair
+  config_drive = true
 
   network {
     port = openstack_networking_port_v2.login_cluster[each.key].id
@@ -188,6 +190,7 @@ resource "openstack_compute_instance_v2" "computes" {
   image_name = var.compute_image
   flavor_name = var.compute_flavor
   key_pair = var.key_pair
+  config_drive = true
 
   network {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
