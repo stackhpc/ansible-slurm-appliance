@@ -7,9 +7,9 @@
 # Use tags like this to run specific tests:
 #   ansible-playbook ansible/adhoc/test.yml --tags pingmatrix
 #
-# Only works for default partition. If this isn't the entire set of compute nodes you must also limit it
-# to those nodes, e.g.:
-#   ansible-playbook ansible/adhoc/test.yml --tags pingmatrix openhpc_tests_nodes=hpc-[0-3]
+# Only works for default partition. If this isn't the entire set of compute nodes you must also set
+# `openhpc_tests_nodes` to relevant nodes using a slurm node expression expression, e.g.:
+#   ansible-playbook ansible/adhoc/test.yml --tags pingmatrix openhpc_tests_nodes=mycluster-hpc-[0-3]
 
 - hosts: openhpc_tests
   name: Run tests
@@ -17,5 +17,3 @@
   tasks:
     - import_role:
         name: stackhpc.slurm_openstack_tools.test
-      # TODO: FIXME: need to fix /opt mount so that it only overrides /opt/intel and /opt/ohpc
-      # TODO: FIXME: need to fix /opt unmount so it works
