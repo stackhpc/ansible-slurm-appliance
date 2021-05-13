@@ -22,14 +22,53 @@
         state: "{{ selinux_state }}"
         policy: "{{ selinux_policy }}"
       register: sestatus
-    - name: Reboot if required to change SELinux state
+
+- hosts: update
+  gather_facts: false
+  become: yes
+  tags:
+    - update
+  tasks:
+    - block:
+      - name: Update selected packages
+        yum:
+          name: "{{ update_name }}"
+          state: "{{ update_state }}"
+          exclude: "{{ update_exclude }}"
+          disablerepo: "{{ update_disablerepo }}"
+        register: updates
+      - debug:
+          var: updates
+      - name: Log updated packages
+        copy:
+          content: "{{ updates.results | join('\n') }}"
+          dest: "{{ update_log_path }}"
+        delegate_to: localhost
+      - debug:
+          msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
+      when: "update_enable | default('false') | bool"
+
+- hosts:
+    - selinux
+    - update
+  gather_facts: false
+  become: yes
+  tags:
+    - reboot
+  tasks:
+    - name: Check for pending reboot from package updates
+      stat: 
+        path: /var/run/reboot-required
+      register: update_reboot_required
+    - debug:
+        msg: "setstatus:{{ (sestatus.reboot_required | default(false)) }} packages: {{ (update_reboot_required.stat.exists | bool) }}"
+    - name: Reboot if required from SELinux state change or package upgrades
       reboot:
-      when: sestatus.reboot_required
+        post_reboot_delay: 30
+      when: (sestatus['reboot_required'] | default(false)) or (update_reboot_required.stat.exists | bool)
     - name: Wait for hosts to be reachable
       wait_for_connection:
-        delay: 30
-        sleep: 5
-      when: sestatus.reboot_required
+        sleep: 15
     - name: update facts
       setup:
-      when: sestatus.reboot_required
+      when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))

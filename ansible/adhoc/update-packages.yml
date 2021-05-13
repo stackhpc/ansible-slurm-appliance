@@ -1,7 +1,18 @@
-- name: Updates
-  hosts: cluster
+- hosts: update
+  become: yes
+  gather_facts: false
   tasks:
-    - package:
-        name: "*"
-        state: latest
-      become: true
+    - name: Update selected packages
+      yum:
+        name: "{{ update_name }}"
+        state: "{{ update_state }}"
+        exclude: "{{ update_exclude }}"
+        disablerepo: "{{ update_disablerepo }}"
+      register: updates
+    - name: Log updated packages
+      copy:
+        content: "{{ updates.results | join('\n') }}"
+        dest: "{{ update_log_path }}"
+      delegate_to: localhost
+    - debug:
+        msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
