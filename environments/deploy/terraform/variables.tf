@@ -1,13 +1,13 @@
 variable "compute_names" {
-    type = list(string)
-    default = ["compute-0", "compute-1"]
-    description = "A list of hostnames for the compute nodes (will be prefixed by cluster_name)"
+    type = map(string)
+    default = {}
+    description = "Mapping of names -> flavor type for compute nodes (Note hostnames will be be prefixed with cluster_name)"
 }
 
 variable "login_names" {
-  type = list(string)
-  default = ["login-0", "login-1"]
-  description = "A list of hostnames for the login nodes (will be prefixed by cluster_name)"
+  type = map(string)
+  default = {}
+  description = "Mapping of names -> flavor type for login nodes (Note hostnames will be prefixed with cluster_name)"
 }
 
 variable "cluster_name" {
@@ -90,11 +90,6 @@ variable "key_pair" {
     description = "Name of an existing keypair in OpenStack"
 }
 
-variable "login_flavor" {
-    type = string
-    description = "Name of instance flavor for login node(s)"
-}
-
 variable "login_image" {
     type = string
     description = "Name of image for login node(s)"
@@ -108,11 +103,6 @@ variable "control_flavor" {
 variable "control_image" {
     type = string
     description = "Name of image for compute node"
-}
-
-variable "compute_flavor" {
-    type = string
-    description = "Name of instance flavor for compute node(s)"
 }
 
 variable "compute_image" {

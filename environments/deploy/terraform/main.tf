@@ -85,7 +85,7 @@ resource "openstack_compute_instance_v2" "control" {
 
 resource "openstack_networking_port_v2" "login_cluster" {
 
-  for_each = toset(var.login_names)
+  for_each = var.login_names
 
   name = each.key
   network_id = data.openstack_networking_network_v2.cluster.id
@@ -103,7 +103,7 @@ resource "openstack_networking_port_v2" "login_cluster" {
 
 resource "openstack_networking_port_v2" "login_storage" {
 
-  for_each = toset(var.login_names)
+  for_each = var.login_names
 
   name = each.key
   network_id = data.openstack_networking_network_v2.storage.id
@@ -121,7 +121,7 @@ resource "openstack_networking_port_v2" "login_storage" {
 
 resource "openstack_networking_port_v2" "login_control" {
 
-  for_each = toset(var.login_names)
+  for_each = var.login_names
 
   name = each.key
   network_id = data.openstack_networking_network_v2.control.id
@@ -139,11 +139,11 @@ resource "openstack_networking_port_v2" "login_control" {
 
 resource "openstack_compute_instance_v2" "logins" {
 
-  for_each = toset(var.login_names)
+  for_each = var.login_names
 
-  name = "${var.cluster_name}-${each.value}"
+  name = "${var.cluster_name}-${each.key}"
   image_name = var.login_image
-  flavor_name = var.login_flavor
+  flavor_name = each.value
   key_pair = var.key_pair
   config_drive = true
 
@@ -166,7 +166,7 @@ resource "openstack_compute_instance_v2" "logins" {
 
 resource "openstack_networking_port_v2" "compute_cluster" {
 
-  for_each = toset(var.compute_names)
+  for_each = var.compute_names
 
   name = each.key
   network_id = data.openstack_networking_network_v2.cluster.id
@@ -184,7 +184,7 @@ resource "openstack_networking_port_v2" "compute_cluster" {
 
 resource "openstack_networking_port_v2" "compute_storage" {
 
-  for_each = toset(var.compute_names)
+  for_each = var.compute_names
 
   name = each.key
   network_id = data.openstack_networking_network_v2.storage.id
@@ -202,7 +202,7 @@ resource "openstack_networking_port_v2" "compute_storage" {
 
 resource "openstack_networking_port_v2" "compute_control" {
 
-  for_each = toset(var.compute_names)
+  for_each = var.compute_names
 
   name = each.key
   network_id = data.openstack_networking_network_v2.control.id
@@ -220,11 +220,11 @@ resource "openstack_networking_port_v2" "compute_control" {
 
 resource "openstack_compute_instance_v2" "computes" {
 
-  for_each = toset(var.compute_names)
+  for_each = var.compute_names
 
-  name = "${var.cluster_name}-${each.value}"
+  name = "${var.cluster_name}-${each.key}"
   image_name = var.compute_image
-  flavor_name = var.compute_flavor
+  flavor_name = each.value
   key_pair = var.key_pair
   config_drive = true
 
@@ -247,13 +247,13 @@ resource "openstack_compute_instance_v2" "computes" {
 
 resource "openstack_networking_floatingip_v2" "logins" {
 
-  for_each = toset(var.login_names)
+  for_each = var.login_names
 
   pool = data.openstack_networking_network_v2.external.name
 }
 
 resource "openstack_compute_floatingip_associate_v2" "logins" {
-  for_each = toset(var.login_names)
+  for_each = var.login_names
 
   floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
   instance_id = openstack_compute_instance_v2.logins[each.key].id
