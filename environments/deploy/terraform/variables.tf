@@ -4,6 +4,11 @@ variable "compute_names" {
     description = "Mapping of names -> flavor type for compute nodes (Note hostnames will be be prefixed with cluster_name)"
 }
 
+variable "proxy_name" {
+    type = string
+    description = "Name from login_names keys defining login node to use for proxy"
+}
+
 variable "login_names" {
   type = map(string)
   default = {}

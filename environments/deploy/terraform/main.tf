@@ -268,7 +268,7 @@ resource "local_file" "hosts" {
   content  = templatefile("${path.module}/inventory.tpl",
                           {
                             "cluster_name": var.cluster_name
-                            "proxy_fip": openstack_networking_floatingip_v2.logins[var.login_names[0]].address
+                            "proxy_fip": openstack_networking_floatingip_v2.logins[var.proxy_name].address
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,
