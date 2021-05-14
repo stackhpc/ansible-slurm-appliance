@@ -15,3 +15,8 @@ os_manila_mount_configurations:
     mount_user: root
     mount_group: root
     mount_mode: '0775'
+  projects:
+    mount_path: /projects
+    mount_user: root
+    mount_group: root
+    mount_mode: '0775'
