@@ -3,4 +3,7 @@ update_enable: false
 # These variables define the packages updates and are passed to ansible's yum module parameters with the same names: https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html
 update_name: '*'
 update_state: latest
-update_exclude: kernel*
+update_exclude: omit
+update_disablerepo: omit
+# Log changes during update here on localhost:
+update_log_path: "/var/log/{{ inventory_hostname }}-updates.log"
