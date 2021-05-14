@@ -1,0 +1,27 @@
+# Variables for mounting OpenStack Manila shares (using CephFS as the backed)
+# See https://github.com/stackhpc/ansible-role-os-manila-mount for full documentation
+# Set groups as follows:
+# `openstack`: A node with access to openstack, e.g. localhost
+# `os_manila`: Nodes to mount the share
+
+# These will always need overriding:
+os_manila_mount_share_name: # ceph
+os_manila_mount_share_user: # cephuser
+os_manila_mount_path: # /mnt/ceph
+
+# Assuming an openrc file is sourced these won't need overiding:
+os_manila_mount_auth_type: password
+os_manila_mount_auth: # when using os_manila_mount_auth_type: password
+  project_domain_name: "{{ lookup('env', 'OS_PROJECT_DOMAIN_NAME') }}"
+  user_domain_name: "{{ lookup('env', 'OS_USER_DOMAIN_NAME') }}"
+  project_name: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
+  username: "{{ lookup('env', 'OS_USERNAME') }}"
+  password: "{{ lookup('env', 'OS_PASSWORD') }}"
+  auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
+
+# Other mount options, defaults here should be sensible:
+os_manila_mount_user: root
+os_manila_mount_group: root
+os_manila_mount_mode: 0775
+os_manila_mount_share_protocol: CEPHFS
+os_manila_mount_fuse: no

@@ -1,0 +1,29 @@
+galaxy_info:
+  #role_name: os_manila_mount
+  author: StackHPC Ltd
+  description: Mount OpenStack manila shares (CephFS native only)
+  company: StackHPC Ltd
+
+  issue_tracker_url: https://github.com/stackhpc/ansible-role-os-manila-mount/issues
+
+  license: Apache2
+
+  min_ansible_version: 2.0
+
+  # If this a Container Enabled role, provide the minimum Ansible Container version.
+  # min_ansible_container_version:
+
+  #github_branch:
+
+  platforms:
+    - name: EL
+      versions:
+        - 7
+
+  galaxy_tags:
+    - openstack
+    - manila
+    - ceph
+    - cephfs
+
+dependencies: []

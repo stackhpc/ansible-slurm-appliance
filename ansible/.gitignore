@@ -16,3 +16,5 @@ roles/*
 !roles/grafana-datasources/**
 !roles/passwords/
 !roles/passwords/**
+!roles/os_manila_mount/
+!roles/os_manila_mount/**

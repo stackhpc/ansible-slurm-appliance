@@ -73,3 +73,9 @@ cluster
 
 [update]
 # Nodes to run yum update on
+
+[os_manila]
+# Nodes to mount OpenStack Manila shares on
+
+[openstack]
+# Node which can run openstack commands
