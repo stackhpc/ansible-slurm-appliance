@@ -13,6 +13,11 @@ roles:
     version: HEAD
   - src: jriguera.configdrive
 
+  - name: stig-hardening
+    src: git+git@github.nrel.gov:hpc/stig-hardening.git
+    version: v0.0.2
+
+
 collections:
 - name: containers.podman
 - name: community.grafana
