@@ -1,26 +1,36 @@
-compute_names = ["hpc-1", "hpc-2", "express-0"]
-login_names = ["login-0"] #, "login-1"]
-cluster_name  = "protovm" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+compute_names = {
+    hpc-0: "general.v1.small"
+    hpc-1: "general.v1.small"
+    hpc-2: "general.v1.small"
+    hpc-3: "general.v1.small"
+    express-0: "general.v1.small"
+    express-1: "general.v1.small"
+}
+login_names = {
+    login-0: "general.v1.small"
+    login-1: "general.v1.small"
+}
+proxy_name = "login-0"
+
+cluster_name  = "test" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 key_pair = "centos_at_nrel-deploy-vm"
 
-cluster_network = "nrel2"
-cluster_network_cidr = "10.99.0.0/16"
-storage_network = "ceph"
-storage_subnet = "ceph"
+cluster_network = "compute"
+cluster_subnet = "compute-subnet"
+storage_network = "storage"
+storage_subnet = "storage"
 external_network = "external"
-external_router = "nrel"
+control_network = "control"
+control_subnet = "control-subnet"
 
 login_image = "CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64"
-login_flavor = "general.v1.small"
 
 control_image = "CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64"
 control_flavor = "general.v1.small"
 
 compute_image = "CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64"
-compute_flavor = "general.v1.small"
 
 # remove this block in the real environment:
-cluster_network_type = "geneve"
 cluster_network_vnic_type = "normal"
 cluster_network_profile = {}
 storage_network_vnic_type = "normal"
