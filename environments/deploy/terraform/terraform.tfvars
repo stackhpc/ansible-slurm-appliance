@@ -12,7 +12,7 @@ login_names = {
 }
 proxy_name = "login-0"
 
-cluster_name  = "test" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+cluster_name  = "vs" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 key_pair = "slurmdeploy"
 
 cluster_network = "compute"
