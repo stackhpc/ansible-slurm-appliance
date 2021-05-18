@@ -65,6 +65,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   network {
     port = openstack_networking_port_v2.control_cluster.id
+    access_network = true
   }
   
   network {
@@ -239,6 +240,7 @@ resource "openstack_compute_instance_v2" "computes" {
 
   network {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
+    access_network = true
   }
   
   network {
