@@ -74,9 +74,6 @@ compute_names = {
   gpu-0001: "gpu.c8m30s32e500"
   gpu-0002: "gpu.c8m30s32e500"
   gpu-0003: "gpu.c8m30s32e500"
-  gpu-0004: "gpu.c8m30s32e500"
-  gpu-0005: "gpu.c8m30s32e500"
-  gpu-0006: "gpu.c8m30s32e500"
 }
 login_names = {
   login-1: "gen.c8m15"
