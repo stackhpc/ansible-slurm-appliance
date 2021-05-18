@@ -36,6 +36,3 @@ login
 
 [update:children]
 cluster
-
-[os_manila:children]
-openhpc

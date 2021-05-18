@@ -1,7 +1,6 @@
 - name: nrel-proto fixes - workaround no internal DNS
   hosts:
     - cluster
-    - localhost
   become: true
   tags: etc_hosts
   tasks:
@@ -19,18 +18,6 @@
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
 
-- name: nrel-proto fixes - add route to filer
-  hosts: cluster
-  become: true
-  tasks:
-    - name: check for route
-      command: "ip route"
-      register: ip_route
-      changed_when: false
-    - command:
-        cmd: "ip route add 10.109.0.0/16 via 10.99.0.1"
-      when: "'10.109.0.0/16 via 10.99.0.1' not in ip_route.stdout"
-
 - name: nrel-proto fixes - compute nodes
   hosts: compute
   become: true
@@ -39,3 +26,4 @@
       file:
         path: /tmp/scratch
         state: directory
+
