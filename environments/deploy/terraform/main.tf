@@ -23,6 +23,13 @@ resource "openstack_networking_port_v2" "control_cluster" {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
   }
+  
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "control_storage" {
@@ -39,24 +46,14 @@ resource "openstack_networking_port_v2" "control_storage" {
     vnic_type = var.storage_network_vnic_type
     profile = jsonencode(var.storage_network_profile)
   }
-}
 
-resource "openstack_networking_port_v2" "control_control" {
-
-  name = "control"
-  network_id = data.openstack_networking_network_v2.control.id
-  admin_state_up = "true"
-
-  fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.control.id
-  }
-
-  binding {
-    vnic_type = var.control_network_vnic_type
-    profile = jsonencode(var.control_network_profile)
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
   }
 }
-
 
 resource "openstack_compute_instance_v2" "control" {
   
@@ -72,11 +69,6 @@ resource "openstack_compute_instance_v2" "control" {
   
   network {
     port = openstack_networking_port_v2.control_storage.id
-  }
-
-  network {
-    port = openstack_networking_port_v2.control_control.id
-    access_network = true
   }
 
 }
@@ -99,6 +91,13 @@ resource "openstack_networking_port_v2" "login_cluster" {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
   }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "login_storage" {
@@ -117,6 +116,13 @@ resource "openstack_networking_port_v2" "login_storage" {
     vnic_type = var.storage_network_vnic_type
     profile = jsonencode(var.storage_network_profile)
   }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "login_control" {
@@ -134,6 +140,13 @@ resource "openstack_networking_port_v2" "login_control" {
   binding {
     vnic_type = var.control_network_vnic_type
     profile = jsonencode(var.control_network_profile)
+  }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
   }
 }
 
@@ -180,6 +193,13 @@ resource "openstack_networking_port_v2" "compute_cluster" {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
   }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "compute_storage" {
@@ -198,23 +218,12 @@ resource "openstack_networking_port_v2" "compute_storage" {
     vnic_type = var.storage_network_vnic_type
     profile = jsonencode(var.storage_network_profile)
   }
-}
 
-resource "openstack_networking_port_v2" "compute_control" {
-
-  for_each = var.compute_names
-
-  name = each.key
-  network_id = data.openstack_networking_network_v2.control.id
-  admin_state_up = "true"
-
-  fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.control.id
-  }
-
-  binding {
-    vnic_type = var.control_network_vnic_type
-    profile = jsonencode(var.control_network_profile)
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
   }
 }
 
@@ -234,11 +243,6 @@ resource "openstack_compute_instance_v2" "computes" {
   
   network {
     port = openstack_networking_port_v2.compute_storage[each.key].id
-  }
-
-  network {
-    port = openstack_networking_port_v2.compute_control[each.key].id
-    access_network = true
   }
 
 }
