@@ -86,17 +86,18 @@ proxy_name = "login"
 cluster_name  = "vs" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 key_pair = "slurmdeploy"
 
+external_network = "external"
 cluster_network = "compute"
 cluster_subnet = "compute-subnet"
+
 storage_network = "storage"
 storage_subnet = "storage"
-external_network = "external"
+
 control_network = "control"
 control_subnet = "control-subnet"
 
 login_image = "CentOS8.3"
-
 control_image = "CentOS8.3"
-control_flavor = "gen.c16m30"
-
 compute_image = "CentOS8.3"
+
+control_flavor = "gen.c16m30"
