@@ -19,7 +19,7 @@ login_names = {
   login-2: "gen.c8m15"
 }
 
-proxy_name = "login"
+proxy_name = "login-1"
 
 cluster_name  = "vs" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 key_pair = "slurmdeploy"
