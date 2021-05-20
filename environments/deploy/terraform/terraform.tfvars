@@ -8,15 +8,15 @@ compute_names = {
   sm-0001: "compute.c16m60s32e250"
   sm-0002: "compute.c16m60s32e250"
 
-  t-0001: "compute.c4m15s16e125"
-  t-0002: "compute.c4m15s16e125"
+  t-0001: "compute.c4m16s8e60"
+  t-0002: "compute.c4m16s8e60"
 
   gpu-0001: "gpu.c30m120s32e6000"
 
 }
 login_names = {
-  login-1: "gen.c8m15"
-  login-2: "gen.c8m15"
+  login-1: "gen.c8m16s16"
+  login-2: "gen.c8m16s16"
 }
 
 proxy_name = "login-1"
@@ -38,5 +38,5 @@ login_image = "CentOS8.3"
 control_image = "CentOS8.3"
 compute_image = "CentOS8.3"
 
-control_flavor = "gen.c16m30"
+control_flavor = "gen.c16m32s32"
 
