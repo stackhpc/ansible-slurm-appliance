@@ -5,8 +5,8 @@ compute_names = {
   std-0001: "compute.c30m120s60e500"
   std-0002: "compute.c30m120s60e500"
 
-  sm-0001: "compute.c16m60s32e250"
-  sm-0002: "compute.c16m60s32e250"
+  sm-0001: "compute.c16m64s32e250"
+  sm-0002: "compute.c16m64s32e250"
 
   t-0001: "compute.c4m16s8e60"
   t-0002: "compute.c4m16s8e60"
