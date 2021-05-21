@@ -1,0 +1,29 @@
+- name: nrel-proto fixes - workaround no internal DNS
+  hosts:
+    - cluster
+  become: true
+  tags: etc_hosts
+  tasks:
+    - name: Internal DNS workaround - generate /etc/hosts file content
+      # which interface is used as ansible_host is defined by terraform (see `access_network`) so this is deterministic for multi-rail hosts
+      set_fact:
+        etc_hosts_content: |
+          {% for host in groups['cluster'] %}{{ hostvars[host]['ansible_host'] }} {{ host }}.novalocal {{ host }}
+          {% endfor %}
+      run_once: true
+    - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
+      blockinfile:
+        path: /etc/hosts
+        create: yes
+        state: present
+        block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
+
+- name: nrel-proto fixes - compute nodes
+  hosts: compute
+  become: true
+  tasks:
+    - name: Create scratch directory - should be on local SSD on real cluster
+      file:
+        path: /tmp/scratch
+        state: directory
+
