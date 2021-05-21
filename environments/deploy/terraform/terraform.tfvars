@@ -34,7 +34,7 @@ storage_subnet = "storage"
 control_network = "control"
 control_subnet = "control-subnet"
 
-login_image = "CentOS8.3"
+login_image = "CentOS8.3_login"
 control_image = "CentOS8.3"
 compute_image = "CentOS8.3"
 
