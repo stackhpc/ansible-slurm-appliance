@@ -1,0 +1,29 @@
+---
+
+- name: Check slurm hostlist
+  hosts: testohpc_login
+  tasks:
+  - name: Get slurm partition info
+    command: sinfo --noheader --format="%P,%a,%l,%D,%t,%N" # using --format ensures we control whitespace
+    register: sinfo
+    changed_when: false
+  - name: Assert slurm running ok
+    assert:                        # PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+      that: "sinfo.stdout_lines == ['compute*,up,60-00:00:00,2,idle,testohpc-compute-[0-1]']"
+      fail_msg: "FAILED - actual value: {{ sinfo.stdout_lines }}"
+  - name: Run a slurm job
+    command:
+      cmd: "sbatch -N2 --wrap 'srun hostname'"
+    register: sbatch
+  - name: Set fact for slurm jobid
+    set_fact:
+      jobid: "{{ sbatch.stdout.split()[-1] }}"
+  - name: Get job completion info
+    command:
+      cmd: "sacct --completion --noheader --parsable2"
+    changed_when: false
+    register: sacct
+  - assert:
+      that: "(jobid + '|0|wrap|compute|2|testohpc-compute-[0-1]|COMPLETED') in sacct.stdout"
+      fail_msg: "Didn't find expected output for {{ jobid }} in sacct output: {{ sacct.stdout }}"
+  

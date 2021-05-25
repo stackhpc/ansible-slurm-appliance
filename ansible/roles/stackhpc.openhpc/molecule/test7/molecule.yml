@@ -1,0 +1,22 @@
+---
+name: single partition, group is partition
+driver:
+  name: docker
+platforms:
+  - name: testohpc-compute-0
+    image: ${MOLECULE_IMAGE}
+    pre_build_image: true
+    groups:
+      - testohpc_compute
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - name: net1
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

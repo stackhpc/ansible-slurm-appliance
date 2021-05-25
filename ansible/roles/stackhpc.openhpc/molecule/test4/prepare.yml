@@ -1,0 +1,19 @@
+---
+
+- name: Prepare
+  hosts: testohpc_login
+  vars:
+    # Slurm recommends larger than default values: https://slurm.schedmd.com/accounting.html
+    mysql_innodb_buffer_pool_size: 1024M
+    mysql_innodb_lock_wait_timeout: 900
+    mysql_root_password: super-secure-password
+    mysql_databases:
+      - name: slurm_acct_db
+    mysql_users:
+      - name: slurm
+        host: "{{ groups['testohpc_login'] | first }}"
+        password: secure-password
+        priv: "slurm_acct_db.*:ALL"
+  tasks:
+    - include_role:
+        name:  geerlingguy.mysql

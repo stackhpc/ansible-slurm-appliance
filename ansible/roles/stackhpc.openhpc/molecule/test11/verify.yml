@@ -1,0 +1,44 @@
+---
+
+- name: Check initial cluster has 2x nodes
+  hosts: testohpc_login
+  tasks:
+  - name: Get slurm partition info
+    command: sinfo --noheader --format="%P,%a,%l,%D,%t,%N" # using --format ensures we control whitespace
+    register: sinfo
+    changed_when: false
+  - assert:                        # PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+      that: "sinfo.stdout_lines == ['compute_orig*,up,60-00:00:00,2,idle,testohpc-compute-[0-1]']"
+      fail_msg: "FAILED - actual value: {{ sinfo.stdout_lines }}"
+      success_msg: "OK - 2x nodes idle"
+
+- name: Rerun with smaller compute group
+  hosts:
+    - testohpc_login
+    - testohpc_compute_new
+  tasks:
+    - name: "Include ansible-role-openhpc"
+      include_role:
+        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      vars:
+        openhpc_enable:
+          control: "{{ inventory_hostname in groups['testohpc_login'] }}"
+          batch: "{{ inventory_hostname in groups['testohpc_compute'] }}"
+          runtime: true
+        openhpc_slurm_control_host: "{{ groups['testohpc_login'] | first }}"
+        openhpc_slurm_partitions:
+          - name: "compute_new"
+        openhpc_cluster_name: testohpc
+        openhpc_slurm_configless: true
+
+- name: Check modified cluster has 1x nodes
+  hosts: testohpc_login
+  tasks:
+  - name: Get slurm partition info
+    command: sinfo --noheader --format="%P,%a,%l,%D,%t,%N" # using --format ensures we control whitespace
+    register: sinfo
+    changed_when: false
+  - assert:                        # PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+      that: "sinfo.stdout_lines == ['compute_new*,up,60-00:00:00,1,idle,testohpc-compute-0']"
+      fail_msg: "FAILED - actual value: {{ sinfo.stdout_lines }}"
+      success_msg: "OK - 1x nodes idle"

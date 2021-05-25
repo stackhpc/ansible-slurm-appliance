@@ -1,0 +1,20 @@
+---
+# OpenHPC 2 on CentOS 8
+
+ohpc_slurm_packages:
+  control:
+    - "ohpc-slurm-server"
+    - "slurm-slurmctld-ohpc"
+    - "slurm-example-configs-ohpc"
+  batch:
+    - "ohpc-base-compute"
+    - "ohpc-slurm-client"
+  runtime:
+    - "slurm-ohpc"
+    - "munge"
+    - "slurm-slurmd-ohpc"
+    - "slurm-example-configs-ohpc"
+    - "{{ 'lmod-ohpc' if openhpc_module_system_install else '' }}"
+  database:
+    - "slurm-slurmdbd-ohpc"
+...

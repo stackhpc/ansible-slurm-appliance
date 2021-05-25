@@ -18,3 +18,5 @@ roles/*
 !roles/passwords/**
 !roles/os_manila_mount/
 !roles/os_manila_mount/**
+!roles/stackhpc.openhpc/
+!roles/stackhpc.openhpc/**

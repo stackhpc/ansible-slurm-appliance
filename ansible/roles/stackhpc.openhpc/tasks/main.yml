@@ -1,0 +1,41 @@
+---
+
+- name: Select slurm service to control
+  set_fact:
+    openhpc_slurm_service: "{{ ohpc_slurm_services[item] }}"
+  loop: "{{ ohpc_slurm_services.keys() | list }}"
+  when: "openhpc_enable.get(item, false)"
+  tags: always
+
+- name: Set slurmd as service for openhpc_login_only_nodes
+  set_fact:
+    openhpc_slurm_service: "slurmd"
+  when: openhpc_login_only_nodes and (openhpc_login_only_nodes in group_names)
+
+- name: Install packages
+  block:
+    - include_tasks: install.yml
+  when: openhpc_enable.runtime | default(false) | bool
+  tags: install
+
+- name: Configure
+  block:
+    - include: runtime.yml
+  when: openhpc_enable.runtime | default(false) | bool
+  tags: configure
+
+- include: post-configure.yml
+  when:
+    - openhpc_enable.runtime | default(false) | bool
+    # Requires operational slurm cluster
+    - openhpc_slurm_service_started | bool
+  tags: post-configure
+
+- include: drain.yml
+  when: openhpc_enable.drain | default(false) | bool
+  delegate_to: "{{ openhpc_slurm_control_host }}"
+
+- include: resume.yml
+  when: openhpc_enable.resume | default(false) | bool
+  delegate_to: "{{ openhpc_slurm_control_host }}"
+...

@@ -1,0 +1,5 @@
+---
+- hosts: openstack
+  connection: local
+  roles:
+    - stackhpc.openhpc
