@@ -16,9 +16,26 @@ ${login.name} ansible_host=${[for n in login.network: n.fixed_ip_v4 if n.access_
 ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in compute.network: net.name => [ net.fixed_ip_v4 ] })}'
 %{ endfor ~}
 
-# Define groups for slurm parititions:
-[${cluster_name}_hpc]
-${cluster_name}-hpc-[0:3]
+## Define groups for slurm parititions:
+#[${cluster_name}_hpc]
+#${cluster_name}-hpc-[0:3]
+#
+#[${cluster_name}_express]
+#${cluster_name}-express-[0:1]
 
-[${cluster_name}_express]
-${cluster_name}-express-[0:1]
+[${cluster_name}_lg] 
+${cluster_name}-lg-[0001:9999]
+
+[${cluster_name}_std]
+${cluster_name}-std-[0001:9999]
+
+[${cluster_name}_sm]
+${cluster_name}-sm-[0001:9999]
+
+[${cluster_name}_t]
+${cluster_name}-t-[0001:9999]
+
+[${cluster_name}_gpu]
+${cluster_name}-gpu-[0001:9999]
+
+

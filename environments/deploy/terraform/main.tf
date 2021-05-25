@@ -55,6 +55,29 @@ resource "openstack_networking_port_v2" "control_storage" {
   }
 }
 
+resource "openstack_networking_port_v2" "control_control" {
+
+  name = "control"
+  network_id = data.openstack_networking_network_v2.control.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.control.id
+  }
+
+  binding {
+    vnic_type = var.control_network_vnic_type
+    profile = jsonencode(var.control_network_profile)
+  }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
+}
+
 resource "openstack_compute_instance_v2" "control" {
   
   name = "${var.cluster_name}-control"
@@ -65,11 +88,15 @@ resource "openstack_compute_instance_v2" "control" {
 
   network {
     port = openstack_networking_port_v2.control_cluster.id
-    access_network = true
   }
   
   network {
     port = openstack_networking_port_v2.control_storage.id
+  }
+
+  network {
+    port = openstack_networking_port_v2.control_control.id
+    access_network = true
   }
 
 }
@@ -228,6 +255,32 @@ resource "openstack_networking_port_v2" "compute_storage" {
   }
 }
 
+resource "openstack_networking_port_v2" "compute_control" {
+
+  for_each = var.compute_names
+
+  name = each.key
+  network_id = data.openstack_networking_network_v2.control.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.control.id
+  }
+
+  binding {
+    vnic_type = var.control_network_vnic_type
+    profile = jsonencode(var.control_network_profile)
+  }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
+}
+
+
 resource "openstack_compute_instance_v2" "computes" {
 
   for_each = var.compute_names
@@ -237,6 +290,10 @@ resource "openstack_compute_instance_v2" "computes" {
   flavor_name = each.value
   key_pair = var.key_pair
   config_drive = true
+
+  network {
+    port = openstack_networking_port_v2.compute_control[each.key].id
+  }
 
   network {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
