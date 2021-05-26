@@ -30,12 +30,12 @@
       shell:
         cmd: "ip route | grep default"
       register: ip_route_show
+      changed_when: false
     - name: Delete uneeded defaults
       command:
         cmd: "ip route del {{ item }}"
       loop: "{{ ip_route_show.stdout_lines }}"
-      when: "'via 192.68.67.1' not in item"
-      register: ip_route_del
+      when: "'default via 192.68.67.1' not in item"
 
 - name: nrel-proto fixes - compute nodes
   hosts: compute
