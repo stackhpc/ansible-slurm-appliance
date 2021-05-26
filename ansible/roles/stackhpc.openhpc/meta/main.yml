@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  role_name: openhpc
+  author: StackHPC Ltd.
+  description: >
+    This role provisions an exisiting cluster to support OpenHPC control
+    and batch compute functions and installs necessary runtime packages.
+  company: StackHPC Ltd
+  license: Apache2
+  min_ansible_version: 2.5.0
+  platforms:
+    - name: EL
+      versions:
+        - 7
+  galaxy_tags:
+    - openhpc
+    - slurm
+
+dependencies: []

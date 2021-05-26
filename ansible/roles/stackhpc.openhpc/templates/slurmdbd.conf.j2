@@ -1,0 +1,39 @@
+{{ ansible_managed | comment }}
+#
+# Example slurmdbd.conf file.
+#
+# See the slurmdbd.conf man page for more information.
+#
+# Archive info
+#ArchiveJobs=yes
+#ArchiveDir="/tmp"
+#ArchiveSteps=yes
+#ArchiveScript=
+#JobPurge=12
+#StepPurge=1
+#
+# Authentication info
+AuthType=auth/munge
+#AuthInfo=/var/run/munge/munge.socket.2
+#
+# slurmDBD info
+DbdHost={{ openhpc_slurmdbd_host }}
+DbdAddr={{ openhpc_slurmdbd_host }}
+DbdPort={{ openhpc_slurmdbd_port }}
+SlurmUser=slurm
+#MessageTimeout=300
+DebugLevel=4
+#DefaultQOS=normal,standby
+# NOTE: By default, slurmdbd will log to syslog
+#LogFile=/var/log/slurm/slurmdbd.log
+PidFile=/var/run/slurmdbd.pid
+#PluginDir=/usr/lib/slurm
+#PrivateData=accounts,users,usage,jobs
+#TrackWCKey=yes
+#
+# Database info
+StorageType=accounting_storage/mysql
+StorageHost={{ openhpc_slurmdbd_mysql_host }}
+StorageUser={{ openhpc_slurmdbd_mysql_username }}
+StoragePass={{ openhpc_slurmdbd_mysql_password | mandatory('You must set openhpc_slurmdbd_mysql_password') }}
+StorageLoc={{ openhpc_slurmdbd_mysql_database }}

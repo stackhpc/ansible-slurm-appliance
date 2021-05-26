@@ -1,0 +1,136 @@
+---
+- name: Fail if openhpc_slurm_control_host or openhpc_cluster_name or openhpc_slurm_partitions are undefined
+  fail:
+    msg: "Undefined openhpc_slurm_control_host or openhpc_cluster_name or openhpc_slurm_partitions, or latter is empty."
+  when:
+    openhpc_slurm_control_host == none or
+    openhpc_cluster_name == none or
+    openhpc_slurm_partitions | length == 0
+
+- name: Fail if configless mode selected when not on Centos 8
+  fail:
+    msg: "openhpc_slurm_configless = True requires Centos8 / OpenHPC v2"
+  when: openhpc_slurm_configless and not ansible_distribution_major_version == "8"
+
+- name: Fail if control host not in play and munge key not specified
+  fail:
+    msg: "Either the slurm control node must be in the play or `openhpc_munge_key` must be set"
+  when:
+    - openhpc_slurm_control_host not in ansible_play_hosts
+    - not openhpc_munge_key
+
+- name: Ensure the Slurm spool directory exists
+  file:
+    path: /var/spool/slurm
+    owner: slurm
+    group: slurm
+    mode: 0755
+    state: directory
+
+- name: Generate a Munge key on control host
+  # NB this is usually a no-op as the package install actually generates a (node-unique) one, so won't usually trigger handler
+  command: "dd if=/dev/urandom of=/etc/munge/munge.key bs=1 count=1024"
+  args:
+    creates: "/etc/munge/munge.key"
+  when: inventory_hostname == openhpc_slurm_control_host
+
+- name: Retrieve Munge key from control host
+  slurp:
+    src: "/etc/munge/munge.key"
+  register: openhpc_control_munge_key
+  delegate_to: "{{ openhpc_slurm_control_host }}"
+  when: openhpc_slurm_control_host in ansible_play_hosts
+
+- name: Write Munge key
+  copy:
+    content: "{{ openhpc_munge_key or (openhpc_control_munge_key.content | b64decode) }}"
+    dest: "/etc/munge/munge.key"
+    owner: munge
+    group: munge
+    mode: 0400
+  notify:
+    - Restart Munge service
+
+- name: Ensure JobComp logfile exists
+  file:
+    path: "{{ openhpc_slurm_job_comp_loc }}"
+    state: touch
+    owner: slurm
+    group: slurm
+    access_time: preserve
+    modification_time: preserve
+  when: openhpc_slurm_job_comp_type == 'jobcomp/filetxt'
+
+- name: Template slurmdbd.conf
+  template:
+    src: slurmdbd.conf.j2
+    dest: /etc/slurm/slurmdbd.conf
+    mode: "0600"
+    owner: slurm
+    group: slurm
+  notify: Restart slurmdbd service
+  when: openhpc_enable.database | default(false) | bool
+
+- name: Apply customised SLURM configuration
+  template:
+    src: slurm.conf.j2
+    dest: /etc/slurm/slurm.conf
+    owner: root
+    group: root
+    mode: 0644
+    lstrip_blocks: true
+  when: openhpc_enable.control | default(false) or not openhpc_slurm_configless
+  notify:
+    - Restart slurmctld service
+  register: ohpc_slurm_conf
+  # NB uses restart rather than reload as number of nodes might have changed
+
+- name: Notify handler for slurmd restart
+  debug:
+    msg: "notifying handlers" # meta: noop doesn't support 'when'
+  changed_when: true
+  when:
+    - openhpc_slurm_control_host in ansible_play_hosts
+    - hostvars[openhpc_slurm_control_host].ohpc_slurm_conf.changed # noqa 503
+  notify:
+    - Restart slurmd service
+
+- name: Set slurmctld location for configless operation
+  lineinfile:
+    path: /etc/sysconfig/slurmd
+    line: "SLURMD_OPTIONS='--conf-server {{ openhpc_slurm_control_host }}'"
+    regexp: "^SLURMD_OPTIONS="
+    create: yes
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - openhpc_slurm_service == 'slurmd'
+    - openhpc_slurm_configless
+  notify:
+    - Restart slurmd service
+  # Reloading is sufficent, but using a single handler means no bounce. Realistically this won't regularly change on a running slurmd so restarting is ok.
+
+# Munge state could be unchanged but the service is not running.
+# Handle that here.
+- name: Configure Munge service
+  service:
+    name: munge
+    enabled: "{{ openhpc_slurm_service_enabled | bool }}"
+    state: "{{ 'started' if openhpc_slurm_service_started | bool else 'stopped' }}"
+
+- name: Ensure slurmdbd is started and running
+  service:
+    name: slurmdbd
+    enabled: "{{ openhpc_slurm_service_enabled | bool }}"
+    state: "{{ 'started' if openhpc_slurm_service_started | bool else 'stopped' }}"
+  when: openhpc_enable.database | default(false) | bool
+
+- name: flush handler
+  meta: flush_handlers # as then subsequent "ensure" is a no-op if slurm services bounced
+
+- name: Ensure Slurm service state
+  service:
+    name: "{{ openhpc_slurm_service }}"
+    enabled: "{{ openhpc_slurm_service_enabled | bool }}"
+    state: "{{ 'started' if openhpc_slurm_service_started | bool else 'stopped' }}"

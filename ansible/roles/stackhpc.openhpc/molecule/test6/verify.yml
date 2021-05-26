@@ -1,0 +1,21 @@
+---
+
+- name: Check slurm hostlist
+  hosts: testohpc_login
+  tasks:
+  - name: Get slurm partition info
+    command: sinfo --noheader --format="%P,%a,%l,%D,%t,%N" # using --format ensures we control whitespace
+    register: sinfo
+  - name: 
+    assert:                        # PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+      that: "sinfo.stdout_lines == ['compute*,up,60-00:00:00,0,n/a,']"
+      fail_msg: "FAILED - actual value: {{ sinfo.stdout_lines }}"
+- name: Check munge key copied
+  hosts: localhost
+  tasks:
+  - stat:
+      path: "./testohpc-login-0/etc/munge/munge.key"
+    register: local_mungekey
+  - assert:
+      that:  local_mungekey.stat.exists
+      fail_msg: "Failed to find munge key copied from node on ansible control host"

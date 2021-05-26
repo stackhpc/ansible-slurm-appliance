@@ -1,0 +1,24 @@
+---
+# Ansible tasks to drain a Slurm compute node. Waits for the compute node to be
+# drained for up to a day by default.
+#
+# Variables:
+# - node_to_drain: compute node to drain
+# - drain_timeout: seconds to wait for node to drain, default is 86400.
+
+- name: Get nodes in DRAINED state
+  command: "sinfo --noheader --Node --format='%N' --states=DRAINED"
+  register: drained_nodes_results
+  changed_when: false
+
+- name: Drain compute node
+  command: "scontrol update nodename={{ inventory_hostname }} state=DRAIN reason='maintenance'"
+  when: inventory_hostname not in drained_nodes_results.stdout_lines
+
+- name: Check node has drained
+  command: "sinfo --noheader --Node --format='%N' --states=DRAINED"
+  register: drained_nodes
+  until: "inventory_hostname in drained_nodes.stdout_lines"
+  delay: "{{ openhpc_retry_delay }}"
+  retries: "{{ (openhpc_drain_timeout/openhpc_retry_delay) | int }}"
+  changed_when: false
