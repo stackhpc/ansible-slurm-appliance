@@ -2,6 +2,7 @@
   hosts:
     - cluster
   become: true
+  gather_facts: false
   tags: etc_hosts
   tasks:
     - name: Internal DNS workaround - generate /etc/hosts file content
@@ -18,9 +19,25 @@
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
 
+- name: nrel-proto fixes - remove multiple routes
+  hosts:
+    - cluster
+  become: true
+  gather_facts: false
+  tags: routes
+  tasks:
+    - command:
+        cmd: "ip route del {{ item }}"
+      loop:
+        - "default via 10.0.0.1 dev eth0 proto dhcp metric 100"
+        - "default via 10.0.1.1 dev eth1 proto dhcp metric 101"
+      register: ip_route
+      failed_when: ip_route.rc not in [0, 2]
+
 - name: nrel-proto fixes - compute nodes
   hosts: compute
   become: true
+  gather_facts: false
   tasks:
     - name: Create scratch directory - should be on local SSD on real cluster
       file:
