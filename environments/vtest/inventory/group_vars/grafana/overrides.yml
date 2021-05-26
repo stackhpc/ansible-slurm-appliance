@@ -2,6 +2,3 @@ grafana_auth:
   anonymous:
     org_name: "Main Org."
     org_role: Viewer
-
-grafana_address: 0.0.0.0
-

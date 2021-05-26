@@ -21,7 +21,7 @@ login_names = {
 
 proxy_name = "login-1"
 
-cluster_name  = "vs" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+cluster_name  = "xx" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 key_pair = "slurmdeploy"
 
 external_network = "external"
@@ -39,4 +39,6 @@ control_image = "CentOS8.3"
 compute_image = "CentOS8.3"
 
 control_flavor = "gen.c16m32s32"
+
+#TODO: gpu image option
 

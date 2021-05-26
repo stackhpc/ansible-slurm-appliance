@@ -1,0 +1,11 @@
+---
+  - hosts: login
+    tasks:
+            
+      - name: "test debug"
+        debug: 
+          msg: "post - we got here" 
+
+# host_group == login
+# - hosts: login#
+
