@@ -8,7 +8,6 @@ compute_names = {
 }
 login_names = {
     login-0: "general.v1.small"
-    login-1: "general.v1.small"
 }
 proxy_name = "login-0"
 
