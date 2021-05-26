@@ -1,7 +1,12 @@
+variable "compute_types" {
+    type = map
+    description = "Mapping defining types of compute nodes: key->(str) name of type, value->mapping {flavor: flavor_name image: image_name_or_id }"
+}
+
 variable "compute_names" {
     type = map(string)
     default = {}
-    description = "Mapping of names -> flavor type for compute nodes (Note hostnames will be be prefixed with cluster_name)"
+    description = "Mapping of compute node name -> key in compute_types (Note nodenames are prefixed with cluster_name to make hostnames)"
 }
 
 variable "proxy_name" {
@@ -110,9 +115,10 @@ variable "control_image" {
     description = "Name of image for compute node"
 }
 
-variable "compute_image" {
-    type = string
-    description = "Name of image for compute node(s)"
+variable "compute_images" {
+    type = map(string)
+    default = {}
+    description = "Mapping to override compute images from compute_types: key->node name value->image name"
 }
 
 variable "cluster_network_cidr" {
