@@ -23,6 +23,13 @@ resource "openstack_networking_port_v2" "control_cluster" {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
   }
+  
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "control_storage" {
@@ -38,6 +45,13 @@ resource "openstack_networking_port_v2" "control_storage" {
   binding {
     vnic_type = var.storage_network_vnic_type
     profile = jsonencode(var.storage_network_profile)
+  }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
   }
 }
 
@@ -55,8 +69,14 @@ resource "openstack_networking_port_v2" "control_control" {
     vnic_type = var.control_network_vnic_type
     profile = jsonencode(var.control_network_profile)
   }
-}
 
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
+}
 
 resource "openstack_compute_instance_v2" "control" {
   
@@ -99,6 +119,13 @@ resource "openstack_networking_port_v2" "login_cluster" {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
   }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "login_storage" {
@@ -117,6 +144,13 @@ resource "openstack_networking_port_v2" "login_storage" {
     vnic_type = var.storage_network_vnic_type
     profile = jsonencode(var.storage_network_profile)
   }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "login_control" {
@@ -134,6 +168,13 @@ resource "openstack_networking_port_v2" "login_control" {
   binding {
     vnic_type = var.control_network_vnic_type
     profile = jsonencode(var.control_network_profile)
+  }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
   }
 }
 
@@ -180,6 +221,13 @@ resource "openstack_networking_port_v2" "compute_cluster" {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
   }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "compute_storage" {
@@ -197,6 +245,13 @@ resource "openstack_networking_port_v2" "compute_storage" {
   binding {
     vnic_type = var.storage_network_vnic_type
     profile = jsonencode(var.storage_network_profile)
+  }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
   }
 }
 
@@ -216,7 +271,15 @@ resource "openstack_networking_port_v2" "compute_control" {
     vnic_type = var.control_network_vnic_type
     profile = jsonencode(var.control_network_profile)
   }
+
+  # don't overrite os-vif adding chosen PCI device
+  lifecycle {
+    ignore_changes = [
+      binding,
+    ]
+  }
 }
+
 
 resource "openstack_compute_instance_v2" "computes" {
 
@@ -229,37 +292,37 @@ resource "openstack_compute_instance_v2" "computes" {
   config_drive = true
 
   network {
+    port = openstack_networking_port_v2.compute_control[each.key].id
+  }
+
+  network {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
+    access_network = true
   }
   
   network {
     port = openstack_networking_port_v2.compute_storage[each.key].id
   }
 
-  network {
-    port = openstack_networking_port_v2.compute_control[each.key].id
-    access_network = true
-  }
-
 }
 
 # --- floating ips ---
 
-// resource "openstack_networking_floatingip_v2" "logins" {
+resource "openstack_networking_floatingip_v2" "logins" {
 
-//   for_each = var.login_names
+  for_each = var.login_names
 
-//   pool = data.openstack_networking_network_v2.external.name
-// }
+  pool = data.openstack_networking_network_v2.external.name
+}
 
-// resource "openstack_compute_floatingip_associate_v2" "logins" {
-//   for_each = var.login_names
+resource "openstack_compute_floatingip_associate_v2" "logins" {
+  for_each = var.login_names
 
-//   floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
-//   instance_id = openstack_compute_instance_v2.logins[each.key].id
-//    # networks are zero-indexed
-//   fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
-// }
+  floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
+  instance_id = openstack_compute_instance_v2.logins[each.key].id
+   # networks are zero-indexed
+  fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
+}
 
 # --- template ---
 
@@ -268,7 +331,7 @@ resource "local_file" "hosts" {
   content  = templatefile("${path.module}/inventory.tpl",
                           {
                             "cluster_name": var.cluster_name
-                            // "proxy_fip": openstack_networking_floatingip_v2.logins[var.proxy_name].address
+                            "proxy_fip": openstack_networking_floatingip_v2.logins[var.proxy_name].address
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,
