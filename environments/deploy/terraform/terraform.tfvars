@@ -57,13 +57,15 @@ compute_names = {
   gpu-0001: "gpu"
   gpu-0002: "gpu"
   gpu-0003: "gpu"
-  gpu-0004: "gpu"
 
 }
+
 login_names = {
   login-1: "gen.c8m16s16"
   login-2: "gen.c8m16s16"
 }
+
+login_image = "CentOS8.3_login"
 
 proxy_name = "login-1"
 
@@ -82,9 +84,8 @@ storage_subnet = "storage"
 control_network = "control"
 control_subnet = "control-subnet"
 
-login_image = "CentOS8.3_login"
 control_image = "CentOS8.3"
-compute_images = {} # allows overrides for specific nodes, by name
-
 control_flavor = "gen.c16m32s32"
+
+compute_images = {} # allows overrides for specific nodes, by name
 
