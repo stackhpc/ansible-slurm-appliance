@@ -63,6 +63,7 @@ compute_names = {
 login_names = {
   login-1: "gen.c8m16s16"
   login-2: "gen.c8m16s16"
+  admin:   "gen.c8m16s16"
 }
 
 login_image = "CentOS8.3_login"
