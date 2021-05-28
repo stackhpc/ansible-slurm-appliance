@@ -17,34 +17,62 @@ compute_types = {
   }
   gpu: {
     flavor: "gpu.c30m120s32e6000"
-    image: "CentOS8.3"
+    image: "CentOS8.3_ofed+cuda.v2"
   }
 }
 
 compute_names = {
   lg-0001: "large"
   lg-0002: "large"
+  lg-0003: "large"
+  lg-0004: "large"
 
   std-0001: "standard"
   std-0002: "standard"
+  std-0003: "standard"
+  std-0004: "standard"
+  std-0005: "standard"
+  std-0006: "standard"
+  std-0007: "standard"
+  std-0008: "standard"
 
   sm-0001: "small"
   sm-0002: "small"
+  sm-0003: "small"
+  sm-0004: "small"
+  sm-0005: "small"
+  sm-0006: "small"
+  sm-0007: "small"
+  sm-0008: "small"
 
   t-0001: "tiny"
   t-0002: "tiny"
+  t-0003: "tiny"
+  t-0004: "tiny"
+  t-0005: "tiny"
+  t-0006: "tiny"
+  t-0007: "tiny"
+  t-0008: "tiny"
 
   gpu-0001: "gpu"
+  gpu-0002: "gpu"
+  gpu-0003: "gpu"
 
 }
+
 login_names = {
   login-1: "gen.c8m16s16"
   login-2: "gen.c8m16s16"
+  admin:   "gen.c8m16s16"
 }
+
+login_image = "CentOS8.3_login"
 
 proxy_name = "login-1"
 
-cluster_name  = "vs" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+cluster_name  = "vs"
+# don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+
 key_pair = "slurmdeploy"
 
 external_network = "external"
@@ -57,9 +85,8 @@ storage_subnet = "storage"
 control_network = "control"
 control_subnet = "control-subnet"
 
-login_image = "CentOS8.3_login"
 control_image = "CentOS8.3"
-compute_images = {} # allows overrides for specific nodes, by name
-
 control_flavor = "gen.c16m32s32"
+
+compute_images = {} # allows overrides for specific nodes, by name
 
