@@ -14,18 +14,11 @@ ${compute.name} ansible_host=${compute.network[0].fixed_ip_v4} server_networks='
 [${cluster_name}_compute:vars]
 ansible_ssh_common_args='-o ProxyCommand="ssh centos@${login.network[0].fixed_ip_v4} -W %h:%p"'
 
-[cluster_login:children]
+[login:children]
 ${cluster_name}_login
 
-# NOTE: This is hardcoded in the tests role
-[cluster_compute:children]
-${cluster_name}_compute
-
-[login:children]
-cluster_login
-
 [compute:children]
-cluster_compute
+${cluster_name}_compute
 
 [cluster:children]
 login
