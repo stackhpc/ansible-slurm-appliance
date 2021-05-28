@@ -17,7 +17,7 @@ compute_types = {
   }
   gpu: {
     flavor: "gpu.c30m120s32e6000"
-    image: "CentOS8.3_ofed+cuda"
+    image: "CentOS8.3_ofed+cuda.v2"
   }
 }
 
