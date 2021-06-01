@@ -293,11 +293,11 @@ resource "openstack_compute_instance_v2" "computes" {
 
   network {
     port = openstack_networking_port_v2.compute_control[each.key].id
+    access_network = true
   }
 
   network {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
-    access_network = true
   }
   
   network {
