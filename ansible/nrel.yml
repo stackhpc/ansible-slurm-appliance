@@ -1,0 +1,19 @@
+---
+
+- name: sync_slurm_allocations install
+  hosts: vs-admin
+  become: true
+  tags:
+    - sync_slurm_allocations
+  tasks:
+    - include_role:
+        name: sync_slurm_allocations
+
+- name: cluster_config_manager install
+  hosts: vs-admin
+  become: true
+  tags:
+    - cluster_config_manager
+  tasks:
+    - include_role:
+        name: cluster_config_manager

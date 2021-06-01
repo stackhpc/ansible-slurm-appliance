@@ -1,0 +1,56 @@
+---
+openhpc_slurm_service_enabled: true
+openhpc_slurm_service_started: "{{ openhpc_slurm_service_enabled }}"
+openhpc_slurm_service:
+openhpc_slurm_control_host: "{{ inventory_hostname }}"
+openhpc_slurm_partitions: []
+openhpc_cluster_name:
+openhpc_packages:
+  - slurm-libpmi-ohpc
+openhpc_drain_timeout: 86400
+openhpc_resume_timeout: 300
+openhpc_retry_delay: 10
+openhpc_job_maxtime: 24:00:00
+
+# Accounting
+openhpc_slurm_accounting_storage_host: "{{ openhpc_slurmdbd_host }}"
+openhpc_slurm_accounting_storage_port: 6819
+openhpc_slurm_accounting_storage_type: accounting_storage/none
+# NOTE: You only need to set these if using accounting_storage/mysql
+openhpc_slurm_accounting_storage_user: slurm
+#openhpc_slurm_accounting_storage_pass:
+
+# Job accounting
+openhpc_slurm_job_acct_gather_type: jobacct_gather/linux
+openhpc_slurm_job_acct_gather_frequency: 30
+openhpc_slurm_job_comp_type: jobcomp/none
+openhpc_slurm_job_comp_loc: /var/log/slurm_jobacct.log
+
+# slurmdbd configuration
+openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
+openhpc_slurmdbd_port: "{{ openhpc_slurm_accounting_storage_port }}"
+openhpc_slurmdbd_mysql_host: "{{ openhpc_slurm_control_host }}"
+openhpc_slurmdbd_mysql_database: slurm_acct_db
+#openhpc_slurmdbd_mysql_password:
+openhpc_slurmdbd_mysql_username: slurm
+
+openhpc_enable:
+  control: false
+  batch: false
+  database: false
+  runtime: false
+  drain: false
+  resume: false
+ohpc_slurm_services:
+  control: slurmctld
+  batch: slurmd
+ohpc_release_repos:
+  "7": "https://github.com/openhpc/ohpc/releases/download/v1.3.GA/ohpc-release-1.3-1.el7.x86_64.rpm" # ohpc v1.3 for Centos 7
+  "8": "http://repos.openhpc.community/OpenHPC/2/CentOS_8/x86_64/ohpc-release-2-1.el8.x86_64.rpm" # ohpc v2 for Centos 8
+openhpc_slurm_configless: false
+openhpc_munge_key:
+openhpc_login_only_nodes: ''
+openhpc_module_system_install: true
+
+# Auto detection
+openhpc_ram_multiplier: 0.95
