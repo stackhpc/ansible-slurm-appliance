@@ -36,3 +36,6 @@ login
 
 [update:children]
 cluster
+
+[rebuild:children]
+openhpc
