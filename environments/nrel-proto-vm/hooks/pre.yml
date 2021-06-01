@@ -9,7 +9,7 @@
       # which interface is used as ansible_host is defined by terraform (see `access_network`) so this is deterministic for multi-rail hosts
       set_fact:
         etc_hosts_content: |
-          {% for host in groups['cluster'] %}{{ hostvars[host]['ansible_host'] }} {{ host }}.novalocal {{ host }}
+          {% for host in (groups['cluster'] | difference(groups['builder'])) %}{{ hostvars[host]['ansible_host'] }} {{ host }}.novalocal {{ host }}
           {% endfor %}
       run_once: true
     - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
@@ -36,6 +36,10 @@
         cmd: "ip route del {{ item }}"
       loop: "{{ ip_route_show.stdout_lines }}"
       when: "'default via 192.68.67.1' not in item"
+    - name: Restart NetworkManager # this replaces the deleted default route in the packer VM
+      systemd:
+        state: restarted
+        name: NetworkManager.service
 
 - name: nrel-proto fixes - compute nodes
   hosts: compute
