@@ -35,11 +35,9 @@
       command:
         cmd: "ip route del {{ item }}"
       loop: "{{ ip_route_show.stdout_lines }}"
-      when: "'default via 192.68.67.1' not in item"
-    - name: Restart NetworkManager # this replaces the deleted default route in the packer VM
-      systemd:
-        state: restarted
-        name: NetworkManager.service
+      when:
+        - "'default via 192.68.67.1' not in item"
+        - "'default via 10.0.2.2' not in item" # packer
 
 - name: nrel-proto fixes - compute nodes
   hosts: compute
