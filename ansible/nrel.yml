@@ -1,19 +1,30 @@
 ---
 
-- name: sync_slurm_allocations install
+- name: sync_slurm_allocations install on admin node
   hosts: vs-admin
   become: true
   tags:
-    - sync_slurm_allocations
+    - sync_slurm_allocations_admin
   tasks:
     - include_role:
         name: sync_slurm_allocations
 
-- name: cluster_config_manager install
+- name: cluster_config_manager install on admin node
   hosts: vs-admin
   become: true
   tags:
-    - cluster_config_manager
+    - cluster_config_manager_admin
   tasks:
     - include_role:
         name: cluster_config_manager
+
+- name: cluster_config_manager pull script on compute nodes
+  hosts: compute
+  become: true
+  tags:
+    - cluster_config_manager_compute
+  tasks:
+    - include_role:
+        name: cluster_config_manager
+  vars:
+    is_compute_node: True
