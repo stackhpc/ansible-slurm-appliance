@@ -1,0 +1,1 @@
+openhpc_rebuild_clouds: /home/centos/nrel-slurm-app/environments/nrel-proto-vm/inventory/group_vars/rebuild/clouds.yaml
