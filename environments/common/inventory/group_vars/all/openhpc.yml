@@ -18,6 +18,6 @@ openhpc_slurm_partitions:
 openhpc_packages:
   - slurm-libpmi-ohpc
   - wget
-slurm_munge_key: "{{ secrets_openhpc_mungekey }}"
+openhpc_munge_key: "{{ secrets_openhpc_mungekey | b64decode }}"
 openhpc_slurm_configless: true
 openhpc_login_only_nodes: login
