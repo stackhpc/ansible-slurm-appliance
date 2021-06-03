@@ -17,7 +17,13 @@ variable "disk_size" {
   default = "20G"
 }
 
-source "qemu" "openhpc-compute" {
+# Groups (as well as 'builder') to add packer VM to - controls which image is built
+variable "groups" {
+  type = list(string)
+  default = ["compute"]
+}
+
+source "qemu" "openhpc-vm" {
   iso_url = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2"
   iso_checksum = "sha256:d8984b9baee57b127abce310def0f4c3c9d5b3cea7ea8451fc4ffcbc9935b640"
   disk_image = true # as above is .qcow2 not .iso
@@ -39,16 +45,16 @@ source "qemu" "openhpc-compute" {
     ["-m", "896M"],
     ["-cdrom", "config-drive.iso"]
     ]
-  vm_name          = "ohpc-compute.qcow2" # image name
+  vm_name          = "ohpc-${var.groups[0]}-${local.timestamp}.qcow2" # image name
   shutdown_command = "sudo shutdown -P now"
 }
 
 build {
-  sources = ["source.qemu.openhpc-compute"]
+  sources = ["source.qemu.openhpc-vm"]
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
     host_alias = "packer"
-    groups = ["compute", "builder"]
+    groups = concat(["builder"], var.groups)
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     # TODO: use completely separate inventory, which just shares common? This will ensure
