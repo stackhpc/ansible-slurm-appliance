@@ -39,6 +39,17 @@
         - "'default via 192.68.67.1' not in item"
         - "'default via 10.0.2.2' not in item" # packer
 
+- name: add centos 8.3 vault repo
+  hosts: cluster
+  become: true
+  gather_facts: false
+  tasks:
+    - yum_repository:
+        name: vault
+        file: CentOS-Linux-Vault8.3
+        description:  CentOS 8.3 packages from Vault
+        baseurl: https://vault.centos.org/8.3.2011/BaseOS/$basearch/os/
+        
 - name: nrel-proto fixes - compute nodes
   hosts: compute
   become: true
