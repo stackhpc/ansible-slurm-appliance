@@ -15,6 +15,12 @@
   tags:
     - openhpc
   tasks:
+    - name: Add CentOS 8.3 Vault repo for OpenHPC hwloc dependency
+      yum_repository:
+        name: vault
+        file: CentOS-Linux-Vault8.3
+        description:  CentOS 8.3 packages from Vault
+        baseurl: https://vault.centos.org/8.3.2011/BaseOS/$basearch/os/
     - import_role:
         name: stackhpc.openhpc
 
