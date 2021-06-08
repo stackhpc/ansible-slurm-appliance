@@ -32,4 +32,5 @@ collections:
 - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
   type: git
   version: main
+- name: openstack.cloud
 ...
