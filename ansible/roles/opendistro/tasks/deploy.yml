@@ -1,11 +1,4 @@
 ---
-- name: Setup volume for opendistro
-  containers.podman.podman_volume:
-    state: present
-    name: opendistro
-  become: true
-  become_user: "{{ opendistro_podman_user }}"
-  notify: Restart opendistro container
 
 - name: Create systemd unit file
   template:
