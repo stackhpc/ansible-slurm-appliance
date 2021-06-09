@@ -39,8 +39,7 @@ login
 [update:children]
 cluster
 
-[os_manila:children]
-cluster
+# NB: [os_manila] not defined here as this template is used in CI, which does not run in openstack
 
 [openstack:children]
 localhost
