@@ -19,26 +19,6 @@
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
 
-- name: nrel-proto fixes - remove multiple routes
-  hosts:
-    - cluster
-  become: true
-  gather_facts: false
-  tags: routes
-  tasks:
-    - name: Get default routes
-      shell:
-        cmd: "ip route | grep default"
-      register: ip_route_show
-      changed_when: false
-    - name: Delete uneeded defaults
-      command:
-        cmd: "ip route del {{ item }}"
-      loop: "{{ ip_route_show.stdout_lines }}"
-      when:
-        - "'default via 192.68.67.1' not in item"
-        - "'default via 10.0.2.2' not in item" # packer
-
 - name: add centos 8.3 vault repo
   hosts: cluster
   become: true
@@ -49,7 +29,7 @@
         file: CentOS-Linux-Vault8.3
         description:  CentOS 8.3 packages from Vault
         baseurl: https://vault.centos.org/8.3.2011/BaseOS/$basearch/os/
-        
+
 - name: nrel-proto fixes - compute nodes
   hosts: compute
   become: true
