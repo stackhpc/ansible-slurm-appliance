@@ -1,7 +1,9 @@
 ---
 roles:
   - src: stackhpc.nfs
-  - src: stackhpc.openhpc
+  - name: stackhpc.openhpc
+    src: https://github.com/stackhpc/ansible-role-openhpc
+    version: e3a9d3ed4b34243ea75f31a285cca792a43ca4a0
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
   - src: cloudalchemy.prometheus
