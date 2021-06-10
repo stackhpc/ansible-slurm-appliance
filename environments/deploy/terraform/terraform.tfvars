@@ -180,6 +180,12 @@ login_names = {
   admin:   "gen.c8m16s16"
 }
 
+login_ips = {
+  login-1: "10.60.105.223"
+  login-2: "10.60.106.225"
+  admin: "10.60.105.50"
+}
+
 login_image = "CentOS8.3_login"
 
 proxy_name = "login-1"

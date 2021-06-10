@@ -163,6 +163,7 @@ resource "openstack_networking_port_v2" "login_control" {
 
   fixed_ip {
     subnet_id = data.openstack_networking_subnet_v2.control.id
+    ip_address = var.login_ips[each.key]
   }
 
   binding {
