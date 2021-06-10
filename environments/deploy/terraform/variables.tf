@@ -105,6 +105,11 @@ variable "login_image" {
     description = "Name of image for login node(s)"
 }
 
+variable "login_ips" {
+    type = map
+    description = "Map of login names -> IPs on control network"
+}
+
 variable "control_flavor" {
     type = string
     description = "Name of instance flavor for control node"
