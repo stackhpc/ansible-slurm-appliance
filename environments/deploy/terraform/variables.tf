@@ -107,7 +107,7 @@ variable "login_image" {
 
 variable "login_ips" {
     type = map
-    description = "Map of login names -> IPs on control network"
+    description = "Map of login names -> floating IP"
 }
 
 variable "control_flavor" {
@@ -124,6 +124,11 @@ variable "compute_images" {
     type = map(string)
     default = {}
     description = "Mapping to override compute images from compute_types: key ->(str) node name, value -> (str) image name"
+}
+
+variable "control_ip" {
+    type = string
+    description = "Floating IP for slurm control node"
 }
 
 variable "cluster_network_cidr" {

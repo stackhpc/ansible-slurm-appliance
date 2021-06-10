@@ -174,6 +174,7 @@ control_subnet = "control-subnet"
 
 control_image = "CentOS8.3"
 control_flavor = "gen.c16m32s32"
+control_ip = "10.60.106.230"
 
 compute_images = {} # allows overrides for specific nodes, by name
 
