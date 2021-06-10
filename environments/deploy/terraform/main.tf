@@ -163,6 +163,7 @@ resource "openstack_networking_port_v2" "login_control" {
 
   fixed_ip {
     subnet_id = data.openstack_networking_subnet_v2.control.id
+    ip_address = var.login_ips[each.key]
   }
 
   binding {
@@ -322,6 +323,19 @@ resource "openstack_compute_floatingip_associate_v2" "logins" {
   instance_id = openstack_compute_instance_v2.logins[each.key].id
    # networks are zero-indexed
   fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
+}
+
+resource "openstack_networking_floatingip_v2" "control" {
+
+  pool = data.openstack_networking_network_v2.external.name
+}
+
+resource "openstack_compute_floatingip_associate_v2" "control" {
+  
+  floating_ip = openstack_networking_floatingip_v2.control.address
+  instance_id = openstack_compute_instance_v2.control.id
+   # networks are zero-indexed
+  fixed_ip = openstack_compute_instance_v2.control.network.2.fixed_ip_v4
 }
 
 # --- template ---
