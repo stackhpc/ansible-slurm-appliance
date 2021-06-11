@@ -153,11 +153,11 @@ login_ips = {
   admin: "10.60.105.50"
 }
 
-login_image = "CentOS8.3_login"
+login_image = "c83_login.v2"
 
 proxy_name = "login-1"
 
-cluster_name  = "vs"
+cluster_name  = "vermilion"
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 
 key_pair = "slurmdeploy"
