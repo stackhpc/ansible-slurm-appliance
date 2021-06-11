@@ -13,6 +13,8 @@ openhpc_packages:
   - wget
   - xz
   - zstd
+  - tmux
+  - vim
 
 openhpc_slurm_partitions:
   - name: "sm"
