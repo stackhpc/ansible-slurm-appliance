@@ -36,5 +36,4 @@ openhpc_slurm_partitions:
 slurm_conf_extraparams:
 # Additional parameters to set in slurm.conf - list of [parameter, value] pairs
   - ['LaunchParameters', 'use_interactive_step']
-  #- ['InteractiveStepOptions', '<whatever>'] # TODO: FIXME:
-  - ['FirstJobId', 15000000]
+  - ['FirstJobId', 50000000]
