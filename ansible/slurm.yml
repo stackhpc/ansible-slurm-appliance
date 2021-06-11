@@ -16,6 +16,7 @@
     - openhpc
   tasks:
     - name: Add CentOS 8.3 Vault repo for OpenHPC hwloc dependency
+      # NB: REMOVE THIS once OpenHPC works on CentOS 8.4
       yum_repository:
         name: vault
         file: CentOS-Linux-Vault8.3
