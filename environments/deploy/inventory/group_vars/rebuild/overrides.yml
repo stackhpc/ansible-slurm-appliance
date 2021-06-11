@@ -1,0 +1,1 @@
+openhpc_rebuild_clouds: environments/deploy/inventory/group_vars/rebuild/clouds.yaml
