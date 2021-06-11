@@ -24,6 +24,10 @@ roles:
     src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
     type: git
     version: feature/generic_for_vermilion
+  - name: pam_mkhomedir_plus
+    src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
+    type: git
+    version: feature/ansible-galaxy
 
   # - name: stig-hardening
   #   src: git+git@github.nrel.gov:hpc/stig-hardening.git

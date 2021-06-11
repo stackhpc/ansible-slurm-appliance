@@ -37,3 +37,12 @@
   tasks:
     - include_role:
         name: cluster_dataset_manager
+
+- name: pam_mkhomedir_plus
+  hosts: login:!vs-admin
+  become: true
+  tags:
+    - pam_mkhomedir_plus
+  tasks:
+    - include_role:
+        name: pam_mkhomedir_plus
