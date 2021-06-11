@@ -1,7 +1,19 @@
 openhpc_packages:
   - slurm-libpmi-ohpc
-  - wget
+  - bzip2
+  - curl
+  - git
   - gnu9-compilers-ohpc
+  - gzip
+  - make
+  - patch
+  - python3
+  - tar
+  - unzip
+  - wget
+  - xz
+  - zstd
+
 openhpc_slurm_partitions:
   - name: "sm"
     default: NO
