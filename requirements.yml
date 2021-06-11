@@ -20,6 +20,10 @@ roles:
     src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
     type: git
     version: feature/galaxy-role-install
+  - name: cluster_dataset_manager
+    src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
+    type: git
+    version: feature/generic_for_vermilion
 
   # - name: stig-hardening
   #   src: git+git@github.nrel.gov:hpc/stig-hardening.git

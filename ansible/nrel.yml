@@ -28,3 +28,12 @@
         name: cluster_config_manager
   vars:
     is_compute_node: True
+
+- name: cluster_dataset_manager create project directories
+  hosts: vs-admin
+  become: true
+  tags:
+    - cluster_dataset_manager
+  tasks:
+    - include_role:
+        name: cluster_dataset_manager
