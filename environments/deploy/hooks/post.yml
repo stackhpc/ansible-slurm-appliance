@@ -55,3 +55,12 @@
   tasks:
     - include_role:
         name: vstack_admin_config
+
+- name: slurm_lex_accounting
+  hosts: vs-control
+  become: true
+  tags:
+    - slurm_lex_accounting
+  tasks:
+    - include_role:
+        name: slurm_lex_accounting
