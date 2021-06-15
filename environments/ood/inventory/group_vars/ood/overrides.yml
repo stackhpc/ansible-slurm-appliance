@@ -1,0 +1,144 @@
+---
+#sssd_allow_groups: hpc-admins
+servername: 10.60.253.87
+# httpd_use_rewrites: false
+httpd_port: 80
+#ssl:
+#  - 'SSLCertificateFile "{{ ood_ssl_cert_file }}"'
+#  - 'SSLCertificateKeyFile "{{ ood_ssl_cert_file_key }}"'
+#  - 'SSLCipherSuite AES256+EECDH:AES256+EDH:AES128+EECDH:AES128+EDH'
+#  - 'SSLProtocol -ALL -SSLv3 +TLSv1.2'
+#  - 'SSLHonorCipherOrder on'
+#  - 'SSLStrictSNIVHostCheck off'
+#  - 'SSLCompression off'
+#  - 'SSLOptions +FakeBasicAuth +ExportCertData +StrictRequire'
+#  - 'Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"'
+#  - 'Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure'
+#  - 'Header always set X-Frame-Options SAMEORIGIN'
+
+#httpd_auth:
+#  - 'AuthType openid-connect'
+#  - 'Require valid-user'
+
+#install_ondemand_dex: true
+#dex_settings: |
+#  dex:
+#    connectors:
+#      - type: ldap
+#        id: um6p
+#        name: UM6P AD
+#        config:
+#          host: prdadum6p-01.um6p.local:636
+#          insecureSkipVerify: false
+#          bindDN: {{ sssd_bind_user }}
+#          bindPW: {{ sssd_bind_password }}
+#          userSearch:
+#            baseDN: DC=UM6P,DC=local
+#            filter: "(memberOf=CN=HPC-Users,OU=HPC,OU=UM6P,DC=UM6P,DC=local)"
+#            username: sAMAccountName
+#            idAttr: sAMAccountName
+#            emailAttr: sAMAccountName
+#            nameAttr: sAMAccountName
+#            preferredUsernameAttr: sAMAccountName
+#          groupSearch:
+#            baseDN: DC=UM6P,DC=local
+#            filter: "(objectClass=group)"
+#            userMatchers:
+#              - userAttr: DN
+#                groupAttr: member
+#            nameAttr: cn
+#    frontend:
+#      dir: /usr/share/ondemand-dex/web
+#      extra:
+#        loginButtonText: "Log in with your UM6P account"
+
+# TODO(gb637) remove this when we get rid of self-signed certificates
+#ood_auth_openidc:
+#  OIDCSSLValidateServer: Off
+
+oidc_uri: /oidc
+node_uri: /node
+rnode_uri: /rnode
+
+clusters:
+  slurm: # TODO(gb637) make {{ openhpc_cluster_name }} interporlation work here
+    v2:
+      metadata:
+        title: ASCC
+      login:
+        host: 10.60.253.76 # "{{ openhpc_cluster_name }}-login-0"
+      job:
+        adapter: slurm
+        cluster: "{{ openhpc_cluster_name }}"
+      batch_connect:
+        basic:
+          script_wrapper: |
+            module purge
+            %s
+          set_host: host=$(hostname -s)
+        vnc:
+          script_wrapper: |
+            module purge
+            export PATH=/opt/TurboVNC/bin:$PATH
+            export WEBSOCKIFY_CMD=/bin/websockify
+
+            # Workaround to avoid "Unable to contact settings server" when
+            # lauching xfce4-session
+            xfce4-session() { /bin/dbus-launch /bin/xfce4-session $@ ; }
+            export -f xfce4-session
+            %s
+          set_host: host=$(hostname -s)
+
+ood_apps:
+  bc_desktop:
+    title: Remote Desktop
+    description: |
+      Request a desktop to run GUI applications.
+    cluster: slurm
+    form:
+      - desktop
+      - bc_account
+      - bc_queue
+      - bc_num_hours
+      - num_cores
+      - bc_email_on_started
+      - bc_num_slots
+      - node
+    attributes:
+      desktop: xfce
+      bc_account:
+        value: root
+      bc_queue:
+        value: compute
+      num_cores:
+        min: 1
+      node: ""
+    submit: |
+      ---
+      script:
+        native:
+          - <%= "--nodes=#{bc_num_slots}" %>
+          - <%= "--ntasks=#{num_cores}" %>
+          - <%= "--nodelist=#{node}" %>
+
+  dashboard:
+    env:
+      motd_path: /etc/motd
+      motd_format: markdown
+      ood_dashboard_support_url: mailto:support-hpc@um6p.ma
+      ood_dashboard_docs_url: https://crc4.gitlab.io/um6p/operations/um6p-sysops
+      ood_brand_bg_color: "#0e6ec8"
+      ood_dashboard_title: ASCC
+      ood_dashboard_logo: /public/ondemand/logo.png
+      ood_dashboard_headr_img_logo: /public/ondemand/logo.png
+      ood_dashboard_logo_height: 200px
+
+  files:
+    env:
+      ood_shell: ""
+
+  shell:
+    env:
+      ood_shell_origin_check: "off" # "http://{{ servername }}"
+
+user_map_cmd: "/opt/ood/ood_auth_map/bin/ood_auth_map.regex"

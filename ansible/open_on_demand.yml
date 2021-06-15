@@ -1,0 +1,13 @@
+---
+- name: Setup Open OnDemand
+  hosts: ood
+  become: true
+  vars:
+    um6p_hpc_admin_gid: 1853010534
+    servername: "{{ ansible_host }}"
+  tags:
+    - open_ondemand
+    - ood
+  tasks:
+    - include_role:
+        name: osc.ood
