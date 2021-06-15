@@ -47,6 +47,15 @@
     - include_role:
         name: pam_mkhomedir_plus
 
+- name: slurm_lex_accounting
+  hosts: vs-control
+  become: true
+  tags:
+    - slurm_lex_accounting
+  tasks:
+    - include_role:
+        name: slurm_lex_accounting
+
 - name: vstack_admin_config
   hosts: vs-admin
   become: true
@@ -56,11 +65,12 @@
     - include_role:
         name: vstack_admin_config
 
-- name: slurm_lex_accounting
-  hosts: vs-control
+- name: vstack_common_config
+  hosts: vs-admin:vs-control:login:compute
   become: true
   tags:
-    - slurm_lex_accounting
+    - vstack_common_config
   tasks:
     - include_role:
-        name: slurm_lex_accounting
+        name: vstack_common_config
+
