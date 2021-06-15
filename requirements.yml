@@ -30,6 +30,9 @@ roles:
     src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
     type: git
     version: feature/ansible-galaxy
+  - name: vstack_admin_config
+    src: git+git@github.nrel.gov:hpc/vstack_admin_config.git
+    type: git
 
   # - name: stig-hardening
   #   src: git+git@github.nrel.gov:hpc/stig-hardening.git

@@ -46,3 +46,12 @@
   tasks:
     - include_role:
         name: pam_mkhomedir_plus
+
+- name: vstack_admin_config
+  hosts: vs-admin
+  become: true
+  tags:
+    - vstack_admin_config
+  tasks:
+    - include_role:
+        name: vstack_admin_config
