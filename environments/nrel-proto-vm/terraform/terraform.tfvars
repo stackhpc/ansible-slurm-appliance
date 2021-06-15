@@ -26,6 +26,7 @@ login_names = {
 proxy_name = "login-0"
 
 cluster_name  = "test" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+cluster_slurm_name = "vermilion" # as above
 key_pair = "centos_at_nrel-deploy-vm"
 
 cluster_network = "compute"

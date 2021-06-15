@@ -1,6 +1,6 @@
 [all:vars]
 ansible_user=centos
-openhpc_cluster_name=${cluster_name}
+openhpc_cluster_name=${cluster_slurm_name}
 ansible_ssh_common_args='-o ProxyCommand="ssh centos@${proxy_fip} -W %h:%p"'
 
 [control]
@@ -17,19 +17,19 @@ ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.acc
 %{ endfor ~}
 
 ## Define groups for slurm parititions:
-[${cluster_name}_lg] 
+[${cluster_slurm_name}_lg] 
 ${cluster_name}-lg-[0001:0008]
 
-[${cluster_name}_std]
+[${cluster_slurm_name}_std]
 ${cluster_name}-std-[0001:0040]
 
-[${cluster_name}_sm]
+[${cluster_slurm_name}_sm]
 ${cluster_name}-sm-[0001:0040]
 
-[${cluster_name}_t]
+[${cluster_slurm_name}_t]
 ${cluster_name}-t-[0001:0015]
 
-[${cluster_name}_gpu]
+[${cluster_slurm_name}_gpu]
 ${cluster_name}-gpu-[0001:0006]
 
 

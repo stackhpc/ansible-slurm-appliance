@@ -25,6 +25,11 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources"
 }
 
+variable "cluster_slurm_name" {
+    type = string
+    description = "Name for cluster in Slurm"
+}
+
 variable "cluster_network" {
     type = string
     description = "Name of pre-existing vnet to use for cluster"

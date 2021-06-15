@@ -1,6 +1,6 @@
 [all:vars]
 ansible_user=centos
-openhpc_cluster_name=${cluster_name}
+openhpc_cluster_name=${cluster_slurm_name}
 
 [control]
 ${control.name} ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}'
@@ -16,8 +16,8 @@ ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.acc
 %{ endfor ~}
 
 # Define groups for slurm parititions:
-[${cluster_name}_sm]
+[${cluster_slurm_name}_sm]
 ${cluster_name}-sm-00[1:2]
 
-[${cluster_name}_ty]
+[${cluster_slurm_name}_ty]
 ${cluster_name}-ty-00[1:2]
