@@ -6,12 +6,13 @@
 nfs_server_default: "{{ hostvars[groups['control'] | first ].internal_address }}"
 
 nfs_configurations:
-  - nfs_enable:
+  - comment: Export HOME from Slurm control node
+    nfs_enable:
         server:  "{{ inventory_hostname in groups['control'] }}"
         # Don't mount share on server where it is exported from...
         # Could do something like nfs_clients: '"nfs_servers" not in group_names' instead.
         # See also constructed inventory: https://docs.ansible.com/ansible/devel/collections/ansible/builtin/constructed_inventory.html
         clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
     nfs_server: "{{ nfs_server_default }}"
-    nfs_export: "/mnt/nfs/"
-    nfs_client_mnt_point: "/mnt/nfs/"
+    nfs_export: "/home"
+    nfs_client_mnt_point: "/home"
