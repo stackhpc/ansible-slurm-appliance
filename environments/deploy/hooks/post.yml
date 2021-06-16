@@ -55,6 +55,9 @@
   tasks:
     - include_role:
         name: slurm_lex_accounting
+  vars:
+    slurm_lex_accounting_dev: True
+    slurm_lex_accounting_clustername: vermilion
 
 - name: vstack_admin_config
   hosts: vs-admin
