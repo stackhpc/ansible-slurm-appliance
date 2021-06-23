@@ -1,0 +1,14 @@
+
+resource "openstack_compute_instance_v2" "control" {
+  
+  name = "${var.cluster_name}-control"
+  image_name = var.control_image
+  flavor_name = var.control_flavor
+  key_pair = var.key_pair
+  config_drive = true
+
+  network {
+    uuid = openstack_networking_network_v2.cluster_net.id
+  }
+
+}
