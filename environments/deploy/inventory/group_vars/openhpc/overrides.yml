@@ -38,13 +38,13 @@ slurm_conf_extraparams:
   - ['LaunchParameters', 'use_interactive_step']
   - ['FirstJobId', 50000000]
 
-  - ['MpiDefault', "pmi2"]    ### get the launcher to work! pmi1, pmi2, or pmix
-  # spack mpi drivers were a mis-match... is this working now????
+  ### - ['MpiDefault', "pmi2"]    ### get the launcher to work! pmi1, pmi2, or pmix
+  # # spack mpi drivers were a mis-match... is this working now????
 
   - ['PropagateResourceLimits', 'NONE']
 
   # vs cgid
-  - ['ProctrackType', 'proctrack/cgroup']
+  # - ['ProctrackType', 'proctrack/cgroup']
   - ['ReturnToService', '1']
 
   - ['SlurmctldPidFile', '/var/run/slurmctld.pid']
@@ -59,14 +59,14 @@ slurm_conf_extraparams:
   - ['SallocDefaultCommand', 'srun  --pty --gres=NONE --preserve-env $SHELL']
 
   # PROLOGUE & EPILOGUE
-  - ['JobSubmitPlugins', 'require_timelimit,lua']
-  - ['PrologSlurmctld', '/nopt/slurm/etc/prologslurmctld.sh']
-  - ['Prolog', '/nopt/slurm/etc/prolog.d/*']
-  - ['PrologFlags', 'X11']
-  - ['X11Parameters', 'local_xauthority']
-  - ['Epilog', '/nopt/slurm/etc/epilog.d/*']
-  - ['PrologEpilogTimeout', 180]
-  - ['UnkillableStepTimeout', 180]
+  # - ['JobSubmitPlugins', 'require_timelimit,lua']
+  # - ['PrologSlurmctld', '/nopt/slurm/etc/prologslurmctld.sh']
+  # - ['Prolog', '/nopt/slurm/etc/prolog.d/*']
+  # - ['PrologFlags', 'X11']
+  # - ['X11Parameters', 'local_xauthority']
+  # - ['Epilog', '/nopt/slurm/etc/epilog.d/*']
+  # - ['PrologEpilogTimeout', 180]
+  # - ['UnkillableStepTimeout', 180]
 
   # FairShare/FairTree Halflife decay, starting at 14 days on Oct 5th 2020:
   - ['PriorityDecayHalfLife', '14-0']
@@ -100,17 +100,17 @@ slurm_conf_extraparams:
   #FastSchedule=1
   #SchedulerParameters=defer
 
-  # NREL: see topology.conf
-  - ['TopologyPlugin', 'topology/tree']
-  - ['JobRequeue', 0]
-  - ['MaxJobCount', 40000]
+  # # NREL: see topology.conf
+  # - ['TopologyPlugin', 'topology/tree']
+  # - ['JobRequeue', 0]
+  # - ['MaxJobCount', 40000]
 
   ### NREL:
   # Kurt... Need to build this - may need the mellanox info here.
-  #NHC Node Halth Check
-  - ['HealthCheckProgram', '/usr/sbin/nhc']
-  - ['HealthCheckInterval', 300]
-  - ['HealthCheckNodeState', 'CYCLE,ANY']
+  #NHC Node Health Check
+  # - ['HealthCheckProgram', '/usr/sbin/nhc']
+  # - ['HealthCheckInterval', 300]
+  # - ['HealthCheckNodeState', 'CYCLE,ANY']
 
   # ACCOUNTING
   ### start with a qos
