@@ -1,23 +1,23 @@
 compute_types = {
   large: {
     flavor: "compute.c60m240s120e1000"
-    image: "CentOS8.3"
+    image: "CentOS84_ldap_v0.1"
   }
   standard: {
     flavor: "compute.c30m120s60e500"
-    image: "CentOS8.3"
+    image: "CentOS84_ldap_v0.1"
   }
   small: {
     flavor: "compute.c16m64s32e250"
-    image: "CentOS8.3"
+    image: "CentOS84_ldap_v0.1"
   }
   tiny: {
     flavor: "compute.c4m16s8e60"
-    image: "CentOS8.3"
+    image: "CentOS84_ldap_v0.1"
   }
   gpu: {
     flavor: "gpu.c30m120s32e6000"
-    image: "CentOS8.3_ofed+cuda.v2"
+    image: "CentOS8.4_ofed+cuda_kbs"
   }
 }
 
@@ -32,6 +32,10 @@ lg-0005: "large"
 lg-0006: "large"
 lg-0007: "large"
 lg-0008: "large"
+lg-0009: "large"
+lg-0010: "large"
+lg-0011: "large"
+lg-0012: "large"
 
 std-0001: "standard"
 std-0002: "standard"
@@ -135,21 +139,23 @@ t-0015: "tiny"
 gpu-0001: "gpu"
 gpu-0002: "gpu"
 gpu-0003: "gpu"
-
 gpu-0005: "gpu"
 gpu-0006: "gpu"
-
 }
 
 login_names = {
   login-1: "gen.c8m16s16"
   login-2: "gen.c8m16s16"
+  login-3: "gen.c8m16s16"
+  login-4: "gen.c8m16s16"
   admin:   "gen.c8m16s16"
 }
 
 login_ips = {
   login-1: "10.60.105.223"
   login-2: "10.60.106.225"
+  login-3: "10.60.105.13"
+  login-4: "10.60.105.14"
   admin: "10.60.105.50"
 }
 
