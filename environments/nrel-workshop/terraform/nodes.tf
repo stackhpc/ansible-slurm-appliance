@@ -9,6 +9,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   network {
     uuid = openstack_networking_network_v2.cluster_net.id
+    access_network = true
   }
 
 }
@@ -25,6 +26,7 @@ resource "openstack_compute_instance_v2" "login" {
 
   network {
     uuid = openstack_networking_network_v2.cluster_net.id
+    access_network = true
   }
 
 }
@@ -41,6 +43,7 @@ resource "openstack_compute_instance_v2" "compute" {
 
   network {
     uuid = openstack_networking_network_v2.cluster_net.id
+    access_network = true
   }
 
 }
