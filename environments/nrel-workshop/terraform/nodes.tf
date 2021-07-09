@@ -36,7 +36,7 @@ resource "openstack_compute_instance_v2" "compute" {
   for_each = var.compute_nodes
   
   name = "${var.cluster_name}-${each.key}"
-  image_name = var.compute_types[each.value].image
+  image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
   config_drive = true
