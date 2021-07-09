@@ -2,12 +2,6 @@
 resource "openstack_networking_network_v2" "cluster_net" {
   name           = var.cluster_name
   admin_state_up = "true"
-  // shouldn't need this once https://github.com/stackhpc/vglab-kayobe-config/pull/69 merged
-  // segments {
-  //   network_type = "vlan"
-  //   physical_network = "physnet1"
-  //   segmentation_id = ???
-  // }
 }
 
 resource "openstack_networking_subnet_v2" "cluster_subnet" {
