@@ -21,7 +21,7 @@ The repository is designed to be forked for a specific use-case/HPC site but can
 These instructions assume the deployment host is running Centos 8:
 
     git clone https://github.com/stackhpc/ansible-slurm-appliance
-    cd openhpc-demo
+    cd ansible-slurm-appliance
     python3 -m venv venv
     . venv/bin/activate
     pip install -U pip
