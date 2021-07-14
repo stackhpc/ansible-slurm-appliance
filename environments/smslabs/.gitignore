@@ -1,2 +1,3 @@
 secrets.yml
 .terraform.lock.hcl
+.vscode
