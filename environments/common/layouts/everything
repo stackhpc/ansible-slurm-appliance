@@ -1,8 +1,5 @@
 [nfs:children]
-cluster
-
-[openhpc:children]
-cluster
+openhpc
 
 [mysql:children]
 control

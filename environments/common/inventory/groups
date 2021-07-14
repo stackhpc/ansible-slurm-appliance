@@ -1,5 +1,5 @@
 [login]
-# Slurm login nodes. Combined control/login nodes are not supported.
+# All Slurm login nodes. Combined control/login nodes are not supported.
 
 [control]
 # A single Slurm control node. Multiple (high availability) control nodes are not supported.
@@ -7,20 +7,18 @@
 [compute]
 # All Slurm compute nodes (in all partitions).
 
-[openhpc]
-# All Slurm nodes
-
-[cluster]
-# All nodes in the appliance - this allows for e.g. specific service nodes not running Slurm.
-# See default below.
-
-[cluster:children]
+[openhpc:children]
+# All Slurm nodes.
 login
 control
 compute
 
+[cluster:children]
+# All nodes in the appliance - add e.g. service nodes not running Slurm here.
+openhpc
+
 [builder]
-# VM used to (optionally) build compute images - do not add hosts. See packer/README.md.
+# Do not add hosts here manually - used as part of Packer image build pipeline. See packer/README.md.
 
 [podman:children]
 # Hosts running containers for below services:
@@ -29,47 +27,47 @@ kibana
 filebeat
 
 [prometheus]
-# Monitoring server(s)
+# Single node to host monitoring server.
 
 [grafana]
-# Dashboard server(s)
+# Single node to host monitoring dashboards.
 
 [alertmanager]
 # TODO:
 
 [opendistro]
-# ElasticSearch server, used for Slurm monitoring.
+# Single node to host ElasticSearch search engine for Slurm monitoring.
 
 [kibana]
-# TODO:
+# Single node to run queries for ElasticSearch.
 
 [slurm_stats]
-# Runs tools to integrate Slurm's accounting information with ElasticSearch.
+# Single node to run tools to integrate Slurm's accounting information with ElasticSearch.
 # NB: Host must be in `openhpc` group (for `sacct` command) and `opendistro` group.
 
 [filebeat]
-# TODO:
+# Single node to parses log files for ElasticSearch - must be co-located with `slurm_stats`.
 
 [nfs]
-# NFS servers or clients.
+# All nodes which are appliance-controlled NFS servers or clients.
 
 [mysql]
-# Runs database used for Slurm accounting.
+# Single node to run database used for Slurm accounting.
 
 [node_exporter]
-# Monitor these hosts for hardware and OS metrics
+# All hosts to monitor for hardware and OS metrics.
 
 [openhpc_tests:children]
-# Run post-deploy MPI-based tests using ansible/adhoc/test.yml
+# For post-deploy MPI-based tests - see ansible/adhoc/test.yml
 login
 compute
 
 [selinux:children]
-# Define selinux status for these
+# All hosts requiring control of SELinux status.
 cluster
 
 [rebuild]
 # Enable rebuild of nodes on an OpenStack cloud; add 'control' group plus 'compute' group or a subset of it.
 
 [update]
-# Nodes to run yum update on
+# All hosts to (optionally) run yum update on.
