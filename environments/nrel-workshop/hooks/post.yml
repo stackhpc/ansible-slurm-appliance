@@ -3,9 +3,16 @@
   tags: pingpong
   gather_facts: false
   tasks:
+  - name: Create directory on shared filesystem
+    file:
+      path: /home/tests
+      state: directory
+      owner: centos
+      group: centos
+    become: true
   - name: Create sbatch script
     copy:
-      dest: "pingpong.sh"
+      dest: "/home/tests/pingpong.sh"
       content: |
         #!/usr/bin/bash
 
@@ -13,7 +20,6 @@
         #SBATCH --ntasks-per-node=1
         #SBATCH --exclusive
         
-        #export UCX_NET_DEVICES={{ openhpc_tests_ucx_net_devices }}
         echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
         module load gnu9
         module load openmpi4
