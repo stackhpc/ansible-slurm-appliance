@@ -1,0 +1,11 @@
+openhpc_packages:
+  - git
+  - python3
+  - make
+  - tar
+  - gzip
+  - patch
+  - curl
+  - unzip
+  - slurm-libpmi-ohpc
+  - ohpc-gnu9-openmpi4-perf-tools

@@ -1,0 +1,11 @@
+- name: Install HPE Emulex NIC drivers
+  hosts: builder #  clearly actual baremetal nodes need to boot images with these in already!
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: install elrepo repos
+      yum:
+        name: elrepo-release
+    - name: install kmod-be2net
+      yum:
+        name: kmod-be2net
