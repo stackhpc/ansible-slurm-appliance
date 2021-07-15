@@ -3,3 +3,4 @@ terraform.tfstate*
 config-drive.iso
 venv
 *.pyc
+.terraform.lock.hcl
