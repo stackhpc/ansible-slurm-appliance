@@ -1,0 +1,3 @@
+openhpc_packages:
+  - slurm-libpmi-ohpc
+  - ohpc-gnu9-openmpi4-perf-tools
