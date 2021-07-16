@@ -94,7 +94,7 @@ varibles are set e.g role variables for the `stackhpc.nfs` role can be found in
 
 ## Parent pointers
 
-As the environemnts form a chain, a symlink pointing to the parent can be be created.
+As the environments form a chain, a symlink pointing to the parent can be be created.
 
     `ln -s ../common/ parent`
 
@@ -102,11 +102,11 @@ This allows you to follow the chain more easily:
 
     # After following two parent pointers
     (venv-enroll) [stack@seed parent]$ pwd
-    /home/stack/will/openhpc-demo/environments/production/parent/parent
+    /home/stack/will/ansible-slurm-appliance/environments/production/parent/parent
 
     # Determing which element this path refers to
     (venv-enroll) [stack@seed parent]$ realpath .
-    /home/stack/will/openhpc-demo/environments/common
+    /home/stack/will/ansible-slurm-appliance/environments/common
 
 This currently has no functional effect, but could be used in future to form the
 chained list of inventories that is currently configured in `ansible.cfg`.

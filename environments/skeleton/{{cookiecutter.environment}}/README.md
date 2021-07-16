@@ -80,7 +80,11 @@ See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/us
 - Activate the virtualenv and create the instances:
 
       . venv/bin/activate
-      cd environments/{{ cookiecutter.environment }}/
+      cd environments/{{ cookiecutter.environment }}/terraform
+
+Now modify the content of `terraform.tfvars` to values appropriate for your environment.
+
+      terraform init    # (first use only)
       terraform apply
 
 This creates an ansible inventory file `./inventory`.
