@@ -1,5 +1,8 @@
 # "timestamp" template function replacement:s
-locals { timestamp = formatdate("YYMMDD-hhmm", timestamp())}
+locals {
+  timestamp = formatdate("YYMMDD-hhmm", timestamp())
+  cluster_name = regex("openhpc_cluster_name=(\\w+)", file("${var.environment_root}/inventory/hosts"))[0]
+  }
 
 # Path pointing to root of repository - set by environment variable PKR_VAR_repo_root
 variable "repo_root" {
@@ -45,8 +48,7 @@ source "qemu" "openhpc-vm" {
     ["-m", "896M"],
     ["-cdrom", "config-drive.iso"]
     ]
-  vm_name          = "ohpc-${var.groups[0]}-${local.timestamp}.qcow2" # image name
-  shutdown_command = "sudo shutdown -P now"
+  vm_name          = "ohpc-${local.cluster_name}-${var.groups[0]}-${local.timestamp}.qcow2" # image name
 }
 
 build {
