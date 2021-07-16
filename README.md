@@ -20,8 +20,9 @@ The repository is designed to be forked for a specific use-case/HPC site but can
 
 These instructions assume the deployment host is running Centos 8:
 
+    sudo yum install -y git python3
     git clone https://github.com/stackhpc/ansible-slurm-appliance
-    cd openhpc-demo
+    cd ansible-slurm-appliance
     python3 -m venv venv
     . venv/bin/activate
     pip install -U pip
@@ -37,46 +38,6 @@ These instructions assume the deployment host is running Centos 8:
 - `ansible/`: Contains the ansible playbooks to configure the infrastruture.
 - `packer/`: Contains automation to use Packer to build compute nodes for an enviromment - see the README in this directory for further information.
 - `dev/`: Contains development tools.
-
-## Creating a Slurm appliance
-
-NB: This section describes generic instructions - check for any environment-specific instructions in `environments/<environment>/README.md` before starting.
-
-1. Activate the environment - this **must be done** before any other commands are run:
-
-        source environments/<environment>activate
-
-2. Deploy instances - see environment-specific instructions.
-
-3. Generate passwords:
-
-        ansible-playbook ansible/adhoc/generate-passwords.yml
-
-    This will output a set of passwords in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
-
-        ansible-vault encrypt inventory/group_vars/all/secrets.yml
-   
-    See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
-
-
-4. Deploy the appliance:
-
-        ansible-playbook ansible/site.yml
-
-   or if you have encrypted secrets use:
-
-        ansible-playbook ansible/site.yml --ask-vault-password
-
-    Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
-
-5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
-
-        ansible-playbook ansible/adhoc/<playbook name>
-
-   Currently they include:
-    - `test.yml`: MPI-based post-deployment tests for latency, bandwidth and floating point performance. See `ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/test/README.md` for full details. Note that you may wish to reconfigure the Slurm compute nodes into a single partition before running this.
-    **IMPORTANT: Do not use these tests on a cluster in production as the reconfiguration it performs will crash running jobs.**
-    - `update-packages.yml`: Update all packages on the cluster.
 
 ## Environments
 
@@ -122,6 +83,45 @@ Although most of the inventory uses the group convention described above there a
     - An entry in the `openhpc_slurm_partitions` mapping in `environments/<environment>/inventory/group_vars/openhpc/overrides.yml`.
     See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
 - On an OpenStack cloud, rebuilding/reimaging compute nodes from Slurm can be enabled by defining a `rebuild` group containing the relevant compute hosts (e.g. in the generated `hosts` file).
+
+## Creating a Slurm appliance
+
+NB: This section describes generic instructions - check for any environment-specific instructions in `environments/<environment>/README.md` before starting.
+
+1. Activate the environment - this **must be done** before any other commands are run:
+
+        source environments/<environment>/activate
+
+2. Deploy instances - see environment-specific instructions.
+
+3. Generate passwords:
+
+        ansible-playbook ansible/adhoc/generate-passwords.yml
+
+    This will output a set of passwords in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
+
+        ansible-vault encrypt inventory/group_vars/all/secrets.yml
+
+    See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
+
+4. Deploy the appliance:
+
+        ansible-playbook ansible/site.yml
+
+   or if you have encrypted secrets use:
+
+        ansible-playbook ansible/site.yml --ask-vault-password
+
+    Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
+
+5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
+
+        ansible-playbook ansible/adhoc/<playbook name>
+
+   Currently they include:
+    - `test.yml`: MPI-based post-deployment tests for latency, bandwidth and floating point performance. See `ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/test/README.md` for full details. Note that you may wish to reconfigure the Slurm compute nodes into a single partition before running this.
+    **IMPORTANT: Do not use these tests on a cluster in production as the reconfiguration it performs will crash running jobs.**
+    - `update-packages.yml`: Update all packages on the cluster.
 
 ## Adding new functionality
 TODO: this is just rough notes:
