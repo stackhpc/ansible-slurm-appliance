@@ -1,9 +1,12 @@
 openhpc_packages:
   - slurm-libpmi-ohpc
   - bzip2
+  - bazaar
   - curl
   - git
   - gnu9-compilers-ohpc
+  - nhc-ohpc
+  - ohpc-gnu9-openmpi4-perf-tools
   - gzip
   - make
   - patch
