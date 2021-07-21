@@ -8,4 +8,4 @@ openhpc_packages:
   - curl
   - unzip
   - slurm-libpmi-ohpc
-  - ohpc-gnu9-openmpi4-perf-tools
+  # - ohpc-gnu9-openmpi4-perf-tools
