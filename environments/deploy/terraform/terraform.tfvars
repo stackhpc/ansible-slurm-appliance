@@ -102,6 +102,7 @@ std-0056: "standard"
 std-0057: "standard"
 std-0058: "standard"
 std-0059: "standard"
+std-0060: "standard"
 std-0061: "standard"
 std-0062: "standard"
 
