@@ -8,7 +8,7 @@ resource "openstack_compute_instance_v2" "control" {
   config_drive = true
 
   network {
-    uuid = openstack_networking_subnet_v2.cluster_subnet.network_id # ensures nodes not created till subnet created
+    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id # ensures nodes not created till subnet created
     access_network = true
   }
 
@@ -25,7 +25,7 @@ resource "openstack_compute_instance_v2" "login" {
   config_drive = true
 
   network {
-    uuid = openstack_networking_subnet_v2.cluster_subnet.network_id
+    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
     access_network = true
   }
 
@@ -42,7 +42,7 @@ resource "openstack_compute_instance_v2" "compute" {
   config_drive = true
 
   network {
-    uuid = openstack_networking_subnet_v2.cluster_subnet.network_id
+    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
     access_network = true
   }
 
