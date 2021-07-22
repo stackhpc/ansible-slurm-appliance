@@ -1,0 +1,13 @@
+# This is a in-production-safe version of ansible/adhoc/tests using installed packages - WIP
+
+---
+
+- hosts: login[0] # TODO: might want to make this selectable?
+  become: false
+  gather_facts: false
+  tasks:
+    - import_role:
+        name: hpctests
+        tasks_from: pingmatrix
+      vars:
+        jobdir: "{{ ansible_env.HOME/hpctests }}" # TODO: make configurable
