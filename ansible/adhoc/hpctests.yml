@@ -1,13 +1,19 @@
-# This is a in-production-safe version of ansible/adhoc/tests using installed packages - WIP
+# This is a version of ansible/adhoc/tests which is safe to use on an in-production cluster.
+# Relies on installed packages - see openhpc variables.
 
 ---
 
 - hosts: login[0] # TODO: might want to make this selectable?
   become: false
   gather_facts: false
+  vars:
+    hpctests_rootdir: "/home/hpctests" # TODO: make configurable
   tasks:
+    - file:
+        path: "{{ hpctests_rootdir }}"
+        state: directory
+        owner: centos
+      become: true
     - import_role:
         name: hpctests
         tasks_from: pingmatrix
-      vars:
-        jobdir: "{{ ansible_env.HOME/hpctests }}" # TODO: make configurable

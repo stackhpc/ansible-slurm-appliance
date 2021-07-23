@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-#SBATCH --ntasks={{ computes.stdout_lines | length }}
+#SBATCH --ntasks={{ hpctests_computes.stdout_lines | length }}
 #SBATCH --ntasks-per-node=1
 #SBATCH --output=%x.out
 #SBATCH --error=%x.out
 #SBATCH --exclusive
-{%if openhpc_tests_nodes is defined %}#SBATCH --nodelist={{ openhpc_tests_nodes }}{% endif %}
+{%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_nodes }}{% endif %}
 
-module load {{ cluster_prod_tests_mpi_module }}
+module load {{ hpctests_pingmatrix_modules | join(' ' ) }}
 mpicc -o nxnlatbw mpi_nxnlatbw.c
 
 # TODO: support export UCX_NET_DEVICES=
-srun --mpi=pmix_v2 nxnlatbw
+mpirun nxnlatbw

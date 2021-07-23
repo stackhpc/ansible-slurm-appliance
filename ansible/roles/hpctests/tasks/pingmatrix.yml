@@ -5,12 +5,12 @@
 
 - name: Make directory
   file:
-    path: "{{ jobdir }}"
+    path: "{{ hpctests_rootdir }}/pingmatrix"
     state: directory
 
 - name: Precreate files to workaround selinux context issues on NFS mounts
   file:
-    path: "{{ jobdir }}/{{ item }}"
+    path: "{{ hpctests_rootdir }}/pingmatrix/{{ item }}"
     state: touch
   loop:
     - mpi_nxnlatbw.c
@@ -18,15 +18,15 @@
 - name: Copy source
   copy:
     src: mpi_nxnlatbw.c
-    dest: "{{ jobdir }}/mpi_nxnlatbw.c"
+    dest: "{{ hpctests_rootdir }}/pingmatrix/mpi_nxnlatbw.c"
 - name: Create sbatch script
   template:
     src: pingmatrix.sh.j2
-    dest: "{{ jobdir }}/pingmatrix.sh"
+    dest: "{{ hpctests_rootdir }}/pingmatrix/pingmatrix.sh"
 - name: Run ping matrix
   shell: sbatch --wait pingmatrix.sh
   args:
-    chdir: "{{ jobdir }}"
+    chdir: "{{ hpctests_rootdir }}/pingmatrix"
 # nxnlatbw outputs ranks, not nodenames which would be more useful for finding issues. The sbatch manpage says nodes provided via --nodelist are sorted, but doesn't specify how.
 # Some testing using a "helloworld" program showed it is NOT sorted the same as python's sorted(), it's lexicographical. So we use scontrol to guarantee the same sort order.
 # Note this still doesn't fix any non-unique names but we should get a length mis-match at least with that.
@@ -42,13 +42,13 @@
   register: slurm_names
 - name: Process output
   plot_nxnlatbw:
-    src: "{{ jobdir }}/pingmatrix.sh.out"
-    dest: "{{ jobdir }}/pingmatrix.html"
+    src: "{{ hpctests_rootdir }}/pingmatrix/pingmatrix.sh.out"
+    dest: "{{ hpctests_rootdir }}/pingmatrix/pingmatrix.html"
     nodes: "{{ slurm_names.stdout_lines | join(',') }}"
   register: nxnlatbw
 - name: Fetch html results table to ansible control host
   fetch:
-    src: "{{ jobdir }}/pingmatrix.html"
+    src: "{{ hpctests_rootdir }}/pingmatrix/pingmatrix.html"
     dest: /tmp/pingmatrix.html
     flat: yes
 - name: Summarise results

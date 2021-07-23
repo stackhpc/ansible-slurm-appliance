@@ -1,2 +1,3 @@
 ---
-# defaults file for hpctests
+hpctests_rootdir:
+hpctests_pingmatrix_modules: [gnu9 openmpi4]
