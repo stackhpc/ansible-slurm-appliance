@@ -50,6 +50,8 @@ variable "compute_nodes" {
     default = {
         compute-0: "small"
         compute-1: "small"
+        compute-2: "small"
+        compute-3: "small"
     }
 }
 
