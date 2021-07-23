@@ -4,3 +4,4 @@ config-drive.iso
 venv
 *.pyc
 .terraform.lock.hcl
+packer/openhpc2
