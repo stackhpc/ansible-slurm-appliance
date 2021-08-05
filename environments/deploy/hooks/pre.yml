@@ -42,3 +42,11 @@
       loop: "{{ slurm_conf_extraparams }}"
       delegate_to: localhost
       run_once: true
+
+- name: Ensure times are correct
+  hosts: all
+  tags: set_time_on_servers
+  become: true
+  tasks:
+    - include_role:
+        name: ansible-role-ntp

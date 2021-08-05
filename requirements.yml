@@ -40,11 +40,9 @@ roles:
   - name: vstack_common_config
     src: git+git@github.nrel.gov:hpc/vstack_common_config.git
     type: git
-
-  # - name: stig-hardening
-  #   src: git+git@github.nrel.gov:hpc/stig-hardening.git
-  #   version: v0.0.2
-
+  - name: ansible-role-ntp
+    src: git+git@github.nrel.gov:hpc/ansible-role-ntp.git
+    type: git
 
 collections:
 - name: containers.podman
