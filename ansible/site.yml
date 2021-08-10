@@ -28,4 +28,11 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Shutdown Packer VM
+  hosts: builder
+  gather_facts: no
+  become: yes
+  tasks:
+    - community.general.shutdown:
+
 ...
