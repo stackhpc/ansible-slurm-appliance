@@ -1,2 +1,2 @@
 cluster_name = "demo"
-key_pair = "demo-nreljumphost"
+key_pair = "demo"
