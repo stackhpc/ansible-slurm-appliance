@@ -12,13 +12,12 @@ resource "local_file" "hosts" {
   filename = "../inventory/hosts"
 }
 
-locals {
-  openhpc_slurm_partitions = {
-    openhpc_slurm_partitions: [for name, _ in var.compute_types : {"name": name}]
-  }
-}
-
-resource "local_file" "slurm_partitions" {
-  content  = yamlencode(local.openhpc_slurm_partitions)
-  filename = "../inventory/group_vars/openhpc/partitions.yml"
+resource "local_file" "partitions" {
+    content  = templatefile("${path.module}/partitions.tpl",
+                            {
+                              "compute_types": var.compute_types,
+                              "compute_nodes": var.compute_nodes,
+                            },
+    )
+    filename = "../inventory/group_vars/openhpc/partitions.yml"
 }
