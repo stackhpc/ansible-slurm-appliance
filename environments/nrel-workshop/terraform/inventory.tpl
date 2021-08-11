@@ -17,8 +17,11 @@ ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.acc
 
 # Define groups for slurm parititions:
 %{~ for type_name, type_descr in compute_types}
+%{~ if contains(values(compute_nodes ), type_descr["flavor"]) }
 [${cluster_name}_${type_name}]
     %{~ for node_name, node_type in compute_nodes ~}
     %{~ if node_type == type_name }${cluster_name}-${node_name}%{ endif }
     %{~ endfor ~}
+%{ endif ~}
 %{ endfor ~}
+
