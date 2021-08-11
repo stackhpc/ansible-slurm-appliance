@@ -5,4 +5,4 @@ update_state: latest
 update_exclude: omit
 update_disablerepo: omit
 # Log changes during update here on localhost:
-update_log_path: "/var/log/{{ inventory_hostname }}-updates.log"
+update_log_path: "/tmp/{{openhpc_cluster_name}}-{{ inventory_hostname }}-updates.log"
