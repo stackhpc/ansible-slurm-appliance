@@ -1,3 +1,4 @@
 ---
 hpctests_rootdir:
 hpctests_pingmatrix_modules: [gnu9 openmpi4]
+hpctests_outdir: "{{ lookup('env', 'HOME') }}/hpctests"

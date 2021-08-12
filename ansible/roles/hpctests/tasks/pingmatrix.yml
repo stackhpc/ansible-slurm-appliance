@@ -49,11 +49,11 @@
 - name: Fetch html results table to ansible control host
   fetch:
     src: "{{ hpctests_rootdir }}/pingmatrix/pingmatrix.html"
-    dest: /tmp/pingmatrix.html
+    dest: "{{ hpctests_outdir }}/pingmatrix.html"
     flat: yes
 - name: Summarise results
   debug:
     msg: |
       Summary for pingmatrix (pairwise on {{ slurm_names.stdout_lines | length }} nodes):
       {{ nxnlatbw['stats'] | to_nice_yaml }}
-      Tabular output on ansible control host at /tmp/pingmatrix.html
+      Tabular output on ansible control host at {{ hpctests_outdir }}/pingmatrix.html
