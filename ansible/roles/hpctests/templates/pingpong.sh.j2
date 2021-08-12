@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+#SBATCH --ntasks=2
+#SBATCH --ntasks-per-node=1
+#SBATCH --output=%x.out
+#SBATCH --error=%x.out
+#SBATCH --exclusive
+{%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_nodes }}{% endif %}
+
+# TODO: support export UCX_NET_DEVICES=
+echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
+module load {{ hpctests_pingpong_modules | join(' ' ) }}
+
+#srun --mpi=pmi2 IMB-MPI1 pingpong # doesn't work in ohpc v2.1
+mpirun IMB-MPI1 pingpong
