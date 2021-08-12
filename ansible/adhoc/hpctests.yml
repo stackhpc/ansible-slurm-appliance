@@ -7,13 +7,8 @@
   become: false
   gather_facts: false
   vars:
-    hpctests_rootdir: "/home/hpctests" # TODO: make configurable
+    hpctests_rootdir: "/home/hpctests" # TODO: make configurable in appliance
   tasks:
-    - file:
-        path: "{{ hpctests_rootdir }}"
-        state: directory
-        owner: centos
-      become: true
     - import_role:
         name: hpctests
         tasks_from: pingmatrix

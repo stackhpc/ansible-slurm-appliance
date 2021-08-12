@@ -12,3 +12,11 @@
     that: hpctests_computes.stdout_lines | length > 0
     fail_msg: "No nodes selected - was variable `openhpc_tests_nodes` set (correctly)?"
   # run_once: yes
+
+- name: Create test root directory
+  file:
+    path: "{{ hpctests_rootdir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  become: true
