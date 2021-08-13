@@ -9,5 +9,5 @@
 module load {{ hpctests_pingmatrix_modules | join(' ' ) }}
 mpicc -o nxnlatbw mpi_nxnlatbw.c
 
-# TODO: support export UCX_NET_DEVICES=
+export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 mpirun nxnlatbw

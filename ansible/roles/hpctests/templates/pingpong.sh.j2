@@ -7,7 +7,7 @@
 #SBATCH --exclusive
 {%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_nodes }}{% endif %}
 
-# TODO: support export UCX_NET_DEVICES=
+export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
 module load {{ hpctests_pingpong_modules | join(' ' ) }}
 
