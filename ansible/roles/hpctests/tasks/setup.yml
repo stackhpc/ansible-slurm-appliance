@@ -6,8 +6,6 @@
   changed_when: false
   failed_when: hpctests_computes.rc != 0
 
-- debug:
-    msg: "{{ hpctests_computes }}"
 - name: Check compute node selection valid
   assert:
     that: hpctests_computes.stdout_lines | length > 0

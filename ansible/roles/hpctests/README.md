@@ -23,6 +23,7 @@ Role Variables
 --------------
 
 - `hpctests_rootdir`: Required. Path to root of test directory tree, which must be on a r/w filesystem shared to all cluster nodes under test. The last directory component will be created.
+- `hpctests_nodes`: Optional. A Slurm node expression, e.g. `'compute-[0-15,19]'` defining the nodes to use. If not set all nodes in the default partition are used. Note nodes selected **must** be in the default partition.
 - `hpctests_ucx_net_devices`: Optional. Control which network device/interface to use, e.g. `mlx5_1:0`. The default of `all` (as per UCX) may not be appropriate for multi-rail nodes with different bandwidths on each device. See [here](https://openucx.readthedocs.io/en/master/faq.html#what-is-the-default-behavior-in-a-multi-rail-environment) and [here](https://github.com/openucx/ucx/wiki/UCX-environment-parameters#setting-the-devices-to-use).
 - `hpctests_outdir`: Optional. Directory to use for test output on local host. Defaults to `$HOME/hpctests` (for local user).
 - `hpctests_pingmatrix_modules`: Optional. List of modules to load for pingmatrix test. Defaults are suitable for OpenHPC 2.x cluster using the required packages.
