@@ -11,4 +11,3 @@
   tasks:
     - import_role:
         name: hpctests
-        tasks_from: pingmatrix

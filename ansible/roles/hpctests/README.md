@@ -5,6 +5,10 @@ An MPI-based test suite for Slurm appliance clusters.
 
 Unlike `https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/test/` this is designed to be safe to use on clusters in production. Instead of exporting installs from `/opt/*` over NFS the required packages are installed by default - see `environments/common/inventory/group_vars/all/openhpc.yml`.
 
+Avaialble tags:
+  - pingpong
+  - pingmatrix
+
 Requirements
 ------------
 

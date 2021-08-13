@@ -1,5 +1,4 @@
-- import_tasks: setup.yml
-  tags: always
+---
 
 - name: Make directory
   file:
