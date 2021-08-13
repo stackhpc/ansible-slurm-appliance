@@ -3,11 +3,9 @@
 
 ---
 
-- hosts: login[0] # TODO: might want to make this selectable?
+- hosts: hpctests[0] # TODO: might want to make which node is used selectable?
   become: false
   gather_facts: false
-  vars:
-    hpctests_rootdir: "/home/hpctests" # TODO: make configurable in appliance
   tasks:
     - import_role:
         name: hpctests
