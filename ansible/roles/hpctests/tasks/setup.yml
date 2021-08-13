@@ -1,17 +1,17 @@
 ---
 
 - name: Get info about compute nodes
-  shell: "sinfo --Node --noheader{%if openhpc_tests_nodes is defined %} --nodes {{openhpc_tests_nodes}}{% endif %} --format %N"
+  shell: "sinfo --Node --noheader{%if hpctests_nodes is defined %} --nodes {{hpctests_nodes}}{% endif %} --format %N"
   register: hpctests_computes
   changed_when: false
   failed_when: hpctests_computes.rc != 0
-  # run_once: yes
 
+- debug:
+    msg: "{{ hpctests_computes }}"
 - name: Check compute node selection valid
   assert:
     that: hpctests_computes.stdout_lines | length > 0
-    fail_msg: "No nodes selected - was variable `openhpc_tests_nodes` set (correctly)?"
-  # run_once: yes
+    fail_msg: "No nodes selected - was variable `hpctests_nodes` set (correctly)?"
 
 - name: Create test root directory
   file:
