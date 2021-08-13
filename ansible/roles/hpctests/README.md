@@ -3,46 +3,55 @@ Role Name
 
 An MPI-based test suite for Slurm appliance clusters.
 
-Unlike `https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/test/` this is designed to be safe to use on clusters in production. Instead of exporting installs from `/opt/*` over NFS the required packages are installed by default - see `environments/common/inventory/group_vars/all/openhpc.yml`.
+This is intended as a replacement for [this test role](`https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/test/`) but will be safe to run on clusters in production use as it does not use NFS exports for package installs. Instead it assumes the required packages are pre-installed, which is the case by default with this appliance. 
 
-Avaialble tags:
+Currently only the `pingpong` and `pingmatrix` tests from the above are implemented.
+
+Available tags:
   - pingpong
   - pingmatrix
 
 Requirements
 ------------
 
-An OpenHPC v2.x cluster.
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- An OpenHPC v2.x cluster.
+- Packages installed listed at `environments/common/inventory/group_vars/all/openhpc.yml`.
 
 Role Variables
 --------------
 
-See `defaults/main.yml`.
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- `hpctests_rootdir`: Required. Path to root of test directory tree, which must be on a r/w filesystem shared to all cluster nodes under test. The last directory component will be created.
+- `hpctests_pingmatrix_modules`: Optional. List of modules to load for pingmatrix test. Defaults are suitable for OpenHPC 2.x cluster using the required packages.
+- `hpctests_pingpong_modules`: As above but for pingpong test.
+- `hpctests_outdir`: Directory to use for test output on local host. Defaults to `$HOME/hpctests` (for local user).
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+The role should be run on a login node;
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+- hosts: login[0]
+  become: false
+  gather_facts: false
+  vars:
+    hpctests_rootdir: "/home/hpctests"
+  tasks:
+    - import_role:
+        name: hpctests
+```
 
 License
 -------
 
-BSD
+Apache v2
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+stackhpc.com
