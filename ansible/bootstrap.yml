@@ -23,6 +23,15 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
+- hosts: fail2ban
+  gather_facts: false
+  become: yes
+  tags:
+    - fail2ban
+  tasks:
+    - import_role:
+        name: fail2ban
+
 - hosts: update
   gather_facts: false
   become: yes
