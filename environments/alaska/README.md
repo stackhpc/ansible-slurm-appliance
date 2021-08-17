@@ -20,6 +20,12 @@ Download an `openrc.sh` file from Horizon and save as e.g. `~/openrc.sh`.
 
 ## Creating a Slurm appliance
 
+This assumes that a network named "iris-alaska-prod-internal" exists to deploy the cluster onto.
+
+0. Create IP addresses:
+- Run a command like `openstack floating ip create --description "slurm login-0" CUDN-Internet` as many times as required for each login node.
+- Add the resulting addresses to the `address` key in the Terraform `login_nodes` variable (e.g. see `environments/alaska/terraform/variables.tf`).
+
 2. Deploy instances:
 
 ```
@@ -27,7 +33,7 @@ Download an `openrc.sh` file from Horizon and save as e.g. `~/openrc.sh`.
 . ~/openrc.sh
 cd environments/alaska/terraform
 
-4. Before deploying/modifying the appliance using ansible then export the vault key:
+4. Before deploying/modifying the appliance using ansible, export the vault key:
 
 ```shell
 export ANSIBLE_VAULT_PASSWORD_FILE=~/vault-password.txt
