@@ -11,6 +11,15 @@
       become_flags: '-i'
       become: true
 
+- hosts: fail2ban
+  gather_facts: false
+  become: yes
+  tags:
+    - fail2ban
+  tasks:
+    - import_role:
+        name: fail2ban
+
 - hosts: selinux
   gather_facts: false
   become: yes
@@ -48,6 +57,29 @@
           msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
       when: "update_enable | default('false') | bool"
 
+- hosts: hardening
+  gather_facts: true
+  become: yes
+  tags:
+    - hardening
+  tasks:
+    - name: Check FIPs status
+      command:
+        cmd: "fips-mode-setup --check"
+      changed_when: false
+      register: fips_mode_check
+    - name: Enable FIPs mode
+      command:
+        cmd: "fips-mode-setup --enable"
+      register: fips_mode_setup
+      when: "'enabled' not in fips_mode_check.stdout"
+    - name: Reboot to enable FIPS
+      reboot:
+        post_reboot_delay: 30
+      when: fips_mode_setup.changed | default(false)
+    - import_role:
+        name: ansible-hardening
+
 - hosts:
     - selinux
     - update
@@ -60,8 +92,6 @@
       stat: 
         path: /var/run/reboot-required
       register: update_reboot_required
-    - debug:
-        msg: "setstatus:{{ (sestatus.reboot_required | default(false)) }} packages: {{ (update_reboot_required.stat.exists | bool) }}"
     - name: Reboot if required from SELinux state change or package upgrades
       reboot:
         post_reboot_delay: 30
@@ -72,12 +102,3 @@
     - name: update facts
       setup:
       when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
-
-- hosts: hardening
-  gather_facts: true
-  become: yes
-  tags:
-    - hardening
-  tasks:
-    - import_role:
-        name: ansible-hardening
