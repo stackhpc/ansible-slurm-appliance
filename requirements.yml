@@ -9,6 +9,7 @@ roles:
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
   - src: jriguera.configdrive
+  - src: git+https://github.com/openstack/ansible-hardening
 
 collections:
 - name: containers.podman

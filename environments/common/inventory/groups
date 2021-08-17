@@ -71,3 +71,7 @@ cluster
 
 [update]
 # All hosts to (optionally) run yum update on.
+
+[hardening]
+# Hosts to apply security hardening configuration configuration to
+# https://github.com/openstack/ansible-hardening
