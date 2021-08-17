@@ -20,7 +20,9 @@ Download an `openrc.sh` file from Horizon and save as e.g. `~/openrc.sh`.
 
 ## Creating a Slurm appliance
 
-This assumes that a network named "iris-alaska-prod-internal" exists to deploy the cluster onto.
+This assumes the following already exist:
+- A network and subnet named "iris-alaska-prod-internal" to deploy the cluster onto.
+- A security group "SSH" allowing inbound ssh.
 
 0. Create IP addresses:
 - Run a command like `openstack floating ip create --description "slurm login-0" CUDN-Internet` as many times as required for each login node.
