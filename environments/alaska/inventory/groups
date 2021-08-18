@@ -34,3 +34,9 @@ compute
 
 [update:children]
 cluster
+
+[fail2ban:children]
+login
+
+[hardening:children]
+login
