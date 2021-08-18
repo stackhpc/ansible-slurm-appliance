@@ -4,7 +4,7 @@
   gather_facts: false
   become: false
   tags:
-    - depreciated
+    - deprecated
   tasks:
     - debug:
         msg: "Variables prefixed secrets_openhpc_* are depreciated and should be replaced with vault_*, please see ansible/roles/passwords/defaults/main.yml"
