@@ -6,7 +6,6 @@ slurm_appliance_secrets:
   vault_elasticsearch_kibana_password: "{{ secrets_openhpc_elasticsearch_kibana_password | default(vault_elasticsearch_kibana_password |default(lookup('password', '/dev/null'))) }}"
   vault_mysql_root_password: "{{ secrets_openhpc_mysql_root_password | default(vault_mysql_root_password | default(lookup('password', '/dev/null'))) }}"
   vault_mysql_slurm_password: "{{ secrets_openhpc_mysql_slurm_password | default(vault_mysql_slurm_password | default(lookup('password', '/dev/null'))) }}"
-  # TODO: Might be cleaner to write this to a file, but needs modification of the role
   vault_openhpc_mungekey: "{{ secrets_openhpc_mungekey | default(vault_openhpc_mungekey | default(secrets_openhpc_mungekey_default)) }}"
 
 secrets_openhpc_mungekey_default:
