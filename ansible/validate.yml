@@ -2,14 +2,6 @@
 
 # Fail early if configuration is invalid
 
-- name: Validate mysql configuration
-  hosts: mysql
-  tags: mysql
-  tasks:
-    - assert:
-        that: "secrets_openhpc_mysql_root_password is defined"
-        fail_msg: "secrets_openhpc_mysql_root_password is not defined - did you run the ansible/adhoc/generate-passwords.yml playbook?"
-
 - name: Validate podman configuration
   hosts: podman
   tags: podman
