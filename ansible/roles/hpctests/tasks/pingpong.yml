@@ -17,7 +17,6 @@
     src: pingpong.sh.j2
     dest: "{{ hpctests_rootdir }}/pingpong/pingpong.sh"
 
-
 - name: Run pingpong
   shell: sbatch --wait pingpong.sh
   become: no
