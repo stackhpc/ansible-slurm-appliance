@@ -2,6 +2,8 @@
 
 - hosts: cluster
   gather_facts: false
+  tags:
+    - users
   tasks:
     - name: Add users
       ansible.builtin.user: "{{ item }}"
@@ -28,7 +30,7 @@
   tasks:
     - name: Set SELinux state and policy
       ansible.posix.selinux:
-        state: "{{ selinux_state }}"
+        state: "{{ hardening_selinux_state if 'hardening' in group_names else selinux_state }}" # as group_vars all/hardening and all/selinux have same precedence
         policy: "{{ selinux_policy }}"
       register: sestatus
 
@@ -73,6 +75,14 @@
         cmd: "fips-mode-setup --enable"
       register: fips_mode_setup
       when: "'enabled' not in fips_mode_check.stdout"
+    - name: Require password for sudo
+      replace:
+        path: "{{ item.path }}"
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.replace }}"
+        validate: 'bash -c "cat /etc/sudoers %s | visudo -cf-"'
+      loop: "{{ hardening_sudo_rules }}"
+    - meta: reset_connection
     - name: Reboot to enable FIPS
       reboot:
         post_reboot_delay: 30
