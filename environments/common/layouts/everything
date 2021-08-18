@@ -32,3 +32,6 @@ slurm_stats
 
 [update:children]
 cluster
+
+[fail2ban:children]
+login
