@@ -1,0 +1,30 @@
+---
+- name: Create user and RSA key
+  user:
+    state: "{{ item.active | default(true) | bool | ternary('present', 'absent') }}"
+    system: no
+    name: "{{ item.user }}"
+    uid: "{{ item.uid }}"
+    comment: "{{ item.name }}"
+    createhome: yes # no if propagage
+    home: "{{ homedir }}/{{ item.user }}"
+    generate_ssh_key: yes # no if propagage
+    ssh_key_comment: "{{ item.name }}"
+  with_items: "{{ users }}"
+  register: users
+
+- name: Read user RSA public key
+  slurp:
+    src: "{{ homedir }}/{{ item.user }}/.ssh/id_rsa.pub"
+  with_items: "{{ users }}"
+  when: item.active | default(true) | bool
+  register: user_pubkeys
+
+- name: Write user's own public key as authorized for SSH access
+  authorized_key:
+    user: "{{ item.item.user }}"
+    state: present
+    manage_dir: no
+    key: "{{ item.content | b64decode }}"
+  with_items: "{{ user_pubkeys.results }}"
+  when: item.item.active | default(true) | bool
