@@ -25,3 +25,7 @@ jobs:
         run: dev/vagrant-example-configure.sh
         env:
           ANSIBLE_FORCE_COLOR: True
+      
+      - name: Run hpctests
+        run: ansible-playbook ansible/adhoc/hpctests.yml
+        
