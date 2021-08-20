@@ -64,7 +64,7 @@ clusters:
   slurm: # TODO(gb637) make {{ openhpc_cluster_name }} interporlation work here
     v2:
       metadata:
-        title: ASCC
+        title: Arcus
       login:
         host: 10.60.253.76 # "{{ openhpc_cluster_name }}-login-0"
       job:

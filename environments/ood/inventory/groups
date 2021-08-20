@@ -1,39 +1,3 @@
-# FIXME: development cluster is currently not setup to use dedicated login nodes
-# This inventory should be changed to match production.
-[control:children]
-login
-
-[podman:children]
-cluster
-
-[prometheus:children]
-login
-
-[grafana:children]
-login
-
-[alertmanager:children]
-login
-
-[exporters:children]
-login
-compute
-
-[elasticsearch:children]
-login
-
-[opendistro:children]
-login
-
-[kibana:children]
-login
-
-[slurm_stats:children]
-login
-
-[filebeat:children]
-slurm_stats
-
 [nfs:children]
 cluster
 
@@ -41,7 +5,36 @@ cluster
 cluster
 
 [mysql:children]
-login
+control
+
+[prometheus:children]
+control
+
+[grafana:children]
+control
+
+[alertmanager:children]
+control
 
 [node_exporter:children]
 cluster
+
+[opendistro:children]
+control
+
+[kibana:children]
+control
+
+[slurm_stats:children]
+control
+
+[filebeat:children]
+slurm_stats
+
+# NB: [rebuild] not defined here as this template is used in CI, which does not run in openstack
+
+[update:children]
+cluster
+
+[ood:children]
+login

@@ -35,6 +35,14 @@ variable "login_image" {
   type = string
 }
 
+variable "control_flavor" {
+  type = string
+}
+
+variable "control_image" {
+  type = string
+}
+
 variable "compute_flavor" {
   type = string
 }
@@ -46,6 +54,13 @@ variable "compute_image" {
 resource "openstack_networking_secgroup_v2" "secgroup_slurm_login" {
   name        = "${var.cluster_name}-secgroup-slurm-login"
   description = "Rules for the slurm login node"
+  # Fully manage with terraform
+  delete_default_rules = true
+}
+
+resource "openstack_networking_secgroup_v2" "secgroup_slurm_control" {
+  name        = "${var.cluster_name}-secgroup-slurm-control"
+  description = "Rules for the slurm control node"
   # Fully manage with terraform
   delete_default_rules = true
 }
@@ -75,6 +90,33 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingr
   security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
 }
 
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_udp_v4" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  # NOTE: You will want to lock down the ports in a production environment. This will require
+  # setting of static ports for the NFS server see:
+  # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/storage_administration_guide/s2-nfs-nfs-firewall-config
+  port_range_min    = 1
+  protocol          = "udp"
+  port_range_max    = 65535
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_login.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_control_rule_egress_v4" {
+  direction         = "egress"
+  ethertype         = "IPv4"
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_control.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_control_rule_ingress_tcp_v4" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  port_range_min    = 1
+  protocol          = "tcp"
+  port_range_max    = 65535
+  security_group_id = openstack_networking_secgroup_v2.secgroup_slurm_control.id
+}
+
 resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_compute_rule_egress_v4" {
   direction         = "egress"
   ethertype         = "IPv4"
@@ -102,16 +144,16 @@ resource "openstack_compute_instance_v2" "login" {
   security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_login.name]
 }
 
-resource "openstack_compute_instance_v2" "ood" {
+resource "openstack_compute_instance_v2" "control" {
 
-  name        = "${var.cluster_name}-ood-0"
-  image_name  = var.login_image
-  flavor_name = var.login_flavor
+  name        = "${var.cluster_name}-control-0"
+  image_name  = var.control_image
+  flavor_name = var.control_flavor
   key_pair    = var.key_pair
   network {
     name = var.network
   }
-  security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_login.name]
+  security_groups = [openstack_networking_secgroup_v2.secgroup_slurm_control.name]
 }
 
 
@@ -135,8 +177,8 @@ resource "local_file" "hosts" {
     {
       "cluster_name" : var.cluster_name
       "login" : openstack_compute_instance_v2.login,
+      "control" : openstack_compute_instance_v2.control,
       "computes" : openstack_compute_instance_v2.compute,
-      "ood" : openstack_compute_instance_v2.ood,
     },
   )
   filename = "${var.environment_root}/inventory/hosts"

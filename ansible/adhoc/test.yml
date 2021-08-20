@@ -7,7 +7,7 @@
 - hosts: openhpc_tests
   name: Run tests
   tags: test
-  gather_facts: true
+  gather_facts: false
   tasks:
     - import_role:
         name: stackhpc.slurm_openstack_tools.test

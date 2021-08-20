@@ -11,3 +11,87 @@
   tasks:
     - include_role:
         name: osc.ood
+  post_tasks:
+    - name: Ensure post_tasks dirs exists
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /etc/ood/config/apps/dashboard/initializers
+        - /etc/ood/config/locales
+        - /etc/ood/config/announcements.d
+        - /etc/ood/config/pun/html
+
+    - name: Filter OOD's dev access & create files shortcuts
+      copy:
+        content: |
+          Configuration.app_development_enabled = Process.groups.include?({{ um6p_hpc_admin_gid }})
+          OodFilesApp.candidate_favorite_paths.tap do |paths|
+            # add RDS space directories
+            paths << Pathname.new("/srv/data/#{User.new.name}")
+          end
+        dest: /etc/ood/config/apps/dashboard/initializers/ood.rb
+
+    - name: Copy web page to let users create their home directory
+      copy:
+        src: adhoc/ood/missing_home_directory.html
+        dest: /etc/ood/config/pun/html/missing_home_directory.html
+
+    - name: Create user_map script to make all users lower case
+      copy:
+        content: |
+          #!/bin/bash
+          username=${1,,}
+          shift
+          /opt/ood/ood_auth_map/bin/ood_auth_map.regex ${username} $@
+        dest: "{{ user_map_cmd }}"
+        mode: "0755"
+      when: false
+
+    - name: Copy motd
+      copy:
+        src: adhoc/ood/motd
+        dest: /etc/motd
+
+    - name: Ensure ondemand-dex is running and active
+      service:
+        name: ondemand-dex
+        enabled: yes
+        state: started
+      when: false
+
+    - name: Copy UM6P Brand images
+      copy:
+        src: adhoc/ood/ondemand
+        dest: "{{ item }}"
+      loop:
+        - /var/www/ood/public
+        - /usr/share/ondemand-dex/web/themes/
+
+    - name: Move favicon to the top level
+      copy:
+        src: /var/www/ood/public/ondemand/favicon.ico
+        dest: "{{ item }}"
+        remote_src: true
+      loop:
+        - /var/www/ood/public/favicon.ico
+        - /usr/share/ondemand-dex/web/themes/ondemand/favicon.svg
+
+    - name: Force ondemand scripts to use the right locale
+      copy:
+        content: |
+          LANG=en_US.UTF8
+          # TODO(gb637) this is not nice, not pretty. we need a better solution.
+          # remove this snippet.
+          for user in $(getent group hpc-users | cut -d: -f4 | tr ',' ' ' ); do
+            test -d /home/$user || su -l $user -c exit
+          done
+        dest: /etc/ood/profile
+
+      # TODO(gb637) make this automatic
+    - name: Add ssh_known_hosts for login node
+      copy:
+        content: |
+          slurm-login-h23d5-u38-svn1,10.43.1.5 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLRzrCQ/iZYBgpWrdn4o3IdJCuXuAUQHbAllc2jEAtTrnVFL3llhexHpNTAo4Kmw40UCv+/1cSHGieBrsH8i0Ec=
+        dest: /etc/ssh/ssh_known_hosts
+      when: false
