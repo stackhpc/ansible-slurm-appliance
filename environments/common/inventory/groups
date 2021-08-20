@@ -79,3 +79,21 @@ cluster
 [hardening]
 # Hosts to apply security hardening configuration configuration to
 # https://github.com/openstack/ansible-hardening
+
+[ipaserver]
+# TODO
+
+#[ipaservers:children]
+#ipaserver
+
+[ipareplicas]
+# TODO
+
+[ipaclients]
+# TODO
+
+[ipacluster:children]
+ipaserver
+ipareplicas
+ipaclients
+

@@ -47,3 +47,24 @@
         name: stackhpc.slurm_openstack_tools.rebuild
         tasks_from: validate.yml
       tags: validate
+
+- name: Validate freeipa configuration
+  hosts:
+    - ipaserver
+    - ipareplicas
+    - ipaclients
+  gather_facts: false
+  tags:
+    - ipaserver
+    - ipareplicas
+    - ipaclients
+  tasks:
+    - assert:
+        that: "{{ item is defined }}"
+        fail_msg: "variable {{ item }} has not be defined"
+      loop:
+        - ipaadmin_password
+        - ipadm_password
+        - ipaserver_domain
+        - ipaserver_realm
+      run_once: true

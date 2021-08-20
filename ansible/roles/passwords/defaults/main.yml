@@ -8,6 +8,8 @@ slurm_appliance_secrets:
   vault_mysql_slurm_password: "{{ secrets_openhpc_mysql_slurm_password | default(vault_mysql_slurm_password | default(lookup('password', '/dev/null'))) }}"
   vault_openhpc_mungekey: "{{ secrets_openhpc_mungekey | default(vault_openhpc_mungekey | default(secrets_openhpc_mungekey_default)) }}"
   ansible_become_password: "{{ ansible_become_password | default(lookup('password', '/dev/null')) }}"
+  vault_ipaadmin_password: "{{ vault_ipaadmin_password | default(lookup('password', '/dev/null')) }}"
+  vault_ipadm_password: "{{ vault_ipadm_password | default(lookup('password', '/dev/null')) }}"
 
 secrets_openhpc_mungekey_default:
   content: "{{ lookup('pipe', 'dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64') }}"
