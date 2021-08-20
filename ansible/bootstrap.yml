@@ -6,8 +6,11 @@
   tags:
     - deprecated
   tasks:
-    - debug:
-        msg: "Variables prefixed secrets_openhpc_* are deprecated and should be replaced with vault_*, please see ansible/roles/passwords/defaults/main.yml"
+    - fail:
+        msg: |
+          Variables prefixed secrets_openhpc_* are deprecated - run:
+              $ ansible-playbook ansible/adhoc/generate-passwords.yml
+          to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
 - hosts: cluster
