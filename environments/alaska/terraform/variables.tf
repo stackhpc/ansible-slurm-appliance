@@ -22,7 +22,7 @@ variable "login_nodes" {
   description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> mapping  {flavor: flavor_name, image: image_name_or_id }"
   default = {
       login-0: {
-        flavor: "vm.alaska.cpu.general.small"
+        flavor: "vm.alaska.cpu.nvme.half"
         image: "CentOS8-2105"
         address: "128.232.222.246"
       }
