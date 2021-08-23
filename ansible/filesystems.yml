@@ -32,6 +32,14 @@
         state: mounted
       when: "item.ansible_groups | intersect(group_names)"
       loop: "{{ block_devices }}"
+    - name: Set owner/group for mounted directory
+      file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner | default(omit) }}"
+        group: "{{ item.owner | default(omit) }}"
+      when: "item.ansible_groups | intersect(group_names)"
+      loop: "{{ block_devices }}"
 
 - name: Setup NFS
   hosts: nfs
