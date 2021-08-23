@@ -72,6 +72,10 @@ cluster
 [update]
 # All hosts to (optionally) run yum update on.
 
+[block_devices]
+# Superset of hosts to configure filesystems on
+# TODO: document what's required
+
 [fail2ban]
 # Hosts to install fail2ban on to protect SSH
 # https://www.fail2ban.org/wiki/index.php/Main_Page

@@ -33,6 +33,9 @@ slurm_stats
 [update:children]
 cluster
 
+[block_devices:children]
+# environment-specific so not defined here
+
 [fail2ban:children]
 login
 
