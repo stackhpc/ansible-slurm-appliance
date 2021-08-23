@@ -16,6 +16,16 @@ resource "openstack_compute_instance_v2" "control" {
 
 }
 
+resource "openstack_compute_volume_attach_v2" "home" {
+  instance_id = openstack_compute_instance_v2.control.id
+  volume_id   = data.openstack_blockstorage_volume_v3.home.id
+}
+
+resource "openstack_compute_volume_attach_v2" "slurmctld" {
+  instance_id = openstack_compute_instance_v2.control.id
+  volume_id   = data.openstack_blockstorage_volume_v3.slurmcltd.id
+}
+
 resource "openstack_compute_instance_v2" "login" {
 
   for_each = var.login_nodes
@@ -25,7 +35,7 @@ resource "openstack_compute_instance_v2" "login" {
   flavor_name = each.value.flavor
   key_pair = var.key_pair
   config_drive = true
-  security_groups = ["default", "SSH"]
+  security_groups = ["default"]
 
   network {
     uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
