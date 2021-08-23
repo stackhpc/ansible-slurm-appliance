@@ -7,6 +7,10 @@ resource "local_file" "hosts" {
                             "computes": openstack_compute_instance_v2.compute,
                             "compute_types": var.compute_types,
                             "compute_nodes": var.compute_nodes,
+                            "volumes": {
+                              "home": openstack_compute_volume_attach_v2.home
+                              "slurmctld": openstack_compute_volume_attach_v2.slurmctld
+                            }
                           },
                           )
   filename = "../inventory/hosts"
