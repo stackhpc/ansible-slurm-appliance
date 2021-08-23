@@ -1,2 +1,2 @@
 inventory/hosts
-inventory/group_vars/openhpc/partitions
+inventory/group_vars/openhpc/partitions.yml
