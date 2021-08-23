@@ -1,0 +1,3 @@
+openhpc_extra_config:
+  StateSaveLocation: /mnt/slurmctld
+  
