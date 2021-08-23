@@ -35,3 +35,6 @@ slurm_stats
 
 [update:children]
 cluster
+
+[block_devices:children]
+# Environment-specific so not defined here

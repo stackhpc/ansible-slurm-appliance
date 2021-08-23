@@ -1,5 +1,32 @@
 ---
 
+- name: Setup block devices
+  hosts: block_devices
+  become: yes
+  tasks:
+    - name:  Create partitions
+      parted:
+        device: "{{ item.device }}"
+        number: "{{ item.number }}"
+        state: present
+      when: "item.ansible_groups | list | intersect(group_names)"
+      loop: "{{ block_devices }}"
+    - name: Create filesystems
+      filesystem:
+        fstype: "{{ item.fstype }}"
+        dev: "{{ item.device }}{{ item.number }}"
+        resizefs: "{{ item.resizefs }}"
+      when: "item.ansible_groups | intersect(group_names)"
+      loop: "{{ block_devices }}"
+    - name: Mount filesystems
+      mount:
+        path: "{{ item.path }}"
+        src: "{{ item.device }}{{ item.number }}"
+        fstype: "{{ item.fstype }}"
+        state: present
+      when: "item.ansible_groups | intersect(group_names)"
+      loop: "{{ block_devices }}"
+
 - name: Setup NFS
   hosts: nfs
   become: true
