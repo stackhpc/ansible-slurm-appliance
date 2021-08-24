@@ -7,9 +7,9 @@ nfs_enable:
         clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
 
 nfs_configurations:
-  - comment: Export HOME from Slurm control node
+  - comment: Export /home from Slurm control node
     nfs_export: "/home"
     nfs_client_mnt_point: "/home"
-  - comment: Export /scratch from Slurm control node
+  - comment: Export /scratch from Slurm control node (NVME drives)
     nfs_export: "/scratch"
     nfs_client_mnt_point: "/scratch"

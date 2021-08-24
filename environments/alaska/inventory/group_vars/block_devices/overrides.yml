@@ -13,4 +13,3 @@ block_devices:
     ansible_groups: ['control']
     owner: slurm
     group: slurm
-  # TODO: NVME drives on /scratch
