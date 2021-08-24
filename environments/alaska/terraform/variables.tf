@@ -22,7 +22,7 @@ variable "login_nodes" {
   description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> mapping  {flavor: flavor_name, image: image_name_or_id }"
   default = {
       login-0: {
-        flavor: "vm.alaska.cpu.general.small"
+        flavor: "vm.alaska.cpu.himem.quarter"
         image: "CentOS8-2105"
         address: "128.232.222.246"
       }
@@ -37,6 +37,10 @@ variable "compute_types" {
           flavor: "vm.alaska.cpu.general.small"
           image: "CentOS8-2105"
       }
+      full: {
+          flavor: "vm.alaska.cpu.general.full"
+          image: "CentOS8-2105"
+      }
     }
 }
 
@@ -44,10 +48,10 @@ variable "compute_nodes" {
     type = map(string)
     description = "Mapping of compute nodename suffix -> key in compute_types"
     default = {
-        compute-0: "small"
-        compute-1: "small"
-        compute-2: "small"
-        compute-3: "small"
+        compute-0: "full"
+        compute-1: "full"
+        compute-2: "full"
+        compute-3: "full"
     }
 }
 
