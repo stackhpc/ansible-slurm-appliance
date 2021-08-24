@@ -1,8 +1,8 @@
 ---
-- name: Start filewalld
+- name: Restart filewalld
   service:
     name: firewalld
-    state: started
+    state: restarted
     enabled: true
 
 - name: Restart fail2ban
