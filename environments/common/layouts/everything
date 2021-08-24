@@ -41,3 +41,6 @@ login
 
 [hardening:children]
 login
+
+[basic_users]
+# Add `openhpc` group to add slurm users via creation of users on each node.
