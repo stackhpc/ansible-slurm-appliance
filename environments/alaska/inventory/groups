@@ -39,4 +39,9 @@ cluster
 login
 
 [hardening:children]
-login
+
+[block_devices:children]
+control
+
+[basic_users:children]
+openhpc
