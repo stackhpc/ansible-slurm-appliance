@@ -4,3 +4,4 @@ basic_users_userdefaults:
   create_home: "{{ basic_users_manage_homedir }}"
   generate_ssh_key:  "{{ basic_users_manage_homedir }}"
   ssh_key_comment: "{{ item.name }}"
+  shell: "{{'/sbin/nologin' if 'control' in group_names else omit }}"
