@@ -1,0 +1,6 @@
+basic_users_manage_homedir: "{{ (ansible_hostname == (ansible_play_hosts | first)) }}"
+basic_users_userdefaults:
+  state: present
+  create_home: "{{ basic_users_manage_homedir }}"
+  generate_ssh_key:  "{{ basic_users_manage_homedir }}"
+  ssh_key_comment: "{{ item.name }}"
