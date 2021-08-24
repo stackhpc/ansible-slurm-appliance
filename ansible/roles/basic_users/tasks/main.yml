@@ -1,0 +1,40 @@
+---
+- name: Terminate systemd user sessions for absent users
+  terminate_user_sessions:
+    user: "{{ item.name }}"
+  loop: "{{ basic_users_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - "item.state | default('present') == 'absent'"
+  
+- name: Create users and public keys
+  user: "{{ basic_users_userdefaults | combine(item) | remove_keys(['public_key']) }}"
+  loop: "{{ basic_users_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: basic_users_info
+  
+
+- name: Write supplied public key as authorized for SSH access
+  authorized_key:
+    user: "{{ item.name }}"
+    state: present
+    key: "{{ item.public_key }}"
+  loop: "{{ basic_users_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - item.state | default('present') == 'present'
+    - "'login' in group_names"
+
+- name: Write generated public key as authorized for SSH access
+  authorized_key:
+    user: "{{ item.name }}"
+    state: present
+    manage_dir: no
+    key: "{{ item.ssh_public_key }}"
+  loop: "{{ hostvars[ansible_play_hosts | first].basic_users_info.results }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: "item.ssh_public_key is defined"
