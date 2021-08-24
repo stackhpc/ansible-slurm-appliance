@@ -9,6 +9,7 @@
       - fail2ban-server
       - fail2ban-firewalld
     state: present
+  notify: Start filewalld
 
 - name: Create config
   template:
@@ -16,7 +17,14 @@
     src: jail.local.j2
   notify: Restart fail2ban
 
-- meta: flush_handlers
+- name: Ensure filewalld running even if no config change
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
+- name: flush handlers
+  meta: flush_handlers
 
 - name: Ensure fail2ban running even if no config change
   service:

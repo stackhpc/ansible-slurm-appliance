@@ -1,4 +1,10 @@
 ---
+- name: Start filewalld
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
 - name: Restart fail2ban
   service:
     name: fail2ban
