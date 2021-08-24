@@ -11,5 +11,3 @@ block_devices:
     resizefs: yes
     path: /mnt/slurmctld
     ansible_groups: ['control']
-    owner: slurm
-    group: slurm

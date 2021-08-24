@@ -1,4 +1,4 @@
 openhpc_extra_config:
-  StateSaveLocation: /mnt/slurmctld
   SlurmctldSyslogDebug: error
   SlurmdSyslogDebug: error
+openhpc_state_save_location: /mnt/slurmctld
