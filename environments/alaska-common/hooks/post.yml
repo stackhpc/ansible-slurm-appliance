@@ -1,0 +1,21 @@
+- hosts: kubectl
+  become: yes
+  name: Install and configure kubectl
+  tasks:
+    - shell: |
+        set -e
+        curl -LO https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+        curl -LO "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl.sha256"
+        echo "$(<kubectl.sha256) kubectl" | sha256sum --check
+        chmod +x kubectl
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl-{{ kubectl_version }}
+        sudo ln -sf /usr/local/bin/kubectl-{{ kubectl_version }} /usr/local/bin/kubectl
+      args:
+        # warn: false
+        creates: "/usr/local/bin/kubectl-{{ kubectl_version }}"
+    - name: Set global KUBECONFIG variable
+      lineinfile:
+        line: "KUBECONFIG={{ kubeconfig_path }}"
+        state: present
+        path: /etc/environment
+      when: kubeconfig_path is defined
