@@ -18,3 +18,5 @@ roles/*
 !roles/passwords/**
 !roles/hpctests/
 !roles/hpctests/**
+!roles/block_devices/
+!roles/block_devices/**

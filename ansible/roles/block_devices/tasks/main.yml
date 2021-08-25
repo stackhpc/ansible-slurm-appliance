@@ -1,0 +1,49 @@
+- name:  Create partitions
+  parted:
+    device: "{{ item.get('device', block_devices_device) }}"
+    number: "{{ item.get('number', block_devices_number) }}"
+    state: "{{ item.get('partition_state', block_devices_partition_state) }}"
+  when:
+    - "inventory_hostname in item.get('hostnames', [inventory_hostname])"
+    - "item.get('partition_state', block_devices_partition_state) != 'skip'"
+  loop: "{{ block_devices_configurations }}"
+
+- name: Create filesystems
+  filesystem:
+    fstype: "{{ item.get('fstype', block_devices_fstype) }}"
+    dev: "{{ item.get('device', block_devices_device) }}{{ item.get('number', block_devices_number) }}"
+    resizefs: "{{ item.get('resizefs', block_devices_resizefs) }}"
+    state: "{{ item.get('filesystem_state', block_devices_filesystem_state) }}"
+  when:
+    - "inventory_hostname in item.get('hostnames', [inventory_hostname])"
+    - "item.get('filesystem_state', block_devices_filesystem_state) != 'skip'"
+  loop: "{{ block_devices_configurations }}"
+
+- name: Ensure mount point exists
+  file:
+    path: "{{ item.get('path', block_devices_path) }}"
+    state: directory
+  when:
+    - "inventory_hostname in item.get('hostnames', [inventory_hostname])"
+  loop: "{{ block_devices_configurations }}"
+
+- name: Mount filesystems
+  mount:
+    path: "{{ item.get('path', block_devices_path) }}"
+    src: "{{ item.get('device', block_devices_device) }}{{ item.get('number', block_devices_number) }}"
+    fstype: "{{ item.get('fstype', block_devices_fstype) }}"
+    state: "{{ item.get('mount_state', block_devices_mount_state) }}"
+  when:
+    - "inventory_hostname in item.get('hostnames', [inventory_hostname])"
+  loop: "{{ block_devices_configurations }}"
+
+- name: Set owner/group for mounted directory
+  file:
+    path: "{{ item.get('path', block_devices_path) }}"
+    state: directory
+    owner: "{{ item.get('owner', block_devices_owner) | default(omit) }}"
+    group: "{{ item.get('group', block_devices_group) | default(omit) }}"
+  when:
+    - "inventory_hostname in item.get('hostnames', [inventory_hostname])"
+    - "item.get('owner', block_devices_owner) or item.get('group', block_devices_group)"
+  loop: "{{ block_devices_configurations }}"
