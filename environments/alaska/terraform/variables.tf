@@ -18,6 +18,16 @@ variable "cluster_subnet" {
     description = "Name of existing subnet to put cluster on"
 }
 
+variable "home_volume" {
+    type = string
+    description = "Name of existing volume to use for /home"
+}
+
+variable "slurmctld_volume" {
+    type = string
+    description = "Name of existing volume to use for slurmctld state"
+}
+
 variable "control_node" {
     type = map
     description = "Mapping {flavor: flavor_name, image: image_name_or_id }"

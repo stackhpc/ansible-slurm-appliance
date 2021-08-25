@@ -1,7 +1,7 @@
 data "openstack_blockstorage_volume_v3" "home" {
-  name = "alaska-home"
+  name = var.home_volume
 }
 
 data "openstack_blockstorage_volume_v3" "slurmcltd" {
-  name = "alaska-slurmctld-state"
+  name = var.slurmctld_volume
 }
