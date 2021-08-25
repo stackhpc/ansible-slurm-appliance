@@ -3,10 +3,10 @@ openhpc_packages:
   - bzip2
   - bazaar
   - curl
+  - fio
+  - libaio
+  - libaio-devel
   - git
-  - gnu9-compilers-ohpc
-  - nhc-ohpc
-  - ohpc-gnu9-openmpi4-perf-tools
   - gzip
   - make
   - patch
@@ -18,6 +18,37 @@ openhpc_packages:
   - zstd
   - tmux
   - vim
+  - gnu9-compilers-ohpc
+  - nhc-ohpc
+  - lmod-ohpc
+  - ohpc-autotools
+  - ohpc-base
+  - ohpc-base-compute
+  - ohpc-gnu9-openmpi4-perf-tools
+  - mpich-ofi-gnu9-ohpc
+  - mpich-ucx-gnu9-ohpc
+  - mvapich2-gnu9-ohpc
+  - openmpi4-gnu9-ohpc
+  - ucx-ohpc
+  - hdf5-gnu9-ohpc
+  - netcdf-gnu9-impi-ohpc
+  - netcdf-gnu9-mpich-ohpc
+  - netcdf-gnu9-mvapich2-ohpc
+  - netcdf-gnu9-openmpi4-ohpc
+  - phdf5-gnu9-impi-ohpc
+  - phdf5-gnu9-mpich-ohpc
+  - phdf5-gnu9-mvapich2-ohpc
+  - phdf5-gnu9-openmpi4-ohpc
+  - pnetcdf-gnu9-impi-ohpc
+  - pnetcdf-gnu9-mpich-ohpc
+  - pnetcdf-gnu9-mvapich2-ohpc
+  - pnetcdf-gnu9-openmpi4-ohpc
+  - charliecloud-ohpc
+  - singularity-ohpc
+  - boost-gnu9-impi-ohpc
+  - boost-gnu9-mpich-ohpc
+  - boost-gnu9-mvapich2-ohpc
+  - boost-gnu9-openmpi4-ohpc
 
 openhpc_slurm_partitions:
   - name: "sm"
