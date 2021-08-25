@@ -3,43 +3,10 @@
 - name: Setup block devices
   hosts: block_devices
   become: yes
+  tags: block_devices
   tasks:
-    - name:  Create partitions
-      parted:
-        device: "{{ item.device }}"
-        number: "{{ item.number }}"
-        state: present
-      when: "item.ansible_groups | list | intersect(group_names)"
-      loop: "{{ block_devices }}"
-    - name: Create filesystems
-      filesystem:
-        fstype: "{{ item.fstype }}"
-        dev: "{{ item.device }}{{ item.number }}"
-        resizefs: "{{ item.resizefs }}"
-      when: "item.ansible_groups | intersect(group_names)"
-      loop: "{{ block_devices }}"
-    - name: Ensure mount point exists
-      file:
-        path: "{{ item.path }}"
-        state: directory
-      when: "item.ansible_groups | intersect(group_names)"
-      loop: "{{ block_devices }}"
-    - name: Mount filesystems
-      mount:
-        path: "{{ item.path }}"
-        src: "{{ item.device }}{{ item.number }}"
-        fstype: "{{ item.fstype }}"
-        state: mounted
-      when: "item.ansible_groups | intersect(group_names)"
-      loop: "{{ block_devices }}"
-    - name: Set owner/group for mounted directory
-      file:
-        path: "{{ item.path }}"
-        state: directory
-        owner: "{{ item.owner | default(omit) }}"
-        group: "{{ item.owner | default(omit) }}"
-      when: "item.ansible_groups | intersect(group_names)"
-      loop: "{{ block_devices }}"
+    - include_role:
+        name: block_devices
 
 - name: Setup NFS
   hosts: nfs
