@@ -1,0 +1,1 @@
+openhpc_rebuild_clouds: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../alaska-common/inventory/group_vars/rebuild/slurm-v1.yaml"
