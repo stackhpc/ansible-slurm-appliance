@@ -25,6 +25,7 @@
     label: "{{ item.name }} [{{ item.state | default('present') }}]"
   when:
     - item.state | default('present') == 'present'
+    - item.public_key is defined
   run_once: true
 
 - name: Write generated public key as authorized for SSH access
