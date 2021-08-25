@@ -13,7 +13,7 @@ A CentOS 8 system.
 Role Variables
 --------------
 
-None.
+fail2ban_trusted_subnet: Required. CIDR of cluster's subnet. This adds this to `firewalld`'s `trusted` zone so that no ports are blocked. This is the easiest way to comply with Slurm's networking requirements.
 
 Dependencies
 ------------
