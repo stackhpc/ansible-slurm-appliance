@@ -1,13 +1,11 @@
-block_devices:
+block_devices_configurations:
   - device: "{{ ( volumes | from_json ).home.device }}"
     number: 1
     fstype: ext4
     resizefs: yes
     path: /home
-    ansible_groups: ['control']
   - device: "{{ (volumes | from_json ).slurmctld.device }}"
     number: 1
     fstype: ext4
     resizefs: yes
     path: /mnt/slurmctld
-    ansible_groups: ['control']
