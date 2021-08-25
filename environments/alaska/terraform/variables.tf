@@ -8,6 +8,16 @@ variable "key_pair" {
     description = "Name of an existing keypair in OpenStack"
 }
 
+variable "cluster_net" {
+    type = string
+    description = "Name of existing network to put cluster on"
+}
+
+variable "cluster_subnet" {
+    type = string
+    description = "Name of existing subnet to put cluster on"
+}
+
 variable "control_node" {
     type = map
     description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
