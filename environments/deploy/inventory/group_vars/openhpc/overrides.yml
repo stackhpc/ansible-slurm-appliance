@@ -1,8 +1,6 @@
 openhpc_packages:
   - slurm-libpmi-ohpc
   - bzip2
-  - bzr
-  - bzr-explorer
   - curl
   - fio
   - libaio
