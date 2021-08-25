@@ -45,3 +45,6 @@ control
 
 [basic_users:children]
 openhpc
+
+[kubectl:children]
+login

@@ -1,0 +1,2 @@
+kubectl_version: v1.20.4
+kubeconfig_path: /home/kubeconfig
