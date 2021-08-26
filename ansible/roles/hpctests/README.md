@@ -1,4 +1,4 @@
-Role Name
+hpctests
 =========
 
 An MPI-based test suite for Slurm appliance clusters.
