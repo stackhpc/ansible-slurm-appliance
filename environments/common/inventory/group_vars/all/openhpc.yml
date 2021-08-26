@@ -15,8 +15,11 @@ openhpc_slurmdbd_mysql_username: slurm
 openhpc_slurm_control_host: "{{ groups['control'] | first }}"
 openhpc_slurm_partitions:
   - name: "compute"
-openhpc_packages:
-  - slurm-libpmi-ohpc
-openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
+openhpc_default_packages:
+  - slurm-libpmi-ohpc # to allow intel mpi to work properly
+  - ohpc-gnu9-openmpi4-perf-tools # for hpctests
+openhpc_extra_packages: []
+openhpc_packages: "{{ openhpc_default_packages + openhpc_extra_packages }}"
+openhpc_munge_key: "{{ secrets_openhpc_mungekey | b64decode }}"
 openhpc_slurm_configless: true
 openhpc_login_only_nodes: login

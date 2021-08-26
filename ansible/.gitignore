@@ -22,3 +22,5 @@ roles/*
 !roles/basic_users/**
 !roles/block_devices/
 !roles/block_devices/**
+!roles/hpctests/
+!roles/hpctests/**
