@@ -1,9 +1,9 @@
-Role Name
+hpctests
 =========
 
 An MPI-based test suite for Slurm appliance clusters.
 
-This is intended as a replacement for [this test role](`https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/test/`) but will be safe to run on clusters in production use as it does not use NFS exports for package installs. Instead it assumes the required packages are pre-installed, which is the case by default with this appliance. 
+This is intended as a replacement for [this test role](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/test/) but will be safe to run on clusters in production use as it does not use NFS exports for package installs. Instead it assumes the required packages are pre-installed, which is the case by default with this appliance. 
 
 Tests (with corresponding tags) are:
 - `pingpong`: Runs Intel MPI Benchmark's IMB-MPI1 pingpong between a pair of (scheduler-selected) nodes. Reports zero-size message latency and maximum bandwidth.
