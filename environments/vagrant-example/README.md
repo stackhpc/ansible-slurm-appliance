@@ -10,6 +10,8 @@ No additional comments.
 ## Installation on deployment host
 See main README and then additionally install Vagrant and a provider. For CentOS 8, you can install Vagrant + VirtualBox using:
 
+    sudo yum install gcc make perl elfutils-devel
+    # install appropriate kernel-headers and kernel-devel packages for running kernel
     sudo dnf install https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.rpm
     sudo dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo
     sudo yum install VirtualBox-6.0
@@ -26,10 +28,17 @@ See main README, plus:
 To provision and configure the appliance in the same way as the CI use:
 
     cd <repo root>
-    dev/vagrant-provision-example.sh
+    dev/vagrant-example-provision.sh
     dev/vagrant-example-configure.sh
 
-To debug failures, activate the venv and environment and switch to the vagrant project directory:
+If running Vagrant itself fails try:
+
+    vagrant init
+    vagrant up --provider=virtualbox
+
+and follow prompts.
+
+To debug provisioning/configuration failures, activate the venv and environment and switch to the vagrant project directory:
 
     . venv/bin/activate
     . environments/vagrant-example/activate
