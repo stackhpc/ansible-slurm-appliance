@@ -8,6 +8,9 @@ This is intended as a replacement for [this test role](`https://github.com/stack
 Tests (with corresponding tags) are:
 - `pingpong`: Runs Intel MPI Benchmark's IMB-MPI1 pingpong between a pair of (scheduler-selected) nodes. Reports zero-size message latency and maximum bandwidth.
 - `pingmatrix`: Runs a similar pingpong test but between all pairs of nodes. Reports zero-size message latency & maximum bandwidth.
+- `hpl-solo`: UNDER DEVELOPMENT
+
+All tests use GCC 9 and OpenMPI 4. The HPL-based tests use OpenBLAS.
 
 Note the HPL-based tests from the above role are currently not supported.
 
