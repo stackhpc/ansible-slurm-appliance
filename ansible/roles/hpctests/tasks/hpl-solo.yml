@@ -12,8 +12,6 @@
   slurm_node_info:
     nodes: "{{ hpctests_computes.stdout_lines }}"
   register: hpctests_nodeinfo
-- debug:
-    msg: "{{ hpctests_nodeinfo }}"
 
 - name: Check nodes are homogenous
   assert:
