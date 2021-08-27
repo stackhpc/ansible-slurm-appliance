@@ -24,3 +24,4 @@
     - include: hpl-solo.yml
   tags:
     - hpl-solo
+    - hpl-solo-debug

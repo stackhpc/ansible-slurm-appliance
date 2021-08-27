@@ -12,6 +12,7 @@
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
 echo SLURM_JOB_ID: $SLURM_JOB_ID
-module load {{ hpctests_hpl_modules | join(' ' ) }}
+echo UCX_NET_DEVICES: $UCX_NET_DEVICES
 
+module load {{ hpctests_hpl_modules | join(' ' ) }}
 mpirun ./xhpl

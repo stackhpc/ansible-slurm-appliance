@@ -9,10 +9,6 @@
   register: hpctests_nodeinfo
 - debug:
     msg: "{{ hpctests_nodeinfo }}"
-# - name: Get compute memory (in megabytes)
-#   command: "sinfo --noheader --Format Memory --nodes {{ hpctests_computes.stdout_lines[0] }}" # first node
-#   register: hpctests_free
-#   changed_when: false
 
 - name: Check nodes are homogenous
   assert:
@@ -23,11 +19,6 @@
     - CORES
     - THREADS
     - MEMORY
-
-# - name: Get compute processor info
-#   command: "sinfo --noheader --Format SocketCoreThread --nodes {{ hpctests_computes.stdout_lines[0] }}" # first node
-#   register: hpctests_cpu
-#   changed_when: false
 
 - name: Calculate number of processes (per node)
   # Will run array job, which is SAME on each node, so only need to deal with a single node's processors here
@@ -44,13 +35,12 @@
 - debug:
     msg: "hpctests_hplsolo_ntasks: {{ hpctests_hplsolo_ntasks }}, pq: {{ hpctests_hplsolo_pq }}"
 
-- fail:
-
-- name: Calculate total memory target
+- name: Calculate problem size
+  # Based on example shown in http://www.crc.nd.edu/~rich/CRC_Summer_Scholars_2014/HPL-HowTo.pdf but we have MB not GB
   set_fact:
-    mem_target: "{{ (( hpctests_nodeinfo['MEMORY'] | min ) | int * (hpctests_hpl_mem_frac | float) ) | int }}" # TODO might want total!
+    hpctests_hplsolo_N: "{{ ((((( (hpctests_nodeinfo.info['MEMORY'][0] | int) * (hpctests_hpl_mem_frac | float) * 1024 * 1024 * 1) / 8) | root) / hpctests_hpl_NB) | int ) * hpctests_hpl_NB }}"
 - debug:
-    msg: "Using 1 process per node targeting {{ mem_target }} MB ({{  (hpctests_hpl_mem_frac | float) * 100 }}% of each node)"
+    msg: "Using 1 process per node targeting {{ (hpctests_hpl_mem_frac | float)  * 100 }}% of {{ hpctests_nodeinfo.info['MEMORY'][0] }} MB memory per node, block size (NB) = {{ hpctests_hpl_NB }}, problem size (N) = {{ hpctests_hplsolo_N }}"
 
 - name: Get all nodes
   shell: "sinfo --Node --noheader --format %N" # TODO: assumes only one partition, although actually excluding nodes not in the default partition should be fine.
@@ -74,9 +64,9 @@
   tags:
     - dat
   vars:
-      hpctests_hpl_N: 29 # TODO: FIXME
-      hpctests_hpl_P: "{{ hpctests_hplsolo_ntasks.grid.P }}"
-      hpctests_hpl_Q: "{{ hpctests_hplsolo_ntasks.grid.Q }}"
+      hpctests_hpl_N: "{{ hpctests_hplsolo_N }}"
+      hpctests_hpl_P: "{{ hpctests_hplsolo_pq.grid.P }}"
+      hpctests_hpl_Q: "{{ hpctests_hplsolo_pq.grid.Q }}"
 
 - name: Create sbatch script
   template:
