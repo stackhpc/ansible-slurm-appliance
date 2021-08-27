@@ -58,6 +58,7 @@
   copy:
     src: "{{ hpctests_hpl_srcdir }}/bin/linux64/xhpl"
     dest: "{{ hpctests_rootdir }}/hpl-solo"
+    mode: "u+x"
     remote_src: yes
 
 - name: Template out HPL.dat
