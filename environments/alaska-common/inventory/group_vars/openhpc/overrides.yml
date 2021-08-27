@@ -2,10 +2,6 @@ openhpc_extra_config:
   SlurmctldSyslogDebug: error
   SlurmdSyslogDebug: error
 openhpc_state_save_location: /mnt/slurmctld
-openhpc_packages_intel_mpi:
-- slurm-libpmi-ohpc # allows intel mpi to work properly
-openhpc_packages_testing:
-- ohpc-gnu9-openmpi4-perf-tools # useful for testing
 openhpc_packages_spack: # prereqs for installing spack
   # prereqs for spack:
   - bzip2
@@ -44,4 +40,4 @@ openhpc_packages_p3_extra: # extra_packages from https://github.com/stackhpc/p3-
   - tmux
   - xorg-x11-xauth # NOTE(wszumski): SKA folks are running casaviewer on the login node using X11 forwarding.
   - mc
-openhpc_packages: "{{ openhpc_packages_intel_mpi + openhpc_packages_testing + openhpc_packages_spack + openhpc_packages_p3_ohpc + openhpc_packages_p3_extra | unique }}"
+openhpc_extra_packages: "{{ openhpc_packages_spack + openhpc_packages_p3_ohpc + openhpc_packages_p3_extra | unique }}"
