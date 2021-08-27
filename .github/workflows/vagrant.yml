@@ -25,3 +25,8 @@ jobs:
         run: dev/vagrant-example-configure.sh
         env:
           ANSIBLE_FORCE_COLOR: True
+      
+      - name: Run MPI-based tests
+        run: dev/vagrant-example-hpctests.sh
+        env:
+          ANSIBLE_FORCE_COLOR: True

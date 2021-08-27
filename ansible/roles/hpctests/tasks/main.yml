@@ -1,0 +1,14 @@
+- name: setup
+  block:
+    - include: setup.yml
+  tags: always
+
+- name: pingpong
+  block:
+    - include: pingpong.yml
+  tags: pingpong
+
+- name: pingmatrix
+  block:
+    - include: pingmatrix.yml
+  tags: pingmatrix
