@@ -1,3 +1,8 @@
+# For further information on tuning HPL see e.g.:
+# - https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/
+# - https://community.arm.com/developer/tools-software/hpc/b/hpc-blog/posts/profiling-and-tuning-linpack-step-step-guide
+# - http://www.crc.nd.edu/~rich/CRC_Summer_Scholars_2014/HPL-HowTo.pdf
+
 - name: Make directory
   file:
     path: "{{ hpctests_rootdir }}/hpl-solo"
