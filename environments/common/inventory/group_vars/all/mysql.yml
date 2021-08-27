@@ -6,11 +6,11 @@
 # Slurm recommends larger than default values: https://slurm.schedmd.com/accounting.html
 mysql_innodb_buffer_pool_size: 1024M
 mysql_innodb_lock_wait_timeout: 900
-mysql_root_password: "{{ vault_mysql_root_password }}"
+mysql_root_password: "{{ secrets_openhpc_mysql_root_password }}"
 mysql_databases:
   - name: slurm_acct_db
 mysql_users:
   - name: slurm
     host: "%"
-    password: "{{ vault_mysql_slurm_password }}"
+    password: "{{ secrets_openhpc_mysql_slurm_password }}"
     priv: "slurm_acct_db.*:ALL"
