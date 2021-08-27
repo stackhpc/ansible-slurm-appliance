@@ -1,26 +1,24 @@
-Role Name
+hpctests
 =========
 
 An MPI-based test suite for Slurm appliance clusters.
 
-This is intended as a replacement for [this test role](`https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/test/`) but will be safe to run on clusters in production use as it does not use NFS exports for package installs. Instead it assumes the required packages are pre-installed, which is the case by default with this appliance. 
+This is intended as a replacement for [this test role](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/test/) but will be safe to run on clusters in production use as it does not use NFS exports for package installs. Instead it assumes the required packages are pre-installed, which is the case by default with this appliance. 
 
 Tests (with corresponding tags) are:
 - `pingpong`: Runs Intel MPI Benchmark's IMB-MPI1 pingpong between a pair of (scheduler-selected) nodes. Reports zero-size message latency and maximum bandwidth.
 - `pingmatrix`: Runs a similar pingpong test but between all pairs of nodes. Reports zero-size message latency & maximum bandwidth.
-- `hpl-solo`: UNDER DEVELOPMENT
+- `hpl-solo`: Runs the HPL benchmark individually on all nodes. Reports Gflops.
 
-All tests use GCC 9 and OpenMPI 4. The HPL-based tests use OpenBLAS.
-
-Note the HPL-based tests from the above role are currently not supported.
-
-By default these tests use OpenMPI v4 with UCX. Currently UCX's [default network device selection](https://openucx.readthedocs.io/en/master/faq.html#what-is-the-default-behavior-in-a-multi-rail-environment) cannot be modified via this role which may be inappropriate for multi-rail nodes with widely-differing bandwidths.
+All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 
 Requirements
 ------------
 
 - An OpenHPC v2.x cluster.
-- Packages installed listed at `environments/common/inventory/group_vars/all/openhpc.yml`.
+- The following OpenHPC packages installed (note this is the default in the appliance, see `environments/common/inventory/group_vars/all/openhpc.yml:openhpc_default_packages`):
+  - `ohpc-gnu9-openmpi4-perf-tools`
+  - `openblas-gnu9-ohpc`
 
 Role Variables
 --------------

@@ -45,7 +45,7 @@ To debug provisioning/configuration failures, activate the venv and environment 
     cd $APPLIANCES_ENVIRONMENT_ROOT/vagrant
 
 (see the main README for an explanation of environment activation). Example vagrant commands are:
-   
-   vagrant status         # list vms
-   vagrant ssh <hostname> # login
-   vagrant destroy --parallel # destroy all VMs in parallel **without confirmation**
+    
+    vagrant status         # list vms
+    vagrant ssh <hostname> # login
+    vagrant destroy --parallel # destroy all VMs in parallel **without confirmation**
