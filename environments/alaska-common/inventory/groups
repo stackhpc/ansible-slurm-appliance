@@ -48,3 +48,6 @@ openhpc
 
 [kubectl:children]
 login
+
+[hpctests:children]
+login
