@@ -30,6 +30,7 @@ To provision and configure the appliance in the same way as the CI use:
     cd <repo root>
     dev/vagrant-example-provision.sh
     dev/vagrant-example-configure.sh
+    dev/vagrant-example-hpctests.sh
 
 If running Vagrant itself fails try:
 
