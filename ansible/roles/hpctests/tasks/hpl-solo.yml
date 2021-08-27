@@ -3,14 +3,52 @@
     path: "{{ hpctests_rootdir }}/hpl-solo"
     state: directory
 
-- name: Get compute memory (in megabytes)
-  command: "sinfo --noheader --Format Memory --node {{ hpctests_computes.stdout_lines[0] }}" # first node
-  register: free
-  changed_when: false
+- name: Get Slurm node info
+  slurm_node_info:
+    nodes: "{{ hpctests_computes.stdout_lines }}"
+  register: hpctests_nodeinfo
+- debug:
+    msg: "{{ hpctests_nodeinfo }}"
+# - name: Get compute memory (in megabytes)
+#   command: "sinfo --noheader --Format Memory --nodes {{ hpctests_computes.stdout_lines[0] }}" # first node
+#   register: hpctests_free
+#   changed_when: false
+
+- name: Check nodes are homogenous
+  assert:
+    that: "{{ hpctests_nodeinfo.info[item] | unique | length == 1 }}"
+    fail_msg: "Selected nodes are not homogenous: {{ item }} = {{ hpctests_nodeinfo.info[item] }}"
+  loop:
+    - SOCKETS
+    - CORES
+    - THREADS
+    - MEMORY
+
+# - name: Get compute processor info
+#   command: "sinfo --noheader --Format SocketCoreThread --nodes {{ hpctests_computes.stdout_lines[0] }}" # first node
+#   register: hpctests_cpu
+#   changed_when: false
+
+- name: Calculate number of processes (per node)
+  # Will run array job, which is SAME on each node, so only need to deal with a single node's processors here
+  # Also ignore any hyperthreading TODO: document
+  set_fact:
+    hpctests_hplsolo_ntasks: "{{ (hpctests_nodeinfo.info['SOCKETS'][0]) | int * (hpctests_nodeinfo.info['CORES'][0] | int) }}"
+
+- name: Calculate problem shape
+  # Want to go nearly square - again this is per-node remember
+  hpl_pq:
+    num_processes: "{{ hpctests_hplsolo_ntasks }}"
+  register: hpctests_hplsolo_pq
+
+- debug:
+    msg: "hpctests_hplsolo_ntasks: {{ hpctests_hplsolo_ntasks }}, pq: {{ hpctests_hplsolo_pq }}"
+
+- fail:
 
 - name: Calculate total memory target
   set_fact:
-    mem_target: "{{ (free.stdout.strip() | int * (hpctests_hpl_mem_frac | float) ) | int }}" # Intel don't tell you but the -b flag appears to be per node or process, not total!
+    mem_target: "{{ (( hpctests_nodeinfo['MEMORY'] | min ) | int * (hpctests_hpl_mem_frac | float) ) | int }}" # TODO might want total!
 - debug:
     msg: "Using 1 process per node targeting {{ mem_target }} MB ({{  (hpctests_hpl_mem_frac | float) * 100 }}% of each node)"
 
@@ -37,8 +75,8 @@
     - dat
   vars:
       hpctests_hpl_N: 29 # TODO: FIXME
-      hpctests_hpl_P: 1 # TODO: FIXME
-      hpctests_hpl_Q: 2 # TODO: FIXME
+      hpctests_hpl_P: "{{ hpctests_hplsolo_ntasks.grid.P }}"
+      hpctests_hpl_Q: "{{ hpctests_hplsolo_ntasks.grid.Q }}"
 
 - name: Create sbatch script
   template:
