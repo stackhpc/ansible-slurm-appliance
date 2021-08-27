@@ -1,0 +1,91 @@
+- name: Make directory
+  file:
+    path: "{{ hpctests_rootdir }}/hpl-solo"
+    state: directory
+
+- name: Get compute memory (in megabytes)
+  command: "sinfo --noheader --Format Memory --node {{ hpctests_computes.stdout_lines[0] }}" # first node
+  register: free
+  changed_when: false
+
+- name: Calculate total memory target
+  set_fact:
+    mem_target: "{{ (free.stdout.strip() | int * (hpctests_hpl_mem_frac | float) ) | int }}" # Intel don't tell you but the -b flag appears to be per node or process, not total!
+- debug:
+    msg: "Using 1 process per node targeting {{ mem_target }} MB ({{  (hpctests_hpl_mem_frac | float) * 100 }}% of each node)"
+
+- name: Get all nodes
+  shell: "sinfo --Node --noheader --format %N" # TODO: assumes only one partition, although actually excluding nodes not in the default partition should be fine.
+  register: all_nodes
+  changed_when: false
+
+- name: Calculate excluded nodes
+  set_fact:
+    hpctests_hplsolo_excluded_nodes: "{{ all_nodes.stdout_lines | difference(hpctests_computes.stdout_lines) }}"
+
+- name: Copy HPL binary
+  copy:
+    src: "{{ hpctests_hpl_srcdir }}/bin/linux64/xhpl"
+    dest: "{{ hpctests_rootdir }}/hpl-solo"
+    remote_src: yes
+
+- name: Template out HPL.dat
+  template:
+    src: "HPL.dat.j2"
+    dest: "{{ hpctests_rootdir }}/hpl-solo/HPL.dat"
+  tags:
+    - dat
+  vars:
+      hpctests_hpl_N: 29 # TODO: FIXME
+      hpctests_hpl_P: 1 # TODO: FIXME
+      hpctests_hpl_Q: 2 # TODO: FIXME
+
+- name: Create sbatch script
+  template:
+    src: hpl-solo.sh.j2
+    dest: "{{ hpctests_rootdir }}/hpl-solo/hpl-solo.sh"
+  vars:
+    hpctests_hplsolo_ntasks: 2 # TODO: FIXME
+
+- name: Run hpl-solo
+  shell: sbatch --wait hpl-solo.sh
+  become: no
+  register:
+  args:
+    chdir: "{{ hpctests_rootdir }}/hpl-solo"
+
+- name: Check HPL completed OK
+  tags: postpro
+  shell: "grep '1 tests completed and passed residual checks' *.out"
+  args:
+    chdir: "{{ hpctests_rootdir }}/hpl-solo"
+  changed_when: false
+  register: passed
+  failed_when: "passed.stdout_lines | length != hpctests_computes.stdout_lines | length"
+
+- name: Extract performance
+  # example of HPL output block - NB code review shows T/V can start with WR or WC:
+  #   <snip>
+  #   T/V                N    NB     P     Q               Time                 Gflops
+  #   --------------------------------------------------------------------------------
+  #   WC00C2R2      110592   256     1     1            2545.90            3.54199e+02
+  #   HPL_pdgesv() start time Thu Feb 25 19:58:25 2021
+  #   <snip>
+  tags: postpro
+  shell: "grep '^W[R|C]' *.out | tr -s ' ' | cut -d ' ' -f 7" # tr -s squeezes multiple spaces to single, then take gflops column
+  args:
+    chdir: "{{ hpctests_rootdir }}/hpl-solo"
+  changed_when: false
+  register: perf
+
+- name: Summarise results
+  tags: postpro
+  debug:
+    msg: |
+      Summary for hpl-solo ({{ hpctests_computes.stdout_lines | length }} nodes):
+        Max:  {{ perf.stdout_lines | map('float') | max }} gflops
+        Min:  {{ perf.stdout_lines | map('float') | min }} gflops
+        Mean: {{ (perf.stdout_lines | map('float') | sum) /  (hpctests_computes.stdout_lines | length) }} gflops
+
+      Individual node results (gflops):
+      {{ dict(hpctests_computes.stdout_lines | zip(perf.stdout_lines | map('float') )) | to_nice_yaml }}
