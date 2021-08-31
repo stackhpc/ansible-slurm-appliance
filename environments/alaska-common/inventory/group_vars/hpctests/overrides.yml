@@ -1,1 +1,2 @@
 hpctests_ucx_net_devices: eth0
+hpctests_hpl_NB: 192 # broadwell vcpus
