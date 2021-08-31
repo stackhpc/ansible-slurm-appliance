@@ -1,0 +1,93 @@
+---
+
+- name: Make directory
+  file:
+    path: "{{ hpctests_rootdir }}/hpl"
+    state: directory
+
+- name: Download HPL sources
+  unarchive:
+    src: "http://www.netlib.org/benchmark/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
+    remote_src: yes
+    dest: "{{ hpctests_rootdir }}/hpl"
+    keep_newer: yes
+
+- name: Copy BLAS make file
+  command:
+    cmd: cp setup/Make.Linux_PII_CBLAS Make.linux64
+    chdir: "{{ hpctests_hpl_srcdir }}"
+    creates: "{{ hpctests_hpl_srcdir }}/Make.linux64"
+
+- name: Modify make file
+  replace:
+    path: "{{ hpctests_hpl_srcdir }}/Make.linux64"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - regexp: '^TOPdir.*$'
+      replace: "TOPdir       = {{ hpctests_hpl_srcdir }}"
+    - regexp: '^ARCH\s+=.*$'
+      replace: "ARCH         = linux64"
+    - regexp: '^MPdir.*$'
+      replace: "MPdir        = $(MPI_DIR)"
+    - regexp: '^MPinc.*$'
+      replace: "MPinc        = -I$(MPI_DIR)/include"
+    - regexp: '^MPlib.*$'
+      replace: "MPlib        = $(MPI_DIR)/lib/libmpi.so"
+    - regexp: '^LAdir.*$'
+      replace: "LAdir        = $(OPENBLAS_DIR)"
+    - regexp: '^LAinc.*$'
+      replace: "LAinc        ="  # not sure if this one is needed?
+    - regexp: '^LAlib.*$'
+      replace: "LAlib        = $(OPENBLAS_LIB)/libopenblas.so"
+    - regexp: '^CC\s+=.*$'
+      replace: "CC           = mpicc"
+    - regexp: '^LINKER\s+=.*$'
+      replace: "LINKER       = mpicc"
+
+- name: Build HPL executable
+  shell:
+    cmd: |
+      set -e
+      . /etc/profile
+      module load {{ hpctests_hpl_modules | join(' ' ) }}
+      make arch=linux64 clean_arch_all
+      make arch=linux64
+    chdir: "{{ hpctests_hpl_srcdir }}"
+    creates: "bin/linux64/xhpl"
+
+
+
+# - name: Precreate files to workaround selinux context issues on NFS mounts
+#   file:
+#     path: "{{ hpctests_rootdir }}/pingpong/{{ item }}"
+#     state: touch
+#   loop:
+#     - pingpong.sh
+
+# - name: Create sbatch script
+#   template:
+#     src: pingpong.sh.j2
+#     dest: "{{ hpctests_rootdir }}/pingpong/pingpong.sh"
+
+# - name: Run pingpong
+#   shell: sbatch --wait pingpong.sh
+#   become: no
+#   args:
+#     chdir: "{{ hpctests_rootdir }}/pingpong"
+
+# - name: Read pingpong
+#   read_imb_pingpong:
+#     path: "{{ hpctests_rootdir }}/pingpong/pingpong.sh.out"
+#   register: hpctests_pingpong_out
+
+# - name: Read nodes used
+#   shell: "grep 'SLURM_JOB_NODELIST:' {{ hpctests_rootdir }}/pingpong/pingpong.sh.out"
+#   register: hpctests_pingpong_run_nodes
+
+# - debug:
+#     msg: |
+#       Summary for pingpong (2x scheduler-selected nodes):
+#       nodes: {{ hpctests_pingpong_run_nodes.stdout.split()[1] }}
+#       zero-size msg latency: {{ hpctests_pingpong_out['columns']['latency'][0] }} us
+#       max bandwidth: {{ hpctests_pingpong_out['columns']['bandwidth'] | max }} Mbytes/s
