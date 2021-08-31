@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+
+#SBATCH --ntasks={{ hpctests_hplsolo_ntasks }}
+#SBATCH --output=%x.%a.out
+#SBATCH --error=%x.%a.out
+#SBATCH --exclusive
+#SBATCH --array=0-{{ hpctests_computes.stdout_lines | length - 1 }}
+{% if hpctests_hplsolo_excluded_nodes | length > 0 %}
+#SBATCH --exclude={{ hpctests_hplsolo_excluded_nodes | join(',') }}
+{% endif %}
+
+export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
+echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
+echo SLURM_JOB_ID: $SLURM_JOB_ID
+echo UCX_NET_DEVICES: $UCX_NET_DEVICES
+
+module load {{ hpctests_hpl_modules | join(' ' ) }}
+mpirun ./xhpl
