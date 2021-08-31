@@ -86,10 +86,6 @@ cluster
 # Hosts to install fail2ban on to protect SSH
 # https://www.fail2ban.org/wiki/index.php/Main_Page
 
-[hardening]
-# Hosts to apply security hardening configuration configuration to
-# https://github.com/openstack/ansible-hardening
-
 [ipaserver]
 # TODO
 

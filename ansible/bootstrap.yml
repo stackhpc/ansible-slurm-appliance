@@ -72,12 +72,3 @@
     - name: update facts
       setup:
       when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
-
-- hosts: hardening
-  gather_facts: true
-  become: yes
-  tags:
-    - hardening
-  tasks:
-    - import_role:
-        name: ansible-hardening
