@@ -10,13 +10,14 @@
       - fail2ban-firewalld
     state: present
 
-- name: Put cluster subnet into firewalld's trusted zone
+- name: Allow cluster subnet through filewalld
   ansible.posix.firewalld:
     permanent: yes
-    source: "{{ fail2ban_trusted_subnet }}"
-    zone: trusted
+    source: "{{ fail2ban_cluster_subnet }}"
+    zone: "{{ fail2ban_cluster_subnet_zone }}"
     state: enabled
   notify: Restart filewalld
+  loop: "{{ fail2ban_firewalld_configs }}"
 
 - name: Create config
   template:

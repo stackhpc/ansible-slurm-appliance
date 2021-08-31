@@ -1,2 +1,8 @@
 ---
-# defaults file for fail2ban
+# fail2ban_cluster_subnet: 
+fail2ban_firewalld_configs:
+  - permanent: yes
+    source:  "{{ fail2ban_cluster_subnet }}"
+    zone: trusted
+    state: enabled
+fail2ban_cluster_subnet_zone: trusted
