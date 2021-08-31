@@ -53,8 +53,8 @@
 
 - name: Copy HPL binary
   copy:
-    src: "{{ hpctests_hpl_srcdir }}/bin/linux64/xhpl"
-    dest: "{{ hpctests_rootdir }}/hpl-solo"
+    src: "{{ hpctests_hpl_srcdir }}/bin/{{ hpctests_hpl_arch }}/xhpl"
+    dest: "{{ hpctests_rootdir }}/hpl-solo/xhpl-{{ hpctests_hpl_arch }}"
     mode: "u+x"
     remote_src: yes
 
@@ -62,8 +62,6 @@
   template:
     src: "HPL.dat.j2"
     dest: "{{ hpctests_rootdir }}/hpl-solo/HPL.dat"
-  tags:
-    - dat
   vars:
       hpctests_hpl_N: "{{ hpctests_hplsolo_N }}"
       hpctests_hpl_P: "{{ hpctests_hplsolo_pq.grid.P }}"

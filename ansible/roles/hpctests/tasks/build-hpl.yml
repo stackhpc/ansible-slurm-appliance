@@ -45,13 +45,14 @@
     - regexp: '^LINKER\s+=.*$'
       replace: "LINKER       = mpicc"
 
+- name: Create build job script
+  template:
+    src: "hpl-build.sh.j2"
+    dest: "{{ hpctests_hpl_srcdir }}/hpl-build-{{ hpctests_hpl_arch }}.sh"
+  
 - name: Build HPL executable
   shell:
-    cmd: |
-      set -e
-      . /etc/profile
-      module load {{ hpctests_hpl_modules | join(' ' ) }}
-      make arch={{ hpctests_hpl_arch }} clean_arch_all
-      make arch={{ hpctests_hpl_arch }}
+    cmd: "sbatch --wait hpl-build-{{ hpctests_hpl_arch }}.sh"
     chdir: "{{ hpctests_hpl_srcdir }}"
     creates: "bin/{{ hpctests_hpl_arch }}/xhpl"
+  become: no
