@@ -1,1 +1,1 @@
-openhpc_slurm_login: "{{ groups['compute'][0] }}" # as login is hardened and can't install intel packages with no package digest
+openhpc_tests_hpl_NB: 192 # broadwell vcpus
