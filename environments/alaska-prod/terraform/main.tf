@@ -15,4 +15,5 @@ module "cluster" {
     cluster_subnet = "iris-alaska-prod-internal"
     home_volume = "alaska-prod-home"
     slurmctld_volume = "alaska-prod-slurmctld"
+    slurmctl_port = "alaska-prod-slurmctl"
 }

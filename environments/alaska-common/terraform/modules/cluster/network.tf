@@ -26,3 +26,7 @@ resource "openstack_compute_floatingip_associate_v2" "logins" {
    # for multi-rail nodes need to control which network's ports are used for FIP:
   fixed_ip = [for n in openstack_compute_instance_v2.login[each.key].network: n if n.name == "iris-alaska-prod-internal"][0].fixed_ip_v4
 }
+
+data "openstack_networking_port_v2" "slurmctl" {
+  name = var.slurmctl_port
+}

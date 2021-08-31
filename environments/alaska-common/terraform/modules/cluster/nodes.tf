@@ -8,7 +8,7 @@ resource "openstack_compute_instance_v2" "control" {
   config_drive = true
 
   network {
-    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id # ensures nodes not created till subnet created
+    port = data.openstack_networking_port_v2.slurmctl.id
     access_network = true
   }
 

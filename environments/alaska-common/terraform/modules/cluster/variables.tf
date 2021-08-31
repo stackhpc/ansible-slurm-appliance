@@ -18,6 +18,11 @@ variable "cluster_subnet" {
     description = "Name of existing subnet to put cluster on"
 }
 
+variable "slurmctl_port" {
+    type = string
+    description = "Name of port on cluster_network for slurm control node"
+}
+
 variable "home_volume" {
     type = string
     description = "Name of existing volume to use for /home"
