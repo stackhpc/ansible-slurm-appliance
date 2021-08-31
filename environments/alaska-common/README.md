@@ -23,6 +23,7 @@ Download an `openrc.sh` file from Horizon and save as e.g. `~/openrc.sh`.
 This assumes the following already exist:
 - A network and subnet named "iris-alaska-prod-internal" to deploy the cluster onto, containing a port "alaska-prod-slurmctl" for the slurm control node.
 - A security group "SSH" allowing inbound ssh.
+- A security group "NFS" allowing inbound NFS.
 - Cinder volumes `alaska-home` (mounted as `/home` on control node and subsequently NFS-exported to all nodes) and `alaska-slurmctld-state` (mounted as `/mnt/slurmctld` on control node).
 
 0. Create IP addresses:

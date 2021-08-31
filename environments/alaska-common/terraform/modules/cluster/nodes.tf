@@ -6,6 +6,7 @@ resource "openstack_compute_instance_v2" "control" {
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
   config_drive = true
+  security_groups = ["default", "NFS"]
 
   network {
     port = data.openstack_networking_port_v2.slurmctl.id
