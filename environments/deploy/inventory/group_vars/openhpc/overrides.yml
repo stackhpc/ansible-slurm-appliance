@@ -17,6 +17,8 @@ openhpc_packages:
   - zstd
   - tmux
   - vim
+  - slurm-libpmi-ohpc
+  - slurm-sview-ohpc
   - gnu9-compilers-ohpc
   - nhc-ohpc
   - lmod-ohpc
