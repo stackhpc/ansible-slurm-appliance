@@ -1,11 +1,1 @@
-hardening_selinux_state: enforcing
-hardening_sudo_rules:
-  - path: '/etc/sudoers'
-    regexp: '#\s+%wheel\s+ALL=\(ALL\)\s+NOPASSWD:\s+ALL' # non-functional but still generates warning
-    replace: ''
-  - path: '/etc/sudoers'
-    regexp: 'centos\s+ALL=\(ALL\)\s+NOPASSWD:\s+ALL'
-    replace: 'centos\tALL=(ALL)\tALL'
-  - path: '/etc/sudoers.d/90-cloud-init-users'
-    regexp: 'centos\s+ALL=\(ALL\)\s+NOPASSWD:ALL'
-    replace: 'centos\tALL=(ALL)\tALL'
+selinux_state: enforcing
