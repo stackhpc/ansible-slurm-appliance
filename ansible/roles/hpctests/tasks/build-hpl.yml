@@ -14,20 +14,20 @@
 
 - name: Copy BLAS make file
   command:
-    cmd: cp setup/Make.Linux_PII_CBLAS Make.linux64
+    cmd: "cp setup/Make.Linux_PII_CBLAS Make.{{ hpctests_hpl_arch }}"
     chdir: "{{ hpctests_hpl_srcdir }}"
-    creates: "{{ hpctests_hpl_srcdir }}/Make.linux64"
+    creates: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
 
 - name: Modify make file
   replace:
-    path: "{{ hpctests_hpl_srcdir }}/Make.linux64"
+    path: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
   loop:
     - regexp: '^TOPdir.*$'
       replace: "TOPdir       = {{ hpctests_hpl_srcdir }}"
     - regexp: '^ARCH\s+=.*$'
-      replace: "ARCH         = linux64"
+      replace: "ARCH         = {{ hpctests_hpl_arch }}"
     - regexp: '^MPdir.*$'
       replace: "MPdir        = $(MPI_DIR)"
     - regexp: '^MPinc.*$'
@@ -51,7 +51,7 @@
       set -e
       . /etc/profile
       module load {{ hpctests_hpl_modules | join(' ' ) }}
-      make arch=linux64 clean_arch_all
-      make arch=linux64
+      make arch={{ hpctests_hpl_arch }} clean_arch_all
+      make arch={{ hpctests_hpl_arch }}
     chdir: "{{ hpctests_hpl_srcdir }}"
-    creates: "bin/linux64/xhpl"
+    creates: "bin/{{ hpctests_hpl_arch }}/xhpl"

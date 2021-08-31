@@ -29,6 +29,7 @@ Role Variables
 - `hpctests_outdir`: Optional. Directory to use for test output on local host. Defaults to `$HOME/hpctests` (for local user).
 - `hpctests_hpl_NB`: Optional, default 192. The HPL block size "NB" - for Intel CPUs see [here](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-linux-developer-guide/top/intel-oneapi-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/configuring-parameters.html).
 - `hpctests_hpl_mem_frac`: Optional, default 0.8. The HPL problem size "N" will be selected to target using this fraction of each node's memory.
+- `hpctests_hpl_arch`: Optional, default 'linux64'. Architecture designation for HPL. This can be used to specify different builds for different nodes.
 
 The following variables should not generally be changed:
 - `hpctests_pingmatrix_modules`: Optional. List of modules to load for pingmatrix test. Defaults are suitable for OpenHPC 2.x cluster using the required packages.
