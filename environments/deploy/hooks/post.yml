@@ -80,7 +80,7 @@
 - name: add kernel modules to compute and login nodes
   hosts: login:compute
   become: true
-  dnf:
+  yum:
     enablerepo: powertools
     state: present
     name: "{{ packages }}"
@@ -94,7 +94,7 @@
 - name: install X stuff from powertools to login hosts
   hosts: login
   become: true
-  dnf:
+  yum:
     enablerepo: powertools
     state: present
     name: "{{ packages }}"
