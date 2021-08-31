@@ -29,4 +29,5 @@ resource "openstack_compute_floatingip_associate_v2" "logins" {
 
 data "openstack_networking_port_v2" "slurmctl" {
   name = var.slurmctl_port
+  network_id = data.openstack_networking_network_v2.cluster_net.id
 }
