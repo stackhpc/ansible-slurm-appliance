@@ -77,8 +77,9 @@
     - include_role:
         name: vstack_common_config
 
-- name: "add kernel modules to compute and login nodes"
+- name: add kernel modules to compute and login nodes
   hosts: login:compute
+  become: true
   dnf:
     enablerepo: powertools
     state: present
@@ -90,8 +91,9 @@
     - post_powertools
     - post_kernel_headers
 
-- name: "install X stuff from powertools to login hosts"
+- name: install X stuff from powertools to login hosts
   hosts: login
+  become: true
   dnf:
     enablerepo: powertools
     state: present
