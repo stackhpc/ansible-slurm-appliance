@@ -31,3 +31,21 @@ data "openstack_networking_port_v2" "slurmctl" {
   name = var.slurmctl_port
   network_id = data.openstack_networking_network_v2.cluster_net.id
 }
+
+// data "openstack_networking_network_v2" "rdma_net" {
+//   name = var.rdma_net
+// }
+
+// resource "openstack_networking_port_v2" "rdma" {
+  
+//   for_each = toset(concat(keys(var.login_nodes), keys(var.compute_nodes)))
+
+//   name = "${var.cluster_name}-${each.key}"
+//   network_id = data.openstack_networking_network_v2.rdma_net.id
+//   admin_state_up = "true"
+
+//   binding {
+//     vnic_type = "direct"
+//   }
+
+// }
