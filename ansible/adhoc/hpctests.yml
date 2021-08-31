@@ -1,0 +1,11 @@
+# This is a version of ansible/adhoc/tests which is safe to use on an in-production cluster.
+# Relies on installed packages - see openhpc variables.
+
+---
+
+- hosts: hpctests[0] # TODO: might want to make which node is used selectable?
+  become: false
+  gather_facts: false
+  tasks:
+    - import_role:
+        name: hpctests

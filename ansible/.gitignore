@@ -18,3 +18,5 @@ roles/*
 !roles/passwords/**
 !roles/fail2ban/
 !roles/fail2ban/**
+!roles/hpctests/
+!roles/hpctests/**

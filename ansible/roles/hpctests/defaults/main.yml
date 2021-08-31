@@ -1,0 +1,7 @@
+---
+hpctests_rootdir:
+hpctests_pingmatrix_modules: [gnu9 openmpi4]
+hpctests_pingpong_modules: [gnu9 openmpi4 imb]
+hpctests_outdir: "{{ lookup('env', 'HOME') }}/hpctests"
+hpctests_ucx_net_devices: all
+#hpctests_nodes:
