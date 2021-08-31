@@ -77,3 +77,30 @@
     - include_role:
         name: vstack_common_config
 
+- name: "add kernel modules to compute and login nodes"
+  hosts: login:compute
+  dnf:
+    enablerepo: powertools
+    state: present
+    name: "{{ packages }}"
+  vars:
+    packages:
+      -
+  tags:
+    - post_powertools
+    - post_kernel_headers
+
+- name: "install X stuff from powertools to login hosts"
+  hosts: login
+  dnf:
+    enablerepo: powertools
+    state: present
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - xorg-x11-server-Xorg
+      - xorg-x11-xauth
+      - xorg-x11-apps
+  tags:
+    - post_powertools
+    - post_x11
