@@ -1,6 +1,0 @@
-- hosts: basic_users
-  become: yes
-  gather_facts: yes
-  tasks:
-    - import_role:
-        name: basic_users
