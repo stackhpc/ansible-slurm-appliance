@@ -1,3 +1,11 @@
+- hosts: control
+  become: yes
+  name: Set /scratch permissions
+  tasks:
+    - file:
+        path: /scratch
+        mode: 0777
+
 - hosts: kubectl
   become: yes
   name: Install and configure kubectl
