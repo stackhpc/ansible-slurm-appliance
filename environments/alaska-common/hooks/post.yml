@@ -1,3 +1,16 @@
+- hosts: control
+  become: yes
+  name: Setup /scratch directories
+  tasks:
+    - file:
+        path: "/scratch/{{ item.name }}"
+        state: directory
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+      loop: "{{ basic_users_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+
 - hosts: kubectl
   become: yes
   name: Install and configure kubectl
