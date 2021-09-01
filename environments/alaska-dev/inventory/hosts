@@ -1,0 +1,26 @@
+[all:vars]
+ansible_user=centos
+openhpc_cluster_name=alaska
+
+[control]
+alaska-control ansible_host=192.168.4.4 server_networks='{"iris-alaska-dev-internal":["192.168.4.4"]}'
+
+[control:vars]
+volumes={"home":{"device":"/dev/sdb","id":"896aba5c-c1ca-43c3-ab64-eecdf5d5c337/3b8fbc4c-654a-4ef1-a14f-30efabdfe4cd","instance_id":"896aba5c-c1ca-43c3-ab64-eecdf5d5c337","multiattach":null,"region":"RegionOne","timeouts":null,"vendor_options":[],"volume_id":"3b8fbc4c-654a-4ef1-a14f-30efabdfe4cd"},"slurmctld":{"device":"/dev/sdc","id":"896aba5c-c1ca-43c3-ab64-eecdf5d5c337/a1076455-da55-4e0c-bac8-ccc4698cff97","instance_id":"896aba5c-c1ca-43c3-ab64-eecdf5d5c337","multiattach":null,"region":"RegionOne","timeouts":null,"vendor_options":[],"volume_id":"a1076455-da55-4e0c-bac8-ccc4698cff97"}}
+
+[login]
+alaska-login-0 ansible_host=192.168.4.137 server_networks='{"iris-alaska-dev-internal":["192.168.4.137"]}'
+
+[compute]
+alaska-compute-0 ansible_host=192.168.4.241 server_networks='{"iris-alaska-dev-internal":["192.168.4.241"]}'
+alaska-compute-1 ansible_host=192.168.4.83 server_networks='{"iris-alaska-dev-internal":["192.168.4.83"]}'
+alaska-compute-2 ansible_host=192.168.4.237 server_networks='{"iris-alaska-dev-internal":["192.168.4.237"]}'
+alaska-compute-3 ansible_host=192.168.4.30 server_networks='{"iris-alaska-dev-internal":["192.168.4.30"]}'
+
+# Define groups for slurm parititions:
+[alaska_small]
+alaska-compute-0
+alaska-compute-1
+alaska-compute-2
+alaska-compute-3
+
