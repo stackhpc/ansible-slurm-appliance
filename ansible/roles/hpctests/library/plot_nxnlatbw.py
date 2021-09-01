@@ -64,11 +64,12 @@ HTML_TEMPLATE = """
 </html>
 """
 
-def html_rows(rankAs, rankBs, data):
+def html_rows(rankAs, rankBs, nodes, data):
     """ Create an HTML-format fragment defining table rows.
 
         Args:
             rankAs, rankBs: lists of ranks
+            nodes: list of nodenames in rank order
             data: dict with keys (rankA, rankB)
 
         Returns a string.
@@ -84,7 +85,7 @@ def html_rows(rankAs, rankBs, data):
         else:
             outrow = ['<tr><td>%s</td>' % rankA]
         for rankB in rankBs:
-            val = latencies.get((rankA, rankB))
+            val = data.get((rankA, rankB))
             if val is not None:
                 lightness = 50 + (50 - 50 * ((val - minv) / (maxv - minv))) # want value in range LOW = 100 (white) -> HIGH 50(red)
                 outrow += ['<td style="background-color:hsl(0, 100%%, %i%%);">%.1f</td>' % (lightness, val)]
@@ -146,8 +147,8 @@ def run_module():
     # create HTML fragments:
     ranks = ' '.join('<td>%s</td>' % rankB for rankB in rankBs)
 
-    lat_rows = html_rows(rankAs, rankBs, latencies)
-    bw_rows = html_rows(rankAs, rankBs, bandwidths)
+    lat_rows = html_rows(rankAs, rankBs, nodes, latencies)
+    bw_rows = html_rows(rankAs, rankBs, nodes, bandwidths)
 
     page = HTML_TEMPLATE.format(min_lat=min_lat, max_lat=max_lat, min_bw=min_bw, max_bw=max_bw, ranks=ranks, lat_rows=lat_rows, bw_rows=bw_rows)
 
