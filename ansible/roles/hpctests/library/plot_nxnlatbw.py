@@ -49,15 +49,14 @@ HTML_TEMPLATE = """
 <html>
 <head></head>
 <body>
-<p>Min latency: {min_lat} &#181;s (white)</p>
-<p>Max latency: {max_lat} &#181;s (red)</p>
 <table>
+<caption>Latency (&#181;s): min {min_lat} (white), max {max_lat} (red)</caption>
 <tr><td>#</td> {ranks} </tr>
 {lat_rows}
 </table>
-<p>Min bandwidth: {min_bw} &#181;s (white)</p>
-<p>Max bandwidth: {max_bw} &#181;s (red)</p>
+<p></p>
 <table>
+<caption>Bandwidth (MB/s): min {min_bw} (white), max {max_bw} (red)</caption>
 <tr><td>#</td> {ranks} </tr>
 {bw_rows}
 </body>
