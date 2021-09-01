@@ -18,10 +18,10 @@ variable "cluster_subnet" {
     description = "Name of existing subnet to put cluster on"
 }
 
-variable "rdma_net" {
-    type = string
-    description = "Name of existing network to use for RDMA"
-}
+// variable "rdma_net" {
+//     type = string
+//     description = "Name of existing network to use for RDMA"
+// }
 
 variable "slurmctl_port" {
     type = string
