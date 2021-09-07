@@ -17,4 +17,17 @@ module "cluster" {
     home_volume = "alaska-prod-home"
     slurmctld_volume = "alaska-prod-slurmctld"
     slurmctl_port = "alaska-prod-slurmctl"
+    compute_images = {
+      compute-0: "ohpc-compute-210907-1401.qcow2"
+      compute-1: "ohpc-compute-210907-1401.qcow2"
+      compute-2: "ohpc-compute-210907-1401.qcow2"
+      compute-3: "ohpc-compute-210907-1401.qcow2"
+    }
+    login_nodes = {
+      login-0: {
+        flavor: "vm.alaska.cpu.himem.quarter"
+        image: "ohpc-login-210907-1451.qcow2"
+        address: "128.232.222.246"
+      }
+    }
 }
