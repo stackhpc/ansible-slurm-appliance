@@ -27,7 +27,7 @@ module "cluster" {
       login-0: {
         flavor: "vm.alaska.cpu.himem.quarter"
         image: "CentOS8-2105"
-        address: "128.232.222.246"
+        address: "128.232.222.71"
       }
     }
 }
