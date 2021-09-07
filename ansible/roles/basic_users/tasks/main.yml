@@ -26,6 +26,7 @@
   when:
     - item.state | default('present') == 'present'
     - item.public_key is defined
+    - basic_users_manage_homedir
   run_once: true
 
 - name: Write generated public key as authorized for SSH access
@@ -39,4 +40,5 @@
     label: "{{ item.name }}"
   when:
   - item.ssh_public_key is defined
+  - basic_users_manage_homedir
   run_once: true
