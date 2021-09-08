@@ -1,1 +1,0 @@
-nfs_server_default: "{{ groups['control'] | first }}"
