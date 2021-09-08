@@ -12,3 +12,15 @@
   block:
     - include: pingmatrix.yml
   tags: pingmatrix
+
+- name: build HPL
+  block:
+    - include: build-hpl.yml
+  tags:
+    - hpl-solo
+
+- name: run HPL on individual nodes
+  block:
+    - include: hpl-solo.yml
+  tags:
+    - hpl-solo

@@ -18,6 +18,7 @@ openhpc_slurm_partitions:
 openhpc_default_packages:
   - slurm-libpmi-ohpc # to allow intel mpi to work properly
   - ohpc-gnu9-openmpi4-perf-tools # for hpctests
+  - openblas-gnu9-ohpc # for hpctests (HPL)
 openhpc_extra_packages: []
 openhpc_packages: "{{ openhpc_default_packages + openhpc_extra_packages }}"
 openhpc_munge_key: "{{ secrets_openhpc_mungekey | b64decode }}"
