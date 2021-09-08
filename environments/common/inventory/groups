@@ -74,3 +74,6 @@ cluster
 
 [update]
 # All hosts to (optionally) run yum update on.
+
+[autoscale]
+# Add control to enable autoscaling

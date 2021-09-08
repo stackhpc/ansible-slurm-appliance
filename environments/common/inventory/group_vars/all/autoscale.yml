@@ -1,0 +1,23 @@
+autoscale_clouds: ~/.config/openstack/clouds.yaml
+# TODO: change below to be defined somewhere else, poss as part of slurm config for partition??
+autoscale_image: ohpc-compute-210406-1108.qcow2
+autoscale_network: stackhpc
+autoscale_flavor: chipolata
+autoscale_keypair: steveb-local
+
+autoscale_openhpc_extra_config:
+  # required parameters:
+  SuspendExcNodes: "{{ groups['compute'] | join(',') }}" # i.e. all tf-defined nodes in the partition # TODO: fixme: hardcoded "compute"
+  SuspendProgram: /opt/slurm-tools/bin/suspend # TODO: fixme: hijacking slurm-tools
+  ResumeProgram: /opt/slurm-tools/bin/resume # TODO: fixme: hijacking slurm-tools
+  SlurmctldParameters: enable_configless,idle_on_node_suspend,cloud_dns
+  CommunicationParameters: NoAddrCache
+  # recommended:
+  PrivateData: cloud # shows cloud node state
+  # TODO: for testing only, not production:
+  DebugFlags: PowerSave
+  SuspendTime: 120
+  SuspendTimeout: 300
+  ResumeTimeout: 300
+  # FIXME: maybe need to set TreeWidth to >= number of nodes (default: 50)
+  # power_save_*interval: options are defaults but should enable changes

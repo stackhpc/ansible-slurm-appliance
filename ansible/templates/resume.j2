@@ -6,10 +6,10 @@ import openstack
 import pprint
 
 # all take a name or ID:
-IMAGE = "{{ openhpc_autoscale_image }}"
-NETWORK = "{{ openhpc_autoscale_network }}"
-FLAVOR = "{{ openhpc_autoscale_flavor }}"
-KEYPAIR = "{{ openhpc_autoscale_keypair }}"
+IMAGE = "{{ autoscale_image }}"
+NETWORK = "{{ autoscale_network }}"
+FLAVOR = "{{ autoscale_flavor }}"
+KEYPAIR = "{{ autoscale_keypair }}"
 
 # configure logging to syslog - by default only "info" and above categories appear
 logger = logging.getLogger("syslogger")
