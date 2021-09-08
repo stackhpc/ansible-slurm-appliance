@@ -2,7 +2,6 @@
 roles:
   - src: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc
-    version: feature/StateSaveLocation # also includes feature/flexi-config
     name: stackhpc.openhpc
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
