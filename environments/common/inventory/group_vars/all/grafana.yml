@@ -31,7 +31,7 @@ grafana_dashboards:
 
 grafana_security:
     admin_user: grafana
-    admin_password: "{{ secrets_openhpc_grafana_admin_password }}"
+    admin_password: "{{ vault_grafana_admin_password }}"
 
 grafana_datasources:
   - name: prometheus
@@ -41,7 +41,7 @@ grafana_datasources:
     ds_type: elasticsearch
     ds_url: "https://{{ elasticsearch_address }}:9200"
     basic_auth_user: admin
-    basic_auth_password: "{{ secrets_openhpc_elasticsearch_admin_password }}"
+    basic_auth_password: "{{ vault_elasticsearch_admin_password }}"
     with_credentials: true
     tls_skip_verify: true
     time_field: "@timestamp"
