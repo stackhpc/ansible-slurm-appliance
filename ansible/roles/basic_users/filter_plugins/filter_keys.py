@@ -7,11 +7,11 @@ class FilterModule(object):
 
     def filters(self):
         return {
-            'remove_keys': self.remove_keys
+            'filter_keys': self.filter_keys
         }
 
-    def remove_keys(self, orig_dict, keys_to_remove):
-        '''Deletes items of dict by list of keys provided'''
+    def filter_keys(self, orig_dict, keys_to_remove):
+        ''' Return a copy of `orig_dict` without the keys in the list `keys_to_remove`'''
         dict_to_return = copy.deepcopy(orig_dict)
         for item in keys_to_remove:
             if item in dict_to_return:
