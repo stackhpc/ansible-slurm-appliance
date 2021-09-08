@@ -15,14 +15,14 @@
   tags:
     - openhpc
   tasks:
-    - name: Add CentOS 8.3 Vault repo for OpenHPC hwloc dependency
-      # NB: REMOVE THIS once OpenHPC works on CentOS 8.4
-      yum_repository:
-        name: vault
-        file: CentOS-Linux-Vault8.3
-        description:  CentOS 8.3 packages from Vault
-        baseurl: https://vault.centos.org/8.3.2011/BaseOS/$basearch/os/
-        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+    # - name: Add CentOS 8.3 Vault repo for OpenHPC hwloc dependency
+    #   # NB: REMOVE THIS once OpenHPC works on CentOS 8.4
+    #   yum_repository:
+    #     name: vault
+    #     file: CentOS-Linux-Vault8.3
+    #     description:  CentOS 8.3 packages from Vault
+    #     baseurl: https://vault.centos.org/8.3.2011/BaseOS/$basearch/os/
+    #     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
     - import_role:
         name: stackhpc.openhpc
 
@@ -41,7 +41,48 @@
   tags:
     - autoscale
   tasks:
-    - import_tasks: autoscale.yml
+- name: Configure autoscale
+  hosts: autoscale
+  become: yes
+  tags:
+    - autoscale
+  tasks:
+    - name: Create /etc/openstack
+      file:
+        path: /etc/openstack
+        state: directory
+        owner: root
+        group: root
+        mode: '0400'
+    - name: Copy out clouds.yaml
+      copy:
+        src: "{{ autoscale_clouds }}"
+        dest: /etc/openstack/clouds.yaml
+        owner: root
+        group: root
+        mode: '0400'
+    - name: Setup slurm tools (to get venv)
+      include_role:
+        name: stackhpc.slurm_openstack_tools.pytools
+    - name: Create SuspendProgram
+      template:
+        src: suspend.j2
+        dest: /opt/slurm-tools/bin/suspend
+        owner: slurm
+        group: slurm
+        mode: u=rwx,go=
+      tags: suspend
+    - name: Create ResumeProgram
+      template:
+        src: resume.j2
+        dest: /opt/slurm-tools/bin/resume
+        owner: slurm
+        group: slurm
+        mode: u=rwx,go=
+      tags: resume
+    - name: Reconfigure slurm
+      command:
+        cmd: scontrol reconfigure
 
 - name: Set locked memory limits on user-facing nodes
   hosts:
