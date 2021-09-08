@@ -24,3 +24,7 @@ openhpc_packages: "{{ openhpc_default_packages + openhpc_extra_packages }}"
 openhpc_munge_key: "{{ secrets_openhpc_mungekey | b64decode }}"
 openhpc_slurm_configless: true
 openhpc_login_only_nodes: login
+
+openhpc_extra_config_overrides: {}
+appliance_openhpc_extra_config: "{{ autoscale_openhpc_extra_config if groups['autoscale'] else {} }}"
+openhpc_extra_config: "{{ appliance_openhpc_extra_config | combine(openhpc_extra_config_overrides) }}"
