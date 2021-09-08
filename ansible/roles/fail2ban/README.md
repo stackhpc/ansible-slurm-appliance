@@ -1,4 +1,4 @@
-Role Name
+fail2ban
 =========
 
 Setup fail2ban to protect SSH on a host.
