@@ -1,8 +1,9 @@
 ---
 roles:
   - src: stackhpc.nfs
-  - src: stackhpc.openhpc
+  - src: https://github.com/stackhpc/ansible-role-openhpc
     version: feature/autoscale
+    name: stackhpc.openhpc
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
   - src: cloudalchemy.prometheus
