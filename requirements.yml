@@ -2,9 +2,7 @@
 roles:
   - src: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc
-    # https://github.com/stackhpc/ansible-role-openhpc
-    # git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
-    version: feature/StateSaveLocation
+    version: alaska-v2 # feature/flexi-config + feature/StateSaveLocation
     name: stackhpc.openhpc
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
