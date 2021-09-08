@@ -30,7 +30,7 @@ Role Variables
 - `block_devices_owner`: Optional. Name of owner for mounted directory (as for `ansible.buildin.file:owner`), or omitted.
 - `block_devices_group`: Optional. Name of group for mounted directory (as for `ansible.buildin.file.group`), or omitted.
 
-Multiple NFS client/server configurations may be provided by defining `block_devices_configurations`. This should be a list of mappings with keys/values are as per the variables above without the `block_devices_` prefix. Omitted keys/values are filled from the corresponding variable. An additional key `hostnames` may optionally be included in these mappings, defining a list of hostnames to restrict a configuration to a subset of the play's hosts.
+Multiple NFS client/server configurations may be provided by defining `block_devices_configurations`. This should be a list of mappings with keys/values are as per the variables above without the `block_devices_` prefix. Omitted keys/values are filled from the corresponding variable.
 
 Dependencies
 ------------
