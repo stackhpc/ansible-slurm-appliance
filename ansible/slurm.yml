@@ -36,6 +36,7 @@
         name: stackhpc.slurm_openstack_tools.rebuild
 
 - name: Setup autoscaling suspend/resume programs
+  # has to happen *after* slurm user has been created
   hosts: autoscale # this is the *controller*
   become: yes
   tags:
@@ -80,6 +81,15 @@
         group: slurm
         mode: u=rwx,go=
       tags: resume
+    - name: Add Resume/SuspendProgram parameters
+      community.general.ini_file:
+        path: /etc/slurm/slurm.conf
+        option: "{{ item.key }}"
+        section: null
+        value: "{{ item.value }}"
+        no_extra_spaces: true
+        create: no
+      loop: "{{ {'SuspendProgram':'/opt/slurm-tools/bin/suspend', 'ResumeProgram':'/opt/slurm-tools/bin/resume'} | dict2items }}" # TODO: fixme: hijacking slurm-tools
     - name: Reconfigure slurm
       command:
         cmd: scontrol reconfigure
