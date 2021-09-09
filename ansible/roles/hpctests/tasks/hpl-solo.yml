@@ -1,0 +1,118 @@
+# For further information on tuning HPL see e.g.:
+# - https://ulhpc-tutorials.readthedocs.io/en/latest/parallel/mpi/HPL/
+# - https://community.arm.com/developer/tools-software/hpc/b/hpc-blog/posts/profiling-and-tuning-linpack-step-step-guide
+# - http://www.crc.nd.edu/~rich/CRC_Summer_Scholars_2014/HPL-HowTo.pdf
+
+- name: Make directory
+  file:
+    path: "{{ hpctests_rootdir }}/hpl-solo"
+    state: directory
+
+- name: Get Slurm node info
+  slurm_node_info:
+    nodes: "{{ hpctests_computes.stdout_lines }}"
+  register: hpctests_nodeinfo
+
+- name: Check nodes are homogenous
+  assert:
+    that: "{{ hpctests_nodeinfo.info[item] | unique | length == 1 }}"
+    fail_msg: "Selected nodes are not homogenous: {{ item }} = {{ hpctests_nodeinfo.info[item] }}"
+  loop:
+    - SOCKETS
+    - CORES
+    - THREADS
+    - MEMORY
+
+- name: Calculate number of processes (per node)
+  # Will run array job, which is SAME on each node, so only need to deal with a single node's processors here
+  # Also ignore any hyperthreading TODO: document
+  set_fact:
+    hpctests_hplsolo_ntasks: "{{ (hpctests_nodeinfo.info['SOCKETS'][0]) | int * (hpctests_nodeinfo.info['CORES'][0] | int) }}"
+
+- name: Calculate problem shape
+  # Want to go nearly square - again this is per-node remember
+  hpl_pq:
+    num_processes: "{{ hpctests_hplsolo_ntasks }}"
+  register: hpctests_hplsolo_pq
+
+- name: Calculate problem size
+  # Based on example shown in http://www.crc.nd.edu/~rich/CRC_Summer_Scholars_2014/HPL-HowTo.pdf but we have MB not GB
+  set_fact:
+    hpctests_hplsolo_N: "{{ ((((( (hpctests_nodeinfo.info['MEMORY'][0] | int) * (hpctests_hpl_mem_frac | float) * 1024 * 1024 * 1) / 8) | root) / hpctests_hpl_NB) | int ) * hpctests_hpl_NB }}"
+- debug:
+    msg: "Using {{ hpctests_hplsolo_ntasks }} process per node with P={{ hpctests_hplsolo_pq.grid.P }}, Q={{ hpctests_hplsolo_pq.grid.Q }} targeting {{ (hpctests_hpl_mem_frac | float)  * 100 }}% of {{ hpctests_nodeinfo.info['MEMORY'][0] }} MB memory per node, block size (NB) = {{ hpctests_hpl_NB }}, problem size (N) = {{ hpctests_hplsolo_N }}"
+
+- name: Get all nodes
+  shell: "sinfo --Node --noheader --format %N" # TODO: assumes only one partition, although actually excluding nodes not in the default partition should be fine.
+  register: all_nodes
+  changed_when: false
+
+- name: Calculate excluded nodes
+  set_fact:
+    hpctests_hplsolo_excluded_nodes: "{{ all_nodes.stdout_lines | difference(hpctests_computes.stdout_lines) }}"
+
+- name: Copy HPL binary
+  copy:
+    src: "{{ hpctests_hpl_srcdir }}/bin/{{ hpctests_hpl_arch }}/xhpl"
+    dest: "{{ hpctests_rootdir }}/hpl-solo/xhpl-{{ hpctests_hpl_arch }}"
+    mode: "u+x"
+    remote_src: yes
+
+- name: Template out HPL.dat
+  template:
+    src: "HPL.dat.j2"
+    dest: "{{ hpctests_rootdir }}/hpl-solo/HPL.dat"
+  vars:
+      hpctests_hpl_N: "{{ hpctests_hplsolo_N }}"
+      hpctests_hpl_P: "{{ hpctests_hplsolo_pq.grid.P }}"
+      hpctests_hpl_Q: "{{ hpctests_hplsolo_pq.grid.Q }}"
+
+- name: Create sbatch script
+  template:
+    src: hpl-solo.sh.j2
+    dest: "{{ hpctests_rootdir }}/hpl-solo/hpl-solo.sh"
+  vars:
+    hpctests_hplsolo_ntasks: 2 # TODO: FIXME
+
+- name: Run hpl-solo
+  shell: sbatch --wait hpl-solo.sh
+  become: no
+  register:
+  args:
+    chdir: "{{ hpctests_rootdir }}/hpl-solo"
+
+- name: Check HPL completed OK
+  tags: postpro
+  shell: "grep '1 tests completed and passed residual checks' *.out"
+  args:
+    chdir: "{{ hpctests_rootdir }}/hpl-solo"
+  changed_when: false
+  register: passed
+  failed_when: "passed.stdout_lines | length != hpctests_computes.stdout_lines | length"
+
+- name: Extract performance
+  # example of HPL output block - NB code review shows T/V can start with WR or WC:
+  #   <snip>
+  #   T/V                N    NB     P     Q               Time                 Gflops
+  #   --------------------------------------------------------------------------------
+  #   WC00C2R2      110592   256     1     1            2545.90            3.54199e+02
+  #   HPL_pdgesv() start time Thu Feb 25 19:58:25 2021
+  #   <snip>
+  tags: postpro
+  shell: "grep '^W[R|C]' *.out | tr -s ' ' | cut -d ' ' -f 7" # tr -s squeezes multiple spaces to single, then take gflops column
+  args:
+    chdir: "{{ hpctests_rootdir }}/hpl-solo"
+  changed_when: false
+  register: perf
+
+- name: Summarise results
+  tags: postpro
+  debug:
+    msg: |
+      Summary for hpl-solo ({{ hpctests_computes.stdout_lines | length }} nodes):
+        Max:  {{ perf.stdout_lines | map('float') | max }} gflops
+        Min:  {{ perf.stdout_lines | map('float') | min }} gflops
+        Mean: {{ (perf.stdout_lines | map('float') | sum) /  (hpctests_computes.stdout_lines | length) }} gflops
+
+      Individual node results (gflops):
+      {{ dict(hpctests_computes.stdout_lines | zip(perf.stdout_lines | map('float') )) | to_nice_yaml }}

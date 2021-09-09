@@ -49,15 +49,51 @@ HTML_TEMPLATE = """
 <html>
 <head></head>
 <body>
-<p>Min latency: {min_lat} &#181;s (white)</p>
-<p>Max latency: {max_lat} &#181;s (red)</p>
 <table>
+<caption>Latency (&#181;s): min {min_lat} (white), max {max_lat} (red)</caption>
 <tr><td>#</td> {ranks} </tr>
-{rows}
+{lat_rows}
 </table>
+<p></p>
+<table>
+<caption>Bandwidth (MB/s): min {min_bw} (white), max {max_bw} (red)</caption>
+<tr><td>#</td> {ranks} </tr>
+{bw_rows}
 </body>
 </html>
 """
+
+def html_rows(rankAs, rankBs, nodes, data):
+    """ Create an HTML-format fragment defining table rows.
+
+        Args:
+            rankAs, rankBs: lists of ranks
+            nodes: list of nodenames in rank order
+            data: dict with keys (rankA, rankB)
+
+        Returns a string.
+    """
+    
+    minv = min(data.values())
+    maxv = max(data.values())
+
+    rows = []
+    for rankA in rankAs: # row
+        if nodes:
+            outrow = ['<tr><td>%s [%s]</td>' % (nodes[rankA], rankA)]
+        else:
+            outrow = ['<tr><td>%s</td>' % rankA]
+        for rankB in rankBs:
+            val = data.get((rankA, rankB))
+            if val is not None:
+                lightness = 50 + (50 - 50 * ((val - minv) / (maxv - minv))) # want value in range LOW = 100 (white) -> HIGH 50(red)
+                outrow += ['<td style="background-color:hsl(0, 100%%, %i%%);">%.1f</td>' % (lightness, val)]
+            else:
+                outrow += ['<td>-</td>']
+        outrow += ['</tr>']
+        rows.append(' '.join(outrow))
+    return '\n'.join(rows)
+
 
 def run_module():
     module_args = dict(
@@ -109,24 +145,11 @@ def run_module():
     
     # create HTML fragments:
     ranks = ' '.join('<td>%s</td>' % rankB for rankB in rankBs)
-    rows = []
-    for rankA in rankAs: # row
-        if nodes:
-            outrow = ['<tr><td>%s [%s]</td>' % (nodes[rankA], rankA)]
-        else:
-            outrow = ['<tr><td>%s</td>' % rankA]
-        for rankB in rankBs:
-            val = latencies.get((rankA, rankB))
-            if val is not None:
-                lightness = 50 + (50 - 50 * ((val - min_lat) / (max_lat - min_lat))) # want value in range LOW = 100 (white) -> HIGH 50(red)
-                outrow += ['<td style="background-color:hsl(0, 100%%, %i%%);">%.1f</td>' % (lightness, val)]
-            else:
-                outrow += ['<td>-</td>']
-        outrow += ['</tr>']
-        rows.append(' '.join(outrow))
-    rows = '\n'.join(rows)
 
-    page = HTML_TEMPLATE.format(min_lat=min_lat, max_lat=max_lat, ranks=ranks, rows=rows)
+    lat_rows = html_rows(rankAs, rankBs, nodes, latencies)
+    bw_rows = html_rows(rankAs, rankBs, nodes, bandwidths)
+
+    page = HTML_TEMPLATE.format(min_lat=min_lat, max_lat=max_lat, min_bw=min_bw, max_bw=max_bw, ranks=ranks, lat_rows=lat_rows, bw_rows=bw_rows)
 
     with open(dest, 'w') as outf:
         outf.write(page)
