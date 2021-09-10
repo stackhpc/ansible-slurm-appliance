@@ -53,10 +53,11 @@ def resume():
         logger.info(f"creating node {node}")
         server = create_server(conn, node) # TODO: save id to disk so can use it instead of name on deletion (to cope with multiple instances with same name)
         logger.info(f"server: {server}")
+        # Don't need scontrol update nodename={node} nodeaddr={server_ip} as using SlurmctldParameters=cloud_dns
 
 if __name__ == "__main__":
     try:
-        sys.exit(resume())
+        resume()
     except:
         logger.exception('Exception in main:')
         raise

@@ -33,7 +33,7 @@ def suspend():
 
 if __name__ == "__main__":
     try:
-        sys.exit(suspend())
+        suspend()
     except:
         logger.exception('Exception in main:')
         raise
