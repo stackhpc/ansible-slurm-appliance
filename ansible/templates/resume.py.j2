@@ -6,10 +6,12 @@ import openstack
 import pprint
 
 # all take a name or ID:
-IMAGE = "{{ autoscale_image }}"
-NETWORK = "{{ autoscale_network }}"
-FLAVOR = "{{ autoscale_flavor }}"
-KEYPAIR = "{{ autoscale_keypair }}"
+config = {
+    'image': "{{ autoscale_image }}",
+    'network': "{{ autoscale_network }}",
+    'flavor': "{{ autoscale_flavor }}",
+    'keypair': "{{ autoscale_keypair }}",
+}
 
 # configure logging to syslog - by default only "info" and above categories appear
 logger = logging.getLogger("syslogger")
@@ -23,10 +25,14 @@ def expand_nodes(hostlist_expr):
 
 def create_server(conn, name):
 
-    image = conn.compute.find_image(IMAGE)
-    flavor = conn.compute.find_flavor(FLAVOR)
-    network = conn.network.find_network(NETWORK)
-    keypair = conn.compute.find_keypair(KEYPAIR)
+    image = conn.compute.find_image(config['image'])
+    flavor = conn.compute.find_flavor(config['flavor'])
+    network = conn.network.find_network(config['network'])
+    keypair = conn.compute.find_keypair(config['keypair'])
+
+    for ix, item in enumerate((image, flavor, network, keypair)):
+        if item is None:
+            raise ValueError(f'Specified {list(config)[ix]} {config[list(config)[ix]]} was not found')
 
     server = conn.compute.create_server(
         name=name, image_id=image.id, flavor_id=flavor.id,
@@ -45,7 +51,7 @@ def resume():
 
     for node in new_nodes:
         logger.info(f"creating node {node}")
-        server = create_server(conn, node)
+        server = create_server(conn, node) # TODO: save id to disk so can use it instead of name on deletion (to cope with multiple instances with same name)
         logger.info(f"server: {server}")
 
 if __name__ == "__main__":
