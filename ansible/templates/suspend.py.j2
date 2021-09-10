@@ -32,4 +32,8 @@ def suspend():
         delete_server(conn, node)
 
 if __name__ == "__main__":
-    sys.exit(suspend())
+    try:
+        sys.exit(suspend())
+    except:
+        logger.exception('Exception in main:')
+    raise

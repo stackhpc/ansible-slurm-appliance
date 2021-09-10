@@ -49,4 +49,8 @@ def resume():
         logger.info(f"server: {server}")
 
 if __name__ == "__main__":
-    sys.exit(resume())
+    try:
+        sys.exit(resume())
+    except:
+        logger.exception('Exception in main:')
+    raise

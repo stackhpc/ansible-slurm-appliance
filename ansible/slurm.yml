@@ -67,7 +67,7 @@
         name: stackhpc.slurm_openstack_tools.pytools
     - name: Create SuspendProgram
       template:
-        src: suspend.j2
+        src: suspend.py.j2
         dest: /opt/slurm-tools/bin/suspend
         owner: slurm
         group: slurm
@@ -75,7 +75,7 @@
       tags: suspend
     - name: Create ResumeProgram
       template:
-        src: resume.j2
+        src: resume.py.j2
         dest: /opt/slurm-tools/bin/resume
         owner: slurm
         group: slurm
