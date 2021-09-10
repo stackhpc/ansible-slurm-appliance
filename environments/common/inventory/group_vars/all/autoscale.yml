@@ -14,6 +14,7 @@ autoscale_openhpc_extra_config:
   PrivateData: cloud # shows cloud node state
   # TODO: for testing only, not production:
   DebugFlags: PowerSave
+  SlurmctldSyslogDebug: info
   SuspendTime: 120
   SuspendTimeout: 300
   ResumeTimeout: 300
