@@ -52,15 +52,15 @@
       file:
         path: /etc/openstack
         state: directory
-        owner: root
-        group: root
-        mode: '0400'
+        owner: slurm
+        group: slurm
+        mode: '0500'
     - name: Copy out clouds.yaml
       copy:
         src: "{{ autoscale_clouds }}"
         dest: /etc/openstack/clouds.yaml
-        owner: root
-        group: root
+        owner: slurm
+        group: slurm
         mode: '0400'
     - name: Setup slurm tools (to get venv)
       include_role:
