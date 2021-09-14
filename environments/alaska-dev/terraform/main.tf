@@ -16,6 +16,7 @@ module "cluster" {
     rdma_net = "WCDC-iLab-60"
     home_volume = "alaska-dev-home"
     slurmctld_volume = "alaska-dev-slurmctld"
+    slurmctl_port = "alaska-dev-slurmctl"
     slurmctl_rdma_port = "alaska-dev-slurmctl-rdma"
     compute_nodes = {
       compute-0: "small"

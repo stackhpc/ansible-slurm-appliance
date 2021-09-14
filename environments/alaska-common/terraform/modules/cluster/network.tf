@@ -32,6 +32,11 @@ data "openstack_networking_port_v2" "slurmctl_rdma" {
   network_id = data.openstack_networking_network_v2.rdma_net.id
 }
 
+data "openstack_networking_port_v2" "slurmctl" {
+  name = var.slurmctl_port
+  network_id = data.openstack_networking_network_v2.cluster_net.id
+}
+
 data "openstack_networking_network_v2" "rdma_net" {
   name = var.rdma_net
 }

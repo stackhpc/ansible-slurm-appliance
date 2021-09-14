@@ -9,7 +9,7 @@ resource "openstack_compute_instance_v2" "control" {
   security_groups = ["default", "NFS"]
 
   network {
-    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
+    port = data.openstack_networking_port_v2.slurmctl.id
     access_network = true
   }
 

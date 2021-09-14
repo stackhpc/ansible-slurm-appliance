@@ -25,7 +25,12 @@ variable "rdma_net" {
 
 variable "slurmctl_rdma_port" {
     type = string
-    description = "Name of port on cluster_network for slurm control node"
+    description = "Name of port on rdma_net for slurm control node - used to export filesystems"
+}
+
+variable "slurmctl_port" {
+    type = string
+    description = "Name of port on cluster_net for slurm control node - used to export filesystems"
 }
 
 variable "home_volume" {

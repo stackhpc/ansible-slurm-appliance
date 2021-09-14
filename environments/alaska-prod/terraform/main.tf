@@ -17,6 +17,7 @@ module "cluster" {
     home_volume = "alaska-prod-home"
     slurmctld_volume = "alaska-prod-slurmctld"
     slurmctl_port = "alaska-prod-slurmctl"
+    slurmctl_rdma_port = "alaska-prod-slurmctl-rdma"
     compute_images = {
       compute-0: "ohpc-compute-210907-1401.qcow2"
       compute-1: "ohpc-compute-210907-1401.qcow2"
