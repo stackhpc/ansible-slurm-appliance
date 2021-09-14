@@ -23,7 +23,8 @@ Download an `openrc.sh` file from Horizon and save as e.g. `~/openrc.sh`.
 ## Creating a Slurm appliance
 
 This assumes the following already exist:
-- A network and subnet named "iris-alaska-prod-internal" to deploy the cluster onto, containing a port "alaska-prod-slurmctl" for the slurm control node.
+- A network and subnet named "iris-alaska-prod-internal" to deploy the cluster onto
+- An RDMA-capable network named "WCDC-iLab-60", containing a direct-type port "alaska-prod-slurmctl-rdma" for the slurm control node.
 - A security group "SSH" allowing inbound ssh.
 - A security group "NFS" allowing inbound NFS (as the K8s cluster mounts the filesystems exported by the Slurm control node)
 - Cinder volumes `alaska-home` (will be mounted as `/home` on control node and subsequently NFS-exported to all nodes) and `alaska-slurmctld-state` (will be mounted as `/mnt/slurmctld` on control node).

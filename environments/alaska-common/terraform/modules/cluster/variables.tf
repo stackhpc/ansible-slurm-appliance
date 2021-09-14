@@ -23,7 +23,7 @@ variable "rdma_net" {
     description = "Name of existing network to use for RDMA"
 }
 
-variable "slurmctl_port" {
+variable "slurmctl_rdma_port" {
     type = string
     description = "Name of port on cluster_network for slurm control node"
 }
