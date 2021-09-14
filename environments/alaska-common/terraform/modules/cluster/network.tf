@@ -38,7 +38,7 @@ data "openstack_networking_network_v2" "rdma_net" {
 
 resource "openstack_networking_port_v2" "rdma" {
   
-  for_each = toset(concat(keys(var.login_nodes), keys(var.compute_nodes)))
+  for_each = toset(concat(keys(var.login_nodes), keys(var.compute_nodes), ["control"]))
 
   name = "${var.cluster_name}-${each.key}-rdma"
   network_id = data.openstack_networking_network_v2.rdma_net.id

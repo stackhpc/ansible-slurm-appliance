@@ -13,6 +13,10 @@ resource "openstack_compute_instance_v2" "control" {
     access_network = true
   }
 
+  network {
+    port = openstack_networking_port_v2.rdma["control"].id
+  }
+
   tags = []
 
 }
