@@ -51,3 +51,6 @@ login
 
 [hpctests:children]
 login
+
+[ofed:children]
+openhpc # include controller as this is NFS server
