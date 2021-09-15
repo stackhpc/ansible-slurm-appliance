@@ -19,7 +19,7 @@
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
   
 - name: Install Mellanox OFED
-  hosts: ofed
+  hosts: disabled
   become: true
   tags: ofed
   tasks:
