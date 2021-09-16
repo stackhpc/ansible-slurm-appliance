@@ -2,10 +2,10 @@
 roles:
   - src: https://github.com/stackhpc/ansible-role-ofed
     name: stackhpc.ofed
-  - src: stackhpc.nfs
+  - src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
+    name: stackhpc.nfs
+    version: feature/rdma
   - src: https://github.com/stackhpc/ansible-role-openhpc
-    # https://github.com/stackhpc/ansible-role-openhpc
-    # git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
     version: feature/StateSaveLocation
     name: stackhpc.openhpc
   - src: cloudalchemy.node_exporter

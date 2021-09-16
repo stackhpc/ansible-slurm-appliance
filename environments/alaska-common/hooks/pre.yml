@@ -29,35 +29,6 @@
       reboot:
         post_reboot_delay: 30
       when: grub_update_result.changed
-    # - name: Wait for hosts to be reachable
-    #   wait_for_connection:
-    #     sleep: 15
     - name: update facts
       setup:
       when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
-
-- name: Configure RDMA for nfs
-  hosts: nfs
-  become: true
-  tags: nfs
-  tasks:
-    - name: Enable svcrdma module at boot
-      file:
-        path: /etc/modules-load.d/svcrdma.conf
-        state: touch
-        access_time: preserve
-        modification_time: preserve
-    - name: Load svcrdma module
-      community.general.modprobe:
-        name: svcrdma
-    - name: Configure NFS server(s) for RDMA
-      # NB: Works because nfs packages are installed in base image
-      community.general.ini_file:
-        path: /etc/nfs.conf
-        section: nfsd
-        option: rdma
-        value: nfsrdma
-      when: nfs_enable.server | bool or ('nfs_enable' in item and item.nfs_enable.server | bool)
-      loop: "{{ nfs_configurations }}"
-
-

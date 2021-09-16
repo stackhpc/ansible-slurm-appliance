@@ -1,3 +1,5 @@
+nfs_rdma: true
+
 nfs_server: "{{ hostvars[groups['control'] | first ].server_networks['WCDC-iLab-60'] }}"
 
 nfs_enable:
@@ -7,7 +9,6 @@ nfs_enable:
         # See also constructed inventory: https://docs.ansible.com/ansible/devel/collections/ansible/builtin/constructed_inventory.html
         clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
 nfs_export_options: rw,async,insecure,no_root_squash
-nfs_client_mnt_options: rdma,port=20049
 
 nfs_configurations:
   - comment: Export /home from Slurm control node
