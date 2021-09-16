@@ -1,5 +1,6 @@
-# This is a version of ansible/adhoc/tests which is safe to use on an in-production cluster.
-# Relies on installed packages - see openhpc variables.
+# An MPI-based test suite for Slurm appliance clusters. Safe to use on in-production clusters.
+# See ansible/roles/hpctests/README.md for details and options.
+# Relies on installed packages in appliance defaults - see openhpc variables.
 
 ---
 
