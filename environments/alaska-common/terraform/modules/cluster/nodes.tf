@@ -13,6 +13,10 @@ resource "openstack_compute_instance_v2" "control" {
     access_network = true
   }
 
+  network {
+    port = data.openstack_networking_port_v2.slurmctl_rdma.id
+  }
+
   tags = []
 
 }
@@ -42,9 +46,9 @@ resource "openstack_compute_instance_v2" "login" {
     access_network = true
   }
 
-  // network {
-  //   port = openstack_networking_port_v2.rdma[each.key].id
-  // }
+  network {
+    port = openstack_networking_port_v2.rdma[each.key].id
+  }
 
   tags = []
 
@@ -64,9 +68,9 @@ resource "openstack_compute_instance_v2" "compute" {
     access_network = true
   }
 
-  // network {
-  //   port = openstack_networking_port_v2.rdma[each.key].id
-  // }
+  network {
+    port = openstack_networking_port_v2.rdma[each.key].id
+  }
 
   tags = []
 

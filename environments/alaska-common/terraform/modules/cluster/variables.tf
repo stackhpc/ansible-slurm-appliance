@@ -18,14 +18,19 @@ variable "cluster_subnet" {
     description = "Name of existing subnet to put cluster on"
 }
 
-// variable "rdma_net" {
-//     type = string
-//     description = "Name of existing network to use for RDMA"
-// }
+variable "rdma_net" {
+    type = string
+    description = "Name of existing network to use for RDMA"
+}
+
+variable "slurmctl_rdma_port" {
+    type = string
+    description = "Name of port on rdma_net for slurm control node - used to export filesystems"
+}
 
 variable "slurmctl_port" {
     type = string
-    description = "Name of port on cluster_network for slurm control node"
+    description = "Name of port on cluster_net for slurm control node - used to export filesystems"
 }
 
 variable "home_volume" {

@@ -27,25 +27,30 @@ resource "openstack_compute_floatingip_associate_v2" "logins" {
   fixed_ip = [for n in openstack_compute_instance_v2.login[each.key].network: n if n.name == var.cluster_net][0].fixed_ip_v4
 }
 
+data "openstack_networking_port_v2" "slurmctl_rdma" {
+  name = var.slurmctl_rdma_port
+  network_id = data.openstack_networking_network_v2.rdma_net.id
+}
+
 data "openstack_networking_port_v2" "slurmctl" {
   name = var.slurmctl_port
   network_id = data.openstack_networking_network_v2.cluster_net.id
 }
 
-// data "openstack_networking_network_v2" "rdma_net" {
-//   name = var.rdma_net
-// }
+data "openstack_networking_network_v2" "rdma_net" {
+  name = var.rdma_net
+}
 
-// resource "openstack_networking_port_v2" "rdma" {
+resource "openstack_networking_port_v2" "rdma" {
   
-//   for_each = toset(concat(keys(var.login_nodes), keys(var.compute_nodes)))
+  for_each = toset(concat(keys(var.login_nodes), keys(var.compute_nodes)))
 
-//   name = "${var.cluster_name}-${each.key}"
-//   network_id = data.openstack_networking_network_v2.rdma_net.id
-//   admin_state_up = "true"
+  name = "${var.cluster_name}-${each.key}-rdma"
+  network_id = data.openstack_networking_network_v2.rdma_net.id
+  admin_state_up = "true"
 
-//   binding {
-//     vnic_type = "direct"
-//   }
+  binding {
+    vnic_type = "direct"
+  }
 
-// }
+}

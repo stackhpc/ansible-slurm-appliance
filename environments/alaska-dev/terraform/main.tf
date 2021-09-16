@@ -13,10 +13,11 @@ module "cluster" {
     key_pair = "centos-slurm-deploy"
     cluster_net = "iris-alaska-dev-internal"
     cluster_subnet = "iris-alaska-dev-internal"
-    // rdma_net = "WCDC-iLab-60"
+    rdma_net = "WCDC-iLab-60"
     home_volume = "alaska-dev-home"
     slurmctld_volume = "alaska-dev-slurmctld"
     slurmctl_port = "alaska-dev-slurmctl"
+    slurmctl_rdma_port = "alaska-dev-slurmctl-rdma"
     compute_nodes = {
       compute-0: "small"
       compute-1: "small"

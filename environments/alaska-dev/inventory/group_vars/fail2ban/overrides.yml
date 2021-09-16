@@ -1,0 +1,1 @@
+fail2ban_cluster_subnet: 192.168.4.0/24

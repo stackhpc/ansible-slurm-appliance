@@ -17,3 +17,18 @@
         create: yes
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
+  
+- name: Install Mellanox OFED
+  hosts: disabled
+  become: true
+  tags: ofed
+  tasks:
+    - import_role: # NB: this will change the kernel if necessary!
+        name: stackhpc.ofed
+    - name: Reboot if required from kernel change
+      reboot:
+        post_reboot_delay: 30
+      when: grub_update_result.changed
+    - name: update facts
+      setup:
+      when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
