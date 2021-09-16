@@ -1,2 +1,3 @@
 hpctests_ucx_net_devices: mlx5_0:1 # use RDMA
 hpctests_hpl_NB: 192 # broadwell vcpus
+hpctests_outdir: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hpctests"
