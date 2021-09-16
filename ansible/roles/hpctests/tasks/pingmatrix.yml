@@ -27,6 +27,7 @@
   shell: sbatch --wait pingmatrix.sh
   args:
     chdir: "{{ hpctests_rootdir }}/pingmatrix"
+  register: hpctests_pingmatrix_sbatch
 
 # nxnlatbw outputs ranks, not nodenames which would be more useful for finding issues. The sbatch manpage says nodes provided via --nodelist are sorted, but doesn't specify how.
 # Some testing using a "helloworld" program showed it is NOT sorted the same as python's sorted(), it's lexicographical. So we use scontrol to guarantee the same sort order.
@@ -60,6 +61,6 @@
 - name: Summarise results
   debug:
     msg: |
-      Summary for pingmatrix (pairwise on {{ slurm_names.stdout_lines | length }} nodes):
+      Summary for pingmatrix (pairwise on {{ slurm_names.stdout_lines | length }} nodes) job {{ hpctests_pingmatrix_sbatch.stdout.split()[-1] }} using {{ hpctests_ucx_net_devices }}:
       {{ nxnlatbw['stats'] | to_nice_yaml }}
       Tabular output on ansible control host at {{ hpctests_outdir }}/pingmatrix.html
