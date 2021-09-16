@@ -160,6 +160,8 @@ def run_module():
         'max_latency (us)': max_lat,
         'min_bandwidth (MB/s)': min_bw,
         'max_bandwidth (MB/s)': max_bw,
+        'min_bandwidth (Gbit/s)': min_bw / 125.0,
+        'max_bandwidth (Gbit/s)': max_bw / 125.0,
     }
 
     module.exit_json(**result)
