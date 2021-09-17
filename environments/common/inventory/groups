@@ -75,5 +75,8 @@ cluster
 [update]
 # All hosts to (optionally) run yum update on.
 
+[block_devices]
+# Superset of hosts to configure filesystems on - see ansible/roles/block_devices/README.md
+
 [basic_users]
 # Add `openhpc` group to add slurm users via creation of users on each node.

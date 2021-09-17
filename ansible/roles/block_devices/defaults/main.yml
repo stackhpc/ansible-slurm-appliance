@@ -1,0 +1,12 @@
+block_devices_configurations: [{}]
+block_devices_partition_state: present # 'present', 'absent' (as for parted) or 'skip'
+block_devices_device: # Path to block device, e.g. '/dev/sda'. See community.general.parted:device and community.general.filesystem:dev
+block_devices_number: # Partition number, e.g 1 for /dev/sda1. See community.general.parted:number
+block_devices_fstype: # Filesystem type, e.g. e.g. 'ext4'. See community.general.filesystem:fstype
+block_devices_resizefs: no # Grow filesystem into block device space (yes or no). See community.general.filesystem:resizefs
+block_devices_filesystem_state: present # 'present', 'absent' (as for community.general.filesystem:state) or 'skip'
+block_devices_path: # Path to mount point, e.g. '/mnt/files'
+block_devices_mount_state: mounted # Mount state, see ansible.posix.mount:state
+block_devices_owner: # Name of owner for mounted directory (ansible.buildin.file:owner
+block_devices_group: # Name of group for mounted directory (ansible.buildin.file.group)
+# also see hostnames
