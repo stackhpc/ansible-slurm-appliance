@@ -61,6 +61,13 @@
         register: updates
       - debug:
           var: updates
+      - name: Ensure update log directory on localhost exists
+        file:
+          path: "{{ update_log_path | dirname }}"
+          state: directory
+        become: false
+        delegate_to: localhost
+        run_once: true
       - name: Log updated packages
         copy:
           content: "{{ updates.results | join('\n') }}"
