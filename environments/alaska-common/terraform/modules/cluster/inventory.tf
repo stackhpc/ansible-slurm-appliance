@@ -11,6 +11,7 @@ resource "local_file" "hosts" {
                               "home": openstack_compute_volume_attach_v2.home
                               "slurmctld": openstack_compute_volume_attach_v2.slurmctld
                             }
+                            "slurmctl_rdma_port_ip": data.openstack_networking_port_v2.slurmctl_rdma.all_fixed_ips[0]
                           },
                           )
   filename = "../inventory/hosts"

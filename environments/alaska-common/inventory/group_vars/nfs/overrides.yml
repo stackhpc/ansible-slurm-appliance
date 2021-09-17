@@ -1,6 +1,6 @@
 nfs_rdma: true
 
-nfs_server: "{{ hostvars[groups['control'] | first ].server_networks['WCDC-iLab-60'] }}"
+nfs_server: "{{ slurmctl_rdma_port_ip }}"
 
 nfs_enable:
         server:  "{{ inventory_hostname in groups['control'] }}"
