@@ -52,11 +52,19 @@
         register: updates
       - debug:
           var: updates
+      - name: Ensure update log directory on localhost exists
+        file:
+          path: "{{ update_log_path | dirname }}"
+          state: directory
+        become: false
+        delegate_to: localhost
+        run_once: true
       - name: Log updated packages
         copy:
           content: "{{ updates.results | join('\n') }}"
           dest: "{{ update_log_path }}"
         delegate_to: localhost
+        become: no
       - debug:
           msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
       when: "update_enable | default('false') | bool"
