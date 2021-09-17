@@ -18,3 +18,5 @@ roles/*
 !roles/passwords/**
 !roles/hpctests/
 !roles/hpctests/**
+!roles/basic_users/
+!roles/basic_users/**

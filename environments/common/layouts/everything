@@ -35,3 +35,6 @@ slurm_stats
 
 [update:children]
 cluster
+
+[basic_users]
+# Add `openhpc` group to add Slurm users via creation of users on each node.
