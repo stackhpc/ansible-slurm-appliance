@@ -41,7 +41,7 @@ ceph_ssd
 overcloud_compute
 controllers
 
-# --- define groups for slurm partitions
+# --- define groups for slurm partitions ---
 [accept_controllers:children]
 controllers
 

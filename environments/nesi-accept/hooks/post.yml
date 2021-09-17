@@ -1,0 +1,8 @@
+- hosts: control
+  become: true
+  tasks:
+    - name: Prevent ansible_user's processes being killed on compute nodes at job completion
+      replace:
+        path: /etc/slurm/slurm.epilog.clean
+        regexp: 'if \[ \$SLURM_UID -lt 100 \] ; then'
+        replace: "if [[ $SLURM_UID -lt 100 || $SLURM_JOB_USER -eq {{ ansible_user }} ]] ; then"
