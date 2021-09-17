@@ -19,15 +19,15 @@ module "cluster" {
     slurmctl_port = "alaska-prod-slurmctl"
     slurmctl_rdma_port = "alaska-prod-slurmctl-rdma"
     compute_images = {
-      compute-0: "ohpc-compute-210907-1401.qcow2"
-      compute-1: "ohpc-compute-210907-1401.qcow2"
-      compute-2: "ohpc-compute-210907-1401.qcow2"
-      compute-3: "ohpc-compute-210907-1401.qcow2"
+      compute-0: "ohpc-compute-210917-0822.qcow2"
+      compute-1: "ohpc-compute-210917-0822.qcow2"
+      compute-2: "ohpc-compute-210917-0822.qcow2"
+      compute-3: "ohpc-compute-210917-0822.qcow2"
     }
     login_nodes = {
       login-0: {
         flavor: "vm.alaska.cpu.himem.quarter"
-        image: "ohpc-login-210907-1451.qcow2"
+        image: "ohpc-login-210917-0850.qcow2"
         address: "128.232.222.246"
       }
     }
