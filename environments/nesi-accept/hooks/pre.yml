@@ -1,0 +1,59 @@
+- name: Configure bashrc HTTP proxy env variables
+  hosts: cluster
+  tags:
+    - proxy
+  vars:
+    http_proxy: "http://130.216.23.17:3128"
+    no_proxy: "127.0.0.1,localhost,seed,wazuh,10.10.224.5,.flexihpc.nesi.org.nz"
+
+  tasks:
+    - name: Write http_proxy parameters to bashrc file
+      lineinfile:
+        path: "{{ ansible_user_dir }}/.bashrc"
+        create: yes
+        mode: 0755
+        state: present
+        regexp: "^export {{ item }}=.*"
+        line: "export {{ item }}={{ http_proxy }}"
+      with_items:
+        - http_proxy
+        - https_proxy
+
+    - name: Write http_proxy parameters to bashrc file for root user
+      lineinfile:
+        path: "/root/.bashrc"
+        create: yes
+        mode: 0755
+        state: present
+        regexp: "^export {{ item }}=.*"
+        line: "export {{ item }}={{ http_proxy }}"
+      with_items:
+        - http_proxy
+        - https_proxy
+      become: true
+
+    - name: Write http/s_proxy parameters to /etc/environment
+      lineinfile:
+        path: "/etc/environment"
+        create: yes
+        mode: 0755
+        state: present
+        regexp: "{{ item }}=.*"
+        line: "{{ item }}={{ http_proxy }}"
+      with_items:
+        - http_proxy
+        - https_proxy
+        - HTTP_PROXY
+        - HTTPS_PROXY
+      become: true
+
+    - name: Write no_proxy parameters to /etc/environment
+      lineinfile:
+        path: "/etc/environment"
+        create: yes
+        mode: 0755
+        state: present
+        regexp: "no_proxy=.*"
+        line: "no_proxy={{ no_proxy }}"
+      become: true
+      
