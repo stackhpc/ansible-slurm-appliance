@@ -9,3 +9,4 @@ update_enable: true
 block_devices_partition_state: skip
 block_devices_filesystem_state: skip
 block_devices_mount_state: present
+basic_users_manage_homedir: false

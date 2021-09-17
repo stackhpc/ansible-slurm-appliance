@@ -20,6 +20,7 @@
 - import_playbook: filesystems.yml
 - import_playbook: slurm.yml
 - import_playbook: monitoring.yml
+- import_playbook: iam.yml
 
 - name: Run post.yml hook
   vars:
