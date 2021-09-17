@@ -1,0 +1,55 @@
+[all:vars]
+ansible_user=centos
+openhpc_cluster_name=accept
+
+# --- hosts below taken from kayobe-config/etc/kayobe/inventory/overcloud ---
+[ceph_hdd]
+a01ss01 ipmi_address=10.110.113.151 bmc_type=
+a01ss02 ipmi_address=10.110.113.152 bmc_type=
+a01ss03 ipmi_address=10.110.113.153 bmc_type=
+a01ss04 ipmi_address=10.110.113.154 bmc_type=
+a01ss05 ipmi_address=10.110.113.155 bmc_type=
+#a01ss06 ipmi_address=10.110.113.156 bmc_type=
+
+[ceph_ssd]
+a01fs01 ipmi_address=10.110.113.102 bmc_type=
+a01fs02 ipmi_address=10.110.113.101 bmc_type=
+
+[overcloud_compute] # NB had to change name here!
+a01co01 ipmi_address=10.110.113.1 bmc_type=
+a01co02 ipmi_address=10.110.113.2 bmc_type=
+a01co03 ipmi_address=10.110.113.3 bmc_type=
+a01co04 ipmi_address=10.110.113.4 bmc_type=
+
+[controllers]
+a01cc01 ipmi_address=10.110.113.201 bmc_type=
+a01cc02 ipmi_address=10.110.113.202 bmc_type=
+a01cc03 ipmi_address=10.110.113.203 bmc_type=
+
+# --- normal slurm appliance hosts ---
+
+[control]
+# reuse first "compute" node as controller too
+a01co01
+
+#[login]
+# Not defined as using combined control/compute/login node
+
+[compute:children]
+ceph_hdd
+ceph_ssd
+overcloud_compute
+controllers
+
+# --- define groups for slurm partitions
+[accept_controllers:children]
+controllers
+
+[accept_overcloud_compute:children]
+overcloud_compute
+
+[accept_ceph_ssd:children]
+ceph_ssd
+
+[accept_ceph_hdd:children]
+ceph_hdd
