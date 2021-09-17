@@ -6,6 +6,7 @@ openhpc_packages_spack: # prereqs for installing spack
   # prereqs for spack:
   - bzip2
   - curl
+  - wget
   - git
   - gzip
   - make
