@@ -19,9 +19,9 @@
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
   
 - name: Install Mellanox OFED
-  hosts: disabled
+  hosts: mofed
   become: true
-  tags: ofed
+  tags: mofed
   tasks:
     - import_role: # NB: this will change the kernel if necessary!
         name: stackhpc.ofed
@@ -31,4 +31,4 @@
       when: grub_update_result.changed
     - name: update facts
       setup:
-      when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
+      when: grub_update_result.changed
