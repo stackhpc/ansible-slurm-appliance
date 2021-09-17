@@ -8,7 +8,7 @@ nfs_enable:
         # Could do something like nfs_clients: '"nfs_servers" not in group_names' instead.
         # See also constructed inventory: https://docs.ansible.com/ansible/devel/collections/ansible/builtin/constructed_inventory.html
         clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
-nfs_export_options: rw,async,insecure,no_root_squash
+nfs_export_options: rw,insecure,no_root_squash
 
 nfs_configurations:
   - comment: Export /home from Slurm control node
