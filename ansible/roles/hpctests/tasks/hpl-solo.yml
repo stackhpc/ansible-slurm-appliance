@@ -80,6 +80,7 @@
   register:
   args:
     chdir: "{{ hpctests_rootdir }}/hpl-solo"
+  register: hpctests_hplsolo_sbatch
 
 - name: Check HPL completed OK
   tags: postpro
@@ -109,7 +110,7 @@
   tags: postpro
   debug:
     msg: |
-      Summary for hpl-solo ({{ hpctests_computes.stdout_lines | length }} nodes):
+      Summary for hpl-solo ({{ hpctests_computes.stdout_lines | length }} nodes) job {{ hpctests_hplsolo_sbatch.stdout.split()[-1] }} using {{ hpctests_ucx_net_devices }}:
         Max:  {{ perf.stdout_lines | map('float') | max }} gflops
         Min:  {{ perf.stdout_lines | map('float') | min }} gflops
         Mean: {{ (perf.stdout_lines | map('float') | sum) /  (hpctests_computes.stdout_lines | length) }} gflops
