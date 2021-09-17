@@ -40,7 +40,11 @@ Steps:
   The following variables may also be set:
 
   - `disk_size`: Set the image size ([docs](https://www.packer.io/docs/builders/qemu#disk_size)). Defaults to 20G, so for smaller VMs use e.g: `packer build -var 'disk_size=10G' ...`
-  - `groups`: List of ansible groups the packer VM is added to, to control which nodes to build an image for. Defaults to `["compute"]` to build a generic compute node image. The first element of this list is used as part of the image name. Examples:
+  - `groups`: List of ansible groups the packer VM is added to, to control which nodes to build an image for. Defaults to `["compute"]` to build a generic compute node image. The first element of this list is used as part of the image name.
+  - `base_img_url`: URL or path of base image to use (default is CentOS 8.4 GenericCloud x86_64 image). See the Packer docs for [iso_url](https://www.packer.io/docs/builders/qemu#iso-configuration) details.
+  - `base_img_checksum`: Checksum type:checksum for `base_img_url`.
+  
+  Examples:
 
      - Build an image for a login node: `packer build -var 'groups=["login"]' ...`
 
