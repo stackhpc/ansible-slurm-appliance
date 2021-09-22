@@ -1,5 +1,5 @@
 openhpc_slurm_partitions:
   - name: controllers
-  - name: overcloud_compute
+  - name: compute
   - name: ceph_ssd
   - name: ceph_hdd
