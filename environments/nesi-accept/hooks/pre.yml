@@ -5,7 +5,7 @@
   vars:
     #http_proxy: "http://130.216.23.17:3128" # uni squid
     http_proxy: "http://10.10.224.2:3128"    # seed node squid
-    no_proxy: "127.0.0.1,localhost,seed,wazuh,10.10.224.5,.flexihpc.nesi.org.nz"
+    no_proxy: "127.0.0.1,localhost,seed,wazuh,10.10.224.5,.flexihpc.nesi.org.nz,{{ ansible_play_hosts | join(',') }}"
   tasks:
     - name: Write http_proxy parameters to bashrc file
       lineinfile:
