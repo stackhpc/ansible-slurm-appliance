@@ -2,7 +2,7 @@
 openhpc
 
 [hpctests:children]
-login
+control
 
 [mysql:children]
 control
