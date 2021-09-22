@@ -17,7 +17,7 @@ a01fs01 ipmi_address=10.110.113.102 bmc_type=
 a01fs02 ipmi_address=10.110.113.101 bmc_type=
 
 [accept_compute] # NB had to change name here!
-#a01co01 ipmi_address=10.110.113.1 bmc_type= # out of disk
+a01co01 ipmi_address=10.110.113.1 bmc_type=
 a01co02 ipmi_address=10.110.113.2 bmc_type=
 a01co03 ipmi_address=10.110.113.3 bmc_type=
 a01co04 ipmi_address=10.110.113.4 bmc_type=
