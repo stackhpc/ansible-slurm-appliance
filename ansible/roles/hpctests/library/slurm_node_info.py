@@ -22,9 +22,14 @@ description:
 options
     nodes:
         description:
-            - Slurm nodenames for which information is required. These must be homogenous.
+            - Slurm nodenames for which information is required.
         required: true
         type: list
+    partition:
+        description:
+            - Slurm partition to query, if there is more than one.
+        required: false
+        type: str
 requirements:
     - "python >= 3.6"
 author:
@@ -39,6 +44,7 @@ TODO
 def run_module():
     module_args = dict(
         nodes=dict(type="list", required=True),
+        partition=dict(type="str", required=False),
     )
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
@@ -47,14 +53,14 @@ def run_module():
         module.exit_json(**result)
     
     node_spec = ','.join(module.params['nodes'])
-    _, stdout,_ = module.run_command("sinfo --Format All --node %s" % node_spec, check_rc=True)
+    partition_arg = '--partition=%s' % module.params['partition'] if module.params['partition'] else ''
+    _, stdout,_ = module.run_command("sinfo --Format All --nodes=%s %s" % (node_spec, partition_arg), check_rc=True)
     lines = stdout.splitlines()
-    # if len(lines) > 2:
-    #     raise ValueError('Info requested for nodes which are not homogenous: %s' % lines)
+    if len(lines) > (len(module.params['nodes']) + 1): # +1 for header
+        raise ValueError('Got %i lines of output for %i nodes - mismatch. Did you specify partition?' % (len(lines), len(module.params['nodes'])))
     info = {}
     params = [v.strip() for v in lines[0].split('|')]
     values = [line.split('|') for line in lines[1:]]
-    print(values)
     for ix, param in enumerate(params):
         info[param] = [nodeinfo[ix].strip() for nodeinfo in values]
     result['info'] = info
