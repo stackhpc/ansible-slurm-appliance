@@ -6,7 +6,6 @@
     #http_proxy: "http://130.216.23.17:3128" # uni squid
     http_proxy: "http://10.10.224.2:3128"    # seed node squid
     no_proxy: "127.0.0.1,localhost,seed,wazuh,10.10.224.5,.flexihpc.nesi.org.nz"
-
   tasks:
     - name: Write http_proxy parameters to bashrc file
       lineinfile:
@@ -77,3 +76,12 @@
         create: yes
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
+
+- name: Set date/time
+  hosts: openhpc
+  become: true
+  tasks:
+    - name: Set date/time from google
+      shell:
+        cmd: |
+          date -u --set="$(curl -H 'Cache-Control: no-cache' -sD - http://google.com |grep '^Date:' |cut -d' ' -f3-6)"
