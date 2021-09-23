@@ -31,6 +31,7 @@
   become: yes
   tags:
     - rebuild
+    - openhpc
   tasks:
     - import_role:
         name: stackhpc.slurm_openstack_tools.rebuild

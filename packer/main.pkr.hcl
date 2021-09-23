@@ -23,9 +23,19 @@ variable "groups" {
   default = ["compute"]
 }
 
+variable "base_img_url" {
+  type = string
+  default = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2"
+}
+
+variable "base_img_checksum" {
+  type = string
+  default = "sha256:3510fc7deb3e1939dbf3fe6f65a02ab1efcc763480bc352e4c06eca2e4f7c2a2"
+}
+
 source "qemu" "openhpc-vm" {
-  iso_url = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2"
-  iso_checksum = "sha256:d8984b9baee57b127abce310def0f4c3c9d5b3cea7ea8451fc4ffcbc9935b640"
+  iso_url = var.base_img_url
+  iso_checksum = var.base_img_checksum
   disk_image = true # as above is .qcow2 not .iso
   disk_size = var.disk_size
   disk_compression = true

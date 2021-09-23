@@ -22,6 +22,7 @@
   become: no
   args:
     chdir: "{{ hpctests_rootdir }}/pingpong"
+  register: hpctests_pingpong_sbatch
 
 - name: Read pingpong
   read_imb_pingpong:
@@ -34,7 +35,7 @@
 
 - debug:
     msg: |
-      Summary for pingpong (2x scheduler-selected nodes):
+      Summary for pingpong (2x scheduler-selected nodes) job {{ hpctests_pingpong_sbatch.stdout.split()[-1] }} using {{ hpctests_ucx_net_devices }}:
       nodes: {{ hpctests_pingpong_run_nodes.stdout.split()[1] }}
       zero-size msg latency: {{ hpctests_pingpong_out['columns']['latency'][0] }} us
-      max bandwidth: {{ hpctests_pingpong_out['columns']['bandwidth'] | max }} Mbytes/s
+      max bandwidth: {{ hpctests_pingpong_out['columns']['bandwidth'] | max }} Mbytes/s ({{ (hpctests_pingpong_out['columns']['bandwidth'] | max) / 125.0 }} Gbit/s)
