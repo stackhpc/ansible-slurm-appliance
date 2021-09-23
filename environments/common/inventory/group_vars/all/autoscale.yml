@@ -10,13 +10,19 @@ autoscale_openhpc_extra_config:
   SuspendExcNodes: "{{ groups['compute'] | join(',') }}" # i.e. all tf-defined nodes in the partition # TODO: fixme: hardcoded "compute"
   SlurmctldParameters: enable_configless,idle_on_node_suspend,cloud_dns
   CommunicationParameters: NoAddrCache
+  SuspendProgram: /opt/slurm-tools/bin/suspend
+  ResumeProgram: /opt/slurm-tools/bin/resume
   # recommended:
   PrivateData: cloud # shows cloud node state
   # TODO: for testing only, not production:
   DebugFlags: PowerSave
   SlurmctldSyslogDebug: info
   SuspendTime: 120
-  SuspendTimeout: 300
+  SuspendTimeout: 30
   ResumeTimeout: 300
   # FIXME: maybe need to set TreeWidth to >= number of nodes (default: 50)
   # power_save_*interval: options are defaults but should enable changes
+openhpc_slurm_dirs:
+  - /etc/openstack
+  - /opt/slurm-tools
+openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml

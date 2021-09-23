@@ -26,5 +26,4 @@ openhpc_slurm_configless: true
 openhpc_login_only_nodes: login
 
 openhpc_extra_config_overrides: {}
-appliance_openhpc_extra_config: "{{ autoscale_openhpc_extra_config if groups['autoscale'] else {} }}"
-openhpc_extra_config: "{{ appliance_openhpc_extra_config | combine(openhpc_extra_config_overrides) }}"
+openhpc_extra_config: "{{ {} | combine(rebuild_openhpc_extra_config, autoscale_openhpc_extra_config, openhpc_extra_config_overrides) }}" # TODO: handle case where groups aren't defined!

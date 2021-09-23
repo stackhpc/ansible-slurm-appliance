@@ -1,0 +1,3 @@
+rebuild_openhpc_extra_config:
+  RebootProgram: /opt/slurm-tools/bin/slurm-openstack-rebuild
+openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml

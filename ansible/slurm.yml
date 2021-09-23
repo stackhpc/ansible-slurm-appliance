@@ -9,6 +9,46 @@
     - include_role:
         name:  geerlingguy.mysql
 
+- name: Enable Slurm-controlled instance changes
+  hosts:
+    - rebuild
+    - autoscale
+  become: true
+  tags:
+    - rebuild
+    - autoscale
+    - openhpc
+  tasks:
+    - name: Create /etc/openstack
+      file:
+        path: /etc/openstack
+        state: directory
+        owner: root # This will be changed later
+        group: root
+        mode: u=r
+    - name: Copy out clouds.yaml
+      copy:
+        src: "{{ openhpc_rebuild_clouds }}" # TODO: name is wrong really!
+        dest: /etc/openstack/clouds.yaml
+        mode: u=rx
+    - name: Setup slurm tools # this adds reboot script only at present
+      include_role:
+        name: stackhpc.slurm_openstack_tools.pytools # TODO: could just move this into the repo?
+    - name: Create SuspendProgram  # TODO: FIXME: add to slurm-tools
+      template:
+        src: suspend.py.j2
+        dest: /opt/slurm-tools/bin/suspend
+        mode: u=rwx,g=rx,o=rx # is OK as clouds.yaml is protected
+      tags: suspend
+      when: "'autoscale' in group_names"
+    - name: Create ResumeProgram # TODO: FIXME: add to slurm-tools
+      template:
+        src: resume.py.j2
+        dest: /opt/slurm-tools/bin/resume
+        mode: u=rwx,g=rx,o=rx # is OK as clouds.yaml is protected
+      tags: resume
+      when: "'autoscale' in group_names"
+
 - name: Setup slurm
   hosts: openhpc
   become: yes
@@ -25,75 +65,6 @@
     #     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
     - import_role:
         name: stackhpc.openhpc
-
-- name: Setup slurm-driven reimage
-  hosts: rebuild
-  become: yes
-  tags:
-    - rebuild
-    - openhpc
-  tasks:
-    - import_role:
-        name: stackhpc.slurm_openstack_tools.rebuild
-
-- name: Setup autoscaling suspend/resume programs
-  # has to happen *after* slurm user has been created
-  hosts: autoscale # this is the *controller*
-  become: yes
-  tags:
-    - autoscale
-  tasks:
-- name: Configure autoscale
-  hosts: autoscale
-  become: yes
-  tags:
-    - autoscale
-  tasks:
-    - name: Create /etc/openstack
-      file:
-        path: /etc/openstack
-        state: directory
-        owner: slurm
-        group: slurm
-        mode: '0500'
-    - name: Copy out clouds.yaml
-      copy:
-        src: "{{ autoscale_clouds }}"
-        dest: /etc/openstack/clouds.yaml
-        owner: slurm
-        group: slurm
-        mode: '0400'
-    - name: Setup slurm tools (to get venv)
-      include_role:
-        name: stackhpc.slurm_openstack_tools.pytools
-    - name: Create SuspendProgram
-      template:
-        src: suspend.py.j2
-        dest: /opt/slurm-tools/bin/suspend
-        owner: slurm
-        group: slurm
-        mode: u=rwx,go=
-      tags: suspend
-    - name: Create ResumeProgram
-      template:
-        src: resume.py.j2
-        dest: /opt/slurm-tools/bin/resume
-        owner: slurm
-        group: slurm
-        mode: u=rwx,go=
-      tags: resume
-    - name: Add Resume/SuspendProgram parameters
-      community.general.ini_file:
-        path: /etc/slurm/slurm.conf
-        option: "{{ item.key }}"
-        section: null
-        value: "{{ item.value }}"
-        no_extra_spaces: true
-        create: no
-      loop: "{{ {'SuspendProgram':'/opt/slurm-tools/bin/suspend', 'ResumeProgram':'/opt/slurm-tools/bin/resume'} | dict2items }}" # TODO: fixme: hijacking slurm-tools
-    - name: Reconfigure slurm
-      command:
-        cmd: scontrol reconfigure
 
 - name: Set locked memory limits on user-facing nodes
   hosts:
