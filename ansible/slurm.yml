@@ -19,21 +19,31 @@
     - autoscale
     - openhpc
   tasks:
+    - name: Check if slurm user exists
+      command:
+        cmd: "id slurm"
+      register: id_slurm
+      failed_when: false
+      changed_when: false
     - name: Create /etc/openstack
       file:
         path: /etc/openstack
         state: directory
-        owner: root # This will be changed later
-        group: root
+        owner: "{{ 'root' if id_slurm.rc  else 'slurm' }}" # TODO: FIXME: for rebuild task
+        group: "{{ 'root' if id_slurm.rc  else 'slurm' }}" # TODO: FIXME: for rebuild task
         mode: u=r
     - name: Copy out clouds.yaml
       copy:
         src: "{{ openhpc_rebuild_clouds }}" # TODO: name is wrong really!
         dest: /etc/openstack/clouds.yaml
         mode: u=rx
+        owner: "{{ 'root' if id_slurm.rc  else 'slurm' }}" # TODO: FIXME: for rebuild task
+        group: "{{ 'root' if id_slurm.rc  else 'slurm' }}" # TODO: FIXME: for rebuild task
     - name: Setup slurm tools # this adds reboot script only at present
       include_role:
         name: stackhpc.slurm_openstack_tools.pytools # TODO: could just move this into the repo?
+      vars:                   # TODO: debug
+        pytools_editable: true # git repo in /opt/slurm-tools/src/slurm-openstack-tools
     - name: Create SuspendProgram  # TODO: FIXME: add to slurm-tools
       template:
         src: suspend.py.j2
