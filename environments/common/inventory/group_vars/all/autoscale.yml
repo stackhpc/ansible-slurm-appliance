@@ -5,9 +5,9 @@ autoscale_network: stackhpc-ipv4-geneve
 autoscale_flavor: general.v1.small
 autoscale_keypair: centos-at-steveb-ansible
 
+openhpc_suspend_exc_nodes: "{{ (groups['compute'] + groups.get('login', [])) }}" # i.e. all tf-defined nodes in the partition # TODO: fixme: hardcoded "compute"
 autoscale_openhpc_extra_config:
   # required parameters:
-  SuspendExcNodes: "{{ groups['compute'] | join(',') }}" # i.e. all tf-defined nodes in the partition # TODO: fixme: hardcoded "compute"
   SlurmctldParameters: enable_configless,idle_on_node_suspend,cloud_dns
   CommunicationParameters: NoAddrCache
   SuspendProgram: /opt/slurm-tools/bin/suspend
