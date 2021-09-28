@@ -1,47 +1,75 @@
 #!/opt/slurm-tools/bin/python3
-""" Create OpenStack instances """
+""" A Slurm ResumeProgram to create OpenStack instances.
+
+    Usage:
+
+        resume HOSTLIST_EXPRESSION [debug]
+    
+    where:
+        HOSTLIST_EXPRESSION: Name(s) of node(s) to create, using Slurm's hostlist expression, as per [1].
+        debug: Any 2nd argument puts this in debug mode which is more verbose but does not actually create nodes.
+
+    Output and exceptions are written to the syslog.
+
+    The flavor, image, network and keypair to be used must be defined as node Features [2] in the format "parameter=value".
+
+    OpenStack credentials must be available to this script (e.g. via an application credential in /etc/openstack/clouds.yaml readable by the slurm user)
+
+    [1]: https://slurm.schedmd.com/slurm.conf.html#OPT_ResumeProgram
+    [2]: https://slurm.schedmd.com/slurm.conf.html#OPT_Features
+"""
 
 import sys, subprocess, logging.handlers
 import openstack
 import pprint
 
-# all take a name or ID:
-config = {
-    'image': "{{ autoscale_image }}",
-    'network': "{{ autoscale_network }}",
-    'flavor': "{{ autoscale_flavor }}",
-    'keypair': "{{ autoscale_keypair }}",
-}
+REQUIRED_PARAMS = ('image', 'flavor', 'keypair', 'network')
 
 # configure logging to syslog - by default only "info" and above categories appear
 logger = logging.getLogger("syslogger")
 logger.setLevel(logging.DEBUG)
 handler = logging.handlers.SysLogHandler("/dev/log")
+handler.setFormatter(logging.Formatter(sys.argv[0] + ': %(message)s'))
 logger.addHandler(handler)
 
 def expand_nodes(hostlist_expr):
     scontrol = subprocess.run(['scontrol', 'show', 'hostnames', hostlist_expr], stdout=subprocess.PIPE, universal_newlines=True)
     return scontrol.stdout.strip().split('\n')
 
-def create_server(conn, name):
+def get_features(nodenames):
+    """ Retrieve the features specified for given node(s).
+    
+        Returns a dict with a key/value pair for each node. Keys are node names, values are lists of strings, one string per feature.
+    """
+    
+    scontrol = subprocess.run(['scontrol', 'show', 'node', nodenames], stdout=subprocess.PIPE, universal_newlines=True)
+    features = {}
+    for line in scontrol.stdout.splitlines():
+        line = line.strip()
+        if line.startswith('NodeName'): # NodeName=dev-small-cloud-1 CoresPerSocket=1 
+            node = line.split()[0].split('=')[1]
+        if line.startswith('AvailableFeatures'):
+            feature_args = line.split('=', 1)[1]
+            features[node] = feature_args.split(',')
+            break
+    
+    return features
 
-    image = conn.compute.find_image(config['image'])
-    flavor = conn.compute.find_flavor(config['flavor'])
-    network = conn.network.find_network(config['network'])
-    keypair = conn.compute.find_keypair(config['keypair'])
-
-    for ix, item in enumerate((image, flavor, network, keypair)):
-        if item is None:
-            raise ValueError(f'Specified {list(config)[ix]} {config[list(config)[ix]]} was not found')
+def create_server(conn, name, image, flavor, network, keypair):
 
     server = conn.compute.create_server(
         name=name, image_id=image.id, flavor_id=flavor.id,
-        networks=[{"uuid": network.id}], key_name=keypair.name)
+        networks=[{"uuid": network.id}], key_name=keypair.name,
+    )
+    #server = conn.compute.wait_for_server(...)
     
-    #server = conn.compute.wait_for_server(server)
     return server
 
 def resume():
+    debug = False
+    if len(sys.argv) > 2:
+        logger.info(f"Running in debug mode - won't actually create nodes")
+        debug = True
     hostlist_expr = sys.argv[1]
     logger.info(f"Slurmctld invoked resume {hostlist_expr}")
     new_nodes = expand_nodes(hostlist_expr)
@@ -49,11 +77,38 @@ def resume():
     conn = openstack.connection.from_config()
     logger.info(f"Got openstack connection {conn}")
 
+    features = get_features(hostlist_expr)
+    logger.info(f"Read feature information from slurm")
+    logger.info(f"Features: {features}")
+    
     for node in new_nodes:
-        logger.info(f"creating node {node}")
-        server = create_server(conn, node) # TODO: save id to disk so can use it instead of name on deletion (to cope with multiple instances with same name)
-        logger.info(f"server: {server}")
-        # Don't need scontrol update nodename={node} nodeaddr={server_ip} as using SlurmctldParameters=cloud_dns
+        # extract the openstack parameters from node features:
+        if node not in features:
+            logger.error(f"No Feature definitions found for node {node}: {features}")
+        os_parameters = dict(feature.split('=') for feature in features[node])
+        if debug:
+            logger.info(f"os_parameters for {node}: {os_parameters}")
+        missing = set(REQUIRED_PARAMS).difference(os_parameters.keys())
+        if missing:
+            logger.error(f"Missing {','.join(missing)} from feature definition for node {node}: {os_parameters}")
+
+        # get openstack objects:
+        os_objects = {
+            'image': conn.compute.find_image(os_parameters['image']),
+            'flavor': conn.compute.find_flavor(os_parameters['flavor']),
+            'network': conn.network.find_network(os_parameters['network']),
+            'keypair': conn.compute.find_keypair(os_parameters['keypair']),
+        }
+        not_found = dict((k, v) for (k, v) in os_objects.items() if v is None)
+        if not_found:
+            raise ValueError('Could not find openstack objects for: %s' % ', '.join(not_found))
+        if debug:
+            logger.info(f"os_objects for {node} : {os_objects}")
+        if not debug:
+            logger.info(f"creating node {node}")
+            server = create_server(conn, node, **os_objects) # TODO: save id to disk so can use it instead of name on deletion (to cope with multiple instances with same name)
+            logger.info(f"server: {server}")
+            # Don't need scontrol update nodename={node} nodeaddr={server_ip} as using SlurmctldParameters=cloud_dns
 
 if __name__ == "__main__":
     try:
