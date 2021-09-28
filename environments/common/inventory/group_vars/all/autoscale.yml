@@ -22,7 +22,4 @@ autoscale_openhpc_extra_config:
   ResumeTimeout: 300
   # FIXME: maybe need to set TreeWidth to >= number of nodes (default: 50)
   # power_save_*interval: options are defaults but should enable changes
-openhpc_slurm_dirs:
-  - /etc/openstack
-  - /opt/slurm-tools
 openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml
