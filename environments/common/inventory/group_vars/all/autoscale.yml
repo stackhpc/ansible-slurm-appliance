@@ -1,11 +1,5 @@
 autoscale_clouds: ~/.config/openstack/clouds.yaml
-# TODO: change below to be defined somewhere else, poss as part of slurm config for partition??
-autoscale_image: ohpc-compute-210909-1316.qcow2
-autoscale_network: stackhpc-ipv4-geneve
-autoscale_flavor: general.v1.small
-autoscale_keypair: centos-at-steveb-ansible
-
-openhpc_suspend_exc_nodes: "{{ (groups['compute'] + groups.get('login', [])) }}" # i.e. all tf-defined nodes in the partition # TODO: fixme: hardcoded "compute"
+autoscale_openhpc_suspend_exc_nodes: "{{ (groups['compute'] + groups.get('login', [])) }}" # i.e. all tf-defined nodes in the partition # TODO: fixme: hardcoded "compute"
 autoscale_openhpc_extra_config:
   # required parameters:
   SlurmctldParameters: enable_configless,idle_on_node_suspend,cloud_dns
@@ -22,4 +16,4 @@ autoscale_openhpc_extra_config:
   ResumeTimeout: 300
   # FIXME: maybe need to set TreeWidth to >= number of nodes (default: 50)
   # power_save_*interval: options are defaults but should enable changes
-openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml
+openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml # TODO: fix name here?
