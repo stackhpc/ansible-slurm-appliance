@@ -1,26 +1,27 @@
-cloud_spec:
+general_v1_small:
   image: ohpc-compute-210909-1316.qcow2
   flavor: general.v1.small
   keypair: centos-at-steveb-ansible
   network: stackhpc-ipv4-geneve
 
+general_v1_medium:
+  image: ohpc-compute-210909-1316.qcow2
+  flavor: general.v1.medium
+  keypair: centos-at-steveb-ansible
+  network: stackhpc-ipv4-geneve
+
 openhpc_slurm_partitions:
 - name: small
-  default: yes
+  default: no
   cloud_nodes: '-[2-3]'
-  cloud_features: "{{ cloud_spec }}"
+  cloud_features: "{{ general_v1_small }}"
 
 - name: burst
-  default: no
+  default: yes
   groups:
-  - name: smallmem
-    cloud_nodes: '[0-3]'
-    cloud_features: "{{ cloud_spec }}"
-    ram_mb: 9996
-    cpus: 2
-  - name: bigmem
+  - name: medium
     cloud_nodes: '[4-6]'
-    cloud_features: "{{ cloud_spec }}"
-    ram_mb: 9992
-    cpus: 2
+    cloud_features: "{{ general_v1_medium }}"
+    ram_mb: "{{ (15258 * 0.95) | int }}"
+    sockets_per_board: 4
     
