@@ -6,14 +6,21 @@ cloud_spec:
 
 openhpc_slurm_partitions:
 - name: small
-  cloud_nodes: 2
-  features: "{{ cloud_spec.items() | map('join', '=') }}"
   default: yes
-  # TODO: consider adding suspend_exc: true here??
-
-- name: cloud_only
-  cloud_nodes: 3
-  ram_mb: 9996
-  cpus: 2
+  cloud_nodes: '-[2-3]'
   features: "{{ cloud_spec.items() | map('join', '=') }}"
+
+- name: burst
   default: no
+  groups:
+  - name: smallmem
+    cloud_nodes: '[0-3]'
+    ram_mb: 9996
+    cpus: 2
+    features: "{{ cloud_spec.items() | map('join', '=') }}"
+  - name: bigmem
+    cloud_nodes: '[4-6]'
+    ram_mb: 9992
+    cpus: 2
+    features: "{{ cloud_spec.items() | map('join', '=') }}"
+    
