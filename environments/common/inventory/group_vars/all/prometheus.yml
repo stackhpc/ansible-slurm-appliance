@@ -14,7 +14,7 @@ prometheus_alert_rules_files:
 prometheus_alert_rules: []
 
 prometheus_targets:
-  node: "{{ groups['all'] | reject('equalto', 'localhost') | prometheus_node_exporter_targets }}"
+  node: "{{ groups.get('node_exporter', []) | reject('equalto', 'localhost') | prometheus_node_exporter_targets }}"
 
 prometheus_scrape_configs:
 - job_name: "prometheus"
