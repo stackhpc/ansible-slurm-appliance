@@ -51,7 +51,6 @@ def get_features(nodenames):
         if line.startswith('AvailableFeatures'):
             feature_args = line.split('=', 1)[1]
             features[node] = feature_args.split(',')
-            break
     
     return features
 
@@ -79,7 +78,6 @@ def resume():
 
     features = get_features(hostlist_expr)
     logger.info(f"Read feature information from slurm")
-    logger.info(f"Features: {features}")
     
     for node in new_nodes:
         # extract the openstack parameters from node features:
