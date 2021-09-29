@@ -15,15 +15,24 @@ openhpc_slurmdbd_mysql_username: slurm
 openhpc_slurm_control_host: "{{ groups['control'] | first }}"
 openhpc_slurm_partitions:
   - name: "compute"
-openhpc_default_packages:
+
+# TODO: WIP PR to change/deprecate name here:
+openhpc_packages_default:
   - slurm-libpmi-ohpc # to allow intel mpi to work properly
   - ohpc-gnu9-openmpi4-perf-tools # for hpctests
   - openblas-gnu9-ohpc # for hpctests (HPL)
-openhpc_extra_packages: []
-openhpc_packages: "{{ openhpc_default_packages + openhpc_extra_packages }}"
+openhpc_packages_extra: []
+openhpc_packages: "{{ openhpc_packages_default + openhpc_packages_extra }}"
+
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_slurm_configless: true
 openhpc_login_only_nodes: login
 
-openhpc_extra_config_overrides: {}
-openhpc_extra_config: "{{ {} | combine(rebuild_openhpc_extra_config, autoscale_openhpc_extra_config, openhpc_extra_config_overrides) }}" # TODO: handle case where groups aren't defined!
+openhpc_config_default: "{{ rebuild_openhpc_extra_config | combine(autoscale_openhpc_extra_config) }}" # TODO: handle case where groups aren't defined!
+openhpc_config_extra: {}
+# TODO: WIP PR for openhpc_extra_config -> openhpc_config
+openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_extra) }}"
+
+openhpc_suspend_exc_nodes_default:  "{{ autoscale_openhpc_suspend_exc_nodes }}" # TODO: handle cases where groups aren't defined
+openhpc_env_suspend_exc_nodes_extra: []
+openhpc_suspend_exc_nodes: "{{ openhpc_suspend_exc_nodes_default + openhpc_env_suspend_exc_nodes_extra }}"
