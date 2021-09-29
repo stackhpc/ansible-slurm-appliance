@@ -19,7 +19,7 @@
     [2]: https://slurm.schedmd.com/slurm.conf.html#OPT_Features
 """
 
-import sys, subprocess, logging.handlers
+import sys, os, subprocess, logging.handlers
 import openstack
 import pprint
 
@@ -31,6 +31,13 @@ logger.setLevel(logging.DEBUG)
 handler = logging.handlers.SysLogHandler("/dev/log")
 handler.setFormatter(logging.Formatter(sys.argv[0] + ': %(message)s'))
 logger.addHandler(handler)
+
+def get_statesavelocation():
+    """ Return the path for Slurm's StateSaveLocation """
+    scontrol = subprocess.run(['scontrol', 'show', 'config'], stdout=subprocess.PIPE, universal_newlines=True)
+    for line in scontrol.stdout.splitlines():
+        if line.startswith('StateSaveLocation'): # StateSaveLocation       = /var/spool/slurm
+            return line.split()[-1]
 
 def expand_nodes(hostlist_expr):
     scontrol = subprocess.run(['scontrol', 'show', 'hostnames', hostlist_expr], stdout=subprocess.PIPE, universal_newlines=True)
@@ -78,6 +85,8 @@ def resume():
 
     features = get_features(hostlist_expr)
     logger.info(f"Read feature information from slurm")
+
+    statedir = get_statesavelocation()
     
     for node in new_nodes:
         # extract the openstack parameters from node features:
@@ -106,6 +115,8 @@ def resume():
             logger.info(f"creating node {node}")
             server = create_server(conn, node, **os_objects) # TODO: save id to disk so can use it instead of name on deletion (to cope with multiple instances with same name)
             logger.info(f"server: {server}")
+            with open(os.path.join(statedir, node), 'w') as f:
+                f.write(server.id)
             # Don't need scontrol update nodename={node} nodeaddr={server_ip} as using SlurmctldParameters=cloud_dns
 
 if __name__ == "__main__":
