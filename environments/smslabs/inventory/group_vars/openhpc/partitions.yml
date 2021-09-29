@@ -1,0 +1,19 @@
+cloud_spec:
+  image: ohpc-compute-210909-1316.qcow2
+  flavor: general.v1.small
+  keypair: centos-at-steveb-ansible
+  network: stackhpc-ipv4-geneve
+
+openhpc_slurm_partitions:
+- name: small
+  cloud_nodes: 2
+  features: "{{ cloud_spec.items() | map('join', '=') }}"
+  default: yes
+  # TODO: consider adding suspend_exc: true here??
+
+- name: cloud_only
+  cloud_nodes: 3
+  ram_mb: 9996
+  cpus: 2
+  features: "{{ cloud_spec.items() | map('join', '=') }}"
+  default: no
