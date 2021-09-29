@@ -8,19 +8,19 @@ openhpc_slurm_partitions:
 - name: small
   default: yes
   cloud_nodes: '-[2-3]'
-  features: "{{ cloud_spec.items() | map('join', '=') }}"
+  cloud_features: "{{ cloud_spec }}"
 
 - name: burst
   default: no
   groups:
   - name: smallmem
     cloud_nodes: '[0-3]'
+    cloud_features: "{{ cloud_spec }}"
     ram_mb: 9996
     cpus: 2
-    features: "{{ cloud_spec.items() | map('join', '=') }}"
   - name: bigmem
     cloud_nodes: '[4-6]'
+    cloud_features: "{{ cloud_spec }}"
     ram_mb: 9992
     cpus: 2
-    features: "{{ cloud_spec.items() | map('join', '=') }}"
     
