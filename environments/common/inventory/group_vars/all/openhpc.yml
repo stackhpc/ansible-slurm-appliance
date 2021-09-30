@@ -28,10 +28,11 @@ openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_slurm_configless: true
 openhpc_login_only_nodes: login
 
-openhpc_config_default: "{{ rebuild_openhpc_config | combine(autoscale_openhpc_config) }}" # TODO: handle case where groups aren't defined!
+openhpc_config_default:
+  SlurmctldParameters:
+    - enable_configless # required as we might override SlurmctldParameters elsewhere
 openhpc_config_extra: {}
-openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_extra) }}"
+openhpc_config: "{{ openhpc_config_default | combine(rebuild_openhpc_config, autoscale_openhpc_config, openhpc_config_extra, list_merge='append') }}"
 
-openhpc_suspend_exc_nodes_default: "{{ autoscale_openhpc_suspend_exc_nodes }}"
 openhpc_suspend_exc_nodes_extra: []
-openhpc_suspend_exc_nodes: "{{ openhpc_suspend_exc_nodes_default + openhpc_suspend_exc_nodes_extra }}"
+openhpc_suspend_exc_nodes: "{{ autoscale_suspend_exc_nodes + openhpc_suspend_exc_nodes_extra }}"

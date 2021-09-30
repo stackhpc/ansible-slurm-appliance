@@ -1,3 +1,4 @@
-rebuild_openhpc_config:
+_rebuild_openhpc_config:
   RebootProgram: /opt/slurm-tools/bin/slurm-openstack-rebuild
-openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml
+rebuild_openhpc_config: "{{ _rebuild_openhpc_config if groups.get('rebuild', []) else {} }}"
+openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml # TODO: rename?
