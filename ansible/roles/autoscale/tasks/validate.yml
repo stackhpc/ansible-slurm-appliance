@@ -1,0 +1,5 @@
+---
+
+- name: Check openhpc_slurm_partitions information
+  debug:
+    msg: "{{ openhpc_slurm_partitions | modify_autoscale_partitions | to_nice_yaml }}"

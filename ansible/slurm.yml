@@ -27,7 +27,7 @@
       file:
         path: /etc/openstack
         state: directory
-        owner: slurm # TODO: check if this works for rebuild too?
+        owner: slurm # TODO: check this works for rebuild too
         group: slurm
         mode: u=rX,go=
     - name: Copy out clouds.yaml
@@ -35,29 +35,19 @@
         src: "{{ openhpc_rebuild_clouds }}" # TODO: name is wrong really!
         dest: /etc/openstack/clouds.yaml
         mode: u=r,go=
-        owner: slurm  # TODO: check if this works for rebuild too?
+        owner: slurm  # TODO: check this works for rebuild too
         group: slurm
-    - name: Setup slurm tools # this adds reboot script only at present
+    - name: Setup slurm tools
       include_role:
         name: stackhpc.slurm_openstack_tools.pytools # TODO: could just move this into the repo?
       vars:                   # TODO: debug
-        pytools_editable: true # git repo in /opt/slurm-tools/src/slurm-openstack-tools
-        become_user: slurm # TODO: check if this works for rebuild too?
-        become_flags: '-s /bin/bash'
-    - name: Create SuspendProgram  # TODO: FIXME: add to slurm-tools
-      template:
-        src: suspend.py.j2
-        dest: /opt/slurm-tools/bin/suspend
-        mode: u=rwx,g=rx,o=rx # is OK as clouds.yaml is protected
-      tags: suspend
+        become_user: slurm # TODO: check this works for rebuild too
+        become_flags: '-s /bin/bash' # as has shell specified as /sbin/nologin
+    - name: Configure autoscale programs and parameters
+      include_role:
+        name: autoscale
       when: "'autoscale' in group_names"
-    - name: Create ResumeProgram # TODO: FIXME: add to slurm-tools
-      template:
-        src: resume.py.j2
-        dest: /opt/slurm-tools/bin/resume
-        mode: u=rwx,g=rx,o=rx # is OK as clouds.yaml is protected
-      tags: resume
-      when: "'autoscale' in group_names"
+    # TODO: rebuild
 
 - name: Setup slurm
   hosts: openhpc

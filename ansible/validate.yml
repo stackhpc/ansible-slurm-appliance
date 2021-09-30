@@ -2,6 +2,15 @@
 
 # Fail early if configuration is invalid
 
+- name: Validate autoscale configuration
+  hosts: autoscale
+  tags: autoscale
+  tasks:
+    - import_role:
+        name: autoscale
+        tasks_from: validate.yml
+      tags: validate
+
 - name: Validate podman configuration
   hosts: podman
   tags: podman
