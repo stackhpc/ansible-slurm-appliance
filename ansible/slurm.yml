@@ -35,19 +35,22 @@
         src: "{{ openhpc_rebuild_clouds }}" # TODO: name is wrong really!
         dest: /etc/openstack/clouds.yaml
         mode: u=r,go=
-        owner: slurm  # TODO: check this works for rebuild too
+        owner: slurm
         group: slurm
     - name: Setup slurm tools
       include_role:
-        name: stackhpc.slurm_openstack_tools.pytools # TODO: could just move this into the repo?
-      vars:                   # TODO: debug
-        become_user: slurm # TODO: check this works for rebuild too
+        name: stackhpc.slurm_openstack_tools.pytools
+      vars:
+        become_user: slurm
         become_flags: '-s /bin/bash' # as has shell specified as /sbin/nologin
     - name: Configure autoscale programs and parameters
       include_role:
         name: autoscale
       when: "'autoscale' in group_names"
-    # TODO: rebuild
+    - name: Configure rebuild programs and parameters
+      include_role:
+        name: rebuild
+      when: "'rebuild' in group_names"
 
 - name: Setup slurm
   hosts: openhpc

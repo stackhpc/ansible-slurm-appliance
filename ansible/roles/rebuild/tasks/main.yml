@@ -1,0 +1,9 @@
+---
+- name: Create RebootProgram # TODO: FIXME: add to slurm-tools
+  template:
+    src: rebuild.py.j2
+    dest: /opt/slurm-tools/bin/rebuild
+    mode: u=rx,go=
+    owner: slurm
+    group: slurm
+  tags: resume
