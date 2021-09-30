@@ -1,6 +1,5 @@
-autoscale_clouds: ~/.config/openstack/clouds.yaml
 autoscale_openhpc_suspend_exc_nodes: "{{ (groups.get('compute', []) + groups.get('login', [])) }}" # i.e. all nodes in inventory, i.e. not in State=CLOUD initially
-autoscale_openhpc_extra_config:
+autoscale_openhpc_config:
   # required parameters:
   SlurmctldParameters: enable_configless,idle_on_node_suspend,cloud_dns
   CommunicationParameters: NoAddrCache

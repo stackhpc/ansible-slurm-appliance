@@ -28,11 +28,10 @@ openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_slurm_configless: true
 openhpc_login_only_nodes: login
 
-openhpc_config_default: "{{ rebuild_openhpc_extra_config | combine(autoscale_openhpc_extra_config) }}" # TODO: handle case where groups aren't defined!
+openhpc_config_default: "{{ rebuild_openhpc_config | combine(autoscale_openhpc_config) }}" # TODO: handle case where groups aren't defined!
 openhpc_config_extra: {}
-# TODO: WIP PR for openhpc_extra_config -> openhpc_config
 openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_extra) }}"
 
-openhpc_suspend_exc_nodes_default:  "{{ autoscale_openhpc_suspend_exc_nodes }}" # TODO: handle cases where groups aren't defined
-openhpc_env_suspend_exc_nodes_extra: []
-openhpc_suspend_exc_nodes: "{{ openhpc_suspend_exc_nodes_default + openhpc_env_suspend_exc_nodes_extra }}"
+openhpc_suspend_exc_nodes_default: "{{ autoscale_openhpc_suspend_exc_nodes }}"
+openhpc_suspend_exc_nodes_extra: []
+openhpc_suspend_exc_nodes: "{{ openhpc_suspend_exc_nodes_default + openhpc_suspend_exc_nodes_extra }}"
