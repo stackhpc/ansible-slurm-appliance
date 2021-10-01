@@ -41,7 +41,7 @@ def suspend():
         instance_file = os.path.join(statedir, node)
         try:
             with open(instance_file) as f:
-                instance_id = f.read()
+                instance_id = f.readline().strip()
         except FileNotFoundError:
             logger.info(f"no instance file found in {statedir} for node {node}")
 
