@@ -1,10 +1,8 @@
 # recommended:
-autoscale_private_data: # PrivateData
-  - cloud # https://slurm.schedmd.com/slurm.conf.html#OPT_cloud
+autoscale_show_suspended_nodes: true
 
 # useful for debugging, may want to amend in production:
-autoscale_debug_flags:
-  - PowerSave # https://slurm.schedmd.com/slurm.conf.html#OPT_Power
+autoscale_debug_powersaving: true
 autoscale_slurmctld_syslog_debug: info # https://slurm.schedmd.com/slurm.conf.html#OPT_SlurmctldSyslogDebug
 
 # likely to need tuning:
@@ -27,8 +25,8 @@ autoscale_openhpc_config:
     # - "power_save_min_interval={{ autoscale_power_save_min_interval }}"
   CommunicationParameters:
     - NoAddrCache # https://slurm.schedmd.com/slurm.conf.html#OPT_NoAddrCache
-  PrivateData: "{{ autoscale_private_data }}"
-  DebugFlags: "{{ autoscale_debug_flags }}"
+  PrivateData: "{{ ['cloud'] if autoscale_show_suspended_nodes else [] }}"
+  DebugFlags: "{{ ['PowerSave'] if autoscale_debug_powersaving else [] }}" # NB: Seems to have disappeared in latest Slurm
   SlurmctldSyslogDebug: "{{ autoscale_slurmctld_syslog_debug }}"
   SuspendTime: "{{ autoscale_suspend_time }}"
   SuspendTimeout: "{{ autoscale_suspend_timeout }}"
