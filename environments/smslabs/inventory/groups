@@ -36,6 +36,7 @@ slurm_stats
 
 [rebuild:children]
 control
+compute
 
 [update:children]
 cluster

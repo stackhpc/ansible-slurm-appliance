@@ -37,7 +37,7 @@
         mode: u=r,go=
         owner: slurm
         group: slurm
-    - name: Setup slurm tools
+    - name: Setup slurm tools # this installs RebootProgram for rebuild too
       include_role:
         name: stackhpc.slurm_openstack_tools.pytools
       vars:
@@ -47,10 +47,6 @@
       include_role:
         name: autoscale
       when: "'autoscale' in group_names"
-    - name: Configure rebuild programs and parameters
-      include_role:
-        name: rebuild
-      when: "'rebuild' in group_names"
 
 - name: Setup slurm
   hosts: openhpc
