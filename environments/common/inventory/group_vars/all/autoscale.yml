@@ -18,8 +18,8 @@ autoscale_power_save_min_interval: 0 # https://slurm.schedmd.com/slurm.conf.html
 openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml # TODO: fix name here?
 
 _autoscale_openhpc_config:
-  SuspendProgram: /opt/slurm-tools/bin/suspend
-  ResumeProgram: /opt/slurm-tools/bin/resume
+  SuspendProgram: /opt/slurm-tools/bin/slurm-openstack-suspend
+  ResumeProgram: /opt/slurm-tools/bin/slurm-openstack-resume
   SlurmctldParameters:
     - idle_on_node_suspend # https://slurm.schedmd.com/slurm.conf.html#OPT_idle_on_node_suspend
     - cloud_dns # https://slurm.schedmd.com/slurm.conf.html#OPT_cloud_dns
