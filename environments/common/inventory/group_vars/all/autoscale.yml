@@ -1,38 +1,4 @@
-# recommended:
+openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml # TODO: rename?
+
+# TODO: should this get moved??
 autoscale_suspend_exc_nodes: "{{ (groups.get('compute', []) + groups.get('login', [])) }}" # i.e. all non-CLOUD nodes, and prevent login-only slurmd nodes getting powered down
-autoscale_private_data: # PrivateData
-  - cloud # https://slurm.schedmd.com/slurm.conf.html#OPT_cloud
-
-# for debugging, may want to amend in production:
-autoscale_debug_flags:
-  - PowerSave # https://slurm.schedmd.com/slurm.conf.html#OPT_Power
-autoscale_slurmctld_syslog_debug: info # https://slurm.schedmd.com/slurm.conf.html#OPT_SlurmctldSyslogDebug
-
-# likely to need tuning:
-autoscale_suspend_time: 120 # https://slurm.schedmd.com/slurm.conf.html#OPT_SuspendTime
-autoscale_suspend_timeout: 30 # https://slurm.schedmd.com/slurm.conf.html#OPT_SuspendTimeout
-autoscale_resume_timeout: 300 # https://slurm.schedmd.com/slurm.conf.html#OPT_ResumeTimeout
-autoscale_power_save_interval: 10 # https://slurm.schedmd.com/slurm.conf.html#OPT_power_save_interval
-autoscale_power_save_min_interval: 0 # https://slurm.schedmd.com/slurm.conf.html#OPT_power_save_min_intervals
-
-openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml # TODO: fix name here?
-
-_autoscale_openhpc_config:
-  SuspendProgram: /opt/slurm-tools/bin/slurm-openstack-suspend
-  ResumeProgram: /opt/slurm-tools/bin/slurm-openstack-resume
-  SlurmctldParameters:
-    - idle_on_node_suspend # https://slurm.schedmd.com/slurm.conf.html#OPT_idle_on_node_suspend
-    - cloud_dns # https://slurm.schedmd.com/slurm.conf.html#OPT_cloud_dns
-    # - "power_save_interval={{ autoscale_power_save_interval}}" # seems to break if you set this
-    # - "power_save_min_interval={{ autoscale_power_save_min_interval }}"
-  CommunicationParameters:
-    - NoAddrCache # https://slurm.schedmd.com/slurm.conf.html#OPT_NoAddrCache
-  PrivateData: "{{ autoscale_private_data }}"
-  DebugFlags: "{{ autoscale_debug_flags }}"
-  SlurmctldSyslogDebug: "{{ autoscale_slurmctld_syslog_debug }}"
-  SuspendTime: "{{ autoscale_suspend_time }}"
-  SuspendTimeout: "{{ autoscale_suspend_timeout }}"
-  ResumeTimeout: "{{ autoscale_resume_timeout }}"
-# See also TreeWidth but shouldn't needs setting with cloud_dns
-
-autoscale_openhpc_config: "{{ _autoscale_openhpc_config if groups.get('autoscale', []) else {} }}"

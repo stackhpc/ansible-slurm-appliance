@@ -1,19 +1,8 @@
 ---
 
-- name: Create SuspendProgram
-  template:
-    src: suspend.py.j2
-    dest: /opt/slurm-tools/bin/suspend
-    mode: u=rx,go=
-  tags: suspend
-  when: "'autoscale' in group_names"
-- name: Create ResumeProgram # TODO: FIXME: add to slurm-tools
-  template:
-    src: resume.py.j2
-    dest: /opt/slurm-tools/bin/resume
-    mode: u=rx,go=
-    #was: mode: u=rwx,g=rx,o=rx # is OK as clouds.yaml is protected
-  tags: resume
 - name: Modify openhpc_slurm_partitions
   set_fact:
     openhpc_slurm_partitions: "{{ openhpc_slurm_partitions | modify_autoscale_partitions }}"
+- name: Merge autoscale configuration
+  set_fact:
+    openhpc_config: "{{ autoscale_openhpc_config | combine(openhpc_config, list_merge='append') }}"
