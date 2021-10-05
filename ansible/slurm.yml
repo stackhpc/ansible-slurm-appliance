@@ -37,16 +37,16 @@
         mode: u=r,go=
         owner: slurm
         group: slurm
-    - name: Setup slurm tools # this installs RebootProgram for rebuild too
+    - name: Setup Python/Slurm tools
       include_role:
         name: stackhpc.slurm_openstack_tools.pytools
-      vars:
-        become_user: slurm
-        become_flags: '-s /bin/bash' # as has shell specified as /sbin/nologin
     - name: Configure autoscale programs and parameters
       include_role:
         name: autoscale
       when: "'autoscale' in group_names"
+    - name: Configure rebuild programs and parameters
+      include_role:
+        name: rebuild
 
 - name: Setup slurm
   hosts: openhpc

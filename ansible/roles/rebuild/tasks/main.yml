@@ -1,9 +1,5 @@
 ---
-- name: Create RebootProgram # TODO: FIXME: add to slurm-tools
-  template:
-    src: rebuild.py.j2
-    dest: /opt/slurm-tools/bin/rebuild
-    mode: u=rx,go=
-    owner: slurm
-    group: slurm
-  tags: resume
+
+- name: Merge rebuild configuration
+  set_fact:
+    openhpc_config: "{{ rebuild_openhpc_config | combine(openhpc_config, list_merge='append') }}"

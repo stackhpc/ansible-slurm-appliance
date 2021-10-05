@@ -1,38 +1,47 @@
-Role Name
-=========
+rebuild
+=======
 
-A brief description of the role goes here.
+Enable the compute nodes to be reimaged from Slurm. To use this functionality add the `control` and `compute` groups to the `rebuild` group.
+
+Once `ansible/slurm.yml` has run, node(s) can be reimaged using:
+
+    scontrol reboot [ASAP] [nextstate=<RESUME|DOWN>] reason="rebuild image:<image_id>" [<NODES>]
+
+where:
+- `<image_id>` is the name (if unique) or ID of an image in OpenStack.
+- `<NODES>` is a Slurm hostlist expression defining the nodes to reimage.
+- `ASAP` means the rebuild will happen as soon as existing jobs on the node(s) complete - no new jobs will be scheduled on it.
+- If `nextstate=...` is not given nodes remain in DRAIN state after the rebuild.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- This role must be run before the `stackhpc.openhpc` role's `runtime.yml` playbook as it modifies the `openhpc_config` variable.
+- OpenStack credentials on the compute nodes, e.g. at `/etc/openstack/clouds.yaml` which are readable by the root user. It is recommended these credentials are an [application credential](https://docs.openstack.org/keystone/latest/user/application_credentials.html). This can be created in Horizon via Identity > Application Credentials > +Create Application Credential. The usual role required is `member`. Using access rules has been found not to work at present. Note that the downloaded credential can be encrpyted using `ansible-vault` to allow commit to source control. It will automatically be decrypted when copied onto the compute nodes.
+- An image which when booted adds that node to the Slurm cluster. E.g. see `packer/README.md`.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+None normally required.
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+See above.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+See `ansible/slurm.yml`
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
 
 License
 -------
 
-BSD
+Apache v2
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+StackHPC Ltd.
