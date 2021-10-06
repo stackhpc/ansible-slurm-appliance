@@ -4,82 +4,86 @@ Support autoscaling nodes on OpenStack clouds, i.e. creating nodes when necessar
 
 This is implemented using Slurm's ["elastic computing"](https://slurm.schedmd.com/elastic_computing.html) features which are based on Slurm's [power saving](https://slurm.schedmd.com/power_save.html) features.
 
-
-NOTES TODO:
-- Won't get monitoring for autoscaling nodes
-- Describe autoscale vs `State=CLOUD` and powersaving enablement.
-- Describe groups.
-- Describe cpu/memory info requirements (inc. for mixed partitions)
-- Describe what happens on failure.
-- Note that DNS is REQUIRED for this.
+Add the `control` group to the `autoscale` group to activate this functionality in the `ansible/slurm.yml` playbook. Note some role variables are likely to need configuring. By default, node creation and deletion will be logged in the control node's syslog.
 
 ## Requirements
 
-- Role `stackhpc.slurm_openstack_tools.pytools`. Installs [slurm-openstack-tools](github.com/stackhpc/slurm-openstack-tools) which provides a venv with the `openstacksdk`.
+- Working DNS.
+- Active OpenStack credentials on localhost (e.g a sourced `openrc.sh` in the shell running ansible).
+- Role `stackhpc.slurm_openstack_tools.pytools`. Installs [slurm-openstack-tools](github.com/stackhpc/slurm-openstack-tools) which provides a venv with the `openstacksdk` and the resume/suspend scripts.
 - Role `stackhpc.openhpc` to create a Slurm cluster.
-- This role should be run on the Slurm controller only, i.e. add the `control` group to the `autoscale` group to activate this functionality.
+- This role should be run on the Slurm controller only.
 
 ## Role Variables
 
-- `openhpc_slurm_partitions`: This role modifies what the partitions/groups defined [openhpc_slurm_partitions](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) in the by `stackhpc.openhpc` role accept:
-  - `cloud_nodes`: Optional. As per the `stackhpc.openhpc` docs this defines nodes in a ["CLOUD" state](https://slurm.schedmd.com/slurm.conf.html#OPT_CLOUD), i.e. treated as powered down/not existing when the Slurm control daemon starts. The value is a suffix for the group/partition's node names in Slurm's hostlist expression format (e.g. `-[11-25]`) and therefore defines the number of CLOUD-state nodes.
-  - `cloud_instances`: Required if `cloud_nodes` is defined. A dict defining the `flavor`, `image`, `keypair` and `network` to use for CLOUD-state instances in this partition/group. Values for these parameters may be either names (if unique in the cloud) or IDs.
-  
-  Some examples are given below.
+### openhpc_slurm_partitions
+This role modifies what the [openhpc_slurm_partitions variable](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) in the `stackhpc.openhpc` role accepts. Partition/group definitions may additionally include:
+- `cloud_nodes`: Optional. Slurm hostlist expression (e.g. `'small-[8,10-16]'`) defining names of nodes to be defined in a ["CLOUD" state](https://slurm.schedmd.com/slurm.conf.html#OPT_CLOUD), i.e. not operational when the Slurm control daemon starts.
+- `cloud_instances`: Required if `cloud_nodes` is defined. A mapping with keys `flavor`, `image`, `keypair` and `network` defining the OpenStack ID or names of properties for the CLOUD-state instances.
 
-- `autoscale_show_suspended_nodes`: Optional, default `true`. Whether to show suspended/powered-down nodes in `sinfo` etc. See `slurm.conf` parameter [PrivateData - cloud](https://slurm.schedmd.com/archive/slurm-20.11.7/slurm.conf.html#OPT_cloud).
+Partitions/groups defining `cloud_nodes` may or may not also contain non-CLOUD state nodes (i.e. nodes in a matching inventory group). For CLOUD-state nodes, memory and CPU information is retrieved from OpenStack for the specified flavors. The `stackhpc.openhpc` group/partition options `ram_mb` and `ram_multiplier` and role variable `openhpc_ram_multiplier` are handled exactly as for non-CLOUD state nodes. This implies that if CLOUD and non-CLOUD state nodes are mixed in a single group all nodes must be homogenous in terms of processors/memory.
+
+Some examples are given below. Note that currently monitoring is not enabled for CLOUD-state nodes.
+
+### Other variables
+
+TODO: what about suspend_excl
+The following variables are likely to need tuning for the specific site/instances:
+- `autoscale_suspend_time`: Optional, default 120s. See `slurm.conf` parameter [SuspendTime](https://slurm.schedmd.com/archive/slurm-20.11.7/slurm.conf.html#OPT_SuspendTime).
+- `autoscale_suspend_timeout`: Optional, default 30s. See `slurm.conf` parameter [SuspendTimeout](https://slurm.schedmd.com/archive/slurm-20.11.7/slurm.conf.html#OPT_SuspendTimeout).
+- `autoscale_resume_timeout`: Optional, default 300s See `slurm.conf` parameter [ResumeTimeout](https://slurm.schedmd.com/archive/slurm-20.11.7/slurm.conf.html#OPT_ResumeTimeout).
 
 The following variables have defaults useful for debugging autoscaling, but may be altered for production:
+- `autoscale_show_suspended_nodes`: Optional, default `true`. Whether to show suspended/powered-down nodes in `sinfo` etc. See `slurm.conf` parameter [PrivateData - cloud](https://slurm.schedmd.com/archive/slurm-20.11.7/slurm.conf.html#OPT_cloud).
 - `autoscale_debug_powersaving`: Optional, default `true`. Log additional information for powersaving, see `slurm.conf` parameter [DebugFlags - PowerSave](https://slurm.schedmd.com/archive/slurm-20.11.7/slurm.conf.html#OPT_PowerSave_2).
 - `autoscale_slurmctld_syslog_debug`: Optional, default `info`. Syslog logging level. See `slurm.conf` parameter [SlurmctldSyslogDebug](https://slurm.schedmd.com/archive/slurm-20.11.7/slurm.conf.html#OPT_SlurmctldSyslogDebug).
 
-The following variables are likely to need tuning for the specific site/instances:
-- `autoscale_suspend_time`: Optional, default 120s TODO https://slurm.schedmd.com/slurm.conf.html#OPT_SuspendTime
-- `autoscale_suspend_timeout`: Optional, default 30s TODO https://slurm.schedmd.com/slurm.conf.html#OPT_SuspendTimeout
-- `autoscale_resume_timeout`: Optional, default 300s TODO https://slurm.schedmd.com/slurm.conf.html#OPT_ResumeTimeout
+### Examples
 
-### Processor/memory information
-Non-CLOUD-state nodes in a group/partition are defined by the hosts in an inventory group named `<cluster_name>_<group_name>` as per `stackhpc.openhpc` [docs](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) and processor/memory information is automatically retrieved from them.
+Below is an example of partition definition, e.g. in `environments/<environment>/inventory/group_vars/openhpc/overrides.yml`. Not shown here the inventory group `dev_small` contains 2 (non-CLOUD state) nodes. The "small" partition is the default and contains 2 non-CLOUD and 2 CLOUD nodes. The "burst" partition contains only CLOUD-state nodes.
 
-- If a group/partition contains both CLOUD and non-CLOUD nodes the processor/memory information for the CLOUD nodes is assumed to match that retrieved for the non-CLOUD nodes.
-- If a group/partition only contains CLOUD-state nodes (i.e. no matching inventory group or it is empty) then processor/memory information must be specified using the `ram_mb`, `sockets`, `cores_per_socket` and `threads_per_core` options.
+```yaml
+openhpc_cluster_name: dev
+general_v1_small:
+  image: ohpc-compute-210909-1316.qcow2
+  flavor: general.v1.small
+  keypair: centos-at-steveb-ansible
+  network: stackhpc-ipv4-geneve
 
+general_v1_medium:
+  image: ohpc-compute-210909-1316.qcow2
+  flavor: general.v1.medium
+  keypair: centos-at-steveb-ansible
+  network: stackhpc-ipv4-geneve
 
+openhpc_slurm_partitions:
+- name: small
+  default: yes
+  cloud_nodes: dev-small-[2-3]
+  cloud_instances: "{{ general_v1_small }}"
 
-
-  
-  ```yaml
-  cloud_instances:
-    flavor: general.v1.medium
-    image: ohpc-compute-210909-1316.qcow2
-    keypair: centos-at-steveb-ansible
-    network: "{{ autoscale_network }}"
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-
-
+- name: burst
+  default: no
+  cloud_nodes: 'burst-[0-3]'
+  cloud_instances: "{{ general_v1_medium }}"
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+TODO: A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+See ansible/slurm.yml
 
 License
 -------
 
-BSD
+Apache v2
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+StackHPC Ltd.
