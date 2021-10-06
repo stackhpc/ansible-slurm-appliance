@@ -12,15 +12,12 @@ general_v1_medium:
 
 openhpc_slurm_partitions:
 - name: small
-  default: no
-  cloud_nodes: '-[2-3]'
+  default: yes
+  cloud_nodes: dev-small-[2-3]
   cloud_instances: "{{ general_v1_small }}"
 
 - name: burst
-  default: yes
-  cloud_nodes: '-[1-4]'
+  default: no
+  cloud_nodes: 'burst-[0-3]'
   cloud_instances: "{{ general_v1_medium }}"
-  ram_mb: "{{ (15258 * 0.95) | int }}"
-  sockets: 1
-  cores_per_socket: 4
-  threads_per_core: 1
+
