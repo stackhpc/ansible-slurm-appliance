@@ -9,6 +9,7 @@
   when: "'cloud_instances' in item"
   register: _os_flavors
   become: no
+  changed_when: false
 - name: Manipulate flavor information
   set_fact:
     flavor_info: "{{ _os_flavors.results | map(attribute='stdout') | map('from_json') }}" # list of json info
