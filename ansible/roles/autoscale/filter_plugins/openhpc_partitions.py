@@ -21,11 +21,16 @@ import re
 
 REQUIRED_INSTANCE_ATTRS=('flavor', 'image', 'keypair', 'network')
 
-def modify_autoscale_partitions(partitions, flavors):
+def modify_autoscale_partitions(openhpc_slurm_partitions, flavors, openhpc_ram_multiplier):
     """ TODO: docs
+
+        partitions: openhpc_slurm_partitions variable from stackhpc.openhpc role
+        flavors: List of dicts with info from `openstack flavor show`. Must contain keys 'ram' and 'vcpus'
+        openhpc_ram_multiplier: openhpc_ram_multiplier variable from stackhpc.openhpc role
+
     """
 
-    for part in partitions:
+    for part in openhpc_slurm_partitions:
         for group in part.get('groups', [part]):
             group_name = group.get('name', '<undefined>')
             
@@ -38,17 +43,25 @@ def modify_autoscale_partitions(partitions, flavors):
                 cloud_names = group['cloud_nodes']
                 # TODO: check for cloud nodes overlapping real ones?
                 
+                flavor = [f for f in flavors if f['name'] == group['cloud_instances']['flavor']]
+                if len(flavor) != 1:
+                    raise errors.AnsibleFilterError(f'expected one flavor matching {group["cloud_instances"]["flavor"]}, found {len(flavor)}: {flavor}')
+                flavor = flavor[0]
+                ram_mb = int(flavor['ram'] * group.get('ram_multiplier', openhpc_ram_multiplier)) # ram in flavor in MB, so no units conversion needed
+
                 features = ['%s=%s' % (k, v) for (k, v) in group['cloud_instances'].items()]
                 cloud_nodes = {
                     'NodeName': cloud_names,
                     'State':'CLOUD',
                     'Features': ','.join(features),
+                    'CPUs': flavor['vcpus'],
+                    'RealMemory': group.get('ram_mb', ram_mb)
                 }
                 
                 group['extra_nodes'] = group.get('extra_nodes', [])
                 group['extra_nodes'].append(cloud_nodes)
 
-    return partitions
+    return openhpc_slurm_partitions
 
 class FilterModule(object):
 
