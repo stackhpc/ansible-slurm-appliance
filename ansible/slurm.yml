@@ -23,6 +23,7 @@
       import_role:
         name: stackhpc.openhpc
         tasks_from: install.yml
+      tags: install
     - name: Create /etc/openstack
       file:
         path: /etc/openstack
