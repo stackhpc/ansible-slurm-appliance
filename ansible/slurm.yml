@@ -17,7 +17,7 @@
     - openhpc
   tasks:
     - import_role:
-        name: rebuild
+        name: stackhpc.slurm_openstack_tools.rebuild
 
 - name: Setup autoscaling on OpenStack
   hosts: autoscale
