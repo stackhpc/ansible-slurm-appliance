@@ -27,7 +27,7 @@
     - openhpc
   tasks:
     - import_role:
-        name: autoscale
+        name: stackhpc.slurm_openstack_tools.autoscale
 
 - name: Setup slurm
   hosts: openhpc
