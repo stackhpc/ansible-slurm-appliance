@@ -9,45 +9,25 @@
     - include_role:
         name:  geerlingguy.mysql
 
-- name: Enable Slurm/OpenStack integrations
-  hosts:
-    - rebuild
-    - autoscale
-  become: true
+- name: Setup Slurm-driven reimage on OpenStack
+  hosts: rebuild
+  become: yes
   tags:
     - rebuild
+    - openhpc
+  tasks:
+    - import_role:
+        name: rebuild
+
+- name: Setup autoscaling on OpenStack
+  hosts: autoscale
+  become: yes
+  tags:
     - autoscale
     - openhpc
   tasks:
-    - name: Install slurm packages to create slurm user
-      import_role:
-        name: stackhpc.openhpc
-        tasks_from: install.yml
-      tags: install
-    - name: Create /etc/openstack
-      file:
-        path: /etc/openstack
-        state: directory
-        owner: slurm # TODO: check this works for rebuild too
-        group: slurm
-        mode: u=rX,go=
-    - name: Copy out clouds.yaml
-      copy:
-        src: "{{ openhpc_rebuild_clouds }}" # TODO: name is wrong really!
-        dest: /etc/openstack/clouds.yaml
-        mode: u=r,go=
-        owner: slurm
-        group: slurm
-    - name: Setup Python/Slurm tools
-      include_role:
-        name: stackhpc.slurm_openstack_tools.pytools
-    - name: Configure autoscale programs and parameters
-      include_role:
+    - import_role:
         name: autoscale
-      when: "'autoscale' in group_names"
-    - name: Configure rebuild programs and parameters
-      include_role:
-        name: rebuild
 
 - name: Setup slurm
   hosts: openhpc

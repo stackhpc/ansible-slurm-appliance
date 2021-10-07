@@ -1,4 +1,23 @@
 ---
+- block:
+    - name: Create /etc/openstack
+      file:
+        path: /etc/openstack
+        state: directory
+        owner: root
+        group: root
+        mode: '0400'
+    - name: Copy out clouds.yaml
+      copy:
+        src: "{{ openhpc_rebuild_clouds }}"
+        dest: /etc/openstack/clouds.yaml
+        owner: root
+        group: root
+        mode: '0400'
+    - name: Setup slurm tools
+      include_role:
+        name: stackhpc.slurm_openstack_tools.pytools
+  when: openhpc_enable.batch
 
 - name: Merge rebuild configuration
   set_fact:

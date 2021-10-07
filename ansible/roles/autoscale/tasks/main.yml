@@ -1,4 +1,29 @@
 ---
+- name: Install slurm packages to create slurm user
+  import_role:
+    name: stackhpc.openhpc
+    tasks_from: install.yml
+  tags: install
+
+- name: Create /etc/openstack
+  file:
+    path: /etc/openstack
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: u=rX,go=
+
+- name: Copy out clouds.yaml
+  copy:
+    src: "{{ autoscale_clouds }}"
+    dest: /etc/openstack/clouds.yaml
+    mode: u=r,go=
+    owner: slurm
+    group: slurm
+
+- name: Setup Python/Slurm tools
+  include_role:
+    name: stackhpc.slurm_openstack_tools.pytools
 
 - name: Get cloud_node specs
   shell:
@@ -10,14 +35,15 @@
   register: _os_flavors
   become: no
   changed_when: false
+
 - name: Manipulate flavor information
   set_fact:
     flavor_info: "{{ _os_flavors.results | map(attribute='stdout') | map('from_json') }}" # list of json info
-- debug:
-    var: flavor_info
+
 - name: Modify openhpc_slurm_partitions
   set_fact:
     openhpc_slurm_partitions: "{{ openhpc_slurm_partitions | modify_autoscale_partitions(flavor_info, openhpc_ram_multiplier) }}"
+    
 - name: Merge autoscale configuration
   set_fact:
     openhpc_config: "{{ autoscale_openhpc_config | combine(openhpc_config, list_merge='append') }}"
