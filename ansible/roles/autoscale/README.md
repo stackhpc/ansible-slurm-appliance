@@ -27,6 +27,8 @@ Some examples are given below. Note that currently monitoring is not enabled for
 
 ### Other variables
 
+- `autoscale_clouds`: Optional, path to a `clouds.yaml` file containing a single cloud. Defaults to `~/.config/openstack/clouds.yaml`. It is recommended this is an [application credential](https://docs.openstack.org/keystone/latest/user/application_credentials.html). This can be created in Horizon via Identity > Application Credentials > +Create Application Credential. The usual role required is `member`. Using access rules has been found not to work at present. Note that the downloaded credential can be encrpyted using `ansible-vault` to allow it to be committed to source control. It will automatically be decrypted when copied onto the compute nodes.
+
 TODO: what about suspend_excl
 The following variables are likely to need tuning for the specific site/instances:
 - `autoscale_suspend_time`: Optional, default 120s. See `slurm.conf` parameter [SuspendTime](https://slurm.schedmd.com/archive/slurm-20.11.7/slurm.conf.html#OPT_SuspendTime).

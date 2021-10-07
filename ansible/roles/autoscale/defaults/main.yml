@@ -1,3 +1,5 @@
+autoscale_clouds: ~/.config/openstack/clouds.yaml
+
 # recommended:
 autoscale_show_suspended_nodes: true
 
