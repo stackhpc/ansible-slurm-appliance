@@ -19,6 +19,20 @@
     - import_role:
         name: stackhpc.slurm_openstack_tools.rebuild
 
+- name: Preinstall Slurm packages to create slurm user
+  # This is an optimisation for speed as it avoids having to do this once for `control` then again for `openhpc` nodes.
+  hosts: openhpc
+  become: yes
+  tags:
+    - autoscale
+    - openhpc
+    - install
+  tasks:
+    - import_role:
+        name: stackhpc.openhpc
+        tasks_from: install.yml
+      when: groups.get('autoscale', []) | length > 0
+
 - name: Setup autoscaling on OpenStack
   hosts: autoscale
   become: yes
