@@ -33,4 +33,5 @@ autoscale_openhpc_config:
   SuspendTime: "{{ autoscale_suspend_time }}"
   SuspendTimeout: "{{ autoscale_suspend_timeout }}"
   ResumeTimeout: "{{ autoscale_resume_timeout }}"
+  SuspendExcNodes: "{{ autoscale_suspend_exc_nodes | join(',') }}"
 # See also TreeWidth but shouldn't needs setting with cloud_dns

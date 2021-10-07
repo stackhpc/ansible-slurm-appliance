@@ -30,6 +30,3 @@ openhpc_config_default:
   SlurmctldParameters: enable_configless
 openhpc_config_extra: {}
 openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_extra, list_merge='append') }}"
-
-openhpc_suspend_exc_nodes_extra: []
-openhpc_suspend_exc_nodes: "{{ autoscale_suspend_exc_nodes + openhpc_suspend_exc_nodes_extra }}"
