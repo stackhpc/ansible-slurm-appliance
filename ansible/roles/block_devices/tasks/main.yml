@@ -3,6 +3,7 @@
     device: "{{ item.get('device', block_devices_device) }}"
     number: "{{ item.get('number', block_devices_number) }}"
     state: "{{ item.get('partition_state', block_devices_partition_state) }}"
+    resize: "{{ item.get('resize_partition', block_devices_resize_partition) }}"
   when: "item.get('partition_state', block_devices_partition_state) != 'skip'"
   loop: "{{ block_devices_configurations }}"
 
