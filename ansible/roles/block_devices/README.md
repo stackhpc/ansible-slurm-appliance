@@ -22,7 +22,6 @@ Role Variables
 - `block_devices_partition_state`: Optional. Partition state, 'present' or 'absent' (as for parted) or 'skip'. Defaults to 'present'.
 - `block_devices_device`: Required. Path to block device, e.g. '/dev/sda'. See `community.general.parted:device` and `community.general.filesystem:dev`.
 - `block_devices_number`: Required. Partition number, e.g 1 for "/dev/sda1". See `community.general.parted:number`.
-- `block_devices_resize_partition`: Optional. Resize existing partition to re-fill changed disk size. Default `false`.
 - `block_devices_fstype`: Required. Filesystem type, e.g.'ext4'. See `community.general.filesystem:fstype`
 - `block_devices_resizefs`: Optional. Grow filesystem into block device space, 'yes' or 'no' (default). See `community.general.filesystem:resizefs` for applicable fileysystem types.
 - `block_devices_filesystem_state`: Optional. Whether filesystem should be 'present' (default) or 'absent', or 'skip'.
