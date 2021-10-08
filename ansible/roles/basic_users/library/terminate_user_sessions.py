@@ -7,15 +7,9 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-<<<<<<< HEAD
-module: my_test
-
-short_description: This is my test module
-=======
 module: terminate_user_sessions
 
 short_description: Terminate systemd user sessions
->>>>>>> main
 
 # If this is part of a collection, you need to use semantic versioning,
 # i.e. the version is of the form "2.5.0" and not "2.4".
