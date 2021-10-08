@@ -10,11 +10,20 @@ general_v1_medium:
   keypair: centos-at-steveb-ansible
   network: stackhpc-ipv4-geneve
 
+
+openhpc_ram_multiplier: 0.90 # TODO: fixme for groups
 openhpc_slurm_partitions:
 - name: small
   default: yes
   cloud_nodes: dev-small-[2-3]
   cloud_instances: "{{ general_v1_small }}"
+
+  # groups:   # TODO: support this
+  #   - name: small
+  #   - name: small_cloud
+  #     ram_multiplier: 0.90
+  #     cloud_nodes: dev-small-[2-3]
+  #     cloud_instances: "{{ general_v1_small }}"
 
 - name: burst
   default: no
