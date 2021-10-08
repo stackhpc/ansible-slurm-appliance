@@ -1,4 +1,0 @@
----
-
-rebuild_openhpc_config:
-  RebootProgram: /opt/slurm-tools/bin/slurm-openstack-rebuild
