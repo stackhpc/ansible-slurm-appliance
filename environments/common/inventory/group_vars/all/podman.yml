@@ -1,1 +1,2 @@
 podman_users: "{{ appliances_local_users_podman }}"
+podman_cidr: 10.0.2.0/24 # see slirp4netns:cidr= at https://docs.podman.io/en/latest/markdown/podman-run.1.html

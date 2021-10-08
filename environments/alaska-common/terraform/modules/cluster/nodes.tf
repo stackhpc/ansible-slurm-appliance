@@ -17,7 +17,9 @@ resource "openstack_compute_instance_v2" "control" {
     port = data.openstack_networking_port_v2.slurmctl_rdma.id
   }
 
-  tags = []
+  metadata = {
+    environment = var.environment_root
+  }
 
 }
 
@@ -50,7 +52,9 @@ resource "openstack_compute_instance_v2" "login" {
     port = openstack_networking_port_v2.rdma[each.key].id
   }
 
-  tags = []
+  metadata = {
+    environment = var.environment_root
+  }
 
 }
 
@@ -72,6 +76,8 @@ resource "openstack_compute_instance_v2" "compute" {
     port = openstack_networking_port_v2.rdma[each.key].id
   }
 
-  tags = []
+  metadata = {
+    environment = var.environment_root
+  }
 
 }

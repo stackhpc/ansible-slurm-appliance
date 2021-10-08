@@ -9,7 +9,7 @@
     - "item.state | default('present') == 'absent'"
   
 - name: Create users and generate public keys
-  user: "{{ basic_users_userdefaults | combine(item) | remove_keys(['public_key']) }}"
+  user: "{{ basic_users_userdefaults | combine(item) | filter_keys(['public_key']) }}"
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }} [{{ item.state | default('present') }}]"

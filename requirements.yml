@@ -6,7 +6,6 @@ roles:
     name: stackhpc.nfs
     version: feature/rdma
   - src: https://github.com/stackhpc/ansible-role-openhpc
-    version: feature/StateSaveLocation
     name: stackhpc.openhpc
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter

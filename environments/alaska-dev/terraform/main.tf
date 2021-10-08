@@ -8,6 +8,7 @@ terraform {
 }
 
 module "cluster" {
+    environment_root = var.environment_root
     source = "../../alaska-common/terraform/modules/cluster"
     cluster_name = "alaska"
     key_pair = "centos-slurm-deploy"
@@ -21,14 +22,18 @@ module "cluster" {
     compute_nodes = {
       compute-0: "small"
       compute-1: "small"
-      compute-2: "small"
-      compute-3: "small"
+      // compute-2: "small"
+      // compute-3: "small"
     }
     login_nodes = {
       login-0: {
-        flavor: "vm.alaska.cpu.himem.quarter"
+        flavor: "vm.alaska.cpu.general.small"
         image: "CentOS8-2105"
         address: "128.232.222.71"
       }
+    }
+    control_node = {
+      flavor: "vm.alaska.cpu.general.small"
+      image: "CentOS8-2105"
     }
 }

@@ -73,6 +73,7 @@
           content: "{{ updates.results | join('\n') }}"
           dest: "{{ update_log_path }}"
         delegate_to: localhost
+        become: no
       - debug:
           msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
       when: "update_enable | default('false') | bool"
