@@ -5,12 +5,11 @@ openhpc_cluster_name=accept
 # --- hosts below taken from kayobe-config/etc/kayobe/inventory/overcloud but named for slurm appliance ---
 
 [accept_ceph_hdd]
-# disabled due to firmware upgrade issues
-#a01ss01 ipmi_address=10.110.113.151 bmc_type=
-#a01ss02 ipmi_address=10.110.113.152 bmc_type=
-#a01ss03 ipmi_address=10.110.113.153 bmc_type=
-#a01ss04 ipmi_address=10.110.113.154 bmc_type=
-#a01ss05 ipmi_address=10.110.113.155 bmc_type=
+a01ss01 ipmi_address=10.110.113.151 bmc_type=
+a01ss02 ipmi_address=10.110.113.152 bmc_type=
+a01ss03 ipmi_address=10.110.113.153 bmc_type=
+a01ss04 ipmi_address=10.110.113.154 bmc_type=
+a01ss05 ipmi_address=10.110.113.155 bmc_type=
 #a01ss06 ipmi_address=10.110.113.156 bmc_type=
 
 [accept_ceph_ssd]
@@ -40,7 +39,7 @@ a01co01
 # Not defined as using combined control/compute/login node
 
 [compute:children]
-#accept_ceph_hdd
+accept_ceph_hdd
 accept_ceph_ssd
 accept_compute
 accept_controllers
