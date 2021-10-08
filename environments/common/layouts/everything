@@ -37,10 +37,11 @@ slurm_stats
 cluster
 
 [block_devices:children]
-# environment-specific so not defined here
+# Environment-specific so not defined here
 
 [fail2ban:children]
 login
 
 [basic_users]
-# Add `openhpc` group to add slurm users via creation of users on each node.
+# Add `openhpc` group to add Slurm users via creation of users on each node.
+

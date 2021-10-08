@@ -77,11 +77,12 @@ cluster
 
 [block_devices]
 # Superset of hosts to configure filesystems on
-# TODO: document what's required
-
-[basic_users]
-# Add `openhpc` group to add slurm users via creation of users on each node.
 
 [fail2ban]
 # Hosts to install fail2ban on to protect SSH
 # https://www.fail2ban.org/wiki/index.php/Main_Page
+=======
+# Superset of hosts to configure filesystems on - see ansible/roles/block_devices/README.md
+
+[basic_users]
+# Add `openhpc` group to add slurm users via creation of users on each node.

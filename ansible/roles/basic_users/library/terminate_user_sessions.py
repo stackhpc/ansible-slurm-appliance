@@ -7,14 +7,21 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
+<<<<<<< HEAD
 module: my_test
 
 short_description: This is my test module
+=======
+module: terminate_user_sessions
+
+short_description: Terminate systemd user sessions
+>>>>>>> main
 
 # If this is part of a collection, you need to use semantic versioning,
 # i.e. the version is of the form "2.5.0" and not "2.4".
 version_added: "1.0.0"
 
+<<<<<<< HEAD
 description: This is my longer description explaining my test module.
 
 options:
@@ -67,6 +74,26 @@ message:
     type: str
     returned: always
     sample: 'goodbye'
+=======
+description: Terminate systemd user sessions.
+
+options:
+    user:
+        description: Name of user
+        required: true
+        type: str
+    
+author:
+    - Steve Brasier (stackhpc.com)
+'''
+
+EXAMPLES = r'''
+- terminate_user_sessions:
+    name: fred
+'''
+
+RETURN = r'''
+>>>>>>> main
 '''
 
 from ansible.module_utils.basic import AnsibleModule
