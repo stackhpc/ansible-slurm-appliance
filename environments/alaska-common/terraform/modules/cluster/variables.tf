@@ -1,3 +1,8 @@
+variable "environment_root" {
+    type = string
+    description = "Path to environment root"
+}
+
 variable "cluster_name" {
     type = string
     description = "Name for cluster, used as prefix for resources"

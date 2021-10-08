@@ -8,6 +8,7 @@ terraform {
 }
 
 module "cluster" {
+    environment_root = var.environment_root
     source = "../../alaska-common/terraform/modules/cluster"
     cluster_name = "alaska"
     key_pair = "centos-slurm-deploy"
