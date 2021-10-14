@@ -10,7 +10,7 @@ openhpc_enable:
 openhpc_slurm_service_enabled: true
 openhpc_slurm_accounting_storage_type: 'accounting_storage/slurmdbd'
 openhpc_slurmdbd_mysql_database: slurm_acct_db
-openhpc_slurmdbd_mysql_password: "{{ secrets_openhpc_mysql_slurm_password }}"
+openhpc_slurmdbd_mysql_password: "{{ vault_mysql_slurm_password }}"
 openhpc_slurmdbd_mysql_username: slurm
 openhpc_slurm_control_host: "{{ groups['control'] | first }}"
 openhpc_slurm_partitions:
@@ -18,8 +18,9 @@ openhpc_slurm_partitions:
 openhpc_default_packages:
   - slurm-libpmi-ohpc # to allow intel mpi to work properly
   - ohpc-gnu9-openmpi4-perf-tools # for hpctests
+  - openblas-gnu9-ohpc # for hpctests (HPL)
 openhpc_extra_packages: []
 openhpc_packages: "{{ openhpc_default_packages + openhpc_extra_packages }}"
-openhpc_munge_key: "{{ secrets_openhpc_mungekey | b64decode }}"
+openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_slurm_configless: true
 openhpc_login_only_nodes: login

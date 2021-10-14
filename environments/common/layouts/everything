@@ -37,4 +37,11 @@ slurm_stats
 cluster
 
 [fail2ban:children]
+# Hosts to install fail2ban on to protect SSH
 login
+
+[block_devices:children]
+# Environment-specific so not defined here
+
+[basic_users]
+# Add `openhpc` group to add Slurm users via creation of users on each node.

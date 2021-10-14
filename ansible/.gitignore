@@ -20,3 +20,7 @@ roles/*
 !roles/fail2ban/**
 !roles/hpctests/
 !roles/hpctests/**
+!roles/block_devices/
+!roles/block_devices/**
+!roles/basic_users/
+!roles/basic_users/**

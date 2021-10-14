@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 #SBATCH --ntasks={{ hpctests_computes.stdout_lines | length }}
 #SBATCH --ntasks-per-node=1
 #SBATCH --output=%x.out
@@ -6,8 +7,11 @@
 #SBATCH --exclusive
 {%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_nodes }}{% endif %}
 
-module load {{ hpctests_pingmatrix_modules | join(' ' ) }}
-mpicc -o nxnlatbw mpi_nxnlatbw.c
-
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
+echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
+echo SLURM_JOB_ID: $SLURM_JOB_ID
+echo UCX_NET_DEVICES: $UCX_NET_DEVICES
+module load {{ hpctests_pingmatrix_modules | join(' ' ) }}
+
+mpicc -o nxnlatbw mpi_nxnlatbw.c
 mpirun nxnlatbw

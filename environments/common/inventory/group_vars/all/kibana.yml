@@ -10,7 +10,7 @@ kibana_indexes:
         timeFieldName: "@timestamp"
 
 # Password for the `admin` user. Used to update the index pattern definitions.
-kibana_admin_password: "{{ secrets_openhpc_elasticsearch_admin_password }}"
+kibana_admin_password: "{{ vault_elasticsearch_admin_password }}"
 
 # The user that runs the kibana container
 kibana_podman_user: podman
