@@ -92,8 +92,8 @@
   tags: grafana
   tasks:
     - assert:
-        that: secrets_openhpc_grafana_admin_password is defined
-        fail_msg: "Must define secrets_openhpc_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
+        that: vault_grafana_admin_password is defined
+        fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
     - import_role:
         name: cloudalchemy.grafana
       vars:
@@ -108,8 +108,8 @@
     - grafana-init
   tasks:
     - assert:
-        that: secrets_openhpc_grafana_admin_password is defined
-        fail_msg: "Must define secrets_openhpc_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
+        that: vault_grafana_admin_password is defined
+        fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
     - import_role:
         name: grafana-datasources
     - import_role:

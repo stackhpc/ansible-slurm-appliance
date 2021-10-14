@@ -16,5 +16,11 @@ roles/*
 !roles/grafana-datasources/**
 !roles/passwords/
 !roles/passwords/**
+!roles/hpctests/
+!roles/hpctests/**
+!roles/block_devices/
+!roles/block_devices/**
+!roles/basic_users/
+!roles/basic_users/**
 !roles/openondemand/
 !roles/openondemand/**

@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+#SBATCH --nodes=1
+#SBATCH --output=%x.%a.out
+#SBATCH --error=%x.%a.out
+#SBATCH --exclusive
+{%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_nodes }}{% endif %}
+
+echo HPL arch: {{ hpctests_hpl_arch }}
+
+module load {{ hpctests_hpl_modules | join(' ' ) }}
+make arch={{ hpctests_hpl_arch }} clean_arch_all
+make arch={{ hpctests_hpl_arch }}

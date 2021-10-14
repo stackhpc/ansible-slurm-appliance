@@ -13,6 +13,9 @@ login
 control
 compute
 
+[hpctests]
+# Login group to use for running mpi-based testing.
+
 [cluster:children]
 # All nodes in the appliance - add e.g. service nodes not running Slurm here.
 openhpc
@@ -71,6 +74,12 @@ cluster
 
 [update]
 # All hosts to (optionally) run yum update on.
+
+[block_devices]
+# Superset of hosts to configure filesystems on - see ansible/roles/block_devices/README.md
+
+[basic_users]
+# Add `openhpc` group to add slurm users via creation of users on each node.
 
 [openondemand:children]
 # Hosts to run openondemand on

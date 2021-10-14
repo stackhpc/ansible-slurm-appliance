@@ -1,0 +1,26 @@
+- name: setup
+  block:
+    - include: setup.yml
+  tags: always
+
+- name: pingpong
+  block:
+    - include: pingpong.yml
+  tags: pingpong
+
+- name: pingmatrix
+  block:
+    - include: pingmatrix.yml
+  tags: pingmatrix
+
+- name: build HPL
+  block:
+    - include: build-hpl.yml
+  tags:
+    - hpl-solo
+
+- name: run HPL on individual nodes
+  block:
+    - include: hpl-solo.yml
+  tags:
+    - hpl-solo
