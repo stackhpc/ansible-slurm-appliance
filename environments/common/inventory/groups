@@ -71,3 +71,7 @@ cluster
 
 [update]
 # All hosts to (optionally) run yum update on.
+
+[openondemand:children]
+# Hosts to run openondemand on
+# TODO: add advice on hosts (login?) and links!

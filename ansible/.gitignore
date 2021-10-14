@@ -16,3 +16,5 @@ roles/*
 !roles/grafana-datasources/**
 !roles/passwords/
 !roles/passwords/**
+!roles/openondemand/
+!roles/openondemand/**
