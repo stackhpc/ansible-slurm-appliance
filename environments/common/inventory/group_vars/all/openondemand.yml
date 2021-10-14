@@ -1,8 +1,11 @@
 ---
+
+openhpc_module_system_install: false # TODO: FIXME - not sure this is OK here
+
 #sssd_allow_groups: hpc-admins
-servername: 10.60.253.87
+openondemand_servername: "{{ ansible_default_ipv4.address }}" # TODO: probably need to make this more complex like api etc
 # httpd_use_rewrites: false
-httpd_port: 80
+# httpd_port: 80
 #ssl:
 #  - 'SSLCertificateFile "{{ ood_ssl_cert_file }}"'
 #  - 'SSLCertificateKeyFile "{{ ood_ssl_cert_file_key }}"'
@@ -60,13 +63,13 @@ oidc_uri: /oidc
 node_uri: /node
 rnode_uri: /rnode
 
-clusters:
+openondemand_clusters:
   slurm: # TODO(gb637) make {{ openhpc_cluster_name }} interporlation work here
     v2:
       metadata:
-        title: Arcus
+        title: "{{ openhpc_cluster_name }}"
       login:
-        host: 10.60.253.76 # "{{ openhpc_cluster_name }}-login-0"
+        host: "{{ ansible_default_ipv4.address }}"
       job:
         adapter: slurm
         cluster: "{{ openhpc_cluster_name }}"
@@ -89,12 +92,12 @@ clusters:
             %s
           set_host: host=$(hostname -s)
 
-ood_apps:
+openondemand_ood_apps:
   bc_desktop:
     title: Remote Desktop
     description: |
       Request a desktop to run GUI applications.
-    cluster: slurm
+    cluster: "{{ openhpc_cluster_name }}"
     form:
       - desktop
       - bc_account
@@ -139,6 +142,6 @@ ood_apps:
 
   shell:
     env:
-      ood_shell_origin_check: "off" # "http://{{ servername }}"
+      ood_shell_origin_check: "off" # "http://{{ openondemand_servername }}"
 
 user_map_cmd: "/opt/ood/ood_auth_map/bin/ood_auth_map.regex"
