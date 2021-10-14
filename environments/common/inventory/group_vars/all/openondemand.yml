@@ -1,6 +1,6 @@
 ---
 
-openhpc_module_system_install: false # TODO: FIXME - not sure this is OK here
+# openhpc_module_system_install: false # TODO: FIXME - not sure this is OK here - NB this requires a bodged lmod-ohpc package though!
 
 #sssd_allow_groups: hpc-admins
 openondemand_servername: "{{ ansible_default_ipv4.address }}" # TODO: probably need to make this more complex like api etc
@@ -70,6 +70,7 @@ openondemand_clusters:
         title: "{{ openhpc_cluster_name }}"
       login:
         host: "{{ ansible_default_ipv4.address }}"
+        default: true
       job:
         adapter: slurm
         cluster: "{{ openhpc_cluster_name }}"

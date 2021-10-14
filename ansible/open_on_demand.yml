@@ -8,8 +8,8 @@
     - include_role:
         name: osc.ood
       vars:
-        clusters: openondemand_clusters
-        ood_apps: openondemand_ood_apps
+        clusters: "{{ openondemand_clusters }}"
+        ood_apps: "{{ openondemand_ood_apps }}"
     - name: Ensure post_tasks dirs exists
       file:
         path: "{{ item }}"
