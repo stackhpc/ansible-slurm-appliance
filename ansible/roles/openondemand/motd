@@ -1,13 +1,8 @@
-## Welcome to HPC
-#### Fri 19 Feb 9:00:00 GMT 2021
+## Welcome to {{ openhpc_cluster_name }}
 
+TODO: check this is true!
 Through this web portal, you can upload and download files to and from
 UM, create, edit, and submit SLURM jobs, run from a list of GUI
 applications, and launch a full remote desktop or login node command
 line, all via a web browser, with no client software to install and
 configure on your local machine.
-
-Please see the [online
-documentation](https://crc4.gitlab.io/um6p/operations/um6p-sysops/) for
-further information and don't hesitate to contact us directly by email
-to [support-hpc@um6p.ma](mailto:support-hpc@um6p.ma)
