@@ -15,11 +15,12 @@ While it is tested on OpenStack it should work on any cloud, except for node reb
 
 ## Prerequisites
 It is recommended to check the following before starting:
+- You have root access on the "ansible deploy host" which will be used to deploy the appliance.
 - You can create instances using a CentOS 8 GenericCloud image (or an image based on that).
 - SSH keys get correctly injected into instances.
 - Instances have access to internet (note proxies can be setup through the appliance if necessary).
 - DNS works (if not this can be partially worked around but additional configuration will be required).
-- You have root access on the "ansible deploy host" which will be used to deploy the appliance.
+- Created instances have accurate/synchronised time (for VM instances this is usually provided by the hypervisor; if not or for bare metal instances it may be necessary to configure a time service via the appliance).
 
 ## Installation on deployment host
 
