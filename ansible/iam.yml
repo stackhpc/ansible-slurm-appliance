@@ -4,3 +4,13 @@
   tasks:
     - import_role:
         name: basic_users
+
+- hosts: openondemand
+  tags:
+    - openondemand
+  become: yes
+  gather_facts: yes # TODO
+  tasks:
+    - import_role:
+        name: openondemand
+        
