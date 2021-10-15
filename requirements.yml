@@ -2,7 +2,7 @@
 roles:
   - src: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc
-    version: feature/autoscale
+    version: feature/autoscale # TODO: remove once merged
     name: stackhpc.openhpc
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter

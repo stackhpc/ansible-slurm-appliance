@@ -76,7 +76,8 @@ cluster
 # All hosts to (optionally) run yum update on.
 
 [autoscale]
-# Add control to enable autoscaling
+# Add control to enable autoscaling on OpenStack.
+# See ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/autoscale/README.md
 
 [block_devices]
 # Superset of hosts to configure filesystems on - see ansible/roles/block_devices/README.md
