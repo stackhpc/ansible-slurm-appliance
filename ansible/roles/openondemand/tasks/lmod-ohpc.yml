@@ -1,6 +1,19 @@
 # Installs a patched version of lmod-ohpc which fixes https://github.com/openhpc/ohpc/issues/1346
-
+# Using root or not is pretty critical so is explicitly specified on all tasks to override caller.
 # TODO: make idempotent by checking `yum whatprovides modulecmd`
+
+- name: Check on CentOS 8
+  assert:
+    that: 'ansible_distribution_major_version == "8"'
+    fail_msg: "ansible_distribution_major_version was {{ ansible_distribution_major_version}}, expected 8"
+  become: false
+
+- name: Install ohpc-release package
+  dnf:
+    name: http://repos.openhpc.community/OpenHPC/2/CentOS_8/x86_64/ohpc-release-2-1.el8.x86_64.rpm # is for all 2.x releases
+    state: present
+    disable_gpg_check: true
+  become: true
 
 - name: Install RPM build tools
   dnf:
@@ -90,5 +103,5 @@
   dnf:
     name: "{{ ansible_env.HOME }}/rpmbuild/RPMS/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm"
     state: present
-    disable_gpg_check: yes
+    disable_gpg_check: true
   become: true
