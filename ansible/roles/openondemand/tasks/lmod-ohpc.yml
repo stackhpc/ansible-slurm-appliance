@@ -1,0 +1,94 @@
+# Installs a patched version of lmod-ohpc which fixes https://github.com/openhpc/ohpc/issues/1346
+
+# TODO: make idempotent by checking `yum whatprovides modulecmd`
+
+- name: Install RPM build tools
+  dnf:
+    name:
+      - make
+      - gcc
+      - rpm-build
+      - redhat-rpm-config
+      - yum-utils
+    state: present
+  become: true
+
+- name: Install lmod-ohpc build dependencies
+  dnf:
+    name:
+      - lua
+      - lua-devel
+      - lua-filesystem
+      - lua-posix
+      - tcl
+      - tcl-devel
+  become: true
+
+- name: Create build directories
+  file:
+    path: ~/rpmbuild/{{ item }}
+    state: directory
+  loop:
+    - BUILD
+    - RPMS
+    - SOURCES
+    - SPECS
+    - SRPMS
+  become: false
+
+- name: Create ~./rpmmacros
+  lineinfile:
+    path: ~/.rpmmacros
+    regexp: '%_topdir %\(echo \$HOME\)\/rpmbuild'
+    line: '%_topdir %(echo $HOME)/rpmbuild'
+    create: true
+  become: false
+
+# TODO: need to install the ohpc-release package too ...
+- name: Download lmod-ohpc source package
+  command:
+    cmd: yumdownloader --source lmod-ohpc-8.2.10-15.1.ohpc.2.0
+    chdir: "{{ ansible_env.HOME }}"
+    creates: lmod-ohpc-8.2.10-15.1.ohpc.2.0.src.rpm
+  become: false
+
+- name: Unpack lmod-ohpc source package
+  command:
+    cmd: rpm -i ./lmod-ohpc-8.2.10-15.1.ohpc.2.0.src.rpm
+    chdir: "{{ ansible_env.HOME }}"
+    creates: rpmbuild/SPECS/lmod.spec
+  become: false
+
+- name: Modify spec
+  # https://github.com/openhpc/ohpc/issues/1346
+  blockinfile:
+    dest: ~/rpmbuild/SPECS/lmod.spec
+    insertafter: "{{ item.after }}"
+    block: "{{ item.block }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.number }}"
+  loop:
+    - number: 0
+      after: '%{__mkdir_p} \${RPM_BUILD_ROOT}\/%{_docdir}'
+      block: |
+        #install a modulecmd soft link
+        # to allow use of scl-utils, among other dependencies
+        %{__mkdir_p} %{buildroot}/%{_bindir}
+        %{__ln_s} %{OHPC_ADMIN}/lmod/lmod/libexec/lmod %{buildroot}/%{_bindir}/modulecmd
+    - number: 1
+      after: '%doc License README\.md README_lua_modulefiles\.txt INSTALL'
+      block: '%{_bindir}/modulecmd'
+  become: false
+
+- name: Rebuild lmod-ohpc
+  command:
+    cmd: rpmbuild -ba lmod.spec
+    chdir: "{{ ansible_env.HOME }}/rpmbuild/SPECS"
+    creates: ~/rpmbuild/RPMS/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm
+  become: false
+
+- name: Install modified lmod-ohpc
+  dnf:
+    name: "{{ ansible_env.HOME }}/rpmbuild/RPMS/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm"
+    state: present
+    disable_gpg_check: yes
+  become: true
