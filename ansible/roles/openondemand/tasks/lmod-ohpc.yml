@@ -1,6 +1,5 @@
 # Installs a patched version of lmod-ohpc which fixes https://github.com/openhpc/ohpc/issues/1346
 # Using root or not is pretty critical so is explicitly specified on all tasks to override caller.
-# TODO: make idempotent by checking `yum whatprovides modulecmd`
 
 - name: Check on CentOS 8
   assert:
