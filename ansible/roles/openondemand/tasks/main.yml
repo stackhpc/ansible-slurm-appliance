@@ -40,10 +40,12 @@
     mode: "0755"
   when: false
 
-- name: Copy motd
-  template:
-    src: motd
-    dest: /etc/motd
+# don't think we actually want to *DEFINE* the MOTD from this role.
+# However the openondemand_ood_apps.dashboard.env.motd_path variables are probably useful.
+# - name: Copy motd
+#   template:
+#     src: motd
+#     dest: /etc/motd
 
 - name: Ensure ondemand-dex is running and active
   service:

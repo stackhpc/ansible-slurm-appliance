@@ -1,5 +1,12 @@
 ---
 ## TODO: most of this needs namespacing properly :-(
+## TODO: maybe we should arrange it following the osc.github.io docs
+## TODO: Note the varible names (except ones we've namespaced!) come from https://github.com/OSC/ood-ansible
+
+
+
+# portal var. TODO: namespace this through vars
+servername: null # override default of "localhost" from ansible/roles/osc.ood/defaults/main/ood_portal.yml which isn't helpful
 
 #sssd_allow_groups: hpc-admins
 openondemand_servername: "{{ ansible_default_ipv4.address }}" # TODO: probably need to make this more complex like api etc
@@ -22,51 +29,45 @@ openondemand_servername: "{{ ansible_default_ipv4.address }}" # TODO: probably n
 #  - 'AuthType openid-connect'
 #  - 'Require valid-user'
 
-install_ondemand_dex: true
-#dex_settings: |
-#  dex:
-#    connectors:
-#      - type: ldap
-#        id: um6p
-#        name: UM6P AD
-#        config:
-#          host: prdadum6p-01.um6p.local:636
-#          insecureSkipVerify: false
-#          bindDN: {{ sssd_bind_user }}
-#          bindPW: {{ sssd_bind_password }}
-#          userSearch:
-#            baseDN: DC=UM6P,DC=local
-#            filter: "(memberOf=CN=HPC-Users,OU=HPC,OU=UM6P,DC=UM6P,DC=local)"
-#            username: sAMAccountName
-#            idAttr: sAMAccountName
-#            emailAttr: sAMAccountName
-#            nameAttr: sAMAccountName
-#            preferredUsernameAttr: sAMAccountName
-#          groupSearch:
-#            baseDN: DC=UM6P,DC=local
-#            filter: "(objectClass=group)"
-#            userMatchers:
-#              - userAttr: DN
-#                groupAttr: member
-#            nameAttr: cn
+# I don't think we even need dex, can set ood_auth_openidc directly?
+# install_ondemand_dex: true
+# dex_settings: # https://osc.github.io/ood-documentation/latest/authentication/dex.html#dex-configuration
+#   dex:
+#     connectors:
+#       - type: oidc  # https://dexidp.io/docs/connectors/oidc/
+#         id: TODO
+#         name: TODO
+#         config:
+#           issuer: TODO
+#           clientID: TODO
+#           clientSecret: TODO
+#           redirectURI: TODO
+#           scopes: [] # not sure we need any?
+#             #- 'federated:id'
+#           promptType: consent # TODO see what returns
 #    frontend:
 #      dir: /usr/share/ondemand-dex/web
+#      issuer: TODO_ADD_DEX_ISSUER
 #      extra:
-#        loginButtonText: "Log in with your UM6P account"
+#         loginButtonText: TODO_ADD_LOGIN_BUTTON_TEXT
 
+# OpenID Connect config: https://osc.github.io/ood-documentation/latest/reference/files/ood-portal-yml.html#configure-openid-connect
+#oidc_uri: /oidc
+# OpenID Connect config https://github.com/OSC/ood-ansible#open-id-connect
 # TODO(gb637) remove this when we get rid of self-signed certificates
 #ood_auth_openidc:
 #  OIDCSSLValidateServer: Off
 
-oidc_uri: /oidc
-node_uri: /node
-rnode_uri: /rnode
+# Reverse Proxy config: https://osc.github.io/ood-documentation/latest/reference/files/ood-portal-yml.html#configure-reverse-proxy
+# node_uri: /node
+# rnode_uri: /rnode
 
+# https://github.com/OSC/ood-ansible#clusters
 openondemand_clusters:
-  slurm: # TODO(gb637) make {{ openhpc_cluster_name }} interporlation work here
+  slurm:
     v2:
       metadata:
-        title: "{{ openhpc_cluster_name }}"
+        title: "{{ openhpc_cluster_name }}" # interpolation here works as openondemand is lexically after openhpc
       login:
         host: "{{ ansible_default_ipv4.address }}"
         default: true
@@ -92,6 +93,7 @@ openondemand_clusters:
             %s
           set_host: host=$(hostname -s)
 
+# https://github.com/OSC/ood-ansible#ood_apps
 openondemand_ood_apps:
   bc_desktop:
     title: Remote Desktop
@@ -144,4 +146,4 @@ openondemand_ood_apps:
     env:
       ood_shell_origin_check: "off" # "http://{{ openondemand_servername }}"
 
-user_map_cmd: "/opt/ood/ood_auth_map/bin/ood_auth_map.regex"
+user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
