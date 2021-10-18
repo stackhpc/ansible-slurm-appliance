@@ -14,6 +14,22 @@
     disable_gpg_check: true
   become: true
 
+- name: Find CentOS8 PowerTools repo
+  find:
+    paths: /etc/yum.repos.d
+    patterns: CentOS-*PowerTools.repo
+  register: powertools
+  become: true
+
+- name: Enable CentOS8 PowerTools repo
+  # NB: doesn't run command  `dnf config-manager --set-enabled PowerTools` as can't make that idempotent
+  lineinfile:
+    path: "{{ powertools.files[0].path }}" # 8.2: /etc/yum.repos.d/CentOS-PowerTools.repo 8.3: /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
+    create: false # raises error if not already installed
+    regexp: enabled=
+    line: enabled=1
+  become: true
+
 - name: Install RPM build tools
   dnf:
     name:
