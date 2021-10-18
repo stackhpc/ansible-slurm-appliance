@@ -72,18 +72,24 @@
     create: true
   become: false
 
+- name: Get ansible_user info
+  # Workaround problem that ansible_env.HOME depends on which user ran facts - so e.g. running site.yml it's /root and when running slurm.yml it's /var/lib/centos. Mad.
+  user:
+    name: "{{ ansible_user }}"
+  register: ansible_user_info
+
 # TODO: need to install the ohpc-release package too ...
 - name: Download lmod-ohpc source package
   command:
     cmd: yumdownloader --source lmod-ohpc-8.2.10-15.1.ohpc.2.0
-    chdir: "{{ ansible_env.HOME }}"
+    chdir: "{{ ansible_user_info.home }}"
     creates: lmod-ohpc-8.2.10-15.1.ohpc.2.0.src.rpm
   become: false
 
 - name: Unpack lmod-ohpc source package
   command:
     cmd: rpm -i ./lmod-ohpc-8.2.10-15.1.ohpc.2.0.src.rpm
-    chdir: "{{ ansible_env.HOME }}"
+    chdir: "{{ ansible_user_info.home }}"
     creates: rpmbuild/SPECS/lmod.spec
   become: false
 
@@ -110,13 +116,13 @@
 - name: Rebuild lmod-ohpc
   command:
     cmd: rpmbuild -ba lmod.spec
-    chdir: "{{ ansible_env.HOME }}/rpmbuild/SPECS"
+    chdir: "{{ ansible_user_info.home }}/rpmbuild/SPECS"
     creates: ~/rpmbuild/RPMS/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm
   become: false
 
 - name: Install modified lmod-ohpc
   dnf:
-    name: "{{ ansible_env.HOME }}/rpmbuild/RPMS/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm"
+    name: "{{ ansible_user_info.home }}/rpmbuild/RPMS/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm"
     state: present
     disable_gpg_check: true
   become: true
