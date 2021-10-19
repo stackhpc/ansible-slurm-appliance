@@ -34,16 +34,25 @@
     src: missing_home_directory.html
     dest: /etc/ood/config/pun/html/missing_home_directory.html
 
-- name: Create user_map script to make all users lower case
-  copy:
-    content: |
-      #!/bin/bash
-      username=${1,,}
-      shift
-      /opt/ood/ood_auth_map/bin/ood_auth_map.regex ${username} $@
-    dest: "{{ user_map_cmd }}"
-    mode: "0755"
-  when: false
+- name: Create mapping file
+  template:
+    dest: /etc/grid-security/grid-mapfile
+    src: grid-mapfile.j2
+    owner: root
+    group: apache
+    mode: u=rw,g=r,o=
+  when: openondemand_mapping_users
+
+# - name: Create user_map script to make all users lower case
+#   copy:
+#     content: |
+#       #!/bin/bash
+#       username=${1,,}
+#       shift
+#       /opt/ood/ood_auth_map/bin/ood_auth_map.regex ${username} $@
+#     dest: "{{ user_map_cmd }}"
+#     mode: "0755"
+#   when: false
 
 # don't think we actually want to *DEFINE* the MOTD from this role.
 # However the openondemand_ood_apps.dashboard.env.motd_path variables are probably useful.

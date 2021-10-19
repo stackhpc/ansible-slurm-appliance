@@ -2,6 +2,7 @@
 # === NEW variables ===
 ood_dashboard_support_url: (undefined)
 ood_dashboard_docs_url: (undefined)
+openondemand_mapping_users: 
 
 # === osc.ood variables new defaults ===
 
@@ -108,3 +109,4 @@ openondemand_osc_ood_defaults:
   ssl: "{{ ssl }}"
   clusters: "{{ clusters }}"
   ood_apps: "{{ ood_apps }}"
+  user_map_cmd: "{{ '/opt/ood/ood_auth_map/bin/ood_auth_map.mapfile' if openondemand_mapping_users else omit }}"

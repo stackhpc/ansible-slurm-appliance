@@ -9,13 +9,17 @@ Any pre-requisites that may not be covered by Ansible itself or the role should 
 ## Role Variables
 
 ### **NEW** variables added by this role
+# TODO: make names consistent here!
 - `ood_dashboard_support_url`: Optional. URL or email etc to show as support contact under Help in dashboard. Default `(undefined)`.
 - `ood_dashboard_docs_url`: Optional. URL of docs to show under Help in dashboard. Default `(undefined)`.
-
+- `openondemand_mapping_users`: Optional. A list of dicts defining users to map (TODO ADD DOCS REFERENCE). Each dict should have keys `name` and `authenticated_username` giving the local and remote usernames respectively. TODO: describe what this turns on.
 
 ### `osc.ood-ansible` variables **overriden** by this role
 - `ssl_cert`: /etc/pki/tls/certs/localhost.crt
 - `ssl_cert_key`: /etc/pki/tls/private/localhost.key
+
+### EXTRA functionality:
+- If there is a non-empty `basic_users` group and `user_map_cmd` is set to `ood_auth_map.mapfile` then TODO: ...
 
 
 # TODO: document how to configure for OIDC:
