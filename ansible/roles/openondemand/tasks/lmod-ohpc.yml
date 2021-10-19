@@ -78,7 +78,6 @@
     name: "{{ ansible_user }}"
   register: ansible_user_info
 
-# TODO: need to install the ohpc-release package too ...
 - name: Download lmod-ohpc source package
   command:
     cmd: yumdownloader --source lmod-ohpc-8.2.10-15.1.ohpc.2.0
