@@ -3,7 +3,6 @@
     name: osc.ood
   vars:
     clusters: "{{ openondemand_clusters }}"
-    ood_apps: "{{ openondemand_ood_apps }}"
 - name: Ensure post_tasks dirs exists
   file:
     path: "{{ item }}"
@@ -47,12 +46,12 @@
 #     src: motd
 #     dest: /etc/motd
 
-- name: Ensure ondemand-dex is running and active
-  service:
-    name: ondemand-dex
-    enabled: yes
-    state: started
-  when: false
+# - name: Ensure ondemand-dex is running and active
+#   service:
+#     name: ondemand-dex
+#     enabled: yes
+#     state: stopped
+#   when: false
 
 # # TODO: make generic
 # - name: Copy UM6P Brand images
@@ -84,6 +83,7 @@
 #     dest: /etc/ood/profile
 
 #   # TODO(gb637) make this automatic
+# TODO: will be needed if openondemand host is NOT the same as the login node
 # - name: Add ssh_known_hosts for login node
 #   copy:
 #     content: |

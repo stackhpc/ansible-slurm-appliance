@@ -3,13 +3,8 @@
 ## TODO: maybe we should arrange it following the osc.github.io docs
 ## TODO: Note the varible names (except ones we've namespaced!) come from https://github.com/OSC/ood-ansible
 
-
-
-# portal var. TODO: namespace this through vars
-servername: null # override default of "localhost" from ansible/roles/osc.ood/defaults/main/ood_portal.yml which isn't helpful
-
 #sssd_allow_groups: hpc-admins
-openondemand_servername: "{{ ansible_default_ipv4.address }}" # TODO: probably need to make this more complex like api etc
+# openondemand_servername: "{{ ansible_default_ipv4.address }}" # TODO: probably need to make this more complex like api etc
 # httpd_use_rewrites: false
 # httpd_port: 80
 #ssl:
@@ -51,12 +46,18 @@ openondemand_servername: "{{ ansible_default_ipv4.address }}" # TODO: probably n
 #      extra:
 #         loginButtonText: TODO_ADD_LOGIN_BUTTON_TEXT
 
-# OpenID Connect config: https://osc.github.io/ood-documentation/latest/reference/files/ood-portal-yml.html#configure-openid-connect
-#oidc_uri: /oidc
-# OpenID Connect config https://github.com/OSC/ood-ansible#open-id-connect
-# TODO(gb637) remove this when we get rid of self-signed certificates
-#ood_auth_openidc:
-#  OIDCSSLValidateServer: Off
+# OpenID Connect config - see https://github.com/OSC/ood-ansible#open-id-connect
+# See environments/alaska-common/inventory/group_vars/openondemand.yml
+# ood_auth_openidc:
+
+
+# ood_auth_openidc:
+#   OIDCRedirectURI: "https://{{ openondemand_servername }}/oidc"  # for some reason this gets ignored on merging!
+#   OIDCClientID: 248626ed-3553-47a0-86f0-7d2b51421cb0
+#   OIDCClientSecret: ALj4EbEct1OMzx18aykn2d0Xkk0Hq3YwBoJcwQD_syhk5RrfcpfaRH0voiCXYk3RWNyxSzt5AF75ldYzQcBWBsg
+#   OIDCProviderMetadataURL: https://iris-iam.stfc.ac.uk/.well-known/openid-configuration
+#   OIDCCryptoPassphrase: oq1uGEj5dQMmr/N9WiLGgSJbmYkUPx5jyXA/ujA1ctxpMjonFq5mP7Do5OhXyaRuEpDYsOT8RCUYO0l6c6TfZ6TY # TODO: generate in passwords
+#   OIDCSSLValidateServer: Off
 
 # Reverse Proxy config: https://osc.github.io/ood-documentation/latest/reference/files/ood-portal-yml.html#configure-reverse-proxy
 # node_uri: /node
@@ -69,7 +70,7 @@ openondemand_clusters:
       metadata:
         title: "{{ openhpc_cluster_name }}" # interpolation here works as openondemand is lexically after openhpc
       login:
-        host: "{{ ansible_default_ipv4.address }}"
+        host: "{{ ansible_default_ipv4.address }}" # TODO: should be specific interface of first LOGIN node - by default
         default: true
       job:
         adapter: slurm
@@ -94,7 +95,7 @@ openondemand_clusters:
           set_host: host=$(hostname -s)
 
 # https://github.com/OSC/ood-ansible#ood_apps
-openondemand_ood_apps:
+ood_apps:
   bc_desktop:
     title: Remote Desktop
     description: |
