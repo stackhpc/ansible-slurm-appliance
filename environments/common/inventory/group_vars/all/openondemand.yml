@@ -1,70 +1,20 @@
 ---
-## TODO: most of this needs namespacing properly :-(
 ## TODO: maybe we should arrange it following the osc.github.io docs
-## TODO: Note the varible names (except ones we've namespaced!) come from https://github.com/OSC/ood-ansible
+## TODO: Note the varible names GENERALLY come from https://github.com/OSC/ood-ansible
 
-#sssd_allow_groups: hpc-admins
-# openondemand_servername: "{{ ansible_default_ipv4.address }}" # TODO: probably need to make this more complex like api etc
-# httpd_use_rewrites: false
-# httpd_port: 80
-#ssl:
-#  - 'SSLCertificateFile "{{ ood_ssl_cert_file }}"'
-#  - 'SSLCertificateKeyFile "{{ ood_ssl_cert_file_key }}"'
-#  - 'SSLCipherSuite AES256+EECDH:AES256+EDH:AES128+EECDH:AES128+EDH'
-#  - 'SSLProtocol -ALL -SSLv3 +TLSv1.2'
-#  - 'SSLHonorCipherOrder on'
-#  - 'SSLStrictSNIVHostCheck off'
-#  - 'SSLCompression off'
-#  - 'SSLOptions +FakeBasicAuth +ExportCertData +StrictRequire'
-#  - 'Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"'
-#  - 'Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure'
-#  - 'Header always set X-Frame-Options SAMEORIGIN'
+# Enable SSL by default:
+httpd_port: 443
+# The mod_ssl package installed by ondemand-apache automatically generates self-signed certs so can use these by default:
+ssl_cert: /etc/pki/tls/certs/localhost.crt
+ssl_cert_key: /etc/pki/tls/private/localhost.key
+ssl:
+  - "SSLCertificateFile {{ ssl_cert }}"
+  - "SSLCertificateKeyFile {{ ssl_cert_key }}"
+  - SSLProtocol +TLSv1.2 +TLSv1.3
+# TODO: consider adding other defaults from here for good security by default:
+# https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04
 
-#httpd_auth:
-#  - 'AuthType openid-connect'
-#  - 'Require valid-user'
-
-# I don't think we even need dex, can set ood_auth_openidc directly?
-# install_ondemand_dex: true
-# dex_settings: # https://osc.github.io/ood-documentation/latest/authentication/dex.html#dex-configuration
-#   dex:
-#     connectors:
-#       - type: oidc  # https://dexidp.io/docs/connectors/oidc/
-#         id: TODO
-#         name: TODO
-#         config:
-#           issuer: TODO
-#           clientID: TODO
-#           clientSecret: TODO
-#           redirectURI: TODO
-#           scopes: [] # not sure we need any?
-#             #- 'federated:id'
-#           promptType: consent # TODO see what returns
-#    frontend:
-#      dir: /usr/share/ondemand-dex/web
-#      issuer: TODO_ADD_DEX_ISSUER
-#      extra:
-#         loginButtonText: TODO_ADD_LOGIN_BUTTON_TEXT
-
-# OpenID Connect config - see https://github.com/OSC/ood-ansible#open-id-connect
-# See environments/alaska-common/inventory/group_vars/openondemand.yml
-# ood_auth_openidc:
-
-
-# ood_auth_openidc:
-#   OIDCRedirectURI: "https://{{ openondemand_servername }}/oidc"  # for some reason this gets ignored on merging!
-#   OIDCClientID: 248626ed-3553-47a0-86f0-7d2b51421cb0
-#   OIDCClientSecret: ALj4EbEct1OMzx18aykn2d0Xkk0Hq3YwBoJcwQD_syhk5RrfcpfaRH0voiCXYk3RWNyxSzt5AF75ldYzQcBWBsg
-#   OIDCProviderMetadataURL: https://iris-iam.stfc.ac.uk/.well-known/openid-configuration
-#   OIDCCryptoPassphrase: oq1uGEj5dQMmr/N9WiLGgSJbmYkUPx5jyXA/ujA1ctxpMjonFq5mP7Do5OhXyaRuEpDYsOT8RCUYO0l6c6TfZ6TY # TODO: generate in passwords
-#   OIDCSSLValidateServer: Off
-
-# Reverse Proxy config: https://osc.github.io/ood-documentation/latest/reference/files/ood-portal-yml.html#configure-reverse-proxy
-# node_uri: /node
-# rnode_uri: /rnode
-
-# https://github.com/OSC/ood-ansible#clusters
-openondemand_clusters:
+openondemand_clusters: # https://github.com/OSC/ood-ansible#clusters
   slurm:
     v2:
       metadata:
@@ -81,7 +31,7 @@ openondemand_clusters:
             module purge
             %s
           set_host: host=$(hostname -s)
-        vnc:
+        vnc: # TODO: check/fix
           script_wrapper: |
             module purge
             export PATH=/opt/TurboVNC/bin:$PATH
@@ -93,10 +43,10 @@ openondemand_clusters:
             export -f xfce4-session
             %s
           set_host: host=$(hostname -s)
+          # TODO: add grafana in here: https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
 
-# https://github.com/OSC/ood-ansible#ood_apps
-ood_apps:
-  bc_desktop:
+ood_apps: # https://github.com/OSC/ood-ansible#ood_apps
+  bc_desktop:             # TODO: get this working
     title: Remote Desktop
     description: |
       Request a desktop to run GUI applications.
@@ -131,12 +81,12 @@ ood_apps:
     env:
       motd_path: /etc/motd
       motd_format: markdown
-      ood_dashboard_support_url: mailto:support-hpc@um6p.ma
-      ood_dashboard_docs_url: https://crc4.gitlab.io/um6p/operations/um6p-sysops
+      ood_dashboard_support_url: "{{ ood_dashboard_support_url }}" # TODO
+      ood_dashboard_docs_url: "{{ ood_dashboard_docs_url }}" # TODO
       ood_brand_bg_color: "#0e6ec8"
-      ood_dashboard_title: ASCC
-      ood_dashboard_logo: /public/ondemand/logo.png
-      ood_dashboard_headr_img_logo: /public/ondemand/logo.png
+      ood_dashboard_title: "{{ openhpc_cluster_name }}"
+      ood_dashboard_logo: /var/www/ood/public/logo.png
+      ood_dashboard_headr_img_logo: /var/www/ood/public/logo.png
       ood_dashboard_logo_height: 200px
 
   files:
