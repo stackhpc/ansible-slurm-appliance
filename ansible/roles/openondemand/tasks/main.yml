@@ -1,8 +1,14 @@
 ---
+
+- name: Set osc.ood variables from this role
+  set_fact:
+    "{{ item.key }}": "{{ item.value }}"
+  loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
+
 - include_role:
     name: osc.ood
-  vars:
-    clusters: "{{ openondemand_clusters }}"
+  # can't set vars: from a dict hence the workaround above
+    
 - name: Ensure post_tasks dirs exists
   file:
     path: "{{ item }}"
