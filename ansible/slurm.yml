@@ -10,7 +10,7 @@
         name:  geerlingguy.mysql
 
 - name: Modify lmod-ohpc package
-  hosts: openondemand
+  hosts: openondemand:&openhpc
   tags:
     - openhpc
     - openondemand
