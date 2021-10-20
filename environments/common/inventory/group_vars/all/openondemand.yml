@@ -1,6 +1,6 @@
 ---
 ## TODO: maybe we should arrange it following the osc.github.io docs
-## TODO: Note the varible names GENERALLY come from https://github.com/OSC/ood-ansible
+## TODO: Note variables prefixed ood_ are all from https://github.com/OSC/ood-ansible but in some case the prefix is added here - if overriding in an environment use the ood_ version.
 
 user_map_cmd: "{{ '/opt/ood/ood_auth_map/bin/ood_auth_map.mapfile' if openondemand_mapping_users else omit }}"
 
@@ -12,7 +12,13 @@ ood_ssl_cert_key: /etc/pki/tls/private/localhost.key # osc.ood:ssl_cert_key
 ood_ssl:
   - "SSLCertificateFile {{ ssl_cert }}"
   - "SSLCertificateKeyFile {{ ssl_cert_key }}"
-  - SSLProtocol +TLSv1.2 +TLSv1.3
+  # following based on https://grok.lsu.edu/article.aspx?articleid=17596
+  - SSLProtocol all -TLSv1.1 -TLSv1 -SSLv2 -SSLv3
+  - SSLCipherSuite ALL:+HIGH:!ADH:!EXP:!SSLv2:!SSLv3:!MEDIUM:!LOW:!NULL:!aNULL
+  - SSLHonorCipherOrder On
+  - SSLCompression off
+  - SSLSessionTickets Off
+
 # TODO: consider adding other defaults from here for good security by default:
 # https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04
 ood_clusters: # osc.ood:clusters - see https://github.com/OSC/ood-ansible#clusters
