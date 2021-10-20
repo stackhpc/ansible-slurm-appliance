@@ -1,0 +1,5 @@
+{% for user in openondemand_mapping_users %}
+{% if 'authenticated_username' in user %}
+"{{ user.authenticated_username }}" {{ user.name }}
+{% endif %}
+{% endfor %}
