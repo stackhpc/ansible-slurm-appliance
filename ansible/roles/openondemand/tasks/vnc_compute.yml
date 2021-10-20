@@ -1,0 +1,49 @@
+# Should be run on compute nodes you want to run the graphical desktop on
+- name: Enable TurboVNC repo
+  tags: install
+  get_url:
+    url: https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
+    dest: /etc/yum.repos.d/TurboVNC.repo
+
+- name: Install EPEL
+  tags: install
+  yum:
+    name: epel-release
+
+- name: Install VNC-related packages
+  tags: install
+  yum:
+    name:
+      - turbovnc
+      - nmap-ncat
+      - python3
+
+- name: Install Xfce desktop
+  tags: install
+  yum:
+    name: '@Xfce'
+  
+- name: Install websockify venv
+  # Requires separate step so that the upgraded pip is used to install packages
+  pip:
+    name: pip
+    virtualenv: /opt/websockify
+    virtualenv_command: python3 -m venv
+  tags: install
+
+- name: Install websockify package in venv
+  pip:
+    name: websockify
+    virtualenv: /opt/websockify
+    virtualenv_command: python3 -m venv
+  tags: install
+
+- name: Symlink websockify into path
+  file:
+    src: /opt/websockify/bin/websockify
+    dest: /bin/local
+    state: link
+
+- name: Start X # TODO: make survive reboot?? systemctl set-default graphical && reboot
+  command:
+    cmd: startx
