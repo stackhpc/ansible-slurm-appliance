@@ -1,13 +1,12 @@
 ---
 
-- name: Set osc.ood variables from this role
-  set_fact:
-    "{{ item.key }}": "{{ item.value }}"
-  loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
-
 - include_role:
     name: osc.ood
-  # can't set vars: from a dict hence the workaround above
+  vars:
+    httpd_port: "{{ ood_httpd_port }}"
+    ssl_cert: "{{ ood_ssl_cert }}"
+    ssl_cert_key: "{{ ood_ssl_cert_key }}"
+    ssl: "{{ ood_ssl }}"
     
 - name: Ensure post_tasks dirs exists
   file:

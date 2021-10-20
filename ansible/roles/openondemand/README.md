@@ -2,6 +2,9 @@
 
 A brief description of the role goes here.
 
+TODO:
+- Support PAM auth (as default when basic_users available??): https://osc.github.io/ood-documentation/latest/authentication/pam.html
+
 ## Requirements
 
 Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
