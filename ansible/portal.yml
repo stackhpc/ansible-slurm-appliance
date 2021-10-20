@@ -1,0 +1,20 @@
+- hosts: openondemand
+  tags:
+    - openondemand
+  become: yes
+  gather_facts: yes # TODO
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: main.yml
+
+- hosts: openondemand_vnc
+  tags:
+    - openondemand
+    - openondemand_vnc
+  become: yes
+  gather_facts: yes
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: vnc_compute.yml
