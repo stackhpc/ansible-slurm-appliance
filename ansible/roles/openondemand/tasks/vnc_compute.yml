@@ -41,7 +41,7 @@
 - name: Symlink websockify into path
   file:
     src: /opt/websockify/bin/websockify
-    dest: /bin/local
+    dest: /bin/websockify
     state: link
 
 # - name: Start X # TODO: make survive reboot?? systemctl set-default graphical && reboot

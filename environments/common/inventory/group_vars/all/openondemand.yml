@@ -39,7 +39,6 @@ ood_clusters: # osc.ood:clusters - see https://github.com/OSC/ood-ansible#cluste
           script_wrapper: |
             module purge
             export PATH=/opt/TurboVNC/bin:$PATH
-            #export WEBSOCKIFY_CMD=/bin/websockify  # TODO: shouldn't need this
 
             # Workaround to avoid "Unable to contact settings server" when
             # lauching xfce4-session
