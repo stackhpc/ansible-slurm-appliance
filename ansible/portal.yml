@@ -1,6 +1,7 @@
 - hosts: openondemand
   tags:
     - openondemand
+    - openondemand_node
   become: yes
   gather_facts: yes # TODO
   tasks:

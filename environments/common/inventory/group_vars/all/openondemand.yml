@@ -19,8 +19,6 @@ ood_ssl:
   - SSLCompression off
   - SSLSessionTickets Off
 
-# TODO: consider adding other defaults from here for good security by default:
-# https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04
 ood_clusters: # osc.ood:clusters - see https://github.com/OSC/ood-ansible#clusters
   slurm:
     v2:
@@ -37,12 +35,11 @@ ood_clusters: # osc.ood:clusters - see https://github.com/OSC/ood-ansible#cluste
           script_wrapper: |
             module purge
             %s
-          set_host: host=$(hostname -s)
         vnc: # TODO: check/fix
           script_wrapper: |
             module purge
             export PATH=/opt/TurboVNC/bin:$PATH
-            export WEBSOCKIFY_CMD=/bin/websockify
+            #export WEBSOCKIFY_CMD=/bin/websockify  # TODO: shouldn't need this
 
             # Workaround to avoid "Unable to contact settings server" when
             # lauching xfce4-session
@@ -57,22 +54,22 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
     title: Remote Desktop
     description: |
       Request a desktop to run GUI applications.
-    cluster: "{{ openhpc_cluster_name }}"
+    cluster: slurm
     form:
       - desktop
-      - bc_account
+      # - bc_account
       - bc_queue
       - bc_num_hours
       - num_cores
-      - bc_email_on_started
+      # - bc_email_on_started
       - bc_num_slots
       - node
     attributes:
       desktop: xfce
-      bc_account:
-        value: root
+      # bc_account:
+      #   value: root
       bc_queue:
-        value: compute
+        value: small # TODO: this isn't necessarily correct
       num_cores:
         min: 1
       node: ""

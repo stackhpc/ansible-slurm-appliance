@@ -44,6 +44,6 @@
     dest: /bin/local
     state: link
 
-- name: Start X # TODO: make survive reboot?? systemctl set-default graphical && reboot
-  command:
-    cmd: startx
+# - name: Start X # TODO: make survive reboot?? systemctl set-default graphical && reboot
+#   command:
+#     cmd: startx
