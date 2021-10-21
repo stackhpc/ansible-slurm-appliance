@@ -3,7 +3,7 @@
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
 
-grafana_dashboards:
+grafana_dashboards_default:
   # node exporter slurm:
   - dashboard_id: 13427
     replacements:
@@ -28,6 +28,8 @@ grafana_dashboards:
       - placeholder: DS_SLURMSTATS
         replacement: slurmstats
     revision_id: 1
+
+grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 
 grafana_security:
     admin_user: grafana

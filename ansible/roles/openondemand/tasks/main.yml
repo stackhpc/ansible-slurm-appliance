@@ -50,17 +50,6 @@
     mode: u=rw,g=r,o=
   when: openondemand_mapping_users
 
-# - name: Create user_map script to make all users lower case
-#   copy:
-#     content: |
-#       #!/bin/bash
-#       username=${1,,}
-#       shift
-#       /opt/ood/ood_auth_map/bin/ood_auth_map.regex ${username} $@
-#     dest: "{{ user_map_cmd }}"
-#     mode: "0755"
-#   when: false
-
 # don't think we actually want to *DEFINE* the MOTD from this role.
 # However the openondemand_ood_apps.dashboard.env.motd_path variables are probably useful.
 # - name: Copy motd
@@ -84,15 +73,6 @@
 #     - /var/www/ood/public
 #     - /usr/share/ondemand-dex/web/themes/
 
-# - name: Move favicon to the top level
-#   copy:
-#     src: /var/www/ood/public/ondemand/favicon.ico
-#     dest: "{{ item }}"
-#     remote_src: true
-#   loop:
-#     - /var/www/ood/public/favicon.ico
-#     - /usr/share/ondemand-dex/web/themes/ondemand/favicon.svg
-
 # - name: Force ondemand scripts to use the right locale
 #   copy:
 #     content: |
@@ -112,3 +92,4 @@
 #       slurm-login-h23d5-u38-svn1,10.43.1.5 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLRzrCQ/iZYBgpWrdn4o3IdJCuXuAUQHbAllc2jEAtTrnVFL3llhexHpNTAo4Kmw40UCv+/1cSHGieBrsH8i0Ec=
 #     dest: /etc/ssh/ssh_known_hosts
 #   when: false
+

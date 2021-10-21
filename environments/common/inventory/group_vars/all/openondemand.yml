@@ -78,3 +78,24 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
       ood_dashboard_logo: /var/www/ood/public/logo.png
       ood_dashboard_headr_img_logo: /var/www/ood/public/logo.png
       ood_dashboard_logo_height: 200px
+
+# Prometheus config for Open Ondemand exporter
+# https://osc.github.io/ood-documentation/latest/monitoring/prometheus.html#prometheus-configuration
+openondemand_scrape_configs:
+  - job_name: ondemand
+    metrics_path: /metrics
+    scrape_timeout: 20s
+    scrape_interval: 2m
+    static_configs:
+    - targets:
+      - "{{ openondemand_address }}:9301"
+      labels:
+        environment: TODO # TODO:
+        service: "openondemand"
+
+openondemand_dashboard:
+  - dashboard_id: 13465
+    replacements:
+      - placeholder: DS_PROMETHEUS
+        replacement: prometheus
+    revision_id: 1

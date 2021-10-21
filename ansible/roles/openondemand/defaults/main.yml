@@ -1,4 +1,5 @@
 ---
+
 openondemand_dashboard_support_url: (undefined)
 openondemand_dashboard_docs_url: (undefined)
 openondemand_mapping_users: []
@@ -14,6 +15,8 @@ openondemand_clusters: {} # synonym for osc.ood:clusters
 # NB: osc.ood:servername default of "localhost" misconfigures name-based virtual hosting if using ip address
 
 openondemand_auth: # Enable authentication using a specified module with sensible defaults. Currently only accepted value is `oidc`.
+
+openondemand_monitoring: true # Install prometheus exporter
 
 # Required variables for `openondemand_auth=oidc` :
 openondemand_oidc_redirect_hostname: # hostname/IP which the OIDC provider should redirect the browser back to after authenticating, i.e. your Open Ondemand node's hostname/IP.
