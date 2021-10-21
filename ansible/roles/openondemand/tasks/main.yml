@@ -4,6 +4,7 @@
   set_fact:
     "{{ item.key }}": "{{ lookup('vars', item.key, default=item.value) }}"
   loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
+  when: (item.key in hostvars[inventory_hostname]) or (item.value is not none)
 
 - include_role:
     name: osc.ood
@@ -26,7 +27,7 @@
     recurse: yes
     owner: root
     mode: o=rwX,go=rX
-    
+
 - name: Create additional shortcuts in Files app
   template:
     src: files_shortcuts.rb.j2
