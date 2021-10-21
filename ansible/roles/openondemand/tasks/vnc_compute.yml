@@ -43,7 +43,3 @@
     src: /opt/websockify/bin/websockify
     dest: /bin/websockify
     state: link
-
-# - name: Start X # TODO: make survive reboot?? systemctl set-default graphical && reboot
-#   command:
-#     cmd: startx

@@ -1,13 +1,14 @@
 ---
 
+- name: Set osc.ood variables from this role's defaults if no overriding inventory var
+  set_fact:
+    "{{ item.key }}": "{{ lookup('vars', item.key, default=item.value) }}"
+  loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
+
 - include_role:
     name: osc.ood
-  vars:
-    httpd_port: "{{ ood_httpd_port }}"
-    ssl_cert: "{{ ood_ssl_cert }}"
-    ssl_cert_key: "{{ ood_ssl_cert_key }}"
-    ssl: "{{ ood_ssl }}"
-    
+  # can't set vars: from a dict hence the workaround above
+
 - name: Ensure post_tasks dirs exists
   file:
     path: "{{ item }}"
