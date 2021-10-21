@@ -19,15 +19,21 @@
     - /etc/ood/config/announcements.d
     - /etc/ood/config/pun/html
 
-# TODO: (steveb): find a way to add filesystems to this - by default will just get homedir (https://osc.github.io/ood-documentation/release-1.2/applications/dashboard.html#add-shortcuts-to-files-menu)
-# - name: Create files shortcuts
-#   copy:
-#     content: |
-#       OodFilesApp.candidate_favorite_paths.tap do |paths|
-#         # add RDS space directories
-#         paths << Pathname.new("/srv/data/#{User.new.name}")
-#       end
-#     dest: /etc/ood/config/apps/dashboard/initializers/ood.rb
+- name: Create dashboard additional config directory
+  file:
+    path: /etc/ood/config/apps/dashboard/initializers
+    state: directory
+    recurse: yes
+    owner: root
+    mode: o=rwX,go=rX
+    
+- name: Create additional shortcuts in Files app
+  template:
+    src: files_shortcuts.rb.j2
+    dest: /etc/ood/config/apps/dashboard/initializers/ood.rb
+    owner: root
+    mode: o=rw,go=r
+  when: openondemand_filesapp_paths
 
 - name: Copy web page to let users create their home directory
   copy:

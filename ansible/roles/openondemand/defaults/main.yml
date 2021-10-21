@@ -6,6 +6,8 @@ openondemand_mapping_users: []
 openondemand_ssl_cert: /etc/pki/tls/certs/localhost.crt
 openondemand_ssl_cert_key: /etc/pki/tls/private/localhost.key
 
+openondemand_filesapp_paths: [] # List of paths (in addition to $HOME) to add shortcuts to in the Files dashboard app
+
 openondemand_clusters: {} # synonym for osc.ood:clusters
 
 # The below overrides some osc.ood defaults - keys are osc.ood varibale names so you can override defaults below
