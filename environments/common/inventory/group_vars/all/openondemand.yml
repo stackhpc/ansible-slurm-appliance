@@ -18,9 +18,11 @@ openondemand_clusters:
           script_wrapper: |
             module purge
             %s
-        vnc: # TODO: check/fix
+        vnc:
           script_wrapper: |
             module purge
+
+            export PATH=/opt/TurboVNC/bin:$PATH
 
             # Workaround to avoid "Unable to contact settings server" when
             # lauching xfce4-session
