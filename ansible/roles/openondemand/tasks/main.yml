@@ -41,6 +41,15 @@
     src: missing_home_directory.html
     dest: /etc/ood/config/pun/html/missing_home_directory.html
 
+- name: Create mapping directory
+  file:
+    path: /etc/grid-security
+    state: directory
+    owner: root
+    group: apache
+    mode: u=rwX,g=rX,o=
+  when: openondemand_mapping_users
+
 - name: Create mapping file
   template:
     dest: /etc/grid-security/grid-mapfile
