@@ -38,8 +38,9 @@
     virtualenv_command: python3 -m venv
   tags: install
 
-- name: Symlink websockify into path
+- name: Symlink websockify to where Open Ondemand expects
   file:
     src: /opt/websockify/bin/websockify
-    dest: /bin/websockify
+    dest: /opt/websockify/run
     state: link
+

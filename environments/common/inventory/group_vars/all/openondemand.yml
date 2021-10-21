@@ -21,7 +21,6 @@ openondemand_clusters:
         vnc: # TODO: check/fix
           script_wrapper: |
             module purge
-            export PATH=/opt/TurboVNC/bin:$PATH
 
             # Workaround to avoid "Unable to contact settings server" when
             # lauching xfce4-session
@@ -29,7 +28,7 @@ openondemand_clusters:
             export -f xfce4-session
             %s
           set_host: host=$(hostname -s)
-          # TODO: add grafana in here - see https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
+      # TODO: add grafana in here - see https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
 
 ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
   bc_desktop:             # TODO: get this working
