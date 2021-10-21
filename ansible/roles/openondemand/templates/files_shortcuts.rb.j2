@@ -1,0 +1,8 @@
+# Template to add additional shortcuts to the Files dashboard app
+# See https://osc.github.io/ood-documentation/master/customization.html#add-shortcuts-to-files-menu
+
+OodFilesApp.candidate_favorite_paths.tap do |paths|
+{% for path in openondemand_filesapp_paths %}
+  paths << Pathname.new("{{ path }}")
+{% endfor %}
+end
