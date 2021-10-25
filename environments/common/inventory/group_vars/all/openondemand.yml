@@ -8,7 +8,7 @@ openondemand_clusters:
       metadata:
         title: "{{ openhpc_cluster_name }}" # interpolation here works as openondemand is lexically after openhpc
       login:
-        host: "{{ ansible_default_ipv4.address }}" # TODO: should be specific interface of first LOGIN node - by default
+        host: "{{ hostvars[groups['login'].0].api_address }}"
         default: true
       job:
         adapter: slurm
