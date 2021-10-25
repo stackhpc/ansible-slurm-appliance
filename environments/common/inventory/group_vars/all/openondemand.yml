@@ -34,7 +34,7 @@ openondemand_clusters:
 
 ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
 # see https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
-  bc_desktop:
+  bc_desktop: # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
     title: Remote Desktop
     description: |
       Request a desktop to run GUI applications.
@@ -48,10 +48,10 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
       - node
     attributes:
       desktop: xfce
-      # bc_account:
+      # bc_account:# slurm account
       #   value: root
       bc_queue:
-        value: small # TODO: this isn't necessarily correct
+        value: "{{ openondemand_desktop_partition }}"
       num_cores:
         min: 1
       node: ""
