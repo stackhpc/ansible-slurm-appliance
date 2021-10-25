@@ -34,7 +34,7 @@ openondemand_clusters:
 
 ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
 # see https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
-  bc_desktop: # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
+  bc_desktop: # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop # TODO: only add this when hosts in openondemand_vnc?
     title: Remote Desktop
     description: |
       Request a desktop to run GUI applications.
@@ -44,23 +44,26 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
       - bc_queue
       - bc_num_hours
       - num_cores
-      - bc_num_slots
       - node
     attributes:
       desktop: xfce
-      # bc_account:# slurm account
+      # bc_account: # i.e. slurm account
       #   value: root
       bc_queue:
         value: "{{ openondemand_desktop_partition }}"
       num_cores:
+        label: Number of cores
         min: 1
-      node: ""
+      node:
+        label: Node name
+        help: Select a particular node or leave empty to let Slurm pick the next available
+        value: ""
     submit: |
       ---
       script:
         job_name: "ood-desktop"
         native:
-          - <%= "--nodes=#{bc_num_slots}" %>
+          - <%= "--nodes=1" %>
           - <%= "--ntasks=#{num_cores}" %>
           - <%= "--nodelist=#{node}" %>
   files:
