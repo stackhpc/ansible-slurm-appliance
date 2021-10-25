@@ -1,7 +1,7 @@
 - hosts: openondemand
   tags:
     - openondemand
-    - openondemand_node
+    - openondemand_server
   become: yes
   gather_facts: yes # TODO
   tasks:
@@ -19,3 +19,14 @@
     - import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+
+- hosts: openondemand_jupyter
+  tags:
+    - openondemand
+    - openondemand_jupyter
+  become: yes
+  gather_facts: yes
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: jupyter_compute.yml

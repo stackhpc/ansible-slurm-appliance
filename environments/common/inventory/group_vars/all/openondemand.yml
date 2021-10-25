@@ -17,6 +17,7 @@ openondemand_clusters:
         basic:
           script_wrapper: |
             module purge
+            export PATH=/opt/jupyter/bin/:$PATH
             %s
         vnc:
           script_wrapper: |
@@ -31,6 +32,12 @@ openondemand_clusters:
             %s
           set_host: host=$(hostname -s)
       # TODO: add grafana in here - see https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
+
+ood_install_apps:
+  jupyter:
+    repo: https://github.com/OSC/bc_example_jupyter.git
+    dest: "{{ ood_sys_app_dir }}"  # defaults (optional)
+    version: master                # defaults (optional)
 
 ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
 # see https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
@@ -83,7 +90,37 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
       ood_dashboard_logo: /var/www/ood/public/logo.png
       ood_dashboard_headr_img_logo: /var/www/ood/public/logo.png
       ood_dashboard_logo_height: 200px
-
+  jupyter:
+    title: Jupyter Notebook
+    description: Request a Jupyter Notebook
+    cluster: slurm
+    form:
+      - modules
+      - extra_jupyter_args
+      - bc_queue
+      - bc_num_hours
+      - num_cores
+      - node
+    attributes: # TODO
+      num_cores:
+        label: Number of cores
+        value: 1
+      modules: ""
+      extra_jupyter_args: ""
+      bc_queue:
+        value: "{{ openondemand_desktop_partition }}" # TODO: somewhere else??
+      node: ""
+    submit: |
+      ---
+      batch_connect:
+        template: "basic"
+      script:
+        job_name: "ood-jupyter"
+        native:
+          - <%= "--nodes=1" %>
+          - <%= "--ntasks=#{num_cores}" %>
+          - <%= "--nodelist=#{node}" %>
+    
 # Prometheus config for Open Ondemand exporter
 # https://osc.github.io/ood-documentation/latest/monitoring/prometheus.html#prometheus-configuration
 openondemand_scrape_configs:
