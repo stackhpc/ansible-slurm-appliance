@@ -38,36 +38,12 @@
 
 - name: Create job template directory
   file:
-    path: "/etc/ood/config/apps/myjobs/templates/{{ item.name }}"
+    path: "/etc/ood/config/apps/myjobs/templates/"
     state: directory
     recurse: True
     owner: root
     group: root
     mode: o=rwX,go=rX
-  loop: "{{ openondemand_job_templates }}"
-
-- name: Create job template metadata files
-  template:
-    src: job_manifest.yml.j2
-    dest: "/etc/ood/config/apps/myjobs/templates/{{ item.name }}/manifest.yml"
-    owner: root
-    group: root
-    mode: o=rw,go=r
-  loop: "{{ openondemand_job_templates }}"
-
-- name: Include vars for job template scripts
-  include_vars: "{{ item.vars_file }}"
-  loop: "{{ openondemand_job_templates }}"
-  when: "'vars_file' in item"
-
-- name: Create job template scripts
-  template:
-    src: "{{ item.script }}"
-    dest: "/etc/ood/config/apps/myjobs/templates/{{ item.name }}/{{ item.script | basename }}"
-    owner: root
-    group: root
-    mode: o=rw,go=r
-  loop: "{{ openondemand_job_templates }}"
 
 - name: Copy web page to let users create their home directory
   copy:
