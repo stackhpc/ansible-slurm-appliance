@@ -52,8 +52,9 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 ### Other
 The [osc.ood](https://github.com/OSC/ood-ansible) role has some varibles 
 
-- `openondemand_clusters`: Synonym for the `osc.ood: clusters` [variable](https://github.com/OSC/ood-ansible#clusters).
+- `openondemand_clusters`: Synonym for the `osc.ood: clusters` [variable](https://github.com/OSC/. ood-ansible#clusters). Default: empty mapping.
 
+- `openondemand_servername`: Optional. Synonym for the `osc.ood: servername` [variable](servername) but with default of empty string rather than `localhost`. This defines the `ServerName` for the Open Ondemand [name-based virtual host](https://httpd.apache.org/docs/current/mod/core.html#servername) and should therefore be the address the user goes to, e.g. `ondemand.mysite.org`. The empty string default set in this role is appropriate if accessing the Open Ondemand server by IP rather than hostname.
 
 Dependencies
 ------------

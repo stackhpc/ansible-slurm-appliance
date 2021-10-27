@@ -29,6 +29,8 @@ openondemand_oidc_crypto_passphrase: # Random string, should be vault-protected
 openondemand_oidc_remote_user_claim: preferred_username
 openondemand_oidc_scope: openid profile preferred_username
 
+openondemand_servername: ''
+
 # keys here are osc.ood vars - override using the osc.odd var name in inventory
 openondemand_oidc_defaults:
   oidc_uri: /oidc # has to be set separately to trigger oidc integration!
@@ -52,6 +54,7 @@ openondemand_osc_ood_defaults:
 
   # Synonyms:
   clusters: "{{ openondemand_clusters }}"
+  servername: "{{ openondemand_servername }}"
 
   # Enable SSL by default:
   httpd_port: 443
