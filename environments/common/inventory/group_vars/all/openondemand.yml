@@ -59,9 +59,10 @@ ood_install_apps:
     dest: "{{ ood_sys_app_dir }}"  # defaults (optional)
     version: master                # defaults (optional)
 
-ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
-# see https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
-  bc_desktop: # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop # TODO: only add this when hosts in openondemand_vnc?
+# https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
+# also https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
+openondemand_apps_desktop:
+  bc_desktop:
     title: Remote Desktop
     description: Request a desktop to run GUI applications.
     cluster: slurm
@@ -92,20 +93,8 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
           - <%= "--nodes=1" %>
           - <%= "--ntasks=#{num_cores}" %>
           - <%= "--nodelist=#{node}" %>
-  files:
-    env:
-      ood_shell: ""
-  shell:
-    env:
-      ood_shell_origin_check: "off" # "http://{{ openondemand_servername }}"
-  dashboard:
-    env:
-      motd_path: /etc/motd
-      motd_format: markdown
-      ood_dashboard_support_url: "{{ openondemand_dashboard_support_url }}"
-      ood_dashboard_docs_url: "{{ openondemand_dashboard_docs_url }}"
-      ood_brand_bg_color: "#0e6ec8"
-      ood_dashboard_title: "{{ openhpc_cluster_name }}"
+
+openondemand_apps_jupyter:
   jupyter:
     title: Jupyter Notebook
     description: Request a Jupyter Notebook server
@@ -136,6 +125,26 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
           - <%= "--nodes=1" %>
           - <%= "--ntasks=#{num_cores}" %>
           - <%= "--nodelist=#{node}" %>
+
+# osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
+ood_apps:
+  files:
+    env:
+      ood_shell: ""
+  shell:
+    env:
+      ood_shell_origin_check: "off" # "http://{{ openondemand_servername }}"
+  dashboard:
+    env:
+      motd_path: /etc/motd
+      motd_format: markdown
+      ood_dashboard_support_url: "{{ openondemand_dashboard_support_url }}"
+      ood_dashboard_docs_url: "{{ openondemand_dashboard_docs_url }}"
+      ood_brand_bg_color: "#0e6ec8"
+      ood_dashboard_title: "{{ openhpc_cluster_name }}"
+  jupyter: "{{ openondemand_apps_jupyter.jupyter if openondemand_jupyter_partition else omit }}"
+  bc_desktop: "{{ openondemand_apps_desktop.bc_desktop if openondemand_desktop_partition else omit }}"
+
     
 # Prometheus config for Open Ondemand exporter
 # https://osc.github.io/ood-documentation/latest/monitoring/prometheus.html#prometheus-configuration

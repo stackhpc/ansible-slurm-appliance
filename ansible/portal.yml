@@ -9,10 +9,10 @@
         name: openondemand
         tasks_from: main.yml
 
-- hosts: openondemand_vnc
+- hosts: openondemand_desktop
   tags:
     - openondemand
-    - openondemand_vnc
+    - openondemand_desktop
   become: yes
   gather_facts: yes
   tasks:
