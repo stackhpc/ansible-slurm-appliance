@@ -34,6 +34,7 @@ grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if 
 grafana_security:
     admin_user: grafana
     admin_password: "{{ vault_grafana_admin_password }}"
+    allow_embedding: true
 
 grafana_datasources:
   - name: prometheus
