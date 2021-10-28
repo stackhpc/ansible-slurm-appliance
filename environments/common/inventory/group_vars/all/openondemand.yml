@@ -43,8 +43,7 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
 # see https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
   bc_desktop: # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop # TODO: only add this when hosts in openondemand_vnc?
     title: Remote Desktop
-    description: |
-      Request a desktop to run GUI applications.
+    description: Request a desktop to run GUI applications.
     cluster: slurm
     form:
       - desktop
@@ -89,7 +88,7 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
       ood_dashboard_title: "{{ openhpc_cluster_name }}"
   jupyter:
     title: Jupyter Notebook
-    description: Request a Jupyter Notebook
+    description: Request a Jupyter Notebook server
     cluster: slurm
     form:
       - modules
