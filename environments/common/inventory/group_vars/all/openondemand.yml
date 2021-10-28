@@ -124,7 +124,7 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
       modules: ""
       extra_jupyter_args: ""
       bc_queue:
-        value: "{{ openondemand_desktop_partition }}" # TODO: somewhere else??
+        value: "{{ openondemand_jupyter_partition }}"
       node: ""
     submit: |
       ---

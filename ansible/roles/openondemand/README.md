@@ -43,7 +43,8 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 ### Dashboard and application configuration
 - `openondemand_dashboard_support_url`: Optional. URL or email etc to show as support contact under Help in dashboard. Default `(undefined)`.
 - `openondemand_dashboard_docs_url`: Optional. URL of docs to show under Help in dashboard. Default `(undefined)`.
-- `openondemand_desktop_partition`: Required. Name of Slurm partition to use for remote desktops and Jupyter Notebook servers. TODO: separate these and make optional.
+- `openondemand_desktop_partition`: Required. Name of Slurm partition to use for remote desktops. TODO: make optional.
+- `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers. TODO: make optional.
 - `openondemand_filesapp_paths`: List of paths (in addition to $HOME, which is always added) to include shortcuts to within the Files dashboard app.
 
 ### Monitoring
