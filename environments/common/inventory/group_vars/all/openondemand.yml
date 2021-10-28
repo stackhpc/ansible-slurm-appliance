@@ -87,9 +87,6 @@ ood_apps: # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
       ood_dashboard_docs_url: "{{ openondemand_dashboard_docs_url }}"
       ood_brand_bg_color: "#0e6ec8"
       ood_dashboard_title: "{{ openhpc_cluster_name }}"
-      ood_dashboard_logo: /var/www/ood/public/logo.png
-      ood_dashboard_headr_img_logo: /var/www/ood/public/logo.png
-      ood_dashboard_logo_height: 200px
   jupyter:
     title: Jupyter Notebook
     description: Request a Jupyter Notebook
