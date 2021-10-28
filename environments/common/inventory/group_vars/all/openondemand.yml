@@ -5,7 +5,7 @@
 
 # --- this section is appliance-specific, not in the openondemamd role --- #
 # The address of grafana, as seen from the browser - NB if ssh proyxing into grafana this might be `localhost`!
-openondemand_grafana_iframe_host: "http://{{ grafana_address }}:{{ grafana_port | default('3000')" # port default from roles/cloudalchemy.grafana
+openondemand_grafana_iframe_host: "http://{{ grafana_address }}:{{ grafana_port | default('3000') }}" # port default from roles/cloudalchemy.grafana
 # --- end of appliance-specific section --- #
 
 openondemand_clusters:
