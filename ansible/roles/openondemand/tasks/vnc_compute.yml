@@ -45,14 +45,6 @@
     state: link
 
 - name: Disable screensaver # as users might not have passwords
-  # see SERVERFLAGS under https://www.x.org/releases/current/doc/man/man5/xorg.conf.5.xhtml - won't have DPMS
-  copy:
-    dest: /etc/X11/xorg.conf.d/30-screensaver.conf
-    content: |
-      Section "ServerFlags"
-        Option    "BlankTime" "0"
-      EndSection
-    owner: root
-    group: root
-    mode: u=rw,go=r
-
+  file:
+    path: /etc/xdg/autostart/xfce4-screensaver.desktop 
+    state: absent
