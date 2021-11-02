@@ -85,7 +85,7 @@
   become: true
   tags:
     - openondemand
-    - openondemand_node
+    - openondemand_server
   tasks:
     - import_role:
         name: openondemand
