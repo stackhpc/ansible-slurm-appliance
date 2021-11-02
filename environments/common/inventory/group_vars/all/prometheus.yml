@@ -47,4 +47,4 @@ prometheus_scrape_configs_default:
   scrape_interval: 30s
   scrape_timeout: 20s
 
-prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups.get('openondemand') else []) }}"
+prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"
