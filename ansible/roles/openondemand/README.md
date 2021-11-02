@@ -37,17 +37,17 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 - `openondemand_ssl_cert_key`: Optional. Default `/etc/pki/tls/private/localhost.key`
 
 ### Dashboard and application configuration
-- `openondemand_dashboard_support_url`: Optional. URL or email etc to show as support contact under Help in dashboard. Default `(undefined)`.
 - `openondemand_dashboard_docs_url`: Optional. URL of docs to show under Help in dashboard. Default `(undefined)`.
+- `openondemand_dashboard_support_url`: Optional. URL or email etc to show as support contact under Help in dashboard. Default `(undefined)`.
 - `openondemand_desktop_partition`: Optional. Name of Slurm partition to use for remote desktops. Requires a corresponding group named "openondemand_desktop" and entry in openhpc_slurm_partitions.
-- `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers. Requires a corresponding group named "openondemand_jupyter" and entry in openhpc_slurm_partitions.
 - `openondemand_filesapp_paths`: List of paths (in addition to $HOME, which is always added) to include shortcuts to within the Files dashboard app.
+- `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers. Requires a corresponding group named "openondemand_jupyter" and entry in openhpc_slurm_partitions.
 
 ### Monitoring
 - `openondemand_monitoring`: Optional. Install the Prometheus [ondemand_exporter](https://github.com/OSC/ondemand_exporter) on the `openondemand` node to export metrics about Open Ondemand itself. Default `true`.
 
 ### Other
-The [osc.ood](https://github.com/OSC/ood-ansible) role has some varibles 
+This role provides synonoyms for some additional [osc.ood](https://github.com/OSC/ood-ansible) role variables: 
 
 - `openondemand_clusters`: Synonym for the `osc.ood: clusters` [variable](https://github.com/OSC/. ood-ansible#clusters). Default: empty mapping.
 
