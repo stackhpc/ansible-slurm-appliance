@@ -25,7 +25,7 @@ openondemand_filesapp_paths: []
 openondemand_jupyter_partition: ''
 
 # Monitoring:
-openondemand_monitoring: true
+openondemand_exporter: true
 
 # Synonyms for osc:ood role vars:
 openondemand_clusters: {} # synonym for osc.ood:clusters

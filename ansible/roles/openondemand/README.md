@@ -44,7 +44,7 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 - `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers. Requires a corresponding group named "openondemand_jupyter" and entry in openhpc_slurm_partitions.
 
 ### Monitoring
-- `openondemand_monitoring`: Optional. Install the Prometheus [ondemand_exporter](https://github.com/OSC/ondemand_exporter) on the `openondemand` node to export metrics about Open Ondemand itself. Default `true`.
+- `openondemand_exporter`: Optional. Install the Prometheus [ondemand_exporter](https://github.com/OSC/ondemand_exporter) on the `openondemand` node to export metrics about Open Ondemand itself. Default `true`.
 
 ### Other
 This role provides synonoyms for some additional [osc.ood](https://github.com/OSC/ood-ansible) role variables: 
