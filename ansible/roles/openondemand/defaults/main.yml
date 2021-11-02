@@ -71,7 +71,7 @@ openondemand_osc_ood_defaults:
   # User mapping:
   user_map_cmd: "{{ '/opt/ood/ood_auth_map/bin/ood_auth_map.mapfile' if openondemand_mapping_users else omit }}"
 
-  # TODO: auth
+  # Auth:
   oidc_uri: "{{ openondemand_oidc_defaults['oidc_uri'] if openondemand_auth == 'oidc' else omit }}"
   ood_auth_openidc: "{{ openondemand_oidc_defaults['ood_auth_openidc'] if openondemand_auth == 'oidc' else omit }}"
   httpd_auth: "{{ openondemand_oidc_defaults['httpd_auth'] if openondemand_auth == 'oidc' else omit }}"

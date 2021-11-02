@@ -68,13 +68,6 @@
     mode: u=rw,g=r,o=
   when: openondemand_mapping_users
 
-# don't think we actually want to *DEFINE* the MOTD from this role.
-# However the openondemand_ood_apps.dashboard.env.motd_path variables are probably useful.
-# - name: Copy motd
-#   template:
-#     src: motd
-#     dest: /etc/motd
-
 # - name: Ensure ondemand-dex is running and active
 #   service:
 #     name: ondemand-dex
@@ -82,32 +75,10 @@
 #     state: stopped
 #   when: false
 
-# # TODO: make generic
-# - name: Copy UM6P Brand images
+# - name: Copy site images
 #   copy:
 #     src: ansible/roles/openondemand/ondemand
 #     dest: "{{ item }}"
 #   loop:
 #     - /var/www/ood/public
 #     - /usr/share/ondemand-dex/web/themes/
-
-# - name: Force ondemand scripts to use the right locale
-#   copy:
-#     content: |
-#       LANG=en_US.UTF8
-#       # TODO(gb637) this is not nice, not pretty. we need a better solution.
-#       # remove this snippet.
-#       for user in $(getent group hpc-users | cut -d: -f4 | tr ',' ' ' ); do
-#         test -d /home/$user || su -l $user -c exit
-#       done
-#     dest: /etc/ood/profile
-
-#   # TODO(gb637) make this automatic
-# TODO: will be needed if openondemand host is NOT the same as the login node
-# - name: Add ssh_known_hosts for login node
-#   copy:
-#     content: |
-#       slurm-login-h23d5-u38-svn1,10.43.1.5 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLRzrCQ/iZYBgpWrdn4o3IdJCuXuAUQHbAllc2jEAtTrnVFL3llhexHpNTAo4Kmw40UCv+/1cSHGieBrsH8i0Ec=
-#     dest: /etc/ssh/ssh_known_hosts
-#   when: false
-
