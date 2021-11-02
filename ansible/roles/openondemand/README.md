@@ -4,10 +4,6 @@ Install and configure the [Open Ondemand](https://osc.github.io/ood-documentatio
 
 This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to provide much of the functionality.
 
-## TODOs
-- Support PAM auth (as default when basic_users available??): https://osc.github.io/ood-documentation/latest/authentication/pam.html
-- Support ways other than `openondemand_mapping_users` of setting [user mappings](https://osc.github.io/ood-documentation/latest/authentication/overview/map-user.html).
-
 ## Requirements
 
 - The `openondemand` node, i.e. the node which will host the Open Ondemand server/portal must:
@@ -18,15 +14,15 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 ## Role Variables
 
 ### Authentication
-See [Authentication](https://osc.github.io/ood-documentation/latest/authentication/overview.html) for an overview of the Open Ondemand authentication process.
+See the Open Ondemand [Authentication docs](https://osc.github.io/ood-documentation/latest/authentication/overview.html) for an overview of the authentication process.
 
 - `openondemand_auth`: Required. Authentication method. Currently only `oidc` is supported.
-- `openondemand_mapping_users`: Required. A list of dicts defining users to map (TODO ADD DOCS REFERENCE). Each dict should have keys as follows:
+- `openondemand_mapping_users`: Required. A list of dicts defining mappings between remote authenticated usernames and local system usernames - see the Open Ondemand [user mapping docs](https://osc.github.io/ood-documentation/latest/authentication/overview/map-user.html). Each dict should have the following keys:
   - `name`: A local (existing) user account
-  - `openondemand_username`: The remote authenticated username. See also `openondemand_oidc_remote_user_claim` if using OIDC authentication
+  - `openondemand_username`: The remote authenticated username. See also `openondemand_oidc_remote_user_claim` if using OIDC authentication.
 
 #### OIDC authentication
-The following variables are active with `openondemand_auth` set to `oidc`. This role uses the below plus a few required defaults to set the `osc.ood: ood_auth_openidc` [variable](https://github.com/OSC/ood-ansible#open-id-connect) - if the below is insufficent to correctly configure OIDC then set `ood_auth_openidc` directly.
+The following variables are active when `openondemand_auth` is `oidc`. This role uses the variables below plus a few required defaults to set the `osc.ood: ood_auth_openidc` [variable](https://github.com/OSC/ood-ansible#open-id-connect) - if the below is insufficent to correctly configure OIDC then set `ood_auth_openidc` directly.
 - `openondemand_oidc_redirect_hostname`: Required. The (external, as seen from the browser) hostname/IP which the OIDC provider should redirect the browser back to after authenticating, i.e. for the `openondemand` node.
 - `openondemand_oidc_client_id`: Required. Client ID, as specified by the OIDC provider
 - `openondemand_oidc_client_secret`: Required. Client secret, as specified the OIDC provider (should be vault-protected).
@@ -57,24 +53,24 @@ The [osc.ood](https://github.com/OSC/ood-ansible) role has some varibles
 
 - `openondemand_servername`: Optional. Synonym for the `osc.ood: servername` [variable](servername) but with default of empty string rather than `localhost`. This defines the `ServerName` for the Open Ondemand [name-based virtual host](https://httpd.apache.org/docs/current/mod/core.html#servername) and should therefore be the address the user goes to, e.g. `ondemand.mysite.org`. The empty string default set in this role is appropriate if accessing the Open Ondemand server by IP rather than hostname.
 
-Dependencies
-------------
+# Dependencies
 
 - `osc.ood` role as described above.
 
 - Note the `osc.ood: servername` variable is important, and has a default of "localhost" - this misconfigures name-based virtual hosting if using ip address and in this case you must set `servername:` to effectively undefine it.
 
-Example Playbook
-----------------
+# Example Playbook
 
 See `ansible/portal.yml`. Note the `main` playbook should be run on the `openondemand` node (i.e. the node to configure as hosting the Open Ondemand server/portal), and the other playbooks should be run on some subset of the `compute` group.
 
-License
--------
+# License
 
 Apache v2
 
-Author Information
-------------------
+# Author Information
 
 Stackhpc Ltd.
+
+# TODOs
+- Support PAM auth (as default when `basic_users` is enabled?): https://osc.github.io/ood-documentation/latest/authentication/pam.html
+- Support ways other than `openondemand_mapping_users` of setting [user mappings](https://osc.github.io/ood-documentation/latest/authentication/overview/map-user.html).
