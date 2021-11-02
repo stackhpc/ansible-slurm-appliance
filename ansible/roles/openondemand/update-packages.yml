@@ -1,7 +1,0 @@
-- name: Updates
-  hosts: cluster
-  tasks:
-    - package:
-        name: "*"
-        state: latest
-      become: true
