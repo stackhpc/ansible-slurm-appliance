@@ -47,3 +47,22 @@
         name: stackhpc.slurm_openstack_tools.rebuild
         tasks_from: validate.yml
       tags: validate
+
+- name: Validate openondemand configuration
+  hosts:
+    - openondemand
+    - grafana
+  gather_facts: false
+  tags:
+    - openondemand
+    - openondemand_server
+    - grafana
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: validate.yml
+      when: groups['openondemand'] | length > 0
+      tags:
+        - openondemand
+        - openondemand_server
+        - grafana

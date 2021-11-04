@@ -1,0 +1,4 @@
+- name: Check Open Ondemand servername is defined
+  assert:
+    that: openondemand_servername != ''
+    fail_msg: "Variable `openondemand_servername` must be set on openondemand and (by default) grafana hosts. See ansible/roles/openondemand/README.md"
