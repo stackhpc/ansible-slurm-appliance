@@ -11,7 +11,7 @@ volumes=${jsonencode(volumes)}
 
 [login]
 %{ for login in logins ~}
-${login.name} instance_id=${login.id} ansible_host=${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]} networks='${jsonencode({for net in login.network: net.name => net.fixed_ip_v4 })}'
+${login.name} instance_id=${login.id} ansible_host=${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]} floating_ip=${fips[login.name]} networks='${jsonencode({for net in login.network: net.name => net.fixed_ip_v4 })}'
 %{ endfor ~}
 
 [compute]

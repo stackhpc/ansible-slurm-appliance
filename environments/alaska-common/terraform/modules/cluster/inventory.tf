@@ -4,6 +4,7 @@ resource "local_file" "hosts" {
                             "cluster_name": var.cluster_name
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.login,
+                            "fips": { for name, fip in data.openstack_networking_floatingip_v2.logins : "${var.cluster_name}-${name}" => fip.address}
                             "computes": openstack_compute_instance_v2.compute,
                             "compute_types": var.compute_types,
                             "compute_nodes": var.compute_nodes,
