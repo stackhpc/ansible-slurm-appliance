@@ -9,6 +9,17 @@
     - include_role:
         name:  geerlingguy.mysql
 
+- name: Modify lmod-ohpc package
+  hosts: openondemand:&openhpc
+  tags:
+    - openhpc
+    - openondemand
+    - install
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: lmod-ohpc.yml
+
 - name: Setup slurm
   hosts: openhpc
   become: yes

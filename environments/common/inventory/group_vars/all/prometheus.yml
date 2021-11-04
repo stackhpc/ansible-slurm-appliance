@@ -16,7 +16,7 @@ prometheus_alert_rules: []
 prometheus_targets:
   node: "{{ groups.get('node_exporter', []) | reject('equalto', 'localhost') | prometheus_node_exporter_targets }}"
 
-prometheus_scrape_configs:
+prometheus_scrape_configs_default:
 - job_name: "prometheus"
   metrics_path: "/metrics"
   static_configs:
@@ -25,7 +25,7 @@ prometheus_scrape_configs:
 - job_name: "grafana"
   static_configs:
   - targets:
-    - "{{ grafana_address }}:3000"
+    - "{{ grafana_api_address }}:{{ grafana_port }}"
 - job_name: "node"
   file_sd_configs:
   - files:
@@ -39,3 +39,5 @@ prometheus_scrape_configs:
     replacement:   '${1}'
   scrape_interval: 15s
   scrape_timeout: 5s
+
+prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"

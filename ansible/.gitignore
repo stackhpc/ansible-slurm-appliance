@@ -28,3 +28,5 @@ roles/*
 !roles/block_devices/**
 !roles/basic_users/
 !roles/basic_users/**
+!roles/openondemand/
+!roles/openondemand/**

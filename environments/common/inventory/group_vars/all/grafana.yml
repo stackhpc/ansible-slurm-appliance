@@ -3,7 +3,21 @@
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
 
-grafana_dashboards:
+# need to copy some role defaults here so we can use in inventory:
+grafana_port: 3000
+
+# Configure internal address & URL - note "api" means "internal" to cloudalchemy.grafana but "external" to appliance:
+grafana_api_address: "{{ hostvars[groups['grafana'].0].internal_address }}"
+grafana_api_url: "http://{{ grafana_api_address }}:{{ grafana_port }}"
+
+# Configure external address, with external URL depending on whether we are using Open Ondemand as a proxy
+grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
+grafana_url_direct: "http://{{ grafana_address }}:{{ grafana_port }}"
+grafana_url_openondemand_proxy: "https://{{ openondemand_servername }}/node/{{ groups['grafana'].0 }}/{{ grafana_port }}"
+grafana_url: "{{ grafana_url_openondemand_proxy if groups['openondemand'] | count > 0 else grafana_url_direct }}"
+grafana_serve_from_sub_path: "{{ groups['openondemand'] | count > 0 }}"
+
+grafana_dashboards_default:
   # node exporter slurm:
   - dashboard_id: 13427
     replacements:
@@ -29,9 +43,12 @@ grafana_dashboards:
         replacement: slurmstats
     revision_id: 1
 
+grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
+
 grafana_security:
     admin_user: grafana
     admin_password: "{{ vault_grafana_admin_password }}"
+    allow_embedding: true
 
 grafana_datasources:
   - name: prometheus
@@ -47,3 +64,17 @@ grafana_datasources:
     time_field: "@timestamp"
     database: "filebeat-*"
     es_version: 70
+
+# want to set grafana_server.serve_from_sub_path if have Open Ondemand to proxy:
+grafana_server:
+  # role defaults:
+  protocol: http
+  enforce_domain: false
+  socket: ""
+  cert_key: ""
+  cert_file: ""
+  enable_gzip: false
+  static_root_path: public
+  router_logging: false
+  # appliance specific:
+  serve_from_sub_path: "{{ grafana_serve_from_sub_path }}"

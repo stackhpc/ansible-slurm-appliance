@@ -1,0 +1,127 @@
+# Installs a patched version of lmod-ohpc which fixes https://github.com/openhpc/ohpc/issues/1346
+# Using root or not is pretty critical so is explicitly specified on all tasks to override caller.
+
+- name: Check on CentOS 8
+  assert:
+    that: 'ansible_distribution_major_version == "8"'
+    fail_msg: "ansible_distribution_major_version was {{ ansible_distribution_major_version}}, expected 8"
+  become: false
+
+- name: Install ohpc-release package
+  dnf:
+    name: http://repos.openhpc.community/OpenHPC/2/CentOS_8/x86_64/ohpc-release-2-1.el8.x86_64.rpm # is for all 2.x releases
+    state: present
+    disable_gpg_check: true
+  become: true
+
+- name: Find CentOS8 PowerTools repo
+  find:
+    paths: /etc/yum.repos.d
+    patterns: CentOS-*PowerTools.repo
+  register: powertools
+  become: true
+
+- name: Enable CentOS8 PowerTools repo
+  # NB: doesn't run command  `dnf config-manager --set-enabled PowerTools` as can't make that idempotent
+  lineinfile:
+    path: "{{ powertools.files[0].path }}" # 8.2: /etc/yum.repos.d/CentOS-PowerTools.repo 8.3: /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
+    create: false # raises error if not already installed
+    regexp: enabled=
+    line: enabled=1
+  become: true
+
+- name: Install RPM build tools
+  dnf:
+    name:
+      - make
+      - gcc
+      - rpm-build
+      - redhat-rpm-config
+      - yum-utils
+    state: present
+  become: true
+
+- name: Install lmod-ohpc build dependencies
+  dnf:
+    name:
+      - lua
+      - lua-devel
+      - lua-filesystem
+      - lua-posix
+      - tcl
+      - tcl-devel
+  become: true
+
+- name: Create build directories
+  file:
+    path: ~/rpmbuild/{{ item }}
+    state: directory
+  loop:
+    - BUILD
+    - RPMS
+    - SOURCES
+    - SPECS
+    - SRPMS
+  become: false
+
+- name: Create ~./rpmmacros
+  lineinfile:
+    path: ~/.rpmmacros
+    regexp: '%_topdir %\(echo \$HOME\)\/rpmbuild'
+    line: '%_topdir %(echo $HOME)/rpmbuild'
+    create: true
+  become: false
+
+- name: Get ansible_user info
+  # Workaround problem that ansible_env.HOME depends on which user ran facts - so e.g. running site.yml it's /root and when running slurm.yml it's /var/lib/centos. Mad.
+  user:
+    name: "{{ ansible_user }}"
+  register: ansible_user_info
+
+- name: Download lmod-ohpc source package
+  command:
+    cmd: yumdownloader --source lmod-ohpc-8.2.10-15.1.ohpc.2.0
+    chdir: "{{ ansible_user_info.home }}"
+    creates: lmod-ohpc-8.2.10-15.1.ohpc.2.0.src.rpm
+  become: false
+
+- name: Unpack lmod-ohpc source package
+  command:
+    cmd: rpm -i ./lmod-ohpc-8.2.10-15.1.ohpc.2.0.src.rpm
+    chdir: "{{ ansible_user_info.home }}"
+    creates: rpmbuild/SPECS/lmod.spec
+  become: false
+
+- name: Modify spec
+  # https://github.com/openhpc/ohpc/issues/1346
+  blockinfile:
+    dest: ~/rpmbuild/SPECS/lmod.spec
+    insertafter: "{{ item.after }}"
+    block: "{{ item.block }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.number }}"
+  loop:
+    - number: 0
+      after: '%{__mkdir_p} \${RPM_BUILD_ROOT}\/%{_docdir}'
+      block: |
+        #install a modulecmd soft link
+        # to allow use of scl-utils, among other dependencies
+        %{__mkdir_p} %{buildroot}/%{_bindir}
+        %{__ln_s} %{OHPC_ADMIN}/lmod/lmod/libexec/lmod %{buildroot}/%{_bindir}/modulecmd
+    - number: 1
+      after: '%doc License README\.md README_lua_modulefiles\.txt INSTALL'
+      block: '%{_bindir}/modulecmd'
+  become: false
+
+- name: Rebuild lmod-ohpc
+  command:
+    cmd: rpmbuild -ba lmod.spec
+    chdir: "{{ ansible_user_info.home }}/rpmbuild/SPECS"
+    creates: ~/rpmbuild/RPMS/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm
+  become: false
+
+- name: Install modified lmod-ohpc
+  dnf:
+    name: "{{ ansible_user_info.home }}/rpmbuild/RPMS/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm"
+    state: present
+    disable_gpg_check: true
+  become: true

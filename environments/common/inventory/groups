@@ -83,3 +83,13 @@ cluster
 
 [basic_users]
 # Add `openhpc` group to add slurm users via creation of users on each node.
+
+[openondemand]
+# Hosts to run Open Ondemand on TODO: guidance
+# TODO: add advice on hosts (login?) and links!
+
+[openondemand_desktop]
+# Subset of compute to run a interactive desktops on via Open Ondemand
+
+[openondemand_jupyter]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
