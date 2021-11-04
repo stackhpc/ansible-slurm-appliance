@@ -30,6 +30,7 @@ openondemand_exporter: true
 # Synonyms for osc:ood role vars:
 openondemand_clusters: {} # synonym for osc.ood:clusters
 openondemand_servername: ''
+openondemand_host_regex:
 
 # Defaults for OIDC auth - keys are osc.ood vars & can be overriden using the osc.odd var name in inventory
 openondemand_oidc_defaults:
@@ -55,6 +56,9 @@ openondemand_osc_ood_defaults:
   # Synonyms:
   clusters: "{{ openondemand_clusters }}"
   servername: "{{ openondemand_servername }}"
+  host_regex: "{{ openondemand_host_regex }}"
+  node_uri: "{{ '/node' if openondemand_host_regex else none }}"
+  rnode_uri: "{{ '/rnode' if openondemand_host_regex else none }}"
 
   # Enable SSL by default:
   httpd_port: 443

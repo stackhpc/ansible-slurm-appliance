@@ -51,7 +51,6 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 - `openondemand_filesapp_paths`: List of paths (in addition to $HOME, which is always added) to include shortcuts to within the Files dashboard app.
 - `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers. Requires a corresponding group named "openondemand_jupyter" and entry in openhpc_slurm_partitions.
 
-
 ### Monitoring
 - `openondemand_exporter`: Optional. Install the Prometheus [ondemand_exporter](https://github.com/OSC/ondemand_exporter) on the `openondemand` node to export metrics about Open Ondemand itself. Default `true`.
 
@@ -59,8 +58,8 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 This role provides synonoyms for some additional [osc.ood](https://github.com/OSC/ood-ansible) role variables: 
 
 - `openondemand_clusters`: Required. Synonym for the `osc.ood: clusters` [variable](https://github.com/OSC/. ood-ansible#clusters). Default: empty mapping.
-
 - `openondemand_servername`: Required. Synonym for the `osc.ood: servername` [variable](servername), defining the `ServerName` for the Open Ondemand [name-based virtual host](https://httpd.apache.org/docs/current/mod/core.html#servername). This should be the IP or hostname(+domain) part of the URL used to access Open Ondemand in the browser, e.g. `ondemand.mysite.org`.
+- `openondemand_host_regex`: Synomyn for the `osc.ood: host_regex` [variable](https://osc.github.io/ood-documentation/latest/app-development/interactive/setup/enable-reverse-proxy.html). A Python regex matching cluster hostnames which Open Ondemand should proxy. Required to proxy Grafana from control node or to run interactive apps such as remote desktop or Jupyter notebook server. Note the osc.ood variables `node_uri` and `rnode_uri` are set automatically if this is added.
 
 # Dependencies
 
