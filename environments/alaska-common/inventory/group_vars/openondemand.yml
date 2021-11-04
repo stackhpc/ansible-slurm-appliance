@@ -4,8 +4,6 @@ openondemand_filesapp_paths:
 
 openondemand_dashboard_support_url: mailto:alaska-support@stackhpc.com
 openondemand_dashboard_docs_url: https://confluence.skatelescope.org/display/SE/Computing+Resources+-+AlaSKA+on+Arcus
-openondemand_desktop_partition: small
-openondemand_jupyter_partition: small
 
 # Enable OIDC authentication using IRIS-IAM:
 openondemand_auth: oidc

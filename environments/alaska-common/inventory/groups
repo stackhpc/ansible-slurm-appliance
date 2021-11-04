@@ -55,3 +55,12 @@ login
 [mofed:children]
 # Include control as this is NFS server
 # Currently using inbox though
+
+[openondemand:children]
+login
+
+[openondemand_desktop:children]
+alaska_small
+
+[openondemand_jupyter:children]
+alaska_small
