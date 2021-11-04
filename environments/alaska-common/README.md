@@ -27,6 +27,7 @@ This assumes the following already exist:
 - An RDMA-capable network named "WCDC-iLab-60", containing a direct-type port "alaska-prod-slurmctl-rdma" for the slurm control node.
 - A security group "SSH" allowing inbound ssh.
 - A security group "NFS" allowing inbound NFS (as the K8s cluster mounts the filesystems exported by the Slurm control node)
+- A security group "HTTPS" allowing inbound HTTPS.
 - Cinder volumes `alaska-home` (will be mounted as `/home` on control node and subsequently NFS-exported to all nodes) and `alaska-slurmctld-state` (will be mounted as `/mnt/slurmctld` on control node).
 
 0. Create IP addresses:

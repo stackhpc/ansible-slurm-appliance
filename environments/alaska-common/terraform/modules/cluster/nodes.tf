@@ -41,7 +41,7 @@ resource "openstack_compute_instance_v2" "login" {
   image_name = each.value.image
   flavor_name = each.value.flavor
   key_pair = var.key_pair
-  security_groups = ["default", "SSH"]
+  security_groups = ["default", "SSH", "HTTPS"]
 
   network {
     uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
