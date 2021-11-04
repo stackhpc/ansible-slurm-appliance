@@ -127,7 +127,7 @@ ood_apps:
       ood_shell: ""
   shell:
     env:
-      ood_shell_origin_check: "off" # "http://{{ openondemand_servername }}"
+      ood_shell_origin_check: "https://{{ openondemand_servername }}"
   dashboard:
     env:
       motd_path: /etc/motd
