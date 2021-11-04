@@ -41,3 +41,15 @@ cluster
 
 [basic_users]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
+
+[openondemand]
+# Host to run Open Ondemand server on - subset of login
+login
+
+[openondemand_desktop]
+# Subset of compute to run a interactive desktops on via Open Ondemand
+compute
+
+[openondemand_jupyter]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+compute

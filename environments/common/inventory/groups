@@ -82,8 +82,7 @@ cluster
 # Add `openhpc` group to add slurm users via creation of users on each node.
 
 [openondemand]
-# Hosts to run Open Ondemand on TODO: guidance
-# TODO: add advice on hosts (login?) and links!
+# Host to run Open Ondemand server on - subset of login
 
 [openondemand_desktop]
 # Subset of compute to run a interactive desktops on via Open Ondemand
