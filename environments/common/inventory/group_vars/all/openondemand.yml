@@ -2,12 +2,6 @@
 ## TODO: maybe we should arrange it following the osc.github.io docs
 ## NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
-
-# --- this section is appliance-specific, not in the openondemamd role --- #
-# The address of grafana, as seen from the browser - NB if ssh proyxing into grafana this might be `localhost`!
-openondemand_grafana_iframe_host: "http://{{ grafana_address }}:{{ grafana_port | default('3000') }}" # port default from roles/cloudalchemy.grafana
-# --- end of appliance-specific section --- #
-
 openondemand_clusters:
   slurm:
     v2:
@@ -40,7 +34,7 @@ openondemand_clusters:
       custom:
         # embed grafana panels in Jobs app: https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
         grafana:
-          host: "{{ openondemand_grafana_iframe_host }}"
+          host: "{{ grafana_url }}"
           orgId: 1
           dashboard:
             name: "node-exporter-slurm"

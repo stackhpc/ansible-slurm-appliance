@@ -5,7 +5,6 @@ openondemand_auth:
 openondemand_mapping_users: []
 
 ## Variables for `openondemand_auth=oidc` :
-openondemand_oidc_redirect_hostname:
 openondemand_oidc_client_id:
 openondemand_oidc_client_secret:
 openondemand_oidc_provider_url:
@@ -35,7 +34,7 @@ openondemand_servername: ''
 openondemand_oidc_defaults:
   oidc_uri: /oidc # has to be set separately to trigger oidc integration!
   ood_auth_openidc:
-    OIDCRedirectURI: "https://{{ openondemand_oidc_redirect_hostname }}/oidc"
+    OIDCRedirectURI: "https://{{ openondemand_servername }}/oidc"
     OIDCClientID: "{{ openondemand_oidc_client_id }}"
     OIDCClientSecret: "{{ openondemand_oidc_client_secret }}" # TODO: needs to be in secrets
     OIDCProviderMetadataURL: "{{ openondemand_oidc_provider_url }}/.well-known/openid-configuration"
