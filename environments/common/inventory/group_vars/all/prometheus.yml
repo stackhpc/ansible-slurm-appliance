@@ -25,7 +25,7 @@ prometheus_scrape_configs_default:
 - job_name: "grafana"
   static_configs:
   - targets:
-    - "{{ grafana_address }}:3000"
+    - "{{ grafana_api_address }}:{{ grafana_port }}"
 - job_name: "node"
   file_sd_configs:
   - files:
