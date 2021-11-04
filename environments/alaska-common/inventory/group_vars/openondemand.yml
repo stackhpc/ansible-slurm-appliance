@@ -1,0 +1,20 @@
+openondemand_mapping_users: "{{ basic_users_users }}"
+openondemand_filesapp_paths:
+  - /scratch
+
+openondemand_dashboard_support_url: mailto:alaska-support@stackhpc.com
+openondemand_dashboard_docs_url: https://confluence.skatelescope.org/display/SE/Computing+Resources+-+AlaSKA+on+Arcus
+openondemand_desktop_partition: small
+openondemand_jupyter_partition: small
+
+# Enable OIDC authentication using IRIS-IAM:
+openondemand_auth: oidc
+openondemand_oidc_client_id: 248626ed-3553-47a0-86f0-7d2b51421cb0 # TODO: needs to be in secrets
+openondemand_oidc_client_secret: ALj4EbEct1OMzx18aykn2d0Xkk0Hq3YwBoJcwQD_syhk5RrfcpfaRH0voiCXYk3RWNyxSzt5AF75ldYzQcBWBsg # TODO: needs to be in secrets
+openondemand_oidc_provider_url: https://iris-iam.stfc.ac.uk
+openondemand_oidc_crypto_passphrase: oq1uGEj5dQMmr/N9WiLGgSJbmYkUPx5jyXA/ujA1ctxpMjonFq5mP7Do5OhXyaRuEpDYsOT8RCUYO0l6c6TfZ6TY # TODO: needs to be in secrets
+openondemand_oidc_remote_user_claim: sub
+
+# Proxy config for virtual desktop:
+openondemand_host_regex: '(alaska-compute-\d+)|(alaska-control)'
+
