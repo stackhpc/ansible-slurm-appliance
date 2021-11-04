@@ -39,10 +39,18 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 
 ### Dashboard and application configuration
 - `openondemand_dashboard_docs_url`: Optional. URL of docs to show under Help in dashboard. Default `(undefined)`.
+- `openondemand_dashboard_links`: Optional. List of mappings defining additional links to add as menu items in the dashboard. Keys are:
+    - `name`: Required. User-facing name for the link.
+    - `category`: Required. Menu to add link under, either a default one (e.g. `Files`, `Jobs`, `Clusters`, `Interactive Apps`) or a new category to add.
+    - `icon`: Optional. URL of icon, defaults to Open Ondemand clock icon as used in standard menus.
+    - `url`: Required. URL of link.
+    - `new_window`: Optional. Whether to open link in new window. Bool, default `false`.
+    - `app_name`: Optional. Unique name for app appended to `/var/www/ood/apps/sys/`. Default is `name`, useful if that is not unique or not suitable as a path component.
 - `openondemand_dashboard_support_url`: Optional. URL or email etc to show as support contact under Help in dashboard. Default `(undefined)`.
 - `openondemand_desktop_partition`: Optional. Name of Slurm partition to use for remote desktops. Requires a corresponding group named "openondemand_desktop" and entry in openhpc_slurm_partitions.
 - `openondemand_filesapp_paths`: List of paths (in addition to $HOME, which is always added) to include shortcuts to within the Files dashboard app.
 - `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers. Requires a corresponding group named "openondemand_jupyter" and entry in openhpc_slurm_partitions.
+
 
 ### Monitoring
 - `openondemand_exporter`: Optional. Install the Prometheus [ondemand_exporter](https://github.com/OSC/ondemand_exporter) on the `openondemand` node to export metrics about Open Ondemand itself. Default `true`.

@@ -22,6 +22,7 @@ openondemand_dashboard_support_url: (undefined)
 openondemand_desktop_partition: ''
 openondemand_filesapp_paths: []
 openondemand_jupyter_partition: ''
+openondemand_dashboard_links: []
 
 # Monitoring:
 openondemand_exporter: true
@@ -46,7 +47,7 @@ openondemand_oidc_defaults:
   httpd_auth: # ood_portal.yml.j2
   - 'AuthType openid-connect'
   - 'Require valid-user'
-    
+
 # The below mapping is used to override osc.ood defaults. Keys are osc.ood varibale names.
 # If you need to override *these* defaults (i.e. this role's vars are not sufficent) just set the corresponding osc.ood var as normal.
 openondemand_osc_ood_defaults:

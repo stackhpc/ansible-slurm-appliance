@@ -68,6 +68,18 @@
     mode: u=rw,g=r,o=
   when: openondemand_mapping_users
 
+- name: Create app directories for dashboard links
+  file:
+    path: /var/www/ood/apps/sys/{{ item.app_name | default(item.name) }}
+    state: directory
+  loop: "{{ openondemand_dashboard_links }}"
+
+- name: Create app manifests for dashboard links
+  template:
+    src: dashboard_app_links.yml.j2
+    dest: /var/www/ood/apps/sys/{{ item.app_name | default(item.name) }}/manifest.yml
+  loop: "{{ openondemand_dashboard_links }}"
+
 # - name: Ensure ondemand-dex is running and active
 #   service:
 #     name: ondemand-dex
