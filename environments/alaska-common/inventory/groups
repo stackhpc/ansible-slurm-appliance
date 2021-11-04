@@ -60,7 +60,7 @@ login
 login
 
 [openondemand_desktop:children]
-alaska_small
+compute
 
 [openondemand_jupyter:children]
-alaska_small
+compute
