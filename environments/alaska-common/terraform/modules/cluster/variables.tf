@@ -79,7 +79,7 @@ variable "compute_types" {
       }
       full: {
           flavor: "vm.alaska.cpu.general.full"
-          image: "CentOS8-2105"
+          image: "ohpc-compute-210917-0822.qcow2"
       }
     }
 }
@@ -92,6 +92,10 @@ variable "compute_nodes" {
         compute-1: "full"
         compute-2: "full"
         compute-3: "full"
+        compute-4: "full"
+        compute-5: "full"
+        compute-6: "full"
+        compute-7: "full"
     }
 }
 
