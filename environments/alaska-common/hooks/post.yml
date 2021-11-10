@@ -27,3 +27,20 @@
         state: present
         path: /etc/environment
       when: kubeconfig_path is defined
+
+- hosts: login
+  become: yes
+  name: Install CARTA
+  # Requested by Tim Cornwell
+  # https://carta.readthedocs.io/en/latest/installation_and_configuration.html#installation-udm-package-managers
+  tasks:
+    - name: Install cartavis repo
+      get_url:
+        url: https://packages.cartavis.org/cartavis-el8.repo
+        dest: /etc/yum.repos.d/cartavis.repo
+    - name: Install EPEL repo
+      package:
+        name: epel-release
+    - name: Install carta
+      package:
+        name: carta
