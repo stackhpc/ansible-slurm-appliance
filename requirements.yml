@@ -43,6 +43,9 @@ roles:
   - name: ansible-role-ntp
     src: git+git@github.nrel.gov:hpc/ansible-role-ntp.git
     type: git
+  - name: vs-set-ephemeral-mounts
+    src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
+    type: git
 
 collections:
 - name: containers.podman

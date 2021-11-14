@@ -50,3 +50,12 @@
   tasks:
     - include_role:
         name: ansible-role-ntp
+
+
+- name: "Set/fix the the ephemeral ssd mounts"
+  hosts: compute
+  tags: set-ephemeral-mounts
+  become: true
+  tasks:
+    - include_role:
+        name: vs-set-ephemeral-mounts
