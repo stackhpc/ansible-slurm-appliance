@@ -10,12 +10,8 @@
       - fail2ban-firewalld
     state: present
 
-- name: Allow cluster subnet through filewalld
-  ansible.posix.firewalld:
-    permanent: yes
-    source: "{{ fail2ban_cluster_subnet }}"
-    zone: "{{ fail2ban_cluster_subnet_zone }}"
-    state: enabled
+- name: Apply filewalld configs
+  ansible.posix.firewalld: "{{ item }}"
   notify: Restart filewalld
   loop: "{{ fail2ban_firewalld_configs }}"
 
