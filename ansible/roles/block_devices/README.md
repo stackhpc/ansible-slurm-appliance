@@ -11,6 +11,8 @@ This is a convenience wrapper around the ansible modules:
 
 It includes logic to handle OpenStack-provided volumes appropriately both for appliance instances and the Packer build VM.
 
+To avoid issues with device names changing after e.g. reboots, devices are identified by serial number and mounted by filesystem UUID. 
+
 Requirements
 ------------
 
@@ -20,7 +22,7 @@ Role Variables
 --------------
 
 - `block_devices_partition_state`: Optional. Partition state, 'present' or 'absent' (as for parted) or 'skip'. Defaults to 'present'.
-- `block_devices_device`: Required. Path to block device, e.g. '/dev/sda'. See `community.general.parted:device` and `community.general.filesystem:dev`.
+- `block_devices_serial`: Required. Serial number of block device. For an OpenStack volume this is the volume ID.
 - `block_devices_number`: Required. Partition number, e.g 1 for "/dev/sda1". See `community.general.parted:number`.
 - `block_devices_fstype`: Required. Filesystem type, e.g.'ext4'. See `community.general.filesystem:fstype`
 - `block_devices_resizefs`: Optional. Grow filesystem into block device space, 'yes' or 'no' (default). See `community.general.filesystem:resizefs` for applicable fileysystem types.
@@ -51,7 +53,7 @@ Example Playbook
 The example variables below create an `ext4` partition on `/dev/sdb1` and mount it as `/mnt/files` with the default owner/group:
 
 ```yaml
-block_devices_device: /dev/sdb
+block_devices_serial: a1076455-da55-4e0c-bac8-ccc4698cff97
 block_devices_number: 1
 block_devices_fstype: ext4
 block_devices_path: /mnt/files
@@ -61,23 +63,10 @@ This does the same:
 
 ```yaml
 block_devices_configurations:
-  - device: /dev/sdb
+  - serial: a1076455-da55-4e0c-bac8-ccc4698cff97
     number: 1
     fstype: ext4
     path: /mnt/files
-```
-
-This creates 'ext4' partitions on `/dev/sdb1` on `server` and `/dev/sdc1` on `server2`, both mounted at `/mnt/files`:
-
-```yaml
-block_devices_fstype: ext4
-block_devices_path: /mnt/files
-block_devices_number: 1
-block_devices_configurations:
-  - device: /dev/sdb
-    hostnames: server1
-  - device: /dev/sdc
-    hostnames: server2
 ```
 
 License
