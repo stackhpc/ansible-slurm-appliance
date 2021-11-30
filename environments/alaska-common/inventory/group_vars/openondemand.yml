@@ -3,7 +3,7 @@ openondemand_filesapp_paths:
   - /scratch
 
 openondemand_dashboard_support_url: mailto:alaska-support@stackhpc.com
-openondemand_dashboard_docs_url: https://confluence.skatelescope.org/display/SE/Computing+Resources+-+AlaSKA+on+Arcus
+openondemand_dashboard_docs_url: https://confluence.skatelescope.org/display/SE/AlaSKA+on+Arcus
 
 # Enable OIDC authentication using IRIS-IAM:
 openondemand_auth: oidc
