@@ -7,10 +7,10 @@ openondemand_dashboard_docs_url: https://confluence.skatelescope.org/display/SE/
 
 # Enable OIDC authentication using IRIS-IAM:
 openondemand_auth: oidc
-openondemand_oidc_client_id: 248626ed-3553-47a0-86f0-7d2b51421cb0 # TODO: needs to be in secrets
-openondemand_oidc_client_secret: ALj4EbEct1OMzx18aykn2d0Xkk0Hq3YwBoJcwQD_syhk5RrfcpfaRH0voiCXYk3RWNyxSzt5AF75ldYzQcBWBsg # TODO: needs to be in secrets
+openondemand_oidc_client_id: "{{ vault_openondemand_oidc_client_id }}"
+openondemand_oidc_client_secret: "{{ vault_openondemand_oidc_client_secret }}"
 openondemand_oidc_provider_url: https://iris-iam.stfc.ac.uk
-openondemand_oidc_crypto_passphrase: oq1uGEj5dQMmr/N9WiLGgSJbmYkUPx5jyXA/ujA1ctxpMjonFq5mP7Do5OhXyaRuEpDYsOT8RCUYO0l6c6TfZ6TY # TODO: needs to be in secrets
+openondemand_oidc_crypto_passphrase: "{{ vault_openondemand_oidc_crypto_passphrase }}"
 openondemand_oidc_remote_user_claim: sub
 
 # Proxy config for virtual desktop:
