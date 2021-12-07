@@ -35,7 +35,7 @@ openhpc_packages_p3_ohpc: # openhpc_packages from https://github.com/stackhpc/p3
   - perf
   - perl-devel
   - gdb
-openhpc_packages_p3_extra: # extra_packages from https://github.com/stackhpc/p3-appliances/blob/master/config/openhpc.yml: 
+openhpc_packages_p3_extra: # extra_packages from https://github.com/stackhpc/p3-appliances/blob/master/config/openhpc.yml or new ones: 
   - singularity-ohpc # NB was non-ohpc version for old alaska
   - podman
   - htop
@@ -43,4 +43,9 @@ openhpc_packages_p3_extra: # extra_packages from https://github.com/stackhpc/p3-
   - tmux
   - xorg-x11-xauth # NOTE(wszumski): SKA folks are running casaviewer on the login node using X11 forwarding.
   - mc
+  # packages to allow building boost with static libraries
+  # https://stackhpc.slack.com/archives/C01FZ359TGU/p1638865831108500
+  - libstdc++-static
+  - glibmm24-devel
+  - glibc-static
 openhpc_extra_packages: "{{ openhpc_packages_spack + openhpc_packages_p3_ohpc + openhpc_packages_p3_extra | unique }}"
