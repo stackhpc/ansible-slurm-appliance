@@ -9,6 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+
       - name: Install coreutils (for realpath on osx)
         run: brew install coreutils
 
