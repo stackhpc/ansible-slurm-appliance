@@ -1,10 +1,5 @@
 ---
 
-# - debug:
-#     var: openondemand_osc_ood_defaults
-
-# - meta: end_here
-
 - name: Set osc.ood variables from this role's defaults if no overriding inventory var
   set_fact:
     "{{ item.key }}": "{{ lookup('vars', item.key, default=item.value) }}"
