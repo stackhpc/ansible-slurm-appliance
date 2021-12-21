@@ -1,5 +1,4 @@
 [all:vars]
-ansible_user=centos
 openhpc_cluster_name=${cluster_name}
 slurmctl_rdma_port_ip=${slurmctl_rdma_port_ip}
 

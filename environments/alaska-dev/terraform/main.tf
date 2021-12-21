@@ -28,12 +28,12 @@ module "cluster" {
     login_nodes = {
       login-0: {
         flavor: "vm.alaska.cpu.general.small"
-        image: "CentOS8-2105"
+        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
         address: "128.232.222.71"
       }
     }
     control_node = {
       flavor: "vm.alaska.cpu.general.small"
-      image: "CentOS8-2105"
+      image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
     }
 }
