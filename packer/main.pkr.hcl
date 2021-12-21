@@ -25,7 +25,7 @@ variable "groups" {
 
 variable "base_img_url" {
   type = string
-  default = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2"
+  default = "https://download.rockylinux.org/pub/rocky/8.5/images/Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
 }
 
 variable "base_img_checksum" {
