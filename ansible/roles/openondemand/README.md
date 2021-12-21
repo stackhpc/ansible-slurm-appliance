@@ -6,8 +6,9 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 
 ## Requirements
 
+- An OpenHPC v2.4 or later cluster (due to [this issue](https://github.com/openhpc/ohpc/issues/1346) in previous versions).
 - The `openondemand` node, i.e. the node which will host the Open Ondemand server/portal must:
-  - Have the slurm packages (e.g. `sinfo` etc) installed and be able to contact the Slurm controller (e.g.) - the easiest way is to ensure it is in the `login` node).
+  - Have the slurm packages (e.g. `sinfo` etc) installed and be able to contact the Slurm controller (e.g. add this node to the `login` group).
   - Have access to any cluster shared filesystems.
 - Open Ondemand's authentication maps authenticated users (e.g. via OIDC) to local users on the `openondemand` node (see `openondemand_mapping_users`). You must therefore ensure that whatever is providing users for the cluster covers the `openondemand` node, e.g. if using `basic_users` role ensure the group for this includes the `openondemand` group.
 
