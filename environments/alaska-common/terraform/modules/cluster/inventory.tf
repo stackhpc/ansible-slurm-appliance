@@ -9,8 +9,8 @@ resource "local_file" "hosts" {
                             "compute_types": var.compute_types,
                             "compute_nodes": var.compute_nodes,
                             "volumes": {
-                              "home": openstack_compute_volume_attach_v2.home
-                              "slurmctld": openstack_compute_volume_attach_v2.slurmctld
+                              "home": data.openstack_blockstorage_volume_v3.home
+                              "slurmctld": data.openstack_blockstorage_volume_v3.slurmctld
                             }
                             "slurmctl_rdma_port_ip": data.openstack_networking_port_v2.slurmctl_rdma.all_fixed_ips[0]
                           },
