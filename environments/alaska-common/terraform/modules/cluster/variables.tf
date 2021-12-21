@@ -53,7 +53,7 @@ variable "control_node" {
     description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
     default = {
         flavor: "vm.alaska.cpu.nvme.half"
-        image: "CentOS8-2105"
+        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
     }
 }
 
@@ -63,7 +63,7 @@ variable "login_nodes" {
   default = {
       login-0: {
         flavor: "vm.alaska.cpu.himem.quarter"
-        image: "CentOS8-2105"
+        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
         address: "128.232.222.246"
       }
     }
@@ -75,11 +75,11 @@ variable "compute_types" {
     default = {
       small: {
           flavor: "vm.alaska.cpu.general.small"
-          image: "CentOS8-2105"
+          image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
       }
       full: {
           flavor: "vm.alaska.cpu.general.full"
-          image: "CentOS8-2105"
+          image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
       }
     }
 }
