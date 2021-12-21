@@ -1,7 +1,7 @@
 # StackHPC Slurm Appliance
 
 This repository contains playbooks and configuration to define a Slurm-based HPC environment including:
-- A Centos 8 and OpenHPC v2-based Slurm cluster.
+- A Rocky Linux 8 and OpenHPC v2-based Slurm cluster.
 - Shared fileystem(s) using NFS (with servers within or external to the cluster).
 - Slurm accounting using a MySQL backend.
 - A monitoring backend using Prometheus and ElasticSearch.
@@ -14,11 +14,11 @@ The repository is designed to be forked for a specific use-case/HPC site but can
 ## Pre-requisites
 
 - Working DNS so that we can use the ansible inventory name as the address for connecting to services.
-- Bootable images based on Centos 8 Cloud images.
+- Bootable images based on Rocky 8 GenericCloud images.
 
 ## Installation on deployment host
 
-These instructions assume the deployment host is running Centos 8:
+These instructions assume the deployment host is running Centos/Rocky 8:
 
     sudo yum install -y git python3
     git clone https://github.com/stackhpc/ansible-slurm-appliance
