@@ -1,10 +1,10 @@
 block_devices_configurations:
-  - serial: "{{ ( volumes | from_json ).home.volume_id }}"
+  - serial: "{{ ( volumes | from_json ).home.id[:20] }}"
     number: 1
     fstype: ext4
     resizefs: yes
     path: /home
-  - serial: "{{ (volumes | from_json ).slurmctld.volume_id }}"
+  - serial: "{{ (volumes | from_json ).slurmctld.id[:20] }}"
     number: 1
     fstype: ext4
     resizefs: yes

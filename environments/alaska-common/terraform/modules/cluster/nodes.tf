@@ -1,3 +1,6 @@
+data "openstack_images_image_v2" "control" {
+    name = var.control_node.image
+}
 
 resource "openstack_compute_instance_v2" "control" {
   
@@ -17,20 +20,34 @@ resource "openstack_compute_instance_v2" "control" {
     port = data.openstack_networking_port_v2.slurmctl_rdma.id
   }
 
+  block_device {
+      uuid = data.openstack_images_image_v2.control.id
+      source_type  = "image"
+      destination_type = "local"
+      boot_index = 0
+      delete_on_termination = true
+  }
+
+  # home volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = data.openstack_blockstorage_volume_v3.home.id
+  }
+
+  # slurmctld volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = data.openstack_blockstorage_volume_v3.slurmctld.id
+  }
+
   metadata = {
     environment = var.environment_root
   }
 
-}
-
-resource "openstack_compute_volume_attach_v2" "home" {
-  instance_id = openstack_compute_instance_v2.control.id
-  volume_id   = data.openstack_blockstorage_volume_v3.home.id
-}
-
-resource "openstack_compute_volume_attach_v2" "slurmctld" {
-  instance_id = openstack_compute_instance_v2.control.id
-  volume_id   = data.openstack_blockstorage_volume_v3.slurmcltd.id
 }
 
 resource "openstack_compute_instance_v2" "login" {
