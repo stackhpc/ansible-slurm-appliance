@@ -6,6 +6,7 @@
   # Requires separate step so that the upgraded pip is used to install packages
   pip:
     name: pip
+    state: latest
     virtualenv: /opt/jupyter
     virtualenv_command: python3 -m venv
   tags: install
