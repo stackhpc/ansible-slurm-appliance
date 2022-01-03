@@ -1,7 +1,12 @@
+variable "compute_types" {
+    type = map
+    description = "Mapping defining types of compute nodes: key -> (str) name of type, value -> mapping {flavor: flavor_name image: image_name_or_id }"
+}
+
 variable "compute_names" {
     type = map(string)
     default = {}
-    description = "Mapping of names -> flavor type for compute nodes (Note hostnames will be be prefixed with cluster_name)"
+    description = "Mapping of compute node name -> key in compute_types (Note nodenames are prefixed with cluster_name to make hostnames)"
 }
 
 variable "proxy_name" {
@@ -18,6 +23,11 @@ variable "login_names" {
 variable "cluster_name" {
     type = string
     description = "Name for cluster, used as prefix for resources"
+}
+
+variable "cluster_slurm_name" {
+    type = string
+    description = "Name for cluster in Slurm"
 }
 
 variable "cluster_network" {
@@ -100,6 +110,11 @@ variable "login_image" {
     description = "Name of image for login node(s)"
 }
 
+variable "login_ips" {
+    type = map
+    description = "Map of login names -> floating IP"
+}
+
 variable "control_flavor" {
     type = string
     description = "Name of instance flavor for control node"
@@ -110,9 +125,15 @@ variable "control_image" {
     description = "Name of image for compute node"
 }
 
-variable "compute_image" {
+variable "compute_images" {
+    type = map(string)
+    default = {}
+    description = "Mapping to override compute images from compute_types: key ->(str) node name, value -> (str) image name"
+}
+
+variable "control_ip" {
     type = string
-    description = "Name of image for compute node(s)"
+    description = "Floating IP for slurm control node"
 }
 
 variable "cluster_network_cidr" {
