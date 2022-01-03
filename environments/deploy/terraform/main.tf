@@ -23,7 +23,7 @@ resource "openstack_networking_port_v2" "control_cluster" {
     vnic_type = var.cluster_network_vnic_type
     profile = jsonencode(var.cluster_network_profile)
   }
-  
+
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
     ignore_changes = [
@@ -79,7 +79,7 @@ resource "openstack_networking_port_v2" "control_control" {
 }
 
 resource "openstack_compute_instance_v2" "control" {
-  
+
   name = "${var.cluster_name}-control"
   image_name = var.control_image
   flavor_name = var.control_flavor
@@ -89,7 +89,7 @@ resource "openstack_compute_instance_v2" "control" {
   network {
     port = openstack_networking_port_v2.control_cluster.id
   }
-  
+
   network {
     port = openstack_networking_port_v2.control_storage.id
   }
@@ -191,7 +191,7 @@ resource "openstack_compute_instance_v2" "logins" {
   network {
     port = openstack_networking_port_v2.login_cluster[each.key].id
   }
-  
+
   network {
     port = openstack_networking_port_v2.login_storage[each.key].id
   }
@@ -212,6 +212,7 @@ resource "openstack_networking_port_v2" "compute_cluster" {
   name = each.key
   network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
+  port_security_enabled = "false"
 
   fixed_ip {
     subnet_id = data.openstack_networking_subnet_v2.cluster.id
@@ -299,7 +300,7 @@ resource "openstack_compute_instance_v2" "computes" {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
     access_network = true
   }
-  
+
   network {
     port = openstack_networking_port_v2.compute_storage[each.key].id
   }
@@ -323,7 +324,7 @@ resource "openstack_compute_floatingip_associate_v2" "logins" {
   instance_id = openstack_compute_instance_v2.logins[each.key].id
    # networks are zero-indexed
   fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
-  
+
 }
 
 resource "openstack_networking_floatingip_v2" "control" {
@@ -333,7 +334,7 @@ resource "openstack_networking_floatingip_v2" "control" {
 }
 
 resource "openstack_compute_floatingip_associate_v2" "control" {
-  
+
   floating_ip = openstack_networking_floatingip_v2.control.address
   instance_id = openstack_compute_instance_v2.control.id
    # networks are zero-indexed
