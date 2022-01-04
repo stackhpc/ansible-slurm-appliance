@@ -85,6 +85,7 @@ resource "openstack_compute_instance_v2" "control" {
   flavor_name = var.control_flavor
   key_pair = var.key_pair
   config_drive = true
+  availability_zone = var.cluster_availability_zone
 
   network {
     port = openstack_networking_port_v2.control_cluster.id
@@ -187,6 +188,7 @@ resource "openstack_compute_instance_v2" "logins" {
   flavor_name = each.value
   key_pair = var.key_pair
   config_drive = true
+  availability_zone = var.cluster_availability_zone
 
   network {
     port = openstack_networking_port_v2.login_cluster[each.key].id
@@ -291,6 +293,7 @@ resource "openstack_compute_instance_v2" "computes" {
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
   config_drive = true
+  availability_zone = var.cluster_availability_zone
 
   network {
     port = openstack_networking_port_v2.compute_control[each.key].id

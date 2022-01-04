@@ -42,6 +42,8 @@ proxy_name = "login1"
 
 cluster_name  = "vtest"
 cluster_slurm_name = "vermilion"
+cluster_availability_zone = "vermilion-tds-az1"
+
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 key_pair = "slurmdeploy"
 

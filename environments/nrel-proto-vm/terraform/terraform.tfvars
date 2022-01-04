@@ -18,7 +18,7 @@ compute_names = {
 
 compute_images = { # allows overrides for specific nodes, by name
     sm-002: "CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64"
-} 
+}
 
 login_names = {
     login-0: "general.v1.small"
@@ -27,6 +27,7 @@ proxy_name = "login-0"
 
 cluster_name  = "test" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 cluster_slurm_name = "vermilion" # as above
+cluster_availability_zone = "vermilion-az1"
 key_pair = "centos_at_nrel-deploy-vm"
 
 cluster_network = "compute"
