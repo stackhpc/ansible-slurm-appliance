@@ -136,3 +136,9 @@ variable "external_network" {
   type = string
   description = "Name of pre-existing external network"
 }
+
+variable "cluster_availability_zone" {
+    type = string
+    description = "Name of the availability zone to be used. Assumes there are different AZs for prod vs test vs stage."
+    default = null
+}
