@@ -27,7 +27,6 @@ std-001: "standard"
 std-002: "standard"
 sm-001: "small"
 sm-002: "small"
-gpu-001: "gpu"
 }
 ###################################################
 login_names = {
