@@ -40,7 +40,7 @@ source "qemu" "openhpc-vm" {
   disk_size = var.disk_size
   disk_compression = true
   accelerator      = "kvm" # default, if available
-  ssh_username = "centos"
+  ssh_username = "rocky"
   ssh_timeout = "20m"
   net_device       = "virtio-net" # default
   disk_interface   = "virtio" # default
