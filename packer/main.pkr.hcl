@@ -30,7 +30,7 @@ variable "base_img_url" {
 
 variable "base_img_checksum" {
   type = string
-  default = "sha256:3510fc7deb3e1939dbf3fe6f65a02ab1efcc763480bc352e4c06eca2e4f7c2a2"
+  default = "sha256:c23f58f26f73fb9ae92bfb4cf881993c23fdce1bbcfd2881a5831f90373ce0c8"
 }
 
 source "qemu" "openhpc-vm" {
@@ -68,8 +68,7 @@ build {
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     # TODO: use completely separate inventory, which just shares common? This will ensure
     # we don't accidently run anything via delegate_to.
-    # partitions must be empty for control and are irrelevant elsewhere:
-    extra_arguments = concat(["--limit", "builder", "-i", "./ansible-inventory.sh", "-e", "'{\"openhpc_slurm_partitions\":[]}'"])
+    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh"]
     # TODO: Support vault password
     #ansible_env_vars = ["ANSIBLE_VAULT_PASSWORD_FILE=/home/stack/.kayobe-vault-pass"]
   }
