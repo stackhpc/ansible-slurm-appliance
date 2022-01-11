@@ -30,7 +30,7 @@ variable "base_img_url" {
 
 variable "base_img_checksum" {
   type = string
-  default = "sha256:c23f58f26f73fb9ae92bfb4cf881993c23fdce1bbcfd2881a5831f90373ce0c8"
+  default = "sha256:3510fc7deb3e1939dbf3fe6f65a02ab1efcc763480bc352e4c06eca2e4f7c2a2"
 }
 
 source "qemu" "openhpc-vm" {
