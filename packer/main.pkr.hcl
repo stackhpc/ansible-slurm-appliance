@@ -68,7 +68,8 @@ build {
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     # TODO: use completely separate inventory, which just shares common? This will ensure
     # we don't accidently run anything via delegate_to.
-    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh"]
+    extra_arguments = concat(["--limit", "builder", "-i", "./ansible-inventory.sh", "-e", "@extra_vars.json"])
+    # extra_vars is used to remove partitions to allow building control images
     # TODO: Support vault password
     #ansible_env_vars = ["ANSIBLE_VAULT_PASSWORD_FILE=/home/stack/.kayobe-vault-pass"]
   }
