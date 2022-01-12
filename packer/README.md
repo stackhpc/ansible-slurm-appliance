@@ -31,10 +31,7 @@ Steps:
 
 - Build an image (using that config drive):
 
-        mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out
         cd packer
-        PACKER_LOG=1 packer build main.pkr.hcl
-        # or during development:
         PACKER_LOG=1 packer build --on-error=ask main.pkr.hcl
 
   The following variables may also be set:

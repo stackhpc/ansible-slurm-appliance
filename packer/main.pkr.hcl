@@ -40,7 +40,7 @@ source "qemu" "openhpc-vm" {
   disk_size = var.disk_size
   disk_compression = true
   accelerator      = "kvm" # default, if available
-  ssh_username = "centos"
+  ssh_username = "rocky"
   ssh_timeout = "20m"
   net_device       = "virtio-net" # default
   disk_interface   = "virtio" # default
@@ -50,7 +50,7 @@ source "qemu" "openhpc-vm" {
   ssh_private_key_file = "~/.ssh/id_rsa"
   qemuargs         = [
     ["-monitor", "unix:qemu-monitor.sock,server,nowait"],
-    # NOTE: To uncomment the below, you need: mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.outh
+    # To see the VM's console, run `mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out` then uncommment the below
     # ["-serial", "pipe:/tmp/qemu-serial"],
     ["-m", "896M"],
     ["-cdrom", "config-drive.iso"]

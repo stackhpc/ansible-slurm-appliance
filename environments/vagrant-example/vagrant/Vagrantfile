@@ -9,14 +9,14 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "#{cluster_name}-login-0" do |login|
     login.vm.hostname = "#{cluster_name}-login-0"
-    login.vm.box = "centos/8"
+    login.vm.box = "bento/rockylinux-8.5"
     login.vm.network "private_network", ip: "192.168.56.10"
     login.vm.provision :hosts, :sync_hosts => true
   end
 
   config.vm.define "#{cluster_name}-control-0" do |control|
     control.vm.hostname = "#{cluster_name}-control-0"
-    control.vm.box = "centos/8"
+    control.vm.box = "bento/rockylinux-8.5"
     control.vm.network "private_network", ip: "192.168.56.11"
     control.vm.provision :hosts, :sync_hosts => true
     control.vm.provider "virtualbox" do |vb|
@@ -29,7 +29,7 @@ Vagrant.configure(2) do |config|
     ip = "192.168.56.#{12 + i}"
     config.vm.define "#{cluster_name}-compute-#{i}" do |node|
       node.vm.hostname = "#{cluster_name}-compute-#{i}"
-      node.vm.box = "centos/8"
+      node.vm.box = "bento/rockylinux-8.5"
       node.vm.network "private_network", ip: ip
       node.vm.provision :hosts, :sync_hosts => true
     end
