@@ -51,7 +51,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
-          ansible-playbook -vv ansible/site.yml
+          ansible-playbook -vvv ansible/site.yml
         env:
           ANSIBLE_FORCE_COLOR: True
           BASTION_SSH_USER: ${{ secrets.BASTION_SSH_USER }}
