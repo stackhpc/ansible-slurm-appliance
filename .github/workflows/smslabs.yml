@@ -17,8 +17,8 @@ jobs:
       
       - name: Initialise terraform
         run: terraform init
-
         working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
+        
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
@@ -28,8 +28,11 @@ jobs:
           CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
       
       - name: Provision infrastructure
-        run: terraform apply -auto-approve
-        working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform apply -auto-approve
         env:
           OS_CLOUD: openstack
 
@@ -44,3 +47,13 @@ jobs:
       #     ANSIBLE_FORCE_COLOR: True
       
       # # TODO: run tests
+      - name: Delete infrastructure
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform destroy -auto-approve
+        working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
+        env:
+          OS_CLOUD: openstack
+
