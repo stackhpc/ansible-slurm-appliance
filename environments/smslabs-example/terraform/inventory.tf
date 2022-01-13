@@ -7,7 +7,6 @@ resource "local_file" "hosts" {
                             "computes": openstack_compute_instance_v2.compute,
                             "compute_types": var.compute_types,
                             "compute_nodes": var.compute_nodes,
-                            "jumphost": var.jumphost
                           },
                           )
   filename = "../inventory/hosts"
