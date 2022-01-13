@@ -67,12 +67,3 @@ variable "compute_images" {
     default = {}
     description = "Mapping to override compute images from compute_types: key ->(str) node name, value -> (str) image name"
 }
-
-variable "jumphost" {
-    type = map(string)
-    description = "Details of jumphost to use to access nodes, see default for contents"
-    default = {
-        ip: "185.45.78.150"
-        user: "slurm-app-ci"
-    }
-}
