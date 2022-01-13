@@ -14,7 +14,6 @@ jobs:
 
       - name: Install terraform
         uses: hashicorp/setup-terraform@v1
-        working-directory: environments/smslabs-example/terraform
       
       - name: Write clouds.yaml
         run: |
@@ -22,11 +21,11 @@ jobs:
           echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
         shell: bash
         env:
-          CLOUDS_YAML: ${{secrets.CLOUDS_YAML }}
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
 
       - name: Provision infrastructure
         run: terraform apply -auto-approve
-        working-directory: environments/smslabs-example/terraform
+        working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
 
       # # TODO: create cloud yml for rebuild - currently disabled in groups
       
