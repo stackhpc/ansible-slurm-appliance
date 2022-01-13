@@ -1,0 +1,41 @@
+
+name: Test on OpenStack via smslabs
+on:
+  push:
+  pull_request:
+jobs:
+  openstack-example:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
+      - name: Install terraform
+        uses: hashicorp/setup-terraform@v1
+        working-directory: environments/smslabs-example/terraform
+      
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+        shell: bash
+        env:
+          CLOUDS_YAML: ${{secrets.CLOUDS_YAML }}
+
+      - name: Provision infrastructure
+        run: terraform apply -auto-approve
+        working-directory: environments/smslabs-example/terraform
+
+      # # TODO: create cloud yml for rebuild - currently disabled in groups
+      
+      # - name: Configure infrastructure
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/smslabs-example/activate
+      #     ansible-playbook -vv ansible/site.yml
+      #   env:
+      #     ANSIBLE_FORCE_COLOR: True
+      
+      # # TODO: run tests
