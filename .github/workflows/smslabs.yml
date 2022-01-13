@@ -17,7 +17,7 @@ jobs:
       
       - name: Initialise terraform
         run: terraform init
-        
+
         working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
       - name: Write clouds.yaml
         run: |
@@ -30,6 +30,8 @@ jobs:
       - name: Provision infrastructure
         run: terraform apply -auto-approve
         working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
+        env:
+          OS_CLOUD: openstack
 
       # # TODO: create cloud yml for rebuild - currently disabled in groups
       
