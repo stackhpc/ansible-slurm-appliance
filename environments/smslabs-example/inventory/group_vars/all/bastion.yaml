@@ -1,0 +1,1 @@
+ansible_ssh_common_args: '-o ProxyCommand="ssh {{ lookup('env', 'BASTION_SSH_USER') }}@${{ lookup('env', 'BASTION_IP') }} -W %h:%p"'
