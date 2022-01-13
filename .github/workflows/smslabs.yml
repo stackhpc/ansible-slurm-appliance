@@ -37,7 +37,7 @@ jobs:
           OS_CLOUD: openstack
           
       # TODO: create cloud yml for rebuild - currently disabled in groups
-      
+
       - name: Setup ssh
         run: |
           set -x
@@ -45,7 +45,7 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         env:
-          SSH__KEY: ${{ secrets.SSH_KEY }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
 
       - name: Configure infrastructure
         run: |
@@ -54,6 +54,8 @@ jobs:
           ansible-playbook -vv ansible/site.yml
         env:
           ANSIBLE_FORCE_COLOR: True
+          BASTION_SSH_USER: ${{ secrets.BASTION_SSH_USER }}
+          BASTION_IP: ${{ secrets.BASTION_IP }}
       
       # # TODO: run tests
       - name: Delete infrastructure
