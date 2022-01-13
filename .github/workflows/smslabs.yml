@@ -35,16 +35,25 @@ jobs:
           terraform apply -auto-approve
         env:
           OS_CLOUD: openstack
-
-      # # TODO: create cloud yml for rebuild - currently disabled in groups
+          
+      # TODO: create cloud yml for rebuild - currently disabled in groups
       
-      # - name: Configure infrastructure
-      #   run: |
-      #     . venv/bin/activate
-      #     . environments/smslabs-example/activate
-      #     ansible-playbook -vv ansible/site.yml
-      #   env:
-      #     ANSIBLE_FORCE_COLOR: True
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        env:
+          SSH__KEY: ${{ secrets.SSH_KEY }}
+
+      - name: Configure infrastructure
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible-playbook -vv ansible/site.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
       
       # # TODO: run tests
       - name: Delete infrastructure
@@ -53,7 +62,5 @@ jobs:
           . environments/smslabs-example/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
-        working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
         env:
           OS_CLOUD: openstack
-
