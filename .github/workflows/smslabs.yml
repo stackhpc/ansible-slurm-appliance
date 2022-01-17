@@ -9,6 +9,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+
+      - name: Confirm ssh to bastion
+        run: ssh -v ${BASTION_SSH_USER}@${BASTION_IP} hostname
+        shell: bash
+        env:
+          BASTION_SSH_USER: ${{ secrets.BASTION_SSH_USER }}
+          BASTION_IP: ${{ secrets.BASTION_IP }}
+
       - name: Install ansible etc
         run: dev/setup-env.sh
 
@@ -37,16 +53,7 @@ jobs:
           OS_CLOUD: openstack
           
       # TODO: create cloud yml for rebuild - currently disabled in groups
-
-      - name: Setup ssh
-        run: |
-          set -x
-          mkdir ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-
+      
       - name: Configure infrastructure
         run: |
           . venv/bin/activate
