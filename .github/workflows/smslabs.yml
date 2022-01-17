@@ -23,11 +23,8 @@ jobs:
         shell: bash
 
       - name: Confirm ssh to bastion
-        run: ssh -v ${BASTION_SSH_USER}@${BASTION_IP} hostname
+        run: ssh -v slurm-app-ci@185.45.78.150 hostname
         shell: bash
-        env:
-          BASTION_SSH_USER: ${{ secrets.BASTION_SSH_USER }}
-          BASTION_IP: ${{ secrets.BASTION_IP }}
 
       - name: Install ansible etc
         run: dev/setup-env.sh
@@ -65,9 +62,7 @@ jobs:
           ansible-playbook -vvvv ansible/site.yml
         env:
           ANSIBLE_FORCE_COLOR: True
-          BASTION_SSH_USER: ${{ secrets.BASTION_SSH_USER }}
-          BASTION_IP: ${{ secrets.BASTION_IP }}
-      
+          
       # # TODO: run tests
       - name: Delete infrastructure
         run: |
