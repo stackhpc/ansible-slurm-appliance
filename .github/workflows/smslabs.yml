@@ -18,6 +18,10 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
 
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/smslabs-example/bastion_fingerprint >> ~/.ssh/known_hosts
+        shell: bash
+
       - name: Confirm ssh to bastion
         run: ssh -v ${BASTION_SSH_USER}@${BASTION_IP} hostname
         shell: bash
