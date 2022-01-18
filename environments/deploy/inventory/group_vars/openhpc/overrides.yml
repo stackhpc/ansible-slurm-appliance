@@ -25,6 +25,7 @@ openhpc_packages:
   - ohpc-autotools
   - ohpc-base
   - ohpc-base-compute
+  - openblas-gnu9-ohpc
   - ohpc-gnu9-openmpi4-perf-tools
   - mpich-ofi-gnu9-ohpc
   - mpich-ucx-gnu9-ohpc
@@ -68,10 +69,10 @@ openhpc_slurm_partitions:
     default: NO
     maxtime: "4:0:0" # 4 hour 0m 0s
 
+# Additional parameters to set in slurm.conf - list of [parameter, value] pairs
 slurm_conf_extraparams:
-  # Additional parameters to set in slurm.conf - list of [parameter, value] pairs
   - ['LaunchParameters', 'use_interactive_step']
-  - ['FirstJobId', 50000000]
+  - ['FirstJobId', 1000]
 
   ### - ['MpiDefault', "pmi2"]    ### get the launcher to work! pmi1, pmi2, or pmix
   # # spack mpi drivers were a mis-match... is this working now????
@@ -117,13 +118,13 @@ slurm_conf_extraparams:
   #   partition = 5%
   #   Age 4%
 
-  - ['PriorityType', 'priority/multifactor']
-  - ['PriorityMaxAge', '14-0']
-  - ['PriorityWeightFairshare', '397659600']
-  - ['PriorityWeightAge', '30589200']
-  - ['PriorityWeightJobSize', '91767600']
-  - ['PriorityWeightQOS', '206477100']
-  - ['PriorityWeightPartition', '38236500']
+  - ['PriorityType',  'priority/multifactor']
+  - ['PriorityMaxAge',                '14-0']
+  - ['PriorityWeightFairshare',  '397659600']
+  - ['PriorityWeightAge',         '30589200']
+  - ['PriorityWeightJobSize',     '91767600']
+  - ['PriorityWeightQOS',        '206477100']
+  - ['PriorityWeightPartition',   '38236500']
 
   # TIMERS  size because db on spinning disk so had to increase
   - ['BatchStartTimeout', 30]
