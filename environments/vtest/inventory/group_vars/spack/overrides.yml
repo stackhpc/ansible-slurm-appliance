@@ -1,4 +1,4 @@
-spack_root: /nopt/spack
+spack_root: /nopt/vtest/spack
 spack_version: develop
 spack_packages:
   - "openmpi@4.0.5 %gcc@9.3.0 fabrics=ucx schedulers=auto"

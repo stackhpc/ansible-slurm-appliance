@@ -1,7 +1,7 @@
 ---
 # vtest post.yml
 - name: sync_slurm_allocations install on admin node
-  hosts: vs-admin
+  hosts: vtest-admin
   become: true
   tags:
     - sync_slurm_allocations_admin
@@ -30,7 +30,7 @@
 #     is_compute_node: True
 
 - name: cluster_dataset_manager create project directories
-  hosts: vs-admin
+  hosts: vtest-admin
   become: true
   tags:
     - cluster_dataset_manager
@@ -39,7 +39,7 @@
         name: cluster_dataset_manager
 
 - name: pam_mkhomedir_plus
-  hosts: login:!vs-admin
+  hosts: login:!vtest-admin
   become: true
   tags:
     - pam_mkhomedir_plus
@@ -48,7 +48,7 @@
         name: pam_mkhomedir_plus
 
 - name: slurm_lex_accounting
-  hosts: vs-control
+  hosts: vtest-control
   become: true
   tags:
     - slurm_lex_accounting
@@ -57,10 +57,10 @@
         name: slurm_lex_accounting
   vars:
     slurm_lex_accounting_dev: False
-    slurm_lex_accounting_clustername: vermilion
+    slurm_lex_accounting_clustername: vtest
 
 - name: vstack_admin_config
-  hosts: vs-admin
+  hosts: vtest-admin
   become: true
   tags:
     - vstack_admin_config
@@ -69,7 +69,7 @@
         name: vstack_admin_config
 
 - name: vstack_common_config
-  hosts: vs-admin:vs-control:login:compute
+  hosts: vtest-admin:vtest-control:login:compute
   become: true
   tags:
     - vstack_common_config
@@ -82,7 +82,8 @@
   become: true
   vars:
     packages:
-      - kernel-devel-4.18.0-305.3.1.el8.x86_64
+      - kernel-devel
+      # - kernel-devel-4.18.0-305.3.1.el8.x86_64
   tags:
     - post_powertools
     - post_kernel_headers
