@@ -59,6 +59,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
+          ansible all -m wait_for_connection
           control_ip=$(ansible-inventory list  --export --host control | python3 -c "import json, sys; d=json.load(sys.stdin); print(d['ansible_host'])")
           echo control_ip: ${control_ip}
           ssh -vvv -o 'ProxyCommand=ssh slurm-app-ci@185.45.78.150 -W %h:%p' rocky@${control_ip} hostname
