@@ -18,13 +18,12 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
 
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/smslabs-example/bastion_fingerprint >> ~/.ssh/known_hosts
-        shell: bash
-
-      - name: Confirm ssh to bastion
-        run: ssh -v slurm-app-ci@185.45.78.150 hostname
-        shell: bash
+      # - name: Add bastion's ssh key to known_hosts
+      #   run: cat environments/smslabs-example/bastion_fingerprint >> ~/.ssh/known_hosts
+      #   shell: bash
+      # - name: Confirm ssh to bastion
+      #   run: ssh -v slurm-app-ci@185.45.78.150 hostname
+      #   shell: bash
 
       - name: Install ansible etc
         run: dev/setup-env.sh
@@ -54,20 +53,24 @@ jobs:
           OS_CLOUD: openstack
           
       # TODO: create cloud yml for rebuild - currently disabled in groups
-      
       - name: Configure infrastructure
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
           ansible all -m wait_for_connection
-          # control_ip=$(ansible-inventory list  --export --host control | python3 -c "import json, sys; d=json.load(sys.stdin); print(d['ansible_host'])")
-          # echo control_ip: ${control_ip}
-          # ssh -vvv -o 'ProxyCommand=ssh slurm-app-ci@185.45.78.150 -W %h:%p' rocky@${control_ip} hostname
-          ansible-playbook -vvvv ansible/site.yml
+          ansible-playbook ansible/adhoc/generate-passwords.yml
+          ansible-playbook -vv ansible/site.yml
         env:
           ANSIBLE_FORCE_COLOR: True
           
-      # # TODO: run tests
+      - name: Run MPI-based tests
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible-playbook ansible/adhoc/hpctests.yml 
+        env:
+          ANSIBLE_FORCE_COLOR: True
+          
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
