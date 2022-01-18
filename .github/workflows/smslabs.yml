@@ -21,10 +21,7 @@ jobs:
       - name: Add bastion's ssh key to known_hosts
         run: cat environments/smslabs-example/bastion_fingerprint >> ~/.ssh/known_hosts
         shell: bash
-      # - name: Confirm ssh to bastion
-      #   run: ssh -v slurm-app-ci@185.45.78.150 hostname
-      #   shell: bash
-
+      
       - name: Install ansible etc
         run: dev/setup-env.sh
 
