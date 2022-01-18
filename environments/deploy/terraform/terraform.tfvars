@@ -13,7 +13,7 @@ compute_types = {
   }
   tiny: {
     flavor: "compute.c4m16s8e60"
-    image: "CCentOS8.5_ofed5.5-1+cuda11.4"
+    image: "CentOS8.5_ofed5.5-1+cuda11.4"
   }
   gpu: {
     flavor: "gpu.c30m120s32e6000"
