@@ -40,6 +40,11 @@ variable "ssh_keypair_name" {
   type = string
 }
 
+variable "image_visibility" {
+  type = string
+  default = "private"
+}
+
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
   networks = "${var.networks}"
@@ -49,7 +54,7 @@ source "openstack" "openhpc" {
   ssh_private_key_file = "${var.ssh_private_key_file}" # TODO: doc same requirements as for qemu build?
   ssh_keypair_name = "${var.ssh_keypair_name}" # TODO: doc this
   image_name = "ohpc-${source.name}-${local.timestamp}.qcow2"
-  # image_disk_format = "qcow2" # TODO: not sure this will work
+  image_visibility = "${var.image_visibility}"
 }
 
 build {
