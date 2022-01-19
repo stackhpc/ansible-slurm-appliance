@@ -12,7 +12,7 @@ variable "cluster_net" {
 variable "cluster_subnet" {
     type = string
     description = "Name of existing cluster subnet"
-    default = "stackhpc-ipv4-geneve-subnet"
+    default = "stackhpc-ci-geneve-subnet"
 }
 
 variable "key_pair" {
