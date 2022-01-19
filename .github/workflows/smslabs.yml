@@ -49,6 +49,7 @@ jobs:
           terraform apply -auto-approve
         env:
           OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
       
       - name: Get server provisioning failure messages
         id: provision_failure
@@ -59,6 +60,7 @@ jobs:
           echo "::set-output name=messages::$(./getfaults.py)"
         env:
           OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
         if: always() && steps.provision.outcome == 'failure'
         
       - name: Delete infrastructure if failed due to lack of hosts
@@ -69,6 +71,7 @@ jobs:
           terraform destroy -auto-approve
         env:
           OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
       # TODO: create cloud yml for rebuild - currently disabled in groups
@@ -97,5 +100,6 @@ jobs:
           . environments/smslabs-example/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
+          TF_VAR_cluster_name: ci${{ github.run_id }}
         env:
           OS_CLOUD: openstack
