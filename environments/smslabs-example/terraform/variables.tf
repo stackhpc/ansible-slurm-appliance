@@ -7,7 +7,6 @@ variable "cluster_net" {
     type = string
     description = "Name of existing cluster network"
     default = "stackhpc-ci-geneve"
-    networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"] # stackhpc-ipv4-geneve
 }
 
 variable "cluster_subnet" {
