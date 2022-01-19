@@ -2,14 +2,12 @@
   become: no
   gather_facts: false
   tasks:
-    - block:
-      - name: Run sinfo
-        shell: 'sinfo --noheader --format="%N %P %a %l %D %t"' # using --format ensures we control whitespace: Partition,partition_state,max_jobtime,num_nodes,node_state,node_name
-        register: sinfo
-        changed_when: false
-      - name: Check nodes have expected slurm state
-        assert:
-          that: "sinfo.stdout_lines[0] | split == ['cidev-compute-[0-1]', 'small*', 'up', '60-00:00:00', '2', 'idle']"
-          fail_msg: "sinfo output not as expected: {{ sinfo.stdout }}"
-      when: 'builder' not in group_names
+    - name: Run sinfo
+      shell: 'sinfo --noheader --format="%N %P %a %l %D %t"' # using --format ensures we control whitespace: Partition,partition_state,max_jobtime,num_nodes,node_state,node_name
+      register: sinfo
+      changed_when: false
+    - name: Check nodes have expected slurm state
+      assert:
+        that: "(sinfo.stdout_lines[0] | split)[1:] == ['small*', 'up', '60-00:00:00', '2', 'idle']" # don't know what instance names are as have CI run ID in them
+        fail_msg: "sinfo output not as expected: {{ sinfo.stdout }}"
 

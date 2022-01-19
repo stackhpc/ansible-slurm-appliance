@@ -2,7 +2,7 @@
 name: Test on OpenStack via smslabs
 on:
   push:
-  # pull_request:
+  pull_request:
 jobs:
   openstack-example:
     runs-on: ubuntu-20.04
@@ -41,6 +41,7 @@ jobs:
           CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
       
       - name: Provision infrastructure
+        id: provision
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
@@ -48,8 +49,33 @@ jobs:
           terraform apply -auto-approve
         env:
           OS_CLOUD: openstack
-          
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+      
+      - name: Get server provisioning failure messages
+        id: provision_failure
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          echo "::set-output name=messages::$(./getfaults.py)"
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: always() && steps.provision.outcome == 'failure'
+        
+      - name: Delete infrastructure if failed due to lack of hosts
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform destroy -auto-approve
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
+
       # TODO: create cloud yml for rebuild - currently disabled in groups
+
       - name: Configure infrastructure
         run: |
           . venv/bin/activate
@@ -59,7 +85,7 @@ jobs:
           ansible-playbook -vv ansible/site.yml
         env:
           ANSIBLE_FORCE_COLOR: True
-          
+      
       - name: Run MPI-based tests
         run: |
           . venv/bin/activate
@@ -74,5 +100,6 @@ jobs:
           . environments/smslabs-example/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
+          TF_VAR_cluster_name: ci${{ github.run_id }}
         env:
           OS_CLOUD: openstack

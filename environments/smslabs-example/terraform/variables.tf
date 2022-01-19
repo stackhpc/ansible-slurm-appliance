@@ -1,7 +1,6 @@
 variable "cluster_name" {
     type = string
     description = "Name for cluster, used as prefix for resources"
-    default = "ci"
 }
 
 variable "cluster_net" {
@@ -26,7 +25,7 @@ variable "control_node" {
     type = map
     description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
     default = {
-        flavor: "general.v1.small"
+        flavor: "general.v1.tiny"
         image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
     }
 }
@@ -36,7 +35,7 @@ variable "login_nodes" {
   description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> mapping  {flavor: flavor_name, image: image_name_or_id }"
   default = {
       login-0: {
-        flavor: "general.v1.small"
+        flavor: "general.v1.tiny"
         image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
       }
     }
@@ -47,7 +46,7 @@ variable "compute_types" {
     description = "Mapping defining types of compute nodes: key -> (str) name of type, value -> mapping {flavor: flavor_name, image: image_name_or_id }"
     default = {
       small: {
-          flavor: "general.v1.small"
+          flavor: "general.v1.tiny"
           image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
       }
     }
