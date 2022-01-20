@@ -6,6 +6,7 @@ resource "openstack_compute_instance_v2" "control" {
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
   config_drive = true
+  security_groups = ["default", "ssh"]
 
   network {
     uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id # ensures nodes not created till subnet created
@@ -23,6 +24,7 @@ resource "openstack_compute_instance_v2" "login" {
   flavor_name = each.value.flavor
   key_pair = var.key_pair
   config_drive = true
+  security_groups = ["default", "ssh"]
 
   network {
     uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
@@ -40,6 +42,7 @@ resource "openstack_compute_instance_v2" "compute" {
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
   config_drive = true
+  security_groups = ["default", "ssh"]
 
   network {
     uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
