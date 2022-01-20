@@ -102,6 +102,6 @@ jobs:
           . environments/smslabs-example/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
-          TF_VAR_cluster_name: ci${{ github.run_id }}
         env:
           OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
