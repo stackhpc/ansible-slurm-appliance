@@ -1,6 +1,10 @@
 ---
 # from THIS directory, run:
-#  ansible-galaxy install --roles-path ./roles -r requirements.yml
+#
+# (venv) vtest/ [centos@slurmdeploy vtest]
+# $ rm -r ./roles/*
+# $ ansible-galaxy install --roles-path ./roles -r requirements_local_env.yml
+#
 roles:
   - name: sync_slurm_allocations
     src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
@@ -32,8 +36,8 @@ roles:
     src: git+git@github.nrel.gov:hpc/vstack_common_config.git
     type: git
   - name: ansible-role-ntp
-    src: git+git@github.nrel.gov:hpc/ansible-role-ntp.git
-    type: git
+    src: git+https://github.com/kbendl/ansible-role-ntp
+    version: rocky
   - name: vs-set-ephemeral-mounts
     src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
     type: git
