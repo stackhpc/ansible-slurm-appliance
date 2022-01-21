@@ -1,6 +1,6 @@
 ---
 # Miscellaneous
-ansible_user: centos
+#ansible_user: centos
 ansible_user_home: /var/lib/{{ ansible_user }} # for use when /home is going to be mounted over
 appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
