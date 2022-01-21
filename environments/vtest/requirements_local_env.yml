@@ -1,0 +1,42 @@
+---
+# from THIS directory, run:
+#  ansible-galaxy install --roles-path ./roles -r requirements.yml
+roles:
+  - name: sync_slurm_allocations
+    src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
+    type: git
+    version: feature/port_from_eagle_to_generic
+
+  ## this first one is currently hacked into ./hooks/post.yml
+  ## - name: cluster_config_manager
+  ##   src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
+  ##   type: git
+  ##   version: feature/galaxy-role-install
+
+  - name: cluster_dataset_manager
+    src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
+    type: git
+    version: feature/generic_for_vermilion
+  - name: pam_mkhomedir_plus
+    src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
+    type: git
+    version: feature/ansible-galaxy
+  - name: slurm_lex_accounting
+    src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
+    type: git
+    version: feature/ansible-galaxy
+  - name: vstack_admin_config
+    src: git+git@github.nrel.gov:hpc/vstack_admin_config.git
+    type: git
+  - name: vstack_common_config
+    src: git+git@github.nrel.gov:hpc/vstack_common_config.git
+    type: git
+  - name: ansible-role-ntp
+    src: git+git@github.nrel.gov:hpc/ansible-role-ntp.git
+    type: git
+  - name: vs-set-ephemeral-mounts
+    src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
+    type: git
+  - name: vermilion_ldap_client
+    src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
+    type: git

@@ -1,7 +1,7 @@
 ---
 # vtest post.yml
 - name: sync_slurm_allocations install on admin node
-  hosts: vtest-admin
+  hosts: admin
   become: true
   tags:
     - sync_slurm_allocations_admin
@@ -30,7 +30,7 @@
 #     is_compute_node: True
 
 - name: cluster_dataset_manager create project directories
-  hosts: vtest-admin
+  hosts: admin
   become: true
   tags:
     - cluster_dataset_manager
@@ -39,7 +39,7 @@
         name: cluster_dataset_manager
 
 - name: pam_mkhomedir_plus
-  hosts: login:!vtest-admin
+  hosts: login:!admin
   become: true
   tags:
     - pam_mkhomedir_plus
@@ -48,7 +48,7 @@
         name: pam_mkhomedir_plus
 
 - name: slurm_lex_accounting
-  hosts: vtest-control
+  hosts: control
   become: true
   tags:
     - slurm_lex_accounting
@@ -60,7 +60,7 @@
     slurm_lex_accounting_clustername: vtest
 
 - name: vstack_admin_config
-  hosts: vtest-admin
+  hosts: admin
   become: true
   tags:
     - vstack_admin_config
@@ -69,13 +69,23 @@
         name: vstack_admin_config
 
 - name: vstack_common_config
-  hosts: vtest-admin:vtest-control:login:compute
+  hosts: control:login:compute
   become: true
   tags:
     - vstack_common_config
   tasks:
     - include_role:
         name: vstack_common_config
+
+- name: vstack_admin_config
+  hosts: login
+  become: true
+  tags:
+    - vstack_admin_config
+  tasks:
+    - include_role:
+        name: vstack_admin_config
+
 
 - name: add kernel modules to compute and login nodes
   hosts: login:compute

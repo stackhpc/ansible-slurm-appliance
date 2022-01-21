@@ -1,4 +1,4 @@
-#openhpc_rebuild_clouds: "/home/centos/nrel-openrc.sh"
+#openhpc_rebuild_clouds: "/home/rocky/nrel-openrc.sh"
 
 openhpc_packages:
   - slurm-libpmi-ohpc

@@ -1,23 +1,23 @@
 compute_types = {
   large: {
     flavor: "compute.c60m240s120e1000"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   }
   /* standard: {
     flavor: "compute.c30m120s60e500"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   } */
   small: {
     flavor: "compute.c16m64s32e250"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   }
   /* tiny: {
     flavor: "compute.c4m16s8e60"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   } */
   gpu: {
     flavor: "gpu.c30m120s32e6000"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   }
 }
 #######################################
@@ -38,10 +38,10 @@ login_ips = {
   login-1: "10.60.107.241"
   admin: "10.60.107.243"
 }
-login_image = "CentOS8.5_login"
+login_image = "rocky8.5_ofed+cuda"
 proxy_name = "login-1"
 
-control_image = "CentOS8.5_login"
+control_image = "rocky8.5_ofed+cuda"
 control_flavor = "gen.c16m32s32"
 control_ip = "10.60.107.240"
 
@@ -64,7 +64,7 @@ storage_subnet = "storage"
 control_network = "control"
 control_subnet = "control-subnet"
 
-#compute_image = "CentOS8.4_ofed5.3-1+cuda11.4"
+#compute_image = "rocky8.5_ofed+cuda"
 #compute_image = "gpu_2021_11_12"
 ###########  ^^^^^^^^^^^^^^^ CHANGE THIS
 
