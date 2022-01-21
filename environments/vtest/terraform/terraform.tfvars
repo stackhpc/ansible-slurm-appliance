@@ -17,7 +17,7 @@ compute_types = {
   } */
   gpu: {
     flavor: "gpu.c30m120s32e6000"
-    image: "rocky8.5_ofed+cuda"
+    image: "rocky8.5_ofed+cuda+driver"
   }
 }
 #######################################
