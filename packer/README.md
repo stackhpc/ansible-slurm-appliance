@@ -38,6 +38,8 @@ Steps:
 
   Note the builder VMs are added to the `builder` group to differentiate them from "real" nodes - see developer notes below.
 
+This will build images for the `compute` and `login` ansible groups. To add additional builds add a new `source` in `openstack.pkr.hcl`.
+
 # Notes for developers
 
 The Packer build VMs are added to both the `builder` group and the `login` or `compute` groups as appropriate. The former group allows `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the VM where the real cluster may not be contactable (depending on the build network used). Currently this means:
