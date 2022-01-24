@@ -95,7 +95,21 @@ jobs:
           ansible-playbook ansible/adhoc/hpctests.yml 
         env:
           ANSIBLE_FORCE_COLOR: True
-          
+      
+      - name: Build control and compute images
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd packer
+          PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+      
+      - name: Reimage compute nodes and check still up
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml 
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
+        
       - name: Delete infrastructure
         run: |
           . venv/bin/activate

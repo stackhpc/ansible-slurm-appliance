@@ -1,0 +1,41 @@
+# Playbook reimage nodes with latest packer-build images and checks cluster still works
+
+- hosts: login[0]
+  become: no
+  tasks:
+    - name: Read packer build manifest
+      set_fact:
+        manifest: "{{ lookup('file', manifest_path) | from_json }}"
+      vars:
+        manifest_path: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/packer/packer-manifest.json"
+      delegate_to: localhost
+    
+    - name: Get latest login image build
+      set_fact:
+        login_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'login'}) | last }}"
+    
+    - name: Get latest compute image build
+      set_fact:
+        compute_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'compute'}) | last }}"
+    
+    - name: Request compute node rebuild via Slurm
+      shell:
+        cmd: scontrol reboot ASAP nextstate=RESUME reason='rebuild image:{{ compute_build.artifact_id }}' {{ openhpc_cluster_name }}-compute-[0-1]
+    
+    - name: Check compute node rebuild completed
+      shell:
+        cmd: openstack server show {{ item }} --format json -c image
+        register: openstack_server
+      loop: "{{ groups['compute'] }}"
+      retries: 5
+      delay: 30
+      until: compute_build.artifact_id in (openstack_server | from_json['image'])
+      delegate_to: localhost
+
+- hosts: compute
+  become: false
+  tasks:
+    - name: Wait for nodes to boot
+      wait_for_connection:
+
+- hosts: login[0]

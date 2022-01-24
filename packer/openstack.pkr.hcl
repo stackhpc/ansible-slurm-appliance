@@ -84,4 +84,10 @@ build {
     # TODO: Support vault password
     #ansible_env_vars = ["ANSIBLE_VAULT_PASSWORD_FILE=/home/stack/.kayobe-vault-pass"]
   }
+
+  post-processor "manifest" {
+    custom_data  = {
+      source = "${source.name}"
+    }
+  }
 }
