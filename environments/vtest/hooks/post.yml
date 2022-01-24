@@ -1,17 +1,6 @@
 ---
 # vtest post.yml
 
-- name: "ensure ceph libs are installed"
-  hosts: all
-  tags: ceph_installed
-  become: true
-  tasks:
-    - package:
-        state: latest
-        name:
-          - centos-release-ceph-nautilus
-          - ceph-common
-
 - name: "Set/fix the the ephemeral ssd mounts"
   hosts: compute
   tags: set-ephemeral-mounts

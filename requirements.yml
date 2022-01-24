@@ -3,17 +3,33 @@ roles:
   - src: stackhpc.nfs
   - name: stackhpc.openhpc
     src: https://github.com/stackhpc/ansible-role-openhpc
-    version: e3a9d3ed4b34243ea75f31a285cca792a43ca4a0
+    version: 'v0.9.0'
+    #version: a0d6f53dde8471fa4685d557bff59ec9b8ed886b
+    #version: e3a9d3ed4b34243ea75f31a285cca792a43ca4a0
+
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
-  - src: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
-  - src: cloudalchemy.grafana
-  - src: geerlingguy.mysql
+
+  #- src: geerlingguy.mysql
+  - src: git+git@github.com:kbendl/ansible-role-mysql.git
+    version: rocky
+    name: geerlingguy.mysql
+
   - src: https://github.com/stackhpc/ansible_role_spack
     name: stackhpc.spack
     version: HEAD
+
   - src: jriguera.configdrive
+
+  - src: git+https://github.com/kbendl/ansible-prometheus
+    name: cloudalchemy.prometheus
+  #- src: cloudalchemy.prometheus
+
+  - src: git+https://github.com/kbendl/ansible-grafana
+    name: cloudalchemy.grafana
+    version: rocky-patch-1
+
   # - name: sync_slurm_allocations
   #   src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
   #   type: git
@@ -57,4 +73,6 @@ collections:
   type: git
   version: main
 - name: openstack.cloud
+
+
 ...
