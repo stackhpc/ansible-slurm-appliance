@@ -40,6 +40,10 @@ variable "ssh_keypair_name" {
   type = string
 }
 
+variable "security_groups" {
+  type = list(string)
+}
+
 variable "image_visibility" {
   type = string
   default = "private"
@@ -53,6 +57,7 @@ source "openstack" "openhpc" {
   ssh_timeout = "20m"
   ssh_private_key_file = "${var.ssh_private_key_file}" # TODO: doc same requirements as for qemu build?
   ssh_keypair_name = "${var.ssh_keypair_name}" # TODO: doc this
+  security_groups = "${var.security_groups}"
   image_name = "ohpc-${source.name}-${local.timestamp}.qcow2"
   image_visibility = "${var.image_visibility}"
 }
