@@ -1,0 +1,107 @@
+
+name: Test on OpenStack via smslabs
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  openstack-example:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/smslabs-example/bastion_fingerprint >> ~/.ssh/known_hosts
+        shell: bash
+      
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
+      - name: Install terraform
+        uses: hashicorp/setup-terraform@v1
+      
+      - name: Initialise terraform
+        run: terraform init
+        working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
+        
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+        shell: bash
+        env:
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+      
+      - name: Provision infrastructure
+        id: provision
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform apply -auto-approve
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+      
+      - name: Get server provisioning failure messages
+        id: provision_failure
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          echo "::set-output name=messages::$(./getfaults.py)"
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: always() && steps.provision.outcome == 'failure'
+        
+      - name: Delete infrastructure if failed due to lack of hosts
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform destroy -auto-approve
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
+
+      # TODO: create cloud yml for rebuild - currently disabled in groups
+
+      - name: Configure infrastructure
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible all -m wait_for_connection
+          ansible-playbook ansible/adhoc/generate-passwords.yml
+          ansible-playbook -vv ansible/site.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
+      
+      - name: Run MPI-based tests
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible-playbook ansible/adhoc/hpctests.yml 
+        env:
+          ANSIBLE_FORCE_COLOR: True
+          
+      - name: Delete infrastructure
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform destroy -auto-approve
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}

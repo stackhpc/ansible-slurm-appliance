@@ -25,12 +25,12 @@ variable "groups" {
 
 variable "base_img_url" {
   type = string
-  default = "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2"
+  default = "https://download.rockylinux.org/pub/rocky/8.5/images/Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
 }
 
 variable "base_img_checksum" {
   type = string
-  default = "sha256:3510fc7deb3e1939dbf3fe6f65a02ab1efcc763480bc352e4c06eca2e4f7c2a2"
+  default = "sha256:c23f58f26f73fb9ae92bfb4cf881993c23fdce1bbcfd2881a5831f90373ce0c8"
 }
 
 source "qemu" "openhpc-vm" {
@@ -40,7 +40,7 @@ source "qemu" "openhpc-vm" {
   disk_size = var.disk_size
   disk_compression = true
   accelerator      = "kvm" # default, if available
-  ssh_username = "centos"
+  ssh_username = "rocky"
   ssh_timeout = "20m"
   net_device       = "virtio-net" # default
   disk_interface   = "virtio" # default
@@ -50,7 +50,7 @@ source "qemu" "openhpc-vm" {
   ssh_private_key_file = "~/.ssh/id_rsa"
   qemuargs         = [
     ["-monitor", "unix:qemu-monitor.sock,server,nowait"],
-    # NOTE: To uncomment the below, you need: mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.outh
+    # To see the VM's console, run `mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out` then uncommment the below
     # ["-serial", "pipe:/tmp/qemu-serial"],
     ["-m", "896M"],
     ["-cdrom", "config-drive.iso"]
