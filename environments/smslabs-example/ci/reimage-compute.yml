@@ -1,4 +1,4 @@
-# Reimage compute nodes via Slurm with latest packer-build images and checks cluster still works
+# Reimage compute nodes via Slurm with latest packer-build images
 
 - hosts: login[0]
   become: no
@@ -9,10 +9,6 @@
       vars:
         manifest_path: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/packer/packer-manifest.json"
       delegate_to: localhost
-    
-    - name: Get latest login image build
-      set_fact:
-        login_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'login'}) | last }}"
     
     - name: Get latest compute image build
       set_fact:
