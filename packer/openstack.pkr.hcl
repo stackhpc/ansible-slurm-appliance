@@ -59,7 +59,7 @@ variable "ssh_bastion_username" {
 
 variable "ssh_bastion_private_key_file" {
   type = string
-  default = "~/.ssh/id_rsa.pub"
+  default = "~/.ssh/id_rsa"
 }
 
 source "openstack" "openhpc" {
