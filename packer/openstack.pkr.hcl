@@ -49,6 +49,19 @@ variable "image_visibility" {
   default = "private"
 }
 
+variable "ssh_bastion_host" {
+  type = string
+}
+
+variable "ssh_bastion_username" {
+  type = string
+}
+
+variable "ssh_bastion_private_key_file" {
+  type = string
+  default = "~/.ssh/id_rsa.pub"
+}
+
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
   networks = "${var.networks}"
@@ -57,6 +70,9 @@ source "openstack" "openhpc" {
   ssh_timeout = "20m"
   ssh_private_key_file = "${var.ssh_private_key_file}" # TODO: doc same requirements as for qemu build?
   ssh_keypair_name = "${var.ssh_keypair_name}" # TODO: doc this
+  ssh_bastion_host = "${var.ssh_bastion_host}"
+  ssh_bastion_username = "${var.ssh_bastion_username}"
+  ssh_bastion_private_key_file = "${var.ssh_bastion_private_key_file}"
   security_groups = "${var.security_groups}"
   image_name = "ohpc-${source.name}-${local.timestamp}.qcow2"
   image_visibility = "${var.image_visibility}"
