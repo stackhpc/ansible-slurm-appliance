@@ -107,7 +107,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml 
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         
       - name: Delete infrastructure
