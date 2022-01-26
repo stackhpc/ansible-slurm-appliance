@@ -92,7 +92,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
-          ansible-playbook ansible/adhoc/hpctests.yml 
+          ansible-playbook -vv ansible/adhoc/hpctests.yml
         env:
           ANSIBLE_FORCE_COLOR: True
           
