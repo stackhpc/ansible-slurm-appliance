@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+concurrency: stackhpc-ci # openstack project
 jobs:
   openstack-example:
     runs-on: ubuntu-20.04
@@ -76,8 +77,6 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
-      # TODO: create cloud yml for rebuild - currently disabled in groups
-
       - name: Configure infrastructure
         run: |
           . venv/bin/activate
@@ -92,10 +91,37 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
-          ansible-playbook ansible/adhoc/hpctests.yml 
+          ansible-playbook -vv ansible/adhoc/hpctests.yml
         env:
           ANSIBLE_FORCE_COLOR: True
-          
+      
+      - name: Build control and compute images
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          cd packer
+          PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+        env:
+          OS_CLOUD: openstack
+      
+      - name: Reimage compute nodes via slurm and check cluster still up
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
+        env:
+          OS_CLOUD: openstack
+
+      - name: Reimage login nodes via openstack and check cluster still up
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-login.yml
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
+        env:
+          OS_CLOUD: openstack
+
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
@@ -105,3 +131,4 @@ jobs:
         env:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: ${{ success() || cancelled() }}

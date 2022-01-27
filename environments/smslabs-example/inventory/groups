@@ -32,10 +32,9 @@ control
 [filebeat:children]
 slurm_stats
 
-# Don't currently test rebuild - need to deploy app cred
-#[rebuild:children]
-#control
-#compute
+[rebuild:children]
+control
+compute
 
 [update:children]
 cluster
