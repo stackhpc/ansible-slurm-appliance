@@ -29,25 +29,6 @@
         tasks_from: deploy.yml
       tags: deploy
 
-- name: Setup kibana
-  hosts: kibana
-  tags: kibana
-  tasks:
-    - import_role:
-        name: kibana
-        tasks_from: config.yml
-      tags: config
-
-    - import_role:
-        name: kibana
-        tasks_from: deploy.yml
-      tags: deploy
-
-    - import_role:
-        name: kibana
-        tasks_from: post.yml
-      tags: post
-
 - name: Setup slurm stats
   hosts: slurm_stats
   tags: slurm_stats
