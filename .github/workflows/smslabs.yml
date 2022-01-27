@@ -131,3 +131,4 @@ jobs:
         env:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: ${{ success() || cancelled() }}
