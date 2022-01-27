@@ -2,6 +2,13 @@
 
 # Fail early if configuration is invalid
 
+- name: Ensure control node is in inventory
+  hosts: all
+  tasks:
+    - assert:
+        that: groups['control'] | length
+        fail_msg: "no hosts found in group 'control' - has control node been deployed?"
+
 - name: Validate podman configuration
   hosts: podman
   tags: podman
