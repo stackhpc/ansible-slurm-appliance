@@ -8,7 +8,7 @@
     - local_deploy
   tasks:
     - include_tasks: site_post.yml
-      when: STACKHPC_DO_CI is not defined
+   #when: STACKHPC_DO_CI is not defined
    # or something like: '{{ lookup('env', 'STACKHPC_CI') }}' is not defined  or HOSTNAME is XXXX.stackhpc.org
 
 - name: install X stuff from powertools to login hosts
@@ -24,6 +24,6 @@
     - post_x11
   tasks:
     - yum:
-        enablerepo: powertools
+        #enablerepo: powertools
         state: present
         name: "{{ packages }}"
