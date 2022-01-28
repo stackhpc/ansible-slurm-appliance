@@ -79,10 +79,6 @@
 - name: add kernel modules to compute and login nodes
   hosts: login:compute
   become: true
-  vars:
-    packages:
-      - kernel-devel
-      # - kernel-devel-4.18.0-305.3.1.el8.x86_64
   tags:
     - post_powertools
     - post_kernel_headers
@@ -91,20 +87,16 @@
         enablerepo: powertools
         state: present
         name: "{{ packages }}"
+      vars:
+        packages:
+          - kernel-devel
+          # - kernel-devel-4.18.0-305.3.1.el8.x86_64
 
-- name: install X stuff from powertools to login hosts
-  hosts: login
+- name: IPA and LDAP san fix
+  hosts: all
   become: true
-  vars:
-    packages:
-      - xorg-x11-server-Xorg
-      - xorg-x11-xauth
-      - xorg-x11-apps
   tags:
-    - post_powertools
-    - post_x11
+    - ipa_ldap_fix
   tasks:
-    - yum:
-        enablerepo: powertools
-        state: present
-        name: "{{ packages }}"
+    - include_role:
+      name: ansible_ipa_ldap_fix

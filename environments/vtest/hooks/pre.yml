@@ -42,6 +42,14 @@
     # #   - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
     # #   - os_manila_mount_pkgs_install | default(true) | bool
 
+- name: Ensure yum repos are local
+  hosts: all
+  tags: ansible_yum_config
+  become: true
+  tasks:
+    - include_role:
+        name: ansible_yum_config
+
 - name: nrel-proto fixes - compute nodes
   hosts: compute
   become: true
@@ -76,19 +84,3 @@
         name: ansible-role-ntp
     - shell: "echo '{{distro_releasever}}' > /etc/yum/vars/releasever"
       tags: lock_releasever
-
-
-- name: "Workaround for missing SAN declartion in IPA cert vs openldap"
-  hosts: all
-  become: true
-  tags:
-    - openldap_fix
-  tasks:
-    - yum:
-        state: present
-        name: "openldap"
-    - lineinfile:
-        path: /etc/openldap/ldap.conf
-        state: present
-        regexp: '^TLS_REQSAN'
-        line: 'TLS_REQSAN allow'

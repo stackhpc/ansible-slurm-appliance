@@ -10,13 +10,9 @@ roles:
     src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
     type: git
     version: feature/port_from_eagle_to_generic
-
-  ## this first one is currently hacked into ./hooks/post.yml
-  ## - name: cluster_config_manager
-  ##   src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
-  ##   type: git
-  ##   version: feature/galaxy-role-install
-
+  - name: ansible_ipa_ldap_fix
+    src: git+https://github.nrel.gov/hpc/ansible_ipa_ldap_fix.git
+    type: git
   - name: cluster_dataset_manager
     src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
     type: git
@@ -44,3 +40,11 @@ roles:
   - name: vermilion_ldap_client
     src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
     type: git
+  - name: ansible_yum_config
+    src: git+git@github.nrel.gov:hpc/ansible_yum_config.git
+    type: git
+## this one is currently hacked into ./hooks/post.yml
+## - name: cluster_config_manager
+##   src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
+##   type: git
+##   version: feature/galaxy-role-install
