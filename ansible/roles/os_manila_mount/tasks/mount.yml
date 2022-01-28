@@ -18,7 +18,6 @@
     - name: Install relevant yum packages
       yum:
         name:
-          - epel-release
           - "centos-release-ceph-{{ os_manila_mount_ceph_version }}"
 
     - name: Install ceph
