@@ -95,7 +95,7 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: True
       
-      - name: Build control and compute images
+      - name: Build login and compute images
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
