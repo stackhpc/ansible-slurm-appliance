@@ -1,9 +1,0 @@
-openhpc_extra_packages:
-  - git
-  - python3
-openhpc_extra_config_overrides:
-  SlurmctldDebug: debug
-  SlurmdDebug: debug
-
-#example_list: "{{ example_list + [7] }}" # FAILS - recursive
-#example_dict: "{{ example_dict | combine({c: 4} ) }}" # FAILS - recursive

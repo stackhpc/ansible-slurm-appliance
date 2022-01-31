@@ -22,5 +22,3 @@ roles/*
 !roles/block_devices/**
 !roles/basic_users/
 !roles/basic_users/**
-!roles/autoscale/
-!roles/autoscale/**
