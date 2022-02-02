@@ -27,15 +27,6 @@
         tasks_from: validate.yml
       tags: validate
 
-- name: Validate kibana configuration
-  hosts: kibana
-  tags: kibana
-  tasks:
-    - import_role:
-        name: kibana
-        tasks_from: validate.yml
-      tags: validate
-
 - name: Validate opendistro configuration
   hosts: opendistro
   tags: opendistro
