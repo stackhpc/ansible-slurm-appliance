@@ -66,8 +66,8 @@ hosts from the associated group in the inventory. A pattern we use is to name th
 ansible inventory `group` after the name of the `role` that configures it. The playbook
 that runs this role targets hosts in that group. The `common` environment typically defines
 all groups as the empty group. You must explicly opt-in and add hosts to these these groups
-to configure that service.  For example, if you don't want to deploy and configure kibana,
-you simply do not add any hosts to the `kibana` group in the inventory. This allows us to
+to configure that service.  For example, if you don't want to deploy and configure grafana,
+you simply do not add any hosts to the `grafana` group in the inventory. This allows us to
 have a shared ansible code base as we can define playbooks to configure all things,
 but these playbooks end up not being run if no host is in the associated group.
 
