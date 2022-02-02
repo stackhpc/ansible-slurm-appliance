@@ -74,10 +74,7 @@ openhpc_slurm_partitions:
 # Additional parameters to set in slurm.conf - list of [parameter, value] pairs
 slurm_conf_extraparams:
   - ['LaunchParameters', 'use_interactive_step']
-  - ['FirstJobId', 1000]
-
-  ### - ['MpiDefault', "pmi2"]    ### get the launcher to work! pmi1, pmi2, or pmix
-  # # spack mpi drivers were a mis-match... is this working now????
+  - ['FirstJobId', 50000000]
 
   - ['PropagateResourceLimits', 'NONE']
 
@@ -137,8 +134,41 @@ slurm_conf_extraparams:
   - ['SchedulerType','sched/backfill']
   - ['SelectType','select/cons_res']
   - ['SelectTypeParameters','CR_Core']
-  #FastSchedule=1
+  - ['EnforcePartLimits', 'ALL']
+  - ['SchedulerParameters', 'defer,default_queue_depth=10750,max_rpc_cnt=125,max_sched_time=6,partition_job_depth=10500,sched_max_job_start=200,sched_min_interval=2000000,batch_sched_delay=20,bf_max_job_test=13000,bf_interval=30,bf_continue,bf_window=15840,bf_resolution=250,max_switch_wait=172800']
   #SchedulerParameters=defer
+  #FastSchedule=1
+
+# LOGGING
+# Silence warnings about configuration file mismatches.
+  - ['DebugFlags', 'NO_CONF_HASH']
+  - ['SlurmctldDebug', 'info']
+  - ['SlurmctldLogFile', '/var/log/slurmctld.log']
+  - ['SlurmdDebug', 'info']
+  - ['JobCompType', 'jobcomp/none']
+  - ['JobCompLoc', '/var/log/slurm_jobacct.log']
+#SlurmdLogFile=
+
+# ACCOUNTING
+### start with a qos
+  - ['AccountingStorageEnforce', 'safe,qos,limits']
+  - ['AcctGatherNodeFreq', '30']
+  - ['AccountingStorageTRES', 'gres/gpu']
+ ## addked kmb
+  - ['AccountingStorageHost', 'vtest-control']
+  - ['AccountingStorageUser', 'slurm']
+  - ['AccountingStorageType', 'accounting_storage/slurmdbd']
+  - ['AcctGatherFilesystemType', 'acct_gather_filesystem/lustre']
+
+#  - ['JobAcctGatherType', 'jobacct_gather/linux']
+#  - ['JobAcctGatherParams', 'UsePss']
+#  - ['JobAcctGatherFrequency', 'task=30,energy=30']
+
+# kbendl - the ephemeral mount for SSD?
+  - ['TmpFS', '/var/scratch']
+  - ['GresTypes', 'gpu']
+  ### - ['MpiDefault', "pmi2"]    ### get the launcher to work! pmi1, pmi2, or pmix
+  # # spack mpi drivers were a mis-match... is this working now????
 
   # # NREL: see topology.conf
   # - ['TopologyPlugin', 'topology/tree']
@@ -151,33 +181,3 @@ slurm_conf_extraparams:
   # - ['HealthCheckProgram', '/usr/sbin/nhc']
   # - ['HealthCheckInterval', 300]
   # - ['HealthCheckNodeState', 'CYCLE,ANY']
-
-  # ACCOUNTING
-  ### start with a qos
-  - ['AccountingStorageEnforce', 'safe,qos,limits']
-  - ['AcctGatherNodeFreq', '30']
-  - ['AccountingStorageTRES', 'gres/gpu']
- ## addked kmb
-#  - ['AccountingStorageHost', 'vtest-control']
-#  - ['AccountingStorageUser', 'slurm']
-#  - ['AccountingStorageType', 'accounting_storage/slurmdbd']
-#  - ['AcctGatherFilesystemType', 'acct_gather_filesystem/lustre']
-
-#  - ['JobAcctGatherType', 'jobacct_gather/linux']
-#  - ['JobAcctGatherParams', 'UsePss']
-#  - ['JobAcctGatherFrequency', 'task=30,energy=30']
-
- # - ['GresTypes', 'gpu']
-
-  # LOGGING
-  - ['SlurmctldDebug', 'info']
-  - ['SlurmctldLogFile', '/var/log/slurmctld.log']
-  - ['SlurmdDebug', 'info']
-
-# kbendl is this the ephemeral mount for SSD?
-  - ['TmpFS', '/var/scratch']
-  - ['EnforcePartLimits', 'ALL']
-
-  - ['SchedulerParameters', 'defer,default_queue_depth=10750,max_rpc_cnt=125,max_sched_time=6,partition_job_depth=10500,sched_max_job_start=200,sched_min_interval=2000000,batch_sched_delay=20,bf_max_job_test=13000,bf_interval=30,bf_continue,bf_window=15840,bf_resolution=250,max_switch_wait=172800']
-
-
