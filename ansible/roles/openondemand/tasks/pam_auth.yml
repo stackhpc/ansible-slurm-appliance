@@ -1,0 +1,24 @@
+# https://osc.github.io/ood-documentation/latest/authentication/pam.html
+---
+- name: Install Apache PAM module
+  yum:
+    name: mod_authnz_pam
+
+- name: Enable Apache PAM module
+  lineinfile:
+    path: /etc/httpd/conf.modules.d/55-authnz_pam.conf
+    line: LoadModule authnz_pam_module modules/mod_authnz_pam.so
+    regexp: ^LoadModule authnz_pam_module modules/mod_authnz_pam.so
+
+- name: Set PAM service # TODO: might need subsequent modification??
+  command:
+    cmd: cp /etc/pam.d/sshd /etc/pam.d/ood
+    creates: /etc/pam.d/ood
+
+- name: Allow the Apache user to read /etc/shadow
+  file:
+    path: /etc/shadow
+    mode: 0640
+    group: apache
+
+# TODO: do we need to restart OOD here??
