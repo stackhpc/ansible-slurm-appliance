@@ -35,3 +35,12 @@ compute
 
 [update:children]
 cluster
+
+[openondemand:children]
+login
+
+[openondemand_desktop:children]
+compute
+
+[openondemand_jupyter:children]
+compute
