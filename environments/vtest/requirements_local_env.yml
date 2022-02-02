@@ -20,7 +20,8 @@ roles:
   - name: pam_mkhomedir_plus
     src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
     type: git
-    version: feature/ansible-galaxy
+    version: 2.0.0
+    # version: feature/ansible-galaxy
   - name: slurm_lex_accounting
     src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
     type: git
@@ -42,6 +43,9 @@ roles:
     type: git
   - name: ansible_yum_config
     src: git+git@github.nrel.gov:hpc/ansible_yum_config.git
+    type: git
+  - name: root_pass_cli
+    src: git+git@github.nrel.gov:hpc/root_pass_cli.git
     type: git
 ## this one is currently hacked into ./hooks/post.yml
 ## - name: cluster_config_manager
