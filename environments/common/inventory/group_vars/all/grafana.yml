@@ -36,7 +36,7 @@ grafana_security:
 grafana_datasources:
   - name: prometheus
     ds_type: prometheus
-    ds_url: "{{ prometheus_address }}:9090" # default prometheus port
+    ds_url: "http://{{ prometheus_address }}:9090" # default prometheus port
   - name: slurmstats
     ds_type: elasticsearch
     ds_url: "https://{{ elasticsearch_address }}:9200"
