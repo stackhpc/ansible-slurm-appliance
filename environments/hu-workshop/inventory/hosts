@@ -1,0 +1,18 @@
+[all:vars]
+ansible_user=rocky
+openhpc_cluster_name=rocky
+
+[control]
+rocky-control ansible_host=192.168.3.212 server_networks='{"hu-lab":["192.168.3.212"]}'
+
+[login]
+rocky-login-0 ansible_host=192.168.3.79 server_networks='{"hu-lab":["192.168.3.79"]}'
+
+[compute]
+rocky-compute-0 ansible_host=192.168.3.206 server_networks='{"hu-lab":["192.168.3.206"]}'
+rocky-compute-1 ansible_host=192.168.3.26 server_networks='{"hu-lab":["192.168.3.26"]}'
+
+# Define groups for slurm parititions:
+[rocky_compute]
+rocky-compute-0
+rocky-compute-1
