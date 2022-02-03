@@ -7,7 +7,11 @@ roles:
     #version: a0d6f53dde8471fa4685d557bff59ec9b8ed886b
     #version: e3a9d3ed4b34243ea75f31a285cca792a43ca4a0
 
-  - src: cloudalchemy.node_exporter
+  #- src: cloudalchemy.node_exporter
+  - src: https://github.com/stackhpc/ansible-node-exporter.git
+    version: support-rhel-clones
+    name: cloudalchemy.node_exporter
+
   - src: cloudalchemy.blackbox-exporter
   - src: cloudalchemy.alertmanager
 
@@ -22,9 +26,12 @@ roles:
 
   - src: jriguera.configdrive
 
-  - src: git+https://github.com/kbendl/ansible-prometheus
-    name: cloudalchemy.prometheus
+  #- src: git+https://github.com/kbendl/ansible-prometheus
+  #  name: cloudalchemy.prometheus
   #- src: cloudalchemy.prometheus
+  - src: https://github.com/cloudalchemy/ansible-prometheus.git
+    version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
+    name: cloudalchemy.prometheus
 
   - src: git+https://github.com/kbendl/ansible-grafana
     name: cloudalchemy.grafana
