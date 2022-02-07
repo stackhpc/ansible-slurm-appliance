@@ -1,0 +1,8 @@
+---
+#  python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())"
+
+- name: root_pass_cli
+  hosts: all
+  become: yes
+  roles:
+    - root_pass_cli

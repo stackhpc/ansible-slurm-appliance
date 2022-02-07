@@ -154,7 +154,8 @@ slurm_conf_extraparams:
   - ['AccountingStorageEnforce', 'safe,qos,limits']
   - ['AcctGatherNodeFreq', '30']
   - ['AccountingStorageTRES', 'gres/gpu']
- ## addked kmb
+
+## addked kmb
   - ['AccountingStorageHost', 'vtest-control']
   - ['AccountingStorageUser', 'slurm']
   - ['AccountingStorageType', 'accounting_storage/slurmdbd']

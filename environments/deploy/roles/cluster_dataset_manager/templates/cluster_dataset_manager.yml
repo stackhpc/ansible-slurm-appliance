@@ -1,0 +1,15 @@
+---
+# Example variable: {"datasets_mountpoints": {"/user1": {"group": "abcdef", "owner": "user1", "mode": "2770"}}
+# - hosts: Peregrine or Eagle or Gyrfalcon or vermilion
+- hosts: {{cluster_dataset_manager_name}}
+  tasks:
+    - name: "Check dataset mountpoints are mounted"
+      shell: "/bin/mountpoint -q /lustre/eaglefs || /bin/mountpoint -q /projects"
+      register: volume_stat
+      changed_when: False
+      check_mode: no
+{% raw %}
+    - name: "Create datasets"
+      file: path="{{item.path}}" owner="{{item.owner}}" group="{{item.group}}" mode="{{item.mode}}" state=directory
+      with_items: "{{ datasets_mountpoints }}"
+{% endraw %}

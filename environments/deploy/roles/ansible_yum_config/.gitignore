@@ -1,0 +1,103 @@
+### roles that are imported via requirements files
+roles/ansible-hardening
+roles/ip_blocker
+roles/ansible-role-hardening
+*/ip_blocker*
+
+*.code-*
+*.py[cod]
+.cache*
+roles/maintenance
+maintenance
+# editor stuff
+.idea
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+*.EGG-INFO
+
+#No Ansible Retry Files
+*.retry
+
+
+dist
+build
+eggs
+parts
+#bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+###############################
+.svn
+.bzr
+.hgsvn
+*.komodoproject
+.hg
+*.wpr
+*.sublime-*
+
+#build and log files
+###############################
+*.o
+*.pyc
+*.pyo
+*.out
+*.log
+*.tmp
+.idea
+.idea/*
+
+
+#Apple / Mac stuff
+###############################
+.DS_Store
+._*
+.Trash
+
+
+# obvious backup files
+###############################
+*.orig
+*.bak
+*~
+~*
+*.tmp*
+
+## Local Testing Files
+test.yml
+test_inventory
+
+# Secure
+cmaccount-hash.txt
+
+# Seems to be ansible script, now sure why its here
+setup
+
+# exe files
+ghost_check
+

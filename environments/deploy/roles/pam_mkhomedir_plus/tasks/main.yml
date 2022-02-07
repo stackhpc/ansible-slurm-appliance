@@ -1,0 +1,14 @@
+---
+- name: "Install pam module to setup scratch directory"
+  yum: name="https://mirrors.hpc.nrel.gov/nrel/x86_64/pam_mkhomedir_plus-0.0.1-0.x86_64.rpm"
+  ignore_errors: yes
+  tags: pam_mkhomedir_plus
+
+- name: "Enable pam module"
+  lineinfile: 
+    dest: "/etc/pam.d/system-auth"
+    line: "session    optional   pam_mkhomedir_plus.so skel=/dev/null umask=0077 homedir=/scratch"
+    insertafter: "^.*session.*pam_oddjob_mkhomedir.so.*" 
+    firstmatch: yes
+    state: present
+  tags: pam_mkhomedir_plus

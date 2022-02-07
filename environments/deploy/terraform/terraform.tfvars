@@ -1,23 +1,23 @@
 compute_types = {
   large: {
     flavor: "compute.c60m240s120e1000"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   }
   standard: {
     flavor: "compute.c30m120s60e500"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   }
   small: {
     flavor: "compute.c16m64s32e250"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   }
   tiny: {
     flavor: "compute.c4m16s8e60"
-    image: "CentOS8.5_ofed5.5-1+cuda11.4"
+    image: "rocky8.5_ofed+cuda"
   }
   gpu: {
     flavor: "gpu.c30m120s32e6000"
-    image: "CentOS8.4_ofed+cuda_kbs"
+    image: "rocky8.5_ofed+cuda+driver"
   }
 }
 
@@ -163,21 +163,31 @@ gpu-0005: "gpu"
 gpu-0006: "gpu"
 }
 
+##########################################
+
 login_names = {
   login-1: "gen.c8m16s16"
   login-2: "gen.c8m16s16"
   admin:   "gen.c8m16s16"
 }
+#
 
 login_ips = {
   login-1: "10.60.105.223"
   login-2: "10.60.106.225"
-  admin: "10.60.105.50"
+   admin: "10.60.105.50"
 }
+#
 
-login_image = "c83_login.v2"
+login_image = "rocky8.5_ofed+cuda"
 
 proxy_name = "login-1"
+
+control_image = "rocky8.5_ofed+cuda"
+control_flavor = "gen.c16m32s32"
+control_ip = "10.60.106.230"
+
+#######################################
 
 cluster_name  = "vs"
 cluster_slurm_name = "vermilion"
@@ -197,9 +207,12 @@ storage_subnet = "storage"
 control_network = "control"
 control_subnet = "control-subnet"
 
-control_image = "CentOS8.3"
-control_flavor = "gen.c16m32s32"
-control_ip = "10.60.106.230"
+#compute_image = "rocky8.5_ofed+cuda"
+#compute_image = "gpu_2021_11_12"
+###########  ^^^^^^^^^^^^^^^ CHANGE THIS
+#compute_images = {} # allows overrides for specific nodes, by name
+compute_images = {}
 
-compute_images = {} # allows overrides for specific nodes, by name
-
+# reserve ports for the above:
+#openstack port create --network external --fixed-ip subnet=external,ip-address=10.60.107.240 vtest_control_port
+#openstack port create --network external --fixed-ip subnet=external,ip-address=10.60.107.241 vtest_login1_port

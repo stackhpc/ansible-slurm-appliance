@@ -1,0 +1,104 @@
+---
+# PROD
+# site_post.yml
+
+- name: "Set/fix the the ephemeral ssd mounts"
+  hosts: compute
+  tags: set-ephemeral-mounts
+  become: true
+  tasks:
+    - include_role:
+        name: vs-set-ephemeral-mounts
+
+- name: sync_slurm_allocations install on admin node
+  hosts: admin
+  become: true
+  tags:
+    - sync_slurm_allocations_admin
+  tasks:
+    - include_role:
+        name: sync_slurm_allocations
+
+- name: cluster_dataset_manager create project directories
+  hosts: admin
+  become: true
+  tags:
+    - cluster_dataset_manager
+  tasks:
+    - include_role:
+        name: cluster_dataset_manager
+
+- name: pam_mkhomedir_plus
+  hosts: login:!admin
+  become: true
+  tags:
+    - pam_mkhomedir_plus
+  tasks:
+    - include_role:
+        name: pam_mkhomedir_plus
+
+- name: slurm_lex_accounting
+  hosts: control
+  become: true
+  tags:
+    - slurm_lex_accounting
+  tasks:
+    - include_role:
+        name: slurm_lex_accounting
+  vars:
+    slurm_lex_accounting_dev: False
+    slurm_lex_accounting_clustername: vermilion
+
+- name: vstack_admin_config
+  hosts: admin
+  become: true
+  tags:
+    - vstack_admin_config
+  tasks:
+    - include_role:
+        name: vstack_admin_config
+
+- name: vstack_common_config
+  hosts: control:login:compute
+  become: true
+  tags:
+    - vstack_common_config
+  tasks:
+    - include_role:
+        name: vstack_common_config
+
+- name: vstack_admin_config
+  hosts: login
+  become: true
+  tags:
+    - vstack_admin_config
+  tasks:
+    - include_role:
+        name: vstack_admin_config
+
+
+- name: add kernel modules to compute and login nodes
+  hosts: login:compute
+  become: true
+  tags:
+    - post_powertools
+    - post_kernel_headers
+  tasks:
+    - yum:
+        enablerepo: powertools
+        state: present
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - kernel-devel
+          # - kernel-devel-4.18.0-305.3.1.el8.x86_64
+
+- name: IPA and LDAP san fix
+  hosts: all
+  become: true
+  tags:
+    - ipa_ldap_fix
+  tasks:
+    - include_role:
+      name: ansible_ipa_ldap_fix
+

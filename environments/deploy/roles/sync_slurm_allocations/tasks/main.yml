@@ -1,0 +1,16 @@
+---
+- name: Install Ansible
+  yum: name=ansible state=latest
+
+- name: Setup vault file
+  copy: src=vault dest={{slurm_sync_allocations_install_path}}/ owner=root group=root mode=400
+
+- name: Setup vault vars
+  copy: src=sync_slurm_allocations_secret.yml dest={{slurm_sync_allocations_install_path}}/ owner=root group=root mode=400 decrypt=no
+
+- name: Copy sync script
+  copy: src=sync_slurm_allocations dest={{slurm_sync_allocations_install_path}} owner=root group=root mode=700
+
+- name: "Slurm Allocations Sync"
+  cron: name="slurm allocations sync cron" minute="0,30" job="(/sbin/sss_cache -E && {{slurm_sync_allocations_install_path}}/sync_slurm_allocations --cluster-name={{sync_slurm_allocations_clustername}} --slurm-path={{slurm_sync_allocations_slurm_path}} --do-account-create --add-only --vault-file={{slurm_sync_allocations_install_path}}/{{slurm_sync_allocations_vault_file}} --vault-secret-file={{slurm_sync_allocations_install_path}}/{{slurm_sync_allocations_vault_secret_file}} 2>&1 | /bin/gawk '{ print strftime(\"[\\%Y-\\%m-\\%d \\%H:\\%M:\\%S]\"), $0 }' >>{{slurm_sync_allocations_log_path}}/{{slurm_sync_allocations_log_file}} 2>&1)"
+

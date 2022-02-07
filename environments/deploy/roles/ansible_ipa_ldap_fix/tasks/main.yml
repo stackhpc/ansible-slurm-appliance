@@ -1,0 +1,43 @@
+---
+# tasks file for ansible_ipa_ldap_fix
+
+- name: Do RedHat
+  block:
+    - name: Setting file path
+      set_fact:
+        ldapconf: "/etc/ldap/ldap.conf"
+
+    - name: install packages
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - sssd-ldap
+          - openldap-clients
+  # end block
+  when: ansible_os_family == 'RedHat'
+
+- name: do debian
+  block:
+    - name: Setting file path - deb
+      set_fact:
+        ldapconf: /etc/ldap.conf
+
+    - name: install packages
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - sssd-ldap
+          - ldap-utils
+
+    # end block
+  when: ansible_os_family == 'Debian'
+
+- name: add line to ldap.conf
+  lineinfile:
+    path:  /etc/openldap/ldap.conf
+    regexp:  '^TLS_REQSAN'
+    state: present
+    line:  'TLS_REQSAN allow'
+    backup: True

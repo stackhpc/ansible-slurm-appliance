@@ -1,0 +1,9 @@
+---
+- name: Copy Admin ssh keys
+  copy: src={{item}} dest=/root/.ssh/ owner=root group=root mode=0600
+  loop:
+    - id_rsa
+    - id_rsa.pub
+
+- name: Admin ssh config to map root to use OS user by default
+  copy: src=ssh_config dest=/root/.ssh/config owner=root group=root mode=0600

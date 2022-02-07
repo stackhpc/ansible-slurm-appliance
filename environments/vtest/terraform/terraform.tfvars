@@ -38,7 +38,9 @@ login_ips = {
   login-1: "10.60.107.241"
   admin: "10.60.107.243"
 }
+
 login_image = "rocky8.5_ofed+cuda"
+
 proxy_name = "login-1"
 
 control_image = "rocky8.5_ofed+cuda"
@@ -52,6 +54,7 @@ cluster_slurm_name = "vtest"
 cluster_availability_zone = "vermilion-tds-az1"
 
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+
 key_pair = "slurmdeploy"
 
 external_network = "external"
@@ -67,9 +70,6 @@ control_subnet = "control-subnet"
 #compute_image = "rocky8.5_ofed+cuda"
 #compute_image = "gpu_2021_11_12"
 ###########  ^^^^^^^^^^^^^^^ CHANGE THIS
-
-
-
 #compute_images = {} # allows overrides for specific nodes, by name
 compute_images = {}
 

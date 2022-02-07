@@ -1,4 +1,5 @@
 #openhpc_rebuild_clouds: "/home/rocky/nrel-openrc.sh"
+
 openhpc_packages:
   - slurm-libpmi-ohpc
   - bzip2
@@ -53,7 +54,6 @@ openhpc_packages:
   - boost-gnu9-mvapich2-ohpc
   - boost-gnu9-openmpi4-ohpc
 
-#################################################################
 openhpc_slurm_partitions:
   - name: "sm"
     default: NO
@@ -64,12 +64,12 @@ openhpc_slurm_partitions:
   - name: "lg"
     default: NO
     maxtime: "1-0" # 1 days 0 hours
-  # - name: "std"
-  #   default: YES
-  #   maxtime: "1-0" # 1 days 0 hours
-  # - name: "t"
-  #   default: NO
-  #   maxtime: "4:0:0" # 4 hour 0m 0s
+  - name: "std"
+    default: YES
+    maxtime: "1-0" # 1 days 0 hours
+  - name: "t"
+    default: NO
+    maxtime: "4:0:0" # 4 hour 0m 0s
 
 # Additional parameters to set in slurm.conf - list of [parameter, value] pairs
 slurm_conf_extraparams:
@@ -154,11 +154,12 @@ slurm_conf_extraparams:
   - ['AccountingStorageEnforce', 'safe,qos,limits']
   - ['AcctGatherNodeFreq', '30']
   - ['AccountingStorageTRES', 'gres/gpu']
+
+## added kmb
+  - ['AccountingStorageHost', 'vs-control']
+  - ['AccountingStorageUser', 'slurm']
   - ['AccountingStorageType', 'accounting_storage/slurmdbd']
- ## addked kmb
-   - ['AccountingStorageHost', 'vs-control']
-   - ['AccountingStorageUser', 'slurm']
-#  - ['AcctGatherFilesystemType', 'acct_gather_filesystem/lustre']
+  - ['AcctGatherFilesystemType', 'acct_gather_filesystem/lustre']
 
 #  - ['JobAcctGatherType', 'jobacct_gather/linux']
 #  - ['JobAcctGatherParams', 'UsePss']

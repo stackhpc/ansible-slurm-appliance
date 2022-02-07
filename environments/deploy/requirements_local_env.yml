@@ -6,52 +6,63 @@
 # $ ansible-galaxy install --roles-path ./roles -r requirements_local_env.yml
 #
 roles:
-  - name: sync_slurm_allocations
-    src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
-    type: git
-    version: feature/port_from_eagle_to_generic
   - name: ansible_ipa_ldap_fix
     src: git+https://github.nrel.gov/hpc/ansible_ipa_ldap_fix.git
     type: git
+
+  - name: vstack_admin_config
+    src: git+git@github.nrel.gov:hpc/vstack_admin_config.git
+    type: git
+
+  - name: vstack_common_config
+    src: git+git@github.nrel.gov:hpc/vstack_common_config.git
+    type: git
+
+  - name: ansible-role-ntp
+    src: git+https://github.com/kbendl/ansible-role-ntp
+    version: rocky
+
+  - name: vs-set-ephemeral-mounts
+    src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
+    type: git
+
+  - name: vermilion_ldap_client
+    src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
+    type: git
+
+  - name: ansible_yum_config
+    src: git+git@github.nrel.gov:hpc/ansible_yum_config.git
+    type: git
+
+  - name: root_pass_cli
+    src: git+git@github.nrel.gov:hpc/root_pass_cli.git
+    type: git
+
+  - name: ansible_wait_30
+    src: git+git@github.nrel.gov:hpc/ansible_wait_30.git
+    type: git
+
+  - name: pam_mkhomedir_plus
+    src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
+    type: git
+    version: feature/ansible-galaxy
+
+  - name: cluster_config_manager
+    src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
+    type: git
+    version: feature/galaxy-role-install
+
   - name: cluster_dataset_manager
     src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
     type: git
     version: feature/generic_for_vermilion
-  - name: pam_mkhomedir_plus
-    src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
+
+  - name: sync_slurm_allocations
+    src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
     type: git
-    version: 2.0.0
-    # version: feature/ansible-galaxy
+    version: feature/port_from_eagle_to_generic
+
   - name: slurm_lex_accounting
     src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
     type: git
     version: feature/ansible-galaxy
-  - name: vstack_admin_config
-    src: git+git@github.nrel.gov:hpc/vstack_admin_config.git
-    type: git
-  - name: vstack_common_config
-    src: git+git@github.nrel.gov:hpc/vstack_common_config.git
-    type: git
-  - name: ansible-role-ntp
-    src: git+https://github.com/kbendl/ansible-role-ntp
-    version: rocky
-  - name: vs-set-ephemeral-mounts
-    src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
-    type: git
-  - name: vermilion_ldap_client
-    src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
-    type: git
-  - name: ansible_yum_config
-    src: git+git@github.nrel.gov:hpc/ansible_yum_config.git
-    type: git
-  - name: root_pass_cli
-    src: git+git@github.nrel.gov:hpc/root_pass_cli.git
-    type: git
-  - name: root_pass_cli
-    src: git+git@github.nrel.gov:hpc/ansible_wait_30.git
-    type: git
-## this one is currently hacked into ./hooks/post.yml
-## - name: cluster_config_manager
-##   src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
-##   type: git
-##   version: feature/galaxy-role-install

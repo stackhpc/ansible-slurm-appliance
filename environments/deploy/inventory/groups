@@ -36,6 +36,3 @@ cluster
 
 [os_manila:children]
 openhpc
-
-[rebuild:children]
-openhpc

@@ -1,0 +1,31 @@
+---
+# tasks file for vs-set-ephemeral-mounts
+
+
+- name: unmount existing SSD mounts
+  mount:
+    path: /mnt
+    state: unmounted
+  tags: ['set-ephemeral-mounts']
+  become: true
+
+- name: create new dir to mount at
+  file:
+    path: /var/scratch
+    state: directory
+    mode: '0775'
+  tags: ['set-ephemeral-mounts']
+  become: true
+
+- name: modify /etc/fstab to mount to new directory
+  lineinfile:
+    path: /etc/fstab
+    regexp: '^/dev/vdb.*$'
+    line: '/dev/vdb     /var/scratch        auto    defaults,nofail,x-systemd.requires=cloud-init.service,comment=cloudconfig       0       2'
+  tags: ['set-ephemeral-mounts']
+  become: true
+
+- name: force a remount
+  shell: mount -a
+  tags: ['set-ephemeral-mounts']
+  become: true

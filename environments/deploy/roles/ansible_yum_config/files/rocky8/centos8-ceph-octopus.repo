@@ -1,0 +1,6 @@
+[centos-ceph-octopus]
+name=CentOS-8 - Ceph Octopus
+baseurl=http://mirror.centos.org/centos/8/storage/x86_64/ceph-octopus/
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Storage

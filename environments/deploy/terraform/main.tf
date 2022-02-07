@@ -215,6 +215,7 @@ resource "openstack_networking_port_v2" "compute_cluster" {
   network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
   port_security_enabled = "false"
+  no_security_groups = "true"
 
   fixed_ip {
     subnet_id = data.openstack_networking_subnet_v2.cluster.id

@@ -42,7 +42,7 @@ prometheus_scrape_configs:
       - netdev
       - cpu
       - meminfo
-      - infiniband
+      - bonding
       - cpufreq
   scrape_interval: 30s
   scrape_timeout: 20s

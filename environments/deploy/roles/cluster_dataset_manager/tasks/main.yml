@@ -1,0 +1,24 @@
+---
+- name: Install Ansible
+  yum: name=ansible state=latest
+
+- name: Setup vault file
+  copy: src=vault dest={{cluster_dataset_manager_install_path}}/{{cluster_dataset_manager_vault_secret_file}} owner=root group=root mode=400
+
+- name: Setup vault vars
+  copy: src=cluster_dataset_manager_config.yml dest={{cluster_dataset_manager_install_path}}/{{cluster_dataset_manager_vault_file}} owner=root group=root mode=400 decrypt=no
+
+- name: Copy cluster_dataset_manager playbook
+  template: src=cluster_dataset_manager.yml dest={{cluster_dataset_manager_install_path}}/ owner=root group=root mode=700
+
+- name: Copy inventory script
+  file: dest={{cluster_dataset_manager_install_path}}/inventory/ owner=root group=root mode=700 state=directory
+
+- name: Copy inventory script
+  template: src=inventory/cluster_dataset_manager.py dest={{cluster_dataset_manager_install_path}}/inventory/ owner=root group=root mode=700
+
+- name: inventory script permissions
+  file: dest={{cluster_dataset_manager_install_path}}/inventory/ owner=root group=root mode=700
+
+- name: "cluster_dataset_manager"
+  cron: name="cluster_dataset_manager_cron" minute="0" job="(cd {{cluster_dataset_manager_install_path}} && ansible-playbook -b cluster_dataset_manager.yml -i inventory/cluster_dataset_manager.py 2>&1)"

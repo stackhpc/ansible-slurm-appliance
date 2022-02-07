@@ -1,0 +1,5 @@
+#!/bin/env python2
+
+print "group1"
+print "group2"
+print "group3"
