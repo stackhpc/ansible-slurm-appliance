@@ -1,5 +1,0 @@
----
-cluster_dataset_manager_install_path: "/nopt/nrel/admin/cluster_dataset_manager"
-cluster_dataset_manager_vault_file: "cluster_dataset_manager_vault.yml"
-cluster_dataset_manager_vault_secret_file: "cluster_dataset_manager_secret"
-cluster_dataset_manager_name: {{ openhpc_cluster_name }}

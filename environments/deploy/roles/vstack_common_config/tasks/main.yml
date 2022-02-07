@@ -1,3 +1,0 @@
----
-- name: Copy nrel environment variables
-  copy: src=nrel.sh dest=/etc/profile.d owner=root group=root mode=0644

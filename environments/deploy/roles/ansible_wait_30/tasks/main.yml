@@ -1,8 +1,0 @@
----
-# tasks file for ansible_wait_30
-- debug:
-    msg: "#### System {{ inventory_hostname }} pausing for {{ pause_for_secs }} seconds ####"
-
-- name: Pause for 30 seconds
-  pause:
-    seconds: "{{ pause_for_secs }}"

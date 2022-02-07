@@ -1,3 +1,0 @@
----
-# defaults file for ansible_wait_30
-pause_for_secs: 30

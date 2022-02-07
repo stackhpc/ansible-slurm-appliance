@@ -1,9 +1,0 @@
-#!/usr/bin/env python3
-from slurm_lex_accounting.cli import Cli
-import sys
-
-
-if __name__ == "__main__":
-    cli = Cli()
-    cli.run()
-    sys.exit(0)

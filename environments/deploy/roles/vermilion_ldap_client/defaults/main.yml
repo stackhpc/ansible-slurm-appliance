@@ -1,9 +1,0 @@
----
-# defaults file for vermilion_ldap_client
-DIB_NREL_LDAP_URI_VAR: "ldap://ds1.hpc.nrel.gov,ldap://ds2.hpc.nrel.gov,ldap://ds3.hpc.nrel.gov,ldap://ds4.nrel.gov"
-DIB_NREL_LDAP_SEARCH_BASE_VAR: "dc=hpc,dc=nrel,dc=gov"
-DIB_NREL_LDAP_CONF_BASE: "dc=hpc,dc=nrel,dc=gov"
-DIB_NREL_LDAP_CONF_URI: "ldap://ds.hpc.nrel.gov"
-DIB_NREL_LDAP_SCHEMA_VAR: "IPA"
-DIB_NREL_LDAP_DEFAULT_BIND_DN_VAR: "uid=ldapreadops,cn=users,cn=accounts,dc=hpc,dc=nrel,dc=gov"
-DIB_NREL_LDAP_DEFAULT_AUTHTOK_VAR: "AAAgAELvZZCx0YBUZ2SteWNz+RSLTRhTopoNLm8UwCY8G1QCjSRTWQ8RxWkewhZBIE8j+ajrSmb6KWJGyoIP4uwhxpvULGiFbRMS1DSt0SmHAj8IAAECAw=="
