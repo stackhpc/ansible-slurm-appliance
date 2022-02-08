@@ -29,8 +29,7 @@ control
 slurm_stats
 
 [rebuild:children]
-control
-compute
+# disabled as requires sudo on deployhost
 
 [update:children]
 cluster
