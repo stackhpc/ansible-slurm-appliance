@@ -28,6 +28,7 @@ openondemand_clusters:
             module purge
             export PATH=/opt/jupyter/bin/:$PATH
             %s
+          set_host: host=$(hostname -s)
         vnc:
           script_wrapper: |
             module purge
