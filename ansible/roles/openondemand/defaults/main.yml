@@ -50,6 +50,7 @@ openondemand_auth_defaults:
       - 'AuthType openid-connect'
       - 'Require valid-user'
     user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
+    user_map_match: none
   
   # Defaults for PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
   pam:
@@ -59,7 +60,8 @@ openondemand_auth_defaults:
       - 'AuthBasicProvider PAM'
       - 'AuthPAMService ood'
       - 'Require valid-user'
-    user_map_cmd: "/opt/ood/ood_auth_map/bin/ood_auth_map.regex"
+    user_map_cmd: null
+    user_map_match: '.*'
 
 # The below mapping is used to override osc.ood defaults. Keys are osc.ood variable names.
 # If you need to override *these* defaults (i.e. this role's vars are not sufficent) just set the corresponding osc.ood var as normal.
@@ -86,8 +88,9 @@ openondemand_osc_ood_defaults:
   
   # User mapping:
   user_map_cmd: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_cmd }}"
+  user_map_match: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_match }}"
 
   # Auth:
-  oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if openondemand_auth == 'oidc' else none }}"
-  ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if openondemand_auth == 'oidc' else none }}"
+  oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if (openondemand_auth | lower) == 'oidc' else none }}"
+  ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
   httpd_auth: "{{ openondemand_auth_defaults[openondemand_auth | lower].httpd_auth }}"

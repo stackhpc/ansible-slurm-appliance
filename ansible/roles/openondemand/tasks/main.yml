@@ -24,8 +24,15 @@
 
 - include_role:
     name: osc.ood
-    tasks_from: configure.yml
+    tasks_from: install-apps.yml
     vars_from: Rocky.yml
+  when: ood_install_apps
+
+- include_role:
+    name: osc.ood
+    tasks_from: apps.yml
+    vars_from: Rocky.yml
+  when: ood_apps
 
 - name: Ensure post_tasks dirs exists
   file:

@@ -58,81 +58,84 @@ openondemand_clusters:
             host: "host"
             jobid: "jobid"
 
-ood_install_apps:
+ood_install_apps_defaults:
   jupyter:
     repo: https://github.com/OSC/bc_example_jupyter.git
-    dest: "{{ ood_sys_app_dir }}"  # defaults (optional)
     version: master                # defaults (optional)
+ood_install_apps: "{{ ood_install_apps_defaults if openondemand_jupyter_partition | default(none) else {} }}"
 
 # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
 # also https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
-openondemand_apps_desktop:
-  bc_desktop:
-    title: Remote Desktop
-    description: Request a desktop to run GUI applications.
-    cluster: slurm
-    form:
-      - desktop
-      - bc_queue
-      - bc_num_hours
-      - num_cores
-      - node
-    attributes:
-      desktop: xfce
-      # bc_account: # i.e. slurm account
-      #   value: root
-      bc_queue:
-        value: "{{ openondemand_desktop_partition }}"
-      num_cores:
-        label: Number of cores
-        value: 1
-      node:
-        label: Node name
-        help: Select a particular node or leave empty to let Slurm pick the next available
-        value: ""
-    submit: |
-      ---
-      script:
-        job_name: "ood-desktop"
-        native:
-          - <%= "--nodes=1" %>
-          - <%= "--ntasks=#{num_cores}" %>
-          - <%= "--nodelist=#{node}" %>
+openondemand_apps_desktop_default:
+  title: Remote Desktop
+  description: Request a desktop to run GUI applications.
+  cluster: slurm
+  form:
+    - desktop
+    - bc_queue
+    - bc_num_hours
+    - num_cores
+    - node
+  attributes:
+    desktop: xfce
+    # bc_account: # i.e. slurm account
+    #   value: root
+    bc_queue:
+      value: "{{ openondemand_desktop_partition | default(none) }}"
+    num_cores:
+      label: Number of cores
+      value: 1
+    node:
+      label: Node name
+      help: Select a particular node or leave empty to let Slurm pick the next available
+      value: ""
+  submit: |
+    ---
+    script:
+      job_name: "ood-desktop"
+      native:
+        - <%= "--nodes=1" %>
+        - <%= "--ntasks=#{num_cores}" %>
+        - <%= "--nodelist=#{node}" %>
+openondemand_apps_desktop: "{{ {'bc_desktop':openondemand_apps_desktop_default} if openondemand_desktop_partition | default(none) else {} }}"
 
-openondemand_apps_jupyter:
-  jupyter:
-    title: Jupyter Notebook
-    description: Request a Jupyter Notebook server
-    cluster: slurm
-    form:
-      - modules
-      - extra_jupyter_args
-      - bc_queue
-      - bc_num_hours
-      - num_cores
-      - node
-    attributes: # TODO
-      num_cores:
-        label: Number of cores
-        value: 1
-      modules: ""
-      extra_jupyter_args: ""
-      bc_queue:
-        value: "{{ openondemand_jupyter_partition }}"
-      node: ""
-    submit: |
-      ---
-      batch_connect:
-        template: "basic"
-      script:
-        job_name: "ood-jupyter"
-        native:
-          - <%= "--nodes=1" %>
-          - <%= "--ntasks=#{num_cores}" %>
-          - <%= "--nodelist=#{node}" %>
+# See https://osc.github.io/ood-documentation/latest/app-development/tutorials-interactive-apps/add-jupyter.html#app-development-tutorials-interactive-apps-add-jupyter
+openondemand_apps_jupyter_default:
+  title: Jupyter Notebook
+  description: Request a Jupyter Notebook server
+  cluster: slurm
+  form:
+    - modules
+    - extra_jupyter_args
+    - bc_queue
+    - bc_num_hours
+    - num_cores
+    - node
+  attributes: # TODO
+    num_cores:
+      label: Number of cores FOO
+      value: 1
+    modules: ""
+    extra_jupyter_args: ""
+    bc_queue:
+      value: "{{ openondemand_jupyter_partition | default(none) }}"
+    node: ""
+  submit: |
+    ---
+    batch_connect:
+      template: "basic"
+    script:
+      job_name: "ood-jupyter"
+      native:
+        - <%= "--nodes=1" %>
+        - <%= "--ntasks=#{num_cores}" %>
+        - <%= "--nodelist=#{node}" %>
+openondemand_apps_jupyter: "{{ {'jupyter':openondemand_apps_jupyter_default} if openondemand_jupyter_partition | default(none) else {} }}"
 
 # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
-ood_apps:
+openondemand_dashboard_support_url: ''
+openondemand_dashboard_docs_url: ''
+openondemand_apps:
   files:
     env:
       ood_shell: ""
@@ -147,10 +150,9 @@ ood_apps:
       ood_dashboard_docs_url: "{{ openondemand_dashboard_docs_url }}"
       ood_brand_bg_color: "#0e6ec8"
       ood_dashboard_title: "{{ openhpc_cluster_name }}"
-  jupyter: "{{ openondemand_apps_jupyter.jupyter if openondemand_jupyter_partition else omit }}"
-  bc_desktop: "{{ openondemand_apps_desktop.bc_desktop if openondemand_desktop_partition else omit }}"
 
-    
+ood_apps: "{{ openondemand_apps | combine(openondemand_apps_jupyter) | combine(openondemand_apps_desktop) }}"
+
 # Prometheus config for Open Ondemand exporter
 # https://osc.github.io/ood-documentation/latest/monitoring/prometheus.html#prometheus-configuration
 openondemand_scrape_configs:
