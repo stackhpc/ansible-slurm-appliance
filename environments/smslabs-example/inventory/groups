@@ -44,3 +44,6 @@ compute
 
 [openondemand_jupyter:children]
 compute
+
+[basic_users:children]
+cluster
