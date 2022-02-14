@@ -3,6 +3,8 @@
 ## NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
 openondemand_servername: '' # Must be changed when using openondemand, but allows templating when openondemand group is empty
+# HACK(johng): assume the login node, for now
+openondemand_servername: "{{ hostvars[groups['login'] | first].ansible_host }}"
 
 openondemand_dashboard_links:
   - name: Grafana
