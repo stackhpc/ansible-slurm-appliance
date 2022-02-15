@@ -17,6 +17,12 @@
     file: pam_auth.yml
   when: openondemand_auth | lower == 'pam'
 
+# The configure.yml playbook needs vars from Rocky (for nginx) and main if using OIDC auth. However vars_from doensn't take a list.
+# include_vars doens't interpolate from role vars, so we use that for main.yml which only requires things we override in the appliance inventory
+# and use vars_from for Rocky which requires interpolation from role vars.
+- include_vars:
+    file: roles/osc.ood/vars/main.yml
+
 - include_role:
     name: osc.ood
     tasks_from: configure.yml
@@ -25,13 +31,12 @@
 - include_role:
     name: osc.ood
     tasks_from: install-apps.yml
-    vars_from: Rocky.yml
   when: ood_install_apps
 
 - include_role:
     name: osc.ood
     tasks_from: apps.yml
-    vars_from: Rocky.yml
+    # vars_from: Rocky.yml
   when: ood_apps
 
 - name: Ensure post_tasks dirs exists
