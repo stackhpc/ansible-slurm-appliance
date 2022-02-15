@@ -19,12 +19,7 @@ module "cluster" {
     slurmctld_volume = "alaska-prod-slurmctld"
     slurmctl_port = "alaska-prod-slurmctl"
     slurmctl_rdma_port = "alaska-prod-slurmctl-rdma"
-    compute_images = {
-      compute-0: "ohpc-compute-210917-0822.qcow2"
-      compute-1: "ohpc-compute-210917-0822.qcow2"
-      compute-2: "ohpc-compute-210917-0822.qcow2"
-      compute-3: "ohpc-compute-210917-0822.qcow2"
-    }
+    compute_images = {}
     login_nodes = {
       login-0: {
         flavor: "vm.alaska.cpu.himem.quarter"
