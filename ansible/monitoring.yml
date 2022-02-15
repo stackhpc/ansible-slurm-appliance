@@ -61,6 +61,12 @@
   tasks:
     - import_role: name=cloudalchemy.node_exporter
 
+- name: Deploy blackbox exporter
+  hosts: blackbox_exporter
+  tags: blackbox_exporter
+  tasks:
+    - import_role: name=cloudalchemy.blackbox-exporter
+
 - name: Deploy OpenOndemand exporter
   hosts: openondemand
   become: true

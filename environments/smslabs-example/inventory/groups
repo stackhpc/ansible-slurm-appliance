@@ -20,6 +20,9 @@ control
 [node_exporter:children]
 cluster
 
+[blackbox_exporter:children]
+prometheus
+
 [opendistro:children]
 control
 
