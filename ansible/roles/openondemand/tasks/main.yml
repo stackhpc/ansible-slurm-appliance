@@ -4,11 +4,35 @@
   set_fact:
     "{{ item.key }}": "{{ lookup('vars', item.key, default=item.value) }}"
   loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
-  when: (item.key in hostvars[inventory_hostname]) or (item.value is not none)
+  when: (item.key in hostvars[inventory_hostname]) or (item.value)
+
+# if using PAM auth we need apache installed but NOT started so split the osc.ood role up:
+- include_role:
+    name: osc.ood
+    tasks_from: install-rpm.yml
+    vars_from: Rocky.yml
+  # can't set vars: from a dict hence the workaround above
+
+- include_tasks:
+    file: pam_auth.yml
+  when: openondemand_auth | lower == 'pam'
 
 - include_role:
     name: osc.ood
-  # can't set vars: from a dict hence the workaround above
+    tasks_from: configure.yml
+    vars_from: Rocky.yml
+
+- include_role:
+    name: osc.ood
+    tasks_from: install-apps.yml
+    vars_from: Rocky.yml
+  when: ood_install_apps
+
+- include_role:
+    name: osc.ood
+    tasks_from: apps.yml
+    vars_from: Rocky.yml
+  when: ood_apps
 
 - name: Ensure post_tasks dirs exists
   file:
