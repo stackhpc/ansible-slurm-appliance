@@ -58,6 +58,8 @@
           state: "{{ update_state }}"
           exclude: "{{ update_exclude }}"
           disablerepo: "{{ update_disablerepo }}"
+        async: "{{ 30 * 60 }}" # wait for up to 30 minutes
+        poll: 15 # check every 15 seconds
         register: updates
       - debug:
           var: updates

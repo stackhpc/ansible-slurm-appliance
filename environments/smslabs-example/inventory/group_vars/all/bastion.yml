@@ -1,0 +1,1 @@
+ansible_ssh_common_args: '-o ProxyCommand="ssh slurm-app-ci@185.45.78.150 -W %h:%p"'

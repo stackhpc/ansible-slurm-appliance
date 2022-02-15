@@ -22,9 +22,6 @@ cluster
 [opendistro:children]
 control
 
-[kibana:children]
-control
-
 [slurm_stats:children]
 control
 
