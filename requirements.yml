@@ -9,11 +9,15 @@ roles:
     name: stackhpc.openhpc
   - src: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
-  - src: cloudalchemy.prometheus
+  - src: https://github.com/dmrub/ansible-prometheus # Can be reverted once https://github.com/cloudalchemy/ansible-prometheus/pull/366 merged
+    name: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
   - src: jriguera.configdrive
+  - src: https://github.com/stackhpc/ood-ansible.git
+    name: osc.ood
+    version: feature/Rocky
 
 collections:
 - name: containers.podman

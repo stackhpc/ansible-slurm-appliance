@@ -1,0 +1,6 @@
+name: "{{ item.name }}"
+category: "{{ item.category }}"
+description: "{{ item.description }}"
+icon: "{{ item.icon | default('fa://clock-o') }}"
+url: "{{ item.url }}"
+new_window: "{{ item.get('new_window', false) }}"

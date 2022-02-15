@@ -18,13 +18,11 @@ roles/*
 !roles/passwords/**
 !roles/fail2ban/
 !roles/fail2ban/**
-!roles/basic_users/
-!roles/basic_users/**
-!roles/block_devices/
-!roles/block_devices/**
 !roles/hpctests/
 !roles/hpctests/**
 !roles/block_devices/
 !roles/block_devices/**
 !roles/basic_users/
 !roles/basic_users/**
+!roles/openondemand/
+!roles/openondemand/**

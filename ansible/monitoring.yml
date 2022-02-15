@@ -80,6 +80,17 @@
   tasks:
     - import_role: name=cloudalchemy.node_exporter
 
+- name: Deploy OpenOndemand exporter
+  hosts: openondemand
+  become: true
+  tags:
+    - openondemand
+    - openondemand_server
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: exporter.yml
+
 - name: Setup core monitoring software
   hosts: prometheus
   tags: prometheus

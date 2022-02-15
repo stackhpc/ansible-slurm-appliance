@@ -1,0 +1,1 @@
+openondemand_servername: "{{ hostvars[groups['openondemand'].0].floating_ip }}"
