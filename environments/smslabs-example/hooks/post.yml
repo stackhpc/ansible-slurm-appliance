@@ -1,6 +1,7 @@
 - hosts: login
   become: no
   gather_facts: false
+  tags: checks
   tasks:
     - block:
       - name: Run sinfo
@@ -12,3 +13,18 @@
           that: "(sinfo.stdout_lines[0] | split)[1:] == ['small*', 'up', '60-00:00:00', '2', 'idle']" # don't know what instance names are as have CI run ID in them
           fail_msg: "sinfo output not as expected: {{ sinfo.stdout }}"
       when: "'builder' not in group_names" # won't have a slurm control daemon when in build
+
+- hosts: openondemand
+  name: Check Open Ondemand is running
+  tags:
+    - checks
+    - openondemand
+    - openondemand_server
+  tasks:
+  - uri:
+      url: https://localhost
+      validate_certs: false # selfsigned
+      force_basic_auth: yes # as otherwise we get 401
+      url_username: testuser
+      url_password: "{{ vault_testuser_password }}"
+      status_code: 200
