@@ -15,9 +15,9 @@ roles:
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
   - src: jriguera.configdrive
-  - src: https://github.com/stackhpc/ood-ansible.git
+  - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
-    version: feature/Rocky
+    version: v2.0.5
 
 collections:
 - name: containers.podman
