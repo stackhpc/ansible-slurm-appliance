@@ -1,7 +1,7 @@
 ---
 
 # Authentication:
-openondemand_auth: # "oidc" or "pam"
+openondemand_auth: # "oidc" or "basic_pam"
 openondemand_mapping_users: []
 
 ## Variables for `openondemand_auth=oidc` :
@@ -32,8 +32,11 @@ openondemand_clusters: {} # synonym for osc.ood:clusters
 openondemand_servername: ''
 openondemand_host_regex:
 
+# Other:
+openondemand_node_proxy_directives: '' # Added to Apache directives for `node_uri` forwarding.
+
 openondemand_auth_defaults:
-  # Defaults for OIDC auth - keys are osc.ood vars & can be overriden using the osc.odd var name in inventory
+  # Defaults for OIDC auth - keys are osc.ood vars & can be overriden using the osc.ood var name in inventory
   oidc:
     oidc_uri: /oidc # has to be set separately to trigger oidc integration!
     ood_auth_openidc:
@@ -52,8 +55,8 @@ openondemand_auth_defaults:
     user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
     user_map_match: none
   
-  # Defaults for PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
-  pam:
+  # Defaults for basic/PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
+  basic_pam:
     httpd_auth: # ood_portal.yml.j2
       - 'AuthType Basic'
       - 'AuthName "Open OnDemand"'
