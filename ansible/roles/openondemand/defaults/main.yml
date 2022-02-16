@@ -32,8 +32,11 @@ openondemand_clusters: {} # synonym for osc.ood:clusters
 openondemand_servername: ''
 openondemand_host_regex:
 
+# Other:
+openondemand_node_proxy_directives: '' # Added to Apache directives for `node_uri` forwarding.
+
 openondemand_auth_defaults:
-  # Defaults for OIDC auth - keys are osc.ood vars & can be overriden using the osc.odd var name in inventory
+  # Defaults for OIDC auth - keys are osc.ood vars & can be overriden using the osc.ood var name in inventory
   oidc:
     oidc_uri: /oidc # has to be set separately to trigger oidc integration!
     ood_auth_openidc:
