@@ -4,7 +4,7 @@
 
 openondemand_servername: '' # Must be changed when using openondemand, but allows templating when openondemand group is empty
 
-openondemand_dashboard_links:
+openondemand_dashboard_links: # TODO: should really only be deployed if grafana is deployed and proxying configured
   - name: Grafana
     app_name: grafana
     category: Monitoring
@@ -172,3 +172,9 @@ openondemand_dashboard:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
     revision_id: 1
+
+_opeonondemand_unset_auth: '    RequestHeader unset Authorization'
+
+# Fix grafana proxying for basic auth if anonymous grafana access enabled:
+openondemand_node_proxy_directives: "{{ _opeonondemand_unset_auth if (openondemand_auth == 'basic_pam' and 'openondemand_host_regex' and groups['grafana'] | length > 0 and hostvars[ groups['grafana']  | first]._grafana_auth_is_anonymous) }}"
+# Reason: OOD server forwards headers to proxied servers, so when if using basic auth Grafana gets passed the Open Ondemand user. This probably isn't a Grafana user so it throws an auth error. If anonymous access is enabled we can work around this by not forwarding auth header.
