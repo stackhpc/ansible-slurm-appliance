@@ -1,7 +1,7 @@
 ---
 
 # Authentication:
-openondemand_auth: # "oidc" or "pam"
+openondemand_auth: # "oidc" or "basic_pam"
 openondemand_mapping_users: []
 
 ## Variables for `openondemand_auth=oidc` :
@@ -52,8 +52,8 @@ openondemand_auth_defaults:
     user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
     user_map_match: none
   
-  # Defaults for PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
-  pam:
+  # Defaults for basic/PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
+  basic_pam:
     httpd_auth: # ood_portal.yml.j2
       - 'AuthType Basic'
       - 'AuthName "Open OnDemand"'

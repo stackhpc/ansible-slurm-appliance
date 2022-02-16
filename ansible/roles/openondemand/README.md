@@ -17,7 +17,7 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 ### Authentication
 See the Open Ondemand [Authentication docs](https://osc.github.io/ood-documentation/latest/authentication/overview.html) for an overview of the authentication process.
 
-- `openondemand_auth`: Required. Authentication method, either `'oidc'` or `'pam'`.
+- `openondemand_auth`: Required. Authentication method, either `'oidc'` or `'basic_pam'`.
 - `openondemand_mapping_users`: Required for `openondemand_auth=='oidc'`. A list of dicts defining mappings between remote authenticated usernames and local system usernames - see the Open Ondemand [user mapping docs](https://osc.github.io/ood-documentation/latest/authentication/overview/map-user.html). Each dict should have the following keys:
   - `name`: A local (existing) user account
   - `openondemand_username`: The remote authenticated username. See also `openondemand_oidc_remote_user_claim` if using OIDC authentication.

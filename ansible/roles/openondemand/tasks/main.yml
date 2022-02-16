@@ -15,7 +15,7 @@
 
 - include_tasks:
     file: pam_auth.yml
-  when: openondemand_auth | lower == 'pam'
+  when: openondemand_auth | lower == 'basic_pam'
 
 # The configure.yml playbook needs vars from Rocky (for nginx) and main if using OIDC auth. However vars_from doensn't take a list.
 # include_vars doens't interpolate from role vars, so we use that for main.yml which only requires things we override in the appliance inventory
