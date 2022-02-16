@@ -26,5 +26,5 @@
       validate_certs: false # selfsigned
       force_basic_auth: yes # as otherwise we get 401
       url_username: testuser
-      url_password: "{{ vault_testuser_password }}"
+      url_password: "{{ test_user_password }}"
       status_code: 200
