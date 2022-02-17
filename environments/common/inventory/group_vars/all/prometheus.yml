@@ -46,5 +46,21 @@ prometheus_scrape_configs_default:
       - cpufreq
   scrape_interval: 30s
   scrape_timeout: 20s
+- job_name: slurm
+  metrics_path: /probe
+  params:
+    module: [tcp_connect]
+  static_configs:
+    - targets:
+      - "http://{{ openhpc_slurm_control_host }}:6817"
+    - targets:
+      - "http://{{ groups['login'] | first }} :6818" # FIXME: want all login and compute nodes
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [__param_target]
+      target_label: instance
+    - target_label: __address__
+      replacement: "{{ blackbox_exporter_address }}:9115"  # Blackbox exporter
 
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"
