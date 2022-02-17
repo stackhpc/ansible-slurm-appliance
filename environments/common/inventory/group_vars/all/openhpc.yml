@@ -28,3 +28,4 @@ openhpc_config_default:
     - enable_configless
 openhpc_config_extra: {}
 openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_extra, list_merge='append') }}"
+openhpc_ram_multiplier: 0.90 # TODO: DOCS: needs to be available to stackhpc.slurm_openstack_tools.autoscale role, plus lowered a bit to cope with autoscale problems
