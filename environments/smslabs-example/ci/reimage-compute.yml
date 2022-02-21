@@ -14,6 +14,14 @@
       set_fact:
         compute_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'compute'}) | last }}"
     
+    - name: Add compute image ID to autoscale definition
+      copy:
+        dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/openhpc/autoscale.yml"
+        content: |
+          openhpc_autoscale_image: {{ compute_build.artifact_id }}
+      delegate_to: localhost
+    - meta: end_here
+
     - name: Request compute node rebuild via Slurm
       shell:
         cmd: scontrol reboot ASAP nextstate=RESUME reason='rebuild image:{{ compute_build.artifact_id }}' {{ openhpc_cluster_name }}-compute-[0-1]

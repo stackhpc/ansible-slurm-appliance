@@ -87,14 +87,6 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: True
       
-      - name: Run MPI-based tests
-        run: |
-          . venv/bin/activate
-          . environments/smslabs-example/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml
-        env:
-          ANSIBLE_FORCE_COLOR: True
-      
       - name: Build login and compute images
         run: |
           . venv/bin/activate
@@ -121,6 +113,14 @@ jobs:
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
           OS_CLOUD: openstack
+      
+      - name: Run MPI-based tests, triggering autoscaling
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible-playbook -vv ansible/adhoc/hpctests.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
 
       - name: Delete infrastructure
         run: |
