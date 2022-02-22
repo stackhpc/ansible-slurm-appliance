@@ -3,7 +3,7 @@ openhpc_config_extra:
   SlurmdDebug: debug
 openhpc_slurm_partitions:
 - name: small
-  cloud_nodes: autoscale-compute-[2-3]
+  cloud_nodes: "{{ openhpc_cluster_name }}-compute-[2-3]"
   cloud_instances: # TODO: can we somehow check these when templating??
     flavor: general.v1.tiny
     image:  "{{ openhpc_autoscale_image | default('IMAGE_PLACEHOLDER') }}"
