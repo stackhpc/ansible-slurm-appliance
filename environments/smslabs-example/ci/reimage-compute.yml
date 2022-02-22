@@ -20,7 +20,6 @@
         content: |
           openhpc_autoscale_image: {{ compute_build.artifact_id }}
       delegate_to: localhost
-    - meta: end_here
 
     - name: Request compute node rebuild via Slurm
       shell:
