@@ -1,0 +1,25 @@
+- hosts: login
+  become: no
+  gather_facts: false
+  tasks:
+    - block:
+      - name: Run sinfo
+        shell: 'sinfo --noheader --format="%N %P %a %l %D %t" | sort' # using --format ensures we control whitespace: Partition,partition_state,max_jobtime,num_nodes,node_state,node_name
+        register: sinfo
+        changed_when: false
+      - name: Check nodes have expected slurm state
+        assert:
+          that: sinfo.stdout_lines == expected_sinfo
+          fail_msg: |
+            sinfo output not as expected:
+            actual:
+            {{ sinfo.stdout_lines }}
+            expected:
+            {{ expected_sinfo }}
+            <end>
+        vars:
+          expected_sinfo:
+            - "{{ openhpc_cluster_name }}-compute-[0-1] small* up 60-00:00:00 2 idle"
+            - "{{ openhpc_cluster_name }}-compute-[2-3] small* up 60-00:00:00 2 idle~"
+
+      when: "'builder' not in group_names" # won't have a slurm control daemon when in build

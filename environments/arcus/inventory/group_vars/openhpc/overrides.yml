@@ -1,0 +1,11 @@
+openhpc_config_extra:
+  SlurmctldDebug: debug
+  SlurmdDebug: debug
+openhpc_slurm_partitions:
+- name: small
+  cloud_nodes: autoscale-compute-[2-3]
+  cloud_instances: # TODO: can we somehow check these when templating??
+    flavor: general.v1.tiny
+    image:  "{{ openhpc_autoscale_image | default('IMAGE_PLACEHOLDER') }}"
+    keypair: slurm-app-ci
+    network: "{{ server_networks.keys() | first }}" # TODO: bit hacky??
