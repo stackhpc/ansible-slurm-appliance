@@ -6,6 +6,6 @@ openhpc_slurm_partitions:
   cloud_nodes: "{{ openhpc_cluster_name }}-compute-[2-3]"
   cloud_instances: # TODO: can we somehow check these when templating??
     flavor: general.v1.tiny
-    image:  "{{ openhpc_autoscale_image | default('IMAGE_PLACEHOLDER') }}"
+    image:  "{{ openhpc_autoscale_image | default('IMAGE_PLACEHOLDER') }}" # Gets set by CI after image build task.
     keypair: slurm-app-ci
-    network: "{{ server_networks.keys() | first }}" # TODO: bit hacky??
+    network: "{{ hostvars[groups['control'] | first]['server_networks'].keys() | first }}" # Defined in inventory, so only defined for control during Packer build.
