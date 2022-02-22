@@ -86,6 +86,7 @@ jobs:
           ansible-playbook -vv ansible/site.yml
         env:
           ANSIBLE_FORCE_COLOR: True
+          OS_CLOUD: openstack # required so openhpc_slurm_partitions filter used by stackhpc.slurm_openstack_tools.autoscale can use clouds.yaml file to run openstack cli to get node config
       
       - name: Build login and compute images
         run: |
