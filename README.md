@@ -98,9 +98,17 @@ NB: This section describes generic instructions - check for any environment-spec
 
         source environments/<environment>/activate
 
-2. Deploy instances - see environment-specific instructions.
+1. Activate your OpenStack credentials (required if Slurm-controlled rebuild or Slurm autoscaling is enabled):
 
-3. Generate passwords:
+        # either source an openrc.sh file
+        source path_to/openrc.sh
+
+        # or if using a clouds.yaml file in ~/.config/openstack/clouds.yaml:
+        export OS_CLOUD=openstack
+
+1. Deploy instances - see environment-specific instructions.
+
+1. Generate passwords:
 
         ansible-playbook ansible/adhoc/generate-passwords.yml
 
@@ -110,7 +118,7 @@ NB: This section describes generic instructions - check for any environment-spec
 
     See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
 
-4. Deploy the appliance:
+1. Deploy the appliance:
 
         ansible-playbook ansible/site.yml
 
@@ -120,7 +128,7 @@ NB: This section describes generic instructions - check for any environment-spec
 
     Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
 
-5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
+1. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
 
         ansible-playbook ansible/adhoc/<playbook name>
 

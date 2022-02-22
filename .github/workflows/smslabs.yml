@@ -97,13 +97,14 @@ jobs:
         env:
           OS_CLOUD: openstack
       
-      - name: Reimage compute nodes via slurm and check cluster still up
+      - name: Reimage compute nodes via slurm and check cluster still up (also adds image to partition cloud node info)
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
+          ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
 
       - name: Reimage login nodes via openstack and check cluster still up
@@ -113,6 +114,16 @@ jobs:
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-login.yml
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
+          ANSIBLE_FORCE_COLOR: True
+          OS_CLOUD: openstack
+      
+      - name: Reconfigure Slurm for new cloud node image
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible-playbook -vv ansible/slurm.yml --tags openhpc --skip-tags install
+        env:
+          ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
       
       - name: Run MPI-based tests, triggering autoscaling
