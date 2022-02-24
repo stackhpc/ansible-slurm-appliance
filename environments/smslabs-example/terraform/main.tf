@@ -6,3 +6,7 @@ terraform {
     }
   }
 }
+
+provider "openstack" {
+  cloud = "openstack"
+}
