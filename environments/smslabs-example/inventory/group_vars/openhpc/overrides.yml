@@ -3,6 +3,7 @@ openhpc_config_extra:
   SlurmdDebug: debug
 openhpc_slurm_partitions:
 - name: small
+  ram_mb: 3362 # fixes wrong OpenStack flavor value for cloud_nodes
   cloud_nodes: "{{ openhpc_cluster_name }}-compute-[2-3]"
   cloud_instances: # TODO: can we somehow check these when templating??
     flavor: general.v1.tiny
