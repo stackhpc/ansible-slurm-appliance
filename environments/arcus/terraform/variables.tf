@@ -61,6 +61,15 @@ variable "compute_nodes" {
     }
 }
 
+variable "cloud_nodes" {
+    type = list(string)
+    description = "Cloud nodename suffixes to precreate RDMA-capable ports"
+    default = [
+        "compute-2",
+        "compute-3",
+    ]
+}
+
 variable "compute_images" {
     type = map(string)
     default = {}

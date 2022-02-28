@@ -9,7 +9,7 @@ data "openstack_networking_subnet_v2" "cluster_subnet" {
 
 resource "openstack_networking_port_v2" "rdma" {
   
-  for_each = toset(concat(keys(var.login_nodes), keys(var.compute_nodes)))
+  for_each = toset(concat(["control"], keys(var.login_nodes), keys(var.compute_nodes), var.cloud_nodes))
 
   name = "${var.cluster_name}-${each.key}"
   network_id = data.openstack_networking_network_v2.cluster_net.id
