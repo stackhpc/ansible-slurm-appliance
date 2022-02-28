@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Install ansible etc
         run: dev/setup-env.sh
 
@@ -37,6 +37,7 @@ jobs:
           . venv/bin/activate
           . environments/arcus/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform init
           terraform apply -auto-approve
         env:
           TF_VAR_cluster_name: ci${{ github.run_id }}
