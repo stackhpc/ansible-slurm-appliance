@@ -8,11 +8,24 @@ on:
   pull_request:
 concurrency: rcp-cloud-portal_demo # openstack project
 jobs:
-  deploy:
+  arcus:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        env:
+          SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
+
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/arcus/bastion_fingerprint >> ~/.ssh/known_hosts
+        shell: bash
+      
       - name: Install ansible etc
         run: dev/setup-env.sh
 
@@ -21,7 +34,7 @@ jobs:
       
       - name: Initialise terraform
         run: terraform init
-        working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
+        working-directory: ${{ github.workspace }}/environments/arcus/terraform
         
       - name: Write clouds.yaml
         run: |
@@ -30,278 +43,90 @@ jobs:
         shell: bash
         env:
           CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-
+      
       - name: Provision infrastructure
         id: provision
         run: |
           . venv/bin/activate
           . environments/arcus/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform init
           terraform apply -auto-approve
         env:
+          OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
-
-      - name: Upload terraform state
-        uses: actions/upload-artifact@v2
-        with:
-          name: tfstate
-          path: ${{ env.APPLIANCES_ENVIRONMENT_ROOT }}/terraform/terraform.tfstate
-
-      - name: Upload templated inventory hosts file
-        uses: actions/upload-artifact@v2
-        with:
-          name: inventory_hosts
-          path: ${{ env.APPLIANCES_ENVIRONMENT_ROOT }}/inventory/hosts
-
-  imagebuild:
-    needs: deploy
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
       
-      - name: Install ansible etc
-        run: dev/setup-env.sh
-
-      - name: Download templated inventory hosts file
-        uses: actions/download-artifact@v2
-        with:
-          name: inventory_hosts
-          path: ${{ env.APPLIANCES_ENVIRONMENT_ROOT }}/inventory
-      
-      - name: Write clouds.yaml
-        run: |
-          mkdir -p ~/.config/openstack/
-          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
-        shell: bash
-        env:
-          CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-
-      - name: Setup ssh
-        run: |
-          set -x
-          mkdir ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-        env:
-          SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
-
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/smslabs-example/bastion_fingerprint >> ~/.ssh/known_hosts
-        shell: bash
-
-      - name: Build login and compute images
+      - name: Get server provisioning failure messages
+        id: provision_failure
         run: |
           . venv/bin/activate
-          . environments/smslabs-example/activate
-          cd packer
-          PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+          . environments/arcus/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          echo "::set-output name=messages::$(./getfaults.py)"
         env:
           OS_CLOUD: openstack
-
-  directdeploy:
-    needs: deploy
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Install ansible etc
-        run: dev/setup-env.sh
-
-      - name: Download templated inventory hosts file
-        uses: actions/download-artifact@v2
-        with:
-          name: inventory_hosts
-          path: ${{ env.APPLIANCES_ENVIRONMENT_ROOT }}/inventory
-      
-      - name: Write clouds.yaml
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: always() && steps.provision.outcome == 'failure'
+        
+      - name: Delete infrastructure if failed due to lack of hosts
         run: |
-          mkdir -p ~/.config/openstack/
-          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
-        shell: bash
+          . venv/bin/activate
+          . environments/arcus/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform destroy -auto-approve
         env:
-          CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-
-      - name: Setup ssh
-        run: |
-          set -x
-          mkdir ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-        env:
-          SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
-
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/smslabs-example/bastion_fingerprint >> ~/.ssh/known_hosts
-        shell: bash
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
       - name: Configure infrastructure
         run: |
           . venv/bin/activate
-          . environments/smslabs-example/activate
+          . environments/arcus/activate
           ansible all -m wait_for_connection
           ansible-playbook ansible/adhoc/generate-passwords.yml
           ansible-playbook -vv ansible/site.yml
         env:
           ANSIBLE_FORCE_COLOR: True
+      
+      - name: Build login and compute images
+        run: |
+          . venv/bin/activate
+          . environments/arcus/activate
+          cd packer
+          PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+        env:
           OS_CLOUD: openstack
-
-  reimage:
-    needs:
-      - deploy
-      - directdeploy
-      - imagebuild
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Install ansible etc
-        run: dev/setup-env.sh
-
-      - name: Download templated inventory hosts file
-        uses: actions/download-artifact@v2
-        with:
-          name: inventory_hosts
-          path: ${{ env.APPLIANCES_ENVIRONMENT_ROOT }}/inventory
-      
-      - name: Write clouds.yaml
-        run: |
-          mkdir -p ~/.config/openstack/
-          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
-        shell: bash
-        env:
-          CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-
-      - name: Setup ssh
-        run: |
-          set -x
-          mkdir ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-        env:
-          SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
-
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/smslabs-example/bastion_fingerprint >> ~/.ssh/known_hosts
-        shell: bash
       
       - name: Reimage compute nodes via slurm and check cluster still up
         run: |
           . venv/bin/activate
-          . environments/smslabs-example/activate
+          . environments/arcus/activate
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
-          ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
 
       - name: Reimage login nodes via openstack and check cluster still up
         run: |
           . venv/bin/activate
-          . environments/smslabs-example/activate
+          . environments/arcus/activate
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-login.yml
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
-          ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
       
-      
-#       - name: Get server provisioning failure messages
-#         id: provision_failure
-#         run: |
-#           . venv/bin/activate
-#           . environments/smslabs-example/activate
-#           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-#           echo "::set-output name=messages::$(./getfaults.py)"
-#         env:
-#           OS_CLOUD: openstack
-#           TF_VAR_cluster_name: ci${{ github.run_id }}
-#         if: always() && steps.provision.outcome == 'failure'
-        
-#       - name: Delete infrastructure if failed due to lack of hosts
-#         run: |
-#           . venv/bin/activate
-#           . environments/smslabs-example/activate
-#           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-#           terraform destroy -auto-approve
-#         env:
-#           OS_CLOUD: openstack
-#           TF_VAR_cluster_name: ci${{ github.run_id }}
-#         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
-
-      
-#       - name: Build login and compute images
-#         run: |
-#           . venv/bin/activate
-#           . environments/smslabs-example/activate
-#           cd packer
-#           PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
-#         env:
-#           OS_CLOUD: openstack
-      
-#       - name: Reimage compute nodes via slurm and check cluster still up
-#         run: |
-#           . venv/bin/activate
-#           . environments/smslabs-example/activate
-#           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml
-#           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
-#         env:
-#           OS_CLOUD: openstack
-
-#       - name: Reimage login nodes via openstack and check cluster still up
-#         run: |
-#           . venv/bin/activate
-#           . environments/smslabs-example/activate
-#           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-login.yml
-#           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
-#         env:
-#           OS_CLOUD: openstack
-      
-#       - name: Run MPI-based tests, triggering autoscaling
-#         run: |
-#           . venv/bin/activate
-#           . environments/smslabs-example/activate
-#           ansible-playbook -vv ansible/adhoc/hpctests.yml
-#         env:
-#           ANSIBLE_FORCE_COLOR: True
-
-  destroy:
-    needs:
-      - deploy
-      - directdeploy
-      - reimage
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install ansible etc
-        run: dev/setup-env.sh
-
-      - name: Install terraform
-        uses: hashicorp/setup-terraform@v1
-      
-      - name: Initialise terraform
-        run: terraform init
-        working-directory: ${{ github.workspace }}/environments/smslabs-example/terraform
-        
-      - name: Write clouds.yaml
+      - name: Run MPI-based tests, triggering autoscaling
         run: |
-          mkdir -p ~/.config/openstack/
-          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
-        shell: bash
+          . venv/bin/activate
+          . environments/arcus/activate
+          ansible-playbook -vv ansible/adhoc/hpctests.yml
         env:
-          CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-      
-      - name: Download terraform state
-        uses: actions/download-artifact@v2
-        with:
-          name: tfstate
-          path: ${{ env.APPLIANCES_ENVIRONMENT_ROOT }}/terraform
-      
+          ANSIBLE_FORCE_COLOR: True
+
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
-          . environments/smslabs-example/activate
+          . environments/arcus/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
         env:
@@ -309,4 +134,4 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ success() || cancelled() }}
 
-# # TODO: delete images!
+# TODO: delete images!
