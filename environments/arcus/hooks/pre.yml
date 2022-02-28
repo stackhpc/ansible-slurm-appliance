@@ -1,0 +1,8 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Configure yum proxy
+      lineinfile:
+        path:  /etc/yum.conf
+        regexp: '^proxy=http://10\.60\.102\.179:3128'
+        line: 'proxy=http://10.60.102.179:3128'
