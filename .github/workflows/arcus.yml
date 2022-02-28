@@ -86,6 +86,7 @@ jobs:
           ansible-playbook ansible/adhoc/generate-passwords.yml
           ansible-playbook -vv ansible/site.yml
         env:
+          OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
       
       - name: Build login and compute images
@@ -105,6 +106,7 @@ jobs:
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
           OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
 
       - name: Reimage login nodes via openstack and check cluster still up
         run: |
@@ -114,6 +116,7 @@ jobs:
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
           OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
       
       - name: Run MPI-based tests, triggering autoscaling
         run: |
@@ -130,7 +133,6 @@ jobs:
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
         env:
-          OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ success() || cancelled() }}
 
