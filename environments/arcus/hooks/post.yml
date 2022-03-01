@@ -19,7 +19,7 @@
             <end>
         vars:
           expected_sinfo:
-            - "{{ openhpc_cluster_name }}-compute-[0-1] small* up 60-00:00:00 2 idle"
-            - "{{ openhpc_cluster_name }}-compute-[2-3] small* up 60-00:00:00 2 idle~"
+            - "{{ openhpc_cluster_name }}-compute-[0-1] {{ openhpc_slurm_partitions[0].name }}* up 60-00:00:00 2 idle"
+            - "{{ openhpc_cluster_name }}-compute-[2-3] {{ openhpc_slurm_partitions[0].name }}* up 60-00:00:00 2 idle~"
 
       when: "'builder' not in group_names" # won't have a slurm control daemon when in build
