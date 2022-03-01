@@ -16,8 +16,3 @@ admin:
   backend_roles:
   - "admin"
   description: "Admin user"
-
-kibanaserver:
-  hash: "{{ vault_elasticsearch_kibana_password | password_hash('bcrypt') }}"
-  reserved: true
-  description: "Used by kibana to connect to elastic"
