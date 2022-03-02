@@ -45,3 +45,13 @@
         name: stackhpc.slurm_openstack_tools.rebuild
         tasks_from: validate.yml
       tags: validate
+
+- name: Validate autoscale configuration
+  hosts: openstack_autoscale
+  gather_facts: false
+  tags: openstack_autoscale
+  tasks:
+    - import_role:
+        name: stackhpc.slurm_openstack_tools.autoscale
+        tasks_from: validate.yml
+      tags: validate
