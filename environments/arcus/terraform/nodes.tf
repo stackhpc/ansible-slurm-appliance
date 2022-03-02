@@ -9,7 +9,7 @@ resource "openstack_compute_instance_v2" "control" {
   security_groups = ["default", "SSH"]
 
   network {
-    port = openstack_networking_port_v2.rdma["control"].id
+    name = var.cluster_net
     access_network = true
   }
 
@@ -27,7 +27,7 @@ resource "openstack_compute_instance_v2" "login" {
   security_groups = ["default", "SSH"]
 
   network {
-    port = openstack_networking_port_v2.rdma[each.key].id
+    name = var.cluster_net
     access_network = true
   }
 
@@ -45,7 +45,7 @@ resource "openstack_compute_instance_v2" "compute" {
   security_groups = ["default", "SSH"]
 
   network {
-    port = openstack_networking_port_v2.rdma[each.key].id
+    name = var.cluster_net
     access_network = true
   }
 

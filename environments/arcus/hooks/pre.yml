@@ -17,4 +17,8 @@
         path: /etc/hosts
         create: yes
         state: present
-        block: "{{ appliance_addresses | from_json | to_nice_yaml | replace(':', '') }}"
+        block: "{{ host_ips | zip(host_names) | map('join', ' ') | join('\n') }}"
+      vars:
+        host_ips: "{{ groups['all'] | map('extract', hostvars, 'ansible_host') | list }}"
+        host_names: "{{ groups['all'] | map('extract', hostvars, 'inventory_hostname') | list }}"
+    

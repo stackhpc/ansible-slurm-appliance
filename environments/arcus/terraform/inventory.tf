@@ -7,7 +7,6 @@ resource "local_file" "hosts" {
                             "computes": openstack_compute_instance_v2.compute,
                             "compute_types": var.compute_types,
                             "compute_nodes": var.compute_nodes,
-                            "ports": openstack_networking_port_v2.rdma
                           },
                           )
   filename = "../inventory/hosts"
