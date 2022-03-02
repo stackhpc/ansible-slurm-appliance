@@ -25,7 +25,7 @@ variable "control_node" {
     type = map
     description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
     default = {
-        flavor: "vm.alaska.cpu.general.tiny"
+        flavor: "vm.alaska.cpu.general.small"
         image: "RockyLinux-8.5-20211114.2"
     }
 }
@@ -45,8 +45,8 @@ variable "compute_types" {
     type = map
     description = "Mapping defining types of compute nodes: key -> (str) name of type, value -> mapping {flavor: flavor_name, image: image_name_or_id }"
     default = {
-      tiny: {
-          flavor: "vm.alaska.cpu.general.tiny"
+      small: {
+          flavor: "vm.alaska.cpu.general.small"
           image: "RockyLinux-8.5-20211114.2"
       }
     }
@@ -56,8 +56,8 @@ variable "compute_nodes" {
     type = map(string)
     description = "Mapping of compute nodename suffix -> key in compute_types"
     default = {
-        compute-0: "tiny"
-        compute-1: "tiny"
+        compute-0: "small"
+        compute-1: "small"
     }
 }
 
