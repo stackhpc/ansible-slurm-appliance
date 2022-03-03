@@ -1,3 +1,22 @@
+- hosts: localhost
+  become: false
+  tags: build
+  tasks:
+    - name: Ensure secrets generated
+      include_role:
+        name: passwords
+    
+    - name: Build packer images
+      shell:
+        cmd: |
+          cd packer
+          PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+        chdir: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
+      when: "'builder' not in group_names" # avoid recursion!
+      register: packer_run
+      async: 2700 # 45 minutes
+      poll: 0
+
 - hosts: all
   become: true
   tags: squid
@@ -12,7 +31,7 @@
   become: true
   tags: etc_hosts
   tasks:
-    - name: Create /etc/hosts for all nodes
+    - name: Create /etc/hosts for all nodes as DNS doesn't work
       blockinfile:
         path: /etc/hosts
         create: yes
@@ -21,4 +40,3 @@
       vars:
         host_ips: "{{ groups['all'] | map('extract', hostvars, 'ansible_host') | list }}"
         host_names: "{{ groups['all'] | map('extract', hostvars, 'inventory_hostname') | list }}"
-    

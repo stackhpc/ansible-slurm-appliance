@@ -78,7 +78,8 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
-      - name: Configure infrastructure
+      - name: Directly configure cluster and build/test images
+        # see post-hook for the image build/test
         run: |
           . venv/bin/activate
           . environments/arcus/activate
@@ -89,36 +90,17 @@ jobs:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
       
-      - name: Build login and compute images
+      - name: Update cloud image and reconfigure Slurm
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
-          cd packer
-          PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+          . environments/smslabs-example/activate
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/update_image.yml
+          ansible-playbook -vv ansible/slurm.yml --tags openhpc --skip-tags install
         env:
+          ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
       
-      - name: Reimage compute nodes via slurm and check cluster still up
-        run: |
-          . venv/bin/activate
-          . environments/arcus/activate
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
-        env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
-
-      - name: Reimage login nodes via openstack and check cluster still up
-        run: |
-          . venv/bin/activate
-          . environments/arcus/activate
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-login.yml
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
-        env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
-      
-      - name: Run MPI-based tests, triggering autoscaling
+      - name: Run MPI-based tests (triggers autoscaling)
         run: |
           . venv/bin/activate
           . environments/arcus/activate
