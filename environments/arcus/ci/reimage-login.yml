@@ -21,3 +21,4 @@
     
     - name: Wait for connection
       wait_for_connection:
+        timeout: 800

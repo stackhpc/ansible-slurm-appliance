@@ -42,3 +42,4 @@
   tasks:
     - name: Wait for nodes to boot
       wait_for_connection:
+        timeout: 800
