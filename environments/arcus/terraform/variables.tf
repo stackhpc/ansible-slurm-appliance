@@ -35,7 +35,7 @@ variable "login_nodes" {
   description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> mapping  {flavor: flavor_name, image: image_name_or_id }"
   default = {
       login-0: {
-        flavor: "vm.alaska.cpu.general.tiny"
+        flavor: "vm.alaska.cpu.general.small"
         image: "RockyLinux-8.5-20211114.2"
       }
     }
