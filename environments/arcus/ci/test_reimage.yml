@@ -33,7 +33,7 @@
         timeout: 800
     
     - name: Check slurm up after reimaging login node
-      import_tasks: check_slurm.yml
+      import_tasks: ../hooks/check_slurm.yml
     
     - name: Request compute node rebuild via Slurm
       shell:
@@ -60,5 +60,5 @@
         timeout: 800
     
     - name: Check slurm up after reimaging login node
-      import_tasks: check_slurm.yml
+      import_tasks: ../hooks/check_slurm.yml
       run_once: true
