@@ -103,7 +103,7 @@ jobs:
       - name: Update cloud image and reconfigure Slurm
         run: |
           . venv/bin/activate
-          . environments/smslabs-example/activate
+          . environments/arcus/activate
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/update_cloudnode_image.yml
           ansible-playbook -vv ansible/slurm.yml --tags openhpc --skip-tags install
         env:
