@@ -77,7 +77,7 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
-      - name: Configure infrastructure
+      - name: Directly configure cluster and build compute + login images
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
@@ -85,48 +85,30 @@ jobs:
           ansible-playbook ansible/adhoc/generate-passwords.yml
           ansible-playbook -vv ansible/site.yml
         env:
-          ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack # required so openhpc_slurm_partitions filter used by stackhpc.slurm_openstack_tools.autoscale can use clouds.yaml file to run openstack cli to get node config
-      
-      - name: Build login and compute images
-        run: |
-          . venv/bin/activate
-          . environments/smslabs-example/activate
-          cd packer
-          PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
-        env:
-          OS_CLOUD: openstack
-      
-      - name: Reimage compute nodes via slurm and check cluster still up (also adds image to partition cloud node info)
-        run: |
-          . venv/bin/activate
-          . environments/smslabs-example/activate
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
-        env:
           ANSIBLE_FORCE_COLOR: True
+          
+      - name: Test reimage of login and compute nodes
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          ansible all -m wait_for_connection
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/test_reimage.yml
+        env:
           OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
 
-      - name: Reimage login nodes via openstack and check cluster still up
+      - name: Update cloud image and reconfigure Slurm
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-login.yml
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
-        env:
-          ANSIBLE_FORCE_COLOR: True
-          OS_CLOUD: openstack
-      
-      - name: Reconfigure Slurm for new cloud node image
-        run: |
-          . venv/bin/activate
-          . environments/smslabs-example/activate
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/update_cloudnode_image.yml
           ansible-playbook -vv ansible/slurm.yml --tags openhpc --skip-tags install
         env:
           ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
-      
-      - name: Run MPI-based tests, triggering autoscaling
+
+      - name: Run MPI-based tests (triggers autoscaling)
         run: |
           . venv/bin/activate
           . environments/smslabs-example/activate

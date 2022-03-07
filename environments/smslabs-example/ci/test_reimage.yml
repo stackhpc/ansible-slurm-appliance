@@ -1,0 +1,64 @@
+- hosts: login:!builder
+  become: no
+  tasks:
+    - name: Read packer build manifest
+      set_fact:
+        manifest: "{{ lookup('file', manifest_path) | from_json }}"
+      vars:
+        manifest_path: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/packer/packer-manifest.json"
+      delegate_to: localhost
+    
+    - name: Get latest image builds
+      set_fact:
+        login_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'login'}) | last }}"
+        compute_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'compute'}) | last }}"
+    
+    - name: Reimage login node via openstack
+      shell:
+        cmd: "openstack server rebuild {{ instance_id | default(inventory_hostname) }} --image {{ login_build.artifact_id }}"
+      delegate_to: localhost
+    
+    - name: Check login node rebuild completed
+      shell:
+        cmd: openstack server show {{ inventory_hostname }} --format value -c image
+      register: openstack_login
+      delegate_to: localhost
+      retries: 5
+      delay: 30
+      until: login_build.artifact_id in openstack_login.stdout
+      changed_when: false
+    
+    - name: Wait for login connection
+      wait_for_connection:
+        timeout: 800
+    
+    - name: Check slurm up after reimaging login node
+      import_tasks: ../hooks/check_slurm.yml
+    
+    - name: Request compute node rebuild via Slurm
+      shell:
+        cmd: scontrol reboot ASAP nextstate=RESUME reason='rebuild image:{{ compute_build.artifact_id }}' {{ openhpc_cluster_name }}-compute-[0-1]
+      become: yes
+        
+    - name: Check compute node rebuild completed
+      shell:
+        cmd: openstack server show {{ item }} --format value -c image
+      register: openstack_compute
+      delegate_to: localhost
+      loop: "{{ groups['compute'] }}"
+      retries: 5
+      delay: 30
+      until: compute_build.artifact_id in openstack_compute.stdout
+      changed_when: false
+
+- hosts: compute:!builder
+  become: no
+  gather_facts: no
+  tasks:
+    - name: Wait for compute connection
+      wait_for_connection:
+        timeout: 800
+    
+    - name: Check slurm up after reimaging login node
+      import_tasks: ../hooks/check_slurm.yml
+      run_once: true
