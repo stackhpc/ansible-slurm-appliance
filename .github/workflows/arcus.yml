@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - ci/arcus
   pull_request:
 concurrency: rcp-cloud-portal_demo # openstack project
 jobs:
