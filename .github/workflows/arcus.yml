@@ -118,6 +118,15 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: True
 
+      - name: Wait for CLOUD nodes to be destroyed
+        run: |
+          . venv/bin/activate
+          . environments/arcus/activate
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/wait_for_scaledown.yml
+        env:
+          OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
+
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
@@ -128,4 +137,11 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ success() || cancelled() }}
 
-# TODO: delete images!
+      - name: Delete images
+        run: |
+          . venv/bin/activate
+          . environments/arcus/activate
+          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/delete_images.yml
+        env:
+          OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
