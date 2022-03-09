@@ -33,7 +33,7 @@
         timeout: 800
     
     - name: Check slurm up after reimaging login node
-      import_tasks: ../hooks/check_slurm.yml
+      import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
     
     # TODO: This is specific to smslabs/arcus environment config - could generalise to all compute nodes
     - name: Request compute node rebuild via Slurm
@@ -61,5 +61,5 @@
         timeout: 800
     
     - name: Check slurm up after reimaging login node
-      import_tasks: ../hooks/check_slurm.yml
+      import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
