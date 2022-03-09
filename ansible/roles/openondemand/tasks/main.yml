@@ -11,6 +11,7 @@
     name: osc.ood
     tasks_from: install-rpm.yml
     vars_from: Rocky.yml
+    public: yes # Expose the vars from this role to the rest of the play
   # can't set vars: from a dict hence the workaround above
 
 - include_tasks:
@@ -23,13 +24,14 @@
 # The configure.yml playbook needs vars from Rocky (for nginx) and main if using OIDC auth. However vars_from doensn't take a list.
 # include_vars doens't interpolate from role vars, so we use that for main.yml which only requires things we override in the appliance inventory
 # and use vars_from for Rocky which requires interpolation from role vars.
-- include_vars:
-    file: roles/osc.ood/vars/main.yml
+#- include_vars:
+#    file: roles/osc.ood/vars/main.yml
 
 - include_role:
     name: osc.ood
     tasks_from: configure.yml
-    vars_from: Rocky.yml
+    vars_from: main.yml
+    public: yes
 
 - include_role:
     name: osc.ood
