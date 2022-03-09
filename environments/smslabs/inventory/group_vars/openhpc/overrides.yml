@@ -3,3 +3,13 @@ openhpc_config_extra:
   SlurmdDebug: debug
 openhpc_slurm_partitions:
 - name: small
+  ram_mb: "{{ (3362 * 0.95) | int }}"  # free --mebi * default openhpc_ram_multiplier
+  sockets: 1
+  cores_per_socket: 1
+  threads_per_core: 1
+  cloud_nodes: "{{ openhpc_cluster_name }}-compute-[2-3]"
+  cloud_instances:
+    flavor: general.v1.tiny
+    image:  "{{ openhpc_autoscale_image | default('IMAGE_PLACEHOLDER') }}" # Gets set by CI after image build task.
+    keypair: slurm-app-ci
+    network: "{{ hostvars[groups['control'] | first]['server_networks'].keys() | first }}" # Defined in inventory, so only defined for control during Packer build.
