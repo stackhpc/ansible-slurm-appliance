@@ -54,33 +54,6 @@ jobs:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
       
-      - name: Confirm Open Ondemand is up (via SOCKS proxy)
-        run: |
-          . venv/bin/activate
-          . environments/smslabs-example/activate
-          
-          # load ansible variables into shell:
-          ansible-playbook ansible/ci/output_vars.yml \
-            -e output_vars_hosts=openondemand \
-            -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
-            -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
-          source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
-          
-          # setup ssh proxying:
-          sudo apt install proxychains
-          ssh -fN -D 8080 ${bastion_user}@${bastion_ip}
-
-          # check OOD server returns 200:
-          statuscode=$(PROXYCHAINS_SOCKS5=8080 wget \
-            --quiet
-            --spider
-            --server-response
-            --no-check-certificate \
-            --http-user=testuser \
-            --http-password=${TEST_USER_PASSWORD} https://${openondemand_servername} \
-            2>&1)
-          (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
-
       - name: Get server provisioning failure messages
         id: provision_failure
         run: |
@@ -115,6 +88,33 @@ jobs:
           ANSIBLE_FORCE_COLOR: True
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
+      - name: Confirm Open Ondemand is up (via SOCKS proxy)
+        run: |
+          . venv/bin/activate
+          . environments/smslabs-example/activate
+          
+          # load ansible variables into shell:
+          ansible-playbook ansible/ci/output_vars.yml \
+            -e output_vars_hosts=openondemand \
+            -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
+            -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
+          source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
+          
+          # setup ssh proxying:
+          sudo apt install proxychains
+          ssh -fN -D 8080 ${bastion_user}@${bastion_ip}
+          
+          # check OOD server returns 200:
+          statuscode=$(PROXYCHAINS_SOCKS5=8080 wget \
+            --quiet \
+            --spider \
+            --server-response \
+            --no-check-certificate \
+            --http-user=testuser \
+            --http-password=${TEST_USER_PASSWORD} https://${openondemand_servername} \
+            2>&1)
+          (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
+
       - name: Run MPI-based tests
         run: |
           . venv/bin/activate
