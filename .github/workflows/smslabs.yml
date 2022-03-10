@@ -71,7 +71,7 @@ jobs:
           ssh -fN -D 8080 ${bastion_user}@${bastion_ip}
 
           # check OOD server returns 200:
-          statuscode=$(PROXYCHAINS_SOCKS4=8080 wget \
+          statuscode=$(PROXYCHAINS_SOCKS5=8080 wget \
             --quiet
             --spider
             --server-response
