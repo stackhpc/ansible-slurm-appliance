@@ -35,3 +35,6 @@ compute
 
 [update:children]
 cluster
+
+[openstack_autoscale:children]
+control

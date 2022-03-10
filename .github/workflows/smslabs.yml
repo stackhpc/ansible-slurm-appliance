@@ -1,13 +1,13 @@
 
-name: Test on Arcus OpenStack in rcp-cloud-portal-demo
+name: Test on SMS-Labs OpenStack in stackhpc-ci
 on:
   push:
     branches:
       - main
   pull_request:
-concurrency: rcp-cloud-portal_demo # openstack project
+concurrency: stackhpc-ci # openstack project
 jobs:
-  arcus:
+  smslabs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -19,10 +19,10 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         env:
-          SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
 
       - name: Add bastion's ssh key to known_hosts
-        run: cat environments/arcus/bastion_fingerprint >> ~/.ssh/known_hosts
+        run: cat environments/smslabs/bastion_fingerprint >> ~/.ssh/known_hosts
         shell: bash
       
       - name: Install ansible etc
@@ -33,7 +33,7 @@ jobs:
       
       - name: Initialise terraform
         run: terraform init
-        working-directory: ${{ github.workspace }}/environments/arcus/terraform
+        working-directory: ${{ github.workspace }}/environments/smslabs/terraform
         
       - name: Write clouds.yaml
         run: |
@@ -41,13 +41,13 @@ jobs:
           echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
         shell: bash
         env:
-          CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
+          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
       
       - name: Provision infrastructure
         id: provision
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform apply -auto-approve
         env:
@@ -58,7 +58,7 @@ jobs:
         id: provision_failure
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           echo "::set-output name=messages::$(./getfaults.py)"
         env:
@@ -69,7 +69,7 @@ jobs:
       - name: Delete infrastructure if failed due to lack of hosts
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
         env:
@@ -81,7 +81,7 @@ jobs:
         # see pre-hook for the image build
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           ansible all -m wait_for_connection
           ansible-playbook ansible/adhoc/generate-passwords.yml
           ansible-playbook -vv ansible/site.yml
@@ -92,7 +92,7 @@ jobs:
       - name: Test reimage of login and compute nodes
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           ansible all -m wait_for_connection
           ansible-playbook -vv ansible/ci/test_reimage.yml
         env:
@@ -102,7 +102,7 @@ jobs:
       - name: Update cloud image and reconfigure Slurm
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           ansible-playbook -vv ansible/ci/update_cloudnode_image.yml
           ansible-playbook -vv ansible/slurm.yml --tags openhpc --skip-tags install
         env:
@@ -112,7 +112,7 @@ jobs:
       - name: Run MPI-based tests (triggers autoscaling)
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
         env:
           ANSIBLE_FORCE_COLOR: True
@@ -120,7 +120,7 @@ jobs:
       - name: Wait for CLOUD nodes to be destroyed
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           ansible-playbook -vv ansible/ci/wait_for_scaledown.yml
         env:
           OS_CLOUD: openstack
@@ -129,7 +129,7 @@ jobs:
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
         env:
@@ -139,7 +139,7 @@ jobs:
       - name: Delete images
         run: |
           . venv/bin/activate
-          . environments/arcus/activate
+          . environments/smslabs/activate
           ansible-playbook -vv ansible/ci/delete_images.yml
         env:
           OS_CLOUD: openstack

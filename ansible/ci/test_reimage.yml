@@ -33,8 +33,9 @@
         timeout: 800
     
     - name: Check slurm up after reimaging login node
-      import_tasks: ../hooks/check_slurm.yml
+      import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
     
+    # TODO: This is specific to smslabs/arcus environment config - could generalise to all compute nodes
     - name: Request compute node rebuild via Slurm
       shell:
         cmd: scontrol reboot ASAP nextstate=RESUME reason='rebuild image:{{ compute_build.artifact_id }}' {{ openhpc_cluster_name }}-compute-[0-1]
@@ -60,5 +61,5 @@
         timeout: 800
     
     - name: Check slurm up after reimaging login node
-      import_tasks: ../hooks/check_slurm.yml
+      import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
