@@ -59,7 +59,9 @@
     - import_role:
         name: openondemand
         tasks_from: validate.yml
-      when: groups['openondemand'] | length > 0
+      when: 
+        - "'openondemand' in groups"
+        - groups['openondemand'] | length > 0
       tags:
         - openondemand
         - openondemand_server
