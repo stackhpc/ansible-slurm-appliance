@@ -79,7 +79,7 @@ jobs:
             --http-user=testuser \
             --http-password=${TEST_USER_PASSWORD} https://${openondemand_servername} \
             2>&1)
-          (echo $statuscode | grep "200 OK") || echo $statuscode
+          (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
 
       - name: Get server provisioning failure messages
         id: provision_failure
