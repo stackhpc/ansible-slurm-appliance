@@ -101,11 +101,11 @@ jobs:
           source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
           
           # setup ssh proxying:
-          sudo apt install proxychains
+          sudo apt-get --yes --force-yes install proxychains
           ssh -fN -D 8080 ${bastion_user}@${bastion_ip}
           
           # check OOD server returns 200:
-          statuscode=$(PROXYCHAINS_SOCKS5=8080 wget \
+          statuscode=$(PROXYCHAINS_SOCKS5=8080 proxychains wget \
             --quiet \
             --spider \
             --server-response \
