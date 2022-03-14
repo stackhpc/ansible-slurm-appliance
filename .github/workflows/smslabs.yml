@@ -86,6 +86,7 @@ jobs:
           ansible-playbook -vv ansible/site.yml
         env:
           ANSIBLE_FORCE_COLOR: True
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
       - name: Run MPI-based tests
         run: |
@@ -94,6 +95,7 @@ jobs:
           ansible-playbook -vv ansible/adhoc/hpctests.yml
         env:
           ANSIBLE_FORCE_COLOR: True
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
       - name: Build control and compute images
         run: |
@@ -103,6 +105,7 @@ jobs:
           PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
         env:
           OS_CLOUD: openstack
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
       - name: Reimage compute nodes via slurm and check cluster still up
         run: |
@@ -112,6 +115,7 @@ jobs:
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
           OS_CLOUD: openstack
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Reimage login nodes via openstack and check cluster still up
         run: |
@@ -121,6 +125,7 @@ jobs:
           ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
         env:
           OS_CLOUD: openstack
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Delete infrastructure
         run: |
