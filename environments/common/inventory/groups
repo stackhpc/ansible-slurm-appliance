@@ -26,7 +26,6 @@ openhpc
 [podman:children]
 # Hosts running containers for below services:
 opendistro
-kibana
 filebeat
 
 [prometheus]
@@ -40,9 +39,6 @@ filebeat
 
 [opendistro]
 # Single node to host ElasticSearch search engine for Slurm monitoring.
-
-[kibana]
-# Single node to run queries for ElasticSearch.
 
 [slurm_stats]
 # Single node to run tools to integrate Slurm's accounting information with ElasticSearch.

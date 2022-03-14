@@ -1,10 +1,16 @@
 ---
 roles:
   - src: stackhpc.nfs
-  - src: stackhpc.openhpc
-  - src: cloudalchemy.node_exporter
+  - src: https://github.com/stackhpc/ansible-role-openhpc.git
+    version: v0.9.0 # supports Rocky Linux
+    name: stackhpc.openhpc
+  - src: https://github.com/stackhpc/ansible-node-exporter.git
+    version: support-rhel-clones
+    name: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
-  - src: cloudalchemy.prometheus
+  - src: https://github.com/cloudalchemy/ansible-prometheus.git
+    version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
+    name: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
   - src: cloudalchemy.grafana
   - src: geerlingguy.mysql
@@ -15,5 +21,5 @@ collections:
 - name: community.grafana
 - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
   type: git
-  version: main
+  version: v0.1.0
 ...
