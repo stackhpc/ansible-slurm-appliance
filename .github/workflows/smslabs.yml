@@ -116,6 +116,8 @@ jobs:
             --http-password=${TEST_USER_PASSWORD} https://${openondemand_servername} \
             2>&1)
           (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
+        env:
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Run MPI-based tests
         run: |
