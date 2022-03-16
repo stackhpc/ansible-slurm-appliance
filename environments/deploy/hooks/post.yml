@@ -47,7 +47,7 @@
         name: cluster_dataset_manager
 
 - name: pam_mkhomedir_plus
-  hosts: login:!admin
+  hosts: login
   become: true
   tags:
     - pam_mkhomedir_plus
