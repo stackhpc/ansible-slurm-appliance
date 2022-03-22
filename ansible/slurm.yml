@@ -32,6 +32,12 @@
         name: stackhpc.openhpc
         tasks_from: install.yml
       when: groups.get('openstack_autoscale', []) | length > 0
+    - name: Fix slurm directory owner
+      file:
+        path: /etc/slurm
+        state: directory
+        owner: slurm
+        group: slurm
 
 - name: Setup autoscaling on OpenStack
   hosts: openstack_autoscale
