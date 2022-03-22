@@ -1,6 +1,7 @@
 openhpc_config_extra:
   SlurmctldDebug: debug
   SlurmdDebug: debug
+  EpilogSlurmctld: /opt/slurm-tools/bin/slurm-openstack-redeploy
 openhpc_slurm_partitions:
 - name: small
   ram_mb: "{{ (808 * 0.9) | int }}" # from free --mebi
