@@ -88,6 +88,7 @@ jobs:
         env:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
       - name: Test reimage of login and compute nodes
         run: |
@@ -98,6 +99,7 @@ jobs:
         env:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
       - name: Update cloud image and reconfigure Slurm
         run: |
@@ -108,6 +110,7 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
       - name: Run MPI-based tests (triggers autoscaling)
         run: |
@@ -116,6 +119,8 @@ jobs:
           ansible-playbook -vv ansible/adhoc/hpctests.yml
         env:
           ANSIBLE_FORCE_COLOR: True
+          OS_CLOUD: openstack
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Wait for CLOUD nodes to be destroyed
         run: |
@@ -125,6 +130,7 @@ jobs:
         env:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Delete infrastructure
         run: |

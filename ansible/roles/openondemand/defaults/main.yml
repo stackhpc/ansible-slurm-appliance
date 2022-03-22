@@ -1,0 +1,99 @@
+---
+
+# Authentication:
+openondemand_auth: # "oidc" or "basic_pam"
+openondemand_mapping_users: []
+
+## Variables for `openondemand_auth=oidc` :
+openondemand_oidc_client_id:
+openondemand_oidc_client_secret:
+openondemand_oidc_provider_url:
+openondemand_oidc_crypto_passphrase:
+openondemand_oidc_remote_user_claim: preferred_username
+openondemand_oidc_scope: openid profile preferred_username
+
+# SSL Certificates
+openondemand_ssl_cert: /etc/pki/tls/certs/localhost.crt
+openondemand_ssl_cert_key: /etc/pki/tls/private/localhost.key
+
+# Dashboard and application config:
+openondemand_dashboard_docs_url: (undefined)
+openondemand_dashboard_support_url: (undefined)
+openondemand_desktop_partition: ''
+openondemand_filesapp_paths: []
+openondemand_jupyter_partition: ''
+openondemand_dashboard_links: []
+
+# Monitoring:
+openondemand_exporter: true
+
+# Synonyms for osc:ood role vars:
+openondemand_clusters: {} # synonym for osc.ood:clusters
+openondemand_servername: ''
+openondemand_host_regex:
+
+# Other:
+openondemand_node_proxy_directives: '' # Added to Apache directives for `node_uri` forwarding.
+
+openondemand_auth_defaults:
+  # Defaults for OIDC auth - keys are osc.ood vars & can be overriden using the osc.ood var name in inventory
+  oidc:
+    oidc_uri: /oidc # has to be set separately to trigger oidc integration!
+    ood_auth_openidc:
+      OIDCRedirectURI: "https://{{ openondemand_servername }}/oidc"
+      OIDCClientID: "{{ openondemand_oidc_client_id }}"
+      OIDCClientSecret: "{{ openondemand_oidc_client_secret }}" # TODO: needs to be in secrets
+      OIDCProviderMetadataURL: "{{ openondemand_oidc_provider_url }}/.well-known/openid-configuration"
+      OIDCCryptoPassphrase: "{{ openondemand_oidc_crypto_passphrase }}"
+      OIDCPassClaimsAs: environment
+      OIDCPassIDTokenAs: serialized
+      OIDCScope: "{{ openondemand_oidc_scope }}"
+      OIDCRemoteUserClaim: "{{ openondemand_oidc_remote_user_claim }}"
+    httpd_auth: # ood_portal.yml.j2
+      - 'AuthType openid-connect'
+      - 'Require valid-user'
+    user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
+    user_map_match: none
+  
+  # Defaults for basic/PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
+  basic_pam:
+    httpd_auth: # ood_portal.yml.j2
+      - 'AuthType Basic'
+      - 'AuthName "Open OnDemand"'
+      - 'AuthBasicProvider PAM'
+      - 'AuthPAMService ood'
+      - 'Require valid-user'
+    user_map_cmd: null
+    user_map_match: '.*'
+
+# The below mapping is used to override osc.ood defaults. Keys are osc.ood variable names.
+# If you need to override *these* defaults (i.e. this role's vars are not sufficent) just set the corresponding osc.ood var as normal.
+openondemand_osc_ood_defaults:
+
+  # Synonyms:
+  clusters: "{{ openondemand_clusters }}"
+  servername: "{{ openondemand_servername }}"
+  host_regex: "{{ openondemand_host_regex }}"
+  node_uri: "{{ '/node' if openondemand_host_regex else none }}"
+  rnode_uri: "{{ '/rnode' if openondemand_host_regex else none }}"
+
+  # Enable SSL by default:
+  httpd_port: 443
+  ssl:
+    - "SSLCertificateFile {{ openondemand_ssl_cert }}"
+    - "SSLCertificateKeyFile {{ openondemand_ssl_cert_key }}"
+    # following based on https://grok.lsu.edu/article.aspx?articleid=17596
+    - SSLProtocol all -TLSv1.1 -TLSv1 -SSLv2 -SSLv3
+    - SSLCipherSuite ALL:+HIGH:!ADH:!EXP:!SSLv2:!SSLv3:!MEDIUM:!LOW:!NULL:!aNULL
+    - SSLHonorCipherOrder On
+    - SSLCompression off
+    - SSLSessionTickets Off
+  
+  # User mapping:
+  user_map_cmd: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_cmd }}"
+  user_map_match: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_match }}"
+
+  # Auth:
+  oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if (openondemand_auth | lower) == 'oidc' else none }}"
+  ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
+  httpd_auth: "{{ openondemand_auth_defaults[openondemand_auth | lower].httpd_auth }}"

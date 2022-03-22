@@ -41,3 +41,15 @@ cluster
 
 [openstack_autoscale]
 # Add `control` group to configure autoscaling on OpenStack clouds.
+
+[openondemand]
+# Host to run Open Ondemand server on - subset of login
+login
+
+[openondemand_desktop]
+# Subset of compute to run a interactive desktops on via Open Ondemand
+compute
+
+[openondemand_jupyter]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+compute
