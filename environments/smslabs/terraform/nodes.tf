@@ -13,6 +13,10 @@ resource "openstack_compute_instance_v2" "control" {
     access_network = true
   }
 
+  metadata = {
+    environment_root = var.environment_root
+  }
+
 }
 
 resource "openstack_compute_instance_v2" "login" {
@@ -31,6 +35,10 @@ resource "openstack_compute_instance_v2" "login" {
     access_network = true
   }
 
+  metadata = {
+    environment_root = var.environment_root
+  }
+
 }
 
 resource "openstack_compute_instance_v2" "compute" {
@@ -47,6 +55,10 @@ resource "openstack_compute_instance_v2" "compute" {
   network {
     uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
     access_network = true
+  }
+
+  metadata = {
+    environment_root = var.environment_root
   }
 
 }
