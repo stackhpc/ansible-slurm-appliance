@@ -84,6 +84,7 @@ jobs:
           . environments/smslabs/activate
           ansible all -m wait_for_connection
           ansible-playbook ansible/adhoc/generate-passwords.yml
+          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           ansible-playbook -vv ansible/site.yml
         env:
           OS_CLOUD: openstack
@@ -99,7 +100,6 @@ jobs:
         env:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
       - name: Update cloud image and reconfigure Slurm
         run: |
@@ -110,7 +110,6 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
       - name: Run MPI-based tests (triggers autoscaling)
         run: |
@@ -120,7 +119,6 @@ jobs:
         env:
           ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Wait for CLOUD nodes to be destroyed
         run: |
@@ -130,7 +128,6 @@ jobs:
         env:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Delete infrastructure
         run: |
