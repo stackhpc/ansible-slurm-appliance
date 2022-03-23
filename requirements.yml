@@ -2,7 +2,7 @@
 roles:
   - src: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.10.0 # supports Rocky Linux
+    version: feature/partition_params
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: support-rhel-clones
