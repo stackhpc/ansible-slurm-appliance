@@ -1,3 +1,8 @@
+---
+
+# See: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/test
+# for variable definitions.
+
 openhpc_tests_rootdir: /home/ohcp-tests
 openhpc_tests_hpl_NB: 192
 openhpc_slurm_login: "{{ groups['login'][0] }}"
