@@ -1,3 +1,5 @@
+[![Test on OpenStack via smslabs](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/smslabs.yml/badge.svg)](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/smslabs.yml)
+
 # StackHPC Slurm Appliance
 
 This repository contains playbooks and configuration to define a Slurm-based HPC environment including:
