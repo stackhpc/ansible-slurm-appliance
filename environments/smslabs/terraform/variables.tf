@@ -66,3 +66,8 @@ variable "compute_images" {
     default = {}
     description = "Mapping to override compute images from compute_types: key ->(str) node name, value -> (str) image name"
 }
+
+variable "environment_root" {
+    type = string
+    description = "Path to environment root, automatically set by activate script"
+}
