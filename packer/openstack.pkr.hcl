@@ -88,6 +88,10 @@ build {
     name = "login"
   }
 
+  source "source.openstack.openhpc" {
+    name = "control"
+  }
+
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
     host_alias = "packer"

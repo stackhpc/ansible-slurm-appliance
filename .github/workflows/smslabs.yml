@@ -97,7 +97,7 @@ jobs:
           ANSIBLE_FORCE_COLOR: True
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       
-      - name: Build control and compute images
+      - name: Build control, login and compute images
         run: |
           . venv/bin/activate
           . environments/smslabs/activate

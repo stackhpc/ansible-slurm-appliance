@@ -38,7 +38,9 @@ Steps:
 
   Note the builder VMs are added to the `builder` group to differentiate them from "real" nodes - see developer notes below.
 
-This will build images for the `compute` and `login` ansible groups. To add additional builds add a new `source` in `openstack.pkr.hcl`.
+This will build images for the `compute`, `login` and `control` ansible groups. To add additional builds add a new `source` in `openstack.pkr.hcl`.
+
+To build only specific images use e.g. `-only openstack.login`.
 
 # Notes for developers
 
