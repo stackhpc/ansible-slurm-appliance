@@ -1,9 +1,0 @@
----
-
-- name: Restart kibana container
-  systemd:
-    name: kibana.service
-    state: restarted
-    enabled: yes
-    daemon_reload: yes
-  become: true

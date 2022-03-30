@@ -1,3 +1,5 @@
+---
+
 update_enable: false
 # These variables define the packages updates and are passed to ansible's yum module parameters with the same names: https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html
 update_name: '*'

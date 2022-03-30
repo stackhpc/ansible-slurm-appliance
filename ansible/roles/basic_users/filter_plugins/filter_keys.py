@@ -2,18 +2,23 @@
 
 import copy
 
+USER_MODULE_PARAMS = ('append authorization comment create_home createhome expires force generate_ssh_key group '
+                      'groups hidden home local login_class move_home name user non_unique password password_expire_min '
+                      'password_expire_max password_lock profile remove role seuser shell skeleton ssh_key_bits '
+                      'ssh_key_comment ssh_key_file ssh_key_passphrase ssh_key_type state system uid update_password').split()
 
 class FilterModule(object):
 
     def filters(self):
         return {
-            'filter_keys': self.filter_keys
+            'filter_user_params': self.filter_user_params
         }
 
-    def filter_keys(self, orig_dict, keys_to_remove):
-        ''' Return a copy of `orig_dict` without the keys in the list `keys_to_remove`'''
-        dict_to_return = copy.deepcopy(orig_dict)
-        for item in keys_to_remove:
-            if item in dict_to_return:
-                del dict_to_return[item]
-        return dict_to_return
+    def filter_user_params(self, d):
+        ''' Return a copy of dict `d` containing only keys which are parameters for the user module'''
+        
+        user_dict = copy.deepcopy(d)
+        remove_keys = set(user_dict).difference(USER_MODULE_PARAMS)
+        for key in remove_keys:
+            del user_dict[key]
+        return user_dict

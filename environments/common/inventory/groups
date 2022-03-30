@@ -26,7 +26,6 @@ openhpc
 [podman:children]
 # Hosts running containers for below services:
 opendistro
-kibana
 filebeat
 
 [prometheus]
@@ -40,9 +39,6 @@ filebeat
 
 [opendistro]
 # Single node to host ElasticSearch search engine for Slurm monitoring.
-
-[kibana]
-# Single node to run queries for ElasticSearch.
 
 [slurm_stats]
 # Single node to run tools to integrate Slurm's accounting information with ElasticSearch.
@@ -60,11 +56,6 @@ filebeat
 [node_exporter]
 # All hosts to monitor for hardware and OS metrics.
 
-[openhpc_tests:children]
-# For post-deploy MPI-based tests - see ansible/adhoc/test.yml
-login
-compute
-
 [selinux:children]
 # All hosts requiring control of SELinux status.
 cluster
@@ -80,3 +71,12 @@ cluster
 
 [basic_users]
 # Add `openhpc` group to add slurm users via creation of users on each node.
+
+[openondemand]
+# Host to run Open Ondemand server on - subset of login
+
+[openondemand_desktop]
+# Subset of compute to run a interactive desktops on via Open Ondemand
+
+[openondemand_jupyter]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand

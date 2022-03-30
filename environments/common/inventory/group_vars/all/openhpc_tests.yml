@@ -1,3 +1,0 @@
-openhpc_tests_rootdir: /home/ohcp-tests
-openhpc_tests_hpl_NB: 192
-openhpc_slurm_login: "{{ groups['login'][0] }}"

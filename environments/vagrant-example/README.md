@@ -12,11 +12,13 @@ See main README and then additionally install Vagrant and a provider. For CentOS
 
     sudo yum install gcc make perl elfutils-devel
     # install appropriate kernel-headers and kernel-devel packages for running kernel
-    sudo dnf install https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.rpm
+    sudo yum install yum-utils
+    sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+    sudo yum install vagrant-2.2.19
     sudo dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo
-    sudo yum install VirtualBox-6.0
+    sudo yum install VirtualBox-6.1
 
-(Note that each Vagrant version only supports a subset of VirtualBox releases.)
+Note that the Vagrant version given above may not be the most recent; each Vagrant version only supports a subset of VirtualBox releases, so check compability if upgrading either.
 
 ## Overview of directory structure
 See main README, plus:

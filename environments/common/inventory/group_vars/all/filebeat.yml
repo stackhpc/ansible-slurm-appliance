@@ -1,4 +1,5 @@
 ---
+
 # Path to filebeat.yml configuration file template
 filebeat_config_path: "{{ appliances_repository_root }}/environments/common/files/filebeat/filebeat.yml"
 

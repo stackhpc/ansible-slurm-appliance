@@ -8,8 +8,6 @@ roles/*
 !roles/opendistro/**
 !roles/podman/
 !roles/podman/**
-!roles/kibana/
-!roles/kibana/**
 !roles/grafana-dashboards/
 !roles/grafana-dashboards/**
 !roles/grafana-datasources/
@@ -22,3 +20,5 @@ roles/*
 !roles/block_devices/**
 !roles/basic_users/
 !roles/basic_users/**
+!roles/openondemand/
+!roles/openondemand/**

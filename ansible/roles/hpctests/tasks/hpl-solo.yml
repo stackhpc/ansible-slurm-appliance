@@ -77,9 +77,10 @@
 - name: Run hpl-solo
   shell: sbatch --wait hpl-solo.sh
   become: no
-  register:
   args:
     chdir: "{{ hpctests_rootdir }}/hpl-solo"
+  async: "{{ 20 * 60 }}" # wait for up to 20 minutes
+  poll: 15 # check every 15 seconds
   register: hpctests_hplsolo_sbatch
 
 - name: Check HPL completed OK

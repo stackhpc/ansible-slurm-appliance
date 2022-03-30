@@ -2,6 +2,24 @@
 
 # Fail early if configuration is invalid
 
+- name: Ensure control node is in inventory
+  hosts: all
+  tasks:
+    - assert:
+        that: groups['control'] | length
+        fail_msg: "no hosts found in group 'control' - has control node been deployed?"
+
+- name: Validate openhpc configuration
+  hosts: openhpc
+  tags: openhpc
+  tasks:
+    - assert:
+        that: "'enable_configless' in openhpc_config.SlurmctldParameters | default([])"
+        fail_msg: |
+          'enable_configless' not found in openhpc_config.SlurmctldParameters - is variable openhpc_config overridden?
+          Additional slurm.conf parameters should be provided using variable openhpc_config_extra.
+        success_msg: Checked Slurm will be configured for configless operation
+    
 - name: Validate podman configuration
   hosts: podman
   tags: podman
@@ -17,15 +35,6 @@
   tasks:
     - import_role:
         name: filebeat
-        tasks_from: validate.yml
-      tags: validate
-
-- name: Validate kibana configuration
-  hosts: kibana
-  tags: kibana
-  tasks:
-    - import_role:
-        name: kibana
         tasks_from: validate.yml
       tags: validate
 
@@ -47,3 +56,31 @@
         name: stackhpc.slurm_openstack_tools.rebuild
         tasks_from: validate.yml
       tags: validate
+
+- name: Validate openondemand configuration
+  hosts:
+    - openondemand
+    - grafana
+  gather_facts: false
+  tags:
+    - openondemand
+    - openondemand_server
+    - grafana
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: validate.yml
+      # This set of tasks will run if there are grafana hosts configured. 
+      # It is a valid configuration to have a grafana group with hosts 
+      # when *not* deploying openondemand. This would mean that openondemand
+      # vars validated in the below task are not set in a way that passes
+      # this set of validation tasks. To ensure that this validation does
+      # not fail with a valid config, only run these tasks when the
+      # openondemand group both exists *and* contains hosts.
+      when: 
+        - "'openondemand' in groups"
+        - groups['openondemand'] | length > 0
+      tags:
+        - openondemand
+        - openondemand_server
+        - grafana
