@@ -9,16 +9,7 @@
     - include_role:
         name:  geerlingguy.mysql
 
-- name: Setup slurm
-  hosts: openhpc
-  become: yes
-  tags:
-    - openhpc
-  tasks:
-    - import_role:
-        name: stackhpc.openhpc
-
-- name: Setup slurm-driven reimage
+- name: Setup Slurm-driven reimage on OpenStack
   hosts: rebuild
   become: yes
   tags:
@@ -27,6 +18,51 @@
   tasks:
     - import_role:
         name: stackhpc.slurm_openstack_tools.rebuild
+
+- name: Preinstall Slurm packages to create slurm user
+  # This is an optimisation for speed as it avoids having to do this once for `control` then again for `openhpc` nodes.
+  hosts: openhpc
+  become: yes
+  tags:
+    - openstack_autoscale
+    - openhpc
+    - install
+  tasks:
+    - import_role:
+        name: stackhpc.openhpc
+        tasks_from: install.yml
+      when: groups.get('openstack_autoscale', []) | length > 0
+    - name: Fix slurm directory owner
+      file:
+        path: /etc/slurm
+        state: directory
+        owner: slurm
+        group: slurm
+
+- name: Setup autoscaling on OpenStack
+  hosts: openstack_autoscale
+  become: yes
+  tags:
+    - openstack_autoscale
+    - openhpc
+  tasks:
+    - import_role:
+        name: stackhpc.slurm_openstack_tools.autoscale
+
+- name: Setup slurm
+  hosts: openhpc
+  become: yes
+  tags:
+    - openhpc
+  tasks:
+    - assert:
+        that: "'enable_configless' in openhpc_config.SlurmctldParameters | default([])"
+        fail_msg: |
+          'enable_configless' not found in openhpc_config.SlurmctldParameters - is variable openhpc_config overridden?
+          Additional slurm.conf parameters should be provided using variable openhpc_config_extra.
+        success_msg: Checked Slurm will be configured for configless operation
+    - import_role:
+        name: stackhpc.openhpc
 
 - name: Set locked memory limits on user-facing nodes
   hosts:

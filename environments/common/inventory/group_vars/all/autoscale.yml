@@ -1,0 +1,4 @@
+autoscale_rebuild_clouds: ~/.config/openstack/clouds.yaml
+autoscale_suspend_exc_nodes_default: "{{ (groups.get('compute', []) + groups.get('login', [])) }}" # i.e. all non-CLOUD nodes, and prevent login-only slurmd nodes getting powered down
+autoscale_suspend_exc_nodes_extra: []
+autoscale_suspend_exc_nodes: "{{ autoscale_suspend_exc_nodes_default + autoscale_suspend_exc_nodes_extra }}"

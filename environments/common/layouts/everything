@@ -39,6 +39,9 @@ cluster
 [basic_users]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
 
+[openstack_autoscale]
+# Add `control` group to configure autoscaling on OpenStack clouds.
+
 [openondemand]
 # Host to run Open Ondemand server on - subset of login
 login

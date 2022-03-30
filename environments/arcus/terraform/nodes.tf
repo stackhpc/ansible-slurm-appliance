@@ -6,11 +6,15 @@ resource "openstack_compute_instance_v2" "control" {
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
   config_drive = true
-  security_groups = ["default", "ssh"]
+  security_groups = ["default", "SSH"]
 
   network {
-    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id # ensures nodes not created till subnet created
+    port = openstack_networking_port_v2.rdma["control"].id
     access_network = true
+  }
+
+  metadata = {
+    environment_root = var.environment_root
   }
 
 }
@@ -24,11 +28,15 @@ resource "openstack_compute_instance_v2" "login" {
   flavor_name = each.value.flavor
   key_pair = var.key_pair
   config_drive = true
-  security_groups = ["default", "ssh"]
+  security_groups = ["default", "SSH"]
 
   network {
-    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
+    port = openstack_networking_port_v2.rdma[each.key].id
     access_network = true
+  }
+
+  metadata = {
+    environment_root = var.environment_root
   }
 
 }
@@ -42,11 +50,15 @@ resource "openstack_compute_instance_v2" "compute" {
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
   config_drive = true
-  security_groups = ["default", "ssh"]
+  security_groups = ["default", "SSH"]
 
   network {
-    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
+    port = openstack_networking_port_v2.rdma[each.key].id
     access_network = true
+  }
+
+  metadata = {
+    environment_root = var.environment_root
   }
 
 }

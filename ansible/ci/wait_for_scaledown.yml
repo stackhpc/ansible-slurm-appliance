@@ -1,0 +1,28 @@
+- hosts: login:!builder
+  become: no
+  gather_facts: no
+  tasks:
+    - name: List CLOUD-state nodes
+      shell:
+        cmd: sinfo --noheader --Node --Format NodeList -t CLOUD
+      register: sinfo_cloudnodes
+      changed_when: false
+    
+    - name: Get SuspendTime
+      shell:
+        cmd: scontrol show config | grep '^SuspendTime '
+      register: suspendtime
+    
+    - name: Wait for SuspendTime
+      pause:
+        seconds: "{{ suspendtime.stdout.split()[2] }}"
+    
+    - name: Wait for CLOUD nodes to be destroyed
+      shell:
+        cmd: "openstack server list -f value -c Name"
+      changed_when: false
+      delegate_to: localhost
+      register: openstack_servers
+      until: "sinfo_cloudnodes.stdout_lines | map('trim') | intersect(openstack_servers.stdout_lines) | length == 0" # cloud nodes aren't found in openstack_servers
+      retries: 10
+      delay: 30
