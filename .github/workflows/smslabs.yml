@@ -91,7 +91,7 @@ jobs:
       - name: Confirm Open Ondemand is up (via SOCKS proxy)
         run: |
           . venv/bin/activate
-          . environments/smslabs-example/activate
+          . environments/smslabs/activate
           
           # load ansible variables into shell:
           ansible-playbook ansible/ci/output_vars.yml \
