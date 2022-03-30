@@ -1,4 +1,5 @@
 ---
+
 # See: https://github.com/stackhpc/ansible-role-openhpc
 # for variable definitions
 
@@ -22,5 +23,9 @@ openhpc_packages_default:
 openhpc_packages_extra: []
 openhpc_packages: "{{ openhpc_packages_default + openhpc_packages_extra }}"
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
-openhpc_slurm_configless: true
 openhpc_login_only_nodes: login
+openhpc_config_default:
+  SlurmctldParameters:
+    - enable_configless
+openhpc_config_extra: {}
+openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_extra, list_merge='append') }}"

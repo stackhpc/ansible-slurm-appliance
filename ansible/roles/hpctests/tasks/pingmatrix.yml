@@ -34,7 +34,7 @@
 # Note this still doesn't fix any non-unique names but we should get a length mis-match at least with that.
 # although this looks a bit crazy:
 - name: Expand node list
-  shell: "scontrol show hostnames {{ openhpc_tests_nodes if openhpc_tests_nodes is defined else (hpctests_computes.stdout_lines | join(',')) }}"
+  shell: "scontrol show hostnames {{ hpctests_nodes if hpctests_nodes is defined else (hpctests_computes.stdout_lines | join(',')) }}"
   register: scontrol_hostnames
 
 - name: Create sorted node expression
