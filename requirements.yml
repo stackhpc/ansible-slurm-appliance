@@ -1,20 +1,29 @@
 ---
 roles:
   - src: stackhpc.nfs
+    version: v21.2.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.9.0 # supports Rocky Linux
+    version: v0.12.0
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: support-rhel-clones
     name: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
+    version: 1.0.0
   - src: https://github.com/cloudalchemy/ansible-prometheus.git
     version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
     name: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
+    version: 0.19.1
   - src: cloudalchemy.grafana
+    version: 0.18.0
   - src: geerlingguy.mysql
+    version: 3.3.2
   - src: jriguera.configdrive
+    # No versions available
+  - src: https://github.com/OSC/ood-ansible.git
+    name: osc.ood
+    version: v2.0.5
 
 collections:
 - name: containers.podman

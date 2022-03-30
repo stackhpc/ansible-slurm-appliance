@@ -16,10 +16,12 @@ Requirements
 Role Variables
 --------------
 
-`basic_users_users`: Required. A list of mappings defining information for each user. In general, mapping keys/values are the parameters to [ansible.builtin.user](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html) and default values are as given there. However:
+`basic_users_users`: Required. A list of mappings defining information for each user. In general, mapping keys/values are passed through as parameters to [ansible.builtin.user](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html) and default values are as given there. However:
 - `create_home`, `generate_ssh_key` and `ssh_key_comment` are set automatically and should not be overriden.
+- `uid` should be set, so that the UID/GID is consistent across the cluster (which Slurm requires).
 - `shell` may be set if required, but will be overriden with `/sbin/nologin` on `control` nodes to prevent user login.
 - An additional key `public_key` may optionally be specified to define a key to log into the cluster.
+- Any other keys may present for other purposes (i.e. not used by this role).
 
 Dependencies
 ------------

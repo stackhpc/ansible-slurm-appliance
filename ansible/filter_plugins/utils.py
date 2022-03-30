@@ -9,22 +9,10 @@ import jinja2
 from ansible.module_utils.six import string_types
 import os.path
 
-def _get_hostvar(context, var_name, inventory_hostname=None):
-    if inventory_hostname is None:
-        namespace = context
-    else:
-        if inventory_hostname not in context['hostvars']:
-            raise AnsibleFilterError(
-                "Inventory hostname '%s' not in hostvars" % inventory_hostname)
-        namespace = context["hostvars"][inventory_hostname]
-    return namespace.get(var_name)
-
-@jinja2.contextfilter
-def prometheus_node_exporter_targets(context, hosts):
+def prometheus_node_exporter_targets(hosts, env):
     result = []
     per_env = defaultdict(list)
     for host in hosts:
-        env = _get_hostvar(context, "env", host) or "ungrouped"
         per_env[env].append(host)
     for env, hosts in per_env.items():
         target = {

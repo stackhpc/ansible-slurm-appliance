@@ -38,3 +38,15 @@ cluster
 
 [fail2ban:children]
 login
+
+[openondemand:children]
+login
+
+[openondemand_desktop:children]
+compute
+
+[openondemand_jupyter:children]
+compute
+
+[basic_users:children]
+cluster

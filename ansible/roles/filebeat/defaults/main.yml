@@ -1,5 +1,4 @@
 ---
 
-# You must define this variable.
-#filebeat_config_path: undefined
-filebeat_podman_user: "{{ ansible_user }}"
+#filebeat_config_path: undefined # REQUIRED. Path to filebeat.yml configuration file template
+filebeat_podman_user: "{{ ansible_user }}" # User that runs the filebeat container

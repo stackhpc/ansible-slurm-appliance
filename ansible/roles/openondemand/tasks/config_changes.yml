@@ -1,0 +1,6 @@
+- name: Add Apache directives for node_uri forwarding
+  blockinfile:
+    path: /opt/ood/ood-portal-generator/templates/ood-portal.conf.erb
+    block: "{{ openondemand_node_proxy_directives }}"
+    insertafter: '    Header edit  Set-Cookie "\^\(\[\^;\]\+\)" "\$1; Path=<%= @node_uri %>\/%{MATCH_HOST}e\/%{MATCH_PORT}e"'
+  when: openondemand_node_proxy_directives
