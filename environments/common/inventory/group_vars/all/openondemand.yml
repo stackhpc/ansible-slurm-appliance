@@ -1,6 +1,9 @@
 ---
-## TODO: maybe we should arrange it following the osc.github.io docs
-## NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
+
+# See: ansible/roles/openondemand/README.md 
+# for variable definitions.
+
+# NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
 openondemand_servername: '' # Must be changed when using openondemand, but allows templating when openondemand group is empty
 

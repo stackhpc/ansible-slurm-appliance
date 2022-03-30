@@ -56,11 +56,6 @@ filebeat
 [node_exporter]
 # All hosts to monitor for hardware and OS metrics.
 
-[openhpc_tests:children]
-# For post-deploy MPI-based tests - see ansible/adhoc/test.yml
-login
-compute
-
 [selinux:children]
 # All hosts requiring control of SELinux status.
 cluster
