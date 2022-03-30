@@ -21,4 +21,11 @@
     mode: 0640
     group: apache
 
+- name: Allow httpd access to PAM in SELinux
+  ansible.posix.seboolean:
+    name: httpd_mod_auth_pam
+    state: yes
+    persistent: yes
+  when: ansible_facts.selinux.status == 'enabled'
+
 # TODO: do we need to restart OOD here??
