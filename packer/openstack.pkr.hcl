@@ -74,7 +74,7 @@ source "openstack" "openhpc" {
   ssh_bastion_username = "${var.ssh_bastion_username}"
   ssh_bastion_private_key_file = "${var.ssh_bastion_private_key_file}"
   security_groups = "${var.security_groups}"
-  image_name = "ohpc-${source.name}-${local.timestamp}.qcow2"
+  image_name = "ohpc-${source.name}-${local.timestamp}" # want to use image name as instance name and dns name - can't include dots
   image_visibility = "${var.image_visibility}"
 }
 
@@ -94,7 +94,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
-    host_alias = "packer"
+    host_alias = "ohpc-${source.name}-${local.timestamp}" # sets inventory_hostname, which we rely on matching hosts DNS name
     groups = concat(["builder"], split("-", "${source.name}"))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
