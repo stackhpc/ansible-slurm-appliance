@@ -24,7 +24,7 @@ resource "openstack_compute_instance_v2" "login" {
   flavor_name = each.value.flavor
   key_pair = var.key_pair
   config_drive = true
-  security_groups = ["default", "ssh"]
+  security_groups = ["default", "ssh", "HTTPS"]
 
   network {
     uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
