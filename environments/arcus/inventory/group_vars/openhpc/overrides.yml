@@ -1,6 +1,7 @@
 openhpc_config_extra:
   SlurmctldDebug: debug
   SlurmdDebug: debug
+  EpilogSlurmctld: /opt/slurm-tools/bin/slurm-openstack-redeploy
 openhpc_slurm_partitions:
 - name: small
   ram_mb: "{{ (808 * 0.9) | int }}" # from free --mebi
@@ -13,3 +14,5 @@ openhpc_slurm_partitions:
     image:  "{{ openhpc_autoscale_image | default('IMAGE_PLACEHOLDER') }}"
     keypair: slurm-app-ci
     network: "{{ hostvars[groups['control'] | first]['server_networks'].keys() | first }}" # Defined in inventory, so only defined for control during Packer build
+  partition_params:
+    OverSubscribe: EXCLUSIVE
