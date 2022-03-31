@@ -7,7 +7,7 @@ on:
   pull_request:
 concurrency: stackhpc-ci # openstack project
 jobs:
-  openstack-example:
+  smslabs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -77,16 +77,29 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
-      - name: Configure infrastructure
+      - name: Directly configure cluster and build compute + login images
+        # see pre-hook for the image build
         run: |
           . venv/bin/activate
           . environments/smslabs/activate
           ansible all -m wait_for_connection
           ansible-playbook ansible/adhoc/generate-passwords.yml
+          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           ansible-playbook -vv ansible/site.yml
         env:
+          OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      
+      - name: Test reimage of login and compute nodes
+        run: |
+          . venv/bin/activate
+          . environments/smslabs/activate
+          ansible all -m wait_for_connection
+          ansible-playbook -vv ansible/ci/test_reimage.yml
+        env:
+          OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
       
       - name: Run MPI-based tests
         run: |
@@ -95,37 +108,7 @@ jobs:
           ansible-playbook -vv ansible/adhoc/hpctests.yml
         env:
           ANSIBLE_FORCE_COLOR: True
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      
-      - name: Build control and compute images
-        run: |
-          . venv/bin/activate
-          . environments/smslabs/activate
-          cd packer
-          PACKER_LOG=1 PACKER_LOG_PATH=build.log packer build -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
-        env:
           OS_CLOUD: openstack
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      
-      - name: Reimage compute nodes via slurm and check cluster still up
-        run: |
-          . venv/bin/activate
-          . environments/smslabs/activate
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-compute.yml
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
-        env:
-          OS_CLOUD: openstack
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-
-      - name: Reimage login nodes via openstack and check cluster still up
-        run: |
-          . venv/bin/activate
-          . environments/smslabs/activate
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/ci/reimage-login.yml
-          ansible-playbook -vv $APPLIANCES_ENVIRONMENT_ROOT/hooks/post.yml
-        env:
-          OS_CLOUD: openstack
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Delete infrastructure
         run: |
@@ -137,3 +120,12 @@ jobs:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ success() || cancelled() }}
+
+      - name: Delete images
+        run: |
+          . venv/bin/activate
+          . environments/smslabs/activate
+          ansible-playbook -vv ansible/ci/delete_images.yml
+        env:
+          OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
