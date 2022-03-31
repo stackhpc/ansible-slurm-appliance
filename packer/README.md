@@ -42,6 +42,12 @@ This will build images for the `compute`, `login` and `control` ansible groups. 
 
 To build only specific images use e.g. `-only openstack.login`.
 
+Instances using built compute and login images should immediately join the cluster, as long as they are in the Slurm configuration. If reimaging existing nodes, consider doing this via Slurm - see [stackhpc.slurm_openstack_tools.rebuild/README.md](../ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md).
+
+Instances using built control iamges will require re-running the `ansible/site.yml` playbook on the entire cluster, as the following aspects cannot be configured inside the image:
+- Slurm configuration (slurm.conf)
+- Grafana dashboard import (assuming default use of control node for Grafana)
+
 # Notes for developers
 
 The Packer build VMs are added to both the `builder` group and the `login` or `compute` groups as appropriate. The former group allows `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the VM where the real cluster may not be contactable (depending on the build network used). Currently this means:
