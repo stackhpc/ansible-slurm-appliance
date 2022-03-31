@@ -10,3 +10,6 @@ block_devices_partition_state: skip
 block_devices_filesystem_state: skip
 block_devices_mount_state: present
 basic_users_manage_homedir: false
+grafana_state: stopped # as it tries to listen on the "real" grafana node
+grafana_datasources: [] # as grafana won't be up - NB also dashboards are downloaded but not imported
+openhpc_slurm_partitions: [] # as no compute nodes will be in play, but partition definition might exist in inventory

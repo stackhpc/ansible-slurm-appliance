@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v21.2.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.12.0
+    version: no-partitions
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: support-rhel-clones
@@ -15,7 +15,9 @@ roles:
     name: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
     version: 0.19.1
-  - src: cloudalchemy.grafana
+  - src: https://github.com/stackhpc/ansible-grafana.git
+    name: cloudalchemy.grafana
+    version: service-state
     version: 0.18.0
   - src: geerlingguy.mysql
     version: 3.3.2
