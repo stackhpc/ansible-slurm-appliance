@@ -18,14 +18,14 @@
       poll: 0
 
 # For some reason squid shows TCP_MISS_ABORTED/200 on everything
-# - hosts: all
-#   become: yes
-#   gather_facts: no
-#   tasks:
-#     - name: Configure dnf proxy
-#       community.general.ini_file:
-#         path: /etc/dnf/dnf.conf
-#         section: main
-#         option: proxy
-#         value: "{{ squid_proxy }}"
-#         no_extra_spaces: true
+- hosts: all
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Configure dnf proxy
+      community.general.ini_file:
+        path: /etc/dnf/dnf.conf
+        section: main
+        option: proxy
+        value: "{{ squid_proxy }}"
+        no_extra_spaces: true
