@@ -1,19 +1,37 @@
+- name: Enumerate block device paths by serial number
+  block_devices:
+  register: _block_devices
+
 - name:  Create partitions
   parted:
-    device: "{{ item.get('device', block_devices_device) }}"
+    device: "{{ _device }}"
     number: "{{ item.get('number', block_devices_number) }}"
     state: "{{ item.get('partition_state', block_devices_partition_state) }}"
   when: "item.get('partition_state', block_devices_partition_state) != 'skip'"
   loop: "{{ block_devices_configurations }}"
+  vars:
+    _device: "{{ _block_devices.devices[ item.get('serial', block_devices_serial) ] }}"
 
 - name: Create filesystems
   filesystem:
     fstype: "{{ item.get('fstype', block_devices_fstype) }}"
-    dev: "{{ item.get('device', block_devices_device) }}{{ item.get('number', block_devices_number) }}"
+    dev: "{{ _device }}{{ item.get('number', block_devices_number) }}"
     resizefs: "{{ item.get('resizefs', block_devices_resizefs) }}"
     state: "{{ item.get('filesystem_state', block_devices_filesystem_state) }}"
   when: "item.get('filesystem_state', block_devices_filesystem_state) != 'skip'"
   loop: "{{ block_devices_configurations }}"
+  vars:
+    _device: "{{ _block_devices.devices[ item.get('serial', block_devices_serial) ] }}"
+
+- name: Get filesystem UUIDs
+  command:
+    cmd: "lsblk {{ _device }}{{ item.get('number', block_devices_number) }} --noheadings --output UUID"
+  loop: "{{ block_devices_configurations }}"
+  vars:
+    _device: "{{ _block_devices.devices[ item.get('serial', block_devices_serial) ] }}"
+  register: block_devices_uuids
+  changed_when: false
+  check_mode: no
 
 - name: Ensure mount point exists
   file:
@@ -21,13 +39,17 @@
     state: directory
   loop: "{{ block_devices_configurations }}"
 
-- name: Mount filesystems
+- name: Mount filesystems by UUID
   mount:
     path: "{{ item.get('path', block_devices_path) }}"
-    src: "{{ item.get('device', block_devices_device) }}{{ item.get('number', block_devices_number) }}"
+    src: "UUID={{ _uuid }}"
     fstype: "{{ item.get('fstype', block_devices_fstype) }}"
     state: "{{ item.get('mount_state', block_devices_mount_state) }}"
+  vars:
+    _uuid: "{{ block_devices_uuids.results[block_devices_idx].stdout }}"
   loop: "{{ block_devices_configurations }}"
+  loop_control:
+    index_var: block_devices_idx
 
 - name: Set owner/group for mounted directory
   file:
