@@ -11,6 +11,13 @@ fail2ban_firewalld_configs_default:
       zone: trusted
       state: enabled
       permanent: yes
+  - name: Allow https for openondemand
+    group: openondemand
+    rule:
+      service: https
+      zone: public
+      state: enabled
+      permanent: yes
 
 fail2ban_firewalld_configs_extra: [] # list of dicts with parameters as for fail2ban_firewalld_configs_default
 
