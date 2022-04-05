@@ -14,6 +14,7 @@ openhpc_slurmdbd_mysql_database: slurm_acct_db
 openhpc_slurmdbd_mysql_password: "{{ vault_mysql_slurm_password }}"
 openhpc_slurmdbd_mysql_username: slurm
 openhpc_slurm_control_host: "{{ hostvars[groups['control'].0].api_address }}"
+openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
 openhpc_slurm_partitions:
   - name: "compute"
 openhpc_packages_default:
