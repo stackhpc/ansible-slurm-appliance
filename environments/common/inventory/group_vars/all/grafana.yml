@@ -41,6 +41,12 @@ grafana_dashboards_default:
       - placeholder: DS_SLURMSTATS
         replacement: slurmstats
     revision_id: 1
+  # slurm exporter
+  - dashboard_id: 4323
+    replacements:
+      - placeholder: DS_PROMETHEUS
+        replacement: prometheus
+    revision_id: 3
 
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 
@@ -63,6 +69,12 @@ grafana_datasources:
     time_field: "@timestamp"
     database: "filebeat-*"
     es_version: 70
+  - name: slurmdb
+    ds_type: mysql
+    ds_url: "{{ openhpc_slurmdbd_host }}" # for some reason doesn't need port
+    database: "{{ openhpc_slurmdbd_mysql_database }}"
+    user: slurm
+    password: "{{ vault_mysql_slurm_password }}"
 
 # want to set grafana_server.serve_from_sub_path if have Open Ondemand to proxy:
 grafana_server:

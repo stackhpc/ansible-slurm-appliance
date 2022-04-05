@@ -1,0 +1,72 @@
+- name: Create slurm exporter group
+  ansible.builtin.group:
+    name: "{{ slurm_exporter_group }}"
+    state: present
+    system: true
+
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ slurm_exporter_user }}"
+    groups: "{{ slurm_exporter_group }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+    home: /
+
+- name: Install GCC
+  ansible.builtin.dnf:
+    name: gcc
+    state: latest
+
+- name: Install go
+  ansible.builtin.unarchive:
+    remote_src: yes
+    src: "https://go.dev/dl/go{{ slurm_exporter_go_version }}.linux-{{ slurm_exporter_go_arch }}.tar.gz"
+    dest: /usr/local
+
+- name: Add go to $PATH
+  ansible.builtin.copy:
+    dest: /etc/profile.d/golang.sh
+    content: 'PATH=$PATH:/usr/local/go/bin'
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Clone exporter repo
+  ansible.builtin.git:
+    repo: https://github.com/vpenso/prometheus-slurm-exporter.git
+    dest: "{{ slurm_exporter_builddir }}"
+    version: '0.20'
+
+- name: Build exporter
+  ansible.builtin.make:
+    chdir: "{{ slurm_exporter_builddir }}"
+  environment:
+    PATH: "{{ lookup('env', 'PATH')}}:/usr/local/go/bin"
+
+- name: Copy binary to path
+  ansible.builtin.copy:
+    remote_src: yes
+    src: "{{ slurm_exporter_builddir }}/bin/prometheus-slurm-exporter"
+    dest: "{{ slurm_exporter_binary_install_dir }}"
+    mode: u=rwx,go=r
+    owner: "{{ slurm_exporter_user }}"
+    group: "{{ slurm_exporter_group }}"
+  notify: Restart slurm exporter
+
+- name: Template systemd unit
+  ansible.builtin.template:
+    src: slurm_exporter.service.j2
+    dest: /etc/systemd/system/slurm_exporter.service
+  notify: Restart slurm exporter
+
+- meta: flush_handlers
+
+- name: Ensure slurm exporter state
+  systemd:
+    name: slurm_exporter
+    state: "{{ slurm_exporter_state }}"
+    enabled: true
+  when:
+    - not ansible_check_mode

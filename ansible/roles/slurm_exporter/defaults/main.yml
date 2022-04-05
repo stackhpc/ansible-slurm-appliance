@@ -1,0 +1,9 @@
+---
+slurm_exporter_go_version: 1.15.15 # as per https://github.com/vpenso/prometheus-slurm-exporter, 1.16 doesn't work due to module changes
+slurm_exporter_go_arch: amd64
+slurm_exporter_user: slurm-exp
+slurm_exporter_group: "{{ slurm_exporter_user }}"
+slurm_exporter_builddir: /tmp/prometheus-slurm-exporter
+slurm_exporter_binary_install_dir: /usr/local/bin
+slurm_exporter_state: started
+slurm_exporter_port: 8080 # as per https://github.com/vpenso/prometheus-slurm-exporter/blob/master/DEVELOPMENT.md

@@ -50,4 +50,11 @@ prometheus_scrape_configs_default:
   scrape_interval: 30s
   scrape_timeout: 20s
 
+- job_name: "slurm_exporter"
+  scrape_interval: 30s
+  scrape_timeout: 30s
+  static_configs:
+    - targets:
+      - "{{ openhpc_slurm_control_host }}:{{ slurm_exporter_port }}"
+
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"

@@ -1,0 +1,1 @@
+slurm_exporter_port: 9341 # as from https://github.com/prometheus/prometheus/wiki/Default-port-allocations
