@@ -26,7 +26,7 @@ variable "control_node" {
     description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
     default = {
         flavor: "general.v1.tiny"
-        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
+        image: "openhpc-220407-1108.qcow2"
     }
 }
 
@@ -36,7 +36,7 @@ variable "login_nodes" {
   default = {
       login-0: {
         flavor: "general.v1.tiny"
-        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
+        image: "openhpc-220407-1108.qcow2"
       }
     }
 }
@@ -47,7 +47,7 @@ variable "compute_types" {
     default = {
       small: {
           flavor: "general.v1.tiny"
-          image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
+          image: "openhpc-220407-1108.qcow2"
       }
     }
 }
