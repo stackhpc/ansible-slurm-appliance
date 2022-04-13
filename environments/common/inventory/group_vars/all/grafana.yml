@@ -27,21 +27,19 @@ grafana_dashboards_default:
         replacement: slurmstats
     revision_id: 1
   # openhpc slurm:
-  - dashboard_id: 13426
+  - dashboard_file: openhpc-slurm.json
     replacements:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
       - placeholder: DS_SLURMSTATS
         replacement: slurmstats
-    revision_id: 2
   # slurm jobs overview
-  - dashboard_id: 13535
+  - dashboard_file: slurm-jobs.json
     replacements:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
       - placeholder: DS_SLURMSTATS
         replacement: slurmstats
-    revision_id: 1
 
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 
