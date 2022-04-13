@@ -270,7 +270,7 @@
         "error": null,
         "hide": 0,
         "includeAll": false,
-        "label": "Dashbaord URL",
+        "label": "Dashboard URL",
         "multi": false,
         "name": "url",
         "options": [

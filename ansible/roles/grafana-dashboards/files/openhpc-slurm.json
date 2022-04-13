@@ -1877,7 +1877,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Network Traffic (recieve)",
+      "title": "Network Traffic (receive)",
       "tooltip": {
         "msResolution": false,
         "shared": true,
