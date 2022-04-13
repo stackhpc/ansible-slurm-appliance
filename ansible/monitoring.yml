@@ -76,6 +76,18 @@
   hosts: prometheus
   tags: prometheus
   tasks:
+    - name: Check for existing prometheus binaries
+      stat:
+        path: /usr/local/bin/{{ item }}
+      register: prometheus_binaries
+      loop:
+        - prometheus
+        - promtool
+    - name: Skip prometheus install if prometheus binaries exist and prometheus_version not defined
+      # i.e. if prometheus_version isn't defined we don't care, so use what's already there
+      set_fact:
+        prometheus_skip_install: "{{ false if prometheus_version is defined else true }}" 
+      when: "{{ prometheus_binaries.results | map(attribute='stat') | map(attribute='exists') }}"
     - import_role:
         name: cloudalchemy.prometheus
 
