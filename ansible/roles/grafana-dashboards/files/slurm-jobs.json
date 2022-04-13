@@ -1,0 +1,305 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_SLURMSTATS",
+      "label": "slurmstats",
+      "description": "filebeat",
+      "type": "datasource",
+      "pluginId": "elasticsearch",
+      "pluginName": "Elasticsearch"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "datasource",
+      "id": "elasticsearch",
+      "name": "Elasticsearch",
+      "version": "1.0.0"
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "7.3.1"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": 13535,
+  "graphTooltip": 0,
+  "id": null,
+  "iteration": 1607441312744,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "${DS_SLURMSTATS}",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": true
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "node exporter",
+              "url": "d/${url}?orgId=1&from=${__data.fields[\"json.StartEpoch\"]}&to=${__data.fields[\"json.EndEpoch\"]}&var-job_id=${__data.fields[\"json.JobID\"]}&var-host_filter=${__data.fields[\"json.AllNodesRegex\"]}"
+            }
+          ],
+          "mappings": [
+            {
+              "from": "",
+              "id": 1,
+              "text": "",
+              "to": "",
+              "type": 1
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "json.ExitCode"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 17,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "7.3.1",
+      "targets": [
+        {
+          "bucketAggs": [],
+          "metrics": [
+            {
+              "$$hashKey": "object:860",
+              "field": "select field",
+              "id": "1",
+              "meta": {},
+              "settings": {
+                "size": 500
+              },
+              "type": "raw_data"
+            }
+          ],
+          "query": "*",
+          "queryType": "randomWalk",
+          "refId": "A",
+          "timeField": "@timestamp"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Slurm jobs",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "json.Account",
+                "json.AllNodes",
+                "json.Cluster",
+                "json.Elapsed",
+                "json.ElapsedRaw",
+                "json.Eligible",
+                "json.End",
+                "json.ExitCode",
+                "json.GID",
+                "json.Group",
+                "json.JobID",
+                "json.JobIDRaw",
+                "json.JobName",
+                "json.NCPUS",
+                "json.NNodes",
+                "json.NodeList",
+                "json.Partition",
+                "json.ReqCPUS",
+                "json.ReqGRES",
+                "json.ReqMem",
+                "json.ReqTRES",
+                "json.Start",
+                "json.State",
+                "json.Submit",
+                "json.Timelimit",
+                "json.UID",
+                "json.User",
+                "event.start",
+                "event.end"
+              ],
+              "pattern": "(json.*)|(event.*)"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "event.end": false,
+              "event.kind": true,
+              "event.start": false,
+              "json.Account": true,
+              "json.ElapsedRaw": true,
+              "json.JobIDRaw": true
+            },
+            "indexByName": {
+              "json.Account": 6,
+              "json.AllNodes": 7,
+              "json.Cluster": 8,
+              "json.Elapsed": 5,
+              "json.ElapsedRaw": 10,
+              "json.Eligible": 9,
+              "json.End": 4,
+              "json.ExitCode": 11,
+              "json.GID": 12,
+              "json.Group": 13,
+              "json.JobID": 0,
+              "json.JobIDRaw": 14,
+              "json.JobName": 1,
+              "json.NCPUS": 15,
+              "json.NNodes": 16,
+              "json.NodeList": 17,
+              "json.Partition": 18,
+              "json.ReqCPUS": 19,
+              "json.ReqGRES": 20,
+              "json.ReqMem": 21,
+              "json.ReqTRES": 22,
+              "json.Start": 3,
+              "json.State": 2,
+              "json.Submit": 23,
+              "json.Timelimit": 24,
+              "json.UID": 25,
+              "json.User": 26
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "datasource": "Elasticsearch",
+        "error": null,
+        "filters": [],
+        "hide": 0,
+        "label": null,
+        "name": "Filters",
+        "skipUrlSync": false,
+        "type": "adhoc"
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": "openhpc-slurm",
+          "value": "openhpc-slurm"
+        },
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Dashbaord URL",
+        "multi": false,
+        "name": "url",
+        "options": [
+          {
+            "selected": true,
+            "text": "openhpc-slurm",
+            "value": "openhpc-slurm"
+          },
+          {
+            "selected": false,
+            "text": "node-exporter-slurm",
+            "value": "node-exporter-slurm"
+          }
+        ],
+        "query": "openhpc-slurm,node-exporter-slurm",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Slurm jobs",
+  "uid": "jYPt7MTGk",
+  "version": 2,
+  "description": "Requires https://github.com/stackhpc/slurm-openstack-tools"
+}
