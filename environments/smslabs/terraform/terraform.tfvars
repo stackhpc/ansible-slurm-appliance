@@ -1,3 +1,0 @@
-
-
-cluster_name = "prebuilt"
