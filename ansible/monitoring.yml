@@ -87,7 +87,7 @@
       # i.e. if prometheus_version isn't defined we don't care, so use what's already there
       set_fact:
         prometheus_skip_install: "{{ false if prometheus_version is defined else true }}" 
-      when: "{{ prometheus_binaries.results | map(attribute='stat') | map(attribute='exists') }}"
+      when: "{{ (prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined] }}"
     - import_role:
         name: cloudalchemy.prometheus
 
