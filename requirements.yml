@@ -6,7 +6,7 @@ roles:
     version: no-partitions
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
-    version: support-rhel-clones
+    version: feature/no-install
     name: cloudalchemy.node_exporter
   - src: cloudalchemy.blackbox-exporter
     version: 1.0.0
