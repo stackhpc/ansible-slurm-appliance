@@ -67,8 +67,11 @@ cluster
 # All hosts to (optionally) run yum update on.
 
 [fail2ban]
-# Hosts to install fail2ban on to protect SSH
+# Hosts to install fail2ban on to protect SSH - uses firewalld
 # https://www.fail2ban.org/wiki/index.php/Main_Page
+
+[firewalld]
+# Hosts to install firewalld on - see ansible/roles/filewalld
 
 [block_devices]
 # Superset of hosts to configure filesystems on - see ansible/roles/block_devices/README.md

@@ -24,3 +24,5 @@ roles/*
 !roles/basic_users/**
 !roles/openondemand/
 !roles/openondemand/**
+!roles/firewalld/
+!roles/firewalld/**

@@ -1,4 +1,7 @@
-fail2ban_firewalld_configs_default:
+# See ansible/roles/firewalld/README.md
+# for variable definitions.
+
+firewalld_configs_default:
   # A list of dicts defining firewalld rules to be applied to the fail2ban node.
   # Each dict contains:
   #   name: An arbitrary name or description
@@ -7,7 +10,7 @@ fail2ban_firewalld_configs_default:
   - name: Enable all ports within openhpc cluster
     group: openhpc
     rule:
-      source:  "{{ fail2ban_cluster_subnet }}"
+      source:  "{{ cluster_subnet_cidr }}"
       zone: trusted
       state: enabled
       permanent: yes
@@ -18,7 +21,14 @@ fail2ban_firewalld_configs_default:
       zone: public
       state: enabled
       permanent: yes
+  # - name: Disable cockpit service
+  #   group: cluster # 'all' is never in group_names
+  #   rule:
+  #     service: cockpit
+  #     zone: public
+  #     state: disabled
+  #     permanent: yes
 
-fail2ban_firewalld_configs_extra: [] # list of dicts with parameters as for fail2ban_firewalld_configs_default
+firewalld_configs_extra: [] # list of dicts with parameters as for firewalld_configs_default
 
-fail2ban_firewalld_configs: "{{ (fail2ban_firewalld_configs_default + fail2ban_firewalld_configs_extra) | selectattr('group', 'in',  group_names) | map(attribute='rule') }}"
+firewalld_configs: "{{ (firewalld_configs_default + firewalld_configs_extra) | selectattr('group', 'in',  group_names) | map(attribute='rule') }}"

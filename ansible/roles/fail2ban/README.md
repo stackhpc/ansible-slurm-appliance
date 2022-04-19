@@ -8,13 +8,12 @@ Note that no email alerts are set up so logs (at `/var/log/fail2ban.log`) will h
 Requirements
 ------------
 
-A CentOS 8 system.
+- An EL8 system.
+- `firewalld` running.
 
 Role Variables
 --------------
-
-- `fail2ban_cluster_subnet`: Required. CIDR of cluster's subnet.
-- `fail2ban_firewalld_configs`: Optional. List of dicts giving parameters for Ansible's [posix.firewalld](https://docs.ansible.com/ansible/latest/collections/ansible/posix/firewalld_module.html) module. The default is to add `fail2ban_cluster_subnet` to the `trusted` zone so that no ports are blocked. This is the easiest way to comply with Slurm's networking requirements.
+None.
 
 Dependencies
 ------------
@@ -29,6 +28,8 @@ Example Playbook
   gather_facts: false
   become: yes
   tasks:
+    - import_role:
+        name: firewalld
     - import_role:
         name: fail2ban
 ```

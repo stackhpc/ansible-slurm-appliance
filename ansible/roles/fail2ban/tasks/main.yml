@@ -10,11 +10,6 @@
       - fail2ban-firewalld
     state: present
 
-- name: Apply filewalld configs
-  ansible.posix.firewalld: "{{ item }}"
-  notify: Restart filewalld
-  loop: "{{ fail2ban_firewalld_configs }}"
-
 - name: Create config
   template:
     dest: /etc/fail2ban/jail.local
@@ -23,12 +18,6 @@
 
 - name: flush handlers
   meta: flush_handlers
-
-- name: Ensure filewalld running even if no config change
-  service:
-    name: firewalld
-    state: started
-    enabled: true
 
 - name: Ensure fail2ban running even if no config change
   service:
