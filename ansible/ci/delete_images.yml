@@ -13,11 +13,12 @@
       set_fact:
         login_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'login'}) | last }}"
         compute_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'compute'}) | last }}"
+        control_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'control'}) | last }}"
     
     - name: Delete images
       shell:
         cmd: |
           openstack image delete {{ login_build.artifact_id }}
           openstack image delete {{ compute_build.artifact_id }}
+          openstack image delete {{ control_build.artifact_id }}
       delegate_to: localhost
-    
