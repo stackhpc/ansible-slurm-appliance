@@ -3,6 +3,7 @@
 ansible_user: rocky
 appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+#appliances_state_dir: # define an absolute path here to use for persistent state
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.
@@ -33,7 +34,7 @@ appliances_local_users_ansible_user:
     local: true
 
 appliances_local_users_podman_enable: "{{ groups['podman'] | length > 0 }}"
-appliances_local_users_podman_home: /var/lib/podman
+appliances_local_users_podman_home: "{{ appliances_state_dir | default('/var/lib') }}/podman"
 appliances_local_users_podman:
     - name: podman
       comment: Used for running all containers
