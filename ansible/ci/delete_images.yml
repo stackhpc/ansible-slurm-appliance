@@ -7,7 +7,6 @@
     - name: Delete images
       shell:
         cmd: |
-          openstack image delete {{ login_build.artifact_id }}
-          openstack image delete {{ compute_build.artifact_id }}
-          openstack image delete {{ control_build.artifact_id }}
+          openstack image delete {{ item.artifact_id }}
       delegate_to: localhost
+      loop: "{{ manifest['builds'] }}"
