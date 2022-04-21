@@ -1,11 +1,17 @@
 - hosts: all:!builder
   become: no
+  gather_facts: no
+  tags:
+    - reimage_login
+    - reimage_compute
+    - reimage_control
   tasks:
     - import_tasks: get_image_ids.yml
     
 - hosts: login:!builder
   become: no
   gather_facts: no
+  tags: reimage_login
   tasks:
     - name: Reimage login node via openstack
       shell:
@@ -28,7 +34,12 @@
     
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
-    
+
+- hosts: login:!builder
+  become: no
+  gather_facts: no
+  tags: reimage_compute
+  tasks:
     # TODO: This is specific to smslabs/arcus environment config - could generalise to all compute nodes
     - name: Request compute node rebuild via Slurm
       shell:
@@ -49,6 +60,7 @@
 - hosts: compute:!builder
   become: no
   gather_facts: no
+  tags: reimage_compute
   tasks:
     - name: Wait for compute connection
       wait_for_connection:
@@ -61,6 +73,7 @@
 - hosts: control:!builder
   become: no
   gather_facts: no
+  tags: reimage_control
   tasks:
     - name: Reimage control node via openstack
       shell:
@@ -81,8 +94,14 @@
       wait_for_connection:
         timeout: 800
     
-    - name: Run slurm playbook again to add partition info
-      import_tasks: ../slurm.yml
-    
+- name: Run slurm playbook again to add partition info
+  import_playbook: ../slurm.yml
+  tags: reimage_control
+
+- hosts: control:!builder
+  become: no
+  gather_facts: no
+  tags: reimage_control
+  tasks:
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
