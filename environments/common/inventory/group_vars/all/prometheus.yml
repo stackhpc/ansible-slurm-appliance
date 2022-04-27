@@ -40,13 +40,6 @@ prometheus_scrape_configs_default:
     regex:         '(.*):.*'
     target_label:  'instance'
     replacement:   '${1}'
-  params:
-    collect[]:
-      - netdev
-      - cpu
-      - meminfo
-      - infiniband
-      - cpufreq
   scrape_interval: 30s
   scrape_timeout: 20s
 
