@@ -1,0 +1,3 @@
+firewalld_enabled: yes
+firewalld_state: started
+firewalld_configs: []

@@ -36,6 +36,12 @@ compute
 [update:children]
 cluster
 
+[fail2ban:children]
+login
+
+[firewalld:children]
+fail2ban
+
 [openondemand:children]
 login
 
