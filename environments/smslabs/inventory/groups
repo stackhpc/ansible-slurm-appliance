@@ -36,6 +36,9 @@ compute
 [update:children]
 cluster
 
+[block_devices:children]
+control
+
 [openondemand:children]
 login
 
