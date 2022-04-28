@@ -1,6 +1,7 @@
 [all:vars]
 ansible_user=rocky
 openhpc_cluster_name=${cluster_name}
+cluster_subnet_cidr=${subnet.cidr}
 
 [control]
 ${control.name} ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}'
