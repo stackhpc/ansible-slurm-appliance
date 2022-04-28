@@ -37,6 +37,16 @@
   become: true
   when: podman_tmp_dirs.results | selectattr('changed') | list | length > 0 # when: any changed
 
+- name: Create volume directories
+  file:
+    path: "{{ podman_volume_root }}/{{ item.name }}/volumes"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  become: yes
+  loop: "{{ podman_user_info.results }}"
+  when: podman_volume_root | default('') != ''
+
 - name: Create podman configuration directories
   file:
     path: "{{ item.home }}/.config/containers/"
@@ -59,8 +69,19 @@
   become: yes
   register: podman_tmp
 
-- debug:
-    var: podman_tmp
+- name: Set podman to use volume path
+  community.general.ini_file:
+    path: "{{ item.home }}/.config/containers/containers.conf"
+    section: engine
+    option: volume_path
+    value: '"{{ podman_volume_root }}/{{ item.name }}/volumes"'
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    create: no
+  loop: "{{ podman_user_info.results }}"
+  become: yes
+  register: podman_volumes
+  when: podman_volume_root | default('') != ''
 
 - name: Reset podman database
   # otherwise old config overrides!
@@ -69,6 +90,6 @@
   become: yes
   become_user: "{{ item.item.name }}"
   when: item.changed
-  loop: "{{ podman_tmp.results }}"
+  loop: "{{ podman_tmp.results + podman_volumes.results }}"
   loop_control:
     label: "{{ item.item.name }}"

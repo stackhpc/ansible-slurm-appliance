@@ -1,3 +1,4 @@
 podman_users:
   - name: "{{ ansible_user }}"
 podman_tmp_dir_root: /run # MUST be on a tmpfs
+#podman_volume_root: # Root of path to use for volumes. Default (if undefined or '') is as per podman's --voluempath

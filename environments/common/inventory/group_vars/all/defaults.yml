@@ -34,7 +34,7 @@ appliances_local_users_ansible_user:
     local: true
 
 appliances_local_users_podman_enable: "{{ groups['podman'] | length > 0 }}"
-appliances_local_users_podman_home: "{{ appliances_state_dir | default('/var/lib') }}/podman"
+appliances_local_users_podman_home: /var/lib/podman
 appliances_local_users_podman:
     - name: podman
       comment: Used for running all containers
