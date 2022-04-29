@@ -1,0 +1,3 @@
+- name: Install firewalld package
+  dnf:
+    name: firewalld
