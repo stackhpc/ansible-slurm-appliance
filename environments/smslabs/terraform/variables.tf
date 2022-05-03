@@ -26,7 +26,7 @@ variable "control_node" {
     description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
     default = {
         flavor: "general.v1.tiny"
-        image: "openhpc-220413-1545.qcow2"
+        image: "openhpc-220429-1537.qcow2"
     }
 }
 
@@ -36,7 +36,7 @@ variable "login_nodes" {
   default = {
       login-0: {
         flavor: "general.v1.tiny"
-        image: "openhpc-220413-1545.qcow2"
+        image: "openhpc-220429-1537.qcow2"
       }
     }
 }
@@ -47,7 +47,7 @@ variable "compute_types" {
     default = {
       small: {
           flavor: "general.v1.tiny"
-          image: "openhpc-220413-1545.qcow2"
+          image: "openhpc-220429-1537.qcow2"
       }
     }
 }
