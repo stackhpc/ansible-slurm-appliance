@@ -71,3 +71,9 @@ variable "environment_root" {
     type = string
     description = "Path to environment root, automatically set by activate script"
 }
+
+variable "state_dir" {
+    type = string
+    description = "Path to state directory on control node"
+    default = "/var/lib/state"
+}

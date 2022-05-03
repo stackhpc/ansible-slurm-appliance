@@ -37,7 +37,6 @@ compute
 cluster
 
 [block_devices:children]
-control
 
 [fail2ban:children]
 login

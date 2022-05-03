@@ -2,6 +2,21 @@ data "openstack_images_image_v2" "control" {
   name = var.control_node.image
 }
 
+data "template_cloudinit_config" "config" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    filename     = "user-data"
+    content_type = "text/cloud-config"
+    content      = templatefile("${path.module}/init.tpl",
+                                {
+                                  state_dir = var.state_dir
+                                }
+                              )
+  }
+}
+
 resource "openstack_compute_instance_v2" "control" {
   
   name = "${var.cluster_name}-control"
@@ -36,6 +51,8 @@ resource "openstack_compute_instance_v2" "control" {
   metadata = {
     environment_root = var.environment_root
   }
+
+  user_data = data.template_cloudinit_config.config.rendered
 
 }
 

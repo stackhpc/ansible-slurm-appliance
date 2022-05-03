@@ -3,7 +3,7 @@ resource "local_file" "hosts" {
                           {
                             "cluster_name": var.cluster_name
                             "control": openstack_compute_instance_v2.control,
-                            "control_volume": openstack_blockstorage_volume_v3.control
+                            "state_dir": var.state_dir
                             "logins": openstack_compute_instance_v2.login,
                             "computes": openstack_compute_instance_v2.compute,
                             "compute_types": var.compute_types,

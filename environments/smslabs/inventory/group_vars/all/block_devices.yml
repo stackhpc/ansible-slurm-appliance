@@ -1,9 +1,0 @@
-appliances_state_dir: /var/lib/state # volume-backed directory for all service state
-
-block_devices_configurations:
-  - serial: "{{ state_volume_serial[:20] }}"
-    number: 1
-    fstype: ext4
-    path: "{{ appliances_state_dir }}"
-    block_devices_owner: root
-    block_devices_group: root
