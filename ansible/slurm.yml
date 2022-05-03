@@ -3,6 +3,7 @@
 - name: Setup DB
   hosts: mysql
   become: true
+  gather_facts: false
   tags:
     - mysql
   tasks:
@@ -12,6 +13,7 @@
 - name: Setup slurm
   hosts: openhpc
   become: yes
+  gather_facts: true # Need cpu & memory information
   tags:
     - openhpc
   tasks:
@@ -24,6 +26,7 @@
   tags:
     - rebuild
     - openhpc
+  gather_facts: false
   tasks:
     - import_role:
         name: stackhpc.slurm_openstack_tools.rebuild
@@ -33,8 +36,8 @@
     - compute
     - login
   become: yes
-  tags:
-    - openhpc
+  gather_facts: false
+  tags: openhpc
   tasks:
     - name: set memory limits
       lineinfile:
@@ -45,8 +48,8 @@
 - name: Block ssh to compute nodes for non-privileged users without running jobs
   hosts: compute
   become: yes
-  tags:
-    - openhpc
+  tags: openhpc
+  gather_facts: false
   tasks:
     - name: Configure sshd pam module
       blockinfile:

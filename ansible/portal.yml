@@ -3,7 +3,7 @@
     - openondemand
     - openondemand_server
   become: yes
-  gather_facts: yes # TODO
+  gather_facts: false # TODO: check?
   tasks:
     - import_role:
         name: openondemand
@@ -14,7 +14,7 @@
     - openondemand
     - openondemand_desktop
   become: yes
-  gather_facts: yes
+  gather_facts: false
   tasks:
     - import_role:
         name: openondemand
@@ -25,7 +25,7 @@
     - openondemand
     - openondemand_jupyter
   become: yes
-  gather_facts: yes
+  gather_facts: false
   tasks:
     - import_role:
         name: openondemand

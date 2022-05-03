@@ -3,8 +3,7 @@
 - hosts: localhost
   gather_facts: false
   become: false
-  tags:
-    - deprecated
+  tags: deprecated
   tasks:
     - fail:
         msg: |

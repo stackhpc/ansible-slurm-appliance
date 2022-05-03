@@ -4,6 +4,7 @@
 
 - name: Ensure control node is in inventory
   hosts: all
+  gather_facts: false
   tasks:
     - assert:
         that: groups['control'] | length
@@ -12,6 +13,7 @@
 - name: Validate openhpc configuration
   hosts: openhpc
   tags: openhpc
+  gather_facts: false
   tasks:
     - assert:
         that: "'enable_configless' in openhpc_config.SlurmctldParameters | default([])"
@@ -23,6 +25,7 @@
 - name: Validate podman configuration
   hosts: podman
   tags: podman
+  gather_facts: true # needs network addresses
   tasks:
     - import_role:
         name: podman
@@ -32,6 +35,7 @@
 - name: Validate filebeat configuration
   hosts: filebeat
   tags: filebeat
+  gather_facts: false
   tasks:
     - import_role:
         name: filebeat
@@ -41,6 +45,7 @@
 - name: Validate opendistro configuration
   hosts: opendistro
   tags: opendistro
+  gather_facts: false
   tasks:
     - import_role:
         name: opendistro

@@ -4,6 +4,7 @@
   hosts: block_devices
   become: yes
   tags: block_devices
+  gather_facts: false
   tasks:
     - include_role:
         name: block_devices
@@ -11,6 +12,7 @@
 - name: Setup NFS
   hosts: nfs
   become: true
+  gather_facts: false
   tags:
     - nfs
   tasks:
