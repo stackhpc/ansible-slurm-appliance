@@ -1,3 +1,19 @@
+resource "openstack_networking_port_v2" "cluster" {
+  for_each = toset(concat(["control"], keys(var.login_nodes), keys(var.compute_nodes)))
+
+  name = "${var.cluster_name}-${each.key}"
+  network_id = data.openstack_networking_network_v2.cluster_net.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
+  }
+
+  binding {
+    vnic_type = var.vnic_type
+    profile = var.vnic_profile
+  }
+}
 
 resource "openstack_compute_instance_v2" "control" {
   
@@ -9,7 +25,7 @@ resource "openstack_compute_instance_v2" "control" {
   security_groups = ["default", "ssh"]
 
   network {
-    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id # ensures nodes not created till subnet created
+    port = openstack_networking_port_v2.cluster["control"].id
     access_network = true
   }
 
@@ -31,7 +47,7 @@ resource "openstack_compute_instance_v2" "login" {
   security_groups = ["default", "ssh", "HTTPS"]
 
   network {
-    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
+    port = openstack_networking_port_v2.cluster[each.key].id
     access_network = true
   }
 
@@ -53,7 +69,7 @@ resource "openstack_compute_instance_v2" "compute" {
   security_groups = ["default", "ssh"]
 
   network {
-    uuid = data.openstack_networking_subnet_v2.cluster_subnet.network_id
+    port = openstack_networking_port_v2.cluster[each.key].id
     access_network = true
   }
 

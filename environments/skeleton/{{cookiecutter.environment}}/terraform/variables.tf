@@ -48,3 +48,15 @@ variable "environment_root" {
     type = string
     description = "Path to environment root, automatically set by activate script"
 }
+
+variable "vnic_type" {
+    type = string
+    description = "VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
+    default = "normal"
+}
+
+variable "vnic_profile" {
+    type = string
+    description = "VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
+    default = "{}"
+}
