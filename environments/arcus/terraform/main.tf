@@ -14,6 +14,7 @@ module "cluster" {
     cluster_name = var.cluster_name
     cluster_net = "WCDC-iLab-60"
     cluster_subnet = "WCDC-iLab-60"
+    vnic_type = "direct"
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: "vm.alaska.cpu.general.small"
