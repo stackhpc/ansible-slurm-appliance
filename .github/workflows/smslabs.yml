@@ -1,10 +1,10 @@
 
 name: Test on SMS-Labs OpenStack in stackhpc-ci
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+on: []
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
 concurrency: stackhpc-ci # openstack project
 jobs:
   smslabs:
