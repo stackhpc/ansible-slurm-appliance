@@ -18,18 +18,18 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: "vm.alaska.cpu.general.small"
-        image: "RockyLinux-8.5-20211114.2"
+        image: "openhpc-220413-1545.qcow2"
     }
     login_nodes = {
         login-0: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "RockyLinux-8.5-20211114.2"
+            image: "openhpc-220413-1545.qcow2"
         }
     }
     compute_types = {
         small: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "RockyLinux-8.5-20211114.2"
+            image: "openhpc-220413-1545.qcow2"
         }
     }
     compute_nodes = {
