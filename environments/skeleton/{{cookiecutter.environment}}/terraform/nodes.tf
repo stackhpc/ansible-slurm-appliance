@@ -22,7 +22,7 @@ resource "openstack_compute_instance_v2" "control" {
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
   config_drive = true
-  security_groups = ["default", "ssh"]
+  security_groups = ["default", "SSH"]
 
   network {
     port = openstack_networking_port_v2.cluster["control"].id
@@ -44,7 +44,7 @@ resource "openstack_compute_instance_v2" "login" {
   flavor_name = each.value.flavor
   key_pair = var.key_pair
   config_drive = true
-  security_groups = ["default", "ssh", "HTTPS"]
+  security_groups = ["default", "SSH", "HTTPS"]
 
   network {
     port = openstack_networking_port_v2.cluster[each.key].id
@@ -66,7 +66,7 @@ resource "openstack_compute_instance_v2" "compute" {
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
   config_drive = true
-  security_groups = ["default", "ssh"]
+  security_groups = ["default", "SSH"]
 
   network {
     port = openstack_networking_port_v2.cluster[each.key].id
