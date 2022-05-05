@@ -3,4 +3,4 @@
   service:
     name: firewalld
     state: restarted
-  when: "{{ firewalld_state != 'stopped' }}"
+  when: firewalld_state != 'stopped'
