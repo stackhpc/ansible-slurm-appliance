@@ -28,6 +28,9 @@
       until: login_build.artifact_id in openstack_login.stdout
       changed_when: false
     
+    - name: Reset connection
+      meta: reset_connection
+      
     - name: Wait for login connection
       wait_for_connection:
         timeout: 800
