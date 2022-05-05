@@ -15,8 +15,8 @@ def read_tf_state(tf_dir):
         state = json.load(statef)
     return state
 
-def check_server_errors():
-    tf_state = read_tf_state()
+def check_server_errors(tf_dir):
+    tf_state = read_tf_state(tf_dir)
     for resource in tf_state['resources']:
         if resource['type'] == 'openstack_compute_instance_v2':
             for instance in resource['instances']:
