@@ -28,12 +28,12 @@
       until: login_build.artifact_id in openstack_login.stdout
       changed_when: false
     
-    - name: Reset connection
-      meta: reset_connection
-      
     - name: Wait for login connection
       wait_for_connection:
         timeout: 800
+    
+    - name: Reset connection
+      meta: reset_connection
     
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
