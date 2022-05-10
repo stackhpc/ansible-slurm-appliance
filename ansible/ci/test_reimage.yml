@@ -61,6 +61,9 @@
         timeout: 800
         delay: 5
     
+    - ansible.builtin.pause:
+        seconds: 20
+      
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
