@@ -32,9 +32,6 @@
       wait_for_connection:
         timeout: 800
     
-    - name: Reset connection
-      meta: reset_connection
-    
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
     
