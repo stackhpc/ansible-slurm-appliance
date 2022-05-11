@@ -23,14 +23,19 @@
         cmd: openstack server show {{ inventory_hostname }} --format value -c image
       register: openstack_login
       delegate_to: localhost
-      retries: 5
-      delay: 30
+      retries: 36
+      delay: 5
       until: login_build.artifact_id in openstack_login.stdout
       changed_when: false
     
     - name: Wait for login connection
       wait_for_connection:
         timeout: 800
+        delay: 5
+      register: login_connect
+      retries: 3
+      delay: 10
+      until: login_connect is not failed
     
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
