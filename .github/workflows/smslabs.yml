@@ -77,7 +77,7 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
-      - name: Directly configure cluster and build compute + login images
+      - name: Directly configure cluster and build compute, login and control images
         # see pre-hook for the image build
         run: |
           . venv/bin/activate
@@ -123,6 +123,7 @@ jobs:
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
           
       - name: Test reimage of login and compute nodes
+        # TODO: test control node reimage
         run: |
           . venv/bin/activate
           . environments/smslabs/activate

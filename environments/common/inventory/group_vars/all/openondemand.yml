@@ -5,7 +5,7 @@
 
 # NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
-openondemand_servername: '' # Must be changed when using openondemand, but allows templating when openondemand group is empty
+# openondemand_servername: '' # Must be defined when using openondemand
 
 openondemand_dashboard_links: # TODO: should really only be deployed if grafana is deployed and proxying configured
   - name: Grafana

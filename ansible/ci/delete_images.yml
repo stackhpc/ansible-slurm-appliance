@@ -2,22 +2,11 @@
   become: no
   gather_facts: no
   tasks:
-    - name: Read packer build manifest
-      set_fact:
-        manifest: "{{ lookup('file', manifest_path) | from_json }}"
-      vars:
-        manifest_path: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/packer/packer-manifest.json"
-      delegate_to: localhost
-    
-    - name: Get latest image builds
-      set_fact:
-        login_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'login'}) | last }}"
-        compute_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'compute'}) | last }}"
+    - import_tasks: get_image_ids.yml
     
     - name: Delete images
       shell:
         cmd: |
-          openstack image delete {{ login_build.artifact_id }}
-          openstack image delete {{ compute_build.artifact_id }}
+          openstack image delete {{ item.artifact_id }}
       delegate_to: localhost
-    
+      loop: "{{ manifest['builds'] }}"

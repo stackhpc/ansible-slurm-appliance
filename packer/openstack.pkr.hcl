@@ -74,7 +74,7 @@ source "openstack" "openhpc" {
   ssh_bastion_username = "${var.ssh_bastion_username}"
   ssh_bastion_private_key_file = "${var.ssh_bastion_private_key_file}"
   security_groups = "${var.security_groups}"
-  image_name = "ohpc-${source.name}-${local.timestamp}.qcow2"
+  image_name = "ohpc-${source.name}-${local.timestamp}" # also provides a unique legal instance hostname (in case of parallel packer builds)
   image_visibility = "${var.image_visibility}"
 }
 
@@ -88,17 +88,16 @@ build {
     name = "login"
   }
 
+  source "source.openstack.openhpc" {
+    name = "control"
+  }
+
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
-    host_alias = "packer"
     groups = concat(["builder"], split("-", "${source.name}"))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    # TODO: use completely separate inventory, which just shares common? This will ensure
-    # we don't accidently run anything via delegate_to.
-    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv"]
-    # TODO: Support vault password
-    #ansible_env_vars = ["ANSIBLE_VAULT_PASSWORD_FILE=/home/stack/.kayobe-vault-pass"]
+    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@extra_vars.yml"]
   }
 
   post-processor "manifest" {

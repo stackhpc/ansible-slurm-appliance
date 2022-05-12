@@ -20,6 +20,7 @@ openondemand_ssl_cert_key: /etc/pki/tls/private/localhost.key
 openondemand_dashboard_docs_url: (undefined)
 openondemand_dashboard_support_url: (undefined)
 openondemand_desktop_partition: ''
+openondemand_desktop_screensaver: false
 openondemand_filesapp_paths: []
 openondemand_jupyter_partition: ''
 openondemand_dashboard_links: []
