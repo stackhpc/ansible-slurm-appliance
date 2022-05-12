@@ -101,7 +101,11 @@
     - name: Wait for control connection
       wait_for_connection:
         timeout: 800
-    
+      register: control_connect
+      retries: 3
+      delay: 10
+      until: control_connect is not failed
+
 - name: Run slurm playbook again to add partition info
   import_playbook: ../slurm.yml
   tags: reimage_control
