@@ -121,3 +121,4 @@
         overwrite: true
       #no_log: true
       with_items: "{{ grafana_dashboards }}"
+      when: grafana_state | default('started') != 'stopped'
