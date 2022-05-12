@@ -14,6 +14,10 @@ module "cluster" {
     cluster_name = var.cluster_name
     cluster_net = "stackhpc-ci-geneve"
     cluster_subnet = "stackhpc-ci-geneve-subnet"
+    nonlogin_security_groups = [
+        "default", # as per variable default
+        "SSH", # enable ansible, as bastion does not have same default security group as nodes
+    ]
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: "general.v1.tiny"

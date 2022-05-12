@@ -8,14 +8,14 @@ data "openstack_networking_subnet_v2" "cluster_subnet" {
   name            = var.cluster_subnet
 }
 
-data "openstack_networking_secgroup_v2" "default" {
-  name = "default"
+data "openstack_networking_secgroup_v2" "login" {
+  for_each = toset(var.login_security_groups)
+
+  name = each.key
 }
 
-data "openstack_networking_secgroup_v2" "ssh" {
-  name = "SSH"
-}
+data "openstack_networking_secgroup_v2" "nonlogin" {
+  for_each = toset(var.nonlogin_security_groups)
 
-data "openstack_networking_secgroup_v2" "https" {
-  name = "HTTPS"
+  name = each.key
 }

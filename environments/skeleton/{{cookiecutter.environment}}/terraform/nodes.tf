@@ -9,11 +9,7 @@ resource "openstack_networking_port_v2" "login" {
     subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
   }
 
-  security_group_ids = [
-    data.openstack_networking_secgroup_v2.default.id,
-    data.openstack_networking_secgroup_v2.ssh.id,
-    data.openstack_networking_secgroup_v2.https.id,
-  ]
+  security_group_ids = data.openstack_networking_secgroup_v2.login[*].id
 
   binding {
     vnic_type = var.vnic_type
@@ -32,9 +28,7 @@ resource "openstack_networking_port_v2" "nonlogin" {
     subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
   }
 
-  security_group_ids = [
-    data.openstack_networking_secgroup_v2.default.id,
-  ]
+  security_group_ids = data.openstack_networking_secgroup_v2.nonlogin[*].id
 
   binding {
     vnic_type = var.vnic_type
