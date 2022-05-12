@@ -1,4 +1,4 @@
-- hosts: all:!builder
+- hosts: all
   become: no
   gather_facts: no
   tags:
@@ -8,7 +8,7 @@
   tasks:
     - import_tasks: get_image_ids.yml
     
-- hosts: login:!builder
+- hosts: login
   become: no
   gather_facts: no
   tags: reimage_login
@@ -40,7 +40,7 @@
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
 
-- hosts: login:!builder
+- hosts: login
   become: no
   gather_facts: no
   tags: reimage_compute
@@ -62,7 +62,7 @@
       until: compute_build.artifact_id in openstack_compute.stdout
       changed_when: false
 
-- hosts: compute:!builder
+- hosts: compute
   become: no
   gather_facts: no
   tags: reimage_compute
@@ -79,7 +79,7 @@
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
 
-- hosts: control:!builder
+- hosts: control
   become: no
   gather_facts: no
   tags: reimage_control
@@ -107,7 +107,7 @@
   import_playbook: ../slurm.yml
   tags: reimage_control
 
-- hosts: control:!builder
+- hosts: control
   become: no
   gather_facts: no
   tags: reimage_control
