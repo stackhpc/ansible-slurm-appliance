@@ -1,13 +1,20 @@
 
-name: Test on SMS-Labs OpenStack in stackhpc-ci
+name: Test deployment and image build on OpenStack
 on:
   push:
     branches:
       - main
   pull_request:
-concurrency: stackhpc-ci # openstack project
 jobs:
-  smslabs:
+  openstack:
+    name: openstack-ci-${{ matrix.cloud }}
+    strategy:
+      matrix:
+        cloud:
+          - "smslabs" # SMS-Labs OpenStack in stackhpc-ci project
+          - "arcus"   # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
+      fail-fast: false # as want clouds to continue independently
+    concurrency: ${{ matrix.cloud }}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -16,13 +23,14 @@ jobs:
         run: |
           set -x
           mkdir ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          echo "${${{ matrix.cloud }}_SSH_KEY}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
+          smslabs_SSH_KEY: ${{ secrets.SSH_KEY }}
+          arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
 
       - name: Add bastion's ssh key to known_hosts
-        run: cat environments/smslabs/bastion_fingerprint >> ~/.ssh/known_hosts
+        run: cat environments/${{ matrix.cloud }}/bastion_fingerprint >> ~/.ssh/known_hosts
         shell: bash
       
       - name: Install ansible etc
@@ -33,21 +41,22 @@ jobs:
       
       - name: Initialise terraform
         run: terraform init
-        working-directory: ${{ github.workspace }}/environments/smslabs/terraform
+        working-directory: ${{ github.workspace }}/environments/${{ matrix.cloud }}/terraform
         
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "$CLOUDS_YAML" > ~/.config/openstack/clouds.yaml
+          echo "${${{ matrix.cloud }}_CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
         shell: bash
         env:
-          CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+          smslabs_CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+          arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
       
       - name: Provision infrastructure
         id: provision
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform apply -auto-approve
         env:
@@ -58,9 +67,9 @@ jobs:
         id: provision_failure
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          echo "::set-output name=messages::$(./getfaults.py)"
+          echo "::set-output name=messages::$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
         env:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
@@ -69,7 +78,7 @@ jobs:
       - name: Delete infrastructure if failed due to lack of hosts
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
         env:
@@ -81,7 +90,7 @@ jobs:
         # see pre-hook for the image build
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           ansible all -m wait_for_connection
           ansible-playbook ansible/adhoc/generate-passwords.yml
           echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
@@ -94,7 +103,7 @@ jobs:
       - name: Confirm Open Ondemand is up (via SOCKS proxy)
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           
           # load ansible variables into shell:
           ansible-playbook ansible/ci/output_vars.yml \
@@ -126,7 +135,7 @@ jobs:
         # TODO: test control node reimage
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           ansible all -m wait_for_connection
           ansible-playbook -vv ansible/ci/test_reimage.yml
         env:
@@ -136,7 +145,7 @@ jobs:
       - name: Run MPI-based tests
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
         env:
           ANSIBLE_FORCE_COLOR: True
@@ -145,7 +154,7 @@ jobs:
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
         env:
@@ -156,7 +165,7 @@ jobs:
       - name: Delete images
         run: |
           . venv/bin/activate
-          . environments/smslabs/activate
+          . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/ci/delete_images.yml
         env:
           OS_CLOUD: openstack

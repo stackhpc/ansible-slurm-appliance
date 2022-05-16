@@ -4,3 +4,4 @@ config-drive.iso
 venv
 *.pyc
 packer/openhpc2
+.vscode
