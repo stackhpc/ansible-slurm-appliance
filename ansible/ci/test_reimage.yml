@@ -71,10 +71,11 @@
       wait_for_connection:
         timeout: 800
         delay: 5
+      register: compute_connect
+      retries: 3
+      delay: 10
+      until: compute_connect is not failed
     
-    - ansible.builtin.pause:
-        seconds: 20
-      
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
@@ -102,6 +103,7 @@
     - name: Wait for control connection
       wait_for_connection:
         timeout: 800
+        delay: 5
       register: control_connect
       retries: 3
       delay: 10
