@@ -1,5 +1,5 @@
-resource "openstack_networking_port_v2" "cluster" {
-  for_each = toset(concat(["control"], keys(var.login_nodes), keys(var.compute_nodes)))
+resource "openstack_networking_port_v2" "login" {
+  for_each = toset(keys(var.login_nodes))
 
   name = "${var.cluster_name}-${each.key}"
   network_id = data.openstack_networking_network_v2.cluster_net.id
@@ -8,6 +8,27 @@ resource "openstack_networking_port_v2" "cluster" {
   fixed_ip {
     subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
   }
+
+  security_group_ids = [for o in data.openstack_networking_secgroup_v2.login: o.id]
+
+  binding {
+    vnic_type = var.vnic_type
+    profile = var.vnic_profile
+  }
+}
+
+resource "openstack_networking_port_v2" "nonlogin" {
+  for_each = toset(concat(["control"], keys(var.compute_nodes)))
+
+  name = "${var.cluster_name}-${each.key}"
+  network_id = data.openstack_networking_network_v2.cluster_net.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
+  }
+
+  security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
 
   binding {
     vnic_type = var.vnic_type
@@ -21,11 +42,9 @@ resource "openstack_compute_instance_v2" "control" {
   image_name = var.control_node.image
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
-  config_drive = true
-  security_groups = ["default", "SSH"]
-
+  
   network {
-    port = openstack_networking_port_v2.cluster["control"].id
+    port = openstack_networking_port_v2.nonlogin["control"].id
     access_network = true
   }
 
@@ -43,11 +62,9 @@ resource "openstack_compute_instance_v2" "login" {
   image_name = each.value.image
   flavor_name = each.value.flavor
   key_pair = var.key_pair
-  config_drive = true
-  security_groups = ["default", "SSH", "HTTPS"]
-
+  
   network {
-    port = openstack_networking_port_v2.cluster[each.key].id
+    port = openstack_networking_port_v2.login[each.key].id
     access_network = true
   }
 
@@ -65,11 +82,9 @@ resource "openstack_compute_instance_v2" "compute" {
   image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
-  config_drive = true
-  security_groups = ["default", "SSH"]
-
+  
   network {
-    port = openstack_networking_port_v2.cluster[each.key].id
+    port = openstack_networking_port_v2.nonlogin[each.key].id
     access_network = true
   }
 

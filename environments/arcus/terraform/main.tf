@@ -8,6 +8,11 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
+variable "base_image_name" {
+    type = string
+    description = "Name of base image for all nodes - set by environment var in CI"
+}
+
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
@@ -18,18 +23,18 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: "vm.alaska.cpu.general.small"
-        image: "openhpc-220510-1911-ofed.qcow2"
+        image: var.base_image_name
     }
     login_nodes = {
         login-0: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220510-1911-ofed.qcow2"
+            image: var.base_image_name
         }
     }
     compute_types = {
         small: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220510-1911-ofed.qcow2"
+            image: var.base_image_name
         }
     }
     compute_nodes = {

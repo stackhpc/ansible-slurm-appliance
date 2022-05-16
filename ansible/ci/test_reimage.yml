@@ -1,4 +1,4 @@
-- hosts: all:!builder
+- hosts: all
   become: no
   gather_facts: no
   tags:
@@ -8,7 +8,7 @@
   tasks:
     - import_tasks: get_image_ids.yml
     
-- hosts: login:!builder
+- hosts: login
   become: no
   gather_facts: no
   tags: reimage_login
@@ -37,13 +37,10 @@
       delay: 10
       until: login_connect is not failed
     
-    - name: Reset connection
-      meta: reset_connection
-    
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
 
-- hosts: login:!builder
+- hosts: login
   become: no
   gather_facts: no
   tags: reimage_compute
@@ -65,7 +62,7 @@
       until: compute_build.artifact_id in openstack_compute.stdout
       changed_when: false
 
-- hosts: compute:!builder
+- hosts: compute
   become: no
   gather_facts: no
   tags: reimage_compute
@@ -73,12 +70,17 @@
     - name: Wait for compute connection
       wait_for_connection:
         timeout: 800
+        delay: 5
+      register: compute_connect
+      retries: 3
+      delay: 10
+      until: compute_connect is not failed
     
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
 
-- hosts: control:!builder
+- hosts: control
   become: no
   gather_facts: no
   tags: reimage_control
@@ -101,6 +103,7 @@
     - name: Wait for control connection
       wait_for_connection:
         timeout: 800
+        delay: 5
       register: control_connect
       retries: 3
       delay: 10
@@ -110,7 +113,7 @@
   import_playbook: ../slurm.yml
   tags: reimage_control
 
-- hosts: control:!builder
+- hosts: control
   become: no
   gather_facts: no
   tags: reimage_control

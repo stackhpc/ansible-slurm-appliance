@@ -86,7 +86,10 @@ def html_rows(rankAs, rankBs, nodes, data):
         for rankB in rankBs:
             val = data.get((rankA, rankB))
             if val is not None:
-                lightness = 50 + (50 - 50 * ((val - minv) / (maxv - minv))) # want value in range LOW = 100 (white) -> HIGH 50(red)
+                try:
+                    lightness = 50 + (50 - 50 * ((val - minv) / (maxv - minv))) # want value in range LOW = 100 (white) -> HIGH 50(red)
+                except ZeroDivisionError: # no min-max spread
+                    lightness = 100
                 outrow += ['<td style="background-color:hsl(0, 100%%, %i%%);">%.1f</td>' % (lightness, val)]
             else:
                 outrow += ['<td>-</td>']

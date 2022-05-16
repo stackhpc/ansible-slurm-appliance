@@ -60,3 +60,21 @@ variable "vnic_profile" {
     description = "VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
     default = "{}"
 }
+
+variable "login_security_groups" {
+    type = list(string)
+    description = "Name of preexisting security groups to apply to login nodes"
+    default = [
+        "default",  # allow all in-cluster services
+        "SSH",      # access via ssh
+        "HTTPS",    # access OpenOndemand
+    ]
+}
+
+variable "nonlogin_security_groups" {
+    type = list(string)
+    description = "Name of preexisting security groups to apply to non-login nodes"
+    default = [
+        "default",  # allow all in-cluster services
+    ]
+}
