@@ -110,6 +110,7 @@ jobs:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          PKR_var_source_image_name: ${{ matrix.base_image_name }}
       
       - name: Confirm Open Ondemand is up (via SOCKS proxy)
         run: |
