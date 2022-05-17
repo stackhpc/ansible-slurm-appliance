@@ -25,18 +25,18 @@ module "cluster" {
     ]
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "general.v1.tiny"
+        flavor: "general.v1.small"
         image: var.base_image_name
     }
     login_nodes = {
         login-0: {
-          flavor: "general.v1.tiny"
+          flavor: "general.v1.small"
           image: var.base_image_name
         }
     }
     compute_types = {
         small: {
-            flavor: "general.v1.tiny"
+            flavor: "general.v1.small"
             image: var.base_image_name
         }
     }
