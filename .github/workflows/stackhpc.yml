@@ -15,17 +15,24 @@ jobs:
           - cloud: smslabs
             base_image_name: openhpc-220510-1910.qcow2
             name: smslabs
+            cluster_name_suffix: ''
           # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
           - cloud: arcus
             base_image_name: openhpc-220510-1910.qcow2
             name: arcus
+            cluster_name_suffix: ''
           # As above using OFED
           - cloud: arcus
             base_image_name: openhpc-220510-1911-ofed.qcow2
             name: arcus-ofed
+            cluster_name_suffix: ofed
       fail-fast: false # as want clouds to continue independently
     concurrency: ${{ matrix.name }}
     runs-on: ubuntu-20.04
+    env:
+      TF_VAR_cluster_name: ci${{ github.run_id }}${{ matrix.cluster_name_suffix }}
+      OS_CLOUD: openstack
+      ANSIBLE_FORCE_COLOR: True
     steps:
       - uses: actions/checkout@v2
 
@@ -70,8 +77,6 @@ jobs:
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform apply -auto-approve
         env:
-          OS_CLOUD: openstack
-          TF_VAR_cluster_name: ci${{ github.run_id }}
           TF_VAR_base_image_name: ${{ matrix.base_image_name }}
       
       - name: Get server provisioning failure messages
@@ -81,9 +86,6 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           echo "::set-output name=messages::$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
-        env:
-          OS_CLOUD: openstack
-          TF_VAR_cluster_name: ci${{ github.run_id }}
         if: always() && steps.provision.outcome == 'failure'
         
       - name: Delete infrastructure if failed due to lack of hosts
@@ -92,9 +94,6 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
-        env:
-          OS_CLOUD: openstack
-          TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
       - name: Directly configure cluster and build compute, login and control images
@@ -107,8 +106,6 @@ jobs:
           echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           ansible-playbook -vv ansible/site.yml
         env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
           PKR_VAR_source_image_name: ${{ matrix.base_image_name }}
       
@@ -150,18 +147,12 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           ansible all -m wait_for_connection
           ansible-playbook -vv ansible/ci/test_reimage.yml
-        env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
-      
+
       - name: Run MPI-based tests
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
-        env:
-          ANSIBLE_FORCE_COLOR: True
-          OS_CLOUD: openstack
 
       - name: Delete infrastructure
         run: |
@@ -170,8 +161,6 @@ jobs:
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
         env:
-          OS_CLOUD: openstack
-          TF_VAR_cluster_name: ci${{ github.run_id }}
           TF_VAR_base_image_name: ${{ matrix.base_image_name }}
         if: ${{ success() || cancelled() }}
 
@@ -180,6 +169,3 @@ jobs:
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/ci/delete_images.yml
-        env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
