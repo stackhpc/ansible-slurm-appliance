@@ -12,26 +12,23 @@ module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
     cluster_name = var.cluster_name
-    cluster_net = "stackhpc-ci-geneve"
-    cluster_subnet = "stackhpc-ci-geneve-subnet"
-    nonlogin_security_groups = [
-        "default", # as per variable default
-        "SSH", # enable ansible, as bastion does not have same default security group as nodes
-    ]
+    cluster_net = "WCDC-iLab-60"
+    cluster_subnet = "WCDC-iLab-60"
+    vnic_type = "direct"
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "general.v1.tiny"
+        flavor: "vm.alaska.cpu.general.small"
         image: "openhpc-220504-0904.qcow2"
     }
     login_nodes = {
         login-0: {
-          flavor: "general.v1.tiny"
-          image: "openhpc-220504-0904.qcow2"
+            flavor: "vm.alaska.cpu.general.small"
+            image: "openhpc-220504-0904.qcow2"
         }
     }
     compute_types = {
         small: {
-            flavor: "general.v1.tiny"
+            flavor: "vm.alaska.cpu.general.small"
             image: "openhpc-220504-0904.qcow2"
         }
     }

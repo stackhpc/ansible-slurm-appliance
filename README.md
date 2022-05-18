@@ -1,4 +1,4 @@
-[![Test on OpenStack via smslabs](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/smslabs.yml/badge.svg)](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/smslabs.yml)
+[![Test deployment and image build on OpenStack](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/stackhpc.yml/badge.svg)](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/stackhpc.yml)
 
 # StackHPC Slurm Appliance
 

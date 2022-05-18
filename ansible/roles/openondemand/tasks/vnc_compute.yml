@@ -45,6 +45,7 @@
     state: link
 
 - name: Disable screensaver # as users might not have passwords
-  file:
-    path: /etc/xdg/autostart/xfce4-screensaver.desktop 
+  yum:
+    name: xfce4-screensaver
     state: absent
+  when: not (openondemand_desktop_screensaver | bool)
