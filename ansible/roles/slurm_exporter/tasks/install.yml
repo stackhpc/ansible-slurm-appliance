@@ -1,7 +1,7 @@
 - name: Install slurm_exporter package
   dnf:
     name: "https://github.com/stackhpc/prometheus-slurm-exporter/releases/download/{{ slurm_exporter_version }}/prometheus-slurm-exporter-{{ slurm_exporter_version }}-{{slurm_exporter_release}}.el8.x86_64.rpm"
-  register: Restart slurm exporter
+  notify: Restart slurm exporter
 
 - meta: flush_handlers
 
