@@ -21,8 +21,6 @@ None.
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
     - name: Deploy Slurm exporter
       hosts: control
       become: true
@@ -30,8 +28,6 @@ Including an example of how to use your role (for instance, with variables passe
       tasks:
         - import_role:
             name: slurm_exporter
-          vars:
-            slurm_exporter_port: 
 
 Prometheus scrape configuration for this might look like:
 
