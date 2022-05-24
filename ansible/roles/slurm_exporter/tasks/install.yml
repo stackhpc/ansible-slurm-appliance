@@ -8,7 +8,7 @@
 
 - name: Ensure slurm exporter state
   systemd:
-    name: slurm_exporter
+    name: prometheus-slurm-exporter
     state: "{{ slurm_exporter_state }}"
     enabled: true
   when:
