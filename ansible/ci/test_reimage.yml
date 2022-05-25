@@ -1,18 +1,18 @@
-- hosts: login:!builder
+- hosts: all
   become: no
+  gather_facts: no
+  tags:
+    - reimage_login
+    - reimage_compute
+    - reimage_control
   tasks:
-    - name: Read packer build manifest
-      set_fact:
-        manifest: "{{ lookup('file', manifest_path) | from_json }}"
-      vars:
-        manifest_path: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/packer/packer-manifest.json"
-      delegate_to: localhost
+    - import_tasks: get_image_ids.yml
     
-    - name: Get latest image builds
-      set_fact:
-        login_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'login'}) | last }}"
-        compute_build: "{{ manifest['builds'] | selectattr('custom_data', 'eq', {'source': 'compute'}) | last }}"
-    
+- hosts: login
+  become: no
+  gather_facts: no
+  tags: reimage_login
+  tasks:
     - name: Reimage login node via openstack
       shell:
         cmd: "openstack server rebuild {{ instance_id | default(inventory_hostname) }} --image {{ login_build.artifact_id }}"
@@ -23,18 +23,28 @@
         cmd: openstack server show {{ inventory_hostname }} --format value -c image
       register: openstack_login
       delegate_to: localhost
-      retries: 5
-      delay: 30
+      retries: 36
+      delay: 5
       until: login_build.artifact_id in openstack_login.stdout
       changed_when: false
     
     - name: Wait for login connection
       wait_for_connection:
         timeout: 800
+        delay: 5
+      register: login_connect
+      retries: 3
+      delay: 10
+      until: login_connect is not failed
     
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
-    
+
+- hosts: login
+  become: no
+  gather_facts: no
+  tags: reimage_compute
+  tasks:
     # TODO: This is specific to smslabs/arcus environment config - could generalise to all compute nodes
     - name: Request compute node rebuild via Slurm
       shell:
@@ -52,14 +62,61 @@
       until: compute_build.artifact_id in openstack_compute.stdout
       changed_when: false
 
-- hosts: compute:!builder
+- hosts: compute
   become: no
   gather_facts: no
+  tags: reimage_compute
   tasks:
     - name: Wait for compute connection
       wait_for_connection:
         timeout: 800
+        delay: 5
+      register: compute_connect
+      retries: 3
+      delay: 10
+      until: compute_connect is not failed
     
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
+
+- hosts: control
+  become: no
+  gather_facts: no
+  tags: reimage_control
+  tasks:
+    - name: Reimage control node via openstack
+      shell:
+        cmd: "openstack server rebuild {{ instance_id | default(inventory_hostname) }} --image {{ control_build.artifact_id }}"
+      delegate_to: localhost
+    
+    - name: Check control node rebuild completed
+      shell:
+        cmd: openstack server show {{ inventory_hostname }} --format value -c image
+      register: openstack_control
+      delegate_to: localhost
+      retries: 5
+      delay: 30
+      until: control_build.artifact_id in openstack_control.stdout
+      changed_when: false
+    
+    - name: Wait for control connection
+      wait_for_connection:
+        timeout: 800
+        delay: 5
+      register: control_connect
+      retries: 3
+      delay: 10
+      until: control_connect is not failed
+
+- name: Run slurm playbook again to add partition info
+  import_playbook: ../slurm.yml
+  tags: reimage_control
+
+- hosts: control
+  become: no
+  gather_facts: no
+  tags: reimage_control
+  tasks:
+    - name: Check slurm up after reimaging login node
+      import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"

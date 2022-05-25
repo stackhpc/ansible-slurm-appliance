@@ -6,59 +6,36 @@ variable "cluster_name" {
 variable "cluster_net" {
     type = string
     description = "Name of existing cluster network"
-    default = "stackhpc-ci-geneve"
 }
 
 variable "cluster_subnet" {
     type = string
     description = "Name of existing cluster subnet"
-    default = "stackhpc-ci-geneve-subnet"
 }
 
 variable "key_pair" {
     type = string
     description = "Name of an existing keypair in OpenStack"
-    default = "slurm-app-ci"
 }
 
 variable "control_node" {
     type = map
     description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
-    default = {
-        flavor: "general.v1.tiny"
-        image: "openhpc-220413-1545.qcow2"
-    }
 }
 
 variable "login_nodes" {
   type = map
   description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> mapping  {flavor: flavor_name, image: image_name_or_id }"
-  default = {
-      login-0: {
-        flavor: "general.v1.tiny"
-        image: "openhpc-220413-1545.qcow2"
-      }
-    }
 }
 
 variable "compute_types" {
     type = map
     description = "Mapping defining types of compute nodes: key -> (str) name of type, value -> mapping {flavor: flavor_name, image: image_name_or_id }"
-    default = {
-      small: {
-          flavor: "general.v1.tiny"
-          image: "openhpc-220413-1545.qcow2"
-      }
-    }
 }
 
 variable "compute_nodes" {
     type = map(string)
     description = "Mapping of compute nodename suffix -> key in compute_types"
-    default = {
-        compute-0: "small"
-        compute-1: "small"
-    }
 }
 
 variable "compute_images" {
@@ -70,4 +47,34 @@ variable "compute_images" {
 variable "environment_root" {
     type = string
     description = "Path to environment root, automatically set by activate script"
+}
+
+variable "vnic_type" {
+    type = string
+    description = "VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
+    default = "normal"
+}
+
+variable "vnic_profile" {
+    type = string
+    description = "VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
+    default = "{}"
+}
+
+variable "login_security_groups" {
+    type = list(string)
+    description = "Name of preexisting security groups to apply to login nodes"
+    default = [
+        "default",  # allow all in-cluster services
+        "SSH",      # access via ssh
+        "HTTPS",    # access OpenOndemand
+    ]
+}
+
+variable "nonlogin_security_groups" {
+    type = list(string)
+    description = "Name of preexisting security groups to apply to non-login nodes"
+    default = [
+        "default",  # allow all in-cluster services
+    ]
 }

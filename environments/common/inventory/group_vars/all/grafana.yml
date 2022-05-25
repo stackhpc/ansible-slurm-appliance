@@ -2,7 +2,7 @@
 
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
-grafana_version: 8.4.6-1
+grafana_version: 8.5.1
 
 # need to copy some role defaults here so we can use in inventory:
 grafana_port: 3000
@@ -12,7 +12,6 @@ grafana_api_address: "{{ hostvars[groups['grafana'].0].internal_address }}"
 grafana_api_url: "http://{{ grafana_api_address }}:{{ grafana_port }}"
 
 # Configure external address, with external URL depending on whether we are using Open Ondemand as a proxy
-grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 grafana_url_direct: "http://{{ grafana_address }}:{{ grafana_port }}"
 grafana_url_openondemand_proxy: "https://{{ openondemand_servername | default('') }}/node/{{ groups['grafana'].0 }}/{{ grafana_port }}"
 grafana_url: "{{ grafana_url_openondemand_proxy if groups['openondemand'] | count > 0 else grafana_url_direct }}"
@@ -41,6 +40,12 @@ grafana_dashboards_default:
         replacement: prometheus
       - placeholder: DS_SLURMSTATS
         replacement: slurmstats
+  # slurm exporter
+  - dashboard_id: 4323
+    replacements:
+      - placeholder: DS_PROMETHEUS
+        replacement: prometheus
+    revision_id: 3
 
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 

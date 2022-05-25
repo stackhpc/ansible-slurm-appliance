@@ -78,6 +78,14 @@
         name: openondemand
         tasks_from: exporter.yml
 
+- name: Deploy Slurm exporter
+  hosts: control
+  become: true
+  tags: slurm_exporter
+  tasks:
+    - import_role:
+        name: slurm_exporter
+
 - name: Setup core monitoring software
   hosts: prometheus
   tags: prometheus
