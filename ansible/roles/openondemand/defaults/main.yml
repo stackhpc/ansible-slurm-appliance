@@ -53,6 +53,7 @@ openondemand_auth_defaults:
     httpd_auth: # ood_portal.yml.j2
       - 'AuthType openid-connect'
       - 'Require valid-user'
+      - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
     user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
     user_map_match: none
   
@@ -64,6 +65,7 @@ openondemand_auth_defaults:
       - 'AuthBasicProvider PAM'
       - 'AuthPAMService ood'
       - 'Require valid-user'
+      - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
     user_map_cmd: null
     user_map_match: '.*'
 
