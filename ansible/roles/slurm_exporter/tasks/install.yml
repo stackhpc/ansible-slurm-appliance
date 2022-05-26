@@ -1,0 +1,15 @@
+- name: Install slurm_exporter package
+  dnf:
+    name: "https://github.com/stackhpc/prometheus-slurm-exporter/releases/download/{{ slurm_exporter_version }}/prometheus-slurm-exporter-{{ slurm_exporter_version }}-{{slurm_exporter_release}}.el8.x86_64.rpm"
+    disable_gpg_check: yes
+  notify: Restart slurm exporter
+
+- meta: flush_handlers
+
+- name: Ensure slurm exporter state
+  systemd:
+    name: prometheus-slurm-exporter
+    state: "{{ slurm_exporter_state }}"
+    enabled: true
+  when:
+    - not ansible_check_mode
