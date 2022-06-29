@@ -20,19 +20,19 @@ module "cluster" {
     ]
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "general.v1.tiny"
-        image: "openhpc-220504-0904.qcow2"
+        flavor: "general.v1.small"
+        image: "openhpc-220526-1354.qcow2"
     }
     login_nodes = {
         login-0: {
-          flavor: "general.v1.tiny"
-          image: "openhpc-220504-0904.qcow2"
+          flavor: "general.v1.small"
+          image: "openhpc-220526-1354.qcow2"
         }
     }
     compute_types = {
         small: {
-            flavor: "general.v1.tiny"
-            image: "openhpc-220504-0904.qcow2"
+            flavor: "general.v1.small"
+            image: "openhpc-220526-1354.qcow2"
         }
     }
     compute_nodes = {
