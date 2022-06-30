@@ -1,10 +1,9 @@
-ansible>=2.9.0
-os-client-config
-openstacksdk
-python-openstackclient
-jmespath
-passlib[bcrypt]
-cookiecutter
-vagranttoansible
-selinux # this is a shim to avoid having to use --system-site-packages, you still need sudo yum install libselinux-python3
-netaddr
+ansible==4.10.0
+os-client-config==2.1.0
+openstacksdk==0.99.0
+python-openstackclient==5.8.0
+jmespath==0.10.0
+passlib[bcrypt]==1.7.4
+cookiecutter==1.7.3
+selinux==0.2.1 # this is a shim to avoid having to use --system-site-packages, you still need sudo yum install libselinux-python3
+netaddr==0.8.0
