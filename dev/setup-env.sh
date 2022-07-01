@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python3 -m venv venv
+/usr/bin/python3.8 -m venv venv # use `sudo yum install python38` on Rocky Linux 8 to install this
 . venv/bin/activate
 pip install -U pip
 pip install -r requirements.txt
