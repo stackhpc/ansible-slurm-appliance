@@ -26,12 +26,12 @@ It is recommended to check the following before starting:
 
 ## Installation on deployment host
 
-These instructions assume the deployment host is running Centos/Rocky 8:
+These instructions assume the deployment host is running Rocky Linux 8:
 
-    sudo yum install -y git python3
+    sudo yum install -y git python38
     git clone https://github.com/stackhpc/ansible-slurm-appliance
     cd ansible-slurm-appliance
-    python3 -m venv venv
+    /usr/bin/python3.8 -m venv venv
     . venv/bin/activate
     pip install -U pip
     pip install -r requirements.txt
