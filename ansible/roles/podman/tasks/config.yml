@@ -20,6 +20,7 @@
   user: "{{ item }}"
   with_items: "{{ podman_users }}"
   register: podman_user_info
+  become: yes
 
 - name: Define tmp directories on tmpfs
   blockinfile:
