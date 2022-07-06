@@ -13,7 +13,8 @@
     - name: Get info for ended jobs
       shell:
         cmd: sacct --format=jobid,jobname,state --allocations --parsable2 --delimiter=, --starttime=now-1days --endtime=now
-      # by default start/end time is midnight/now which will trip up CI at some point!
+        # by default start/end time is midnight/now which is not robust
+      changed_when: false
       register: sacct
     - name: Check info for ended jobs
       assert:
