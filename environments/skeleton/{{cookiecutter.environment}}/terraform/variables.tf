@@ -55,6 +55,12 @@ variable "state_dir" {
     default = "/var/lib/state"
 }
 
+variable "state_volume_size" {
+    type = number
+    description = "Size of state volume on control node, in GB"
+    default = 150 # GB
+}
+
 variable "vnic_type" {
     type = string
     description = "VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
