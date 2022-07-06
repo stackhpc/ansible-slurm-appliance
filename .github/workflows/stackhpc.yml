@@ -132,6 +132,15 @@ jobs:
         env:
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
           
+      - name: Run MPI-based tests (on directly-configured nodes)
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook -vv ansible/adhoc/hpctests.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
+          OS_CLOUD: openstack
+
       - name: Test reimage of login and compute nodes
         # TODO: test control node reimage
         run: |
@@ -143,7 +152,16 @@ jobs:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
       
-      - name: Run MPI-based tests
+      - name: Check sacct state survived reimage
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
+          OS_CLOUD: openstack
+
+      - name: Run MPI-based tests (on reimaged nodes)
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
