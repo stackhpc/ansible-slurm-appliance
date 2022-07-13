@@ -92,6 +92,7 @@ data "template_cloudinit_config" "compute" {
       {
         control_address = openstack_compute_instance_v2.control.name,
         munge_key = data.external.secrets.result.openhpc_munge_key_b64,
+        clouds_yaml = data.external.secrets.result.clouds_yaml,
       }
     ) 
   }

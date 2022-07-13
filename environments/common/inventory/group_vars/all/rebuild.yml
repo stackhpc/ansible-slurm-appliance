@@ -1,0 +1,6 @@
+---
+
+# See: ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md
+# for variable definitions
+
+openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml
