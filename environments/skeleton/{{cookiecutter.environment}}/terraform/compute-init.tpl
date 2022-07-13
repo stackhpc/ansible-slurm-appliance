@@ -2,7 +2,7 @@
 mounts:
   - ["${ control_address }:/home", "/home", "nfs", "defaults", "0", "0"]
 
-write_files:  
+write_files:
   - path: /etc/munge/munge.key
     encoding: base64
     permissions: "0400"
