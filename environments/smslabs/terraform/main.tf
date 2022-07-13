@@ -8,6 +8,27 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
+variable "default_image_name" {
+    type = string
+    default = "openhpc-220526-1354.qcow2"
+    description = "Image name if {control,login,compute}_image_name not specified"
+}
+
+variable "control_image_name" {
+    type = string
+    default = ""
+}
+
+variable "login_image_name" {
+    type = string
+    default = ""
+}
+
+variable "compute_image_name" {
+    type = string
+    default = ""
+}
+
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
@@ -21,18 +42,18 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: "general.v1.small"
-        image: "openhpc-220526-1354.qcow2"
+        image: var.control_image_name == "" ? var.default_image_name : var.control_image_name
     }
     login_nodes = {
         login-0: {
           flavor: "general.v1.small"
-          image: "openhpc-220526-1354.qcow2"
+          image: var.login_image_name == "" ? var.default_image_name : var.login_image_name
         }
     }
     compute_types = {
         small: {
             flavor: "general.v1.small"
-            image: "openhpc-220526-1354.qcow2"
+            image: var.compute_image_name == "" ? var.default_image_name : var.compute_image_name
         }
     }
     compute_nodes = {
