@@ -1,0 +1,10 @@
+- hosts: builder
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Delete cluster-specific config/secrets
+      file:
+        state: absent
+        path: "{{ item }}"
+      loop: "{{ builder_preimage_delete }}"
+    - community.general.shutdown:

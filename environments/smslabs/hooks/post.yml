@@ -5,20 +5,6 @@
     - name: Check slurm up after direct deploy
       import_tasks: check_slurm.yml
 
-- hosts: compute:&builder
-  become: yes
-  gather_facts: false
-  tasks:
-    - name: Delete cluster-specific config/secrets from compute instance
-      file:
-        state: absent
-        path: "{{ item }}"
-      loop:
-        - /etc/fstab
-        - /etc/sysconfig/slurmd
-        - /etc/openstack/clouds.yaml
-        - /etc/munge/munge.key
-
 - hosts: localhost
   become: false
   tags: build

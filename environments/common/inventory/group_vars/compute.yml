@@ -1,0 +1,5 @@
+builder_preimage_delete:
+  - /etc/fstab
+  - /etc/sysconfig/slurmd
+  - /etc/openstack/clouds.yaml
+  - /etc/munge/munge.key
