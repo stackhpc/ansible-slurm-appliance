@@ -5,3 +5,4 @@ venv
 *.pyc
 packer/openhpc2
 .vscode
+environments/*/userdata/
