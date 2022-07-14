@@ -75,29 +75,6 @@ resource "openstack_compute_instance_v2" "login" {
 
 }
 
-data "external" "secrets" {
-
-  program = ["${path.module}/run_ansible.sh", "${path.root}/../../../ansible/output_secrets.yml"]
-}
-
-data "template_cloudinit_config" "compute" {
-  # NB: The alternative approach of templating in cloud-init using  `## template: jinja` passing the control name as instance metadata didn't work.
-  gzip          = true
-  base64_encode = true
-
-  part {
-    filename = "user-data"
-    content_type = "text/cloud-config"
-    content = templatefile("${path.module}/compute-init.tpl",
-      {
-        control_address = openstack_compute_instance_v2.control.name,
-        munge_key = data.external.secrets.result.openhpc_munge_key_b64,
-        clouds_yaml = data.external.secrets.result.clouds_yaml,
-      }
-    )
-  }
-}
-
 resource "openstack_compute_instance_v2" "compute" {
 
   for_each = var.compute_nodes
@@ -115,7 +92,5 @@ resource "openstack_compute_instance_v2" "compute" {
   metadata = {
     environment_root = var.environment_root
   }
-
-  user_data = data.template_cloudinit_config.compute.rendered
 
 }

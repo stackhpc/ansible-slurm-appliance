@@ -1,0 +1,26 @@
+- hosts: control
+  gather_facts: no
+  name: Provide site-specific configuration/secrets
+  tasks:
+    - name: Create compute node cloud-init userdata
+      # on localhost allows use from TF and `openstack server rebuild`
+      template:
+        src: compute-init.j2
+        dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/compute-init.txt"
+      no_log: true
+      delegate_to: localhost
+    
+    - name: Create directory for compute node cloud-init userdata
+      file:
+        path: /etc/slurm-appliance/ # TODO: move this to config volume once available # TODO: bikeshed name?
+        state: directory
+        mode: u=rw,go=
+      become: yes
+
+    - name: Push compute node cloud-init userdata to control node
+      # on control allows for Slurm-based rebuild
+      copy:
+        src: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/compute-init.txt"
+        dest: /etc/slurm-appliance/compute-init.txt 
+        mode: u=rw,go=
+      become: yes
