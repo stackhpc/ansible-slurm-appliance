@@ -65,7 +65,7 @@ appliances_local_users_default:
       user:
         name: prometheus
         uid: 981
-        home: /var/lib/prometheus
+        home: "{{ prometheus_db_dir }}"
         shell: /usr/sbin/nologin
       enable: "{{ 'prometheus' in group_names }}"
     
