@@ -9,10 +9,23 @@
 # Example:
 #   ansible-playbook -v --limit ohpc_compute ansible/adhoc/rebuild.yml -e rebuild_image=openhpc_v2.3
 
+#TODO: should run the configuration.yml playbook to update the compute node cloud-init userdata?
+#TODO: probably need to control whether we use userdata?
+#TODO: if this isn't multipart mime is it going to break openstack userdata?
+
 - hosts: cluster
   become: no
   gather_facts: no
   tasks:
-    - command: "openstack server rebuild {{ instance_id | default(inventory_hostname) }}{% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}"
+    - command:
+      # TODO: This isn't right, appliances_manage_userdata is host/groupvar, but then /userdata/compute is group-based.
+        cmd: >
+          openstack server rebuild
+            {% if appliances_manage_userdata | bool %}
+            --os-compute-api-version {{ os_compute_api_version }}
+            --user-data {{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/userdata/compute.txt
+            {% endif %}
+            {% if rebuild_image is defined %}--image {{ rebuild_image }}{% endif %}
+            {{ instance_id | default(inventory_hostname) }}
       delegate_to: localhost
     - wait_for_connection:

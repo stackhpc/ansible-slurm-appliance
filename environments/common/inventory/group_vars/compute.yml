@@ -3,3 +3,4 @@ builder_preimage_delete:
   - /etc/sysconfig/slurmd
   - /etc/openstack/clouds.yaml
   - /etc/munge/munge.key
+appliances_manage_userdata: true

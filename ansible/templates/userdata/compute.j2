@@ -5,6 +5,21 @@ mounts:
   {% endfor %}
 
 write_files:
+{% if appliances_manage_etc_hosts | default(false) | bool %}
+  - path: /etc/hosts
+    encoding: text/plain
+    permissions: "0644"
+    owner: root:root
+    content: |
+      127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+      ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+      # BEGIN ANSIBLE MANAGED BLOCK
+{% for hostname in groups['all'] | sort %}
+      {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
+{% endfor %}
+      # END ANSIBLE MANAGED BLOCK
+{% endif %}
   - path: /etc/sysconfig/slurmd
     encoding: text/plain
     permissions: "0644"

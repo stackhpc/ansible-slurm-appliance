@@ -132,8 +132,7 @@ jobs:
         env:
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
           
-      - name: Test reimage of login and compute nodes
-        # TODO: test control node reimage
+      - name: Reimage nodes with Packer-built images
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate

@@ -40,33 +40,29 @@
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
 
-- hosts: login
-  become: no
-  gather_facts: no
-  tags: reimage_compute
-  tasks:
-    # TODO: This is specific to smslabs/arcus environment config - could generalise to all compute nodes
-    - name: Request compute node rebuild via Slurm
-      shell:
-        cmd: scontrol reboot ASAP nextstate=RESUME reason='rebuild image:{{ compute_build.artifact_id }}' {{ openhpc_cluster_name }}-compute-[0-1]
-      become: yes
-        
-    - name: Check compute node rebuild completed
-      shell:
-        cmd: openstack server show {{ item }} --format value -c image
-      register: openstack_compute
-      delegate_to: localhost
-      loop: "{{ groups['compute'] }}"
-      retries: 5
-      delay: 30
-      until: compute_build.artifact_id in openstack_compute.stdout
-      changed_when: false
-
 - hosts: compute
   become: no
   gather_facts: no
   tags: reimage_compute
   tasks:
+    # TODO: this will currently fail on both smslabs and arcus because of no DNS!
+    - name: Reimage compute nodes via openstack, providing metadata
+      shell:
+        cmd: "openstack server rebuild --os-compute-api-version {{ os_compute_api_version }} {{ instance_id | default(inventory_hostname) }} --image {{ compute_build.artifact_id }} --user-data {{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/userdata/compute.txt"
+      delegate_to: localhost
+      vars:
+        os_compute_api_version: '2.79' # highest common version between smslabs and arcus. --user-data requires >= 2.5
+
+    - name: Check compute node rebuild completed
+      shell:
+        cmd: openstack server show {{ inventory_hostname }} --format value -c image
+      register: openstack_compute
+      delegate_to: localhost
+      retries: 36
+      delay: 5
+      until: compute.artifact_id in openstack_compute.stdout
+      changed_when: false
+
     - name: Wait for compute connection
       wait_for_connection:
         timeout: 800
@@ -75,8 +71,8 @@
       retries: 3
       delay: 10
       until: compute_connect is not failed
-    
-    - name: Check slurm up after reimaging login node
+
+    - name: Check slurm up after reimaging compute nodes
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
 

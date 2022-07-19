@@ -27,6 +27,6 @@
         create: yes
         state: present
         block: |
-          {% for hostname in groups['all'] %}
+          {% for hostname in groups['all'] | sort %}
           {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
           {% endfor %}

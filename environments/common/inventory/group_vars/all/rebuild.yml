@@ -4,3 +4,4 @@
 # for variable definitions
 
 openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml
+os_compute_api_version: 2.5
