@@ -14,3 +14,4 @@ mysql_users:
     host: "%"
     password: "{{ vault_mysql_slurm_password }}"
     priv: "slurm_acct_db.*:ALL"
+mysql_root_password_update: true
