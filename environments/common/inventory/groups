@@ -25,7 +25,7 @@ openhpc
 
 [podman:children]
 # Hosts running containers for below services:
-opendistro
+opensearch
 filebeat
 
 [prometheus]
@@ -37,12 +37,12 @@ filebeat
 [alertmanager]
 # TODO:
 
-[opendistro]
+[opensearch]
 # Single node to host ElasticSearch search engine for Slurm monitoring.
 
 [slurm_stats]
 # Single node to run tools to integrate Slurm's accounting information with ElasticSearch.
-# NB: Host must be in `openhpc` group (for `sacct` command) and `opendistro` group.
+# NB: Host must be in `openhpc` group (for `sacct` command) and `opensearch` group.
 
 [filebeat]
 # Single node to parses log files for ElasticSearch - must be co-located with `slurm_stats`.

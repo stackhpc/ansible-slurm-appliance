@@ -5,7 +5,7 @@
     content: |
       # WARNING: This file is managed by ansible, do not modify.
       # This is so non-root containers can use more resources. This is useful
-      # for opendistro.
+      # for opensearch.
       * soft memlock unlimited
       * hard memlock unlimited
       * soft nofile 65536

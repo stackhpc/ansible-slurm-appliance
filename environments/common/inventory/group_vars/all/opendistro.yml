@@ -1,8 +1,0 @@
----
-# See: https://opendistro.github.io/for-elasticsearch-docs/docs/security/configuration/yaml/
-
-# Path to template that specifies opendistro users
-opendistro_internal_users_path: "{{ appliances_repository_root }}/environments/common/files/opendistro/internal_users.yml"
-
-# The user what runs the opendistro container
-opendistro_podman_user: podman

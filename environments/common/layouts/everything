@@ -19,7 +19,7 @@ control
 [node_exporter:children]
 cluster
 
-[opendistro:children]
+[opensearch:children]
 control
 
 [slurm_stats:children]

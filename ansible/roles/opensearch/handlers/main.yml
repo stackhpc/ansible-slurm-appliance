@@ -1,8 +1,8 @@
 ---
 
-- name: Restart opendistro container
+- name: Restart opensearch container
   systemd:
-    name: opendistro.service
+    name: opensearch.service
     state: restarted
     enabled: yes
     daemon_reload: yes

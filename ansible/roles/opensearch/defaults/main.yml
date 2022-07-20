@@ -1,0 +1,5 @@
+---
+# Used to set passwords
+#opensearch_internal_users_path:
+
+opensearch_podman_user: "{{ ansible_user }}"
