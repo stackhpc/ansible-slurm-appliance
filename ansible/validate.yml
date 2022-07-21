@@ -38,12 +38,12 @@
         tasks_from: validate.yml
       tags: validate
 
-- name: Validate opendistro configuration
-  hosts: opendistro
-  tags: opendistro
+- name: Validate opensearch configuration
+  hosts: opensearch
+  tags: opensearch
   tasks:
     - import_role:
-        name: opendistro
+        name: opensearch
         tasks_from: validate.yml
       tags: validate
 

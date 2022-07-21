@@ -49,8 +49,8 @@ processors:
         - {from: "json.ElapsedRaw", type: "integer"}
 
 output.elasticsearch:
-  hosts: ["{{ elasticsearch_address }}:9200"]
+  hosts: ["{{ opensearch_address }}:9200"]
   protocol: "https"
   ssl.verification_mode: none
   username: "admin"
-  password: "{{ vault_elasticsearch_admin_password }}"
+  password: "{{ vault_opensearch_admin_password }}"

@@ -12,16 +12,25 @@
 - name: Ensure parent directory exists
   file:
     state: directory
-    path: "/etc/elastic"
+    path: "/etc/opensearch"
     owner: "{{ opensearch_host_user_id }}"
     group: "{{ opensearch_host_group_id }}"
     mode: 0770
   become: true
 
+- name: Increase maximum number of virtual memory maps
+  # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    state: present
+    reload: yes
+  become: true
+
 - name: Template configuration files
   template:
       src: "{{ opensearch_internal_users_path }}"
-      dest: /etc/elastic/internal_users.yml
+      dest: /etc/opensearch/internal_users.yml
       owner: "{{ opensearch_host_user_id }}"
       # NOTE: root user in container maps to user on host, so this will appear as
       # owned by root in the container.
