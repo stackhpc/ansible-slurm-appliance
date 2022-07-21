@@ -56,18 +56,29 @@ grafana_security:
 
 grafana_datasources:
   - name: prometheus
-    ds_type: prometheus
-    ds_url: "http://{{ prometheus_address }}:9090" # default prometheus port
+    type: prometheus
+    url: "http://{{ prometheus_address }}:9090" # default prometheus port
+    readOnly: false
+    editable: true
   - name: slurmstats
-    ds_type: elasticsearch
-    ds_url: "https://{{ elasticsearch_address }}:9200"
-    basic_auth_user: admin
-    basic_auth_password: "{{ vault_elasticsearch_admin_password }}"
-    with_credentials: true
-    tls_skip_verify: true
-    time_field: "@timestamp"
+    type: grafana-opensearch-datasource
+    flavor: opensearch
+    # version: "{{ opensearch_version }}"
+    url: "https://{{ opensearch_address }}:9200"
+    basicAuth: true
+    basicAuthUser: admin
+    secureJsonData:
+      basicAuthPassword: "{{ vault_opensearch_admin_password }}"
+    withCredentials: true
+    jsonData:
+      tlsSkipVerify: true
+      timeField: "@timestamp"
     database: "filebeat-*"
-    es_version: 70
+    readOnly: false
+    editable: true
+
+grafana_plugins:
+  - grafana-opensearch-datasource
 
 # want to set grafana_server.serve_from_sub_path if have Open Ondemand to proxy:
 grafana_server:

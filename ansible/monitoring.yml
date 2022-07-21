@@ -16,16 +16,16 @@
       tags: config
 
 - name: Setup elasticsearch
-  hosts: opendistro
-  tags: opendistro
+  hosts: opensearch
+  tags: opensearch
   tasks:
     - import_role:
-        name: opendistro
+        name: opensearch
         tasks_from: config.yml
       tags: config
 
     - import_role:
-        name: opendistro
+        name: opensearch
         tasks_from: deploy.yml
       tags: deploy
 
@@ -109,12 +109,10 @@
     - import_role:
         name: cloudalchemy.grafana
       vars:
-        # We use internal roles to register the datasources and dashboards as the roles
-        # does not support all options that we require.
+        # Use an internal role to import dashboards as the cloudalchemy role does not support all options that we require
         grafana_dashboards: []
-        grafana_datasources: []
 
-- name: Initialise grafana
+- name: Initialise grafana dashboards
   hosts: grafana
   tags:
     - grafana-init
@@ -122,7 +120,5 @@
     - assert:
         that: vault_grafana_admin_password is defined
         fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
-    - import_role:
-        name: grafana-datasources
     - import_role:
         name: grafana-dashboards
