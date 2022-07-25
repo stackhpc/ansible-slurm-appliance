@@ -1,11 +1,11 @@
 compute_types = {
     small: {
         flavor: "general.v1.small"
-        image: "CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64"
+        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
     }
     tiny: {
         flavor: "general.v1.tiny"
-        image: "CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64"
+        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
     }
 }
 
@@ -16,32 +16,38 @@ compute_names = {
     ty-002: "tiny"
 }
 
-compute_images = { # allows overrides for specific nodes, by name
-    sm-002: "CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64"
-}
-
 login_names = {
-    login-0: "general.v1.small"
+    login-0: "general.v1.tiny"
 }
-proxy_name = "login-0"
+#
 
-cluster_name  = "test" # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
-cluster_slurm_name = "vermilion" # as above
-cluster_availability_zone = "vermilion-az1"
-key_pair = "centos_at_nrel-deploy-vm"
+login_image = "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
 
-cluster_network = "compute"
-cluster_subnet = "compute-subnet"
-storage_network = "storage"
-storage_subnet = "storage"
+proxy_name = "" # need to set something but its unused in lab
+
+control_image = "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
+control_flavor = "general.v1.tiny"
+
+#######################################
+
+cluster_name  = "nrel"
+cluster_slurm_name = "nrel" # as above
+cluster_availability_zone = "nova"
+
+# don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
+
+key_pair = "slurm-app-ci"
+
 external_network = "external"
-control_network = "nrel"
-control_subnet = "nrel-subnet"
+cluster_network = "nrel-compute"
+cluster_subnet = "nrel-compute"
 
-login_image = "CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64"
+storage_network = "nrel-storage"
+storage_subnet = "nrel-storage"
 
-control_image = "CentOS-8-GenericCloud-8.3.2011-20201204.2.x86_64"
-control_flavor = "general.v1.small"
+control_network = "stackhpc-ipv4-geneve"
+control_subnet = "stackhpc-ipv4-geneve-subnet"
+
 
 # remove this block in the real environment:
 cluster_network_vnic_type = "normal"
