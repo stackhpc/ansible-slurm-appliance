@@ -63,7 +63,6 @@ grafana_datasources:
   - name: slurmstats
     type: grafana-opensearch-datasource
     flavor: opensearch
-    # version: "{{ opensearch_version }}"
     url: "https://{{ opensearch_address }}:9200"
     basicAuth: true
     basicAuthUser: admin

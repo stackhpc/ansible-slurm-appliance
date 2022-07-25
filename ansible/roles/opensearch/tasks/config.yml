@@ -9,15 +9,6 @@
     opensearch_host_user_id: "{{ ansible_facts.subuid[opensearch_podman_user]['start'] + 1000 - 1 }}"
     opensearch_host_group_id: "{{ ansible_facts.subgid[opensearch_podman_user]['start'] + 1000 - 1 }}"
 
-- name: Ensure parent directory exists
-  file:
-    state: directory
-    path: "/etc/opensearch"
-    owner: "{{ opensearch_host_user_id }}"
-    group: "{{ opensearch_host_group_id }}"
-    mode: 0770
-  become: true
-
 - name: Increase maximum number of virtual memory maps
   # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
   ansible.posix.sysctl:
@@ -27,7 +18,28 @@
     reload: yes
   become: true
 
-- name: Template configuration files
+- name: Ensure parent directory exists
+  file:
+    state: directory
+    path: "/etc/opensearch"
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
+    mode: 0770
+  become: true
+
+- name: Template general configuration
+  ansible.builtin.template:
+    src: "{{ appliances_repository_root }}/environments/common/files/opensearch/opensearch.yml.j2"
+    dest: /etc/opensearch/opensearch.yml
+    owner: "{{ opensearch_host_user_id }}"
+    # NOTE: root user in container maps to user on host, so this will appear as
+    # owned by root in the container.
+    group: "{{ opensearch_podman_user }}"
+    mode: 0660
+  notify: Restart opensearch container
+  become: true
+
+- name: Template internal user configuration
   template:
       src: "{{ opensearch_internal_users_path }}"
       dest: /etc/opensearch/internal_users.yml
@@ -36,6 +48,9 @@
       # owned by root in the container.
       group: "{{ opensearch_podman_user }}"
       mode: 0660
-  # TODO: This needs to smarter as bcrypt hash changes everytime
+  vars:
+    # bcrypt requires a 128 bits salt in base64 encoding
+    salt: "{{ (2 | pow(128) | int) | random(seed=inventory_hostname) | b64encode }}"
+    opensearch_admin_password_hash: "{{ vault_opensearch_admin_password | password_hash('bcrypt', salt[0:22]) }}"
   notify: Restart opensearch container
   become: true
