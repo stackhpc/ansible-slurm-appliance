@@ -1,5 +1,3 @@
-# PRODUCTION
-# vs pre.yml
 
 - name: nrel-proto fixes - workaround no internal DNS
   hosts:

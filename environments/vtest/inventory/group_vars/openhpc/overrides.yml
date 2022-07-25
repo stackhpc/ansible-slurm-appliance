@@ -26,6 +26,7 @@ openhpc_packages:
   - ohpc-autotools
   - ohpc-base
   - ohpc-base-compute
+  - openblas-gnu9-ohpc
   - ohpc-gnu9-openmpi4-perf-tools
   - mpich-ofi-gnu9-ohpc
   - mpich-ucx-gnu9-ohpc
@@ -69,8 +70,9 @@ openhpc_slurm_partitions:
   #   default: NO
   #   maxtime: "4:0:0" # 4 hour 0m 0s
 
-slurm_conf_extraparams:
+
   # Additional parameters to set in slurm.conf - list of [parameter, value] pairs
+  slurm_conf_extraparams:
   - ['LaunchParameters', 'use_interactive_step']
   - ['FirstJobId', 50000000]
 

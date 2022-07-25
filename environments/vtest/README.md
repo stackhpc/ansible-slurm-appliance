@@ -28,7 +28,7 @@ In addition to main README:
    In either case:
    - Modify variables in `terraform/terraform.tfvars` to define the cluster size and cloud environment.
    - Ensure the appropriate images (Centos 8.3) and SSH keys are available in OpenStack.
-
+   
    Then run:
 
         cd <terraform directory>

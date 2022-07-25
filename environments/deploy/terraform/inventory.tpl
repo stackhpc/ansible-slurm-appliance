@@ -35,4 +35,3 @@ ${cluster_name}-t-[0001:0015]
 [${cluster_slurm_name}_gpu]
 ${cluster_name}-gpu-[0001:0006]
 
-

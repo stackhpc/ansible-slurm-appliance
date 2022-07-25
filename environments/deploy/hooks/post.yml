@@ -1,6 +1,4 @@
 ---
-# PRODUCTION
-# vs post.yml
 
 - name: install X stuff from powertools to login hosts
   hosts: login
@@ -65,7 +63,7 @@
         name: slurm_lex_accounting
   vars:
     slurm_lex_accounting_dev: False
-    slurm_lex_accounting_clustername: vermilion
+    slurm_lex_accounting_clustername: "{{ openhpc_cluster_name }}"
 
 - name: vstack_admin_config
   hosts: admin
