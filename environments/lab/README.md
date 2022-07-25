@@ -1,8 +1,6 @@
 # NREL prototype Slurm appliance
 
-Prototype for the Slurm appliance on the NREL Vermilion system.
-
-While the real system will use VMs on AMD Epyc hypervisors with RoCE, this prototype uses baremetal blade instances with a variety of processors and IP over Ethernet.
+Prototype on `sms-labs` for the Slurm appliance on the NREL Vermilion system. This uses VMs and does not have RoCE.
 
 This README is supplimentary to the main readme at ../../README.md so only differences/additinoal information is noted here. Paths are relative to this environment unless otherwise noted.
 
@@ -23,7 +21,7 @@ In addition to main README:
 
 2. Deploy instances using Terraform:
 
-   An example terraform configuration is provided in `terraform/`. This deploys all instances onto two preexisting `vlan`-type networks (storage and compute) with SR-IOV ports on both. It assumes there is an external network with a router. It will create floating IPs on the login node(s).
+   An example terraform configuration is provided in `terraform/`. This deploys all instances onto two preexisting `vlan`-type networks (storage and compute). It assumes there is an external network with a router. It will create floating IPs on the login node(s).
 
    In either case:
    - Modify variables in `terraform/terraform.tfvars` to define the cluster size and cloud environment.
