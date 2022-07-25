@@ -1,13 +1,12 @@
-# NREL prototype Slurm appliance
+# NREL Slurm appliance - Environment-Specific README
 
-Prototype for the Slurm appliance on the NREL Vermilion system.
+This README covers the NREL-specific environments:
+   - `nrel`: Shared base environment for other NREL environments - do not activate this.
+   - `prod`: Production environment using VMs on AMD Epyc hypervisors with RoCE.
+   - `vtest`: Test & development environment at NREL.
+   - `lab`: Development environment for StackHPC on `sms-labs`, using VMs without RoCE.
 
-While the real system will use VMs on AMD Epyc hypervisors with RoCE, this prototype uses baremetal blade instances with a variety of processors and IP over Ethernet.
-
-This README is supplimentary to the main readme at ../../README.md so only differences/additinoal information is noted here. Paths are relative to this environment unless otherwise noted.
-
-## Pre-requisites
-- The lab does not provide internal DNS hence `hooks/pre.yml` will populate `/etc/hosts` for all hosts.
+This README is supplimentary to the main readme at ../../README.md so only differences/additinoal information is noted here. Paths are relative to the environment unless otherwise noted.
 
 ## Installation on deployment host
 See main README.
@@ -23,18 +22,13 @@ In addition to main README:
 
 2. Deploy instances using Terraform:
 
-   An example terraform configuration is provided in `terraform/`. This deploys all instances onto two preexisting `vlan`-type networks (storage and compute) with SR-IOV ports on both. It assumes there is an external network with a router. It will create floating IPs on the login node(s).
-
-   In either case:
    - Modify variables in `terraform/terraform.tfvars` to define the cluster size and cloud environment.
-   - Ensure the appropriate images (Centos 8.3) and SSH keys are available in OpenStack.
+   - Ensure the appropriate images (Rocky Linux 8.x) and SSH keys are available in OpenStack.
    
    Then run:
 
-        cd <terraform directory>
+        cd environments/<environment>/terraform
         terraform apply
-
-3. Passwords are not currently encrypted or commited.
 
 6. Spack can be installed, configured, and pre-determined packages installed by running:
 
@@ -44,7 +38,7 @@ In addition to main README:
 
 ## Environments
 
-This section describes this environment as currently previsioned using `terraform-flat/`. For general notes on how environments work see the main README.
+TODO: update this section
 
 This environment defines:
 
