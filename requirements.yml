@@ -4,6 +4,7 @@ roles:
     version: v21.2.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
     version: v0.13.0
+    name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: feature/no-install
     name: cloudalchemy.node_exporter

@@ -7,7 +7,7 @@
     - mysql
   tasks:
     - include_role:
-        name:  ansible-role-mysql
+        name:  geerlingguy.mysql
 
 - name: Setup slurm-driven reimage
   hosts: rebuild

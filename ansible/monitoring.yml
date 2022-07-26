@@ -114,8 +114,9 @@
         grafana_dashboards: []
         grafana_datasources: []
 
-    - import_role:
-        name: ansible_wait_30
+    # TODO: can we remove this?
+    # - import_role:
+    #     name: ansible_wait_30
 
 - name: Initialise grafana
   hosts: grafana
