@@ -17,6 +17,7 @@ resource "openstack_networking_subnet_v2" "storage" {
   network_id = openstack_networking_network_v2.storage.id
   cidr       = "192.168.100.0/24"
   name           = "nrel-storage"
+  no_gateway = true
 }
 
 resource "openstack_networking_network_v2" "compute" {
@@ -24,8 +25,9 @@ resource "openstack_networking_network_v2" "compute" {
   admin_state_up = "true"
 }
 
-resource "openstack_networking_subnet_v2" "control" {
+resource "openstack_networking_subnet_v2" "compute" {
   network_id = openstack_networking_network_v2.compute.id
   name           = "nrel-compute"
   cidr       = "192.168.101.0/24"
+  no_gateway = true
 }
