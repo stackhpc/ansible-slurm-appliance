@@ -1,42 +1,26 @@
-- name: nrel-proto fixes - workaround no internal DNS
-  hosts:
-    - cluster
+- name: NREL lab fixes - Workaround no internal DNS
+  hosts: all
   become: true
   gather_facts: false
   tags: etc_hosts
   tasks:
-    - name: Internal DNS workaround - generate /etc/hosts file content
-      # which interface is used as ansible_host is defined by terraform (see `access_network`) so this is deterministic for multi-rail hosts
-      set_fact:
-        etc_hosts_content: |
-          {% for host in (groups['cluster'] | difference(groups['builder'])) %}{{ hostvars[host]['ansible_host'] }} {{ host }}.novalocal {{ host }}
-          {% endfor %}
-      run_once: true
-    - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
+    - name: Create /etc/hosts for all nodes as DNS doesn't work
+      # the interface used as ansible_host is defined by terraform's `access_network` parameter, so this is deterministic for multi-rail hosts
       blockinfile:
         path: /etc/hosts
         create: yes
         state: present
-        block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
+        block: |
+          {% for hostname in groups['all'] %}
+          {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
+          {% endfor %}
 
-- name: add centos 8.3 vault repo
-  hosts: cluster
-  become: true
-  gather_facts: false
-  tasks:
-    - yum_repository:
-        name: vault
-        file: CentOS-Linux-Vault8.3
-        description:  CentOS 8.3 packages from Vault
-        baseurl: https://vault.centos.org/8.3.2011/BaseOS/$basearch/os/
-        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
-
-- name: nrel-proto fixes - compute nodes
+- name: NREL lab fixes - For compute nodes
   hosts: compute
   become: true
   gather_facts: false
   tasks:
-    - name: Create scratch directory - should be on local SSD on real cluster
+    - name: Create scratch directory - on local SSD on prod
       file:
-        path: /tmp/scratch
+        path: /var/scratch
         state: directory

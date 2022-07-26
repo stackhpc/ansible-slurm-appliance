@@ -20,15 +20,23 @@ See main README.
 
 In addition to main README:
 
-2. Deploy instances using Terraform:
+2. Deploy infrastructure using Terraform:
 
-   - Modify variables in `terraform/terraform.tfvars` to define the cluster size and cloud environment.
+   - Modify variables in `environments/<environment>/terraform/terraform.tfvars` to define the cluster size and cloud environment.
    - Ensure the appropriate images (Rocky Linux 8.x) and SSH keys are available in OpenStack.
    
-   Then run:
+   For the `lab` environment on `sms-labs` ONLY run:
+   
+         cd environments/lab/terraform/network
+         terraform init
+         terraform apply
+   
+   (this creates appropriate networking, which is preprovisioned in the other environments)
 
-        cd environments/<environment>/terraform
-        terraform apply
+   For all environments run:
+
+         cd environments/<environment>/terraform
+         terraform apply
 
 6. Spack can be installed, configured, and pre-determined packages installed by running:
 

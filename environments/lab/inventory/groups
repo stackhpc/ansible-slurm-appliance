@@ -1,2 +1,1 @@
-[nfs:children]
-cluster
+../../nrel/inventory/groups
