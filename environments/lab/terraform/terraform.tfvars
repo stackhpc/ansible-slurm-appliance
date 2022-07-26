@@ -18,6 +18,7 @@ compute_names = {
 
 login_names = {
     login-0: "general.v1.tiny"
+    admin: "general.v1.tiny"
 }
 #
 
