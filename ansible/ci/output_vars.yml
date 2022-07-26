@@ -1,0 +1,12 @@
+# Output specific hostvars to a file in a form which can be sourced by bash
+# NB: obviously the keys and values for the hostvars need to be suitable bash variables
+- hosts: "{{ output_vars_hosts }}"
+  gather_facts: no
+  tasks:
+    - copy:
+        dest: "{{ output_vars_path }}"
+        content: |
+          {% for item in output_vars_items.split(',') %}
+          export {{output_vars_prefix | default('') }}{{ item }}={{ lookup('vars', item) }}
+          {% endfor %}
+      delegate_to: localhost

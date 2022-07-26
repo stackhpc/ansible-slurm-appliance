@@ -1,0 +1,7 @@
+---
+
+# See: ansible/roles/basic_users/README.md 
+# for variable definitions.
+
+basic_users_homedir: /home
+basic_users_users: []

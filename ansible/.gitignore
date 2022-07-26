@@ -8,8 +8,6 @@ roles/*
 !roles/opendistro/**
 !roles/podman/
 !roles/podman/**
-!roles/kibana/
-!roles/kibana/**
 !roles/grafana-dashboards/
 !roles/grafana-dashboards/**
 !roles/grafana-datasources/
@@ -18,3 +16,17 @@ roles/*
 !roles/passwords/**
 !roles/os_manila_mount/
 !roles/os_manila_mount/**
+!roles/fail2ban/
+!roles/fail2ban/**
+!roles/hpctests/
+!roles/hpctests/**
+!roles/block_devices/
+!roles/block_devices/**
+!roles/basic_users/
+!roles/basic_users/**
+!roles/openondemand/
+!roles/openondemand/**
+!roles/slurm_exporter/
+!roles/slurm_exporter/**
+!roles/firewalld/
+!roles/firewalld/**

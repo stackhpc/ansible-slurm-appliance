@@ -1,0 +1,172 @@
+
+name: Test deployment and image build on OpenStack
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  openstack:
+    name: openstack-ci-${{ matrix.cloud }}
+    strategy:
+      matrix:
+        cloud:
+          - "smslabs" # SMS-Labs OpenStack in stackhpc-ci project
+          - "arcus"   # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
+      fail-fast: false # as want clouds to continue independently
+    concurrency: ${{ matrix.cloud }}
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "${${{ matrix.cloud }}_SSH_KEY}" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        env:
+          smslabs_SSH_KEY: ${{ secrets.SSH_KEY }}
+          arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
+
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/${{ matrix.cloud }}/bastion_fingerprint >> ~/.ssh/known_hosts
+        shell: bash
+      
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
+      - name: Install terraform
+        uses: hashicorp/setup-terraform@v1
+      
+      - name: Initialise terraform
+        run: terraform init
+        working-directory: ${{ github.workspace }}/environments/${{ matrix.cloud }}/terraform
+        
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${${{ matrix.cloud }}_CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+        env:
+          smslabs_CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
+          arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
+      
+      - name: Provision infrastructure
+        id: provision
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform apply -auto-approve
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+      
+      - name: Get server provisioning failure messages
+        id: provision_failure
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          echo "::set-output name=messages::$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: always() && steps.provision.outcome == 'failure'
+        
+      - name: Delete infrastructure if failed due to lack of hosts
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform destroy -auto-approve
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
+
+      - name: Directly configure cluster and build compute, login and control images
+        # see pre-hook for the image build
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible all -m wait_for_connection
+          ansible-playbook ansible/adhoc/generate-passwords.yml
+          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
+          ansible-playbook -vv ansible/site.yml
+        env:
+          OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      
+      - name: Confirm Open Ondemand is up (via SOCKS proxy)
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          
+          # load ansible variables into shell:
+          ansible-playbook ansible/ci/output_vars.yml \
+            -e output_vars_hosts=openondemand \
+            -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
+            -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
+          source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
+          
+          # setup ssh proxying:
+          sudo apt-get --yes install proxychains
+          echo proxychains installed
+          ssh -v -fN -D 9050 ${bastion_user}@${bastion_ip}
+          echo port 9050 forwarded
+
+          # check OOD server returns 200:
+          statuscode=$(proxychains wget \
+            --quiet \
+            --spider \
+            --server-response \
+            --no-check-certificate \
+            --http-user=testuser \
+            --http-password=${TEST_USER_PASSWORD} https://${openondemand_servername} \
+            2>&1)
+          (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
+        env:
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          
+      - name: Test reimage of login and compute nodes
+        # TODO: test control node reimage
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible all -m wait_for_connection
+          ansible-playbook -vv ansible/ci/test_reimage.yml
+        env:
+          OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
+      
+      - name: Run MPI-based tests
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook -vv ansible/adhoc/hpctests.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
+          OS_CLOUD: openstack
+
+      - name: Delete infrastructure
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          terraform destroy -auto-approve
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+        if: ${{ success() || cancelled() }}
+
+      - name: Delete images
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook -vv ansible/ci/delete_images.yml
+        env:
+          OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True

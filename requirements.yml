@@ -1,85 +1,37 @@
 ---
 roles:
   - src: stackhpc.nfs
-  - name: stackhpc.openhpc
-    src: https://github.com/stackhpc/ansible-role-openhpc
-    version: 'v0.9.0'
-    #version: a0d6f53dde8471fa4685d557bff59ec9b8ed886b
-    #version: e3a9d3ed4b34243ea75f31a285cca792a43ca4a0
-
-  #- src: cloudalchemy.node_exporter
+    version: v21.2.1
+  - src: https://github.com/stackhpc/ansible-role-openhpc.git
+    version: v0.13.0
   - src: https://github.com/stackhpc/ansible-node-exporter.git
-    version: support-rhel-clones
+    version: feature/no-install
     name: cloudalchemy.node_exporter
-
   - src: cloudalchemy.blackbox-exporter
-  - src: cloudalchemy.alertmanager
-
-  #- src: geerlingguy.mysql
-  - src: git+git@github.com:kbendl/ansible-role-mysql.git
-    version: rocky
-    name: geerlingguy.mysql
-
-  - src: https://github.com/stackhpc/ansible_role_spack
-    name: stackhpc.spack
-    version: HEAD
-
-  - src: jriguera.configdrive
-
-  #- src: git+https://github.com/kbendl/ansible-prometheus
-  #  name: cloudalchemy.prometheus
-  #- src: cloudalchemy.prometheus
+    version: 1.0.0
   - src: https://github.com/cloudalchemy/ansible-prometheus.git
     version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
     name: cloudalchemy.prometheus
-
-  - src: git+https://github.com/kbendl/ansible-grafana
+  - src: cloudalchemy.alertmanager
+    version: 0.19.1
+  - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
-    version: rocky-patch-1
-
-  # - name: sync_slurm_allocations
-  #   src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
-  #   type: git
-  #   version: feature/port_from_eagle_to_generic
-  ## - name: cluster_config_manager
-  ##   src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
-  ##   type: git
-  ##   version: feature/galaxy-role-install
-  # - name: cluster_dataset_manager
-  #   src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
-  #   type: git
-  #   version: feature/generic_for_vermilion
-  # - name: pam_mkhomedir_plus
-  #   src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
-  #   type: git
-  #   version: feature/ansible-galaxy
-  # - name: slurm_lex_accounting
-  #   src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
-  #   type: git
-  #   version: feature/ansible-galaxy
-  # - name: vstack_admin_config
-  #   src: git+git@github.nrel.gov:hpc/vstack_admin_config.git
-  #   type: git
-  # - name: vstack_common_config
-  #   src: git+git@github.nrel.gov:hpc/vstack_common_config.git
-  #   type: git
-  # - name: ansible-role-ntp
-  #   src: git+git@github.nrel.gov:hpc/ansible-role-ntp.git
-  #   type: git
-  # - name: vs-set-ephemeral-mounts
-  #   src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
-  #   type: git
-  # - name: vermilion_ldap_client
-  #   src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
-  #   type: git
+    version: service-state
+  - src: geerlingguy.mysql
+    version: 3.3.2
+  - src: jriguera.configdrive
+    # No versions available
+  - src: https://github.com/OSC/ood-ansible.git
+    name: osc.ood
+    version: v2.0.5
+  - src: https://github.com/stackhpc/ansible_role_spack
+    name: stackhpc.spack
+    version: HEAD
 
 collections:
 - name: containers.podman
 - name: community.grafana
 - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
   type: git
-  version: main
-- name: openstack.cloud
-
-
+  version: v0.2.0
 ...

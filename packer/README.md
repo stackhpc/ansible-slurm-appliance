@@ -1,90 +1,61 @@
 # Packer-based image build
 
-This workflow uses Packer with `qemu-kvm` to build an image for a compute node based on a CentOS 8.2 cloud image. The same `ansible/site.yml` playbook is run inside Packer as for the normal cluster creation.
+This workflow uses Packer with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images. These images can be used during cluster creation or to update an existing cluster. Building images reduces the number of package downloads when deploying a large cluster, and ensures that nodes can be recreated even if packages are changed in repositories (e.g. due to Rocky Linux or OpenHPC updates).
 
-This image creation pipeline requires at least the control node to have been created using the normal ansible playbook.
+Packer creates OpenStack VMs and configures them by running `ansible/site.yml` in the same way as for direct configuration of instances using Ansible. However (by default) in Packer builds a `yum update *` step is run. This is not the default for direct configuration, to avoid modifying existing nodes. Packer will upload the resulting images to OpenStack with a name which includes a timestamp.
 
-Steps:
+Building images is likely to require Ansible host/group variables to be set in inventory to provide required configuration information. This may (depending on the inventory generation approach) require nodes to deployed before building images. See developer notes below for more information.
 
-- Ensure hardware virtualisation is enabled:
+# Build Process
 
-      egrep 'vmx|svm' /proc/cpuinfo
-
-- Follow the standard installation instructions in the main README.
-
-- Install packer and qemu-kvm, and ensure libgcrypt is updated:
-
-      sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
-      sudo yum -y install packer
-      sudo yum -y install qemu-kvm
-      sudo yum -y install libgcrypt
+- Create an application credential with sufficient authorisation to upload images (this may or may not be the `member` role, depending on your OpenStack configuration).
+- Create a file `environments/<environment>/builder.pkrvars.hcl` containing at a minimum e.g.:
+  
+  ```hcl
+  flavor = "general.v1.small"                           # VM flavor to use for builder VMs
+  networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
+  source_image_name = "Rocky-8.5-GenericCloud"          # Name of source image. This must exist in OpenStack and should be a Rocky Linux 8.5 GenericCloud-based image.
+  ssh_keypair_name = "slurm-app-ci"                     # Name of an existing keypair in OpenStack. The private key must be on the host running Packer.
+  ```
+  
+  The network(s) used for the Packer VMs must provide for outbound internet access but do not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.). These items are configured but not enabled in the Packer VMs.
+  
+  For additional options such as non-default private key locations or jumphost configuration see the variable descriptions in `./openstack.pkr.hcl`.
 
 - Activate the venv and the relevant environment.
 - Ensure you have generated passwords using:
 
         ansible-playbook ansible/adhoc/generate-passwords.yml
 
-- Ensure you have a public/private keypair as `~/.ssh/id_rsa[.pub]`.
-- Create a config drive which sets this public key for the `centos` user, so that Packer can login to the VM:
+- Ensure you have the private part of the keypair `ssh_keypair_name` at `~/.ssh/id_rsa.pub` (or set variable `ssh_private_key_file` in `builder.pkrvars.hcl`).
 
-        ansible-playbook packer/config-drive.yml # creates packer/config-drive.iso
+- Build images using the variable definition file:
 
-- Build an image (using that config drive):
-
-        mkfifo /tmp/qemu-serial.in /tmp/qemu-serial.out
         cd packer
-        PACKER_LOG=1 packer build main.pkr.hcl
-        # or during development:
-        PACKER_LOG=1 packer build --on-error=ask main.pkr.hcl
+        PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
-  The following variables may also be set:
+  Note the builder VMs are added to the `builder` group to differentiate them from "real" nodes - see developer notes below.
 
-  - `disk_size`: Set the image size ([docs](https://www.packer.io/docs/builders/qemu#disk_size)). Defaults to 20G, so for smaller VMs use e.g: `packer build -var 'disk_size=10G' ...`
-  - `groups`: List of ansible groups the packer VM is added to, to control which nodes to build an image for. Defaults to `["compute"]` to build a generic compute node image. The first element of this list is used as part of the image name. Examples:
+This will build images for the `compute`, `login` and `control` ansible groups. To add additional builds add a new `source` in `openstack.pkr.hcl`.
 
-     - Build an image for a login node: `packer build -var 'groups=["login"]' ...`
+To build only specific images use e.g. `-only openstack.login`.
 
-  Note the VM is also always added to the `builder` group to differentiate it from a real node - see developer notes below.
+Instances using built compute and login images should immediately join the cluster, as long as they are in the Slurm configuration. If reimaging existing nodes, consider doing this via Slurm - see [stackhpc.slurm_openstack_tools.rebuild/README.md](../ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md).
 
-- For debugging, you can login to the VM over ssh by looking in the Packer output for lines showing the IP and ssh port forwarding, e.g.:
-
-        Executing /usr/libexec/qemu-kvm: ...  "-netdev", "user,id=user.0,hostfwd=tcp::2922-:22", ... 
-
-  so in this case login using:
-
-        ssh -p 2922 centos@<ip address>
-
-- You can also watch the console output from the VM startup in another terminal using:
-
-        cat /tmp/qemu-serial.out
-
-- The image will be created in `environments/<environment>/images`
-
-- Upload the image to Openstack:
-
-        openstack image create --file $PKR_VAR_environment_root/images/*.qcow2 --disk-format qcow2 $(basename $PKR_VAR_environment_root/images/*.qcow2)
-
-You can now recreate the compute VMs with the new image using one of the following methods:
-- By changing the compute image name in the deployment automation.
-- Using the playbook `ansible/adhoc/rebuild.yml`.
-- Using a Slurm-driven reimage - see `ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md` for details.
-
-**NB:** You may need to restart `slurmctld` if the nodes come up and then go down again.
+Instances using built control images will require re-running the `ansible/site.yml` playbook on the entire cluster, as the following aspects cannot be configured inside the image:
+- Slurm configuration (the "slurm.conf" file)
+- Grafana dashboard import (assuming default use of control node for Grafana)
+- Prometheus scrape configuration (ditto)
 
 # Notes for developers
 
-The Packer build VM is added to both the `builder` group and the groups specified in the packer `groups` variable, with the former allowing `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the VM where the real cluster may not be contactable (depending on where the build is run from). Currently this means:
-- Enabling but not starting `slurmd`.
-- Setting NFS mounts to `present` but not `mounted`
+The Packer build VMs are added to both the `builder` group and the appropriate `login`, `compute` or `control` group. The former group allows `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the Packer builds, e.g. for services which should not be started.
 
-Note that in this appliance the munge key is pre-created in the environment's "all" group vars, so this aspect needs no special handling.
+Note that hostnames in the Packer VMs are not the same as the equivalent "real" hosts. Therefore variables required inside a Packer VM must be defined as group vars, not hostvars.
 
-Some more subtle points to note if developing code based off this:
-- In general, we should assume that ansible needs to ssh proxy to the compute nodes via the control node (not actually the case in these demos as everything is on one network). However we **don't** want packer's "builder" host to use this proxy, so the proxy has to be added to the group `[${cluster_name}_compute:vars]`, not `[cluster_compute:vars]`.
-- You can't use `-target` (terraform) and `--limit` (ansible) as the `openhpc` role needs all nodes in the play to be able to define `slurm.conf`. If you don't want to configure the entire cluster up-front then alternatives are:
-  1. Define/create a smaller cluster in terraform/ansible, create that and build an image, then change the cluster definition to the real one, limiting the ansible play to just `cluster_login`.
-  2. Work the other way around:
-        - Create the control/login node using TF only (this would need the current inventory to be split up as currently the implicit dependency on `computes` will create those too, even with `-limit`).
-        - Build the image.
-        - Launch compute nodes w/ TF using that (slurm won't start).
-        - Configure control node using `--limit` (will use the local munge key).
+Ansible may need to proxy to compute nodes. If the Packer build should not use the same proxy to connect to the builder VMs, note that proxy configuration should not be added to the `all` group.
+
+When using appliance defaults and an environment with an `inventory/groups` file matching `environments/common/layouts/everything` (as used by cookiecutter for new environment creation), the following inventory variables must be defined when running Packer builds:
+- `openhpc_cluster_name`
+- `openondemand_servername`
+- `inventory_hostname` for a host in the `control` group (provides `openhpc_slurm_control_host` and `nfs_server`)

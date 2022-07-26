@@ -1,0 +1,5 @@
+---
+# See: ansible/roles/hpctests/README.md
+# for variable definitions.
+
+hpctests_rootdir: "/home/hpctests" # Can't use centos's $HOME as that's not on /home and may not have another user

@@ -45,11 +45,24 @@
       retries: 5
       delay: 2
       with_items: "{{ grafana_dashboards }}"
-      when: grafana_dashboards | length > 0
+      when:
+        - grafana_dashboards | length > 0
+        - "'dashboard_id' in item"
       changed_when: false
       check_mode: false
       tags:
         - skip_ansible_lint
+
+    - name: copy in-role grafana dashboards
+      ansible.builtin.copy:
+        src: "{{ item.dashboard_file }}"
+        dest: "{{ _tmp_dashboards.path }}"
+      loop: "{{ grafana_dashboards }}"
+      when:
+        - grafana_dashboards | length > 0
+        - "'dashboard_file' in item"
+      changed_when: false
+      check_mode: false
 
     # As noted in [1] an exported dashboard replaces the exporter's datasource
     # name with a representative name, something like 'DS_GRAPHITE'. The name
@@ -84,8 +97,8 @@
     # matches and non-matches in https://regex101.com/r/f4Gkvg/6
 
     - name: Set the correct data source name in the dashboard
-      replace:
-        dest: "{{ _tmp_dashboards.path }}/{{ item.0.dashboard_id }}.json"
+      ansible.builtin.replace:
+        path: "{{ _tmp_dashboards.path }}/{{ ((item.0.dashboard_id | string) + '.json') if 'dashboard_id' in item.0 else item.0.dashboard_file }}"
         regexp: '"(?:\${)?{{ item.1.placeholder }}(?:})?"'
         replace: '"{{ item.1.replacement }}"'
       changed_when: false
@@ -100,7 +113,7 @@
         grafana_url: "{{ grafana_api_url }}"
         grafana_user: "{{ grafana_security.admin_user }}"
         grafana_password: "{{ grafana_security.admin_password }}"
-        path: "{{ _tmp_dashboards.path }}/{{ item.dashboard_id }}.json"
+        path: "{{ _tmp_dashboards.path }}/{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"
         # message renamed to commit_message (Be aware if using old ansible)
         # https://github.com/ansible/ansible/pull/60051
         #commit_message: Updated by ansible
@@ -108,3 +121,4 @@
         overwrite: true
       #no_log: true
       with_items: "{{ grafana_dashboards }}"
+      when: grafana_state | default('started') != 'stopped'

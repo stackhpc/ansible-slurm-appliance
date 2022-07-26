@@ -1,0 +1,2 @@
+---
+hpctests_hpl_srcdir: "{{ hpctests_rootdir }}/hpl/hpl-{{ hpctests_hpl_version }}"

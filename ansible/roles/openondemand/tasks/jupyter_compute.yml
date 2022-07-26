@@ -1,0 +1,21 @@
+# Should be run on compute nodes you want to run jupyter notebook on
+# See https://osc.github.io/ood-documentation/latest/app-development/tutorials-interactive-apps/add-jupyter/software-requirements.html
+# - Will already have openssl and lmod
+
+- name: Install jupyter venv
+  # Requires separate step so that the upgraded pip is used to install packages
+  pip:
+    name: pip
+    state: latest
+    virtualenv: /opt/jupyter
+    virtualenv_command: python3 -m venv
+  tags: install
+
+- name: Install jupyter package in venv
+  pip:
+    name: jupyter
+    virtualenv: /opt/jupyter
+    virtualenv_command: python3 -m venv
+  tags: install
+
+

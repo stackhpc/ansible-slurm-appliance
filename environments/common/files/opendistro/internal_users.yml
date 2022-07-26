@@ -11,13 +11,8 @@ _meta:
 # Define your internal users here
 
 admin:
-  hash: "{{ secrets_openhpc_elasticsearch_admin_password | password_hash('bcrypt') }}"
+  hash: "{{ vault_elasticsearch_admin_password | password_hash('bcrypt') }}"
   reserved: true
   backend_roles:
   - "admin"
   description: "Admin user"
-
-kibanaserver:
-  hash: "{{ secrets_openhpc_elasticsearch_kibana_password | password_hash('bcrypt') }}"
-  reserved: true
-  description: "Used by kibana to connect to elastic"

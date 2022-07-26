@@ -1,0 +1,26 @@
+- name: Configure UCX for hpctests
+  hosts: openhpc
+  become: false
+  tasks:
+    - name: Find interface for vagrant's private network
+      command:
+        cmd: "ip -o address show to 192.168.0.0/16" # see `private_network` in environments/vagrant-example/vagrant/Vagrantfile
+      register: private_network_interface
+      changed_when: false
+    
+    - name: Check single private network interface found
+      assert:
+        that: private_network_interface.stdout_lines | length == 1
+        fail_msg: "Could not find interface for 192.168.0.0/16"
+    
+    - name: Check private network interface consistent across hosts
+      assert:
+        that: private_network_interface.stdout.split()[1] == hostvars[play_hosts | first].private_network_interface.stdout.split()[1]
+        fail_msg: "ERROR: interface for Vagrant private network is inconsistent with first host"
+    
+    - name: Set {{ hpctests_ucx_net_devices }} in inventory
+      copy:
+        dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/hpctests.yml" # saves creating the hpctests/ directory
+        content: "hpctests_ucx_net_devices: {{ private_network_interface.stdout.split()[1] }}\n"
+      delegate_to: localhost
+      run_once: true

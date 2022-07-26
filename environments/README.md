@@ -66,8 +66,8 @@ hosts from the associated group in the inventory. A pattern we use is to name th
 ansible inventory `group` after the name of the `role` that configures it. The playbook
 that runs this role targets hosts in that group. The `common` environment typically defines
 all groups as the empty group. You must explicly opt-in and add hosts to these these groups
-to configure that service.  For example, if you don't want to deploy and configure kibana,
-you simply do not add any hosts to the `kibana` group in the inventory. This allows us to
+to configure that service.  For example, if you don't want to deploy and configure grafana,
+you simply do not add any hosts to the `grafana` group in the inventory. This allows us to
 have a shared ansible code base as we can define playbooks to configure all things,
 but these playbooks end up not being run if no host is in the associated group.
 
@@ -94,7 +94,7 @@ varibles are set e.g role variables for the `stackhpc.nfs` role can be found in
 
 ## Parent pointers
 
-As the environemnts form a chain, a symlink pointing to the parent can be be created.
+As the environments form a chain, a symlink pointing to the parent can be be created.
 
     `ln -s ../common/ parent`
 
@@ -102,11 +102,11 @@ This allows you to follow the chain more easily:
 
     # After following two parent pointers
     (venv-enroll) [stack@seed parent]$ pwd
-    /home/stack/will/openhpc-demo/environments/production/parent/parent
+    /home/stack/will/ansible-slurm-appliance/environments/production/parent/parent
 
     # Determing which element this path refers to
     (venv-enroll) [stack@seed parent]$ realpath .
-    /home/stack/will/openhpc-demo/environments/common
+    /home/stack/will/ansible-slurm-appliance/environments/common
 
 This currently has no functional effect, but could be used in future to form the
 chained list of inventories that is currently configured in `ansible.cfg`.

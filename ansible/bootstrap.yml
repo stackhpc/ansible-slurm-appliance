@@ -1,5 +1,18 @@
 ---
 
+- hosts: localhost
+  gather_facts: false
+  become: false
+  tags:
+    - deprecated
+  tasks:
+    - fail:
+        msg: |
+          Variables prefixed secrets_openhpc_* are deprecated - run:
+              $ ansible-playbook ansible/adhoc/generate-passwords.yml
+          to update these variable names. ** NB: The actual secrets will not be changed.**
+      when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
+
 - hosts: cluster
   gather_facts: false
   tasks:
@@ -23,6 +36,22 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
+- hosts: firewalld
+  gather_facts: false
+  become: yes
+  tags: firewalld
+  tasks:
+    - import_role:
+        name: firewalld
+
+- hosts: fail2ban
+  gather_facts: false
+  become: yes
+  tags: fail2ban
+  tasks:
+    - import_role:
+        name: fail2ban
+
 - hosts: update
   gather_facts: false
   become: yes
@@ -36,14 +65,24 @@
           state: "{{ update_state }}"
           exclude: "{{ update_exclude }}"
           disablerepo: "{{ update_disablerepo }}"
+        async: "{{ 30 * 60 }}" # wait for up to 30 minutes
+        poll: 15 # check every 15 seconds
         register: updates
       - debug:
           var: updates
+      - name: Ensure update log directory on localhost exists
+        file:
+          path: "{{ update_log_path | dirname }}"
+          state: directory
+        become: false
+        delegate_to: localhost
+        run_once: true
       - name: Log updated packages
         copy:
           content: "{{ updates.results | join('\n') }}"
           dest: "{{ update_log_path }}"
         delegate_to: localhost
+        become: no
       - debug:
           msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
       when: "update_enable | default('false') | bool"

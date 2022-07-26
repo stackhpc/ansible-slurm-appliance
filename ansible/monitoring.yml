@@ -29,25 +29,6 @@
         tasks_from: deploy.yml
       tags: deploy
 
-- name: Setup kibana
-  hosts: kibana
-  tags: kibana
-  tasks:
-    - import_role:
-        name: kibana
-        tasks_from: config.yml
-      tags: config
-
-    - import_role:
-        name: kibana
-        tasks_from: deploy.yml
-      tags: deploy
-
-    - import_role:
-        name: kibana
-        tasks_from: post.yml
-      tags: post
-
 - name: Setup slurm stats
   hosts: slurm_stats
   tags: slurm_stats
@@ -80,10 +61,41 @@
   tasks:
     - import_role: name=cloudalchemy.node_exporter
 
+- name: Deploy OpenOndemand exporter
+  hosts: openondemand
+  become: true
+  tags:
+    - openondemand
+    - openondemand_server
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: exporter.yml
+
+- name: Deploy Slurm exporter
+  hosts: control
+  become: true
+  tags: slurm_exporter
+  tasks:
+    - import_role:
+        name: slurm_exporter
+
 - name: Setup core monitoring software
   hosts: prometheus
   tags: prometheus
   tasks:
+    - name: Check for existing prometheus binaries
+      stat:
+        path: /usr/local/bin/{{ item }}
+      register: prometheus_binaries
+      loop:
+        - prometheus
+        - promtool
+    - name: Skip prometheus install if prometheus binaries exist and prometheus_version not defined
+      # i.e. if prometheus_version isn't defined we don't care, so use what's already there
+      set_fact:
+        prometheus_skip_install: "{{ false if prometheus_version is defined else true }}" 
+      when: "{{ (prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined] }}"
     - import_role:
         name: cloudalchemy.prometheus
 
@@ -92,8 +104,8 @@
   tags: grafana
   tasks:
     - assert:
-        that: secrets_openhpc_grafana_admin_password is defined
-        fail_msg: "Must define secrets_openhpc_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
+        that: vault_grafana_admin_password is defined
+        fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
     - import_role:
         name: cloudalchemy.grafana
       vars:
@@ -111,8 +123,8 @@
     - grafana-init
   tasks:
     - assert:
-        that: secrets_openhpc_grafana_admin_password is defined
-        fail_msg: "Must define secrets_openhpc_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
+        that: vault_grafana_admin_password is defined
+        fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
     - import_role:
         name: grafana-datasources
     - import_role:

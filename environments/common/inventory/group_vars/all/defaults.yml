@@ -1,7 +1,6 @@
 ---
 # Miscellaneous
-#ansible_user: centos
-ansible_user_home: /var/lib/{{ ansible_user }} # for use when /home is going to be mounted over
+ansible_user: rocky
 appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
 
@@ -13,9 +12,10 @@ internal_address: "{{ inventory_hostname }}"
 api_address: "{{ inventory_hostname }}"
 
 # Service endpoints
-grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 elasticsearch_address: "{{ hostvars[groups['opendistro'].0].api_address }}"
 prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
+openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
+grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 
 ############################# bootstrap: local user configuration #########################
 

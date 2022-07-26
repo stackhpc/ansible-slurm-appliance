@@ -1,0 +1,1 @@
+openondemand_servername: "{{ hostvars[ groups['openondemand'] | first].ansible_host }}" # Use a SOCKS proxy to acccess

@@ -1,0 +1,3 @@
+bastion_user: slurm-app-ci
+bastion_ip: 128.232.222.183
+ansible_ssh_common_args: '-o ProxyCommand="ssh {{ bastion_user }}@{{ bastion_ip }} -W %h:%p"'

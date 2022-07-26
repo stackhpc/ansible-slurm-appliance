@@ -1,8 +1,8 @@
 [nfs:children]
-cluster
+openhpc
 
-[openhpc:children]
-cluster
+[hpctests:children]
+login
 
 [mysql:children]
 control
@@ -22,9 +22,6 @@ cluster
 [opendistro:children]
 control
 
-[kibana:children]
-control
-
 [slurm_stats:children]
 control
 
@@ -39,7 +36,28 @@ login
 [update:children]
 cluster
 
-# NB: [os_manila] not defined here as this template is used in CI, which does not run in openstack
+[fail2ban:children]
+# Hosts to install fail2ban on to protect SSH
+login
 
-[openstack:children]
-localhost
+[firewalld:children]
+# Hosts to install firewalld on
+fail2ban
+
+[block_devices:children]
+# Environment-specific so not defined here
+
+[basic_users]
+# Add `openhpc` group to add Slurm users via creation of users on each node.
+
+[openondemand:children]
+# Host to run Open Ondemand server on - subset of login
+login
+
+[openondemand_desktop:children]
+# Subset of compute to run a interactive desktops on via Open Ondemand
+compute
+
+[openondemand_jupyter:children]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+compute

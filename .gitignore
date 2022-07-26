@@ -21,6 +21,7 @@ ansible-vault.pass
 *.code-*
 .cache
 *.sublime*
+.vscode
 
 # C extensions
 *.so

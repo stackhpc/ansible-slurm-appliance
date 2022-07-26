@@ -1,27 +1,36 @@
+[![Test deployment and image build on OpenStack](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/stackhpc.yml/badge.svg)](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/stackhpc.yml)
+
 # StackHPC Slurm Appliance
 
 This repository contains playbooks and configuration to define a Slurm-based HPC environment including:
-- A Centos 8 and OpenHPC v2-based Slurm cluster.
+- A Rocky Linux 8 and OpenHPC v2-based Slurm cluster.
 - Shared fileystem(s) using NFS (with servers within or external to the cluster).
 - Slurm accounting using a MySQL backend.
 - A monitoring backend using Prometheus and ElasticSearch.
 - Grafana with dashboards for both individual nodes and Slurm jobs.
 - Production-ready Slurm defaults for access and memory.
-- A Packer-based build pipeline for compute node images.
+- A Packer-based build pipeline for compute and login node images.
 
 The repository is designed to be forked for a specific use-case/HPC site but can contain multiple environments (e.g. development, staging and production). It has been designed to be modular and extensible, so if you add features for your HPC site please feel free to submit PRs back upstream to us!
 
-## Pre-requisites
+While it is tested on OpenStack it should work on any cloud, except for node rebuild/reimaging features which are currently OpenStack-specific.
 
-- Working DNS so that we can use the ansible inventory name as the address for connecting to services.
-- Bootable images based on Centos 8 Cloud images.
+## Prerequisites
+It is recommended to check the following before starting:
+- You have root access on the "ansible deploy host" which will be used to deploy the appliance.
+- You can create instances using a Rocky 8 GenericCloud image (or an image based on that).
+- SSH keys get correctly injected into instances.
+- Instances have access to internet (note proxies can be setup through the appliance if necessary).
+- DNS works (if not this can be partially worked around but additional configuration will be required).
+- Created instances have accurate/synchronised time (for VM instances this is usually provided by the hypervisor; if not or for bare metal instances it may be necessary to configure a time service via the appliance).
 
 ## Installation on deployment host
 
-These instructions assume the deployment host is running Centos 8:
+These instructions assume the deployment host is running Centos/Rocky 8:
 
+    sudo yum install -y git python3
     git clone https://github.com/stackhpc/ansible-slurm-appliance
-    cd openhpc-demo
+    cd ansible-slurm-appliance
     python3 -m venv venv
     . venv/bin/activate
     pip install -U pip
@@ -37,46 +46,6 @@ These instructions assume the deployment host is running Centos 8:
 - `ansible/`: Contains the ansible playbooks to configure the infrastruture.
 - `packer/`: Contains automation to use Packer to build compute nodes for an enviromment - see the README in this directory for further information.
 - `dev/`: Contains development tools.
-
-## Creating a Slurm appliance
-
-NB: This section describes generic instructions - check for any environment-specific instructions in `environments/<environment>/README.md` before starting.
-
-1. Activate the environment - this **must be done** before any other commands are run:
-
-        source environments/<environment>activate
-
-2. Deploy instances - see environment-specific instructions.
-
-3. Generate passwords:
-
-        ansible-playbook ansible/adhoc/generate-passwords.yml
-
-    This will output a set of passwords in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
-
-        ansible-vault encrypt $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/secrets.yml
-   
-    See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
-
-
-4. Deploy the appliance:
-
-        ansible-playbook ansible/site.yml
-
-   or if you have encrypted secrets use:
-
-        ansible-playbook ansible/site.yml --ask-vault-password
-
-    Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
-
-5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
-
-        ansible-playbook ansible/adhoc/<playbook name>
-
-   Currently they include:
-    - `test.yml`: MPI-based post-deployment tests for latency, bandwidth and floating point performance. See `ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/test/README.md` for full details. Note that you may wish to reconfigure the Slurm compute nodes into a single partition before running this.
-    **IMPORTANT: Do not use these tests on a cluster in production as the reconfiguration it performs will crash running jobs.**
-    - `update-packages.yml`: Update all packages on the cluster.
 
 ## Environments
 
@@ -123,14 +92,54 @@ Although most of the inventory uses the group convention described above there a
     See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
 - On an OpenStack cloud, rebuilding/reimaging compute nodes from Slurm can be enabled by defining a `rebuild` group containing the relevant compute hosts (e.g. in the generated `hosts` file).
 
+## Creating a Slurm appliance
+
+NB: This section describes generic instructions - check for any environment-specific instructions in `environments/<environment>/README.md` before starting.
+
+1. Activate the environment - this **must be done** before any other commands are run:
+
+        source environments/<environment>/activate
+
+2. Deploy instances - see environment-specific instructions.
+
+3. Generate passwords:
+
+        ansible-playbook ansible/adhoc/generate-passwords.yml
+
+    This will output a set of passwords in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
+
+        ansible-vault encrypt inventory/group_vars/all/secrets.yml
+
+    See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
+
+4. Deploy the appliance:
+
+        ansible-playbook ansible/site.yml
+
+   or if you have encrypted secrets use:
+
+        ansible-playbook ansible/site.yml --ask-vault-password
+
+    Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
+
+5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
+
+        ansible-playbook ansible/adhoc/<playbook name>
+
+   Currently they include the following (see each playbook for links to documentation):
+    - `hpctests.yml`: MPI-based cluster tests for latency, bandwidth and floating point performance.
+    - `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for reimaging nodes on an in-production cluster - see `ansible/roles/rebuild` for that).
+    - `restart-slurm.yml`: Restart all Slurm daemons in the correct order.
+    - `update-packages.yml`: Update specified packages on cluster nodes.
+
 ## Adding new functionality
-TODO: this is just rough notes:
-- Add new plays into existing playbook, or add a new playbook and update `site.yml`.
-- Add new empty group into `environments/common/inventory/groups`
-- Add new default group vars.
-- Update example groups file `environments/common/layouts/everything`
-- Update default Packer build variables in `environments/common/inventory/group_vars/builder/defaults.yml`.
-- Update READMEs.
+Please contact us for specific advice, but in outline this generally involves:
+- Adding a role.
+- Adding a play calling that role into an existing playbook in `ansible/`, or adding a new playbook there and updating `site.yml`.
+- Adding a new (empty) group named after the role into `environments/common/inventory/groups` and a non-empty example group into `environments/common/layouts/everything`.
+- Adding new default group vars into `environments/common/inventory/group_vars/all/<rolename>/`.
+- Updating the default Packer build variables in `environments/common/inventory/group_vars/builder/defaults.yml`.
+- Updating READMEs.
 
 ## Monitoring and logging
 
