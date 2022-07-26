@@ -1,4 +1,4 @@
-openhpc_packages:
+openhpc_packages_extra:
   - slurm-libpmi-ohpc
   - bzip2
   - curl
