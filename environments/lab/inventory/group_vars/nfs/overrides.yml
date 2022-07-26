@@ -1,13 +1,22 @@
 ---
 
-
+nfs_server: "{{ (hostvars[groups['control'] | first].server_networks)['nrel-storage'][0] }}"
+nfs_enable:
+  server:  "{{ inventory_hostname in groups['control'] }}"
+  # Don't mount share on server where it is exported from...
+  # Could do something like nfs_clients: '"nfs_servers" not in group_names' instead.
+  # See also constructed inventory: https://docs.ansible.com/ansible/devel/collections/ansible/builtin/constructed_inventory.html
+  clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
 nfs_configurations:
-  - comment: Home directories served from slurm control node
-    nfs_enable:
-      server:  "{{ inventory_hostname == groups['control'] | first}}"
-      # Don't mount share on server where it is exported from ...
-      clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
-    nfs_server: "{{ nfs_server_default }}"
+  - comment: NFS share /home from slurm controller
     nfs_export: "/home"
     nfs_client_mnt_point: "/home"
-
+  - comment: NFS share /nopt from slurm controller
+    nfs_export: /nopt
+    nfs_client_mnt_point: "/nopt"
+  - comment: NFS share /projects from slurm controller
+    nfs_export: /project
+    nfs_client_mnt_point: /project
+  - comment: NFS share /scratch from slurm controller
+    nfs_export: /scratch
+    nfs_client_mnt_point: /scratch
