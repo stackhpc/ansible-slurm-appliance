@@ -1,5 +1,9 @@
-[openhpc:children]
-cluster
+# commented blocks are unused from everything layout
+# [nfs:children]
+# openhpc
+
+[hpctests:children]
+login
 
 [mysql:children]
 control
@@ -19,9 +23,6 @@ cluster
 [opendistro:children]
 control
 
-[kibana:children]
-control
-
 [slurm_stats:children]
 control
 
@@ -31,8 +32,37 @@ slurm_stats
 [spack:children]
 login
 
+# [rebuild:children]
+# compute
+
 [update:children]
 cluster
 
 [os_manila:children]
 openhpc
+
+[fail2ban:children]
+# Hosts to install fail2ban on to protect SSH
+login
+
+[firewalld:children]
+# Hosts to install firewalld on
+fail2ban
+
+# [block_devices:children]
+# # Environment-specific so not defined here
+
+# [basic_users]
+# # Add `openhpc` group to add Slurm users via creation of users on each node.
+
+# [openondemand:children]
+# # Host to run Open Ondemand server on - subset of login
+# login
+
+# [openondemand_desktop:children]
+# # Subset of compute to run a interactive desktops on via Open Ondemand
+# compute
+
+# [openondemand_jupyter:children]
+# # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+# compute
