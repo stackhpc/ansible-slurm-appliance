@@ -1,6 +1,6 @@
-flavor = "general.v1.tiny"
+flavor = "general.v1.small"
 networks = ["c245901d-6b84-4dc4-b02b-eec0fb6122b2"] # stackhpc-ci-geneve
-source_image_name = "openhpc-220413-1545.qcow2"
+source_image_name = "openhpc-220526-1354.qcow2"
 ssh_keypair_name = "slurm-app-ci"
 security_groups = ["default", "SSH"]
 ssh_bastion_host = "185.45.78.150"
