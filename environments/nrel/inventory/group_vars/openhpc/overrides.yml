@@ -1,4 +1,4 @@
-openhpc_packages_extra:
+openhpc_packages_extra_nrel: # extra indirection to allow lab environment to filter this
   - slurm-libpmi-ohpc
   - bzip2
   - curl

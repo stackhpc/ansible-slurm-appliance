@@ -1,5 +1,7 @@
 openhpc_rebuild_clouds: "/opt/nrel-slurm-app/environments/deploy/inventory/group_vars/rebuild/clouds.yaml"
 
+openhpc_packages_extra: "{{ openhpc_packages_extra_nrel}}"
+
 openhpc_slurm_partitions:
   - name: "sm"
     default: NO
