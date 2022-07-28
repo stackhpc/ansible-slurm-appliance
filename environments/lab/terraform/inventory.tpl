@@ -11,6 +11,7 @@ ${login.name} ansible_host=${[for n in login.network: n.fixed_ip_v4 if n.access_
 %{ endfor ~}
 
 [admin]
+${cluster_name}-admin
 
 [compute]
 %{ for compute in computes ~}
