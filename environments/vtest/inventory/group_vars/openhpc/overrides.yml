@@ -1,4 +1,4 @@
-openhpc_rebuild_clouds: "/home/rocky/nrel-openrc.sh"
+openhpc_rebuild_clouds: "/home/rocky/nrel-openrc.sh" # TODO: not sure this will work
 
 openhpc_packages_extra: "{{ openhpc_packages_extra_nrel}}"
 
