@@ -45,6 +45,7 @@ prometheus_scrape_configs_default:
       - netdev
       - cpu
       - meminfo
+      - bonding
       - infiniband
       - cpufreq
   scrape_interval: 30s
