@@ -103,9 +103,6 @@ openhpc_config_extra:
   SlurmctldDebug: 'info'
   SlurmctldLogFile: '/var/log/slurmctld.log'
   SlurmdDebug: 'info'
-  JobCompType: 'jobcomp/none'
-  JobCompLoc: '/var/log/slurm_jobacct.log'
-#SlurmdLogFile=
 
 # ACCOUNTING
 ### start with a qos
@@ -117,9 +114,6 @@ openhpc_config_extra:
   AccountingStorageTRES: 'gres/gpu'
 
 ## added kmb
-  AccountingStorageHost: 'vs-control'
-  AccountingStorageUser: 'slurm'
-  AccountingStorageType: 'accounting_storage/slurmdbd'
   AcctGatherFilesystemType: 'acct_gather_filesystem/lustre'
 
   # JobAcctGatherType: 'jobacct_gather/linux'
