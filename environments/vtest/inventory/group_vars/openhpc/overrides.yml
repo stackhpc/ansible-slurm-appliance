@@ -29,11 +29,11 @@ openhpc_config_extra:
   ReturnToService: '1'
   SlurmctldPidFile: /var/run/slurmctld.pid
   SlurmdPidFile: /var/run/slurmd.pid
-  SlurmdSpoolDir: '/var/spool/slurmd'
-  StateSaveLocation: /var/spool/slurmctld'
+  SlurmdSpoolDir: /var/spool/slurm/slurmd
+  StateSaveLocation: /var/spool/slurm/slurmctld
   SwitchType: 'switch/none'
   TaskPlugin: 'task/affinity'
-  #- TaskPlugin: 'task/affinity,task/cgroup'
+  # TaskPlugin: 'task/affinity,task/cgroup'
 
   # Use sbatch or srun, however...
   # Don't recomend salloc, but this makes it less troublesome
