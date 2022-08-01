@@ -98,8 +98,6 @@ openhpc_config_extra:
   #FastSchedule=1
 
 # LOGGING
-# Silence warnings about configuration file mismatches. TODO: ask why required?
-  DebugFlags: 'NO_CONF_HASH'
   SlurmctldDebug: 'info'
   SlurmctldLogFile: '/var/log/slurmctld.log'
   SlurmdDebug: 'info'
