@@ -112,8 +112,7 @@ openhpc_config_extra:
   AccountingStorageTRES: 'gres/gpu'
 
 ## added kmb
-  AcctGatherFilesystemType: 'acct_gather_filesystem/lustre'
-
+  # AcctGatherFilesystemType: 'acct_gather_filesystem/lustre'
   # JobAcctGatherType: 'jobacct_gather/linux'
   # JobAcctGatherParams: 'UsePss'
   # JobAcctGatherFrequency: 'task=30,energy=30'
