@@ -119,7 +119,7 @@ openhpc_config_extra:
   # JobAcctGatherFrequency: 'task=30,energy=30'
 
 # kbendl - the ephemeral mount for SSD?
-  TmpFS: '/tmp/scratch'
+  TmpFS: '/var/scratch'
   GresTypes: 'gpu'
 
 

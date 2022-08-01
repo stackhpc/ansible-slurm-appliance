@@ -16,15 +16,6 @@
     - include_role:
         name: ansible_yum_config
 
-- name: nrel-proto fixes - compute nodes
-  hosts: compute
-  become: true
-  tasks:
-    - name: Create scratch directory - should be on local SSD on real cluster
-      file:
-        path: /tmp/scratch
-        state: directory
-
 - name: Ensure times are correct
   hosts: all
   tags: set_time_on_servers
