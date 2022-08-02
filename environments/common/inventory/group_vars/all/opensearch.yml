@@ -4,5 +4,9 @@
 # Path to template that specifies opensearch users
 opensearch_internal_users_path: "{{ appliances_repository_root }}/environments/common/files/opensearch/internal_users.yml.j2"
 
-# The user what runs the opensearch container
+# define an idempotent bcrypt hash for the above (requires a 128bit salt in base64 encoding):
+opensearch_admin_password_salt: "{{ (2 | pow(128) | int) | random(seed=inventory_hostname) | b64encode }}"
+opensearch_admin_password_hash: "{{ vault_elasticsearch_admin_password | password_hash('bcrypt', opensearch_admin_password_salt[0:22]) }}"
+
+# user running the opensearch container
 opensearch_podman_user: podman

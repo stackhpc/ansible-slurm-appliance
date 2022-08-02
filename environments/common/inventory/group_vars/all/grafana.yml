@@ -67,7 +67,7 @@ grafana_datasources:
     basicAuth: true
     basicAuthUser: admin
     secureJsonData:
-      basicAuthPassword: "{{ vault_opensearch_admin_password }}"
+      basicAuthPassword: "{{ vault_elasticsearch_admin_password }}"
     withCredentials: true
     jsonData:
       tlsSkipVerify: true

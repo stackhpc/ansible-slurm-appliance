@@ -48,9 +48,5 @@
       # owned by root in the container.
       group: "{{ opensearch_podman_user }}"
       mode: 0660
-  vars:
-    # bcrypt requires a 128 bits salt in base64 encoding
-    salt: "{{ (2 | pow(128) | int) | random(seed=inventory_hostname) | b64encode }}"
-    opensearch_admin_password_hash: "{{ vault_opensearch_admin_password | password_hash('bcrypt', salt[0:22]) }}"
   notify: Restart opensearch container
   become: true
