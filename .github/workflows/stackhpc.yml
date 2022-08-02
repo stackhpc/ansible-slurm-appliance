@@ -119,7 +119,7 @@ jobs:
           ssh -v -fN -D 9050 ${bastion_user}@${bastion_ip}
           echo port 9050 forwarded
 
-          # check OOD server returns 200:
+          # check OOD server returns 200 OK:
           statuscode=$(proxychains wget \
             --quiet \
             --spider \
@@ -148,6 +148,15 @@ jobs:
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
+          OS_CLOUD: openstack
+      
+      - name: Check MPI-based tests are shown in Grafana
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook -vv ansible/ci/check_grafana.yml
         env:
           ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
