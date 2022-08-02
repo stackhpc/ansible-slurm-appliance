@@ -1,4 +1,4 @@
-
+openhpc_rebuild_clouds: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/rebuild/clouds.yaml"
 
 openhpc_packages_extra: "{{ openhpc_packages_extra_nrel | reject('match', '.*-impi-') }}" # don't have intel compilers available
 
