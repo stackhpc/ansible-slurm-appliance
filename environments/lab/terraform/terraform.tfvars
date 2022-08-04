@@ -1,11 +1,11 @@
 compute_types = {
     small: {
         flavor: "general.v1.small"
-        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
+        image: "Rocky-8-GenericCloud-8.6.20220702.0.x86_64"
     }
     tiny: {
         flavor: "general.v1.tiny"
-        image: "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
+        image: "Rocky-8-GenericCloud-8.6.20220702.0.x86_64"
     }
 }
 
@@ -22,11 +22,11 @@ login_names = {
 }
 #
 
-login_image = "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
+login_image = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64"
 
 proxy_name = "" # need to set something but its unused in lab
 
-control_image = "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
+control_image = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64"
 control_flavor = "general.v1.tiny"
 
 #######################################
