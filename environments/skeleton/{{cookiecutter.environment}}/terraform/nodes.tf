@@ -48,14 +48,16 @@ resource "openstack_compute_instance_v2" "control" {
     access_network = true
   }
 
-  # volume-backed instance:
-  block_device {
-    boot_index = 0
-    source_type = "image"
-    uuid = data.openstack_images_image_v2.nodes[lookup(var.image_names, "control", "default")].id
-    destination_type = "volume"
-    volume_size = data.openstack_images_image_v2.nodes[lookup(var.image_names, "control", "default")].min_disk_gb
-    delete_on_termination = true
+  dynamic "block_device" {
+    for_each = toset(true ? [1] : [])
+    content {
+      boot_index = 0
+      source_type = "image"
+      uuid = data.openstack_images_image_v2.nodes[lookup(var.image_names, "control", "default")].id
+      destination_type = "volume"
+      volume_size = data.openstack_images_image_v2.nodes[lookup(var.image_names, "control", "default")].min_disk_gb
+      delete_on_termination = true
+    }
   }
 
   metadata = {
@@ -78,14 +80,16 @@ resource "openstack_compute_instance_v2" "login" {
     access_network = true
   }
 
-  # volume-backed instance:
-  block_device {
-    boot_index = 0
-    source_type = "image"
-    uuid = data.openstack_images_image_v2.nodes[lookup(var.image_names, each.key, "default")].id
-    destination_type = "volume"
-    volume_size = data.openstack_images_image_v2.nodes[lookup(var.image_names, each.key, "default")].min_disk_gb
-    delete_on_termination = true
+  dynamic "block_device" {
+    for_each = toset(true ? [1] : [])
+    content {
+      boot_index = 0
+      source_type = "image"
+      uuid = data.openstack_images_image_v2.nodes[lookup(var.image_names, each.key, "default")].id
+      destination_type = "volume"
+      volume_size = data.openstack_images_image_v2.nodes[lookup(var.image_names, each.key, "default")].min_disk_gb
+      delete_on_termination = true
+    }
   }
 
   metadata = {
@@ -108,14 +112,16 @@ resource "openstack_compute_instance_v2" "compute" {
     access_network = true
   }
 
-  # volume-backed instance:
-  block_device {
-    boot_index = 0
-    source_type = "image"
-    uuid = data.openstack_images_image_v2.nodes[lookup(var.image_names, each.key, "default")].id
-    destination_type = "volume"
-    volume_size = data.openstack_images_image_v2.nodes[lookup(var.image_names, each.key, "default")].min_disk_gb
-    delete_on_termination = true
+  dynamic "block_device" {
+    for_each = toset(true ? [1] : [])
+    content {
+      boot_index = 0
+      source_type = "image"
+      uuid = data.openstack_images_image_v2.nodes[lookup(var.image_names, each.key, "default")].id
+      destination_type = "volume"
+      volume_size = data.openstack_images_image_v2.nodes[lookup(var.image_names, each.key, "default")].min_disk_gb
+      delete_on_termination = true
+    }
   }
 
   metadata = {

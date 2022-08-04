@@ -43,6 +43,12 @@ variable "image_names" {
     description = "Mapping defining images: key -> 'default' (must exist) or nodename suffix, value -> name of image (must exist in OpenStack)"
 }
 
+variable "volume_backed_instances" {
+    type = bool
+    description = "Whether instance root disks are on volumes or local disk"
+    default = false
+}
+
 variable "environment_root" {
     type = string
     description = "Path to environment root, automatically set by activate script"
