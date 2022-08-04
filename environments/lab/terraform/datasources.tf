@@ -25,3 +25,11 @@ data "openstack_networking_subnet_v2" "cluster" {
 data "openstack_networking_subnet_v2" "control" {
   name = var.control_subnet
 }
+
+data "openstack_networking_secgroup_v2" "grafana" {
+  name = "grafana"
+}
+
+data "openstack_networking_secgroup_v2" "default" {
+  name = "default"
+}

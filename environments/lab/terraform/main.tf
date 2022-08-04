@@ -65,6 +65,11 @@ resource "openstack_networking_port_v2" "control_control" {
     subnet_id = data.openstack_networking_subnet_v2.control.id
   }
 
+  security_group_ids = [
+    data.openstack_networking_secgroup_v2.default.id,
+    data.openstack_networking_secgroup_v2.grafana.id,
+  ]
+
   binding {
     vnic_type = var.control_network_vnic_type
     profile = jsonencode(var.control_network_profile)
