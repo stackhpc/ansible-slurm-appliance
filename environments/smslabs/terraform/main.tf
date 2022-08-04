@@ -19,21 +19,15 @@ module "cluster" {
         "SSH", # enable ansible, as bastion does not have same default security group as nodes
     ]
     key_pair = "slurm-app-ci"
-    control_node = {
-        flavor: "general.v1.small"
-        image: "openhpc-220526-1354.qcow2"
+    image_names = {
+        default = "openhpc-220526-1354.raw"
     }
-    login_nodes = {
-        login-0: {
-          flavor: "general.v1.small"
-          image: "openhpc-220526-1354.qcow2"
-        }
+    control_node_flavor = "general.v1.small"
+    login_node_flavors = {
+        login-0: "general.v1.small"
     }
     compute_types = {
-        small: {
-            flavor: "general.v1.small"
-            image: "openhpc-220526-1354.qcow2"
-        }
+        small: "general.v1.small"
     }
     compute_nodes = {
         compute-0: "small"

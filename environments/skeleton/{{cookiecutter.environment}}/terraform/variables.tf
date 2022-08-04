@@ -18,19 +18,19 @@ variable "key_pair" {
     description = "Name of an existing keypair in OpenStack"
 }
 
-variable "control_node" {
-    type = map
-    description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
+variable "control_node_flavor" {
+    type = string
+    description = "Name of flavor for control node"
 }
 
-variable "login_nodes" {
-  type = map
-  description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> mapping  {flavor: flavor_name, image: image_name_or_id }"
+variable "login_node_flavors" {
+  type = map(string)
+  description = "Mapping defining login nodes: key -> nodename suffix, value -> flavor name"
 }
 
 variable "compute_types" {
-    type = map
-    description = "Mapping defining types of compute nodes: key -> (str) name of type, value -> mapping {flavor: flavor_name, image: image_name_or_id }"
+    type = map(string)
+    description = "Mapping defining *types* of compute nodes: key -> name of type, value -> flavor name"
 }
 
 variable "compute_nodes" {
@@ -38,10 +38,9 @@ variable "compute_nodes" {
     description = "Mapping of compute nodename suffix -> key in compute_types"
 }
 
-variable "compute_images" {
+variable "image_names" {
     type = map(string)
-    default = {}
-    description = "Mapping to override compute images from compute_types: key ->(str) node name, value -> (str) image name"
+    description = "Mapping defining images: key -> 'default' (must exist) or nodename suffix, value -> name of image (must exist in OpenStack)"
 }
 
 variable "environment_root" {
