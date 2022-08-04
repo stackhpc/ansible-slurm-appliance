@@ -22,6 +22,7 @@ module "cluster" {
     image_names = {
         default = "openhpc-220526-1354.raw"
     }
+    volume_backed_instances = true
     control_node_flavor = "general.v1.small"
     login_node_flavors = {
         login-0: "general.v1.small"
