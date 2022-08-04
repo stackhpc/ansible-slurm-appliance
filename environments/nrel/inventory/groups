@@ -12,7 +12,7 @@ control
 control
 
 [grafana:children]
-login
+control
 
 [alertmanager:children]
 control
