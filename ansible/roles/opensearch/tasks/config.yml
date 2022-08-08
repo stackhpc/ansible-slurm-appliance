@@ -29,7 +29,7 @@
 
 - name: Template general configuration
   ansible.builtin.template:
-    src: "{{ appliances_repository_root }}/environments/common/files/opensearch/opensearch.yml.j2"
+    src: opensearch.yml.j2
     dest: /etc/opensearch/opensearch.yml
     owner: "{{ opensearch_host_user_id }}"
     # NOTE: root user in container maps to user on host, so this will appear as
