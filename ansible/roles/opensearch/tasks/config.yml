@@ -18,7 +18,7 @@
     reload: yes
   become: true
 
-- name: Ensure parent directory exists
+- name: Ensure parent config directory exists
   file:
     state: directory
     path: "/etc/opensearch"
