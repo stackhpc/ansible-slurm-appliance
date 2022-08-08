@@ -62,6 +62,11 @@ variable "ssh_bastion_private_key_file" {
   default = "~/.ssh/id_rsa"
 }
 
+variable "use_blockstorage_volume" {
+  type = bool
+  default = false
+}
+
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
   networks = "${var.networks}"
@@ -76,6 +81,7 @@ source "openstack" "openhpc" {
   security_groups = "${var.security_groups}"
   image_name = "ohpc-${source.name}-${local.timestamp}" # also provides a unique legal instance hostname (in case of parallel packer builds)
   image_visibility = "${var.image_visibility}"
+  use_blockstorage_volume = "{var.use_blockstorage_volume}"
 }
 
 # NB: build names, split on "-", are used to determine groups to add build to, so could build for a compute gpu group using e.g. `compute-gpu`.
