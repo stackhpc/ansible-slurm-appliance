@@ -49,7 +49,7 @@ resource "openstack_compute_instance_v2" "control" {
   }
 
   dynamic "block_device" {
-    for_each = toset(true ? [1] : [])
+    for_each = toset(var.volume_backed_instances ? [1] : [])
     content {
       boot_index = 0
       source_type = "image"
@@ -81,7 +81,7 @@ resource "openstack_compute_instance_v2" "login" {
   }
 
   dynamic "block_device" {
-    for_each = toset(true ? [1] : [])
+    for_each = toset(var.volume_backed_instances ? [1] : [])
     content {
       boot_index = 0
       source_type = "image"
@@ -113,7 +113,7 @@ resource "openstack_compute_instance_v2" "compute" {
   }
 
   dynamic "block_device" {
-    for_each = toset(true ? [1] : [])
+    for_each = toset(var.volume_backed_instances ? [1] : [])
     content {
       boot_index = 0
       source_type = "image"
