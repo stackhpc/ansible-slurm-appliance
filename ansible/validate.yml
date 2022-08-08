@@ -38,15 +38,6 @@
         tasks_from: validate.yml
       tags: validate
 
-- name: Validate opensearch configuration
-  hosts: opensearch
-  tags: opensearch
-  tasks:
-    - import_role:
-        name: opensearch
-        tasks_from: validate.yml
-      tags: validate
-
 - name: Validate rebuild configuration
   hosts: rebuild
   gather_facts: false
