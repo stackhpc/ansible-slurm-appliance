@@ -16,21 +16,16 @@ module "cluster" {
     cluster_subnet = "WCDC-iLab-60"
     vnic_type = "direct"
     key_pair = "slurm-app-ci"
-    control_node = {
-        flavor: "vm.alaska.cpu.general.small"
-        image: "openhpc-220526-1354.qcow2"
+    image_names = {
+        default = "openhpc-220526-1354.qcow2"
     }
-    login_nodes = {
-        login-0: {
-            flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220526-1354.qcow2"
-        }
+    
+    control_node_flavor = "vm.alaska.cpu.general.small"
+    login_node_flavors = {
+        login-0: "vm.alaska.cpu.general.small"
     }
     compute_types = {
-        small: {
-            flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220526-1354.qcow2"
-        }
+        small: "vm.alaska.cpu.general.small"
     }
     compute_nodes = {
         compute-0: "small"
