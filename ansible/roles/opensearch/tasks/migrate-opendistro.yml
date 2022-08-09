@@ -1,0 +1,39 @@
+# This relies on:
+# - open{distro,search}_podman_user being the same
+# - opendistro and opensearch hosts being the same
+
+# NB: This deliberately does not remove the opendistro podman volume - do that manually once happy.
+
+- name: Stop opendistro
+  ansible.builtin.systemd:
+    name: opendistro.service
+    state: stopped
+    enabled: false
+  become: yes
+    
+- name: Export opendistro volume
+  ansible.builtin.shell:
+    cmd: podman volume export opendistro --output /tmp/opendistro_volume.tar
+    creates: /tmp/opendistro_volume.tar
+  become: yes
+  become_user: "{{ opensearch_podman_user }}"
+
+- name: Make opensearch data directory
+  file:
+    path: "{{ opensearch_data_path }}"
+    state: directory
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+  become: yes
+  become_user: "{{ opensearch_podman_user }}"
+
+- name: Unpack opendistro volume
+  ansible.builtin.unarchive:
+    remote_src: yes
+    src: /tmp/opendistro_volume.tar
+    dest: "{{ opensearch_data_path }}"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    list_files: yes
+  become: yes
+  become_user: "{{ opensearch_podman_user }}"

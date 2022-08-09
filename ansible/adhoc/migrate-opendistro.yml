@@ -2,32 +2,16 @@
 #
 # Usage:
 #
-#   ansible-playbook ansible/adhoc/migrate-opendistro.yml
 #   git pull                # and merge etc as required, including changing groups file to define opensearch not opendistro
-#   ansible-playbook ansible/adhoc/generate-passwords.yml
+#   ansible-playbook ansible/adhoc/migrate-opendistro.yml
 #   ansible-playbook ansible/monitoring.yml
 #
 
-- hosts: opendistro
+- hosts: opensearch
   become: no
   gather_facts: no
   tasks:
-    - name: Stop opendistro
-      ansible.builtin.systemd:
-        name: opendistro.service
-        state: stopped
-        enabled: false
-      become: yes
-    
-    - name: Make opensearch volume
-      containers.podman.podman_volume:
+    - name: Export opendistro volume
+      import_role:
         name: opensearch
-      become: yes
-      become_user: "{{ opendistro_podman_user }}"
-    
-    - name: Copy opendistro data
-      shell:
-        cmd: "podman volume export opendistro | podman volume import opensearch -"
-        creates: "{{ appliances_local_users_podman_home }}.local/share/containers/storage/volumes/opensearch"
-      become: yes
-      become_user: "{{ opendistro_podman_user }}"
+        tasks_from: migrate-opendistro.yml
