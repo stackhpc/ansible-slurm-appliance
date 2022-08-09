@@ -2,7 +2,7 @@
 
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
-grafana_version: 8.5.1
+grafana_version: '8.5.9'
 
 # need to copy some role defaults here so we can use in inventory:
 grafana_port: 3000
