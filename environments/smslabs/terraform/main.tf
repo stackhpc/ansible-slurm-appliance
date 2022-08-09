@@ -20,7 +20,7 @@ module "cluster" {
     ]
     key_pair = "slurm-app-ci"
     image_names = {
-        default = "openhpc-220526-1354.raw"
+        default = "openhpc-220808-1510.raw"
     }
     volume_backed_instances = true
     control_node_flavor = "general.v1.small"
