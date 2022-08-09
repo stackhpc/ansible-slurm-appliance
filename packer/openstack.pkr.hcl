@@ -42,6 +42,7 @@ variable "ssh_keypair_name" {
 
 variable "security_groups" {
   type = list(string)
+  default = []
 }
 
 variable "image_visibility" {
@@ -51,10 +52,12 @@ variable "image_visibility" {
 
 variable "ssh_bastion_host" {
   type = string
+  default = ""
 }
 
 variable "ssh_bastion_username" {
   type = string
+  default = ""
 }
 
 variable "ssh_bastion_private_key_file" {
