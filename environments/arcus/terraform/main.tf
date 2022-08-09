@@ -17,7 +17,7 @@ module "cluster" {
     vnic_type = "direct"
     key_pair = "slurm-app-ci"
     image_names = {
-        default = "openhpc-220526-1354.qcow2"
+        default = "openhpc-220808-1510.qcow2"
     }
     
     control_node_flavor = "vm.alaska.cpu.general.small"
