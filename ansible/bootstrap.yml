@@ -96,6 +96,8 @@
   become: yes
   tags:
     - reboot
+    - selinux
+    - update
   tasks:
     - name: Check for pending reboot from package updates
       stat: 

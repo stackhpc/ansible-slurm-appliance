@@ -1,3 +1,0 @@
-inventory/hosts
-inventory/group_vars/all/secrets.yml
-inventory/group_vars/hpctests.yml
