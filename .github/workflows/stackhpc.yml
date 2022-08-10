@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         cloud:
-          - "smslabs" # SMS-Labs OpenStack in stackhpc-ci project
           - "arcus"   # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
       fail-fast: false # as want clouds to continue independently
     concurrency: ${{ matrix.cloud }}
@@ -87,8 +86,7 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
-      - name: Directly configure cluster and build compute
-        # see pre-hook for the image build
+      - name: Directly configure cluster
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
