@@ -70,7 +70,9 @@ jobs:
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          echo "::set-output name=messages::$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
+          TF_FAILURE_MSGS=$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)
+          echo terraform failures: $TF_FAILURE_MSGS
+          echo "::set-output name=messages::${TF_FAILURE_MSGS}"
         env:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
