@@ -1,22 +1,3 @@
-- hosts: localhost
-  become: false
-  tags: build
-  tasks:
-    - name: Ensure secrets generated
-      include_role:
-        name: passwords
-    
-    - name: Build packer images
-      shell:
-        cmd: |
-          cd packer
-          PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
-        chdir: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
-      when: "'builder' not in group_names" # avoid recursion!
-      register: packer_run
-      async: 2700 # 45 minutes
-      poll: 0
-
 - hosts: all
   become: true
   tags: etc_hosts

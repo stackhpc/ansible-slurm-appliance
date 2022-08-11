@@ -16,7 +16,7 @@
 - name: Check nodes are homogenous
   assert:
     that: "{{ hpctests_nodeinfo.info[item] | unique | length == 1 }}"
-    fail_msg: "Selected nodes are not homogenous: {{ item }} = {{ hpctests_nodeinfo.info[item] }}"
+    fail_msg: "Selected nodes are not homogenous: {{ item }} ({{ hpctests_nodeinfo.info['NODELIST'] }}) = {{ hpctests_nodeinfo.info[item] }}"
   loop:
     - SOCKETS
     - CORES

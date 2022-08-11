@@ -47,17 +47,16 @@ def run_module():
     if module.check_mode:
         module.exit_json(**result)
     
-    node_spec = ','.join(module.params['nodes'])
-    _, stdout,_ = module.run_command("sinfo --Format All --node %s" % node_spec, check_rc=True)
+    _, stdout,_ = module.run_command("sinfo --Format All --Node", check_rc=True) # `--nodes` doesn't filter enough, other partitions are still shown
     lines = stdout.splitlines()
-    # if len(lines) > 2:
-    #     raise ValueError('Info requested for nodes which are not homogenous: %s' % lines)
     info = {}
     params = [v.strip() for v in lines[0].split('|')]
     values = [line.split('|') for line in lines[1:]]
+    nodelist_ix = params.index('NODELIST')
     print(values)
     for ix, param in enumerate(params):
-        info[param] = [nodeinfo[ix].strip() for nodeinfo in values]
+        info[param] = [nodeinfo[ix].strip() for nodeinfo in values if nodeinfo[nodelist_ix].strip() in module.params['nodes']]
+        # info[param] = [nodeinfo[nodelist_ix] for nodeinfo in values]
     result['info'] = info
     
     module.exit_json(**result)

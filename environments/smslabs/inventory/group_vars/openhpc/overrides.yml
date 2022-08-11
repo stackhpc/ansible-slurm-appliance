@@ -1,3 +1,0 @@
-openhpc_config_extra:
-  SlurmctldDebug: debug
-  SlurmdDebug: debug
