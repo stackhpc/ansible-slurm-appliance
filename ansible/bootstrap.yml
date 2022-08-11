@@ -23,6 +23,8 @@
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: '-i'
       become: true
+    - name: Reset ssh connection to allow user changes to affect ansible_user
+      meta: reset_connection
 
 - hosts: selinux
   gather_facts: false
@@ -93,6 +95,7 @@
   gather_facts: false
   become: yes
   tags:
+    - reboot
     - selinux
     - update
   tasks:

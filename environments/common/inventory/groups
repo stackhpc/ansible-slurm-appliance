@@ -70,8 +70,9 @@ cluster
 # Hosts to install fail2ban on to protect SSH - uses firewalld
 # https://www.fail2ban.org/wiki/index.php/Main_Page
 
-[firewalld]
+[firewalld:children]
 # Hosts to install firewalld on - see ansible/roles/filewalld
+fail2ban
 
 [block_devices]
 # Superset of hosts to configure filesystems on - see ansible/roles/block_devices/README.md

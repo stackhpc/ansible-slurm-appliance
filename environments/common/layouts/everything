@@ -40,10 +40,6 @@ cluster
 # Hosts to install fail2ban on to protect SSH
 login
 
-[firewalld:children]
-# Hosts to install firewalld on
-fail2ban
-
 [block_devices:children]
 # Environment-specific so not defined here
 
