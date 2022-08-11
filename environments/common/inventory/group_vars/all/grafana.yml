@@ -72,7 +72,7 @@ grafana_datasources:
     jsonData:
       tlsSkipVerify: true
       timeField: "@timestamp"
-    database: "filebeat-*"
+      database: filebeat-*
     readOnly: false
     editable: true
 
