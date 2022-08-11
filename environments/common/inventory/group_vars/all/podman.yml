@@ -1,2 +1,1 @@
-podman_users: "{{ appliances_local_users_podman }}" # user to use for podman
-podman_cidr: 10.0.2.0/24 # IP range to use for podman - see slirp4netns:cidr= at https://docs.podman.io/en/latest/markdown/podman-run.1.html
+podman_users: "{{ [appliances_local_users_podman] }}" # user to use for podman

@@ -12,14 +12,14 @@ internal_address: "{{ inventory_hostname }}"
 api_address: "{{ inventory_hostname }}"
 
 # Service endpoints
-opensearch_address: "{{ hostvars[groups['opensearch'].0].api_address }}"
+opensearch_address: "127.0.0.1"
 prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
 grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 
 ############################# bootstrap: local user configuration #########################
 
-appliances_local_users_default: "{{ ([appliances_local_users_podman] if appliances_local_users_podman_enable else []) + [appliances_local_users_ansible_user] + appliances_local_users_extra }}"
+appliances_local_users_default: "{{ ([appliances_local_users_podman] if (groups['podman'] | length > 0) else []) + [appliances_local_users_ansible_user] + appliances_local_users_extra }}"
 
 # Overide this to add extra users whilst keeping the defaults.
 appliances_local_users_extra: []
@@ -33,13 +33,12 @@ appliances_local_users_ansible_user:
     move_home: true
     local: true
 
-appliances_local_users_podman_enable: "{{ groups['podman'] | length > 0 }}"
 appliances_local_users_podman_home: /var/lib/podman
 appliances_local_users_podman:
-    - name: podman
-      comment: Used for running all containers
-      # Would like to set subuid so that we that we know what will appear in /etc/subuid
-      # See: https://github.com/ansible/ansible/issues/68199
-      home: "{{ appliances_local_users_podman_home }}"
+    name: podman
+    comment: Used for running all containers
+    # Would like to set subuid so that we that we know what will appear in /etc/subuid
+    # See: https://github.com/ansible/ansible/issues/68199
+    home: "{{ appliances_local_users_podman_home }}"
 
 ###########################################################################################

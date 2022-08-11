@@ -13,7 +13,7 @@ After=network-online.target
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=always
 ExecStart=/usr/bin/podman run \
-    --network slirp4netns:cidr={{ podman_cidr }} \
+    --network=host \
     --sdnotify=conmon --cgroups=no-conmon --replace --name filebeat --user root --restart=always --security-opt label=disable \
     --volume /var/log/:/logs:ro \
     --volume /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro \
