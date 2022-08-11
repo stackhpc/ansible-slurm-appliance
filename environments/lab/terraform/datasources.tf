@@ -33,3 +33,7 @@ data "openstack_networking_secgroup_v2" "grafana" {
 data "openstack_networking_secgroup_v2" "default" {
   name = "default"
 }
+
+data "openstack_networking_secgroup_v2" "deploy_ssh" {
+  name = "deploy_ssh"
+}
