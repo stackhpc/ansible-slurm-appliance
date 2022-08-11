@@ -46,8 +46,8 @@ cluster_subnet = "nrel-compute"
 storage_network = "nrel-storage"
 storage_subnet = "nrel-storage"
 
-control_network = "stackhpc-ipv4-geneve"
-control_subnet = "stackhpc-ipv4-geneve-subnet"
+control_network = "nrel-control"
+control_subnet = "nrel-control"
 
 
 # remove this block in the real environment:
