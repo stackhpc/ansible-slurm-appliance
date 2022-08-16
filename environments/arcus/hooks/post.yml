@@ -5,7 +5,7 @@
     - name: Check slurm up after direct deploy
       import_tasks: check_slurm.yml
 
-- hosts: control:!builder
+- hosts: control
   become: yes
   gather_facts: false
   tasks:
