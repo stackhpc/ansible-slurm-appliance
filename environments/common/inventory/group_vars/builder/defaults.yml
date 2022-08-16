@@ -6,6 +6,8 @@ openhpc_slurm_service_started: false
 nfs_client_mnt_state: present
 openhpc_rebuild_reconfigure: false
 update_enable: true
+update_exclude:
+  - grafana
 block_devices_partition_state: skip
 block_devices_filesystem_state: skip
 block_devices_mount_state: present
