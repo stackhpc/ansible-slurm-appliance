@@ -106,19 +106,10 @@
     - assert:
         that: vault_grafana_admin_password is defined
         fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
-    - import_role:
+    - include_role:
         name: cloudalchemy.grafana
       vars:
         # We use internal roles to register the dashboards as the role does not support all options that we require.
         grafana_dashboards: []
-
-- name: Initialise grafana
-  hosts: grafana
-  tags:
-    - grafana-init
-  tasks:
-    - assert:
-        that: vault_grafana_admin_password is defined
-        fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
-    - import_role:
+    - import_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards
