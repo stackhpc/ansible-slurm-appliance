@@ -10,8 +10,6 @@ roles/*
 !roles/podman/**
 !roles/grafana-dashboards/
 !roles/grafana-dashboards/**
-!roles/grafana-datasources/
-!roles/grafana-datasources/**
 !roles/passwords/
 !roles/passwords/**
 !roles/fail2ban/

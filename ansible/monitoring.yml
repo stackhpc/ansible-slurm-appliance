@@ -109,10 +109,8 @@
     - import_role:
         name: cloudalchemy.grafana
       vars:
-        # We use internal roles to register the datasources and dashboards as the roles
-        # does not support all options that we require.
+        # We use internal roles to register the dashboards as the role does not support all options that we require.
         grafana_dashboards: []
-        grafana_datasources: []
 
 - name: Initialise grafana
   hosts: grafana
@@ -122,7 +120,5 @@
     - assert:
         that: vault_grafana_admin_password is defined
         fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
-    - import_role:
-        name: grafana-datasources
     - import_role:
         name: grafana-dashboards
