@@ -161,6 +161,15 @@ jobs:
           ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
 
+      - name: Check MPI-based tests are shown in Grafana
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook -vv ansible/ci/check_grafana.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
+          OS_CLOUD: openstack
+
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
