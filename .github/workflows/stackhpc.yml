@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         cloud:
-          - "smslabs" # SMS-Labs OpenStack in stackhpc-ci project
           - "arcus"   # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
       fail-fast: false # as want clouds to continue independently
     concurrency: ${{ matrix.cloud }}
@@ -70,7 +69,9 @@ jobs:
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          echo "::set-output name=messages::$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
+          TF_FAIL_MSGS="$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
+          echo $TF_FAIL_MSGS
+          echo "::set-output name=messages::${TF_FAIL_MSGS}"
         env:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
@@ -87,8 +88,7 @@ jobs:
           TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
-      - name: Directly configure cluster and build compute, login and control images
-        # see pre-hook for the image build
+      - name: Directly configure cluster
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
@@ -131,18 +131,20 @@ jobs:
           (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
         env:
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-          
-      - name: Run MPI-based tests (on directly-configured nodes)
+
+      - name: Build packer images
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml
+          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
+          cd packer/
+          PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
         env:
-          ANSIBLE_FORCE_COLOR: True
           OS_CLOUD: openstack
+          ANSIBLE_FORCE_COLOR: True
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      - name: Test reimage of login and compute nodes
-        # TODO: test control node reimage
+      - name: Test reimage of nodes
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
