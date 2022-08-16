@@ -5,6 +5,20 @@
     - name: Check slurm up after direct deploy
       import_tasks: check_slurm.yml
 
+- hosts: control:!builder
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Write CI-generated secrets for debugging
+      ansible.builtin.copy:
+        dest: /etc/ci-secrets.txt
+        content: |
+          vault_elasticsearch_admin_password: {{ vault_elasticsearch_admin_password }}
+          vault_grafana_admin_password: {{ vault_grafana_admin_password }}
+          vault_mysql_root_password: {{ vault_mysql_root_password }}
+          test_user_password: {{ test_user_password }}
+      no_log: true
+
 - hosts: localhost
   become: false
   tags: build
