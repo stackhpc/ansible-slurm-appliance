@@ -7,7 +7,6 @@ At present this will affect the following items:
 - The MySQL database for `slurmdbd`, i.e. Slurm accounting information as shown by the `sacct` command.
 - Prometheus database
 - Grafana data
-- All volumes for `podman` containers (currently, OpenDistro/ElasticSearch state to allow display of Slurm jobs in Grafana)
 
 If using the `environments/common/layout/everything` Ansible groups template (which is the default for a new cookiecutter-produced enviromnent) then these services will all be on the `control` node and hence only this node requires persistent storage.
 
