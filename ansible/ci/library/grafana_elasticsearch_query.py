@@ -4,50 +4,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import requests
-import json
-
 DOCUMENTATION = r'''
 ---
-module: user_namepace_facts
+module: grafana_elasticsearch_query
 
-short_description: Returns subgid and subuid maps
+short_description: Get elasticsearch hits via grafana
 
 version_added: "1.0.0"
 
-description: Returns subgid and subuid maps.
+description: Returns hits from selected datasource and indices.
 
 author:
-    - Will Szumski (@jovial)
+    - Steve Brasier
 '''
 
 EXAMPLES = r'''
-- name: Return ansible_facts
-  user_namepace_facts:
+- name: Get elasticsearch hits
+  grafana_elasticsearch_query:
+    grafana_url: http://{{ grafana_api_address }}:{{ grafana_port }}
+    grafana_username: grafana
+    grafana_password: "{{ vault_grafana_admin_password }}"
+    datasource: slurmstats
+    index_pattern: 'filebeat-*'
 '''
 
 RETURN = r'''
 # These are examples of possible return values, and in general should use other names for return values.
-ansible_facts:
-  description: Facts to add to ansible_facts.
+docs:
+  description: List of dicts with the original json in each document.
   returned: always
-  type: dict
-  contains:
-    subuid:
-      description: Parsed output of /etc/subuid
-      type: str
-      returned: always, empty dict if /etc/subuid doesn't exist
-      sample: { "foo": {"size": 123, "start": 100000 }}
-    subgid:
-      description: Parsed output of /etc/subgid
-      type: str
-      returned: always, empty dict if /etc/subgid doesn't exist
-      sample: { "foo": {"size": 123, "start": 100000 }}
+  type: list
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-import csv
-import os
+import requests
+import json
 
 def run_module():
     module_args = dict(
