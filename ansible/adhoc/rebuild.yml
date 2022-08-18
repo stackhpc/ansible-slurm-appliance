@@ -13,6 +13,12 @@
   become: no
   gather_facts: no
   tasks:
-    - command: "openstack server rebuild {{ instance_id | default(inventory_hostname) }}{% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}"
+    - command: >-
+          openstack server rebuild {{ instance_id | default(inventory_hostname) }}
+          {% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}
+          {% if 'compute' in group_names %}
+          --os-compute-api-version {{ os_compute_api_version }}
+          --user-data {{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/userdata/compute.yml
+          {% endif %}
       delegate_to: localhost
     - wait_for_connection:

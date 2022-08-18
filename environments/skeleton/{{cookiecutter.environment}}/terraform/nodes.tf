@@ -93,4 +93,6 @@ resource "openstack_compute_instance_v2" "compute" {
     environment_root = var.environment_root
   }
 
+  user_data = fileexists("${var.environment_root}/userdata/compute.yml") ? file("${var.environment_root}/userdata/compute.yml") : null
+
 }

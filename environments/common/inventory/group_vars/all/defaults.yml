@@ -3,6 +3,8 @@
 ansible_user: rocky
 appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+appliances_manage_etc_hosts: false # template out /etc/hosts (e.g. if no internal DNS) - assumes inventory_hostname->hostname and ansible_host->address
+os_compute_api_version: 2.57 # need at least this to support userdata in ansible/adhoc/rebuild.yml
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.
