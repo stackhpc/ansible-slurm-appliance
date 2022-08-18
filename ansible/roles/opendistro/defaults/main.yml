@@ -3,3 +3,4 @@
 #opendistro_internal_users_path:
 
 opendistro_podman_user: "{{ ansible_user }}"
+opendistro_data_path: "{{ appliances_state_dir | default('/usr/share/') }}/elasticsearch/data"  # path to host data directory
