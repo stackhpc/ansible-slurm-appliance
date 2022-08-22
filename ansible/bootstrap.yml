@@ -13,6 +13,16 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
+- hosts: etc_hosts
+  gather_facts: false
+  become: yes
+  tags:
+    etc_hosts
+  tasks:
+    - name: Manage /etc/hosts
+      import_role:
+        name: etc_hosts
+
 - hosts: cluster
   gather_facts: false
   tasks:
