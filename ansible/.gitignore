@@ -26,3 +26,5 @@ roles/*
 !roles/slurm_exporter/**
 !roles/firewalld/
 !roles/firewalld/**
+!roles/etc_hosts/
+!roles/etc_hosts/**
