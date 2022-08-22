@@ -16,7 +16,7 @@
           {% endfor %}
 
           write_files:
-            {% if appliances_manage_etc_hosts | default(false) | bool -%}
+          {% if groups['etc_hosts'] | length > 0 %}
             - path: /etc/hosts
               encoding: text/plain
               permissions: "0644"
@@ -26,9 +26,7 @@
                 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
                 # BEGIN ANSIBLE MANAGED BLOCK
-                {% for hostname in groups['all'] | sort -%}
-                {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
-                {% endfor -%}
+                {{ etc_hosts_template | indent(width=6, first=false) | trim }}
                 # END ANSIBLE MANAGED BLOCK
             {% endif %}
 
