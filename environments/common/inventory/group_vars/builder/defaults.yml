@@ -5,13 +5,14 @@
 openhpc_slurm_service_started: false
 nfs_client_mnt_state: present
 openhpc_rebuild_reconfigure: false
-#update_enable: true # WIP: disable this during dev simply for speed!
+update_enable: true
+update_exclude:
+  - grafana
 block_devices_partition_state: skip
 block_devices_filesystem_state: skip
 block_devices_mount_state: present
 basic_users_manage_homedir: false
 grafana_state: stopped # as it tries to listen on the "real" grafana node
-grafana_datasources: [] # as grafana won't be up - NB also dashboards are downloaded but not imported
 block_devices_configurations: [] # as volumes will not be attached to Packer build VMs
 nfs_configurations: [] # don't modify fstab or exports
 basic_users_users: [] # don't want user definitions
