@@ -1,15 +1,27 @@
 # Packer-based image build
 
-This workflow uses Packer with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images. These images can be used during cluster creation or to update an existing cluster. Building images reduces the number of package downloads when deploying a large cluster, and ensures that nodes can be recreated even if packages are changed in repositories (e.g. due to Rocky Linux or OpenHPC updates).
+This workflow uses Packer with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images. These images can be used to create or update a cluster. Using images speeds up cluster deploument and ensures that nodes are reproducable even if repository changes occur.
 
-Packer creates OpenStack VMs and configures them by running `ansible/site.yml` in the same way as for direct configuration of instances using Ansible. However (by default) in Packer builds a `yum update *` step is run. This is not the default for direct configuration, to avoid modifying existing nodes. Packer will upload the resulting images to OpenStack with a name which includes a timestamp.
+Packer creates OpenStack VMs and configures them by running `ansible/site.yml`, in the same way as for "direct configuration" of a cluster. However (by default) Packer builds set `update_enable: true` to run a `dnf update`. This is not the default for direct configuration to avoid modification of existing nodes. The Packer-build images will be uploaded to OpenStack with a name format of  `slurm-<nodetype>-<timestamp>`.
 
-Building images is likely to require Ansible host/group variables to be set in inventory to provide required configuration information. This may (depending on the inventory generation approach) require nodes to deployed before building images. See developer notes below for more information.
+By default Packer builds images for `control`, `login` and `compute` nodes. TODO: indicate how to extend this.
+
+## Control and Login images
+Currently these are environment-specific, i.e. they contain all the configuration and secrets required. They therefore require some Ansible host/group variables to be set in inventory, which may (depending on the inventory generation approach) require nodes to deployed before building images. Using the [appliance default](../environments/common/inventory/group_vars/all/defaults.yml) that service addresses are hostnames, these images may be moved between environments (e.g. dev/test/production) **if** hostnames are the same in all environments.
+
+Note that adding or removing compute nodes to a cluster requires updating some configuration on the control nodes. At a minimum the following should be run:
+- For slurm: `ansible-playbook ansible/slurm.yml --tags openhpc`
+- For prometheus: `ansible-playbook ansible/monitoring.yml`
+
+## Compute images
+By default (i.e. with no additional environment hooks etc) these images are generic, i.e. they contain no configuration or secrets. These are injected at boot time using cloud-init userdata.
+
+**TODO: complete this**
 
 # Build Process
 
 - Create an application credential with sufficient authorisation to upload images (this may or may not be the `member` role, depending on your OpenStack configuration).
-- Create a file `environments/<environment>/builder.pkrvars.hcl` containing at a minimum e.g.:
+- TODO: FIXME: Create a file `environments/<environment>/builder.pkrvars.hcl` containing at a minimum e.g.:
   
   ```hcl
   flavor = "general.v1.small"                           # VM flavor to use for builder VMs
@@ -27,24 +39,24 @@ Building images is likely to require Ansible host/group variables to be set in i
 
         ansible-playbook ansible/adhoc/generate-passwords.yml
 
-- Ensure you have the private part of the keypair `ssh_keypair_name` at `~/.ssh/id_rsa.pub` (or set variable `ssh_private_key_file` in `builder.pkrvars.hcl`).
+- TODO: FIXME: Ensure you have the private part of the keypair `ssh_keypair_name` at `~/.ssh/id_rsa.pub` (or set variable `ssh_private_key_file` in `builder.pkrvars.hcl`).
 
-- Build images using the variable definition file:
+- Generate the builder definitions:
+
+        ansible-playbook ansible/adhoc/build.yml
+
+- Build images:
 
         cd packer
-        PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+        PACKER_LOG=1 /usr/bin/packer build -on-error=ask .
 
-  Note the builder VMs are added to the `builder` group to differentiate them from "real" nodes - see developer notes below.
+To build only specific images use e.g. `-only compute.openstack.openhpc`.
 
-This will build images for the `compute`, `login` and `control` ansible groups. To add additional builds add a new `source` in `openstack.pkr.hcl`.
-
-To build only specific images use e.g. `-only openstack.login`.
-
+TODO: update below:
 Instances using built compute and login images should immediately join the cluster, as long as they are in the Slurm configuration. If reimaging existing nodes, consider doing this via Slurm - see [stackhpc.slurm_openstack_tools.rebuild/README.md](../ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md).
 
 Instances using built control images will require re-running the `ansible/site.yml` playbook on the entire cluster, as the following aspects cannot be configured inside the image:
 - Slurm configuration (the "slurm.conf" file)
-- Grafana dashboard import (assuming default use of control node for Grafana)
 - Prometheus scrape configuration (ditto)
 
 # Notes for developers

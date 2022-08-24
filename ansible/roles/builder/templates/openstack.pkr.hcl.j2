@@ -1,0 +1,32 @@
+# "timestamp" template function replacement:s
+locals { timestamp = formatdate("YYYYMMDD-hhmm", timestamp())}
+
+source "openstack" "{{ build_name }}" {
+{% for k, v in ( builder_openstack_defaults | combine(builder_openstack_overrides) ).items() %}
+    {{ k }} = {{ v | to_json }}
+{% endfor %}
+    image_name = "slurm-{{ build_name }}-${local.timestamp}"
+}
+
+build {
+
+    name = "{{ build_name }}"
+  
+    sources = [
+        "openstack.{{ build_name }}",
+    ]
+
+    provisioner "ansible" {
+        playbook_file = "{{ builder_playbook_file }}"
+        groups = ["builder", "{{ build_name }}", "builder_{{ build_name }}" ]
+        keep_inventory_file = true # for debugging
+        use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
+        extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-v"]
+    }
+    
+    post-processor "manifest" {
+        custom_data  = {
+            source = "${source.name}"
+        }
+    }
+}

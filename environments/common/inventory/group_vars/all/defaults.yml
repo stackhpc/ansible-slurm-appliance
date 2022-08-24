@@ -19,6 +19,14 @@ prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
 grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 
+# Builder configuration
+builder_images: # List of images to build - see ansible/roles/builder/README.md
+  - control
+  - login
+  - compute
+builder_dir: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/packer"
+builder_playbook_file: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/ansible/site.yml"
+
 ############################# bootstrap: local user configuration #########################
 
 appliances_local_users_default: "{{ ([appliances_local_users_podman] if appliances_local_users_podman_enable else []) + [appliances_local_users_ansible_user] + appliances_local_users_extra }}"

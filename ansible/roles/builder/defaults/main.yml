@@ -1,0 +1,9 @@
+# REQUIRED:
+# builder_dir:
+# builder_images:
+# builder_openstack_defaults:
+# builder_playbook_file:
+
+# OPTIONAL:
+builder_openstack_overrides: {}
+builder_cloudinit_userdata:
