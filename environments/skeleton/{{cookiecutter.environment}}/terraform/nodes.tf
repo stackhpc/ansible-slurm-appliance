@@ -9,7 +9,7 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "user-data"
     content_type = "text/cloud-config"
-    content      = templatefile("${path.module}/init.tpl",
+    content      = templatefile("${path.module}/control.userdata.tpl",
                                 {
                                   state_dir = var.state_dir
                                 }
