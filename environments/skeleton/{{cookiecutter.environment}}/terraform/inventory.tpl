@@ -3,7 +3,11 @@ ansible_user=rocky
 openhpc_cluster_name=${cluster_name}
 
 [control]
-${control.name} ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}' appliances_state_dir=${state_dir}
+${control.name} ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}'
+
+[control:vars]
+# NB needs to be set on group not host otherwise it is ignored in packer build!
+appliances_state_dir=${state_dir}
 
 [login]
 %{ for login in logins ~}
