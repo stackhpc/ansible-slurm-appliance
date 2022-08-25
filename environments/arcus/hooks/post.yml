@@ -8,6 +8,45 @@
 - hosts: control
   become: yes
   gather_facts: false
+  name: Fudge in dependencies on appliances_state_dir
+  vars:
+    persistent_services:
+      - opendistro
+      - grafana-server
+      - mariadb # mysql
+      - slurmdbd # openhpc
+      - slurmctld # openhpc
+      - prometheus
+  tasks:
+    - name: Make directory for unit dropins
+      file:
+        path: "/etc/systemd/system/{{ item }}.service.d/"
+        state: directory
+      loop: "{{ persistent_services }}"
+    - name: Add dropins for unit files
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          RequiresMountsFor={{ appliances_state_dir }}
+        dest: "/etc/systemd/system/{{ item }}.service.d/appliance_state.conf"
+      loop: "{{ persistent_services }}"
+      register: persistent_services_dropins
+    - name: Reload unit definitions
+      ansible.builtin.shell:
+        cmd: systemctl daemon-reload
+      when: persistent_services_dropins.changed
+    - name: Reload units
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: restarted
+      loop: "{{ persistent_services }}"
+      when:
+        - persistent_services_dropins.changed
+        - "'builder' not in group_names"
+
+- hosts: control
+  become: yes
+  gather_facts: false
   tasks:
     - name: Write CI-generated inventory and secrets for debugging
       ansible.builtin.copy:
@@ -22,16 +61,3 @@
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/secrets.yml"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/basic_users/defaults.yml"
-
-- hosts: localhost
-  become: false
-  tags: build
-  tasks:
-    - name: Check Packer build finished
-      async_status:
-        jid: "{{ packer_run.ansible_job_id }}"
-      register: packer_result
-      until: packer_result.finished
-      retries: 30 # allow 15 mins
-      delay: 30
-      when: packer_run is defined # allows rerunning post.yml
