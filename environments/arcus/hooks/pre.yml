@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: all # NB: As this doesn't exclude `builder` /etc/hosts is baked into images, which should let `openstack server rebuild` work
   become: true
   tags: etc_hosts
   tasks:
