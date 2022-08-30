@@ -5,6 +5,7 @@ Description=Podman container mysql.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network.target
 After=network-online.target
+RequiresMountsFor={{ mysql_datadir }}
 
 # TODO: wait for port!
 [Service]
