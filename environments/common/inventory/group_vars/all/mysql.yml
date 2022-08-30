@@ -15,4 +15,3 @@ mysql_users:
     password: "{{ vault_mysql_slurm_password }}"
     priv: "slurm_acct_db.*:ALL"
 mysql_datadir: "{{ appliances_state_dir | default('/var/lib') }}/mysql"
-mysql_root_password_update: true
