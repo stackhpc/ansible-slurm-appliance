@@ -2,6 +2,8 @@
 # mysql_root_password:
 
 mysql_tag: 8.0.30
+mysql_enabled: yes
+#mysql_state: # default is started or restarted as required
 mysql_podman_user: "{{ ansible_user }}"
 mysql_datadir: /var/lib/mysql
 mysql_host: "{{ inventory_hostname }}"

@@ -5,14 +5,14 @@
     dest: /etc/systemd/system/mysql.service
     src: mysql.service.j2
   become: true
+  register: _mysql_unitfile
 
 - name: Ensure mysql service state
   systemd:
     name: mysql
-    state: started
-    enabled: true
-    daemon_reload: yes
-  # TODO: add state/enabled control!
+    state: "{{ mysql_state | default('restarted' if _mysql_unitfile.changed else 'started') }}"
+    enabled: "{{ mysql_enabled }}"
+    daemon_reload: "{{ _mysql_unitfile.changed }}"
 
 - name: Wait for mysql to initialise
   # NB: It is not sufficent to wait_for the port
