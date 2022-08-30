@@ -1,0 +1,34 @@
+# TODO: sudo su; echo 50000 > /proc/sys/kernel/keys/maxkeys
+
+- name: Create systemd mysql container unit file
+  template:
+    dest: /etc/systemd/system/mysql.service
+    src: mysql.service.j2
+  become: true
+
+- name: Ensure mysql service state
+  systemd:
+    name: mysql
+    state: started
+    enabled: true
+    daemon_reload: yes
+  # TODO: add state/enabled control!
+
+- name: Wait for mysql to initialise
+  # NB: It is not sufficent to wait_for the port
+  community.mysql.mysql_info:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+  no_log: true
+  register: _mysql_info
+  until: "'version' in _mysql_info"
+  retries: 30
+  delay: 2
+
+- name: Ensure mysql databases created
+  community.mysql.mysql_db: "{{ mysql_db_login_details | combine(item) }}"
+  loop: "{{ mysql_databases}}"
+
+- name: Ensure mysql users present
+  community.mysql.mysql_user: "{{ mysql_user_login_details | combine(item) }}"
+  loop: "{{ mysql_users }}"

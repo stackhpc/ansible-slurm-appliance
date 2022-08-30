@@ -18,8 +18,6 @@ roles:
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
     version: service-state
-  - src: geerlingguy.mysql
-    version: 3.5.0
   - src: jriguera.configdrive
     # No versions available
   - src: https://github.com/OSC/ood-ansible.git

@@ -7,7 +7,7 @@
     - mysql
   tasks:
     - include_role:
-        name:  geerlingguy.mysql
+        name:  mysql
 
 - name: Setup slurm-driven reimage
   hosts: rebuild
