@@ -9,11 +9,11 @@
   become: yes
   gather_facts: false
   name: Fudge in dependencies on appliances_state_dir
+  # NB: mysql is handled by its own unit file
   vars:
     persistent_services:
       - opendistro
       - grafana-server
-      - mariadb # mysql
       - slurmdbd # openhpc
       - slurmctld # openhpc
       - prometheus
