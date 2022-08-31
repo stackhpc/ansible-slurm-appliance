@@ -50,15 +50,6 @@ appliances_local_users_default:
         system: true
       enable: "{{ 'control' in group_names }}"
     
-    - user:
-        name: mysql
-        comment: MySQL Server
-        home: /var/lib/mysql
-        shell: /sbin/nologin
-        uid: 27
-        system: true
-      enable: "{{ 'control' in group_names }}"
-    
     - group:
         name: prometheus
         gid: 976
