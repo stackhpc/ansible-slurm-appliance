@@ -1,11 +1,23 @@
-# TODO: sudo su; echo 50000 > /proc/sys/kernel/keys/maxkeys
+- name: Install python mysql client
+  pip:
+    name: pymysql
+    state: present
 
 - name: Create systemd mysql container unit file
   template:
     dest: /etc/systemd/system/mysql.service
     src: mysql.service.j2
-  become: true
   register: _mysql_unitfile
+
+- name: Create environment file for mysql server root password
+  # NB: This doesn't trigger a restart on changes as it will be ignored once mysql is initialised
+  copy:
+    dest: /etc/sysconfig/mysqld
+    content: |
+      MYSQL_INITIAL_ROOT_PASSWORD='{{ mysql_root_password }}'
+    owner: root
+    group: root
+    mode: u=rw,go=
 
 - name: Ensure mysql service state
   systemd:
@@ -22,7 +34,7 @@
   # no_log: true # TODO: FIXME
   register: _mysql_info
   until: "'version' in _mysql_info"
-  retries: 60
+  retries: 30
   delay: 2
 
 - name: Ensure mysql databases created

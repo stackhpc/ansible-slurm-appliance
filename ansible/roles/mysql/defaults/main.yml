@@ -1,5 +1,5 @@
 # required:
-# mysql_root_password:
+# mysql_root_password: # TODO: make it possible to CHANGE root password
 
 mysql_tag: 8.0.30
 mysql_enabled: yes
