@@ -76,7 +76,15 @@ resource "openstack_compute_instance_v2" "control" {
       destination_type = "volume"
       source_type  = "volume"
       boot_index = -1
-      uuid = openstack_blockstorage_volume_v3.control.id
+      uuid = openstack_blockstorage_volume_v3.state.id
+  }
+
+  # home volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.home.id
   }
 
   network {

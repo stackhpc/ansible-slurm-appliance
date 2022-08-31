@@ -3,10 +3,19 @@ disk_setup:
   /dev/vdb:
     table_type: gpt
     layout: true
+  /dev/vdc:
+    table_type: gpt
+    layout: true
 fs_setup:
-  - label: control_state
+  - label: state
     filesystem: ext4
     device: /dev/vdb
     partition: auto
+  - label: home
+    filesystem: ext4
+    device: /dev/vdc
+    partition: auto
+
 mounts:
-  - [LABEL=control_state, ${state_dir}]
+  - [LABEL=state, ${state_dir}]
+  - [LABEL=home, /exports/home]
