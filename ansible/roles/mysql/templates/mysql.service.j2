@@ -11,7 +11,8 @@ RequiresMountsFor={{ mysql_datadir }} /etc/sysconfig/mysqld
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=always
 EnvironmentFile=/etc/sysconfig/mysqld
-ExecStartPre=+install -d -o {{ mysql_podman_user }} -g {{ mysql_podman_user }} {{ mysql_datadir }}
+# The above EnvironmentFile must define MYSQL_INITIAL_ROOT_PASSWORD
+ExecStartPre=+install -d -o {{ mysql_podman_user }} -g {{ mysql_podman_user }} -Z container_file_t {{ mysql_datadir }}
 ExecStart=/usr/bin/podman run \
     --network slirp4netns:cidr={{ podman_cidr }} \
     --sdnotify=conmon --cgroups=no-conmon \
