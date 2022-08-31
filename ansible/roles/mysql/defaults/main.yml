@@ -17,4 +17,5 @@ mysql_db_login_details: # as passed to community.mysql.mysql_user to make connec
   login_password: "{{ mysql_root_password }}"
   login_host: "{{ mysql_host }}"
 mysql_mysqld_options: [] # list of str options to mysqld, see `run -it --rm mysql:tag --verbose --help`
-mysql_databases: [] # list of dicts for community.mysql.mysql_db - NB `mysql_login_details` sets some defaults
+mysql_users: [] # list of dicts for community.mysql.mysql_user - NB `mysql_user_login_details` sets some defaults
+mysql_databases: [] # list of dicts for community.mysql.mysql_db - NB `mysql_db_login_details` sets some defaults
