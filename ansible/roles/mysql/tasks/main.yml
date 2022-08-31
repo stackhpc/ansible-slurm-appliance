@@ -19,10 +19,10 @@
   community.mysql.mysql_info:
     login_user: root
     login_password: "{{ mysql_root_password }}"
-  no_log: true
+  # no_log: true # TODO: FIXME
   register: _mysql_info
   until: "'version' in _mysql_info"
-  retries: 30
+  retries: 60
   delay: 2
 
 - name: Ensure mysql databases created
