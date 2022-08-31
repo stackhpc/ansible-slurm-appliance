@@ -109,11 +109,6 @@
       delay: 10
       until: control_connect is not failed
 
-    - name: Restart mysql
-      systemd:
-        name: mysql
-        state: restarted
-
 - name: Run slurm playbook again to add partition info
   import_playbook: ../slurm.yml
   tags: reimage_control
