@@ -34,7 +34,7 @@
   # no_log: true # TODO: FIXME
   register: _mysql_info
   until: "'version' in _mysql_info"
-  retries: 30
+  retries: 60
   delay: 2
 
 - name: Ensure mysql databases created
