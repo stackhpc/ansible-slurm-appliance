@@ -1,0 +1,19 @@
+---
+# for role ipaclient from the NREL repo.
+ipaclient_domain: hpc.nrel.gov
+ipaclient_realm: HPC.NREL.GOV
+ipaclient_force_join: yes
+ipaclient_force: yes
+ipaclient_mkhomedir: yes
+ipaclient_allow_repair: yes
+ipaclient_ntp_servers:
+  - ds1.hpc.nrel.gov
+  - ds2.hpc.nrel.gov
+  - ds3.hpc.nrel.gov
+  - ds4.nrel.gov
+
+ipaserver_domain: hpc.nrel.gov
+ipaserver_realm: HPC.NREL.GOV
+ipaserver_setup_firewalld: no
+ipaserver_setup_dns: no
+ipa_ds_server: ds1.hpc.nrel.gov

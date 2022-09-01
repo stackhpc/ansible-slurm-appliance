@@ -7,9 +7,7 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   - libaio-devel
   - git
   - gzip
-  - make
   - patch
-  - python3
   - tar
   - unzip
   - wget
@@ -17,40 +15,70 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   - zstd
   - tmux
   - vim
+
+  - docs-ohpc
+
+  - gnu9-compilers-ohpc
   - slurm-libpmi-ohpc
   - slurm-sview-ohpc
-  - gnu9-compilers-ohpc
   - nhc-ohpc
   - lmod-ohpc
   - ohpc-autotools
   - ohpc-base
   - ohpc-base-compute
-  - openblas-gnu9-ohpc
-  - ohpc-gnu9-openmpi4-perf-tools
+  - cmake-ohpc
+  - hwloc-ohpc
+
+  - charliecloud-ohpc
+  - singularity-ohpc
+
   - mpich-ofi-gnu9-ohpc
   - mpich-ucx-gnu9-ohpc
-  - mvapich2-gnu9-ohpc
-  - openmpi4-gnu9-ohpc
+
+  # - intel-compilers-devel-ohpc
+  # - intel-mpi-devel-ohpc
+  # - intel-oneapi-toolkit-release-ohpc
+  # - mpich-ofi-intel-ohpc
+  # - mpich-ucx-intel-ohpc
+  # - mvapich2-intel-ohpc
+  # - openmpi4-intel-ohpc
+
+  # - mvapich2-gnu9-ohpc
+  # - openmpi4-gnu9-ohpc
+  # - hpc-gnu9-openmpi4-io-libs
+  # - ohpc-gnu9-openmpi4-perf-tools
+  # - ohpc-gnu9-openmpi4-parallel-libs
+
   - ucx-ohpc
-  - hdf5-gnu9-ohpc
-  - netcdf-gnu9-impi-ohpc
-  - netcdf-gnu9-mpich-ohpc
-  - netcdf-gnu9-mvapich2-ohpc
-  - netcdf-gnu9-openmpi4-ohpc
+
+  - ohpc-gnu9-mpich-perf-tools
+  - ohpc-gnu9-mpich-io-libs
+  - ohpc-gnu9-mpich-parallel-libs
+  - ohpc-gnu9-mpich-perf-tools
+
+
+  # - hdf5-gnu9-ohpc
+  # - netcdf-gnu9-impi-ohpc
+  # - netcdf-gnu9-mpich-ohpc
+  # - netcdf-gnu9-mvapich2-ohpc
+  # - netcdf-gnu9-openmpi4-ohpc
+
   - phdf5-gnu9-impi-ohpc
   - phdf5-gnu9-mpich-ohpc
   - phdf5-gnu9-mvapich2-ohpc
   - phdf5-gnu9-openmpi4-ohpc
+
   - pnetcdf-gnu9-impi-ohpc
   - pnetcdf-gnu9-mpich-ohpc
   - pnetcdf-gnu9-mvapich2-ohpc
   - pnetcdf-gnu9-openmpi4-ohpc
-  - charliecloud-ohpc
-  - singularity-ohpc
+  - openblas-gnu9-ohpc
   - boost-gnu9-impi-ohpc
   - boost-gnu9-mpich-ohpc
   - boost-gnu9-mvapich2-ohpc
   - boost-gnu9-openmpi4-ohpc
+#  - python3
+# - make
 
 # Additional parameters to set in slurm.conf - use yaml format
 openhpc_config_extra:

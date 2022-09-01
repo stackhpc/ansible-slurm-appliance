@@ -66,3 +66,7 @@ roles:
     src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
     type: git
     version: feature/ansible-galaxy
+
+  - name: ipaclient
+    src: git+git@github.nrel.gov:hpc/ipaclient.git
+    type: git
