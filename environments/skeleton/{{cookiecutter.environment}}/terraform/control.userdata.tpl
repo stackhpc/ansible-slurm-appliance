@@ -1,11 +1,4 @@
 #cloud-config
-disk_setup:
-  /dev/vdb:
-    table_type: gpt
-    layout: true
-  /dev/vdc:
-    table_type: gpt
-    layout: true
 fs_setup:
   - label: state
     filesystem: ext4
