@@ -23,7 +23,7 @@
   systemd:
     name: mysql
     state: "{{ mysql_state | default('restarted' if _mysql_unitfile.changed else 'started') }}"
-    enabled: "{{ mysql_enabled }}"
+    enabled: "{{ mysql_systemd_service_enabled }}"
     daemon_reload: "{{ _mysql_unitfile.changed }}"
 
 - name: Wait for mysql to initialise

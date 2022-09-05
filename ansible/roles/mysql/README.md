@@ -14,7 +14,7 @@ Role Variables
 
 - `mysql_root_password`: Required str. Password to set for `root` mysql user. **NB** This cannot be changed by this role once mysql server has initialised.
 - `mysql_tag`: Optional str. Tag for version of `mysql` container image to use. Default `8.0.30`.
-- `mysql_enabled`: Optional bool. Whether `mysql` service starts on boot. Default `yes`.
+- `mysql_systemd_service_enabled`: Optional bool. Whether `mysql` service starts on boot. Default `yes`.
 - `mysql_state`: Optional str. As per `ansible.builtin.systemd:state`. Default is `started` or `restarted` as required.
 - `mysql_podman_user`: Optional str. User running `podman`. Default `{{ ansible_user }}`.
 - `mysql_datadir`: Optional str. Path to data directory on the host to store databases etc. Default `/var/lib/mysql`. Note all path components will be created and user set appropriately if this does not exist.
