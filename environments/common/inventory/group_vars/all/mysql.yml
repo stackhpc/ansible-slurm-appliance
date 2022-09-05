@@ -2,6 +2,8 @@
 
 # See ansible/roles/mysql for variable definitions.
 
+mysql_host: "{{ hostvars[groups['mysql'] | first].api_address }}"
+
 # The user which runs the mysql container
 mysql_podman_user: podman
 
@@ -16,9 +18,15 @@ mysql_datadir: "{{ appliances_state_dir | default('/var/lib') }}/mysql"
 mysql_databases:
   - name: slurm_acct_db
     config_file: ''
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_host: "{{ mysql_host }}"
 
 mysql_users:
   - name: slurm
     host: "%"
     password: "{{ vault_mysql_slurm_password }}"
     priv: "slurm_acct_db.*:ALL"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_host: "{{ mysql_host }}"
