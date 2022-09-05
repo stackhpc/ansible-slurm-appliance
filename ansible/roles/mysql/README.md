@@ -17,7 +17,7 @@ Role Variables
 - `mysql_enabled`: Optional bool. Whether `mysql` service starts on boot. Default `yes`.
 - `mysql_state`: Optional str. As per `ansible.builtin.systemd:state`. Default is `started` or `restarted` as required.
 - `mysql_podman_user`: Optional str. User running `podman`. Default `{{ ansible_user }}`.
-- `mysql_datadir`: Optional str. Path to data directory to store databases etc. Default `/var/lib/mysql`. Note all path components will be created and user set appropriately if this does not exist.
+- `mysql_datadir`: Optional str. Path to data directory on the host to store databases etc. Default `/var/lib/mysql`. Note all path components will be created and user set appropriately if this does not exist.
 - `mysql_host`: Optional str. Address of host. Default `{{ inventory_hostname }}`.
 - `mysql_user_login_details`: Optional. As required for `community.mysql.mysql_db` to connect to mysql server as the root user. See `defaults/main.yml`.
 - `mysql_db_login_details`: Optional. As required for `community.mysql.mysql_user` to connect to mysql server as the root user. See `defaults/main.yml`.
