@@ -12,13 +12,23 @@
 - hosts: cluster
   become: no
   gather_facts: no
+  vars:
+    os_compute_api_version: 2.57 #  need at least this to support userdata in `openstack server rebuild`
   tasks:
-    - command: >-
+    # - command:
+    #     cmd: >-
+    - debug:
+        msg: >-
           openstack server rebuild {{ instance_id | default(inventory_hostname) }}
           {% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}
-          {% if 'compute' in group_names %}
+          {% if _userdata_hostgroups | length > 0 %}
           --os-compute-api-version {{ os_compute_api_version }}
-          --user-data {{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/userdata/compute.yml
+          --user-data {{ _userdata_group2files[_userdata_hostgroups | first] }}
           {% endif %}
       delegate_to: localhost
+      vars:
+        _userdata_files: "{{ lookup('fileglob', lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') + '/userdata/*.userdata.yml', wantlist=True) }}"
+        _userdata_groups: "{{ _userdata_files | map('basename') | map('split', '.' ) | map('first') }}" # e.g. extract 'compute' from 'compute.userdata.yml'
+        _userdata_group2files: "{{ dict(_userdata_groups | zip(_userdata_files)) }}" # groupname -> path
+        _userdata_hostgroups: "{{ group_names | intersect(_userdata_groups) | sort }}"
     - wait_for_connection:

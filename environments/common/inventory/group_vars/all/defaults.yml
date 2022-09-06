@@ -4,7 +4,6 @@ ansible_user: rocky
 appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
 appliances_manage_etc_hosts: false # template out /etc/hosts (e.g. if no internal DNS) - assumes inventory_hostname->hostname and ansible_host->address
-os_compute_api_version: 2.57 # need at least this to support userdata in ansible/adhoc/rebuild.yml
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.
@@ -18,14 +17,6 @@ elasticsearch_address: "{{ hostvars[groups['opendistro'].0].api_address }}"
 prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
 grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
-
-# Builder configuration
-builder_images: # List of images to build - see ansible/roles/builder/README.md
-  - control
-  - login
-  - compute
-builder_dir: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/packer"
-builder_playbook_file: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/ansible/site.yml"
 
 ############################# bootstrap: local user configuration #########################
 
