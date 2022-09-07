@@ -11,4 +11,4 @@ fs_setup:
 
 mounts:
   - [LABEL=state, ${state_dir}]
-  - [LABEL=home, /exports/home]
+  - [LABEL=home, /exports/home, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
