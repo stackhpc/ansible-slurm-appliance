@@ -53,6 +53,12 @@ resource "openstack_compute_instance_v2" "control" {
     environment_root = var.environment_root
   }
 
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
+
 }
 
 resource "openstack_compute_instance_v2" "login" {
@@ -72,6 +78,12 @@ resource "openstack_compute_instance_v2" "login" {
   metadata = {
     environment_root = var.environment_root
   }
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
 
 }
 
@@ -94,5 +106,11 @@ resource "openstack_compute_instance_v2" "compute" {
   }
 
   user_data = fileexists("${var.environment_root}/userdata/compute.userdata.yml") ? file("${var.environment_root}/userdata/compute.userdata.yml") : null
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
 
 }
