@@ -28,5 +28,3 @@ roles/*
 !roles/firewalld/**
 !roles/etc_hosts/
 !roles/etc_hosts/**
-!roles/builder/
-!roles/builder/**

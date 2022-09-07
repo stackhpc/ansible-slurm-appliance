@@ -1,0 +1,8 @@
+---
+# Values below are required in order for builds to work.
+openhpc_slurm_service_started: false # Control node is not available in build
+nfs_client_mnt_state: present        # Control node not available in build 
+basic_users_manage_homedir: false    # Will not have real $HOME mounted
+grafana_state: stopped               # Grafana tries to bind to real grafana or openondemend node's interface
+block_devices_configurations: []     # Volumes will not be attached to Packer build VMs
+openhpc_slurm_partitions: []         # No compute nodes will be in play, but partitions may be defined in inventory

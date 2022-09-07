@@ -1,11 +1,2 @@
----
-# This file contains defaults for the `builder` role itself.
-# NB: Default values here MAY be overriden by specific environments or builds, depending on the ordering & priority.
-
-# Example of a minimal configuration for Packer OpenStack builder - this must be overriden in your environment:
-builder_openstack_defaults:
-  source_image_name: Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2
-  flavor: vm.small
-  networks: ["6b0ade25-89d3-4fc5-94f7-b2ec87199c51"] # list of network IDs to use
-  ssh_username: rocky
-  ssh_timeout: 20m
+# Generally want Packer to update packages during build. Note that environments/common/inventory/group_vars/all/update.yml:update_exclude is used to avoid breakages.
+update_enable: true
