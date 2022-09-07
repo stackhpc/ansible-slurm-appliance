@@ -1,4 +1,1 @@
-etc_hosts_template: |
-  {% for hostname in groups['etc_hosts'] | sort -%}
-  {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
-  {% endfor -%}
+../../../../../ansible/roles/etc_hosts/defaults/main.yml
