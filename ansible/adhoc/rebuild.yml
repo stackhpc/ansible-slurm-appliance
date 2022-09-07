@@ -23,7 +23,7 @@
           {% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}
           {% if _userdata_hostgroups | length > 0 %}
           --os-compute-api-version {{ os_compute_api_version }}
-          --user-data {{ cloud_init_output_path }}/{{ _userdata_hostgroups | first }}.yml
+          --user-data {{ cloud_init_output_path }}/{{ _userdata_hostgroups | first }}.userdata.yml
           {% endif %}
       delegate_to: localhost
       vars:

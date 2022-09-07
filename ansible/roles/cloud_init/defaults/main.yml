@@ -1,4 +1,4 @@
 # REQUIRED:
 cloud_init_userdata_templates:
   compute: compute.userdata.yml.j2
-cloud_init_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/userdata"
+cloud_init_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/cloud_init"
