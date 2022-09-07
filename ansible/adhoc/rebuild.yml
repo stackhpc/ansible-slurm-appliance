@@ -15,10 +15,8 @@
   vars:
     os_compute_api_version: 2.57 #  need at least this to support userdata in `openstack server rebuild`
   tasks:
-    # - command:
-    #     cmd: >-
-    - debug:
-        msg: >-
+    - command:
+        cmd: >-
           openstack server rebuild {{ instance_id | default(inventory_hostname) }}
           {% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}
           {% if _userdata_hostgroups | length > 0 %}
