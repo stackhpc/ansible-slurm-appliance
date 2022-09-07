@@ -1,0 +1,5 @@
+- name: Template out cloud-init userdata
+  ansible.builtin.template:
+    src: "{{ item.value }}"
+    dest: "{{ cloud_init_output_path }}/{{ item.key }}.yml"
+  loop: "{{ cloud_init_userdata_templates | dict2items }}"

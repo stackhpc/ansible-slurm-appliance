@@ -1,0 +1,7 @@
+- hosts: localhost
+  gather_facts: no
+  become: no
+  tasks:
+    - name: Template out cloud-init userdata
+      import_role:
+        name: cloud_init
