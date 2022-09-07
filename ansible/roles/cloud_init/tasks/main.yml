@@ -1,4 +1,7 @@
 - name: Template out cloud-init userdata
+  # NB: This assumes:
+  #  1) hosts are defined in inventory, so that intersections of groups work
+  #  2) any templated vars are defined for `all` so that localhost has access to them
   ansible.builtin.template:
     src: "{{ item.value }}"
     dest: "{{ cloud_init_output_path }}/{{ item.key }}.userdata.yml"

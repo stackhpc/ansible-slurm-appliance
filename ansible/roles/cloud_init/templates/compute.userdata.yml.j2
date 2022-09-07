@@ -3,12 +3,13 @@ disable_ec2_metadata: true
 
 mounts:
 # nfs_configurations:
-{% for nfs_cfg in nfs_configurations %}
+{% if (groups['nfs'] | intersect(groups['compute'])) | length > 0 %}{% for nfs_cfg in nfs_configurations %}
   - ["{{ nfs_cfg.nfs_server }}:{{ nfs_cfg.nfs_export }}", "{{ nfs_cfg.nfs_client_mnt_point }}", "nfs", "defaults", "0", "0"]
-{% endfor %}
+{% endfor %}{% endif %}
+
 
 write_files:
-{% if groups['etc_hosts'] | length > 0 %}
+{% if (groups['etc_hosts'] | intersect(groups['compute'])) | length > 0 %}
   - path: /etc/hosts
     encoding: text/plain
     permissions: "0644"
@@ -36,7 +37,7 @@ write_files:
     owner: munge:munge
     content: {{ openhpc_munge_key | b64encode}}
 
-{% if groups['rebuild'] | length > 0 %}
+{% if (groups['rebuild'] | intersect(groups['compute'])) | length > 0 %}
   # openhpc_rebuild_clouds:
   - path: /etc/openstack/clouds.yaml
     encoding: text/plain
@@ -46,7 +47,7 @@ write_files:
         {{ lookup('file', openhpc_rebuild_clouds) | indent(width=8, first=false) }}
 {% endif %}
 
-{% if groups['basic_users'] | length > 0 %}
+{% if (groups['basic_users'] | intersect(groups['compute'])) | length > 0 %}
 # basic_users:
 # NB: https://cloudinit.readthedocs.io/en/latest/topics/modules.html#users-and-groups states using a str for uid is depreciated and to use an int.
 # however /usr/lib/python3.6/site-packages/cloudinit/distros/__init__.py shows it is ignored if NOT a str at v21.1-15.el8_6.3 at least
