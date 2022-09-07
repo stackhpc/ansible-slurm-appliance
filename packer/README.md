@@ -44,7 +44,7 @@ By default (i.e. with no additional environment hooks etc) these images are gene
 - Build images:
 
         cd packer
-        PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl .
+        PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
 To build only specific images use e.g. `-only compute.openstack.openhpc`.
 

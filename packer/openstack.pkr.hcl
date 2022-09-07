@@ -83,8 +83,9 @@ source "openstack" "openhpc" {
 
 build {
 
-  name = "compute"
-  sources = ["source.openstack.openhpc"]
+  source "source.openstack.openhpc" {
+    name = "compute"
+  }
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
@@ -103,8 +104,9 @@ build {
 
 build {
   
-  name = "login"
-  sources = ["source.openstack.openhpc"]
+  source "source.openstack.openhpc" {
+    name = "login"
+  }
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
@@ -123,9 +125,10 @@ build {
 
 build {
   
-  name = "control"
-  sources = ["source.openstack.openhpc"]
-
+  source "source.openstack.openhpc" {
+    name = "control"
+  }
+  
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
     groups = ["builder", "control"]
