@@ -27,6 +27,7 @@ openhpc
 # Hosts running containers for below services:
 opendistro
 filebeat
+mysql
 
 [prometheus]
 # Single node to host monitoring server.
