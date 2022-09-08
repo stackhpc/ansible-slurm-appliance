@@ -28,3 +28,5 @@ roles/*
 !roles/firewalld/**
 !roles/mysql/
 !roles/mysql/**
+!roles/systemd/
+!roles/systemd/**

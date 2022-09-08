@@ -54,3 +54,7 @@ compute
 [openondemand_jupyter:children]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
 compute
+
+[systemd:children]
+# Hosts to make systemd unit adjustments on
+podman

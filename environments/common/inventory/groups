@@ -89,3 +89,6 @@ fail2ban
 
 [openondemand_jupyter]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+
+[systemd]
+# Hosts to make systemd unit adjustments on
