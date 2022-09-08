@@ -2,34 +2,32 @@
 # NB: As `appliances_persistent_services` is defined in group_vars/all, all tasks here are conditional
 - name: Make directory for unit dropins
   file:
-    path: "/etc/systemd/system/{{ item.value }}.service.d/"
+    path: "/etc/systemd/system/{{ item.key }}.service.d/"
     state: directory
   loop: "{{ appliances_persistent_services | dict2items }}"
-  when: "'item.key' in group_names"
+  when: "'item.value' in group_names"
 
 - name: Add dropins for unit files
   ansible.builtin.copy:
     content: |
       [Unit]
       RequiresMountsFor={{ appliances_state_dir }}
-    dest: "/etc/systemd/system/{{ item.value }}.service.d/appliance_state.conf"
+    dest: "/etc/systemd/system/{{ item.key }}.service.d/appliance_state.conf"
   loop: "{{ appliances_persistent_service | dict2items }}"
-  register: persistent_services_dropins
-  when: "'item.key' in group_names"
+  register: _systemd_persistent_services_dropins
+  when: "'item.value' in group_names"
 
 - name: Reload unit definitions
   ansible.builtin.shell:
     cmd: systemctl daemon-reload
-  when:
-    - persistent_services_dropins.changed
-    - "'item.key' in group_names"
+  when: _systemd_persistent_services_dropins.changed
 
 - name: Reload units
   ansible.builtin.systemd:
-    name: "{{ item.value }}"
+    name: "{{ item.key }}"
     state: restarted
   loop: "{{ appliances_persistent_service | dict2items }}"
   when:
-    - persistent_services_dropins.changed
-    - "'item.key' in group_names"
+    - _systemd_persistent_services_dropins.changed
+    - "'item.value' in group_names"
     # - "'builder' not in group_names" # because mount of appliances_state_dir won't be done in builder
