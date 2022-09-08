@@ -1,0 +1,1 @@
+cloud_init_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/cloud_init"

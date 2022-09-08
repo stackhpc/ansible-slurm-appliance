@@ -9,10 +9,29 @@
 # Example:
 #   ansible-playbook -v --limit ohpc_compute ansible/adhoc/rebuild.yml -e rebuild_image=openhpc_v2.3
 
-- hosts: cluster
+- hosts: cloud_init
   become: no
   gather_facts: no
   tasks:
-    - command: "openstack server rebuild {{ instance_id | default(inventory_hostname) }}{% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}"
+    - name: Template out cloud-init userdata
+      import_role:
+        name: cloud_init
+        tasks_from: template.yml
+      delegate_to: localhost
+
+- hosts: cluster
+  become: no
+  gather_facts: no
+  vars:
+    os_compute_api_version: 2.57 #  need at least this to support userdata in `openstack server rebuild`
+  tasks:
+    - command:
+        cmd: >-
+          openstack server rebuild {{ instance_id | default(inventory_hostname) }}
+          {% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}
+          {% if 'cloud_init' in group_names %}
+          --os-compute-api-version {{ os_compute_api_version }}
+          --user-data "{{ cloud_init_output_path }}/{{ inventory_hostname }}.userdata.yml"
+          {% endif %}
       delegate_to: localhost
     - wait_for_connection:
