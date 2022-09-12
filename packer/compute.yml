@@ -1,6 +1,2 @@
 # Fake/discard variables to give a "generic" compute image build:
-openhpc_slurm_control_host: '<openhpc_slurm_control_host>'
-openhpc_munge_key: '<openhpc_munge_key>'
-openhpc_rebuild_clouds: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/environments/common/files/empty_clouds.yaml"
 nfs_configurations: [] # don't modify fstab
-basic_users_users: []  # don't want user definitions
