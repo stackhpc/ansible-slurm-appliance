@@ -19,7 +19,7 @@
         tasks_from: template.yml
       delegate_to: localhost
 
-- hosts: "{{ 'rebuild_hosts' | default('cluster') }}" # allows equivalent of `--limit` when run using import_playbook
+- hosts: "{{ rebuild_hosts | default('cluster') }}" # allows equivalent of `--limit` when run using import_playbook
   become: no
   gather_facts: no
   vars:
