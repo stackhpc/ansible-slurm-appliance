@@ -1,9 +1,9 @@
 resource "local_file" "hosts" {
   content  = templatefile("${path.module}/inventory.tpl",
                           {
-                            "cluster_name": var.cluster_name
+                            "cluster_name": var.cluster_name,
                             "control": openstack_compute_instance_v2.control,
-                            "state_dir": var.state_dir
+                            "state_dir": var.state_dir,
                             "logins": openstack_compute_instance_v2.login,
                             "computes": openstack_compute_instance_v2.compute,
                             "compute_types": var.compute_types,
