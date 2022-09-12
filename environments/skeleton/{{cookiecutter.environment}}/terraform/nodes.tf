@@ -1,3 +1,7 @@
+locals {
+  user_data_path = "${var.environment_root}/cloud_init/${var.cluster_name}-%s.userdata.yml"
+}
+
 resource "openstack_networking_port_v2" "login" {
 
   for_each = toset(keys(var.login_nodes))
@@ -75,6 +79,8 @@ resource "openstack_compute_instance_v2" "control" {
     environment_root = var.environment_root
   }
 
+  user_data = fileexists(format(local.user_data_path, "control")) ? file(format(local.user_data_path, "control")) : null
+
   lifecycle{
     ignore_changes = [
       image_name,
@@ -100,6 +106,8 @@ resource "openstack_compute_instance_v2" "login" {
   metadata = {
     environment_root = var.environment_root
   }
+
+  user_data = fileexists(format(local.user_data_path, each.key)) ? file(format(local.user_data_path, each.key)) : null
 
   lifecycle{
     ignore_changes = [
@@ -127,7 +135,7 @@ resource "openstack_compute_instance_v2" "compute" {
     environment_root = var.environment_root
   }
 
-  user_data = fileexists("${var.environment_root}/userdata/compute.userdata.yml") ? file("${var.environment_root}/userdata/compute.userdata.yml") : null
+  user_data = fileexists(format(local.user_data_path, each.key)) ? file(format(local.user_data_path, each.key)) : null
 
   lifecycle{
     ignore_changes = [

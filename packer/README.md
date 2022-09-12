@@ -6,17 +6,19 @@ Packer creates OpenStack VMs and configures them by running `ansible/site.yml`, 
 
 By default Packer builds images for `control`, `login` and `compute` nodes. TODO: indicate how to extend this.
 
+## Compute images
+By default (i.e. with no additional environment hooks etc.) these images are generic, i.e. they contain no configuration or secrets. These should be injected at boot time using cloud-init userdata - see TODO:. Building these images does not require any infrastructure to have been deployed. Nodes rebuilt with these images will join the cluster on boot.
+
+TODO: Note that if NOT launched with metadata, the slurm-controlled rebuild will NOT work (as there is no metadata to provide config/secrets).
+
 ## Control and Login images
-Currently these contain the configuration and secrets for the environment they are built in. Building these images therefore requires some Ansible host/group variables to be set in inventory, which with the default Terraform-generated inventory requires control and login nodes to deployed before building these images. Using the [appliance default](../environments/common/inventory/group_vars/all/defaults.yml) that hostnames are used for service addresses, these images may be moved between environments (e.g. dev/test/production) **if** hostnames are the same in all environments. **TODO** not sure this is true given IP addresses for openondemand??
+By default (i.e. with no additional environment hooks etc.) these images are not fully generic. Some configuration and secrets must be provided via cloud-init userdata as for compute nodes, but some is saved in the images. Building these images therefore requires some Ansible host/group variables to be set in inventory, which with the default Terraform-generated inventory requires control and login ports to deployed before building these images. Using the [appliance default](../environments/common/inventory/group_vars/all/defaults.yml) that hostnames are used for service addresses, these images may be moved between environments (e.g. dev/test/production) **if** hostnames are the same in all environments. **TODO** not sure this is true given IP addresses for openondemand??
 
-If login nodes are reimaged with the built image will rejoin the cluster on boot.
+Nodes rebuilt with a login node image (+ userdata) will rejoin the cluster on boot.
 
-If the control node is reimaged with the build image, **or** any nodes are added to or removed from the cluster, the following plays must be run after boot:
+If a nodes is rebuild with a control node image (+ userdata), **or** any nodes are added to or removed from the cluster, the following plays must be run after boot of that control node:
 - `ansible-playbook ansible/slurm.yml --tags openhpc` for Slurm partition configuration
 - `ansible-playbook ansible/monitoring.yml` for Prometheus scrape configuration
-
-## Compute images
-By default (i.e. with no additional environment hooks etc) these images are generic, i.e. they contain no configuration or secrets. No additional nodes need to be deployed to build these images. These should be injected at boot time using cloud-init userdata. TODO: document this! Nodes reimaged in this way will rejoin the cluster on boot.
 
 # Build Process
 
