@@ -35,3 +35,4 @@
           {% endif %}
       delegate_to: localhost
     - wait_for_connection:
+        delay: 15
