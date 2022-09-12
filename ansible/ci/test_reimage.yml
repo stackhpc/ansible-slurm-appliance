@@ -33,16 +33,22 @@
 - hosts: login
   become: no
   gather_facts: no
-  tags: reimage_login
-  tasks:
-    - name: Check slurm up after reimaging compute nodes
-      import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
-
-- hosts: login
-  become: no
-  gather_facts: no
   tags: reimage_compute
   tasks:
+    - name: Check compute node rebuild completed
+      shell:
+        cmd: openstack server show {{ item }} --format value -c image
+      register: openstack_compute
+      delegate_to: localhost
+      loop: "{{ groups['compute'] }}"
+      retries: 5
+      delay: 30
+      until: compute_build.artifact_id in openstack_compute.stdout
+      changed_when: false
+    
+    - name: Check slurm up after reimaging compute nodes
+      import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
+    
     # TODO: This is specific to smslabs/arcus environment config - could generalise to all compute nodes
     - name: Request compute node rebuild via Slurm
       shell:
