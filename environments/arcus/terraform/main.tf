@@ -8,6 +8,12 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
+variable "create_nodes" {
+    description = "Whether to create nodes (servers) or just ports and other infra"
+    type = bool # can't use bool as want to pass from command-line
+    default = true
+}
+
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
@@ -36,6 +42,7 @@ module "cluster" {
         compute-0: "small"
         compute-1: "small"
     }
+    create_nodes = var.create_nodes
     
     environment_root = var.environment_root
 }
