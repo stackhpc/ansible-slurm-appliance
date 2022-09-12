@@ -9,7 +9,19 @@
 # Example:
 #   ansible-playbook -v --limit ohpc_compute ansible/adhoc/rebuild.yml -e rebuild_image=openhpc_v2.3
 
-- hosts: cluster
+- hosts: cloud_init
+  become: no
+  gather_facts: no
+  vars:
+    os_compute_api_version: 2.57 #  need at least this to support userdata in `openstack server rebuild`
+  tasks:
+    - name: Template out cloud-init userdata
+      import_role:
+        name: cloud_init
+        tasks_from: template.yml
+      delegate_to: localhost
+
+- hosts: "{{ 'rebuild_hosts' | default('cluster') }}" # allows equivalent of `--limit` when run using import_playbook
   become: no
   gather_facts: no
   vars:
@@ -19,11 +31,12 @@
         cmd: >-
           openstack server rebuild {{ instance_id | default(inventory_hostname) }}
           {% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}
-          {% if _userdata_hostgroups | length > 0 %}
+          {% if 'cloud_init' in group_names %}
           --os-compute-api-version {{ os_compute_api_version }}
-          --user-data {{ cloud_init_output_path }}/{{ _userdata_hostgroups | first }}.userdata.yml
+          --user-data "{{ cloud_init_output_path }}/{{ inventory_hostname }}.userdata.yml"
           {% endif %}
       delegate_to: localhost
       vars:
         _userdata_hostgroups: "{{ group_names | intersect(cloud_init_userdata_templates.keys()) | sort }}"
     - wait_for_connection:
+        delay: 15

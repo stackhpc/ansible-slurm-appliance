@@ -1,4 +1,4 @@
 etc_hosts_template: |
-  {% for hostname in (groups['etc_hosts'] | difference(groups['cloud_init_templating']))  | sort -%}
+  {% for hostname in groups['etc_hosts'] | sort -%}
   {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
   {% endfor -%}

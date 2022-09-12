@@ -1,9 +1,4 @@
 - name: Template out cloud-init userdata
-  # NB: run on (faked) hosts, so that group_vars are actually available
-  ansible.builtin.template:
-    src: "{{ cloud_init_userdata_templates[cloud_init_group] }}"
-    dest: "{{ cloud_init_output_path }}/{{ cloud_init_group }}.userdata.yml"
-  # debug:
-  #   msg: "{{ cloud_init_group }}"
-  vars:
-    cloud_init_group: "{{ cloud_init_userdata_templates.keys() | intersect(group_names) | sort | first }}"
+  ansible.builtin.copy:
+    content: "{{ cloud_init_userdata_template }}"
+    dest: "{{ cloud_init_output_path }}/{{ inventory_hostname }}.userdata.yml"
