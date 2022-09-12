@@ -37,6 +37,15 @@
     - name: Reset ssh connection to allow user changes to affect ansible_user
       meta: reset_connection
 
+- hosts: systemd
+  become: yes
+  gather_facts: false
+  tags: systemd
+  tasks:
+    - name: Make systemd unit modifications
+      import_role:
+        name: systemd
+
 - hosts: selinux
   gather_facts: false
   become: yes

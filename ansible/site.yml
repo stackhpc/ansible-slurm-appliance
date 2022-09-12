@@ -22,7 +22,6 @@
 - import_playbook: portal.yml
 - import_playbook: monitoring.yml
 - import_playbook: iam.yml
-- import_playbook: systemd.yml
 
 - name: Run post.yml hook
   vars:

@@ -25,7 +25,9 @@
 - name: Reload unit definitions
   ansible.builtin.shell:
     cmd: systemctl daemon-reload
-  when: _systemd_dropins.changed
+  when:
+    - _systemd_dropins.changed
+    - systemd_restart | default(false) | bool
 
 - name: Reload units
   ansible.builtin.systemd:
@@ -35,3 +37,4 @@
   when:
     - _systemd_dropins.changed
     - "item.value.group in group_names"
+    - systemd_restart | default(false) | bool

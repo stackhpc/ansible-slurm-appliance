@@ -1,8 +1,0 @@
-- hosts: systemd
-  become: yes
-  gather_facts: false
-  tags: systemd
-  tasks:
-    - name: Make systemd unit adjustments
-      import_role:
-        name: systemd

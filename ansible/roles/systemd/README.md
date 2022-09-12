@@ -16,3 +16,4 @@ Create drop-in files for systemd services.
     - `group`: Required str. Inventory group this drop-in applies to.
     - `comment`: Optional str. Comment describing reason for drop-in.
     - `content`: Required str. Content of drop-in file.
+- `systemd_restart`: Optional bool. Whether to reload unit definitions and restart services. Default `false`.
