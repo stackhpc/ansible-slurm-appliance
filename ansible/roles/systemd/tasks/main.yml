@@ -1,33 +1,37 @@
-
-# NB: As `appliances_persistent_services` is defined in group_vars/all, all tasks here are conditional
+# NB: As `systemd_TODO:` is defined in group_vars/all, all tasks here are conditional on group.
 - name: Make directory for unit dropins
   file:
     path: "/etc/systemd/system/{{ item.key }}.service.d/"
     state: directory
-  loop: "{{ appliances_persistent_services | dict2items }}"
-  when: "'item.value' in group_names"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ systemd_dropins | dict2items }}"
+  when: "item.value.group in group_names"
 
 - name: Add dropins for unit files
   ansible.builtin.copy:
     content: |
-      [Unit]
-      RequiresMountsFor={{ appliances_state_dir }}
-    dest: "/etc/systemd/system/{{ item.key }}.service.d/appliance_state.conf"
-  loop: "{{ appliances_persistent_service | dict2items }}"
-  register: _systemd_persistent_services_dropins
-  when: "'item.value' in group_names"
+      # {{ item.value.comment | default('slurm appliance generated') }}
+      {{ item.value.content }}
+    dest: "/etc/systemd/system/{{ item.key }}.service.d/slurm_app.conf"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ systemd_dropins | dict2items }}"
+  register: _systemd_dropins
+  when: "item.value.group in group_names"
 
 - name: Reload unit definitions
   ansible.builtin.shell:
     cmd: systemctl daemon-reload
-  when: _systemd_persistent_services_dropins.changed
+  when: _systemd_dropins.changed
 
 - name: Reload units
   ansible.builtin.systemd:
     name: "{{ item.key }}"
     state: restarted
-  loop: "{{ appliances_persistent_service | dict2items }}"
+  loop: "{{ systemd_dropins | dict2items }}"
   when:
-    - _systemd_persistent_services_dropins.changed
-    - "'item.value' in group_names"
-    # - "'builder' not in group_names" # because mount of appliances_state_dir won't be done in builder
+    - _systemd_dropins.changed
+    - "item.value.group in group_names"

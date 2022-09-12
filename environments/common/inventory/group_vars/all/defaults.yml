@@ -4,13 +4,6 @@ ansible_user: rocky
 appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
 #appliances_state_dir: # define an absolute path here to use for persistent state
-appliances_persistent_services: # dict of service:role requiring appliances_state_dir
-  # mysql not included as it role handles state dir correctly
-  opendistro: opendistro
-  grafana-server: grafana
-  slurmdbd: openhpc
-  slurmctld: openhpc
-  prometheus: prometheus
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.
