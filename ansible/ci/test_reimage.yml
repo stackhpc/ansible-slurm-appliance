@@ -23,6 +23,21 @@
     - name: Check slurm up after reimaging login node
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
 
+- name: Reimage compute nodes via rebuild adhoc - this sets metadata
+  tags: reimage_compute
+  import_playbook: ../adhoc/rebuild.yml
+  vars:
+    rebuild_image: "{{ compute_build.artifact_id }}"
+    rebuild_hosts: "{{ groups['compute' ]}}"
+
+- hosts: login
+  become: no
+  gather_facts: no
+  tags: reimage_login
+  tasks:
+    - name: Check slurm up after reimaging compute nodes
+      import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
+
 - hosts: login
   become: no
   gather_facts: no
