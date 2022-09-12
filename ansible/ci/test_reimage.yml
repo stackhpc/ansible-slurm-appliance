@@ -13,7 +13,7 @@
   import_playbook: ../adhoc/rebuild.yml
   vars:
     rebuild_image: "{{ login_build.artifact_id }}"
-    rebuild_hosts: "{{ groups['login' ]}}"
+    rebuild_hosts: login
 
 - hosts: login
   become: no
@@ -28,7 +28,7 @@
   import_playbook: ../adhoc/rebuild.yml
   vars:
     rebuild_image: "{{ compute_build.artifact_id }}"
-    rebuild_hosts: "{{ groups['compute' ]}}"
+    rebuild_hosts: compute
 
 - hosts: login
   become: no
@@ -89,7 +89,7 @@
   import_playbook: ../adhoc/rebuild.yml
   vars:
     rebuild_image: "{{ control_build.artifact_id }}"
-    rebuild_hosts: "{{ groups['control' ]}}"
+    rebuild_hosts: control
 
 - name: Run slurm playbook again to add partition info
   import_playbook: ../slurm.yml
