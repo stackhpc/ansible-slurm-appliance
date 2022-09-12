@@ -14,7 +14,7 @@ None
 None.
 
 # Example Playbook
-See `ansible/adhoc/cloud_init.yml`. **NB:** Templating is done on a host created in the appropriate group, so group_names and hostvars will be set appropriately, even if inventory actually has no hosts in that group.
+See `ansible/adhoc/rebuild.yml`.
 
 # License
 Apache 2.0
