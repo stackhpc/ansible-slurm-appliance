@@ -1,20 +1,10 @@
-data "openstack_images_image_v2" "control" {
-  name = var.control_node.image
+locals {
+  user_data_path = "${var.environment_root}/cloud_init/${var.cluster_name}-%s.userdata.yml"
 }
 
-data "template_cloudinit_config" "config" {
-  gzip          = true
-  base64_encode = true
 
-  part {
-    filename     = "user-data"
-    content_type = "text/cloud-config"
-    content      = templatefile("${path.module}/control.userdata.tpl",
-                                {
-                                  state_dir = var.state_dir
-                                }
-                              )
-  }
+data "openstack_images_image_v2" "control" {
+  name = var.control_node.image
 }
 
 resource "openstack_networking_port_v2" "login" {
@@ -119,7 +109,13 @@ resource "openstack_compute_instance_v2" "control" {
     environment_root = var.environment_root
   }
 
-  user_data = data.template_cloudinit_config.config.rendered
+  user_data = fileexists(format(local.user_data_path, "control")) ? file(format(local.user_data_path, "control")) : null
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
 
 }
 
@@ -141,6 +137,14 @@ resource "openstack_compute_instance_v2" "login" {
     environment_root = var.environment_root
   }
 
+  user_data = fileexists(format(local.user_data_path, each.key)) ? file(format(local.user_data_path, each.key)) : null
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
+
 }
 
 resource "openstack_compute_instance_v2" "compute" {
@@ -160,5 +164,13 @@ resource "openstack_compute_instance_v2" "compute" {
   metadata = {
     environment_root = var.environment_root
   }
+
+  user_data = fileexists(format(local.user_data_path, each.key)) ? file(format(local.user_data_path, each.key)) : null
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
 
 }
