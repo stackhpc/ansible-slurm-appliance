@@ -2,7 +2,7 @@ cloud_init_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/clou
 cloud_init_userdata_etchosts:
   module: write_files
   group: etc_hosts
-  template: |
+  template: |-
     - path: /etc/hosts
       encoding: text/plain
       permissions: "0644"
@@ -11,9 +11,9 @@ cloud_init_userdata_etchosts:
           127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
           ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
-          # BEGIN ANSIBLE MANAGED BLOCK
-          {{ etc_hosts_template | indent(width=6, first=false) | trim }}
-          # END ANSIBLE MANAGED BLOCK
+          {% for hostname in groups['etc_hosts'] | sort -%}
+          {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
+          {% endfor -%}
 
 cloud_init_userdata_templates_default:
   - "{{ cloud_init_userdata_etchosts }}"

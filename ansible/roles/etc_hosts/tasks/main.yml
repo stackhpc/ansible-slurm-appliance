@@ -1,6 +1,0 @@
-- name: Create /etc/hosts entries
-  blockinfile:
-    path: /etc/hosts
-    create: no
-    state: present
-    block: "{{ etc_hosts_template }}"
