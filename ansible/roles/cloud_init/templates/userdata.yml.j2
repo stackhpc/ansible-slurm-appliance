@@ -3,10 +3,10 @@ disable_ec2_metadata: true
 
 {% for module, tmpls in cloud_init_userdata_templates | groupby(attribute='module') %}
 {% for tmpl in tmpls %}
+{% if not 'group' in tmpl or tmpl.group in group_names %}
 {% if loop.first %}
 {{ module }}:
 {% endif %}
-{% if not 'group' in tmpl or tmpl.group in group_names %}
 {{ tmpl.template }}
 {% endif %}
 {% endfor %}
