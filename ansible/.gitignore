@@ -30,3 +30,7 @@ roles/*
 !roles/etc_hosts/**
 !roles/cloud_init/
 !roles/cloud_init/**
+!roles/mysql/
+!roles/mysql/**
+!roles/systemd/
+!roles/systemd/**

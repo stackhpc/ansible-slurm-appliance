@@ -1,0 +1,40 @@
+# NB: As `systemd_TODO:` is defined in group_vars/all, all tasks here are conditional on group.
+- name: Make directory for unit dropins
+  file:
+    path: "/etc/systemd/system/{{ item.key }}.service.d/"
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ systemd_dropins | dict2items }}"
+  when: "item.value.group in group_names"
+
+- name: Add dropins for unit files
+  ansible.builtin.copy:
+    content: |
+      # {{ item.value.comment | default('slurm appliance generated') }}
+      {{ item.value.content }}
+    dest: "/etc/systemd/system/{{ item.key }}.service.d/slurm_app.conf"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ systemd_dropins | dict2items }}"
+  register: _systemd_dropins
+  when: "item.value.group in group_names"
+
+- name: Reload unit definitions
+  ansible.builtin.shell:
+    cmd: systemctl daemon-reload
+  when:
+    - _systemd_dropins.changed
+    - systemd_restart | default(false) | bool
+
+- name: Reload units
+  ansible.builtin.systemd:
+    name: "{{ item.key }}"
+    state: restarted
+  loop: "{{ systemd_dropins | dict2items }}"
+  when:
+    - _systemd_dropins.changed
+    - "item.value.group in group_names"
+    - systemd_restart | default(false) | bool

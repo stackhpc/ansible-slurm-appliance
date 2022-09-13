@@ -1,3 +1,22 @@
+data "openstack_images_image_v2" "control" {
+  name = var.control_node.image
+}
+
+data "template_cloudinit_config" "config" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    filename     = "user-data"
+    content_type = "text/cloud-config"
+    content      = templatefile("${path.module}/control.userdata.tpl",
+                                {
+                                  state_dir = var.state_dir
+                                }
+                              )
+  }
+}
+
 resource "openstack_networking_port_v2" "login" {
   for_each = toset(keys(var.login_nodes))
 
@@ -40,10 +59,34 @@ resource "openstack_networking_port_v2" "nonlogin" {
 resource "openstack_compute_instance_v2" "control" {
   
   name = "${var.cluster_name}-control"
-  image_name = var.control_node.image
+  image_name = data.openstack_images_image_v2.control.name
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
-  
+  # root device:
+  block_device {
+      uuid = data.openstack_images_image_v2.control.id
+      source_type  = "image"
+      destination_type = "local"
+      boot_index = 0
+      delete_on_termination = true
+  }
+
+  # state volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.state.id
+  }
+
+  # home volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.home.id
+  }
+
   network {
     port = openstack_networking_port_v2.nonlogin["control"].id
     access_network = true
@@ -52,6 +95,8 @@ resource "openstack_compute_instance_v2" "control" {
   metadata = {
     environment_root = var.environment_root
   }
+
+  user_data = data.template_cloudinit_config.config.rendered
 
 }
 
