@@ -27,6 +27,7 @@ openhpc
 # Hosts running containers for below services:
 opendistro
 filebeat
+mysql
 
 [prometheus]
 # Single node to host monitoring server.
@@ -88,3 +89,10 @@ fail2ban
 
 [openondemand_jupyter]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+
+[systemd:children]
+# Hosts to make systemd unit adjustments on
+opendistro
+grafana
+control
+prometheus

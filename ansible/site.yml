@@ -36,5 +36,6 @@
   become: yes
   tasks:
     - community.general.shutdown:
-
+  # TODO: should remove /etc/resolv.conf here too
+  
 ...

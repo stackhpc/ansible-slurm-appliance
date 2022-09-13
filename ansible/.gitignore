@@ -26,3 +26,7 @@ roles/*
 !roles/slurm_exporter/**
 !roles/firewalld/
 !roles/firewalld/**
+!roles/mysql/
+!roles/mysql/**
+!roles/systemd/
+!roles/systemd/**
