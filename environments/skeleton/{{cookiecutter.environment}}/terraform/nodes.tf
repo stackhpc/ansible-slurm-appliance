@@ -68,7 +68,7 @@ resource "openstack_networking_port_v2" "compute" {
 
 resource "openstack_compute_instance_v2" "control" {
   
-  for_each = var.create_nodes ? toset(["${var.cluster_name}-control"]) : toset([])
+  for_each = var.create_nodes ? toset(["control"]) : toset([])
   
   name = "${var.cluster_name}-${each.key}"
   image_name = data.openstack_images_image_v2.control.name
