@@ -1,19 +1,2 @@
-cloud_init_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/cloud_init"
-cloud_init_userdata_template: |
-  #cloud-config
-  disable_ec2_metadata: true
-
-  write_files:
-  {% if 'etc_hosts' in group_names %}
-    - path: /etc/hosts
-      encoding: text/plain
-      permissions: "0644"
-      owner: root:root
-      content: |
-          127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-          ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-
-          # BEGIN ANSIBLE MANAGED BLOCK
-          {{ etc_hosts_template | indent(width=8, first=false) | trim }}
-          # END ANSIBLE MANAGED BLOCK
-  {% endif %}
+#cloud_init_output_path: 
+cloud_init_userdata_templates: []

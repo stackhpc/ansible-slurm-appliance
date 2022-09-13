@@ -1,4 +1,5 @@
+
 - name: Template out cloud-init userdata
-  ansible.builtin.copy:
-    content: "{{ cloud_init_userdata_template }}"
+  ansible.builtin.template:
+    src: userdata.yml.j2
     dest: "{{ cloud_init_output_path }}/{{ inventory_hostname }}.userdata.yml"
