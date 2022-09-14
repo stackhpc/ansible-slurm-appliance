@@ -1,7 +1,7 @@
 block_devices
 =============
 
-Manage filesystems on block devices, including creating partitions, creating filesystems and mounting filesystems.
+Manage filesystems on block devices (such as OpenStack volumes), including creating partitions, creating filesystems and mounting filesystems.
 
 This is a convenience wrapper around the ansible modules:
 - community.general.parted
@@ -9,9 +9,11 @@ This is a convenience wrapper around the ansible modules:
 - ansible.buildin.file
 - ansible.posix.mount
 
-It includes logic to handle OpenStack-provided volumes appropriately both for appliance instances and the Packer build VM.
+To avoid issues with device names changing after e.g. reboots, devices are identified by serial number and mounted by filesystem UUID.
 
-To avoid issues with device names changing after e.g. reboots, devices are identified by serial number and mounted by filesystem UUID. 
+**NB:** This role is ignored[^1] during Packer builds as block devices will not be attached to the Packer build VMs. This role is therefore deprecated and it is suggested that `cloud-init` is used instead. See e.g. `environments/skeleton/{{cookiecutter.environment}}/terraform/control.userdata.tpl`.
+
+[^1]: See `environments/common/inventory/group_vars/builder/defaults.yml`
 
 Requirements
 ------------

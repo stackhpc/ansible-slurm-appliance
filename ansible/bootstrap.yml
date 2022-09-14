@@ -13,28 +13,38 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
-- hosts: etc_hosts:!builder
-  gather_facts: false
-  become: yes
-  tags:
-    etc_hosts
-  tasks:
-    - name: Manage /etc/hosts
-      import_role:
-        name: etc_hosts
-
 - hosts: cluster
   gather_facts: false
   tasks:
+    - name: Add groups
+      ansible.builtin.group: "{{ item.group }}"
+      loop: "{{ appliances_local_users }}"
+      when:
+        - item.enable | default(true) | bool
+        - "'group' in item"
+      become_method: "sudo"
+      # Need to change working directory otherwise we try to switch back to non-existent directory.
+      become_flags: '-i'
+      become: true
     - name: Add users
-      ansible.builtin.user: "{{ item }}"
-      with_items: "{{ appliances_local_users }}"
+      ansible.builtin.user: "{{ item.user }}"
+      loop: "{{ appliances_local_users }}"
+      when: item.enable | default(true) | bool
       become_method: "sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: '-i'
       become: true
     - name: Reset ssh connection to allow user changes to affect ansible_user
       meta: reset_connection
+
+- hosts: systemd
+  become: yes
+  gather_facts: false
+  tags: systemd
+  tasks:
+    - name: Make systemd unit modifications
+      import_role:
+        name: systemd
 
 - hosts: selinux
   gather_facts: false

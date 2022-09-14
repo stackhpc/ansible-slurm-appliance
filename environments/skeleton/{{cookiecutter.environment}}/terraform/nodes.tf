@@ -2,6 +2,11 @@ locals {
   user_data_path = "${var.environment_root}/cloud_init/${var.cluster_name}-%s.userdata.yml"
 }
 
+
+data "openstack_images_image_v2" "control" {
+  name = var.control_node.image
+}
+
 resource "openstack_networking_port_v2" "login" {
 
   for_each = toset(keys(var.login_nodes))
@@ -63,13 +68,38 @@ resource "openstack_networking_port_v2" "compute" {
 
 resource "openstack_compute_instance_v2" "control" {
   
-  for_each = var.create_nodes ? toset(["${var.cluster_name}-control"]) : toset([])
+  for_each = var.create_nodes ? toset(["control"]) : toset([])
   
   name = "${var.cluster_name}-${each.key}"
-  image_name = var.control_node.image
+  image_name = data.openstack_images_image_v2.control.name
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
   
+  # root device:
+  block_device {
+      uuid = data.openstack_images_image_v2.control.id
+      source_type  = "image"
+      destination_type = "local"
+      boot_index = 0
+      delete_on_termination = true
+  }
+
+  # state volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.state.id
+  }
+
+  # home volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.home.id
+  }
+
   network {
     port = openstack_networking_port_v2.control.id
     access_network = true

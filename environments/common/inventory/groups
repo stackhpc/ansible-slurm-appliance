@@ -27,6 +27,7 @@ openhpc
 # Hosts running containers for below services:
 opendistro
 filebeat
+mysql
 
 [prometheus]
 # Single node to host monitoring server.
@@ -95,3 +96,10 @@ fail2ban
 [cloud_init:children]
 # Hosts to template out cloud_init data for
 etc_hosts
+
+[systemd:children]
+# Hosts to make systemd unit adjustments on
+opendistro
+grafana
+control
+prometheus
