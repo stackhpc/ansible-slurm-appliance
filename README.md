@@ -14,7 +14,7 @@ This repository is expected to be forked for a specific site and can contain mul
 Currently, the Slurm Appliance requires an [OpenStack](https://www.openstack.org/) cloud for full functionality, although it can be deployed on other clouds or unmanaged servers.
 
 ## Quickstart
-This section demonstrates creating an Appliance with default configuration on VM instances with no floating IPs.
+This section demonstrates creating an Appliance with default configuration on VM instances with no floating IPs. See the full [Configuration](docs/configuration.md) guide for options.
 
 Prerequsites:
 - An OpenStack project with access to a RockyLinux 8.x GenericCloud image (or image based on that).
