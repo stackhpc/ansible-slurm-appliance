@@ -9,7 +9,7 @@ This repository contains [Ansible](https://www.ansible.com/) playbooks and confi
 - Integrated monitoring providing per-job and per-node dashboards, using a [Prometheus](https://prometheus.io/) + [ElasticSearch](https://www.elastic.co/) + [Grafana](https://grafana.com/grafana/) stack.
 - A [Packer](https://packer.io/) build pipeline for node images.
 
-This repository is expected to be forked for a specific site and can contain multiple [environments](#environments) (e.g. development, staging and production). It has been designed to be modular and extensible, so if you add features for your HPC site please feel free to submit PRs to us!
+This repository is expected to be forked for a specific site and can contain multiple environments (e.g. development, staging and production). It has been designed to be modular and extensible, so if you add features for your HPC site please feel free to submit PRs to us!
 
 Currently, the Slurm Appliance requires an [OpenStack](https://www.openstack.org/) cloud for full functionality, although it can be deployed on other clouds or unmanaged servers.
 

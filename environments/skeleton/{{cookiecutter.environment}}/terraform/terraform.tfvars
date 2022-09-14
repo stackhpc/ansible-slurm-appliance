@@ -1,10 +1,24 @@
-compute_names = ["compute-0", "compute-1"]
-cluster_name  = "example"
-key_pair      = "wendy"
-network       = "ilab"
-
-login_image  = "CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64"
-login_flavor = "general.v1.small"
-
-compute_image  = "CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64"
-compute_flavor = "general.v1.small"
+cluster_name = "slurmdemo"
+cluster_net = "your_network_name"
+cluster_subnet = "your_subnet_name"
+key_pair = "your_keypair_name"
+control_node = {
+    flavor: "your_flavor_name"
+    image: "your_image_name"
+}
+login_nodes = {
+    login-0: {
+        flavor: "your_flavor_name"
+        image: "your_image_name"
+    }
+}
+compute_types = {
+    small: {
+        flavor: "your_flavor_name"
+        image: "your_image_name"
+    }
+}
+compute_nodes = {
+    compute-0: "small"
+    compute-1: "small"
+}

@@ -84,6 +84,7 @@ variable "login_security_groups" {
     description = "Name of preexisting security groups to apply to login nodes"
     default = [
         "default",  # allow all in-cluster services
+        # To allow access from other networks uncomment the below and create appropriate security groups
         "SSH",      # access via ssh
         "HTTPS",    # access OpenOndemand
     ]
