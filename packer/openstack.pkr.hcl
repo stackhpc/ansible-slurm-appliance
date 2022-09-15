@@ -113,7 +113,7 @@ build {
     groups = ["builder", "login"]
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@builder.yml"]
+    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@builder.yml", "-e", "@login.yml"]
   }
 
   post-processor "manifest" {
