@@ -2,6 +2,7 @@ _systemd_requiresmount_statedir: |
   [Unit]
   RequiresMountsFor={{ appliances_state_dir }}
 
+# Modify systemd units to account for appliances_state_dir
 _systemd_dropins_statedir:
   # mysql not included as role handles state dir correctly
   opendistro:
@@ -19,5 +20,13 @@ _systemd_dropins_statedir:
   prometheus:
     group: prometheus
     content: "{{ _systemd_requiresmount_statedir }}"
+
+# Modify systemd units which will have config provided by cloud_init:
+_systemd_dropins_cloud_init_cfg:
+  munge:
+    group: openhpc
+    content: |
+      [Unit]
+      After=cloud-final.service
 
 systemd_dropins: "{{ _systemd_dropins_statedir if appliances_state_dir is defined else {} }}"
