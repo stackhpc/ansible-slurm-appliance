@@ -21,7 +21,7 @@ cloud_init_nfsclients:
   module: mounts
   group: nfs
   template: |-
-    # nfs mounts:
+    # nfs_configurations:
     {% for nfs_cfg in nfs_configurations | default([]) %}{% if nfs_cfg.nfs_enable.clients | default(nfs_enable.clients) | default(false) | bool %}
       - ["{{ nfs_cfg.nfs_server }}:{{ nfs_cfg.nfs_export }}", "{{ nfs_cfg.nfs_client_mnt_point }}", "nfs", "defaults", "0", "0"]
     {% endif %}{% endfor %}
@@ -30,7 +30,7 @@ cloud_init_slurm_control_addr:
   module: write_files
   group: openhpc # gets templated into control host too but doesn't matter
   template: |-
-    # slurm control host for slurmd
+    # openhpc - slurm control host for slurmd
       - path: /etc/sysconfig/slurmd
         encoding: text/plain
         permissions: "0644"
