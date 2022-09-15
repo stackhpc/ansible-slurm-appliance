@@ -75,6 +75,17 @@ cloud_init_basic_users:
         no_create_home: true
     {% endfor %}
 
+cloud_init_openondemand_servername:
+  module: write_files
+  group: openondemand
+  template: |-
+    # openondemand_servername:
+      - path: /etc/sysconfig/openondemand
+        encoding: text/plain
+        permissions: "0644"
+        owner: root:root
+        content: OPENONDEMAND_SERVERNAME={{ openondemand_servername }}
+
 cloud_init_userdata_templates_default: # provides indirection so environments could copy parts of default without having to rewrite the entire thing
   - "{{ cloud_init_userdata_etchosts }}"
   - "{{ cloud_init_nfsclients }}"
@@ -82,6 +93,7 @@ cloud_init_userdata_templates_default: # provides indirection so environments co
   - "{{ cloud_init_mungekey }}"
   - "{{ cloud_init_os_creds }}"
   - "{{ cloud_init_basic_users }}"
+  - "{{ cloud_init_openondemand_servername }}"
 
 cloud_init_userdata_templates_extra: []
 cloud_init_userdata_templates: "{{ cloud_init_userdata_templates_default + cloud_init_userdata_templates_extra }}"

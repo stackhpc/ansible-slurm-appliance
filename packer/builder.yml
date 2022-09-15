@@ -11,3 +11,4 @@ openhpc_slurm_control_host: '<openhpc_slurm_control_host>'
 openhpc_munge_key: '<openhpc_munge_key>'
 openhpc_rebuild_clouds: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/environments/common/files/empty_clouds.yaml"
 basic_users_users: []  # don't want user definitions
+openondemand_servername: "${OPENONDEMAND_SERVERNAME}" # Will be set from a systemd environment file
