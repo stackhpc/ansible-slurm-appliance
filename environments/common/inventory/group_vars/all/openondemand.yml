@@ -1,13 +1,25 @@
 ---
 
-# See: ansible/roles/openondemand/README.md 
-# for variable definitions.
+# See: ansible/roles/openondemand/README.md for all variable definitions.
 
 # NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
-# openondemand_servername: '' # Must be defined when using openondemand
+# --- Required ---
+# Values for variables in this section do not have defaults here and MUST be defined by the environment.
+# These are automatically defined if using the skelton Terraform.
+# openondemand_servername:
+# openondemand_auth:
+# openondemand_host_regex:
+# openondemand_jupyter_partition: # required if group openondemand_jupyter defined
+# openondemand_desktop_partition: # required if group openondemand_desktop defined
 
-openondemand_dashboard_links: # TODO: should really only be deployed if grafana is deployed and proxying configured
+# --- Optional customisation ---
+openondemand_dashboard_support_url: '' # URL to show in help menu
+openondemand_dashboard_docs_url: ''    # URL to show in docs menu
+
+# --- Variables below here should not generally need modifying ---
+
+openondemand_dashboard_links: # TODO: should really only be deployed if this openondemand is proxying grafana
   - name: Grafana
     app_name: grafana
     category: Monitoring
@@ -135,8 +147,6 @@ openondemand_apps_jupyter_default:
 openondemand_apps_jupyter: "{{ {'jupyter':openondemand_apps_jupyter_default} if openondemand_jupyter_partition | default(none) else {} }}"
 
 # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
-openondemand_dashboard_support_url: ''
-openondemand_dashboard_docs_url: ''
 openondemand_apps:
   files:
     env:

@@ -60,10 +60,9 @@ Note that most of these can be relaxed with additional configuration.
 
 1. Deploy instances:
 
-        cd environments/<environment>/terraform
         terraform apply
 
-1. Generate passwords:
+1. Generate system passwords:
 
         ansible-playbook ansible/adhoc/generate-passwords.yml
 
@@ -73,6 +72,10 @@ Note that most of these can be relaxed with additional configuration.
 
     See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
 
+1. Set a password for the demo user `testuser`:
+
+        export TEST_USER_PASSWORD='mysupersecretpassword'
+
 1. Deploy the appliance:
 
         ansible-playbook ansible/site.yml
@@ -81,4 +84,6 @@ Note that most of these can be relaxed with additional configuration.
 
         ansible-playbook ansible/site.yml --ask-vault-password
 
+
+TODO UPDATE THIS:
 You can now ssh into your cluster as user `rocky` - IP addresses will be listed in `environments/<environment>/inventory/hosts`. Note this cluster has an NFS-shared `/home` but the `rocky` user's home is `/var/lib/rocky`.

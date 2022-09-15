@@ -43,9 +43,8 @@ login
 [basic_users]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
 
-[openondemand:children]
-# Host to run Open Ondemand server on - subset of login
-login
+[openondemand]
+# Host to run Open Ondemand server on - generally a single login node
 
 [openondemand_desktop:children]
 # Subset of compute to run a interactive desktops on via Open Ondemand

@@ -14,11 +14,17 @@ grafana_data_dir: "{{ appliances_state_dir | default('/var/lib') }}/grafana"
 grafana_api_address: "{{ hostvars[groups['grafana'].0].internal_address }}"
 grafana_api_url: "http://{{ grafana_api_address }}:{{ grafana_port }}"
 
-# Configure external address, with external URL depending on whether we are using Open Ondemand as a proxy
-grafana_url_direct: "http://{{ grafana_address }}:{{ grafana_port }}"
-grafana_url_openondemand_proxy: "https://{{ openondemand_servername | default('') }}/node/{{ groups['grafana'].0 }}/{{ grafana_port }}"
-grafana_url: "{{ grafana_url_openondemand_proxy if groups['openondemand'] | count > 0 else grafana_url_direct }}"
-grafana_serve_from_sub_path: "{{ groups['openondemand'] | count > 0 }}"
+# Proxy grafana through Open Ondemand, if available
+grafana_via_openondemand: "{{ groups['openondemand'] | count > 0 }}"
+
+# Configure external address, using the **first** Open Ondemand node as a proxy
+grafana_url: >-
+  {% if grafana_via_openondemand %}
+  https://{{ hostvars[groups['openondemand'].0]['openondemand_servername'] }}
+  {% else %}
+  "http://{{ grafana_address }}:{{ grafana_port }}"
+  {% endif %}
+grafana_serve_from_sub_path: "{{ grafana_via_openondemand }}"
 
 grafana_dashboards_default:
   # node exporter slurm:

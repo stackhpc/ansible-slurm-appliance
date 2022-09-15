@@ -40,7 +40,7 @@ The OIDC provider should be configured to redirect to `https://{{ openondemand_s
 
 
 #### Basic/PAM authentication
-This option uses HTTP Basic Authentication (i.e. browser prompt) to get a username and password. This is then checked against an existing local user using PAM. Note that HTTPS is configured by default, so the password is protected in transit, although there are [other](https://security.stackexchange.com/a/990) security concerns with Basic Authentication.
+This option uses HTTP Basic Authentication (i.e. browser prompt) to get a username and password. This is then checked against an existing local user using PAM. Local users could be defined using e.g. the `basic_users` role. Note that HTTPS is configured by default, so the password is protected in transit, although there are [other](https://security.stackexchange.com/a/990) security concerns with Basic Authentication.
 
 No other authentication options are required for this method.
 
