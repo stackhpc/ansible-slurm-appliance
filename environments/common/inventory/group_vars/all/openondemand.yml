@@ -7,12 +7,13 @@
 
 # openondemand_servername: '' # Must be defined when using openondemand
 
-openondemand_dashboard_links: # TODO: should really only be deployed if grafana is deployed and proxying configured
+_openondemand_monitoring_link:
   - name: Grafana
     app_name: grafana
     category: Monitoring
     description: Dashboards
-    url: "{{ grafana_url_openondemand_proxy }}"
+    url: "{{ grafana_url }}"
+openondemand_dashboard_links: "{{ _openondemand_monitoring_link if grafana_via_openondemand else [] }}"
 
 openondemand_clusters:
   slurm:
