@@ -63,13 +63,13 @@ jobs:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
       
-      - name: Template out cloud-init userdata and other environment specific inventory
+      - name: Setup environment-specific inventory/terraform inputs
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook ansible/adhoc/generate-passwords.yml
+          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
           ansible-playbook ansible/adhoc/template-cloud-init.yml
-          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
         env:
           ANSIBLE_FORCE_COLOR: True
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
