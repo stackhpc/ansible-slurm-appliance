@@ -1,11 +1,15 @@
 ---
 
-# See: ansible/roles/openondemand/README.md 
-# for variable definitions.
-
+# See: ansible/roles/openondemand/README.md for variable definitions.
 # NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
-# openondemand_servername: '' # Must be defined when using openondemand
+# --- Variables in this section are REQUIRED for relevant groups, and should be set in an environment ---
+openondemand_servername: "{{ undef(hint='openondemand_servername is required') if groups['openondemand'] | length > 0 else '' }}"
+openondemand_auth: "{{ undef(hint='openondemand_auth is required') if groups['openondemand'] | length > 0 else '' }}"
+openondemand_host_regex: "{{ undef(hint='openondemand_host_regex is required') if groups['openondemand'] | length > 0 else '' }}"
+openondemand_jupyter_partition: "{{ undef(hint='openondemand_jupyter_partition is required') if groups['openondemand_jupyter'] | length > 0 else '' }}"
+openondemand_desktop_partition: "{{ undef(hint='openondemand_desktop_partition is required') if groups['openondemand_desktop'] | length > 0 else '' }}"
+# --- end of mandatory variables ---
 
 openondemand_dashboard_links: # TODO: should really only be deployed if grafana is deployed and proxying configured
   - name: Grafana
