@@ -24,8 +24,16 @@
         mode: 0400
         owner: root
         group: root
-      no_log: true
+      #no_log: true
+      no_log: false
       loop:
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/secrets.yml"
-        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/basic_users/defaults.yml"
+    - name: Write testuser password for debugging
+      ansible.builtin.copy:
+        dest: /etc/ci-config/testuser
+        content: "{{ test_user_password }}"
+        mode: 0400
+        owner: root
+        group: root
+      no_log: true
