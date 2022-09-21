@@ -164,7 +164,8 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
+          ansible-playbook ansible/adhoc/generate-passwords.yml
+          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
           cd packer/
           PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
         env:
