@@ -70,7 +70,10 @@ cloud_init_basic_users:
       - default
     {% for user in basic_users_users %}
       - name: {{ user.name }}
+    {% if 'password' in user %}
         passwd: {{ user.password }}
+        lock_passwd: false
+    {% endif %}
         uid: '{{ user.uid }}'
         no_create_home: true
     {% endfor %}
