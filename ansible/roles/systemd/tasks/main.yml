@@ -14,7 +14,7 @@
     content: |
       # {{ item.comment | default('slurm appliance generated') }}
       {{ item.content }}
-    dest: "/etc/systemd/system/{{ item.key }}.service.d/slurm_app.conf"
+    dest: "/etc/systemd/system/{{ item.unit }}.service.d/slurm_app.conf"
     owner: root
     group: root
     mode: 0644
