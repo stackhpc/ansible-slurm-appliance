@@ -48,7 +48,7 @@ If a nodes is rebuild with a control node image (+ userdata), **or** any nodes a
         cd packer
         PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
-To build only specific images use e.g. `-only compute.openstack.openhpc`.
+To build only specific images use e.g. `-only openstack.compute`.
 
 # Notes for developers
 
