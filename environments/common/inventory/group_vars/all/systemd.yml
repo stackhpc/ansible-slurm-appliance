@@ -1,6 +1,7 @@
 _systemd_requiresmount_statedir: |
   [Unit]
-  RequiresMountsFor={{ appliances_state_dir }}
+  RequiresMountsFor={{ appliances_state_dir | default('') }}
+# default enables templating if appliances_state_dir not defined on host - will be ignored later
 
 # Modify systemd units to account for appliances_state_dir
 _systemd_dropins_statedir:

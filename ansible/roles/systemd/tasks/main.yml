@@ -1,4 +1,4 @@
-# NB: As `systemd_TODO:` is defined in group_vars/all, all tasks here are conditional on group.
+# NB: As `systemd_dropins` is defined in group_vars/all, all tasks here are conditional on group.
 - name: Make directory for unit dropins
   file:
     path: "/etc/systemd/system/{{ item.unit }}.service.d/"
