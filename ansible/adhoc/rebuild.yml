@@ -9,7 +9,7 @@
 # Example:
 #   ansible-playbook -v --limit ohpc_compute ansible/adhoc/rebuild.yml -e rebuild_image=openhpc_v2.3
 
-# - import_playbook: template-cloud-init.yml
+- import_playbook: template-cloud-init.yml
 
 - hosts: "{{ rebuild_hosts | default('cluster') }}" # allows equivalent of `--limit` when run using import_playbook
   become: no
