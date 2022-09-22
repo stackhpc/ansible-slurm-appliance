@@ -101,5 +101,5 @@ etc_hosts
 # Hosts to make systemd unit adjustments on
 opendistro
 grafana
-control
+openhpc     # for munge
 prometheus
