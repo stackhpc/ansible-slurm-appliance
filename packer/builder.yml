@@ -6,6 +6,7 @@ grafana_state: stopped               # Grafana tries to bind to real grafana or 
 block_devices_configurations: []     # Volumes will not be attached to Packer build VMs
 openhpc_slurm_partitions: []         # No compute nodes will be in play, but partitions may be defined in inventory
 mysql_state: stopped                 # As mysql role tries to connect to real mysql node
+apache_service_state: stopped        # For open ondemand
 
 # Values below are filled in by cloud_init:
 openhpc_slurm_control_host: '<openhpc_slurm_control_host>'
