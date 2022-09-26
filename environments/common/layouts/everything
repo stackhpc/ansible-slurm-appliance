@@ -1,9 +1,6 @@
 [nfs:children]
 openhpc
 
-[hpctests:children]
-login
-
 [mysql:children]
 control
 
