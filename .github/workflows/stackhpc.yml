@@ -16,6 +16,10 @@ jobs:
       fail-fast: false # as want clouds to continue independently
     concurrency: ${{ matrix.cloud }}
     runs-on: ubuntu-20.04
+    env:
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+      TF_VAR_cluster_name: ci${{ github.run_id }}
     steps:
       - uses: actions/checkout@v2
 
@@ -26,7 +30,6 @@ jobs:
           echo "${${{ matrix.cloud }}_SSH_KEY}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         env:
-          smslabs_SSH_KEY: ${{ secrets.SSH_KEY }}
           arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
 
       - name: Add bastion's ssh key to known_hosts
@@ -49,7 +52,6 @@ jobs:
           echo "${${{ matrix.cloud }}_CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
         shell: bash
         env:
-          smslabs_CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
           arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
       
       - name: Provision infrastructure
@@ -59,10 +61,7 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform apply -auto-approve
-        env:
-          OS_CLOUD: openstack
-          TF_VAR_cluster_name: ci${{ github.run_id }}
-      
+        
       - name: Get server provisioning failure messages
         id: provision_failure
         run: |
@@ -72,9 +71,6 @@ jobs:
           TF_FAIL_MSGS="$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
           echo $TF_FAIL_MSGS
           echo "::set-output name=messages::${TF_FAIL_MSGS}"
-        env:
-          OS_CLOUD: openstack
-          TF_VAR_cluster_name: ci${{ github.run_id }}
         if: always() && steps.provision.outcome == 'failure'
         
       - name: Delete infrastructure if failed due to lack of hosts
@@ -83,9 +79,6 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
-        env:
-          OS_CLOUD: openstack
-          TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
 
       - name: Directly configure cluster
@@ -96,19 +89,12 @@ jobs:
           ansible-playbook ansible/adhoc/generate-passwords.yml
           echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           ansible-playbook -vv ansible/site.yml
-        env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Run MPI-based tests
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
-        env:
-          ANSIBLE_FORCE_COLOR: True
-          OS_CLOUD: openstack
 
       - name: Confirm Open Ondemand is up (via SOCKS proxy)
         run: |
@@ -149,8 +135,6 @@ jobs:
           cd packer/
           PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
         env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Test reimage of nodes
@@ -159,27 +143,18 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           ansible all -m wait_for_connection
           ansible-playbook -vv ansible/ci/test_reimage.yml
-        env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
       
       - name: Check sacct state survived reimage
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
-        env:
-          ANSIBLE_FORCE_COLOR: True
-          OS_CLOUD: openstack
 
       - name: Check MPI-based tests are shown in Grafana
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/ci/check_grafana.yml
-        env:
-          ANSIBLE_FORCE_COLOR: True
-          OS_CLOUD: openstack
 
       - name: Delete infrastructure
         run: |
@@ -187,9 +162,6 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
-        env:
-          OS_CLOUD: openstack
-          TF_VAR_cluster_name: ci${{ github.run_id }}
         if: ${{ success() || cancelled() }}
 
       - name: Delete images
@@ -197,6 +169,3 @@ jobs:
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook -vv ansible/ci/delete_images.yml
-        env:
-          OS_CLOUD: openstack
-          ANSIBLE_FORCE_COLOR: True
