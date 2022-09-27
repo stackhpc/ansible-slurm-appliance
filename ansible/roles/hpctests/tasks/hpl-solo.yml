@@ -116,10 +116,11 @@
   tags: postpro
   debug:
     msg: |
-      Summary for hpl-solo ({{ hpctests_computes.stdout_lines | length }} nodes) job {{ hpctests_hplsolo_sbatch.stdout.split()[-1] }} using {{ hpctests_ucx_net_devices }}:
+      Summary for hpl-solo on {{ hpctests_computes.stdout_lines | length }} nodes in '{{ hpctests_partition }}' partition, job ID {{ hpctests_hplsolo_sbatch.stdout.split()[-1] }}, device '{{ hpctests_ucx_net_devices }}':
+
         Max:  {{ perf.stdout_lines | map('float') | max }} gflops
         Min:  {{ perf.stdout_lines | map('float') | min }} gflops
-        Mean: {{ (perf.stdout_lines | map('float') | sum) /  (hpctests_computes.stdout_lines | length) }} gflops
+        Mean: {{ (perf.stdout_lines | map('float') | sum) / (hpctests_computes.stdout_lines | length) }} gflops
 
       Individual node results (gflops):
       {{ dict(hpctests_computes.stdout_lines | zip(perf.stdout_lines | map('float') )) | to_nice_yaml }}
