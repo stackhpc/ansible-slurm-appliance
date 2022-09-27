@@ -74,6 +74,20 @@
     - import_role:
         name: fail2ban
 
+- name: Setup podman
+  hosts: podman
+  tags: podman
+  tasks:
+    - import_role:
+        name: podman
+        tasks_from: prereqs.yml
+      tags: prereqs
+
+    - import_role:
+        name: podman
+        tasks_from: config.yml
+      tags: config
+
 - hosts: update
   gather_facts: false
   become: yes
