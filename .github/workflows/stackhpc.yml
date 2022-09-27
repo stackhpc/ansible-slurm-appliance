@@ -88,7 +88,8 @@ jobs:
           ansible all -m wait_for_connection
           ansible-playbook ansible/adhoc/generate-passwords.yml
           echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
-          ansible-playbook -vv ansible/site.yml
+          ansible-playbook -v ansible/site.yml
+          ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Run MPI-based tests
         run: |
@@ -128,21 +129,42 @@ jobs:
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Build packer images
+        id: packer_build
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           cd packer/
           PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+          ../dev/output_manifest.py packer-manifest.json # Sets NEW_{COMPUTE,CONTROL,LOGIN}_IMAGE_ID outputs
         env:
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      - name: Test reimage of nodes
+      - name: Test reimage of login nodes (via rebuild adhoc)
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          ansible all -m wait_for_connection
-          ansible-playbook -vv ansible/ci/test_reimage.yml
+          ansible-playbook -v --limit login ansible/adhoc/rebuild.yml -e rebuild_image=${{ steps.packer_build.outputs.NEW_LOGIN_IMAGE_ID }}
+          ansible login -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
+          ansible-playbook -v ansible/ci/check_slurm.yml
+
+      - name: Test reimage of compute nodes (via slurm)
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' ${TF_VAR_cluster_name}-compute-[0-1]"
+          ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
+          ansible-playbook -v ansible/ci/check_slurm.yml
+      
+      - name: Test reimage of control node (via rebuild adhoc)
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook -v --limit control ansible/adhoc/rebuild.yml -e rebuild_image=${{ steps.packer_build.outputs.NEW_CONTROL_IMAGE_ID }}
+          ansible control -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
+          ansible-playbook ansible/slurm.yml --tags openhpc # configures partitions
+          ansible-playbook ansible/monitoring.yml --tags prometheus # configures scrapes
+          ansible-playbook -v ansible/ci/check_slurm.yml
       
       - name: Check sacct state survived reimage
         run: |
