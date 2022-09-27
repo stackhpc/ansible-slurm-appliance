@@ -1,23 +1,14 @@
+locals {
+  user_data_path = "${var.environment_root}/cloud_init/${var.cluster_name}-%s.userdata.yml"
+}
+
+
 data "openstack_images_image_v2" "control" {
   name = var.control_node.image
 }
 
-data "template_cloudinit_config" "config" {
-  gzip          = true
-  base64_encode = true
-
-  part {
-    filename     = "user-data"
-    content_type = "text/cloud-config"
-    content      = templatefile("${path.module}/control.userdata.tpl",
-                                {
-                                  state_dir = var.state_dir
-                                }
-                              )
-  }
-}
-
 resource "openstack_networking_port_v2" "login" {
+
   for_each = toset(keys(var.login_nodes))
 
   name = "${var.cluster_name}-${each.key}"
@@ -36,8 +27,27 @@ resource "openstack_networking_port_v2" "login" {
   }
 }
 
-resource "openstack_networking_port_v2" "nonlogin" {
-  for_each = toset(concat(["control"], keys(var.compute_nodes)))
+resource "openstack_networking_port_v2" "control" {
+
+  name = "${var.cluster_name}-control"
+  network_id = data.openstack_networking_network_v2.cluster_net.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
+  }
+
+  security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
+
+  binding {
+    vnic_type = var.vnic_type
+    profile = var.vnic_profile
+  }
+}
+
+resource "openstack_networking_port_v2" "compute" {
+
+  for_each = toset(keys(var.compute_nodes))
 
   name = "${var.cluster_name}-${each.key}"
   network_id = data.openstack_networking_network_v2.cluster_net.id
@@ -58,10 +68,13 @@ resource "openstack_networking_port_v2" "nonlogin" {
 
 resource "openstack_compute_instance_v2" "control" {
   
-  name = "${var.cluster_name}-control"
+  for_each = var.create_nodes ? toset(["control"]) : toset([])
+  
+  name = "${var.cluster_name}-${each.key}"
   image_name = data.openstack_images_image_v2.control.name
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
+  
   # root device:
   block_device {
       uuid = data.openstack_images_image_v2.control.id
@@ -88,7 +101,7 @@ resource "openstack_compute_instance_v2" "control" {
   }
 
   network {
-    port = openstack_networking_port_v2.nonlogin["control"].id
+    port = openstack_networking_port_v2.control.id
     access_network = true
   }
 
@@ -96,13 +109,19 @@ resource "openstack_compute_instance_v2" "control" {
     environment_root = var.environment_root
   }
 
-  user_data = data.template_cloudinit_config.config.rendered
+  user_data = fileexists(format(local.user_data_path, "control")) ? file(format(local.user_data_path, "control")) : null
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
 
 }
 
 resource "openstack_compute_instance_v2" "login" {
 
-  for_each = var.login_nodes
+  for_each = var.create_nodes ? var.login_nodes : {}
   
   name = "${var.cluster_name}-${each.key}"
   image_name = each.value.image
@@ -118,11 +137,19 @@ resource "openstack_compute_instance_v2" "login" {
     environment_root = var.environment_root
   }
 
+  user_data = fileexists(format(local.user_data_path, each.key)) ? file(format(local.user_data_path, each.key)) : null
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
+
 }
 
 resource "openstack_compute_instance_v2" "compute" {
 
-  for_each = var.compute_nodes
+  for_each = var.create_nodes ? var.compute_nodes : {}
   
   name = "${var.cluster_name}-${each.key}"
   image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
@@ -130,12 +157,20 @@ resource "openstack_compute_instance_v2" "compute" {
   key_pair = var.key_pair
   
   network {
-    port = openstack_networking_port_v2.nonlogin[each.key].id
+    port = openstack_networking_port_v2.compute[each.key].id
     access_network = true
   }
 
   metadata = {
     environment_root = var.environment_root
   }
+
+  user_data = fileexists(format(local.user_data_path, each.key)) ? file(format(local.user_data_path, each.key)) : null
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      ]
+    }
 
 }

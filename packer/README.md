@@ -1,10 +1,24 @@
 # Packer-based image build
 
-This workflow uses Packer with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images. These images can be used during cluster creation or to update an existing cluster. Building images reduces the number of package downloads when deploying a large cluster, and ensures that nodes can be recreated even if packages are changed in repositories (e.g. due to Rocky Linux or OpenHPC updates).
+This workflow uses Packer with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images. These images can be used to create or update a cluster. Using images speeds up cluster deploument and ensures that nodes are reproducable even if repository changes occur.
 
-Packer creates OpenStack VMs and configures them by running `ansible/site.yml` in the same way as for direct configuration of instances using Ansible. However (by default) in Packer builds a `yum update *` step is run. This is not the default for direct configuration, to avoid modifying existing nodes. Packer will upload the resulting images to OpenStack with a name which includes a timestamp.
+Packer creates OpenStack VMs and configures them by running `ansible/site.yml`, in the same way as for "direct configuration" of a cluster. However (by default) Packer builds set `update_enable: true` to run a `dnf update`. This is not the default for direct configuration to avoid modification of existing nodes. The Packer-build images will be uploaded to OpenStack with a name format of  `slurm-<nodetype>-<timestamp>`.
 
-Building images is likely to require Ansible host/group variables to be set in inventory to provide required configuration information. This may (depending on the inventory generation approach) require nodes to deployed before building images. See developer notes below for more information.
+By default Packer builds images for `control`, `login` and `compute` nodes. TODO: indicate how to extend this.
+
+## Compute images
+By default (i.e. with no additional environment hooks etc.) these images are generic, i.e. they contain no configuration or secrets. These should be injected at boot time using cloud-init userdata - see TODO:. Building these images does not require any infrastructure to have been deployed. Nodes rebuilt with these images will join the cluster on boot.
+
+TODO: Note that if NOT launched with metadata, the slurm-controlled rebuild will NOT work (as there is no metadata to provide config/secrets).
+
+## Control and Login images
+By default (i.e. with no additional environment hooks etc.) these images are not fully generic. Some configuration and secrets must be provided via cloud-init userdata as for compute nodes, but some is saved in the images. Building these images therefore requires some Ansible host/group variables to be set in inventory, which with the default Terraform-generated inventory requires control and login ports to deployed before building these images. Using the [appliance default](../environments/common/inventory/group_vars/all/defaults.yml) that hostnames are used for service addresses, these images may be moved between environments (e.g. dev/test/production) **if** hostnames are the same in all environments. **TODO** not sure this is true given IP addresses for openondemand??
+
+Nodes rebuilt with a login node image (+ userdata) will rejoin the cluster on boot.
+
+If a nodes is rebuild with a control node image (+ userdata), **or** any nodes are added to or removed from the cluster, the following plays must be run after boot of that control node:
+- `ansible-playbook ansible/slurm.yml --tags openhpc` for Slurm partition configuration
+- `ansible-playbook ansible/monitoring.yml` for Prometheus scrape configuration
 
 # Build Process
 
@@ -29,32 +43,22 @@ Building images is likely to require Ansible host/group variables to be set in i
 
 - Ensure you have the private part of the keypair `ssh_keypair_name` at `~/.ssh/id_rsa.pub` (or set variable `ssh_private_key_file` in `builder.pkrvars.hcl`).
 
-- Build images using the variable definition file:
+- Build images:
 
         cd packer
         PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
-  Note the builder VMs are added to the `builder` group to differentiate them from "real" nodes - see developer notes below.
-
-This will build images for the `compute`, `login` and `control` ansible groups. To add additional builds add a new `source` in `openstack.pkr.hcl`.
-
-To build only specific images use e.g. `-only openstack.login`.
-
-Instances using built compute and login images should immediately join the cluster, as long as they are in the Slurm configuration. If reimaging existing nodes, consider doing this via Slurm - see [stackhpc.slurm_openstack_tools.rebuild/README.md](../ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md).
-
-Instances using built control images will require re-running the `ansible/site.yml` playbook on the entire cluster, as the following aspects cannot be configured inside the image:
-- Slurm configuration (the "slurm.conf" file)
-- Grafana dashboard import (assuming default use of control node for Grafana)
-- Prometheus scrape configuration (ditto)
+To build only specific images use e.g. `-only openstack.compute`.
 
 # Notes for developers
 
-The Packer build VMs are added to both the `builder` group and the appropriate `login`, `compute` or `control` group. The former group allows `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the Packer builds, e.g. for services which should not be started.
+The Packer build VMs are added to both the `builder` group and the appropriate `login`, `compute` or `control` group. The former group allows `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the Packer builds, e.g. for services which should not be started. However this **may** be overriden by specific environment group_vars definitions, depending on ordering. Therefore ansible extravars files are also provided in `packer/*.yml`.
 
-Note that hostnames in the Packer VMs are not the same as the equivalent "real" hosts. Therefore variables required inside a Packer VM must be defined as group vars, not hostvars.
+Note that hostnames in the Packer VMs are not the same as the equivalent "real" hosts (this is deliberate to make it clearer when the Ansible running in the Packer build host is incorrectly trying to contact a "real" host). Therefore variables required inside a Packer VM must be defined as group vars, not hostvars.
 
 Ansible may need to proxy to compute nodes. If the Packer build should not use the same proxy to connect to the builder VMs, note that proxy configuration should not be added to the `all` group.
 
+**TODO:** tidy/move this:
 When using appliance defaults and an environment with an `inventory/groups` file matching `environments/common/layouts/everything` (as used by cookiecutter for new environment creation), the following inventory variables must be defined when running Packer builds:
 - `openhpc_cluster_name`
 - `openondemand_servername`

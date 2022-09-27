@@ -1,0 +1,2 @@
+# Fake/discard variables to give a "generic" login image build:
+nfs_configurations: [] # don't modify fstab

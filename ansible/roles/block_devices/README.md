@@ -11,9 +11,9 @@ This is a convenience wrapper around the ansible modules:
 
 To avoid issues with device names changing after e.g. reboots, devices are identified by serial number and mounted by filesystem UUID.
 
-**NB:** This role is ignored[^1] during Packer builds as block devices will not be attached to the Packer build VMs. This role is therefore deprecated and it is suggested that `cloud-init` is used instead. See e.g. `environments/skeleton/{{cookiecutter.environment}}/terraform/control.userdata.tpl`.
+**NB:** This role is ignored[^1] during Packer builds as block devices will not be attached to the Packer build VMs. This role is therefore deprecated and it is suggested that `cloud-init` is used instead. See e.g. `environments/skeleton/{{cookiecutter.environment}}/inventory/group_vars/all/cloud_init.yml`.
 
-[^1]: See `environments/common/inventory/group_vars/builder/defaults.yml`
+[^1]: See `packer/builder.yml`
 
 Requirements
 ------------

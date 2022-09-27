@@ -81,26 +81,60 @@ source "openstack" "openhpc" {
   image_visibility = "${var.image_visibility}"
 }
 
-# NB: build names, split on "-", are used to determine groups to add build to, so could build for a compute gpu group using e.g. `compute-gpu`.
 build {
+
   source "source.openstack.openhpc" {
     name = "compute"
   }
 
+  provisioner "ansible" {
+    playbook_file = "${var.repo_root}/ansible/site.yml"
+    groups = ["builder", "compute"]
+    keep_inventory_file = true # for debugging
+    use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
+    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@builder.yml", "-e", "@compute.yml"]
+  }
+
+  post-processor "manifest" {
+    custom_data  = {
+      source = "${source.name}"
+    }
+  }
+}
+
+build {
+  
   source "source.openstack.openhpc" {
     name = "login"
   }
 
+  provisioner "ansible" {
+    playbook_file = "${var.repo_root}/ansible/site.yml"
+    groups = ["builder", "login"]
+    keep_inventory_file = true # for debugging
+    use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
+    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@builder.yml", "-e", "@login.yml"]
+  }
+
+  post-processor "manifest" {
+    custom_data  = {
+      source = "${source.name}"
+    }
+  }
+}
+
+build {
+  
   source "source.openstack.openhpc" {
     name = "control"
   }
-
+  
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
-    groups = concat(["builder"], split("-", "${source.name}"))
+    groups = ["builder", "control"]
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@extra_vars.yml"]
+    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@builder.yml"]
   }
 
   post-processor "manifest" {

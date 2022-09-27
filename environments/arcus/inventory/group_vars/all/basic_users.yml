@@ -1,3 +1,4 @@
+# has to be defined on 'all' group so localhost can template out for cloud-init
 test_user_password: "{{ lookup('env', 'TEST_USER_PASSWORD') | default(vault_testuser_password, true) }}" # CI uses env, debug can set vault_testuser_password
 
 basic_users_users:

@@ -1,17 +1,3 @@
-- hosts: all # NB: As this doesn't exclude `builder` /etc/hosts is baked into images, which should let `openstack server rebuild` work
-  become: true
-  tags: etc_hosts
-  tasks:
-    - name: Create /etc/hosts for all nodes as DNS doesn't work
-      blockinfile:
-        path: /etc/hosts
-        create: yes
-        state: present
-        block: |
-          {% for hostname in groups['all'] %}
-          {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
-          {% endfor %}
-
 - hosts: control
   become: yes
   gather_facts: false
@@ -28,4 +14,4 @@
       loop:
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/secrets.yml"
-        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/basic_users/defaults.yml"
+        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/test_user.yml"
