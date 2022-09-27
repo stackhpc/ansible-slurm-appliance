@@ -10,6 +10,7 @@ After=network-online.target
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=always
 ExecStartPre=+install -d -o {{ opendistro_podman_user }} -g {{ opendistro_podman_user }} -Z container_file_t {{ opendistro_data_path }}
+ExecStartPre=+chown -R {{ opendistro_podman_user }}:{{ opendistro_podman_user }} {{ opendistro_data_path }}
 ExecStart=/usr/bin/podman run \
     --network slirp4netns:cidr={{ podman_cidr }} \
     --sdnotify=conmon --cgroups=no-conmon \

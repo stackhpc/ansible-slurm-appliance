@@ -1,20 +1,6 @@
 # ---
 # # NOTE: Requires slurmdbd
 
-- name: Setup podman
-  hosts: podman
-  tags: podman
-  tasks:
-    - import_role:
-        name: podman
-        tasks_from: prereqs.yml
-      tags: prereqs
-
-    - import_role:
-        name: podman
-        tasks_from: config.yml
-      tags: config
-
 - name: Setup elasticsearch
   hosts: opendistro
   tags: opendistro
