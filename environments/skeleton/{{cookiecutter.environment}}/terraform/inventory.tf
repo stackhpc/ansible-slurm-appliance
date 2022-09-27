@@ -22,12 +22,3 @@ resource "local_file" "partitions" {
     )
     filename = "../inventory/group_vars/all/partitions.yml" # as all/ is created by skeleton
 }
-
-resource "local_file" "userdata" {
-  content = templatefile("${path.module}/control.userdata.tpl",
-                            {
-                              "state_dir": var.state_dir,
-                            }
-  )
-  filename = "../inventory/group_vars/all/cloud_init.yml"  # as all/ is created by skeleton
-}

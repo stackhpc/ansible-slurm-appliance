@@ -1,8 +1,12 @@
+# This provides cloud_init templates to manage and mount the Terraform-provided
+# volumes on the control node for `appliances_state_dir` and $HOME.
+# Note volumes MUST be defined using block_device{} inside openstack_compute_instance_v2,
+# NOT attached after boot, else the device ordering is liable to change e.g. on reboots.
+
 cloud_init_userdata_templates_extra:
   - module: fs_setup
     group: control
     template: |
-      # fileysystems on volumes for appliances_state_dir state and $HOME
         - label: state
           filesystem: ext4
           device: /dev/vdb
@@ -14,6 +18,5 @@ cloud_init_userdata_templates_extra:
   - module: mounts
     group: control
     template: |
-      # mounts for appliances_state_dir state and $HOME
-        - [LABEL=state, ${state_dir}]
+        - [LABEL=state, /var/lib/state]
         - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
