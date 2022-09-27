@@ -80,7 +80,7 @@
       delay: 10
       until: compute_connect is not failed
     
-    - name: Check slurm up after reimaging login node
+    - name: Check slurm up after reimaging compute nodes
       import_tasks: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hooks/check_slurm.yml"
       run_once: true
 
