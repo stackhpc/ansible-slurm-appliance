@@ -10,3 +10,4 @@ hpctests_hpl_NB: 192
 hpctests_hpl_mem_frac: 0.8
 hpctests_hpl_arch: linux64
 #hpctests_nodes:
+#hpctests_partition:
