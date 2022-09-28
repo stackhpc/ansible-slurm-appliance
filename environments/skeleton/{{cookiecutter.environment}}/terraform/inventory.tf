@@ -14,8 +14,8 @@ resource "local_file" "hosts" {
   filename = "../inventory/hosts"
 }
 
-resource "local_file" "group_vars" {
-    content  = templatefile("${path.module}/group_vars.tpl",
+resource "local_file" "partitions" {
+    content  = templatefile("${path.module}/partitions.tpl",
                             {
                               "cluster_name": var.cluster_name,
                               "compute_types": var.compute_types,
