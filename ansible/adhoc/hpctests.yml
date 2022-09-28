@@ -4,7 +4,7 @@
 
 ---
 
-- hosts: hpctests[0] # TODO: might want to make which node is used selectable?
+- hosts: login[0] # TODO: might want to make which node is used selectable?
   become: false
   gather_facts: false
   tasks:
