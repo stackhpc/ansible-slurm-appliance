@@ -64,11 +64,11 @@ openondemand_clusters:
             host: "host"
             jobid: "jobid"
 
-ood_install_apps_defaults:
+ood_install_apps_jupyter:
   jupyter:
     repo: https://github.com/OSC/bc_example_jupyter.git
     version: master                # defaults (optional)
-ood_install_apps: "{{ ood_install_apps_defaults if openondemand_jupyter_partition | default(none) else {} }}"
+ood_install_apps: "{{ ood_install_apps_jupyter if groups['openondemand_jupyter'] | length > 0 }}"
 
 # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
 # also https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission

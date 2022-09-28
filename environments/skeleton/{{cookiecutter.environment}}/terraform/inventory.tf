@@ -17,6 +17,7 @@ resource "local_file" "hosts" {
 resource "local_file" "group_vars" {
     content  = templatefile("${path.module}/group_vars.tpl",
                             {
+                              "cluster_name": var.cluster_name,
                               "compute_types": var.compute_types,
                             },
     )
