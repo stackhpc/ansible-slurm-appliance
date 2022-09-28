@@ -114,6 +114,7 @@ resource "openstack_compute_instance_v2" "control" {
   lifecycle{
     ignore_changes = [
       image_name,
+      user_data,
       ]
     }
 
@@ -142,6 +143,7 @@ resource "openstack_compute_instance_v2" "login" {
   lifecycle{
     ignore_changes = [
       image_name,
+      user_data,
       ]
     }
 
@@ -170,6 +172,7 @@ resource "openstack_compute_instance_v2" "compute" {
   lifecycle{
     ignore_changes = [
       image_name,
+      user_data,
       ]
     }
 
