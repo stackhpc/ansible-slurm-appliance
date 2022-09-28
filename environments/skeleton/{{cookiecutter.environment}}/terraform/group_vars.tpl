@@ -5,10 +5,3 @@ openhpc_slurm_partitions:
 %{for type_name, type_descr in compute_types ~}
     - name: ${type_name}
 %{ endfor ~}
-
-# Open Ondemand configuration:
-openondemand_servername: "{{ hostvars[ groups['openondemand'].0 ].ansible_host }}" # i.e. private IP - use a SOCKS proxy to acccess this
-openondemand_auth: basic_pam                                                       #
-openondemand_host_regex: "({{ groups['compute'] | join(')|(') }})|({{ groups['grafana'].0 }})" # Allow proxying to compute nodes (for desktop) and Grafana (for monitoring)
-openondemand_jupyter_partition: "{{ openhpc_slurm_partitions.0.name }}"                 # Default: 1st partition runs jupyter notebook servers
-openondemand_desktop_partition: "{{ openhpc_slurm_partitions.0.name }}"                 # Default: 1st partition runs remote desktops
