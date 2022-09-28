@@ -55,10 +55,11 @@
   
 - debug:
     msg: |
-      Summary for pingpong (2x scheduler-selected nodes) job {{ _pingpong_jobid }} (using interface {{ hpctests_ucx_net_devices }}):
-      nodes: {{ hpctests_pingpong_run_nodes.stdout.split()[1] }}
-      zero-size msg latency: {{ hpctests_pingpong_out['columns']['latency'][0] }} us
-      max bandwidth: {{ hpctests_pingpong_out['columns']['bandwidth'] | max }} Mbytes/s ({{ (hpctests_pingpong_out['columns']['bandwidth'] | max) / 125.0 }} Gbit/s)
+      Summary for pingpong using 2x scheduler-selected nodes in '{{ hpctests_partition }}' partition, job ID {{ _pingpong_jobid }}, device '{{ hpctests_ucx_net_devices }}':
+
+      Nodes: {{ hpctests_pingpong_run_nodes.stdout.split()[1] }}
+      Zero-size msg latency: {{ hpctests_pingpong_out['columns']['latency'][0] }} us
+      Max bandwidth: {{ hpctests_pingpong_out['columns']['bandwidth'] | max }} Mbytes/s ({{ (hpctests_pingpong_out['columns']['bandwidth'] | max) / 125.0 }} Gbit/s)
 
       See plot on localhost:
       {{ _pingpong_plot.stdout }}

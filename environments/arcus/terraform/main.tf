@@ -31,10 +31,16 @@ module "cluster" {
             flavor: "vm.alaska.cpu.general.small"
             image: "openhpc-220830-2042.qcow2"
         }
+        extra: {
+            flavor: "vm.alaska.cpu.general.small"
+            image: "openhpc-220830-2042.qcow2"
+        }
     }
     compute_nodes = {
         compute-0: "small"
         compute-1: "small"
+        compute-2: "extra"
+        compute-3: "extra"
     }
     
     environment_root = var.environment_root
