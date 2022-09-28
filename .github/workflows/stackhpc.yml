@@ -68,11 +68,11 @@ jobs:
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook ansible/adhoc/generate-passwords.yml
-          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
+          echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
           ansible-playbook ansible/adhoc/template-cloud-init.yml
         env:
           ANSIBLE_FORCE_COLOR: True
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Provision servers
         id: provision_servers
@@ -154,24 +154,24 @@ jobs:
             --server-response \
             --no-check-certificate \
             --http-user=testuser \
-            --http-password=${TEST_USER_PASSWORD} https://${openondemand_servername} \
+            --http-password=${TESTUSER_PASSWORD} https://${openondemand_servername} \
             2>&1)
           (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
         env:
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Build packer images
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook ansible/adhoc/generate-passwords.yml
-          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
+          echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
           cd packer/
           PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
         env:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Test reimage of nodes
         run: |
