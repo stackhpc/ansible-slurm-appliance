@@ -14,7 +14,7 @@ jobs:
         cloud:
           - "arcus"   # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
       fail-fast: false # as want clouds to continue independently
-    concurrency: ${{ matrix.cloud }}
+    concurrency: ${{ github.ref }} # to branch/PR
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
