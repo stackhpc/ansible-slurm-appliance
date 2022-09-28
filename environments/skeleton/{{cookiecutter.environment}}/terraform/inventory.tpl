@@ -23,6 +23,8 @@ ${compute.name} ansible_host=${compute.all_fixed_ips[0]}
 %{~ for type_name, type_descr in compute_types}
 [${cluster_name}_${type_name}]
     %{~ for node_name, node_type in compute_nodes ~}
-    %{~ if node_type == type_name }${cluster_name}-${node_name}%{ endif }
-    %{~ endfor ~}
+        %{~ if node_type == type_name ~}
+${cluster_name}-${node_name}
+        %{~ endif ~}
+%{~ endfor ~}
 %{ endfor ~}

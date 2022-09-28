@@ -4,6 +4,7 @@
 #SBATCH --output=%x.%a.out
 #SBATCH --error=%x.%a.out
 #SBATCH --exclusive
+#SBATCH --partition={{ hpctests_partition }}
 {%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}{% endif %}
 
 echo HPL arch: {{ hpctests_hpl_arch }}
