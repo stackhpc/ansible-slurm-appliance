@@ -87,9 +87,11 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           ansible all -m wait_for_connection
           ansible-playbook ansible/adhoc/generate-passwords.yml
-          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
+          echo vault_testuser_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
+        env:
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Run MPI-based tests
         run: |
@@ -133,7 +135,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
+          echo vault_testuser_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           cd packer/
           PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
           ../dev/output_manifest.py packer-manifest.json # Sets NEW_{COMPUTE,CONTROL,LOGIN}_IMAGE_ID outputs
