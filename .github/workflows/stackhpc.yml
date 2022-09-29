@@ -54,14 +54,31 @@ jobs:
         env:
           arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
       
-      - name: Provision infrastructure
-        id: provision
+      - name: Provision ports, inventory and other infrastructure apart from nodes
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          TF_VAR_create_nodes=false terraform apply -auto-approve
+      
+      - name: Setup environment-specific inventory/terraform inputs
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook ansible/adhoc/generate-passwords.yml
+          echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
+          ansible-playbook ansible/adhoc/template-cloud-init.yml
+        env:
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+
+      - name: Provision servers
+        id: provision_servers
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform apply -auto-approve
-        
+
       - name: Get server provisioning failure messages
         id: provision_failure
         run: |
@@ -69,9 +86,9 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           TF_FAIL_MSGS="$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
-          echo $TF_FAIL_MSGS
+          echo TF failure messages: $TF_FAIL_MSGS
           echo "::set-output name=messages::${TF_FAIL_MSGS}"
-        if: always() && steps.provision.outcome == 'failure'
+        if: always() && steps.provision_servers.outcome == 'failure'
         
       - name: Delete infrastructure if failed due to lack of hosts
         run: |
@@ -79,19 +96,15 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
-        if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
+        if: ${{ always() && steps.provision_servers.outcome == 'failure' && contains(steps.provision_failure.messages, 'not enough hosts available') }}
 
       - name: Directly configure cluster
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible all -m wait_for_connection
-          ansible-playbook ansible/adhoc/generate-passwords.yml
-          echo vault_testuser_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
-        env:
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Run MPI-based tests
         run: |
@@ -124,23 +137,20 @@ jobs:
             --server-response \
             --no-check-certificate \
             --http-user=testuser \
-            --http-password=${TEST_USER_PASSWORD} https://${openondemand_servername} \
+            --http-password=${TESTUSER_PASSWORD} https://${openondemand_servername} \
             2>&1)
           (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
         env:
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Build packer images
         id: packer_build
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          echo vault_testuser_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           cd packer/
           PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
           ../dev/output_manifest.py packer-manifest.json # Sets NEW_{COMPUTE,CONTROL,LOGIN}_IMAGE_ID outputs
-        env:
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Test reimage of login nodes (via rebuild adhoc)
         run: |
