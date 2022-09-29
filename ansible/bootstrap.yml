@@ -104,8 +104,6 @@
         async: "{{ 30 * 60 }}" # wait for up to 30 minutes
         poll: 15 # check every 15 seconds
         register: updates
-      - debug:
-          var: updates
       - name: Ensure update log directory on localhost exists
         file:
           path: "{{ update_log_path | dirname }}"
