@@ -96,3 +96,9 @@ variable "nonlogin_security_groups" {
         "default",  # allow all in-cluster services
     ]
 }
+
+variable "create_nodes" {
+    description = "Whether to create nodes (servers) or just ports and other infra"
+    type = bool # can't use bool as want to pass from command-line
+    default = true
+}

@@ -1,0 +1,2 @@
+#cloud_init_output_path: 
+cloud_init_userdata_templates: []
