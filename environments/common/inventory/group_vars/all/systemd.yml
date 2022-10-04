@@ -22,7 +22,23 @@ _systemd_dropins_statedir:
     group: prometheus
     content: "{{ _systemd_requiresmount_statedir }}"
 
-systemd_dropins: "{{ _systemd_dropins_statedir if appliances_state_dir is defined else {} }}"
+# Modify systemd units which will have config provided by cloud_init:
+_systemd_dropins_cloud_init_cfg:
+  - unit: munge
+    group: openhpc
+    content: |
+      [Unit]
+      After=cloud-final.service
+  # -unit: slurmd,slurmctld: already depend on munge so indirectly on cloud_init
+  - unit: httpd
+    group: openondemand
+    content: |
+      [Unit]
+      After=cloud-final.service
+      
+      [Service]
+      EnvironmentFile=/etc/sysconfig/openondemand
+# systemd_dropins_default: "{{ _systemd_dropins_cloud_init_cfg + (_systemd_dropins_statedir if appliances_state_dir is defined else  []) }}"
 
 systemd_dropins_default: "{{ (_systemd_dropins_statedir if appliances_state_dir is defined else  []) }}"
 systemd_dropins_extra: [] # allows easy expansion in environments
