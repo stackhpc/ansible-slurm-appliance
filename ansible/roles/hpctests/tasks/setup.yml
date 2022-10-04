@@ -7,7 +7,7 @@
 
 - name: Select default partition if hpctests_partition not given
   set_fact:
-    hpctests_partition: "{{ _sinfo_partitions.stdout_lines  | select('contains', '*') | first | trim('*') }}"
+    hpctests_partition: "{{ (_sinfo_partitions.stdout_lines  | select('contains', '*') | first)[:-1] }}"
   when: hpctests_partition is not defined
 
 - name: Get info about compute nodes
