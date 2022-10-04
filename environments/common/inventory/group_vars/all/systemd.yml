@@ -1,23 +1,29 @@
 _systemd_requiresmount_statedir: |
   [Unit]
-  RequiresMountsFor={{ appliances_state_dir }}
+  RequiresMountsFor={{ appliances_state_dir | default('') }}
+# default enables templating if appliances_state_dir not defined on host - will be ignored later
 
+# Modify systemd units to account for appliances_state_dir
 _systemd_dropins_statedir:
   # mysql not included as role handles state dir correctly
-  opendistro:
+  - unit: opendistro
     group: opendistro
     content: "{{ _systemd_requiresmount_statedir }}"
-  grafana-server:
+  - unit: grafana-server
     group: grafana
     content: "{{ _systemd_requiresmount_statedir }}"
-  slurmdbd:
+  - unit: slurmdbd
     group: openhpc
     content: "{{ _systemd_requiresmount_statedir }}"
-  slurmctld:
+  - unit: slurmctld
     group: openhpc
     content: "{{ _systemd_requiresmount_statedir }}"
-  prometheus:
+  - unit: prometheus
     group: prometheus
     content: "{{ _systemd_requiresmount_statedir }}"
 
 systemd_dropins: "{{ _systemd_dropins_statedir if appliances_state_dir is defined else {} }}"
+
+systemd_dropins_default: "{{ (_systemd_dropins_statedir if appliances_state_dir is defined else  []) }}"
+systemd_dropins_extra: [] # allows easy expansion in environments
+systemd_dropins: "{{ systemd_dropins_default + systemd_dropins_extra }}"
