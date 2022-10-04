@@ -48,7 +48,7 @@
 
 - name: Plot image
   shell:
-    cmd: "python {{lookup('env', 'APPLIANCES_REPO_ROOT') }}/ansible/roles/hpctests/files/plot_imb_pingpong.py {{ _pingpong_local_output }}"
+    cmd: "python {{ role_path }}/files/plot_imb_pingpong.py {{ _pingpong_local_output }}"
     creates: "{{ _pingpong_local_output | dirname }}/latency.png"
   register: _pingpong_plot
   delegate_to: localhost
