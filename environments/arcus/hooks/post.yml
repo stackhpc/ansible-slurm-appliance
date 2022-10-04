@@ -1,6 +1,0 @@
-- hosts: login:!builder # won't have a slurm control daemon when in build
-  become: no
-  gather_facts: false
-  tasks:
-    - name: Check slurm up after direct deploy
-      import_tasks: check_slurm.yml
