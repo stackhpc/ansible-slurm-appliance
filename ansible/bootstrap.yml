@@ -13,6 +13,19 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
+- hosts: etc_hosts
+  gather_facts: false
+  tags: etc_hosts
+  become: yes
+  tasks:
+    - name: Template /etc/hosts
+      copy:
+        content: "{{ etc_hosts_template }}"
+        dest: /etc/hosts
+        owner: root
+        group: root
+        mode: u=rw,og=r
+
 - hosts: cluster
   gather_facts: false
   tasks:
@@ -73,6 +86,20 @@
   tasks:
     - import_role:
         name: fail2ban
+
+- name: Setup podman
+  hosts: podman
+  tags: podman
+  tasks:
+    - import_role:
+        name: podman
+        tasks_from: prereqs.yml
+      tags: prereqs
+
+    - import_role:
+        name: podman
+        tasks_from: config.yml
+      tags: config
 
 - hosts: update
   gather_facts: false

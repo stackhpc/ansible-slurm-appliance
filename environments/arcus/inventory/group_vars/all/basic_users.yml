@@ -1,0 +1,7 @@
+# has to be defined on 'all' group so localhost can template out for cloud-init
+testuser_password: "{{ lookup('env', 'TESTUSER_PASSWORD') | default(vault_testuser_password, true) }}"
+
+basic_users_users:
+  - name: testuser # can't use rocky as $HOME isn't shared!
+    password: "{{ testuser_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+    uid: 1005

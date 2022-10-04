@@ -14,7 +14,7 @@ jobs:
         cloud:
           - "arcus"   # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
       fail-fast: false # as want clouds to continue independently
-    concurrency: ${{ matrix.cloud }}
+    concurrency: ${{ github.ref }} # to branch/PR
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -52,8 +52,30 @@ jobs:
           smslabs_CLOUDS_YAML: ${{ secrets.CLOUDS_YAML }}
           arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
       
-      - name: Provision infrastructure
-        id: provision
+      - name: Provision ports, inventory and other infrastructure apart from nodes
+        id: provision_ports
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          TF_VAR_create_nodes=false terraform apply -auto-approve
+        env:
+          OS_CLOUD: openstack
+          TF_VAR_cluster_name: ci${{ github.run_id }}
+      
+      - name: Setup environment-specific inventory/terraform inputs
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          ansible-playbook ansible/adhoc/generate-passwords.yml
+          echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
+          ansible-playbook ansible/adhoc/template-cloud-init.yml
+        env:
+          ANSIBLE_FORCE_COLOR: True
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+
+      - name: Provision servers
+        id: provision_servers
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
@@ -62,7 +84,7 @@ jobs:
         env:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
-      
+
       - name: Get server provisioning failure messages
         id: provision_failure
         run: |
@@ -70,12 +92,12 @@ jobs:
           . environments/${{ matrix.cloud }}/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           TF_FAIL_MSGS="$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
-          echo $TF_FAIL_MSGS
+          echo TF failure messages: $TF_FAIL_MSGS
           echo "::set-output name=messages::${TF_FAIL_MSGS}"
         env:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
-        if: always() && steps.provision.outcome == 'failure'
+        if: always() && steps.provision_servers.outcome == 'failure'
         
       - name: Delete infrastructure if failed due to lack of hosts
         run: |
@@ -86,20 +108,17 @@ jobs:
         env:
           OS_CLOUD: openstack
           TF_VAR_cluster_name: ci${{ github.run_id }}
-        if: ${{ always() && steps.provision.outcome == 'failure' && contains('not enough hosts available', steps.provision_failure.messages) }}
+        if: ${{ always() && steps.provision_servers.outcome == 'failure' && contains(steps.provision_failure.messages, 'not enough hosts available') }}
 
       - name: Directly configure cluster
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible all -m wait_for_connection
-          ansible-playbook ansible/adhoc/generate-passwords.yml
-          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
           ansible-playbook -vv ansible/site.yml
         env:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Run MPI-based tests
         run: |
@@ -135,23 +154,24 @@ jobs:
             --server-response \
             --no-check-certificate \
             --http-user=testuser \
-            --http-password=${TEST_USER_PASSWORD} https://${openondemand_servername} \
+            --http-password=${TESTUSER_PASSWORD} https://${openondemand_servername} \
             2>&1)
           (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
         env:
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Build packer images
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          echo test_user_password: "$TEST_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/basic_users/defaults.yml
+          ansible-playbook ansible/adhoc/generate-passwords.yml
+          echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
           cd packer/
           PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
         env:
           OS_CLOUD: openstack
           ANSIBLE_FORCE_COLOR: True
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Test reimage of nodes
         run: |
