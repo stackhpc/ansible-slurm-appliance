@@ -52,6 +52,7 @@
     creates: "{{ _pingpong_local_output | dirname }}/latency.png"
   register: _pingpong_plot
   delegate_to: localhost
+  when: hpctests_pingpong_plot | bool
   
 - debug:
     msg: |
@@ -61,5 +62,7 @@
       Zero-size msg latency: {{ hpctests_pingpong_out['columns']['latency'][0] }} us
       Max bandwidth: {{ hpctests_pingpong_out['columns']['bandwidth'] | max }} Mbytes/s ({{ (hpctests_pingpong_out['columns']['bandwidth'] | max) / 125.0 }} Gbit/s)
 
+      {% if hpctests_pingpong_plot %}
       See plot on localhost:
       {{ _pingpong_plot.stdout }}
+      {% endif %}

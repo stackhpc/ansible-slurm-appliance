@@ -35,6 +35,7 @@ Role Variables
 The following variables should not generally be changed:
 - `hpctests_pingmatrix_modules`: Optional. List of modules to load for pingmatrix test. Defaults are suitable for OpenHPC 2.x cluster using the required packages.
 - `hpctests_pingpong_modules`: As above but for pingpong test.
+- `hpctests_pingpong_plot`: Whether to plot pingpong results. Default `yes`.
 - `hpctests_hpl_modules`: As above but for hpl tests.
 - `hpctests_hpl_version`: Version of HPL
 
