@@ -18,5 +18,5 @@ cloud_init_userdata_templates_extra:
   - module: mounts
     group: control
     template: |
-        - [LABEL=state, /var/lib/state]
+        - [LABEL=state, {{ appliances_state_dir }}]
         - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
