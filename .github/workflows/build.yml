@@ -8,7 +8,7 @@ on:
   pull_request:
 jobs:
   build:
-    name: openstack-ci-${{ matrix.cloud }}
+    name: Build generic images on ${{ matrix.cloud }}
     outputs:
       compute_image: ${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}
       login_image: ${{ steps.packer_build.outputs.NEW_LOGIN_IMAGE_ID }}

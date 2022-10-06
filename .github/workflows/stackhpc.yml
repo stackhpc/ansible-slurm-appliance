@@ -8,7 +8,7 @@ on:
   pull_request:
 jobs:
   openstack:
-    name: openstack-ci-${{ matrix.cloud }}
+    name: Test appliance on ${{ matrix.cloud }}
     strategy:
       matrix:
         cloud:
