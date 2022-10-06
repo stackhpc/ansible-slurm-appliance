@@ -1,0 +1,22 @@
+# Build generic images - values below are filled in by cloud_init for ALL nodes:
+openhpc_slurm_control_host: UNKNOWN
+openhpc_munge_key: UNKNOWN
+openhpc_rebuild_clouds: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/environments/common/files/empty_clouds.yaml"
+basic_users_users: []  # don't want user definitions
+openondemand_servername: "${OPENONDEMAND_SERVERNAME}" # Will be set from a systemd environment file
+apache_service_enabled: false # don't start openondemand apache by default
+
+# Build generic images - values below require site.yml to be run:
+apache_service_state: stopped        # due to UNKNOWN Open Ondemand server variables below
+openhpc_cluster_name: UNKNOWN
+vault_elasticsearch_admin_password: UNKNOWN
+vault_grafana_admin_password: UNKNOWN
+vault_mysql_root_password: UNKNOWN
+vault_mysql_slurm_password: UNKNOWN
+elasticsearch_address: UNKNOWN       # impacts filebeat and grafana
+prometheus_address: UNKNOWN
+openondemand_address: UNKNOWN
+openondemand_host_regex: UNKNOWN
+grafana_address: UNKNOWN
+grafana_api_address: UNKNOWN
+nfs_server_default: UNKNOWN

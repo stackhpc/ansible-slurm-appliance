@@ -20,9 +20,9 @@ roles:
     version: service-state
   - src: jriguera.configdrive
     # No versions available
-  - src: https://github.com/OSC/ood-ansible.git
+  - src: https://github.com/stackhpc/ood-ansible.git
     name: osc.ood
-    version: v2.0.5
+    version: feature/service_state # based on v2.0.7
 
 collections:
 - name: containers.podman

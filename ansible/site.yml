@@ -30,12 +30,17 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- name: Shutdown Packer VM
+- name: Packer-specific tasks
   hosts: builder
   gather_facts: no
   become: yes
   tasks:
-    - community.general.shutdown:
-  # TODO: should remove /etc/resolv.conf here too
-  
+    - name: Delete /etc/resolv.conf
+      # required as if cloud-init (rather than network manager) controls this on next boot it won't be entirely overrwritten
+      file:
+        path: /etc/resolv.conf
+        state: absent
+    - name: Shutdown VM
+      community.general.shutdown:
+
 ...

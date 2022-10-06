@@ -1,3 +1,8 @@
-# Used to override anything defined in a concrete environment
-
-openhpc_slurm_partitions: [] # as no compute nodes will be in play, but partition definition might exist in inventory
+---
+# Values below are required in order for builds to work:
+block_devices_configurations: []     # Volumes will not be attached to Packer build VMs
+grafana_state: stopped               # Grafana tries to bind to real grafana or openondemend node's interface
+mysql_state: stopped                 # mysql role tries to connect to real mysql node to configure db,users etc
+nfs_client_mnt_state: absent         # Can't reach NFS servers
+openhpc_slurm_partitions: []         # No compute nodes will be in play, but partitions may be defined in inventory
+openhpc_slurm_service_started: false # Control node is not available in build

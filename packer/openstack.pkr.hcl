@@ -100,7 +100,7 @@ build {
     groups = concat(["builder"], split("-", "${source.name}"))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@extra_vars.yml"]
+    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@extra_vars.yml", "-e", "@generic_vars.yml"]
   }
 
   post-processor "manifest" {

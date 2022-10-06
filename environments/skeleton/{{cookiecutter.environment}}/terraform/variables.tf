@@ -49,12 +49,6 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
-variable "state_dir" {
-    type = string
-    description = "Path to state directory on control node"
-    default = "/var/lib/state"
-}
-
 variable "state_volume_size" {
     type = number
     description = "Size of state volume on control node, in GB"
