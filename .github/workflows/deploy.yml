@@ -5,7 +5,7 @@ on:
   # push:
   #   branches:
   #     - main
-  pull_request:
+  # pull_request:
 jobs:
   openstack:
     name: Test pre-built images on ${{ matrix.cloud }}
