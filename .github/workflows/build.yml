@@ -1,0 +1,62 @@
+
+name: Build generic images
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  build:
+    name: openstack-ci-${{ matrix.cloud }}
+    outputs:
+      compute_image: ${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}
+      login_image: ${{ steps.packer_build.outputs.NEW_LOGIN_IMAGE_ID }}
+      control_image: ${{ steps.packer_build.outputs.NEW_CONTROL_IMAGE_ID }}
+    strategy:
+      matrix:
+        cloud:
+          - "arcus"   # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
+      fail-fast: false # as want clouds to continue independently
+    concurrency: ${{ github.ref }} # to branch/PR
+    runs-on: ubuntu-20.04
+    env:
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+      TF_VAR_cluster_name: ci${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "${${{ matrix.cloud }}_SSH_KEY}" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        env:
+          arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
+
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/${{ matrix.cloud }}/bastion_fingerprint >> ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${${{ matrix.cloud }}_CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+        env:
+          arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
+      
+      - name: Build packer images
+        # NB: There are NO hosts or secrets available here!
+        id: packer_build
+        run: |
+          . venv/bin/activate
+          . environments/${{ matrix.cloud }}/activate
+          cd packer/
+          PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+          ../dev/output_manifest.py packer-manifest.json # Sets NEW_{COMPUTE,CONTROL,LOGIN}_IMAGE_ID outputs

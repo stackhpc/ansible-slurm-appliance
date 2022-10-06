@@ -1,15 +1,2 @@
----
-# NOTE: Might be better of as extra vars or in a builder specific inventory as
-# as dependent on alphabetical ordering of groups, so if these variables are
-# defined elsewhere the group that is ordered lower will determine the values.
-openhpc_slurm_service_started: false
-nfs_client_mnt_state: present
-openhpc_rebuild_reconfigure: false
+# Generally want Packer to update packages during build. Note that environments/common/inventory/group_vars/all/update.yml:update_exclude is used to avoid breakages.
 update_enable: true
-block_devices_partition_state: skip
-block_devices_filesystem_state: skip
-block_devices_mount_state: present
-basic_users_manage_homedir: false
-grafana_state: stopped # as it tries to listen on the "real" grafana node
-block_devices_configurations: [] # as volumes will not be attached to Packer build VMs
-mysql_state: stopped # as it tries to connect to real mysql node

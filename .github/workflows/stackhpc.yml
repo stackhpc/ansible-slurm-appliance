@@ -2,9 +2,9 @@
 name: Test deployment and image build on OpenStack
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   pull_request:
 jobs:
   openstack:

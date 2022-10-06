@@ -9,7 +9,7 @@
 # if using PAM auth we need apache installed but NOT started so split the osc.ood role up:
 - include_role:
     name: osc.ood
-    tasks_from: install-rpm.yml
+    tasks_from: install-package.yml
     vars_from: Rocky.yml
     public: yes # Expose the vars from this role to the rest of the play
   # can't set vars: from a dict hence the workaround above

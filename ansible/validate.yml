@@ -3,7 +3,7 @@
 # Fail early if configuration is invalid
 
 - name: Ensure control node is in inventory
-  hosts: all
+  hosts: all:!builder
   tasks:
     - assert:
         that: groups['control'] | length
@@ -48,7 +48,7 @@
       tags: validate
 
 - name: Validate rebuild configuration
-  hosts: rebuild
+  hosts: rebuild:!builder
   gather_facts: false
   tags: rebuild
   tasks:
