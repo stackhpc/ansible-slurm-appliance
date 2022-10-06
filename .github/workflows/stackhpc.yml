@@ -1,5 +1,5 @@
 
-name: Test deployment and image build on OpenStack
+name: Test deployment on OpenStack
 on:
   workflow_dispatch:
   # push:
@@ -8,7 +8,7 @@ on:
   pull_request:
 jobs:
   openstack:
-    name: Test appliance on ${{ matrix.cloud }}
+    name: Test pre-built images on ${{ matrix.cloud }}
     strategy:
       matrix:
         cloud:
@@ -143,46 +143,37 @@ jobs:
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      - name: Build packer images
-        id: packer_build
-        run: |
-          . venv/bin/activate
-          . environments/${{ matrix.cloud }}/activate
-          cd packer/
-          PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
-          ../dev/output_manifest.py packer-manifest.json # Sets NEW_{COMPUTE,CONTROL,LOGIN}_IMAGE_ID outputs
+      # - name: Test reimage of login nodes (via rebuild adhoc)
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/${{ matrix.cloud }}/activate
+      #     ansible-playbook -v --limit login ansible/adhoc/rebuild.yml -e rebuild_image=${{ steps.packer_build.outputs.NEW_LOGIN_IMAGE_ID }}
+      #     ansible login -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
+      #     ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Test reimage of login nodes (via rebuild adhoc)
-        run: |
-          . venv/bin/activate
-          . environments/${{ matrix.cloud }}/activate
-          ansible-playbook -v --limit login ansible/adhoc/rebuild.yml -e rebuild_image=${{ steps.packer_build.outputs.NEW_LOGIN_IMAGE_ID }}
-          ansible login -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
-          ansible-playbook -v ansible/ci/check_slurm.yml
-
-      - name: Test reimage of compute nodes (via slurm)
-        run: |
-          . venv/bin/activate
-          . environments/${{ matrix.cloud }}/activate
-          ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' ${TF_VAR_cluster_name}-compute-[0-3]"
-          ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
-          ansible-playbook -v ansible/ci/check_slurm.yml
+      # - name: Test reimage of compute nodes (via slurm)
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/${{ matrix.cloud }}/activate
+      #     ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' ${TF_VAR_cluster_name}-compute-[0-3]"
+      #     ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
+      #     ansible-playbook -v ansible/ci/check_slurm.yml
       
-      - name: Test reimage of control node (via rebuild adhoc)
-        run: |
-          . venv/bin/activate
-          . environments/${{ matrix.cloud }}/activate
-          ansible-playbook -v --limit control ansible/adhoc/rebuild.yml -e rebuild_image=${{ steps.packer_build.outputs.NEW_CONTROL_IMAGE_ID }}
-          ansible control -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
-          ansible-playbook ansible/slurm.yml --tags openhpc # configures partitions
-          ansible-playbook ansible/monitoring.yml --tags prometheus # configures scrapes
-          ansible-playbook -v ansible/ci/check_slurm.yml
+      # - name: Test reimage of control node (via rebuild adhoc)
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/${{ matrix.cloud }}/activate
+      #     ansible-playbook -v --limit control ansible/adhoc/rebuild.yml -e rebuild_image=${{ steps.packer_build.outputs.NEW_CONTROL_IMAGE_ID }}
+      #     ansible control -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
+      #     ansible-playbook ansible/slurm.yml --tags openhpc # configures partitions
+      #     ansible-playbook ansible/monitoring.yml --tags prometheus # configures scrapes
+      #     ansible-playbook -v ansible/ci/check_slurm.yml
       
-      - name: Check sacct state survived reimage
-        run: |
-          . venv/bin/activate
-          . environments/${{ matrix.cloud }}/activate
-          ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
+      # - name: Check sacct state survived reimage
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/${{ matrix.cloud }}/activate
+      #     ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
 
       - name: Check MPI-based tests are shown in Grafana
         run: |
@@ -198,8 +189,8 @@ jobs:
           terraform destroy -auto-approve
         if: ${{ success() || cancelled() }}
 
-      - name: Delete images
-        run: |
-          . venv/bin/activate
-          . environments/${{ matrix.cloud }}/activate
-          ansible-playbook -vv ansible/ci/delete_images.yml
+      # - name: Delete images
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/${{ matrix.cloud }}/activate
+      #     ansible-playbook -vv ansible/ci/delete_images.yml
