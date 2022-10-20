@@ -127,14 +127,14 @@
     mode: 0640
   notify: restart grafana
 
-- name: Register previously copied dashboards
+- name: Register preexisting dashboards
   become: true
   find:
     paths: "{{ grafana_data_dir }}/dashboards"
     hidden: true
     patterns:
       - "*.json"
-  register: _dashboards_present
+  register: _dashboards_pre
 
 - name: Import grafana dashboards
   become: true
@@ -142,17 +142,25 @@
     remote_src: yes
     src: "{{ _tmp_dashboards.path }}/" # Note trailing / to only copy contents, not directory itself
     dest: "{{ grafana_data_dir }}/dashboards/"
-  register: _dashboards_copied
   notify: "provisioned dashboards changed"
+
+- name: Register all installed dashboards
+  become: true
+  find:
+    paths: "{{ grafana_data_dir }}/dashboards"
+    hidden: true
+    patterns:
+      - "*.json"
+  register: _dashboards_post
 
 - name: Get dashboard lists
   set_fact:
-    _dashboards_present_list: "{{ _dashboards_present | json_query('files[*].path') | default([]) }}"
-    _dashboards_copied_list: "{{ _dashboards_copied | json_query('results[*].dest') | default([]) }}"
+    _dashboards_pre_list:  "{{ _dashboards_pre  | json_query('files[*].path') | default([]) }}"
+    _dashboards_post_list: "{{ _dashboards_post | json_query('files[*].path') | default([]) }}"
 
 - name: Remove installed dashboards not defined through this role
   become: true
   file:
     path: "{{ item }}"
     state: absent
-  with_items: "{{ _dashboards_present_list | difference( _dashboards_copied_list ) }}"
+  with_items: "{{ _dashboards_pre_list | difference( _dashboards_post_list ) }}"
