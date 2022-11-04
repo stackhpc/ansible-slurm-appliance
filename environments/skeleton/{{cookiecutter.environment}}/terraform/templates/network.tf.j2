@@ -1,17 +1,16 @@
 
 data "openstack_networking_network_v2" "cluster_net" {
-  name           = "{{ network_name }}"
+  name = "{{ network_name }}"
 }
 
 data "openstack_networking_subnet_v2" "cluster_subnet" {
 
-  name            = "{{ subnet_name }}"
+  name = "{{ subnet_name }}"
 }
 
-{% for inventory_hostname in groups['all'] %}
-data "openstack_networking_secgroup_v2" "{{ inventory_hostname }}" {
-  for_each = toset({{ hostvars[inventory_hostname].security_groups | default(["default"]) | to_json }} ) {# json forces double-quotes #}
+{% for secgroup in hostvars.values() | map(attribute='security_groups', default=[]) | flatten | unique %}
+data "openstack_networking_secgroup_v2" "{{ secgroup }}" {
 
-  name = each.key
+  name = "{{ secgroup }}"
 }
 {% endfor %}

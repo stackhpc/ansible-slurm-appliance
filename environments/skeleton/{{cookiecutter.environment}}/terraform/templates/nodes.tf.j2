@@ -29,7 +29,12 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}" {
     subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
   }
 
-  security_group_ids = [for o in data.openstack_networking_secgroup_v2.{{ inventory_hostname }}: o.id]
+
+  security_group_ids = [
+  {% for secgroup in hostvars[inventory_hostname].security_groups %}
+    data.openstack_networking_secgroup_v2.{{ secgroup }}.id,
+  {% endfor %}
+  ]
 
   binding {
     vnic_type = "{{ hostvars[inventory_hostname].vnic_type }}"  # TODO: add to defaults
