@@ -1,0 +1,46 @@
+- hosts: localhost
+  become: no
+  gather_facts: no
+  vars: # TODO: move me
+    terraform_templates:
+      - main
+      - nodes
+      - network
+    terraform_project_path: "{{ appliances_environment_root }}/terraform/"
+    terraform_template_path: "{{ appliances_repository_root }}/environments/skeleton/{% raw %}{{cookiecutter.environment}}{% endraw %}/terraform/templates"
+  tasks:
+    - name: Template Terraform configuration files
+      template:
+        src: "{{ terraform_template_path }}/{{ item }}.tf.j2"
+        dest: "{{ terraform_project_path }}/{{ item }}.tf"
+      loop: "{{ terraform_templates }}"
+    
+    # - meta: end_here
+
+    - name: Create Terraform plan
+      community.general.terraform:
+        project_path: "{{ terraform_project_path }}"
+        state: planned
+        plan_file: tf.plan
+        force_init: yes
+      register: tf_plan
+    
+    - name: Show Terraform plan
+      debug:
+        msg: "{{ tf_plan.stdout }}"
+    
+    - name: Confirm Terraform plan execution
+      pause:
+        prompt: "Do you want to execute this plan? (Only 'yes' executes)"
+      register: confirm_plan
+      when: "'No changes. Your infrastructure matches the configuration.' not in tf_plan.stdout"
+    
+    - name: Execute Terraform plan
+      community.general.terraform:
+        project_path: "{{ terraform_project_path }}"
+        state: present
+        plan_file: tf.plan
+        force_init: yes
+      when:
+        - not confirm_plan.skipped | default(false)
+        - confirm_plan.user_input | bool

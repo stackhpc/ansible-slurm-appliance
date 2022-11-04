@@ -1,0 +1,87 @@
+locals {
+  user_data_path = "{{ appliances_environment_root }}/cloud_init/{{ cluster_name }}-%s.userdata.yml" # FIXME
+}
+
+
+{% for inventory_hostname in groups['all'] %}
+
+data "openstack_images_image_v2" "{{ inventory_hostname }}" {
+  name = "{{ hostvars[inventory_hostname].image_name }}"
+}
+
+{% for volume in hostvars[inventory_hostname].volumes | default([]) %}
+
+resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.name }}" {
+    name = "{{ cluster_name }}-{{ inventory_hostname }}-{{ volume.name }}"
+    description = "{{ volume.description | default('') }}"
+    size = {{ volume.size }}
+}
+
+{% endfor %}
+
+resource "openstack_networking_port_v2" "{{ inventory_hostname }}" {
+
+  name = "{{ cluster_name }}-{{ inventory_hostname }}"
+  network_id = data.openstack_networking_network_v2.cluster_net.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
+  }
+
+  security_group_ids = [for o in data.openstack_networking_secgroup_v2.{{ inventory_hostname }}: o.id]
+
+  binding {
+    vnic_type = "{{ hostvars[inventory_hostname].vnic_type }}"  # TODO: add to defaults
+    profile = "{{ hostvars[inventory_hostname].vnic_profile | to_json }}" # TODO: add to defaults
+  }
+}
+
+resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
+  
+  name = "{{ cluster_name }}-{{ inventory_hostname }}"
+  image_name = data.openstack_images_image_v2.{{ inventory_hostname }}.name
+  flavor_name = "{{ hostvars[inventory_hostname].flavor }}"
+  key_pair = "{{ hostvars[inventory_hostname].key_pair }}"
+  
+  {% if hostvars[inventory_hostname].volumes | default([]) | length %} # TODO: add to defaults
+  # root device:
+  block_device {
+      uuid = data.openstack_images_image_v2.{{ inventory_hostname }}.id # FIXME:
+      source_type  = "image"
+      destination_type = "local"
+      boot_index = 0
+      delete_on_termination = true
+  }
+  {% endif %}
+
+  {% for volume in hostvars[inventory_hostname].volumes | default([]) %}
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.{{ inventory_hostname }}_{{ volume.name }}.id
+  }
+  {% endfor %}
+
+  network {
+    port = openstack_networking_port_v2.{{ inventory_hostname }}.id
+    access_network = true
+  }
+
+  metadata = {
+    environment_root = "{{ appliances_environment_root }}"
+  }
+
+  user_data = fileexists(format(local.user_data_path, "control")) ? file(format(local.user_data_path, "control")) : null
+
+  lifecycle{
+    ignore_changes = [
+      image_name,
+      user_data,
+      ]
+    }
+
+}
+
+{% endfor %}
