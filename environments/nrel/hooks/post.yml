@@ -107,11 +107,27 @@
     - include_role:
         name: ansible_ipa_ldap_fix
 
-- name: register_aco_idm
-  hosts: control:login:admin
-  become: true
-  tags:
-    - vstack_idm_config
-  tasks:
-    - include_role:
-        name: vstack_common_config
+# - name: register_aco_idm
+#   hosts: control:login:admin
+#   become: true
+#   tags:
+#     - vstack_idm_config
+#     - aco_idm
+#   tasks:
+#     - include_role:
+#         name: vstack_common_config
+
+# - name: "ansible_sshd_baseline"
+#   hosts: all:!no_sshd_update
+#   become: yes
+#   roles:
+#     - ansible_sshd_baseline
+
+# - name: hspd12 provision
+#   hosts: control:login:admin
+#   tags:
+#     - hspd12
+#     - aco_idm
+#   tasks:
+#     - include_role:
+#         name: hspd12

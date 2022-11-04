@@ -26,7 +26,7 @@
     - shell: "echo '{{distro_releasever}}' > /etc/yum/vars/releasever"
       tags: lock_releasever
 
-- name: set hostname to hpc.nrel.gov domain
+- name: set admin hostnames to hpc.nrel.gov domain
   hosts: control,login
   tags: set_hpc_hostname
   become: true
@@ -35,13 +35,117 @@
         name: ansible-role-ntp
     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
 
-- name: install ldap requirements to nodes
+- name: set compute hostname to HOSTNAME.vs.hpc.nrel.gov domain
   hosts: compute
-  tags: vermilion_ldap_client
+  tags: set_hpc_hostname
   become: true
   tasks:
     - include_role:
-        name: vermilion_ldap_client
+        name: ansible-role-ntp
+    - shell: "hostnamectl set-hostname {{ ansible_hostname }}.vs.hpc.nrel.gov"
+
+
+# - name: install ldap requirements to nodes
+#   hosts: compute
+#   tags: vermilion_ldap_client
+#   become: true
+#   tasks:
+#     - include_role:
+#         name: vermilion_ldap_client
+
+# - name: ensure desired packages are installed
+#   hosts: all
+#   become: true
+#   vars:
+#     packages:
+#       - rsyslog
+#   tags:
+#     - nrel_base_packages
+#   tasks:
+#     - yum:
+#         state: present
+#         name: "{{ packages }}"
+
+# - name: ensure desired login packages are installed
+#   hosts: control,login
+#   become: true
+#   vars:
+#     packages:
+#       - crontabs
+#       - cronie
+#   tags:
+#     - nrel_base_packages
+#   tasks:
+#     - yum:
+#         state: present
+#         name: "{{ packages }}"
+
+# - name: start systemd procs control
+#   hosts: control,login
+#   become: true
+#   tags:
+#     - nrel_base_packages
+#   tasks:
+#     - systemd:
+#         state: started
+#         enabled: yes
+#         name: "{{ item }}"
+#       loop:
+#         - crond
+#         - rsyslog
+
+# - name: start systemd procs compute
+#   hosts: compute
+#   become: true
+#   tags:
+#     - nrel_base_packages
+#   tasks:
+#     - systemd:
+#         state: restarted
+#         enabled: yes
+#         name: "{{ item }}"
+#       loop:
+#         - rsyslog
+
+# #### This is a TOTAL hack or elase podman container will not load
+# - name: fix perms on etc/subuid subgid files
+#   hosts: control
+#   become: true
+#   tags:
+#     - nrel_base_packages
+#     - nrel_base_packagessubid
+#   vars:
+#     etcsubvars: |
+#       stack:100000:65536
+#       podman:100000:65536
+#       rocky:165536:65536
+#   tasks:
+#     - copy:
+#         content: "{{ etcsubvars }}"
+#         mode: '4755'
+#         dest: "{{ item }}"
+#         owner: root
+#         group: root
+#       loop:
+#         - /etc/subuid
+#         - /etc/subgid
+
+
+    # - file:
+    #     state: touch
+    #     mode: '4755'
+    #     name: "{{ item }}"
+    #     owner: podman
+    #     group: podman
+    #   loop:
+    #     - /etc/subuid
+    #     - /etc/subgid
+
+
+# TODO
+# the ssh plays don't work/break when writing sshd_config
+# in /etc/ssh/sshd_config
+#AllowUsers kbendl kbs rocky root kbendl2 devuser stack sccmgr
 
 
     # # - block:
