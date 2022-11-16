@@ -24,7 +24,7 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: "vm.alaska.cpu.general.small"
-        image: "openhpc-220830-2042.qcow2"
+        image: "openhpc-221116-1159.qcow2"
     }
     login_nodes = {
         login-0: {
@@ -35,11 +35,11 @@ module "cluster" {
     compute_types = {
         small: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220830-2042.qcow2"
+            image: "openhpc-221116-1159.qcow2"
         }
         extra: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220830-2042.qcow2"
+            image: "openhpc-221116-1159.qcow2"
         }
     }
     compute_nodes = {
