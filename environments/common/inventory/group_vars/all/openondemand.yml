@@ -7,7 +7,7 @@
 
 # openondemand_servername: '' # Must be defined when using openondemand
 
-ondemand_package: ondemand-2.0.28
+ondemand_package: ondemand-2.0.29
 
 openondemand_dashboard_links: # TODO: should really only be deployed if grafana is deployed and proxying configured
   - name: Grafana
