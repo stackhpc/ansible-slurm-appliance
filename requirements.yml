@@ -1,15 +1,13 @@
 ---
 roles:
   - src: stackhpc.nfs
-    version: v21.2.1
+    version: v22.9.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
     version: v0.16.0
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: feature/no-install
     name: cloudalchemy.node_exporter
-  - src: cloudalchemy.blackbox-exporter
-    version: 1.0.0
   - src: https://github.com/cloudalchemy/ansible-prometheus.git
     version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
     name: cloudalchemy.prometheus
@@ -18,7 +16,6 @@ roles:
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
     version: service-state
-  - src: jriguera.configdrive
     # No versions available
   - src: https://github.com/stackhpc/ood-ansible.git
     name: osc.ood
