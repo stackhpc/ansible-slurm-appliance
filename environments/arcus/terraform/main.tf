@@ -17,7 +17,7 @@ variable "create_nodes" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-221117-1324.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/9
+    default = "openhpc-221118-1422.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/12
 }
 
 module "cluster" {
