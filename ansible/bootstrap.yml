@@ -53,6 +53,7 @@
       ansible.builtin.copy:
         dest: /etc/yum/vars/releasever
         content: "{{ releasever }}"
+      become: true
 
 - hosts: systemd
   become: yes
