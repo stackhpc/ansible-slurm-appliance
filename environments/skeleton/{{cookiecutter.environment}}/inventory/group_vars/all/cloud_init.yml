@@ -3,17 +3,19 @@
 # Note volumes MUST be defined using block_device{} inside openstack_compute_instance_v2,
 # NOT attached after boot, else the device ordering is liable to change e.g. on reboots.
 
+block_device_prefix: sd
+
 cloud_init_userdata_templates_extra:
   - module: fs_setup
     group: control
     template: |
         - label: state
           filesystem: ext4
-          device: /dev/vdb
+          device: /dev/{{ block_device_prefix }}b
           partition: auto
         - label: home
           filesystem: ext4
-          device: /dev/vdc
+          device: /dev/{{ block_device_prefix }}c
           partition: auto
   - module: mounts
     group: control
