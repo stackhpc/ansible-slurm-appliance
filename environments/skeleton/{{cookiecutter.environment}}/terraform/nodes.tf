@@ -109,12 +109,26 @@ resource "openstack_compute_instance_v2" "control" {
     environment_root = var.environment_root
   }
 
-  user_data = fileexists(format(local.user_data_path, "control")) ? file(format(local.user_data_path, "control")) : null
+  user_data = <<-EOF
+    #cloud-config
+    fs_setup:
+      - label: state
+        filesystem: ext4
+        device: /dev/vdb
+        partition: auto
+      - label: home
+        filesystem: ext4
+        device: /dev/vdc
+        partition: auto
+
+    mounts:
+      - [LABEL=state, ${var.state_dir}]
+      - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
+  EOF
 
   lifecycle{
     ignore_changes = [
       image_name,
-      user_data,
       ]
     }
 
@@ -138,12 +152,9 @@ resource "openstack_compute_instance_v2" "login" {
     environment_root = var.environment_root
   }
 
-  user_data = fileexists(format(local.user_data_path, each.key)) ? file(format(local.user_data_path, each.key)) : null
-
   lifecycle{
     ignore_changes = [
       image_name,
-      user_data,
       ]
     }
 
@@ -167,12 +178,9 @@ resource "openstack_compute_instance_v2" "compute" {
     environment_root = var.environment_root
   }
 
-  user_data = fileexists(format(local.user_data_path, each.key)) ? file(format(local.user_data_path, each.key)) : null
-
   lifecycle{
     ignore_changes = [
       image_name,
-      user_data,
       ]
     }
 

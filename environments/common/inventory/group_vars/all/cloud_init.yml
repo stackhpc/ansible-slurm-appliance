@@ -1,6 +1,0 @@
-cloud_init_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/cloud_init"
-
-cloud_init_userdata_templates_default: [] # provides indirection so environments could copy parts of default without having to rewrite the entire thing
-
-cloud_init_userdata_templates_extra: []
-cloud_init_userdata_templates: "{{ cloud_init_userdata_templates_default + cloud_init_userdata_templates_extra }}"
