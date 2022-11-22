@@ -52,7 +52,7 @@ variable "environment_root" {
 variable "block_device_prefix" {
     type = string
     description = "Prefix for block device names"
-    default = "vd"
+    default = "sd"
 }
 
 variable "state_dir" {

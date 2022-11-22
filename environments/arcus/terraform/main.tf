@@ -14,6 +14,12 @@ variable "create_nodes" {
     default = true
 }
 
+variable "cluster_image" {
+    description = "single image for all cluster nodes - a convenience for CI"
+    type = string
+    default = "openhpc-221118-1422.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/12
+}
+
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
@@ -24,22 +30,22 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: "vm.alaska.cpu.general.small"
-        image: "openhpc-221027-1557.qcow2"
+        image: var.cluster_image
     }
     login_nodes = {
         login-0: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-221027-1557.qcow2"
+            image: var.cluster_image
         }
     }
     compute_types = {
         small: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-221027-1557.qcow2"
+            image: var.cluster_image
         }
         extra: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-221027-1557.qcow2"
+            image: var.cluster_image
         }
     }
     compute_nodes = {
