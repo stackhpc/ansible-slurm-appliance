@@ -1,0 +1,32 @@
+/usr/bin/podman run \
+    --cidfile=%t/%n.ctr-id \
+    --cgroups=no-conmon \
+    --rm \
+    --network=slirp4netns:cidr=10.0.2.0/24 \
+    --sdnotify=conmon \
+    --detach \
+    --replace \
+    --name freeipa-server \
+    --sysctl net.ipv6.conf.all.disable_ipv6=0 \
+    --read-only \
+    --dns=127.0.0.1 \
+    --hostname ipa01.noetchosts.test \
+    --publish 53:53/udp \
+    --publish 53:53/tcp \
+    --publish 80:80/tcp \
+    --publish 443:443/tcp \
+    --publish 389:389/tcp \
+    --publish 636:636/tcp \
+    --publish 123:123/udp \
+    --publish 88:88/tcp \
+    --publish 88:88/udp \
+    --publish 464:464/tcp \
+    --publish 464:464/udp \
+    -e IPA_SERVER_IP=10.60.102.51 \
+    -v /var/lib/ipa-data:/data:Z \
+    quay.io/freeipa/freeipa-server:rocky-8-4.9.10 \
+    --setup-dns \
+    --auto-forwarders \
+    --no-dnssec-validation \
+    --no-ntp \
+    --unattended

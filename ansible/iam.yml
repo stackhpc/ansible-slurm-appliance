@@ -1,3 +1,11 @@
+- hosts: freeipa_server
+  become: yes
+  tags: freeipa_server
+  gather_facts: yes
+  tasks:
+    - import_role:
+        name: freeipa
+        tasks_from: server.yml
 - hosts: basic_users
   become: yes
   tags:

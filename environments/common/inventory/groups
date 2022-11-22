@@ -104,3 +104,6 @@ opendistro
 grafana
 control
 prometheus
+
+[freeipa_server]
+# Hosts to run FreeIPA server on

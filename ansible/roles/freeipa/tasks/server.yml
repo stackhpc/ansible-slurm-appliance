@@ -1,0 +1,32 @@
+- name: Ensure FreeIPA server configuration directory exists
+  file:
+    path: "{{ freeipa_server_datadir }}"
+    state: directory
+    owner: "{{ freeipa_server_podman_user }}"
+    group: "{{ freeipa_server_podman_user }}"
+
+- name: Template FreeIPA server options
+  template:
+    src: ipa-server-options.j2
+    dest: "{{ freeipa_server_datadir }}/ipa-server-install-options"
+    owner: "{{ freeipa_server_podman_user }}"
+    group: "{{ freeipa_server_podman_user }}"
+
+- name: Create FreeIPA server container unit file
+  template:
+    dest: /etc/systemd/system/freeipa-server.service
+    src: ipa-server.service.j2
+  register: _freeipa_server_unitfile
+
+- name: Enable rootless podman to bind priviledged port
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: '53'
+    sysctl_set: yes
+
+- name: Ensure freeipa-server service state
+  systemd:
+    name: freeipa-server
+    state: "{{ freeipa_server_state | default('restarted' if _freeipa_server_unitfile.changed else 'started') }}"
+    enabled: "{{ freeipa_server_enabled }}"
+    daemon_reload: "{{ _freeipa_server_unitfile.changed }}"
