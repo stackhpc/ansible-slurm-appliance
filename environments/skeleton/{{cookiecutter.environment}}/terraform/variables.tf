@@ -49,6 +49,12 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
+variable "block_device_prefix" {
+    type = string
+    description = "Prefix for block device names"
+    default = "vd"
+}
+
 variable "state_dir" {
     type = string
     description = "Path to state directory on control node"
