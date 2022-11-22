@@ -1,27 +1,6 @@
 cloud_init_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/cloud_init"
 
-etc_hosts_template: |
-  127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-  ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-
-  {% for hostname in groups['etc_hosts'] | sort -%}
-  {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
-  {% endfor -%}
-
-cloud_init_userdata_etchosts:
-  module: write_files
-  group: etc_hosts
-  template: |-
-    # etc_hosts group:
-      - path: /etc/hosts
-        encoding: text/plain
-        permissions: "0644"
-        owner: root:root
-        content: |
-          {{ etc_hosts_template | indent(width=6, first=false) }}
-
-cloud_init_userdata_templates_default: # provides indirection so environments could copy parts of default without having to rewrite the entire thing
-  - "{{ cloud_init_userdata_etchosts }}"
+cloud_init_userdata_templates_default: [] # provides indirection so environments could copy parts of default without having to rewrite the entire thing
 
 cloud_init_userdata_templates_extra: []
 cloud_init_userdata_templates: "{{ cloud_init_userdata_templates_default + cloud_init_userdata_templates_extra }}"
