@@ -14,7 +14,7 @@
   tags: install
   yum:
     name:
-      - turbovnc-2.2.7 # see https://discourse.osc.edu/t/turbovnc-seems-to-no-longer-have-the-nohttpd-option/1856/6 and https://github.com/OSC/ood_core/issues/737
+      - turbovnc-3.0.1
       - nmap-ncat
       - python3
 
