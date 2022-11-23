@@ -1,0 +1,70 @@
+# yaml-format ansible inventory with default hostvars
+# This provides defaults when no actual hosts are available, i.e. during provisining or image build. It should be overriden/extended
+# using an environment's own cluster.yml file.
+# NB: This is the lowest-possible priority - it will be overridden by inventory files in other inventories, 'all' group_vars, etc.
+all:
+  vars:
+    # Must be provided in an environment:
+    cluster_name: "{{ undef(hint='cluster_name must be defined') }}"
+    image_name: "{{ undef(hint='image_name must be defined') }}"
+    flavor: "{{ undef(hint='flavor must be defined') }}"
+    key_pair: "{{ undef(hint='key_pair must be defined') }}"
+    network_name: "{{ undef(hint='network_name must be defined') }}"
+    subnet_name: "{{ undef(hint='subnet_name must be defined') }}"
+
+    # tf meta:
+    tf_ignore_changes:
+      - image_name
+      - user_data
+    
+    state_volume_size: 150 # GB
+    home_volume_size: 100 # GB
+    volumes: []
+    
+    # tf openstack_networking_port_v2:binding
+    vnic_profile: {}
+    vnic_type: normal
+    
+    security_groups: ["default"]
+    
+    openhpc_cluster_name: "{{ cluster_name }}" # FIXME move to defaults?
+    block_device_prefix: vd
+
+control:
+  hosts:
+    control:
+  vars:
+    appliances_state_dir: /var/lib/state
+    volumes: # could move to defaults
+      - label: state
+        description: State for control node
+        size: "{{ state_volume_size }}"
+        mount_point: "{{ appliances_state_dir }}"
+      - label: home
+        description: Home for cluster
+        size: "{{ home_volume_size }}"
+        mount_point: /exports/home
+        mount_options: 'x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service'
+    user_data: |
+      #cloud-config
+      fs_setup:
+        - label: state
+          filesystem: ext4
+          device: /dev/{{ block_device_prefix }}b
+          partition: auto
+        - label: home
+          filesystem: ext4
+          device: /dev/{{ block_device_prefix }}c
+          partition: auto
+      mounts:
+        - [LABEL=state, {{ appliances_state_dir }}]
+        - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
+
+login:
+  hosts:
+    login:
+  vars:
+    security_groups: # again could move to defaults
+      - default
+      - SSH
+      - HTTPS

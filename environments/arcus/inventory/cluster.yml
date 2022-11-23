@@ -1,0 +1,25 @@
+all:
+  vars:
+    # required:
+    cluster_name: templatetf # FIXME: needs defining for each arcus cluster!
+    image_name: openhpc-221118-1422.qcow2 # https://github.com/stackhpc/slurm_image_builder/pull/12
+    flavor: vm.alaska.cpu.general.small
+    key_pair: slurm-app-ci
+    network_name: WCDC-iLab-60
+    subnet_name: WCDC-iLab-60
+    
+    # overrides:
+    vnic_type: direct
+    block_device_prefix: sd
+    home_volume_size: 10
+    state_volume_size: 10
+
+# use child groups of compute with names starting "paritition_" to define partitions
+compute:
+  children:
+    partition_small:
+      hosts:
+        compute[0:1]:
+    partition_extra:
+      hosts:
+        compute[2:3]:

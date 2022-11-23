@@ -5,3 +5,12 @@
     - import_role:
         name: terraform
         tasks_from: template.yml
+      when: "tf_state != 'absent'"
+
+- hosts: localhost
+  become: no
+  gather_facts: no
+  tasks:
+    - import_role:
+        name: terraform
+        tasks_from: apply.yml
