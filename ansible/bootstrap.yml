@@ -70,6 +70,10 @@
         state: "{{ selinux_state }}"
         policy: "{{ selinux_policy }}"
       register: sestatus
+    - name: Flag reboot required
+      set_fact:
+        reboot_required: "{{ reboot_required | default([]) + [sestatus.msg] }}"
+      when: sestatus.reboot_required | default(false)
 
 - hosts: firewalld
   gather_facts: false
@@ -101,6 +105,11 @@
         tasks_from: config.yml
       tags: config
 
+    - name: Flag reboot required
+      set_fact:
+        reboot_required: "{{ reboot_required | default([]) + ['Configuration changes for podman'] }}"
+      when: podman_reboot_required | default(false)
+
 - hosts: update
   gather_facts: false
   become: yes
@@ -117,6 +126,7 @@
         async: "{{ 30 * 60 }}" # wait for up to 30 minutes
         poll: 15 # check every 15 seconds
         register: updates
+
       - name: Ensure update log directory on localhost exists
         file:
           path: "{{ update_log_path | dirname }}"
@@ -124,6 +134,7 @@
         become: false
         delegate_to: localhost
         run_once: true
+
       - name: Log updated packages
         copy:
           content: "{{ updates.results | join('\n') }}"
@@ -132,31 +143,38 @@
         become: no
       - debug:
           msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
+
+      - name: Check for pending reboot from package updates
+        stat:
+          path: /var/run/reboot-required
+          register: _stat_update_reboot_required
+
+      - name: Flag reboot required
+        set_fact:
+          reboot_required: "{{ reboot_required | default([]) + ['From package updates'] }}"
+        when: _stat_update_reboot_required.stat.exists | bool
+
       when: "update_enable | default('false') | bool"
 
-- hosts:
-    - selinux
-    - update
+- hosts: all
   gather_facts: false
   become: yes
   tags:
     - reboot
     - selinux
     - update
+    - podman
   tasks:
-    - name: Check for pending reboot from package updates
-      stat: 
-        path: /var/run/reboot-required
-      register: update_reboot_required
-    - debug:
-        msg: "setstatus:{{ (sestatus.reboot_required | default(false)) }} packages: {{ (update_reboot_required.stat.exists | bool) }}"
-    - name: Reboot if required from SELinux state change or package upgrades
-      reboot:
-        post_reboot_delay: 30
-      when: (sestatus['reboot_required'] | default(false)) or (update_reboot_required.stat.exists | bool)
-    - name: Wait for hosts to be reachable
-      wait_for_connection:
-        sleep: 15
-    - name: update facts
-      setup:
-      when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
+    - block:
+      - name: Show reasons for reboot
+        debug:
+          msg: "{{ reboot_required }}"
+      - name: Reboot
+        reboot:
+          post_reboot_delay: 30
+      - name: Wait for hosts to be reachable
+        wait_for_connection:
+          sleep: 15
+      - name: update facts
+        setup:
+      when: reboot_required | default([]) | length > 0
