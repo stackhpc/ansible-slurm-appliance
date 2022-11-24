@@ -29,7 +29,7 @@ module "cluster" {
     vnic_type = "direct"
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "vm.alaska.cpu.general.small"
+        flavor: "vm.alaska.cpu.general.quarter" # 28GB memory
         image: var.cluster_image
     }
     login_nodes = {
