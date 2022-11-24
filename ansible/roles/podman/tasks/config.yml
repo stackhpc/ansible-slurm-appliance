@@ -76,3 +76,68 @@
   loop: "{{ podman_tmp.results }}"
   loop_control:
     label: "{{ item.item.name }}"
+
+- name: Check whether cgroups v2 is enabled
+  stat:
+    path:  /sys/fs/cgroup/cgroup.controllers
+  register: _stat_cgroup
+
+- name: Enable cgroups v2
+  # grubby output/rc doesn't change whether or not its added something
+  command:
+    cmd: 'grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=1"'
+  when: not _stat_cgroup.stat.exists
+  changed_when: not _stat_cgroup.stat.exists
+  become: yes
+
+- name: Set reboot flag
+  set_fact:
+    podman_reboot_required: true
+  when: not _stat_cgroup.stat.exists
+
+- name: Check if users have lingering enabled
+  stat:
+    path: "/var/lib/systemd/linger/{{ item }}"
+  register: _stat_linger
+  loop: "{{ podman_users | map(attribute='name') }}"
+  become: yes
+
+- name: Enable user lingering
+  command:
+    cmd: "loginctl enable-linger {{ item.item }}"
+  loop: "{{ _stat_linger.results }}"
+  when: not item.stat.exists
+  become: yes
+
+- name: Fix broken systemd cgroups - make directory
+  file:
+    path: /etc/systemd/system/user-.slice.d/
+    state: directory
+    owner: root
+    group: root
+  become: yes
+
+- name: Fix broken systemd cgroups - create file
+  # See https://bugzilla.redhat.com/show_bug.cgi?id=1897579#c50
+  copy:
+    dest: /etc/systemd/system/user-.slice.d/override.conf
+    content: |
+      [Slice]
+      Slice=user.slice
+
+      CPUAccounting=yes
+      MemoryAccounting=yes
+      IOAccounting=yes
+      TasksAccounting=yes
+    owner: root
+    group: root
+  become: yes
+  register: _copy_cgroups
+
+- name: Reload systemd
+  command:
+    cmd: systemctl daemon-reload
+  # set_fact:
+  #   podman_reboot_required: true
+  become: yes
+  when: _copy_cgroups.changed
