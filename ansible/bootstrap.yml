@@ -14,7 +14,7 @@
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
 - hosts: etc_hosts
-  gather_facts: false
+  gather_facts: yes
   tags: etc_hosts
   become: yes
   tasks:
