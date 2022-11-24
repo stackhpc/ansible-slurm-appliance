@@ -1,4 +1,4 @@
-freeipa_realm: "{{ openhpc_cluster_name | upper }}.test"
+freeipa_realm: "{{ openhpc_cluster_name | upper }}.TEST"
 freeipa_server_podman_user: podman
 freeipa_ds_password: "{{ vault_freeipa_ds_password }}"
 freeipa_admin_password: "{{ vault_freeipa_admin_password }}"

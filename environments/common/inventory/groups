@@ -29,6 +29,7 @@ openhpc
 opendistro
 filebeat
 mysql
+freeipa_server
 
 [prometheus]
 # Single node to host monitoring server.
