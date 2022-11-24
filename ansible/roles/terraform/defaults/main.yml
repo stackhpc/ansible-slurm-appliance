@@ -3,6 +3,7 @@ tf_template_path: # default uses normal ansible search path
 tf_single_templates:
   - main.tf.j2
   - network.tf.j2
+  - inventory.tf.j2
 tf_host_templates:
   - node.tf.j2
 tf_state: present
