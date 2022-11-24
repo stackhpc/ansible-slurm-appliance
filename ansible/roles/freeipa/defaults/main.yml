@@ -8,7 +8,7 @@ freeipa_server_podman_user: "{{ ansible_user }}"
 freeipa_server_podman_group: "{{ freeipa_server_podman_user }}"
 freeipa_server_ip: "{{ ansible_default_ipv4.address }}"
 freeipa_server_hostname: "ipa01.{{ freeipa_domain }}"
-freeipa_server_tag: rocky-8-4.9.10
+freeipa_server_tag: rocky-9-4.9.8
 # freeipa_server_state: started
 freeipa_server_enabled: true
 freeipa_server_datadir: /var/lib/ipa-data
