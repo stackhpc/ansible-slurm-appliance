@@ -1,9 +1,20 @@
 
 resource "local_file" "hosts" {
     content  = <<EOT
-{% for host in groups['all'] %}
+{% for host in groups['all'] | sort %}
 {{ host }} ansible_host=${openstack_networking_port_v2.{{ host }}.all_fixed_ips[0]}
 {% endfor %}
 EOT
     filename = "../inventory/hosts"
+}
+
+resource "local_file" "partitions" {
+    content = <<EOT
+{% for part in openhpc_slurm_partitions %}
+{{ cluster_name }}_{{ part.name }}:
+    children:
+        {{ part.name }}
+{% endfor %}
+EOT
+    filename = "../inventory/partitions.yml"
 }
