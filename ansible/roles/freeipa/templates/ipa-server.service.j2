@@ -1,7 +1,7 @@
 # freeipa-server.service
 
 [Unit]
-Description=Podman container 
+Description=Podman container-freeipa-server.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -10,9 +10,11 @@ RequiresMountsFor=%t/containers
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=on-failure
+TimeoutStartSec=600
+TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
-#     --cidfile=%t/%n.ctr-id
 ExecStart=/usr/bin/podman run \
+    --cidfile=%t/%n.ctr-id \
     --cgroups=no-conmon \
     --rm \
     --network=slirp4netns:cidr={{ podman_cidr }} \
@@ -43,15 +45,12 @@ ExecStart=/usr/bin/podman run \
     --no-dnssec-validation \
     --no-ntp \
     --unattended
-#ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
-ExecStop=/usr/bin/podman stop --ignore freeipa-server
-#ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
-ExecStopPost=/usr/bin/podman rm -f --ignore freeipa-server
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
 NotifyAccess=all
 User={{ freeipa_server_podman_user }}
 Group={{ freeipa_server_podman_user }}
-TimeoutStartSec=600
 
 [Install]
 WantedBy=multi-user.target default.target
