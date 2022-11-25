@@ -36,7 +36,7 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}" {
 
 resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   
-  name = "{{ cluster_name }}-{{ inventory_hostname }}"
+  name = "{{ hostname }}"
   image_name = data.openstack_images_image_v2.{{ inventory_hostname }}.name
   flavor_name = "{{ hostvars[inventory_hostname].flavor }}"
   key_pair = "{{ hostvars[inventory_hostname].key_pair }}"

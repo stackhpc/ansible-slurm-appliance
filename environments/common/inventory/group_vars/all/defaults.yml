@@ -5,13 +5,16 @@ appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
 #appliances_state_dir: # define an absolute path here to use for persistent state
 releasever: '8.6'
+# Define actual hostname:
+# - Cannot use `ansible_nodename` as may not have facts for all nodes e.g. during image build.
+# - Just `inventory_hostname` provides backwards compatibility with earlier default Terraform.
+hostname: "{{ '%s-%s' % (cluster_name, inventory_hostname) if cluster_name not in inventory_hostname else inventory_hostname }}"
 
-# Address(ip/dns) for internal communication between services. This is
-# normally traffic you do no want to expose to users.
-internal_address: "{{ inventory_hostname }}"
-# Address(ip/dns) for user facing services e.g grafana. Can be set to
-# `internal_address`
-api_address: "{{ inventory_hostname }}"
+# Address(ip/dns) for internal communication between services. This is normally traffic you do not want to expose to users.
+internal_address: "{{ hostname }}"
+
+# Address(ip/dns) for user facing services e.g grafana:
+api_address: "{{ hostname }}"
 
 # Service endpoints
 elasticsearch_address: "{{ hostvars[groups['opendistro'].0].api_address }}"

@@ -2,5 +2,5 @@
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
 {% for inventory_hostname in groups['etc_hosts'] | sort -%}
-{{ hostvars[inventory_hostname]['ansible_host'] }} {{ hostvars[inventory_hostname]['ansible_nodename'] }}
+{{ hostvars[inventory_hostname]['ansible_host'] }} {{ hostvars[inventory_hostname]['hostname'] }}
 {% endfor -%}
