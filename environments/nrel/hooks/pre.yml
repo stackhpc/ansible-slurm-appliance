@@ -16,42 +16,36 @@
     - include_role:
         name: ansible_yum_config
 
-- name: Ensure times are correct
-  hosts: all
-  tags: set_time_on_servers
-  become: true
-  tasks:
-    - include_role:
-        name: ansible-role-ntp
-    - shell: "echo '{{distro_releasever}}' > /etc/yum/vars/releasever"
-      tags: lock_releasever
+# - name: Set releasever
+#   hosts: all
+#   tags: set_time_on_servers
+#   become: true
+#   tasks:
+#     - shell: "echo '{{distro_releasever}}' > /etc/yum/vars/releasever"
+#       tags: lock_releasever
 
 - name: set admin hostnames to hpc.nrel.gov domain
   hosts: control,login
   tags: set_hpc_hostname
   become: true
   tasks:
-    - include_role:
-        name: ansible-role-ntp
     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
 
-- name: set compute hostname to HOSTNAME.vs.hpc.nrel.gov domain
+# - name: set compute hostname to HOSTNAME.vs.hpc.nrel.gov domain
+#   hosts: compute
+#   tags: set_hpc_hostname
+#   become: true
+#   tasks:
+#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.vs.hpc.nrel.gov"
+
+
+- name: install ldap requirements to nodes
   hosts: compute
-  tags: set_hpc_hostname
+  tags: vermilion_ldap_client
   become: true
   tasks:
     - include_role:
-        name: ansible-role-ntp
-    - shell: "hostnamectl set-hostname {{ ansible_hostname }}.vs.hpc.nrel.gov"
-
-
-# - name: install ldap requirements to nodes
-#   hosts: compute
-#   tags: vermilion_ldap_client
-#   become: true
-#   tasks:
-#     - include_role:
-#         name: vermilion_ldap_client
+        name: vermilion_ldap_client
 
 # - name: ensure desired packages are installed
 #   hosts: all
@@ -147,25 +141,32 @@
 # in /etc/ssh/sshd_config
 #AllowUsers kbendl kbs rocky root kbendl2 devuser stack sccmgr
 
+- name: Ensure yum repos are local
+  hosts: all
+  tags: do_nrel_ceph_repo
+  become: true
+  tasks:
+    - name: Add Ceph reposity
+      yum_repository:
+        name: ceph
+        description: repo for ceph
+        baseurl: "{{ os_manila_mount_ceph_repo_base }}"
+        gpgcheck: 0
+        gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
+      when:
+        - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
+        - os_manila_mount_pkgs_install | default(true) | bool
 
-    # # - block:
-    #   # - name: Add Ceph reposity
-    #   #   yum_repository: centos-release-ceph
-    #   #     name: "centos-release-ceph-{{ os_manila_mount_ceph_version }}"
-    #   #     description: CentOS Storage SIG repo for ceph
-    #   #     baseurl: "{{ os_manila_mount_ceph_repo_base }}"
-    #   #     gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
     # - name: NREL says - Install epel and ceph yum repo
+    #   tags: do_nrel_ceph_repo
     #   yum:
-    #     name:
-    #       - epel-release
-    #       - "centos-release-ceph-{{ os_manila_mount_ceph_version }}"
+    #     name: centos-release-ceph-{{ os_manila_mount_ceph_version }}
 
-    # - name: Install relevant yum packages
-    #   yum:
-    #     name:
-    #       - ceph-common
-    # # when:
-    # #   - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
-    # #   - os_manila_mount_pkgs_install | default(true) | bool
+    - name: Install relevant yum packages
+      yum:
+        name:
+          - ceph-common
+      when:
+        - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
+        - os_manila_mount_pkgs_install | default(true) | bool
 

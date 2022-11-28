@@ -26,44 +26,44 @@
     - include_role:
         name: vs-set-ephemeral-mounts
 
-- name: sync_slurm_allocations install on admin node
-  hosts: admin
-  become: true
-  tags:
-    - sync_slurm_allocations_admin
-  tasks:
-    - include_role:
-        name: sync_slurm_allocations
+# - name: sync_slurm_allocations install on admin node
+#   hosts: admin
+#   become: true
+#   tags:
+#     - sync_slurm_allocations_admin
+#   tasks:
+#     - include_role:
+#         name: sync_slurm_allocations
 
-- name: cluster_dataset_manager create project directories
-  hosts: admin
-  become: true
-  tags:
-    - cluster_dataset_manager
-  tasks:
-    - include_role:
-        name: cluster_dataset_manager
+# - name: cluster_dataset_manager create project directories
+#   hosts: admin
+#   become: true
+#   tags:
+#     - cluster_dataset_manager
+#   tasks:
+#     - include_role:
+#         name: cluster_dataset_manager
 
-- name: pam_mkhomedir_plus
-  hosts: login
-  become: true
-  tags:
-    - pam_mkhomedir_plus
-  tasks:
-    - include_role:
-        name: pam_mkhomedir_plus
+# - name: pam_mkhomedir_plus
+#   hosts: login
+#   become: true
+#   tags:
+#     - pam_mkhomedir_plus
+#   tasks:
+#     - include_role:
+#         name: pam_mkhomedir_plus
 
-- name: slurm_lex_accounting
-  hosts: control
-  become: true
-  tags:
-    - slurm_lex_accounting
-  tasks:
-    - include_role:
-        name: slurm_lex_accounting
-  vars:
-    slurm_lex_accounting_dev: False
-    slurm_lex_accounting_clustername: "{{ openhpc_cluster_name }}"
+# - name: slurm_lex_accounting
+#   hosts: control
+#   become: true
+#   tags:
+#     - slurm_lex_accounting
+#   tasks:
+#     - include_role:
+#         name: slurm_lex_accounting
+#   vars:
+#     slurm_lex_accounting_dev: False
+#     slurm_lex_accounting_clustername: "{{ openhpc_cluster_name }}"
 
 - name: vstack_admin_config
   hosts: admin:login
