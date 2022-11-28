@@ -77,10 +77,10 @@ resource "openstack_networking_port_v2" "control_control" {
     ]
   }
 }
-
+#### NREL test control name set here:
 resource "openstack_compute_instance_v2" "control" {
 
-  name = "${var.cluster_name}-control"
+  name = "${var.cluster_name}-vtcontrol"
   image_name = var.control_image
   flavor_name = var.control_flavor
   key_pair = var.key_pair

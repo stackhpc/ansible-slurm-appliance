@@ -1,52 +1,50 @@
 compute_types = {
   large: {
     flavor: "test.compute.c60m240s8e1k"
-    image: "vermilion_rocky86_nodes"
+    image: "TEST_Rocky86_login"
   }
   /* standard: {
     flavor: "compute.c30m120s60e500"
-    image: "rocky8.5_ofed+cuda"
+    image: "rocky-221117-1304"
   } */
   small: {
-    flavor: "test.compute.c4m16s8e60"
-    image: "vermilion_rocky86_nodes"
+    flavor: "test.compute.c8m32s8e60"
+    image: "TEST_Rocky86_login"
   }
   /* tiny: {
     flavor: "compute.c4m16s8e60"
-    image: "Rocky86_login"
+    image: "rocky-221117-1304"
   } */
   gpu: {
     flavor: "test.gpu.c30m120s16e5000"
-    image: "vermilion_rocky86_nodes"
+    image: "TEST_Rocky86_login"
   }
 }
 #######################################
 compute_names = {
 # Node-inventory.txt
-lg-001: "large"
-lg-002: "large"
-sm-001: "small"
-sm-002: "small"
-gpu-001: "gpu"
-gpu-002: "gpu"
+vlg-001: "large"
+vsm-001: "small"
+vsm-002: "small"
+vgpu-001: "gpu"
+vgpu-002: "gpu"
 }
 ###################################################
 
-# login_names are are the flavor names to use
 login_names = {
-  login-1: "test.gen.c8m16s16"
-  admin: "test.gen.c8m16s16"
+  vtlogin-1: "test.gen.c8m16s16"
+  vtadmin: "test.gen.c8m16s16"
 }
 login_ips = {
-  login-1: "10.60.107.241"
-  admin: "10.60.107.243"
+  vtlogin-1: "10.60.107.241"
+  vtadmin: "10.60.107.243"
 }
 
-login_image = "vermilion_rocky86_login"
+login_image = "TEST_Rocky86_login"
 
-proxy_name = "login-1"
+proxy_name = "vtlogin-1"
 
-control_image = "vermilion_rocky86_login"
+control_image = "TEST_Rocky86_login"
 control_flavor = "test.gen.c8m16s16"
 control_ip = "10.60.107.240"
 
