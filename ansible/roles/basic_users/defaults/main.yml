@@ -1,4 +1,4 @@
-basic_users_manage_homedir: "{{ (ansible_hostname == (ansible_play_hosts | first)) }}"
+basic_users_manage_homedir: "{{ (inventory_hostname == (ansible_play_hosts | first)) }}"
 basic_users_userdefaults:
   state: present
   create_home: "{{ basic_users_manage_homedir }}"
