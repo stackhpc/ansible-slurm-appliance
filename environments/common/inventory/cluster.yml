@@ -31,6 +31,9 @@ all:
     block_device_prefix: vd
     tld: invalid
 
+    openhpc_slurm_partitions:
+      - name: "compute"
+
 control:
   hosts:
     control:

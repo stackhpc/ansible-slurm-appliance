@@ -14,12 +14,16 @@ all:
     home_volume_size: 10
     state_volume_size: 10
 
-# use child groups of compute with names starting "paritition_" to define partitions
+    openhpc_slurm_partitions:
+      - name: small
+      - name: extra
+
+# compute must contain child groups matching openhpc_slurm_partitions
 compute:
   children:
-    partition_small:
+    small:
       hosts:
         compute[0:1]:
-    partition_extra:
+    extra:
       hosts:
         compute[2:3]:

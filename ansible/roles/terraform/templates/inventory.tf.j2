@@ -5,6 +5,12 @@ resource "local_file" "hosts" {
 {% for inventory_hostname in groups['all'] | sort %}
 {{ inventory_hostname }} ansible_host=${openstack_networking_port_v2.{{ inventory_hostname }}.all_fixed_ips[0]}
 {% endfor %}
+
+# define groups for partitions:
+{% for part in openhpc_slurm_partitions %}
+[{{ cluster_name }}_{{ part.name }}:children]
+{{ part.name }}
+{% endfor %}
 EOT
     filename = "../inventory/hosts"
 }
