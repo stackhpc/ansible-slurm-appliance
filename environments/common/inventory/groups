@@ -104,3 +104,6 @@ opendistro
 grafana
 control
 prometheus
+
+[freeipa_server]
+# Hosts to be a FreeIPA server. See ansible/roles/freeipa/README.md

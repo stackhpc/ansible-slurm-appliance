@@ -1,0 +1,5 @@
+#freeipa_realm:
+freeipa_domain: "{{ freeipa_realm | lower }}"
+#freeipa_ds_password:
+#freeipa_admin_password:
+freeipa_server_ip: "{{ ansible_default_ipv4.address }}"

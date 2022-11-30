@@ -54,3 +54,7 @@ compute
 
 [etc_hosts]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+
+[freeipa_server:children]
+# Hosts to be a FreeIPA server. See ansible/roles/freeipa/README.md
+control
