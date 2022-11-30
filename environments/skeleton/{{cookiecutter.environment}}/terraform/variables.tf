@@ -3,6 +3,12 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources"
 }
 
+variable "tld" {
+    type = string
+    description = "Top level domain name"
+    default = "invalid"
+}
+
 variable "cluster_net" {
     type = string
     description = "Name of existing cluster network"

@@ -11,7 +11,7 @@ resource "openstack_networking_port_v2" "login" {
 
   for_each = toset(keys(var.login_nodes))
 
-  name = "${var.cluster_name}-${each.key}"
+  name = "${each.key}.${var.cluster_name}.${var.tld}"
   network_id = data.openstack_networking_network_v2.cluster_net.id
   admin_state_up = "true"
 
@@ -29,7 +29,7 @@ resource "openstack_networking_port_v2" "login" {
 
 resource "openstack_networking_port_v2" "control" {
 
-  name = "${var.cluster_name}-control"
+  name = "control.${var.cluster_name}.${var.tld}"
   network_id = data.openstack_networking_network_v2.cluster_net.id
   admin_state_up = "true"
 
@@ -49,7 +49,7 @@ resource "openstack_networking_port_v2" "compute" {
 
   for_each = toset(keys(var.compute_nodes))
 
-  name = "${var.cluster_name}-${each.key}"
+  name = "${each.key}.${var.cluster_name}.${var.tld}"
   network_id = data.openstack_networking_network_v2.cluster_net.id
   admin_state_up = "true"
 
@@ -70,7 +70,7 @@ resource "openstack_compute_instance_v2" "control" {
   
   for_each = var.create_nodes ? toset(["control"]) : toset([])
   
-  name = "${var.cluster_name}-${each.key}"
+  name = "control.${var.cluster_name}.${var.tld}"
   image_name = data.openstack_images_image_v2.control.name
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
@@ -138,7 +138,7 @@ resource "openstack_compute_instance_v2" "login" {
 
   for_each = var.create_nodes ? var.login_nodes : {}
   
-  name = "${var.cluster_name}-${each.key}"
+  name = "${each.key}.${var.cluster_name}.${var.tld}"
   image_name = each.value.image
   flavor_name = each.value.flavor
   key_pair = var.key_pair
@@ -164,7 +164,7 @@ resource "openstack_compute_instance_v2" "compute" {
 
   for_each = var.create_nodes ? var.compute_nodes : {}
   
-  name = "${var.cluster_name}-${each.key}"
+  name = "${each.key}.${var.cluster_name}.${var.tld}"
   image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
