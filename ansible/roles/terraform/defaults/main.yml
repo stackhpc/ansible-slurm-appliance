@@ -7,3 +7,4 @@ tf_single_templates:
 tf_host_templates:
   - node.tf.j2
 tf_state: present
+tf_autoapprove: no
