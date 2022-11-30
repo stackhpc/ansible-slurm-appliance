@@ -1,8 +1,9 @@
 
 resource "local_file" "hosts" {
     content  = <<EOT
-{% for host in groups['all'] %}
-{{ host }} ansible_host=${openstack_networking_port_v2.{{ host }}.all_fixed_ips[0]}
+# define host addresses:
+{% for inventory_hostname in groups['all'] | sort %}
+{{ inventory_hostname }} ansible_host=${openstack_networking_port_v2.{{ inventory_hostname }}.all_fixed_ips[0]}
 {% endfor %}
 EOT
     filename = "../inventory/hosts"

@@ -29,6 +29,7 @@ all:
     
     openhpc_cluster_name: "{{ cluster_name }}" # FIXME move to defaults?
     block_device_prefix: vd
+    tld: invalid
 
 control:
   hosts:

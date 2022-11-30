@@ -5,7 +5,7 @@ data "openstack_images_image_v2" "{{ inventory_hostname }}" {
 {% for volume in hostvars[inventory_hostname].volumes | default([]) %}
 
 resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.label }}" {
-    name = "{{ cluster_name }}-{{ inventory_hostname }}-{{ volume.label }}"
+    name = "{{ inventory_hostname }}-{{ cluster_name }}-{{ volume.label }}"
     description = "{{ volume.description | default('') }}"
     size = {{ volume.size }}
 }
@@ -14,7 +14,7 @@ resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.
 
 resource "openstack_networking_port_v2" "{{ inventory_hostname }}" {
 
-  name = "{{ cluster_name }}-{{ inventory_hostname }}"
+  name = "{{ inventory_hostname }}.{{ cluster_name }}.{{ tld }}"
   network_id = data.openstack_networking_network_v2.cluster_net.id
   admin_state_up = "true"
 
@@ -36,7 +36,7 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}" {
 
 resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   
-  name = "{{ cluster_name }}-{{ inventory_hostname }}"
+  name = "{{ inventory_hostname }}.{{ cluster_name }}.{{ tld }}"
   image_name = data.openstack_images_image_v2.{{ inventory_hostname }}.name
   flavor_name = "{{ hostvars[inventory_hostname].flavor }}"
   key_pair = "{{ hostvars[inventory_hostname].key_pair }}"
