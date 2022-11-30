@@ -4,6 +4,3 @@ cluster
 [rebuild:children]
 control
 compute
-
-[etc_hosts:children]
-cluster
