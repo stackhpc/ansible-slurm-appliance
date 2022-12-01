@@ -40,7 +40,7 @@ jobs:
         run: dev/setup-env.sh
 
       - name: Install terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
       
       # - name: Initialise terraform
       #   run: terraform init
