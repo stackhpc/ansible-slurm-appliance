@@ -23,7 +23,7 @@ compute:
   children:
     small:
       hosts:
-        compute[0:1]:
+        compute-[0:1]:
     extra:
       hosts:
-        compute[2:3]:
+        compute-[2:3]:
