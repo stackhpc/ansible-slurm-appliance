@@ -9,6 +9,7 @@ from collections import defaultdict
 import jinja2
 from ansible.module_utils.six import string_types
 import os.path
+import re
 
 def prometheus_node_exporter_targets(hosts, env):
     result = []
@@ -34,6 +35,19 @@ def readfile(fpath):
 def exists(fpath):
     return os.path.isfile(fpath)
 
+def to_regex(items):
+    """ Convert a list of strings possibly containing digits into a regex containing \d+
+    
+        eg {{ [compute-001, compute-002, control] | to_regex }} -> '(compute-\d+)|(control)'
+    """
+    
+    # There's a python bug which means re.sub() can't use '\d' in the replacement so
+    # ave to do replacement in two stages:
+    r = [re.sub(r"\d+", 'XBACKSLASHX', v) for v in items]
+    r = [v.replace('XBACKSLASHX', '\d+') for v in set(r)]
+    r = ['(%s)' % v for v in r]
+    return '|'.join(r)
+
 class FilterModule(object):
     ''' Ansible core jinja2 filters '''
 
@@ -47,5 +61,6 @@ class FilterModule(object):
             'readfile': readfile,
             'prometheus_node_exporter_targets': prometheus_node_exporter_targets,
             'exists': exists,
-            'warn': self.warn
+            'warn': self.warn,
+            'to_regex': to_regex
         }
