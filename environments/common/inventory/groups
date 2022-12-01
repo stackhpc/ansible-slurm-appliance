@@ -107,3 +107,11 @@ prometheus
 
 [freeipa_server]
 # Hosts to be a FreeIPA server. See ansible/roles/freeipa/README.md
+
+[freeipa_client]
+# Hosts to be a FreeIPA client. See ansible/roles/freeipa/README.md
+
+[freeipa:children]
+# Allows defining variables common to freeipa_server and _client
+freeipa_server
+freeipa_client

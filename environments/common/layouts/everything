@@ -58,3 +58,7 @@ compute
 [freeipa_server:children]
 # Hosts to be a FreeIPA server. See ansible/roles/freeipa/README.md
 control
+
+[freeipa_client:children]
+login
+compute

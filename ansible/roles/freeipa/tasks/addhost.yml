@@ -1,0 +1,18 @@
+- name: Add host to IPA
+  # annoyingly this always shows as changed!
+  community.general.ipa_host:
+    name: "{{ inventory_hostname }}"
+    ip_address: "{{ freeipa_client_ip }}"
+    ipa_host: "{{ groups['freeipa_server'].0 }}"
+    ipa_pass: "{{ vault_freeipa_admin_password }}"
+    ipa_user: admin
+    random_password: true
+    state: present
+    validate_certs: false
+  delegate_to: "{{ groups['freeipa_server'].0 }}"
+  register: _ipa_host_add
+- debug:
+    var: _ipa_host_add
+
+- set_fact:
+    freeipa_client_randompassword: "{{ _ipa_host_add.host.randompassword }}" # could use ipa host-mod --random to set a new one, if necessary

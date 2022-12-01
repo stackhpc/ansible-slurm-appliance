@@ -1,3 +1,4 @@
 freeipa_realm: "{{ openhpc_cluster_name | upper }}.INVALID"
 freeipa_ds_password: "{{ vault_freeipa_ds_password }}"
 freeipa_admin_password: "{{ vault_freeipa_admin_password }}"
+freeipa_server_ip: "{{ hostvars[groups['freeipa_server'].0].ansible_host }}" # not using ansible_default_ipv4.address as that requires facts

@@ -2,4 +2,6 @@
 freeipa_domain: "{{ freeipa_realm | lower }}"
 #freeipa_ds_password:
 #freeipa_admin_password:
-freeipa_server_ip: "{{ ansible_default_ipv4.address }}"
+#freeipa_server_ip:
+freeipa_client_ip: "{{ ansible_host }}" # when run on freeipa_client group!
+# freeipa_client_randompassword: # auto set
