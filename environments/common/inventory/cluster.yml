@@ -1,7 +1,7 @@
-# yaml-format ansible inventory with default hostvars
-# This provides defaults when no actual hosts are available, i.e. during provisining or image build. It should be overriden/extended
-# using an environment's own cluster.yml file.
+# Yaml-format ansible inventory with default hostvars. It should be overriden/extended by an environment's own cluster.yml file.
 # NB: This is the lowest-possible priority - it will be overridden by inventory files in other inventories, 'all' group_vars, etc.
+# Host and group vars defined here are available even when no hosts have been provisioned (e.g. during provisioning or image build).
+
 all:
   vars:
     # Must be provided in an environment:
@@ -12,25 +12,28 @@ all:
     network_name: "{{ undef(hint='network_name must be defined') }}"
     subnet_name: "{{ undef(hint='subnet_name must be defined') }}"
 
-    # tf meta:
+    # top-level domain for cluster (FQDN is nodename.clustername.tld):
+    tld: invalid
+
+    # terraform lifecycle:
     tf_ignore_changes:
       - image_name
       - user_data
     
+    # openstack volume options - note hostvars too:
     state_volume_size: 150 # GB
     home_volume_size: 100 # GB
+    block_device_prefix: vd
     volumes: []
     
-    # tf openstack_networking_port_v2:binding
+    # terrraform openstack_networking_port_v2:binding
     vnic_profile: {}
     vnic_type: normal
     
     security_groups: ["default"]
-    
-    openhpc_cluster_name: "{{ cluster_name }}" # FIXME move to defaults?
-    block_device_prefix: vd
-    tld: invalid
 
+    # this default works when there are no child groups in the 'compute' group
+    # and no partition customisation is required
     openhpc_slurm_partitions:
       - name: "compute"
 
