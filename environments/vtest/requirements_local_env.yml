@@ -75,3 +75,7 @@ roles:
   - name: ansible_sshd_baseline
     src: git+git@github.nrel.gov:hpc/ansible_sshd_baseline.git
     type: git
+
+  - name: vs_hpc_mounts
+    src: git+git@github.nrel.gov:hpc/vs_hpc_mounts.git
+    type: git
