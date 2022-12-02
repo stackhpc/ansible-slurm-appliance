@@ -1,21 +1,4 @@
 - name: Add users to freeipa
   # this falls back to the keys from ansible.builtin.user, where they're equivalent
   community.general.ipa_user: "{{ freeipa_user_defaults | combine(item) }}"
-    # name: "{{ item.name }}"
-    # password: "{{ item.password }}"
-    # # update_password: always # default
-    # # uidnumber: "{{ item.uidnumber | default(item.uid) }}"
-    # # gidnumber: "{{ item.gidnumber | default(item.uidnumber) | default(item.uid) }}"
-    # givenname: "{{ item.givenname }}"
-    # sn: "{{ item.sn }}"
-    # # sshpubkey: "{{ item.sshpubkey | default(item.public_key) | default(omit) }}"
-    # # have to set this if you don't want an immediately-expired password!
-    # # krbpasswordexpiration: >-
-    # #   {{ lookup('pipe', 'date --date "1 year" +%Y%m%d%H%M%S') }}
-    # # ipa_host: not needed, using DNS
-    # ipa_pass: "{{ freeipa_admin_password | quote }}"
-    # ipa_user: admin
-
-    # state: present
-    # userauthtype: password
   loop: "{{ freeipa_users }}"

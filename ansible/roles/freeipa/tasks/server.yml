@@ -5,11 +5,9 @@
     name: '@idm:DL1/dns'
     state: present
 
-# TODO: set file mask but that's a bit horrendous?
-# TODO: verify etc_hosts is empty?
-# TODO: verify hostname is fully-qualified
 - name: Install ipa server
-# TODO: make no-ui-redirect configurable??
+# TODO: make no-ui-redirect and dns configurable??
+# TODO: set file mask as per docs? Would be hard to cope with failures. Doesn't appear to be necessary actually.
   command:
     cmd: >
       ipa-server-install
