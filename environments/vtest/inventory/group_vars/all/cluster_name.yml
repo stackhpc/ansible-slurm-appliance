@@ -1,0 +1,5 @@
+
+vermilion_cluster_name: vtest
+vermilion_cluster_name_prefix: vtest
+
+openhpc_rebuild_no_log: False
