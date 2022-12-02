@@ -30,6 +30,7 @@
       --unattended
       --mkhomedir
       --force-join
+      --enable-dns-updates
       --principal admin
       --password {{ freeipa_admin_password | quote }}
   register: ipa_client_install

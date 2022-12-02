@@ -17,6 +17,7 @@
         --admin-password {{ freeipa_admin_password | quote }} 
         --ip-address={{ freeipa_server_ip }}
         --setup-dns
+        --auto-reverse
         --auto-forwarders
         --no-dnssec-validation
         --no-ntp
