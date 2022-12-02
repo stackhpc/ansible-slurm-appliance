@@ -1,6 +1,3 @@
-[basic_users:children]
-cluster
-
 [rebuild:children]
 control
 compute
