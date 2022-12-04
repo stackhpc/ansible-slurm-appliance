@@ -1,3 +1,6 @@
-distro_releasever: "8.6"
+vermilion_cluster_name: vermilion
+vermilion_cluster_name_prefix: vs
+NREL_RELEASEVER: "8.6"
 
+# universal overrides
 openhpc_rebuild_no_log: False

@@ -27,7 +27,7 @@
         name: vs-set-ephemeral-mounts
 
 # - name: sync_slurm_allocations install on admin node
-#   hosts: admin
+#   hosts: login
 #   become: true
 #   tags:
 #     - sync_slurm_allocations_admin
@@ -66,7 +66,7 @@
 #     slurm_lex_accounting_clustername: "{{ openhpc_cluster_name }}"
 
 - name: vstack_admin_config
-  hosts: admin:login
+  hosts: control,login
   become: true
   tags:
     - vstack_admin_config
@@ -74,17 +74,8 @@
     - include_role:
         name: vstack_admin_config
 
-- name: vstack_common_config
-  hosts: control:login:compute
-  become: true
-  tags:
-    - vstack_common_config
-  tasks:
-    - include_role:
-        name: vstack_common_config
-
 - name: add kernel modules to compute and login nodes
-  hosts: login:compute
+  hosts: login,compute
   become: true
   tags:
     - post_powertools
@@ -109,7 +100,7 @@
 
 
 # - name: register_aco_idm
-#   hosts: control:login:admin
+#   hosts: control,login:
 #   become: true
 #   tags:
 #     - vstack_idm_config
@@ -125,7 +116,7 @@
 #     - ansible_sshd_baseline
 
 # - name: hspd12 provision
-#   hosts: control:login:admin
+#   hosts: control,login
 #   tags:
 #     - hspd12
 #     - aco_idm

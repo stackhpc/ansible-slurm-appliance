@@ -1,3 +1,28 @@
+
+# - name: " "
+#   hosts: control,login,compute
+#   tags: nrel_
+#   become: true
+#   tasks:
+#     - include_role:
+#         name:
+
+- name: "Set releasever and local repos"
+  hosts: control,login,compute
+  tags: nrel_releasever
+  become: true
+  tasks:
+    - include_role:
+        name: releasever-config
+
+- name: "NREL pre - Mount cephfs volumes"
+  hosts: control,login,compute
+  tags: cephfs_mounts
+  become: true
+  tasks:
+    - include_role:
+        name: vs_hpc_mounts
+
 - name: "NREL pre - set cluster root password"
   hosts: all
   tags: root_pass_cli
@@ -8,20 +33,12 @@
         name: root_pass_cli
       when: new_root_pass is defined
 
-- name: NREL pre - Ensure yum repos are local
-  hosts: all
-  tags: ansible_yum_config
-  become: true
-  tasks:
-    - include_role:
-        name: ansible_yum_config
-
-- name: "NREL pre - set admin hostnames to hpc.nrel.gov domain"
-  hosts: control,login
-  tags: set_hpc_hostname
-  become: true
-  tasks:
-    - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
+# - name: "NREL pre - set admin hostnames to hpc.nrel.gov domain"
+#   hosts: control,login
+#   tags: set_hpc_hostname
+#   become: true
+#   tasks:
+#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
 
 - name: "NREL pre - install ldap requirements to nodes"
   hosts: compute
@@ -31,15 +48,18 @@
     - include_role:
         name: vermilion_ldap_client
 
-
-- name: NREL pre - rel-proto fixes - compute nodes
-  hosts: compute
-  become: true
-  tasks:
-    - name: Create scratch directory - should be on local SSD on real cluster
-      file:
-        path: /tmp/scratch
-        state: directory
+# - name: NREL pre - rel-proto fixes - compute nodes
+#   hosts: compute
+#   become: true
+#   tasks:
+#     - name: Create scratch directory - should be on local SSD on real cluster
+#       file:
+#         src: /mnt/
+#         dest: "{{ item }}"
+#         state: directory
+#       loop:
+#         - /tmp/scratch
+#         - /var/scratch
 
 - name: NREL pre - Ensure times are correct
   hosts: all
@@ -49,51 +69,89 @@
     - include_role:
         name: ansible-role-ntp
 
-- name: NREL pre - set nodes hostnames
-  hosts: compute
-  tags: set_node_hostnames
-  become: true
-  tasks:
-    - shell: "hostnamectl set-hostname {{ ansible_hostname }}"
 
-- name: NREL pre - set hostname to hpc.nrel.gov domain
-  hosts: control,login
-  tags: set_hpc_hostname
+- name: vstack_common_config
+  hosts: control,login,compute
   become: true
+  tags:
+    - vstack_common_config
   tasks:
-    - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
+    - include_role:
+        name: vstack_common_config
 
-- name: NREL pre - set keys
-  hosts: control,login
-  tags: set_node_hostnames
+- name: "login node only configs"
+  hosts: login
+  tags: set_login_configs
   become: true
   tasks:
-    - name: setup intra-node access
-      copy:
-        dest: /root/.ssh/id_rsa
-        content: "{{ SLURM_CONTROL_KEY }}"
-      backup: yes
+    - include_role:
+        name: vermilion_login_nodes
 
-- name: NREL pre - no place for firewalld today
-  hosts: all
-  tags: vs_no_firewalld
+- name: "admin util configs"
+  hosts: login,control
+  tags: set_admin_configs
   become: true
   tasks:
-    - name: no firewalld
-      dnf:
-        name: firewalld
-        state: absent
+    - include_role:
+        name: vstack_admin_config
 
-- name: NREL pre - no place for firewalld today
-  hosts: all
-  tags: vs_no_firewalld
+- name: "Apply configs to control nodes"
+  hosts: control
+  tags: set_vermilion_control_setup
   become: true
   tasks:
-    - name: no firewalld
+    - include_role:
+        name: vermilion_control_setup
+
+- name: nrel-proto fixes - workaround no internal DNS
+  hosts:
+    - cluster
+  become: true
+  tags: etc_hosts
+  tasks:
+    - name: Internal DNS workaround - generate /etc/hosts file content
+      # which interface is used as ansible_host is defined by terraform (see `access_network`) so this is deterministic for multi-rail hosts
+      set_fact:
+        etc_hosts_content: |
+          {% for host in groups['cluster'] %}{{ hostvars[host]['ansible_host'] }} {{ host }}.novalocal {{ host }}
+          {% endfor %}
+      run_once: true
+
+    - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
+      blockinfile:
+        path: /etc/hosts
+        create: yes
+        state: present
+        block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
+
+# ref: Error: cannot setup namespace using "/usr/bin/newuidmap": should have setuid or have filecaps setuid:
+- name: "podman uid-gid workaround"
+  hosts:
+    - cluster
+  become: true
+  tags: etc_hosts
+  tasks:
+    - name: "set newuidmap/newgidmap perms so containers will start"
       file:
-        path: /var/spool/slurm/
-        state: directory
-        mode: '0755'
+        path: "{{ item }}"
+        mode: '4755'
+      loop:
+        - /usr/bin/newgidmap
+        - /usr/bin/newuidmap
+
+# - name: NREL pre - set nodes hostnames
+#   hosts: cluster
+#   tags: set_node_hostnames
+#   become: true
+#   tasks:
+#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}"
+
+# - name: "NREL pre - set hostname to hpc.nrel.gov domain"
+#   hosts: control,login
+#   tags: set_hpc_hostname
+#   become: true
+#   tasks:
+#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
 
 # - name: install ldap requirements to nodes
 #   hosts: compute
@@ -102,8 +160,6 @@
 #   tasks:
 #     - include_role:
 #         name: vermilion_ldap_client
-
-
 
 # - name: ensure desired packages are installed
 #   hosts: all
@@ -301,5 +357,5 @@
 #   tags: set_time_on_servers
 #   become: true
 #   tasks:
-#     - shell: "echo '{{distro_releasever}}' > /etc/yum/vars/releasever"
+#     - shell: "echo '{{ NREL_RELEASEVER }}' > /etc/yum/vars/releasever"
 #       tags: lock_releasever

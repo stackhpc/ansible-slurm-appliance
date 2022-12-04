@@ -22,7 +22,6 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   - ohpc-base
   - ohpc-base-compute
   - ohpc-slurm-client
-
   - lmod-ohpc
   - ohpc-autotools
 
@@ -33,6 +32,9 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   - clustershell
   - conman-ohpc
   - magpie-ohpc
+  - charliecloud-ohpc
+  - singularity-ohpc
+
 # - EasyBuild-ohpc
 
   - gnu9-compilers-ohpc
@@ -48,8 +50,7 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   # - openmpi4-gnu9-ohpc
   # #openmpi-*-ohpc mvapich2-*-ohpc intel-mpi-ohpc
 
-  #- charliecloud-ohpc
-  #- singularity-ohpc
+
 
   #- mpich-ofi-gnu9-ohpc
   #- mpich-ucx-gnu9-ohpc
@@ -91,7 +92,7 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   #- slurm-sview-ohpc
   #- slurm-libpmi-ohpc
 
-#  - python3
+# - python3
 # - make
 
 # Additional parameters to set in slurm.conf - use yaml format

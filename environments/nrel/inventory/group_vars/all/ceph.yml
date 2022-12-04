@@ -1,0 +1,7 @@
+os_manila_mount_ceph_version: pacific
+os_manila_mount_pkgs_install: True
+os_manila_mount_ceph_repo_base: https://download.ceph.com/rpm-{{os_manila_mount_ceph_version}}/el8/x86_64/
+os_manila_mount_ceph_conf_path: "/etc/ceph"
+
+#os_manila_mount_ceph_repo_base: https://download.ceph.com/rpm-{{os_manila_mount_ceph_version}}/el8/x86_64/ceph-{{ os_manila_mount_ceph_version }}/"
+#os_manila_mount_ceph_repo_key: "https://download.ceph.com/keys/release.asc"

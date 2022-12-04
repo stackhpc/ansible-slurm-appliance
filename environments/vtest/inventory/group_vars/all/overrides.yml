@@ -1,0 +1,6 @@
+vermilion_cluster_name: vtest
+vermilion_cluster_name_prefix: vtest
+NREL_RELEASEVER: "8.6"
+
+#ceph.yml
+os_manila_mount_ceph_version: pacific
