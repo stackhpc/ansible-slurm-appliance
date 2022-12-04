@@ -33,12 +33,12 @@
         name: root_pass_cli
       when: new_root_pass is defined
 
-# - name: "NREL pre - set admin hostnames to hpc.nrel.gov domain"
-#   hosts: control,login
-#   tags: set_hpc_hostname
-#   become: true
-#   tasks:
-#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
+- name: "NREL pre - set admin hostnames to hpc.nrel.gov domain"
+  hosts: control,login
+  tags: set_hpc_hostname
+  become: true
+  tasks:
+    - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
 
 - name: "NREL pre - install ldap requirements to nodes"
   hosts: compute
@@ -48,18 +48,18 @@
     - include_role:
         name: vermilion_ldap_client
 
-# - name: NREL pre - rel-proto fixes - compute nodes
-#   hosts: compute
-#   become: true
-#   tasks:
-#     - name: Create scratch directory - should be on local SSD on real cluster
-#       file:
-#         src: /mnt/
-#         dest: "{{ item }}"
-#         state: directory
-#       loop:
-#         - /tmp/scratch
-#         - /var/scratch
+- name: NREL pre - rel-proto fixes - compute nodes
+  hosts: compute
+  become: true
+  tasks:
+    - name: Create scratch directory - should be on local SSD on real cluster
+      file:
+        src: /mnt/
+        dest: "{{ item }}"
+        state: directory
+      loop:
+        - /tmp/scratch
+        - /var/scratch
 
 - name: NREL pre - Ensure times are correct
   hosts: all
@@ -103,6 +103,7 @@
     - include_role:
         name: vermilion_control_setup
 
+# Builds the /etc/hosts inventory files.
 - name: nrel-proto fixes - workaround no internal DNS
   hosts:
     - cluster
@@ -139,27 +140,13 @@
         - /usr/bin/newgidmap
         - /usr/bin/newuidmap
 
-# - name: NREL pre - set nodes hostnames
-#   hosts: cluster
-#   tags: set_node_hostnames
-#   become: true
-#   tasks:
-#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}"
-
-# - name: "NREL pre - set hostname to hpc.nrel.gov domain"
-#   hosts: control,login
-#   tags: set_hpc_hostname
-#   become: true
-#   tasks:
-#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
-
-# - name: install ldap requirements to nodes
-#   hosts: compute
-#   tags: vermilion_ldap_client
-#   become: true
-#   tasks:
-#     - include_role:
-#         name: vermilion_ldap_client
+- name: install ldap requirements to nodes
+  hosts: compute
+  tags: vermilion_ldap_client
+  become: true
+  tasks:
+    - include_role:
+        name: vermilion_ldap_client
 
 # - name: ensure desired packages are installed
 #   hosts: all
@@ -174,46 +161,6 @@
 #         state: present
 #         name: "{{ packages }}"
 
-# - name: ensure desired login packages are installed
-#   hosts: control,login
-#   become: true
-#   vars:
-#     packages:
-#       - crontabs
-#       - cronie
-#   tags:
-#     - nrel_base_packages
-#   tasks:
-#     - yum:
-#         state: present
-#         name: "{{ packages }}"
-
-# - name: start systemd procs control
-#   hosts: control,login
-#   become: true
-#   tags:
-#     - nrel_base_packages
-#   tasks:
-#     - systemd:
-#         state: started
-#         enabled: yes
-#         name: "{{ item }}"
-#       loop:
-#         - crond
-#         - rsyslog
-
-# - name: start systemd procs compute
-#   hosts: compute
-#   become: true
-#   tags:
-#     - nrel_base_packages
-#   tasks:
-#     - systemd:
-#         state: restarted
-#         enabled: yes
-#         name: "{{ item }}"
-#       loop:
-#         - rsyslog
 
 # #### This is a TOTAL hack or elase podman container will not load
 # - name: fix perms on etc/subuid subgid files
@@ -237,8 +184,6 @@
 #       loop:
 #         - /etc/subuid
 #         - /etc/subgid
-
-
     # - file:
     #     state: touch
     #     mode: '4755'
@@ -248,7 +193,6 @@
     #   loop:
     #     - /etc/subuid
     #     - /etc/subgid
-
 
 
 # - name: "NREL pre - add ceph repos"
@@ -267,26 +211,6 @@
 #         - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
 #         - os_manila_mount_pkgs_install | default(true) | bool
 
-#     # - name: NREL says - Install epel and ceph yum repo
-#     #   tags: do_nrel_ceph_repo
-#     #   yum:
-#     #     name: centos-release-ceph-{{ os_manila_mount_ceph_version }}
-
-#     - name: "NREL pre - Install ceph yum packages"
-#       yum:
-#         name:
-#           - ceph-common
-#       when:
-#         - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
-#         - os_manila_mount_pkgs_install | default(true) | bool
-
-# - name: "NREL pre - Mount cephfs volumes"
-#   hosts: all
-#   tags: cephfs_mounts
-#   become: true
-#   tasks:
-#     - include_role:
-#         name:  vs_hpc_mounts
 
 #################################################################
 # vtest
@@ -313,16 +237,6 @@
 #         state: present
 #         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
 
-# - name: set cluster root password
-#   hosts: all
-#   tags: root_pass_cli
-#   become: true
-#   tasks:
-#     - name: include root if called
-#       include_role:
-#         name: root_pass_cli
-#       when: new_root_pass is defined
-
 # - name: Ensure yum repos are local
 #   hosts: all
 #   tags: ansible_yum_config
@@ -345,17 +259,3 @@
 #       loop: "{{ slurm_conf_extraparams }}"
 #       delegate_to: localhost
 #       run_once: true
-
-# - name: set compute hostname to HOSTNAME.vs.hpc.nrel.gov domain
-#   hosts: compute
-#   tags: set_hpc_hostname
-#   become: true
-#   tasks:
-#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.vs.hpc.nrel.gov"
-# - name: Set releasever
-#   hosts: all
-#   tags: set_time_on_servers
-#   become: true
-#   tasks:
-#     - shell: "echo '{{ NREL_RELEASEVER }}' > /etc/yum/vars/releasever"
-#       tags: lock_releasever
