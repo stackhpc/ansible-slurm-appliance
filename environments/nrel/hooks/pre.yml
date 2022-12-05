@@ -15,6 +15,24 @@
     - include_role:
         name: releasever-config
 
+# Stupid dependency hack
+- name: re-install libibverbs openmpi tcpdump
+  hosts: cluster
+  tags: dependency_dnf_hack
+  become: true
+  vars:
+    packages:
+      - libibverbs
+      - openmpi
+      - tcpdump
+  tasks:
+    - dnf:
+        name: "{{packages}}"
+        state: absent
+    - dnf:
+        name: "{{packages}}"
+        state: present
+
 - name: "NREL pre - Mount cephfs volumes"
   hosts: control,login,compute
   tags: cephfs_mounts

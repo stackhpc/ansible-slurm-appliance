@@ -24,7 +24,6 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   - ohpc-slurm-client
   - lmod-ohpc
   - ohpc-autotools
-
   - cmake-ohpc
   - hwloc-ohpc
   - nhc-ohpc
@@ -34,10 +33,10 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   - magpie-ohpc
   - charliecloud-ohpc
   - singularity-ohpc
+  - gnu9-compilers-ohpc
 
 # - EasyBuild-ohpc
 
-  - gnu9-compilers-ohpc
   # - intel-compilers-devel-ohpc
   # - intel-oneapi-toolkit-release-ohpc
 
