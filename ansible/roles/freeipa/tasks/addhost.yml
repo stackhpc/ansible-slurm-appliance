@@ -1,7 +1,7 @@
 - name: Add host to IPA
   # annoyingly this always shows as changed!
   community.general.ipa_host:
-    name: "{{ inventory_hostname }}"
+    name: "{{ [inventory_hostname, openhpc_cluster_name, tld] | join('.') }}" # don't want to use ansible_ variables as might not have host in play e.g. during image build
     ip_address: "{{ freeipa_client_ip }}"
     ipa_host: "{{ groups['freeipa_server'].0 }}"
     ipa_pass: "{{ vault_freeipa_admin_password }}"
