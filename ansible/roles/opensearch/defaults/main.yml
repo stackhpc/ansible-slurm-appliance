@@ -3,5 +3,5 @@
 #opensearch_internal_users_path:
 
 opensearch_podman_user: "{{ ansible_user }}"
-opensearch_version: '2.1.0' # https://hub.docker.com/r/opensearchproject/opensearch/tags
+opensearch_version: '2.4.0' # https://hub.docker.com/r/opensearchproject/opensearch/tags
 opensearch_data_path: /usr/share/opensearch/data
