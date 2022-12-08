@@ -1,4 +1,4 @@
-test_user_password: "{{ lookup('env', 'TEST_USER_PASSWORD') | default(vault_testuser_password, true) }}" # CI uses env, debug can set vault_testuser_password
+test_user_password: "{{ lookup('env', 'TESTUSER_PASSWORD') | default(vault_testuser_password, true) }}" # CI uses env, debug can set vault_testuser_password
 
 basic_users_users:
   - name: testuser # can't use rocky as $HOME isn't shared!

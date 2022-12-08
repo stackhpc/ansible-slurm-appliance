@@ -13,6 +13,12 @@
     dest: /etc/security/limits.d/custom.conf
   become: true
 
+- name: Up default keys permitted
+  ansible.posix.sysctl:
+    name: kernel.keys.maxkeys # /proc/sys/kernel/keys/maxkeys
+    value: 50000
+  become: true
+
 - name: reset ssh connection to allow user changes to affect 'current login user'
   meta: reset_connection
 
@@ -59,9 +65,6 @@
   loop: "{{ podman_user_info.results }}"
   become: yes
   register: podman_tmp
-
-- debug:
-    var: podman_tmp
 
 - name: Reset podman database
   # otherwise old config overrides!

@@ -13,18 +13,56 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
+- hosts: etc_hosts
+  gather_facts: false
+  tags: etc_hosts
+  become: yes
+  tasks:
+    - name: Template /etc/hosts
+      copy:
+        content: "{{ etc_hosts_template }}"
+        dest: /etc/hosts
+        owner: root
+        group: root
+        mode: u=rw,og=r
+
 - hosts: cluster
   gather_facts: false
   tasks:
+    - name: Add groups
+      ansible.builtin.group: "{{ item.group }}"
+      loop: "{{ appliances_local_users }}"
+      when:
+        - item.enable | default(true) | bool
+        - "'group' in item"
+      become_method: "sudo"
+      # Need to change working directory otherwise we try to switch back to non-existent directory.
+      become_flags: '-i'
+      become: true
     - name: Add users
-      ansible.builtin.user: "{{ item }}"
-      with_items: "{{ appliances_local_users }}"
+      ansible.builtin.user: "{{ item.user }}"
+      loop: "{{ appliances_local_users }}"
+      when: item.enable | default(true) | bool
       become_method: "sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: '-i'
       become: true
     - name: Reset ssh connection to allow user changes to affect ansible_user
       meta: reset_connection
+    - name: Set dnf releasever
+      ansible.builtin.copy:
+        dest: /etc/yum/vars/releasever
+        content: "{{ releasever }}"
+      become: true
+
+- hosts: systemd
+  become: yes
+  gather_facts: false
+  tags: systemd
+  tasks:
+    - name: Make systemd unit modifications
+      import_role:
+        name: systemd
 
 - hosts: selinux
   gather_facts: false
@@ -54,6 +92,20 @@
     - import_role:
         name: fail2ban
 
+- name: Setup podman
+  hosts: podman
+  tags: podman
+  tasks:
+    - import_role:
+        name: podman
+        tasks_from: prereqs.yml
+      tags: prereqs
+
+    - import_role:
+        name: podman
+        tasks_from: config.yml
+      tags: config
+
 - hosts: update
   gather_facts: false
   become: yes
@@ -70,8 +122,6 @@
         async: "{{ 30 * 60 }}" # wait for up to 30 minutes
         poll: 15 # check every 15 seconds
         register: updates
-      - debug:
-          var: updates
       - name: Ensure update log directory on localhost exists
         file:
           path: "{{ update_log_path | dirname }}"

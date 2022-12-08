@@ -13,8 +13,9 @@ login
 control
 compute
 
-[hpctests]
+[hpctests:children]
 # Login group to use for running mpi-based testing.
+login
 
 [cluster:children]
 # All nodes in the appliance - add e.g. service nodes not running Slurm here.
@@ -27,6 +28,7 @@ openhpc
 # Hosts running containers for below services:
 opensearch
 filebeat
+mysql
 
 [prometheus]
 # Single node to host monitoring server.
@@ -88,3 +90,17 @@ fail2ban
 
 [openondemand_jupyter]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+
+[etc_hosts]
+# Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+
+[cloud_init:children]
+# Hosts to template out cloud_init data for
+etc_hosts
+
+[systemd:children]
+# Hosts to make systemd unit adjustments on
+opensearch
+grafana
+control
+prometheus

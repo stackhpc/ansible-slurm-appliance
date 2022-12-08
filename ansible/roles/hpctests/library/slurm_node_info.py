@@ -23,7 +23,7 @@ description:
 options
     nodes:
         description:
-            - Slurm nodenames for which information is required. These must be homogenous.
+            - Slurm nodenames for which information is required.
         required: true
         type: list
 requirements:
@@ -56,7 +56,6 @@ def run_module():
     print(values)
     for ix, param in enumerate(params):
         info[param] = [nodeinfo[ix].strip() for nodeinfo in values if nodeinfo[nodelist_ix].strip() in module.params['nodes']]
-        # info[param] = [nodeinfo[nodelist_ix] for nodeinfo in values]
     result['info'] = info
     
     module.exit_json(**result)

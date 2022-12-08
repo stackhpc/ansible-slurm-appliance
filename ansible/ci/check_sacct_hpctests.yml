@@ -1,0 +1,27 @@
+- hosts: control
+  gather_facts: false
+  become: true
+  vars:
+    sacct_stdout_expected: |- # based on CI running hpctests as the first job - NB note no trailing newline
+      JobID,JobName,State
+      1,pingpong.sh,COMPLETED
+      2,pingmatrix.sh,COMPLETED
+      3,hpl-build-linux64.sh,COMPLETED
+      4_0,hpl-solo.sh,COMPLETED
+      4_1,hpl-solo.sh,COMPLETED
+  tasks:
+    - name: Get info for ended jobs
+      shell:
+        cmd: sacct --format=jobid,jobname,state --allocations --parsable2 --delimiter=, --starttime=now-1days --endtime=now
+        # by default start/end time is midnight/now which is not robust
+      changed_when: false
+      register: sacct
+    - name: Check info for ended jobs
+      assert:
+        that: sacct.stdout == sacct_stdout_expected
+        fail_msg: |
+          Expected:
+          --{{ sacct_stdout_expected }}--
+          Got:
+          --{{ sacct.stdout }}--
+        success_msg: sacct shows hpctests jobs as first and only jobs

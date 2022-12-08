@@ -8,6 +8,18 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
+variable "create_nodes" {
+    description = "Whether to create nodes (servers) or just ports and other infra"
+    type = bool # can't use bool as want to pass from command-line
+    default = true
+}
+
+variable "cluster_image" {
+    description = "single image for all cluster nodes - a convenience for CI"
+    type = string
+    default = "openhpc-221118-1422.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/12
+}
+
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
@@ -18,24 +30,31 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: "vm.alaska.cpu.general.small"
-        image: "openhpc-220811-0842.qcow2"
+        image: var.cluster_image
     }
     login_nodes = {
         login-0: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220811-0842.qcow2"
+            image: var.cluster_image
         }
     }
     compute_types = {
         small: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220811-0842.qcow2"
+            image: var.cluster_image
+        }
+        extra: {
+            flavor: "vm.alaska.cpu.general.small"
+            image: var.cluster_image
         }
     }
     compute_nodes = {
         compute-0: "small"
         compute-1: "small"
+        compute-2: "extra"
+        compute-3: "extra"
     }
+    create_nodes = var.create_nodes
     
     environment_root = var.environment_root
 }

@@ -10,31 +10,17 @@
         path: /var/log/slurm-stats/finished_jobs.json
         timeout: 315 # slurm stats cron job runs every 5 mins
       
-    - name: Get grafana datasources
-      ansible.builtin.uri:
-        url: http://{{ grafana_api_address }}:{{ grafana_port }}/api/datasources
-        url_username: grafana
-        url_password: "{{ vault_grafana_admin_password }}"
-        force_basic_auth: yes # otherwise get a 403
-      register: grafana_datasources_api
-      
-    - name: Query slurm stats
-      ansible.builtin.uri:
-        url: "http://{{ grafana_api_address }}:{{ grafana_port }}/api/datasources/proxy/{{ _slurmstats_id }}/filebeat-*/_search"
-        url_username: grafana
-        url_password: "{{ vault_grafana_admin_password }}"
-      register: _slurmstats_docs
+    - name: Query grafana for expected hpctests jobs
+      grafana_elasticsearch_query:
+        grafana_url: http://{{ grafana_api_address }}:{{ grafana_port }}
+        grafana_username: grafana
+        grafana_password: "{{ vault_grafana_admin_password }}"
+        datasource: slurmstats
+        index_pattern: filebeat-*
+      register: _slurm_stats_jobs
+      until: _expected_jobs | difference(_found_jobs) == []
+      retries: 60
+      delay: 5
       vars:
-        _slurmstats_id: "{{ (grafana_datasources_api.json | selectattr('name', 'eq', 'slurmstats'))[0]['id'] }}" # [0] as only one slurmstats datasource
-    
-    - name: Check all hpctests jobs listed
-      assert:
-        that: "_expected_jobs | difference(_slurm_stats_jobs) == []"
-        fail_msg: |
-          expected jobs: {{ _expected_jobs }}
-          found jobs  : {{ _slurm_stats_jobs }}
-        success_msg: "Found all expected jobs: {{ _expected_jobs | sort | join(', ') }}" 
-      vars:
-        # see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html#search-api-response-body
-        _slurm_stats_jobs: "{{ _slurmstats_docs.json.hits.hits | map(attribute='_source') | map(attribute='json') | map(attribute='JobName', default='(json error in slurmstats data)') }}"
+        _found_jobs: "{{ _slurm_stats_jobs.docs | map(attribute='JobName', default='(json error in slurmstats data)') }}"
         _expected_jobs: ['hpl-solo.sh', 'pingpong.sh', 'pingmatrix.sh']
