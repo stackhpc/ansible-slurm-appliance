@@ -161,7 +161,7 @@ This section details the configuration of OpenSearch.
 
 ### Defaults
 
-The internal `opensearch` role is ued to configure the service. The list of variables that can be customised can found in:
+The internal `opensearch` role is used to configure the service. The list of variables that can be customised can found in:
 
 > [ansible/roles/opensearch/defaults/main.yml](../ansible/roles/opensearch/defaults/main.yml)
 

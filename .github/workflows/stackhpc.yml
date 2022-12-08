@@ -130,7 +130,7 @@ jobs:
           ssh -v -fN -D 9050 ${bastion_user}@${bastion_ip}
           echo port 9050 forwarded
 
-          # check OOD server returns 200 OK:
+          # check OOD server returns 200:
           statuscode=$(proxychains wget \
             --quiet \
             --spider \

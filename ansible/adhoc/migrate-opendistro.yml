@@ -6,6 +6,7 @@
 #   ansible-playbook ansible/adhoc/migrate-opendistro.yml
 #   ansible-playbook ansible/monitoring.yml
 #
+# This does not automatically remove the opendistro podman volume. That can be done manually once happy data has transferred ok.
 
 - hosts: opensearch
   become: no
