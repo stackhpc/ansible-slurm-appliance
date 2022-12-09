@@ -12,4 +12,4 @@ opensearch_admin_password_hash: "{{ vault_elasticsearch_admin_password | passwor
 opensearch_podman_user: podman
 
 # Path to host data directory
-opendistro_data_path: "{{ appliances_state_dir | default('/usr/share') }}/opensearch/data"
+opensearch_data_path: "{{ appliances_state_dir | default('/usr/share') }}/opensearch/data"
