@@ -18,18 +18,17 @@
     mode: u=rw,og=r
 
 - name: Enrole with FreeIPA
-  # reenrolment requires --force-join and --password or --keytab
+  # reenrolment requires --force-join and --password, or --keytab
   # renrolement means:
   #  1. A new host certificate is issued
   #  2. The old host certificate is revoked
   #  3. New SSH keys are generated
   #  4. ipaUniqueID is preserved
-  # --password is overloaded - its bulkpassword unless --prinicpal is used in which case it's admin password
+  # --password is overloaded - its bulkpassword unless --principal or --force-join is used in which case it's admin password
   command: >
     ipa-client-install
       --unattended
       --mkhomedir
-      --force-join
       --enable-dns-updates
       --principal admin
       --password {{ freeipa_admin_password | quote }}
