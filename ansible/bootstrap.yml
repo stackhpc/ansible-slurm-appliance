@@ -18,13 +18,8 @@
   tags: etc_hosts
   become: yes
   tasks:
-    - name: Template /etc/hosts
-      copy:
-        content: "{{ etc_hosts_template }}"
-        dest: /etc/hosts
-        owner: root
-        group: root
-        mode: u=rw,og=r
+    - import_role:
+        name: etc_hosts
 
 - hosts: cluster
   gather_facts: false
