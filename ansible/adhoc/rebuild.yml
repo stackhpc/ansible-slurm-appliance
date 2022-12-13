@@ -13,6 +13,8 @@
   become: no
   gather_facts: no
   tasks:
-    - command: "openstack server rebuild {{ instance_id | default(inventory_hostname) }}{% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}"
+    - command: "openstack server rebuild {{ instance_id | default(instance_name) }}{% if rebuild_image is defined %} --image {{ rebuild_image }}{% endif %}"
       delegate_to: localhost
+      vars:
+        instance_name: "{{ [inventory_hostname, openhpc_cluster_name, tld] | join('.') if tld is defined else inventory_hostname }}"
     - wait_for_connection:
