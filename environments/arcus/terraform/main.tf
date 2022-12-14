@@ -61,4 +61,7 @@ module "cluster" {
     home_volume_size = 10
 
     environment_root = var.environment_root
+    # Can reduce volume size a lot for short-lived CI clusters:
+    state_volume_size = 10
+    home_volume_size = 20
 }
