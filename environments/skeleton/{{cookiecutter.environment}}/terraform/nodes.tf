@@ -114,11 +114,11 @@ resource "openstack_compute_instance_v2" "control" {
     fs_setup:
       - label: state
         filesystem: ext4
-        device: /dev/${var.block_device_prefix}b
+        device: ${var.state_volume_device_path}
         partition: auto
       - label: home
         filesystem: ext4
-        device: /dev/${var.block_device_prefix}c
+        device: ${var.home_volume_device_path}
         partition: auto
 
     mounts:

@@ -23,7 +23,8 @@ all:
     # openstack volume options - note hostvars too:
     state_volume_size: 150 # GB
     home_volume_size: 100 # GB
-    block_device_prefix: vd
+    state_volume_device_path: /dev/vdb
+    home_volume_device_path: /dev/vdc
     volumes: []
     
     # terrraform openstack_networking_port_v2:binding
@@ -57,11 +58,11 @@ control:
       fs_setup:
         - label: state
           filesystem: ext4
-          device: /dev/{{ block_device_prefix }}b
+          device: {{ state_volume_device_path }}
           partition: auto
         - label: home
           filesystem: ext4
-          device: /dev/{{ block_device_prefix }}c
+          device: {{ home_volume_device_path }}
           partition: auto
       mounts:
         - [LABEL=state, {{ appliances_state_dir }}]
