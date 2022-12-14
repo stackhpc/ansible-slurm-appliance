@@ -13,10 +13,17 @@
     dest: /etc/security/limits.d/custom.conf
   become: true
 
-- name: Up default keys permitted
+- name: Up number of non-root kernel keys permitted per user
+  # See https://www.kernel.org/doc/html/v4.18/security/keys/core.html
   ansible.posix.sysctl:
     name: kernel.keys.maxkeys # /proc/sys/kernel/keys/maxkeys
-    value: 50000
+    value: 50000 # default is 200
+  become: true
+
+- name: Up size of non-root kernel keys permitted per user
+  ansible.posix.sysctl:
+    name: kernel.keys.maxbytes # /proc/sys/kernel/keys/maxbytes
+    value: 25000000 # set same as root. Non-root default is 20000
   become: true
 
 - name: reset ssh connection to allow user changes to affect 'current login user'
