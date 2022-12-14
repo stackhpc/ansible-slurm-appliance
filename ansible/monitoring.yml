@@ -10,11 +10,6 @@
         tasks_from: config.yml
       tags: config
 
-    - import_role:
-        name: opensearch
-        tasks_from: deploy.yml
-      tags: deploy
-
 - name: Setup slurm stats
   hosts: slurm_stats
   tags: slurm_stats

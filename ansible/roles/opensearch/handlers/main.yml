@@ -3,7 +3,7 @@
 - name: Restart opensearch container
   systemd:
     name: opensearch.service
-    state: restarted
+    state: restarted # TODO: fix for image build
     enabled: yes
     daemon_reload: yes
   become: true

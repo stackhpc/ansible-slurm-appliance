@@ -11,5 +11,6 @@ opensearch_admin_password_hash: "{{ vault_elasticsearch_admin_password | passwor
 # user running the opensearch container
 opensearch_podman_user: podman
 
-# Path to host data directory
+# Path to host directories
+opensearch_config_path: "{{ appliances_state_dir | default('/usr/share') }}/opensearch/config"
 opensearch_data_path: "{{ appliances_state_dir | default('/usr/share') }}/opensearch/data"

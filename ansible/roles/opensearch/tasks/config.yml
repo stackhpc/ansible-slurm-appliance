@@ -1,14 +1,5 @@
 ---
 
-- name: Collect usernamespace facts
-  user_namespace_facts:
-
-- name: Set facts containing group_ids
-  set_fact:
-    # Elastic search user is 1000
-    opensearch_host_user_id: "{{ ansible_facts.subuid[opensearch_podman_user]['start'] + 1000 - 1 }}"
-    opensearch_host_group_id: "{{ ansible_facts.subgid[opensearch_podman_user]['start'] + 1000 - 1 }}"
-
 - name: Increase maximum number of virtual memory maps
   # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
   ansible.posix.sysctl:
@@ -18,23 +9,29 @@
     reload: yes
   become: true
 
-- name: Ensure parent config directory exists
+- name: Ensure required opensearch host directories exist
   file:
     state: directory
-    path: "/etc/opensearch"
-    owner: "{{ opensearch_host_user_id }}"
-    group: "{{ opensearch_host_group_id }}"
+    path: "{{ item }}"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
     mode: 0770
   become: true
+  loop:
+    - "{{ opensearch_config_path }}/"
+    - "{{ opensearch_data_path }}/"
+
+- name: Create certs
+  import_tasks: certs.yml
 
 - name: Template general configuration
   ansible.builtin.template:
     src: opensearch.yml.j2
-    dest: /etc/opensearch/opensearch.yml
-    owner: "{{ opensearch_host_user_id }}"
+    dest: "{{ opensearch_config_path }}/opensearch.yml"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
     # NOTE: root user in container maps to user on host, so this will appear as
     # owned by root in the container.
-    group: "{{ opensearch_podman_user }}"
     mode: 0660
   notify: Restart opensearch container
   become: true
@@ -42,11 +39,18 @@
 - name: Template internal user configuration
   template:
       src: "{{ opensearch_internal_users_path }}"
-      dest: /etc/opensearch/internal_users.yml
-      owner: "{{ opensearch_host_user_id }}"
+      dest: "{{ opensearch_config_path }}/internal_users.yml"
+      owner: "{{ opensearch_podman_user }}"
+      group: "{{ opensearch_podman_user }}"
       # NOTE: root user in container maps to user on host, so this will appear as
       # owned by root in the container.
-      group: "{{ opensearch_podman_user }}"
       mode: 0660
   notify: Restart opensearch container
   become: true
+
+- name: Create systemd unit file
+  template:
+    dest: /etc/systemd/system/opensearch.service
+    src: opensearch.service.j2
+  become: true
+  notify: Restart opensearch container

@@ -1,0 +1,50 @@
+- name: Ensure host certs directory exists
+  file:
+    path: "{{ opensearch_config_path }}/certs"
+    state: directory
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rwx,o=
+  become: true
+
+# Based on https://opensearch.org/docs/latest/security-plugin/configuration/generate-certificates/
+- name: Generate private key
+  command:
+    cmd: openssl genrsa -out root-ca-key.pem 2048
+    chdir: "{{ opensearch_config_path }}/certs"
+    creates: root-ca-key.pem
+  become: true
+  become_user: "{{ opensearch_podman_user }}"
+
+- name: Generate root cert
+  command:
+    cmd: openssl req -new -x509 -sha256 -key root-ca-key.pem -out root-ca.pem -days 730 -subj "/C=CA/ST=ONTARIO/L=TORONTO/O=ORG/OU=UNIT/CN=root.dns.a-record"
+    chdir: "{{ opensearch_config_path }}/certs"
+    creates: root-ca.pem
+  become: true
+  become_user: "{{ opensearch_podman_user }}"
+
+- name: Generate node cert
+  shell:
+    cmd: |
+      openssl genrsa -out esnode-key-temp.pem 2048
+      openssl pkcs8 -inform PEM -outform PEM -in esnode-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out esnode-key.pem
+      openssl req -new -key esnode-key.pem -subj "/C=CA/ST=ONTARIO/L=TORONTO/O=ORG/OU=UNIT/CN=esnode.dns.a-record" -out esnode.csr
+      echo 'subjectAltName=DNS:esnode.dns.a-record' > esnode.ext
+      openssl x509 -req -in esnode.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out esnode.pem -days 730 -extfile esnode.ext
+    chdir: "{{ opensearch_config_path }}/certs"
+    creates: esnode.pem
+  become: true
+  become_user: "{{ opensearch_podman_user }}"
+
+- name: Remove temporary cert files
+  file:
+    path: "{{ opensearch_config_path }}/certs/{{ item }}"
+    state: absent
+  loop:
+    - admin-key-temp.pem
+    - admin.csr
+    - node1-key-temp.pem
+    - node1.csr
+    - node1.ext
+  become: true
