@@ -39,8 +39,8 @@ jobs:
       - name: Install ansible etc
         run: dev/setup-env.sh
 
-      - name: Install terraform
-        uses: hashicorp/setup-terraform@v2
+      # - name: Install terraform
+      #   uses: hashicorp/setup-terraform@v2
       
       # - name: Initialise terraform
       #   run: terraform init
