@@ -1,5 +1,5 @@
 ---
-# See: https://opendistro.github.io/for-elasticsearch-docs/docs/security/configuration/yaml/
+# See: https://opensearch.org/docs/latest/security-plugin/configuration/index/
 
 # Path to template that specifies opensearch users
 opensearch_internal_users_path: "{{ appliances_repository_root }}/environments/common/files/opensearch/internal_users.yml.j2"
