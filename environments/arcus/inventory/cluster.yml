@@ -8,8 +8,8 @@ all:
     network_name: WCDC-iLab-60
     subnet_name: WCDC-iLab-60
     openhpc_slurm_partitions:
-      - name: small
       - name: extra
+      - name: small
     
     # overrides:
     vnic_type: direct
