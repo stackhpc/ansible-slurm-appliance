@@ -18,7 +18,6 @@ all:
     # terraform lifecycle:
     tf_ignore_changes:
       - image_name
-      - user_data
     
     # openstack volume options - note hostvars too:
     state_volume_size: 150 # GB

@@ -13,7 +13,8 @@ all:
     
     # overrides:
     vnic_type: direct
-    block_device_prefix: sd
+    state_volume_device_path: /dev/sdb
+    home_volume_device_path: /dev/sdc
     home_volume_size: 10
     state_volume_size: 10
 
