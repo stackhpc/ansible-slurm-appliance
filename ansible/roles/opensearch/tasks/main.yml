@@ -20,9 +20,11 @@
   loop:
     - "{{ opensearch_config_path }}/"
     - "{{ opensearch_data_path }}/"
+  when: "{{ 'started' in opensearch_state }}" # don't run during image build
 
 - name: Create certs
   import_tasks: certs.yml
+  when: "{{ 'started' in opensearch_state }}" # don't run during image build
 
 - name: Template general configuration
   ansible.builtin.template:
@@ -33,8 +35,9 @@
     # NOTE: root user in container maps to user on host, so this will appear as
     # owned by root in the container.
     mode: 0660
-  notify: Restart opensearch container
+  notify: Restart opensearch service
   become: true
+  when: "{{ 'started' in opensearch_state }}" # don't run during image build
 
 - name: Template internal user configuration
   template:
@@ -45,12 +48,23 @@
       # NOTE: root user in container maps to user on host, so this will appear as
       # owned by root in the container.
       mode: 0660
-  notify: Restart opensearch container
+  notify: Restart opensearch service
   become: true
+  when: "{{ 'started' in opensearch_state }}" # don't run during image build
 
 - name: Create systemd unit file
   template:
     dest: /etc/systemd/system/opensearch.service
     src: opensearch.service.j2
   become: true
-  notify: Restart opensearch container
+  notify: Restart opensearch service
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Ensure opensearch service state
+  systemd:
+    name: opensearch.service
+    state: "{{ opensearch_state }}"
+    enabled: "{{ opensearch_systemd_service_enabled }}"
+  become: true

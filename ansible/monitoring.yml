@@ -7,8 +7,6 @@
   tasks:
     - import_role:
         name: opensearch
-        tasks_from: config.yml
-      tags: config
 
 - name: Setup slurm stats
   hosts: slurm_stats
