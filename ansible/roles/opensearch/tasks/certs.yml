@@ -17,6 +17,7 @@
   become_user: "{{ opensearch_podman_user }}"
 
 - name: Generate root cert
+  # FIXME: need a way to regenerate a new one on expiry?
   command:
     cmd: openssl req -new -x509 -sha256 -key root-ca-key.pem -out root-ca.pem -days 730 -subj "/C=CA/ST=ONTARIO/L=TORONTO/O=ORG/OU=UNIT/CN=root.dns.a-record"
     chdir: "{{ opensearch_config_path }}/certs"
@@ -25,6 +26,7 @@
   become_user: "{{ opensearch_podman_user }}"
 
 - name: Generate node cert
+  # FIXME: need a way to regenerate a new one on expiry?
   shell:
     cmd: |
       openssl genrsa -out esnode-key-temp.pem 2048
