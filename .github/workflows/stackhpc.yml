@@ -155,7 +155,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' ${TF_VAR_cluster_name}-compute-[0-3]"
+          ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' compute-[0-3]"
           ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
           ansible-playbook -v ansible/ci/check_slurm.yml
       
