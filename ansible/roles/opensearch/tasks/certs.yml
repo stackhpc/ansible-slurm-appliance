@@ -19,7 +19,7 @@
 - name: Generate root cert
   # FIXME: need a way to regenerate a new one on expiry?
   command:
-    cmd: openssl req -new -x509 -sha256 -key root-ca-key.pem -out root-ca.pem -days 730 -subj "/C=CA/ST=ONTARIO/L=TORONTO/O=ORG/OU=UNIT/CN=root.dns.a-record"
+    cmd: openssl req -new -x509 -sha256 -key root-ca-key.pem -out root-ca.pem -days 730 -subj "/C=XX"
     chdir: "{{ opensearch_config_path }}/certs"
     creates: root-ca.pem
   become: true
