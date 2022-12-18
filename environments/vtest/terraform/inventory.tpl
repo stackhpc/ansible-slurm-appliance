@@ -21,10 +21,10 @@ ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.acc
 
 ## Define groups for slurm parititions:
 [${cluster_name}_lg]
-${cluster_name}-vlg-[001:001]
+${cluster_name}-vlg-001
 
 [${cluster_name}_sm]
-${cluster_name}-vsm-[001:002]
+${cluster_name}-vsm-001
 
 [${cluster_name}_gpu]
-${cluster_name}-vgpu-[001:002]
+${cluster_name}-vgpu-001
