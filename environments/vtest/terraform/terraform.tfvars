@@ -4,7 +4,7 @@ compute_types = {
     image: "TEST_Rocky86_login"
   }
   /* standard: {
-    flavor: "compute.c30m120s60e500"
+    flavor: "compute.c30m120s60e5000"
     image: "rocky-221117-1304"
   } */
   small: {
@@ -25,9 +25,7 @@ compute_names = {
 # Node-inventory.txt
 vlg-001: "large"
 vsm-001: "small"
-vsm-002: "small"
 vgpu-001: "gpu"
-vgpu-002: "gpu"
 }
 ###################################################
 
@@ -52,7 +50,7 @@ control_ip = "10.60.107.240"
 
 cluster_name  = "vtest"
 cluster_slurm_name = "vtest"
-cluster_availability_zone = "vermilion-az1"
+cluster_availability_zone = "esif"
 
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 
@@ -63,7 +61,7 @@ cluster_network = "compute"
 cluster_subnet = "compute-subnet"
 
 storage_network = "storage"
-storage_subnet = "storage"
+storage_subnet = "storage-subnet"
 
 control_network = "control"
 control_subnet = "control-subnet"
