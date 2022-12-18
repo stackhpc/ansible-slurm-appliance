@@ -72,7 +72,7 @@
   tasks:
     - name: Create scratch directory - should be on local SSD on real cluster
       file:
-        src: /mnt/vdb
+        src: /mnt
         dest: "{{ item }}"
         state: link
       loop:
