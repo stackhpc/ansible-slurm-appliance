@@ -44,7 +44,7 @@
     path: "{{ opensearch_config_path }}/certs/{{ item }}"
     state: absent
   loop:
-    - node1-key-temp.pem
-    - node1.csr
-    - node1.ext
+    - esnode-key-temp.pem
+    - esnode.csr
+    - esnode.ext
   become: true
