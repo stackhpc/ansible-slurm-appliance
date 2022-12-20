@@ -35,14 +35,14 @@ def readfile(fpath):
 def exists(fpath):
     return os.path.isfile(fpath)
 
-def to_regex(items):
+def to_ood_regex(items):
     """ Convert a list of strings possibly containing digits into a regex containing \d+
     
         eg {{ [compute-001, compute-002, control] | to_regex }} -> '(compute-\d+)|(control)'
     """
     
     # There's a python bug which means re.sub() can't use '\d' in the replacement so
-    # ave to do replacement in two stages:
+    # have to do replacement in two stages:
     r = [re.sub(r"\d+", 'XBACKSLASHX', v) for v in items]
     r = [v.replace('XBACKSLASHX', '\d+') for v in set(r)]
     r = ['(%s)' % v for v in r]
@@ -62,5 +62,5 @@ class FilterModule(object):
             'prometheus_node_exporter_targets': prometheus_node_exporter_targets,
             'exists': exists,
             'warn': self.warn,
-            'to_regex': to_regex
+            'to_ood_regex': to_ood_regex,
         }
