@@ -20,11 +20,11 @@
   loop:
     - "{{ opensearch_config_path }}/"
     - "{{ opensearch_data_path }}/"
-  when: "{{ 'started' in opensearch_state }}" # don't run during image build
+  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Create certs
   import_tasks: certs.yml
-  when: "{{ 'started' in opensearch_state }}" # don't run during image build
+  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Template general configuration
   ansible.builtin.template:
@@ -37,7 +37,7 @@
     mode: 0660
   notify: Restart opensearch service
   become: true
-  when: "{{ 'started' in opensearch_state }}" # don't run during image build
+  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Template internal user configuration
   template:
@@ -50,7 +50,7 @@
       mode: 0660
   notify: Restart opensearch service
   become: true
-  when: "{{ 'started' in opensearch_state }}" # don't run during image build
+  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Create systemd unit file
   template:
