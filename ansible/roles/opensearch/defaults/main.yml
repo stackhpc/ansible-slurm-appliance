@@ -8,3 +8,4 @@ opensearch_config_path: /usr/share/opensearch/config
 opensearch_data_path: /usr/share/opensearch/data
 opensearch_state: started # will be restarted if required
 opensearch_systemd_service_enabled: true
+opensearch_certs_duration: "{{ 365 * 10 }}" # days validity for self-signed certs

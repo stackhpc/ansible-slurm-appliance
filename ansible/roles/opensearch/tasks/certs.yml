@@ -5,7 +5,6 @@
     owner: "{{ opensearch_podman_user }}"
     group: "{{ opensearch_podman_user }}"
     mode: ug=rwx,o=
-  become: true
 
 # Based on https://opensearch.org/docs/latest/security-plugin/configuration/generate-certificates/
 - name: Generate private key
@@ -13,16 +12,13 @@
     cmd: openssl genrsa -out root-ca-key.pem 2048
     chdir: "{{ opensearch_config_path }}/certs"
     creates: root-ca-key.pem
-  become: true
   become_user: "{{ opensearch_podman_user }}"
 
 - name: Generate root cert
-  # FIXME: need a way to regenerate a new one on expiry?
   command:
-    cmd: openssl req -new -x509 -sha256 -key root-ca-key.pem -out root-ca.pem -days 730 -subj "/C=XX"
+    cmd: "openssl req -new -x509 -sha256 -key root-ca-key.pem -out root-ca.pem -days {{ opensearch_certs_duration }} -subj '/C=XX'"
     chdir: "{{ opensearch_config_path }}/certs"
     creates: root-ca.pem
-  become: true
   become_user: "{{ opensearch_podman_user }}"
 
 - name: Generate node cert
@@ -33,10 +29,9 @@
       openssl pkcs8 -inform PEM -outform PEM -in esnode-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out esnode-key.pem
       openssl req -new -key esnode-key.pem -subj "/C=XX" -out esnode.csr
       echo 'subjectAltName=DNS:esnode.dns.a-record' > esnode.ext
-      openssl x509 -req -in esnode.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out esnode.pem -days 730 -extfile esnode.ext
+      openssl x509 -req -in esnode.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out esnode.pem -days {{ opensearch_certs_duration }} -extfile esnode.ext
     chdir: "{{ opensearch_config_path }}/certs"
     creates: esnode.pem
-  become: true
   become_user: "{{ opensearch_podman_user }}"
 
 - name: Remove temporary cert files
@@ -47,4 +42,3 @@
     - esnode-key-temp.pem
     - esnode.csr
     - esnode.ext
-  become: true
