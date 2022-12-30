@@ -15,6 +15,31 @@
     - include_role:
         name: releasever-config
 
+- name: NREL pre - Ensure times are correct
+  hosts: all
+  tags: set_time_on_servers
+  become: true
+  vars:
+    ntp_servers:
+      - "server ds1.hpc.nrel.gov iburst"
+      - "server ds2.hpc.nrel.gov iburst"
+      - "server ds3.hpc.nrel.gov iburst"
+      - "server ds4.nrel.gov iburst"
+  tasks:
+    - include_role:
+        name: ansible-role-ntp
+
+- name: "dnf upgrade"
+  hosts: control,login,compute
+  tags: dnf_initial_update
+  become: true
+  tasks:
+    - name: dnf fix challenging dependency issues
+      dnf:
+        name: "*"
+        allowerasing: true
+        nobest: true
+
 # Stupid dependency hack
 - name: re-install libibverbs openmpi tcpdump
   hosts: cluster
@@ -78,15 +103,6 @@
       loop:
         - /tmp/scratch
         - /var/scratch
-
-- name: NREL pre - Ensure times are correct
-  hosts: all
-  tags: set_time_on_servers
-  become: true
-  tasks:
-    - include_role:
-        name: ansible-role-ntp
-
 
 - name: vstack_common_config
   hosts: control,login,compute
