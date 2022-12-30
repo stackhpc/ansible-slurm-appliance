@@ -18,6 +18,14 @@ roles:
     src: git+git@github.nrel.gov:hpc/vstack_common_config.git
     type: git
 
+  - name: vermilion_login_nodes
+    src: git+git@github.nrel.gov:hpc/vermilion_login_nodes.git
+    type: git
+
+  - name: vermilion_control_setup
+    src: git+git@github.nrel.gov:hpc/vermilion_control_setup.git
+    type: git
+
   - name: ansible-role-ntp
     src: git+https://github.com/kbendl/ansible-role-ntp
     version: rocky
@@ -28,10 +36,6 @@ roles:
 
   - name: vermilion_ldap_client
     src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
-    type: git
-
-  - name: ansible_yum_config
-    src: git+git@github.nrel.gov:hpc/ansible_yum_config.git
     type: git
 
   - name: root_pass_cli
@@ -46,6 +50,7 @@ roles:
     src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
     type: git
     version: master
+    #version: feature/ansible-galaxy
 
   - name: cluster_config_manager
     src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
@@ -65,4 +70,16 @@ roles:
   - name: slurm_lex_accounting
     src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
     type: git
-    version: feature/ansible-galaxy
+    version: master
+
+  - name: ipaclient
+    src: git+git@github.nrel.gov:hpc/ipaclient.git
+    type: git
+
+  - name: vs_hpc_mounts
+    src: git+git@github.nrel.gov:hpc/vs_hpc_mounts.git
+    type: git
+
+  - name: releasever-config
+    src: git+git@github.nrel.gov:hpc/releasever-config.git
+    type: git

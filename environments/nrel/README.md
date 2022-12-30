@@ -24,13 +24,13 @@ In addition to main README:
 
    - Modify variables in `environments/<environment>/terraform/terraform.tfvars` to define the cluster size and cloud environment.
    - Ensure the appropriate images (Rocky Linux 8.x) and SSH keys are available in OpenStack.
-   
+
    For the `lab` environment on `sms-labs` ONLY run:
-   
+
          cd environments/lab/terraform/network
          terraform init
          terraform apply
-   
+
    (this creates appropriate networking, which is preprovisioned in the other environments)
 
    For all environments run:
