@@ -1,23 +1,23 @@
 compute_types = {
   large: {
     flavor: "compute.c60m240s120e1000"
-    image: "rocky8.5_ofed+cuda"
+    image: "TEST_Rocky86_login"
   }
   standard: {
     flavor: "compute.c30m120s60e500"
-    image: "rocky8.5_ofed+cuda"
+    image: "TEST_Rocky86_login"
   }
   small: {
     flavor: "compute.c16m64s32e250"
-    image: "rocky8.5_ofed+cuda"
+    image: "TEST_Rocky86_login"
   }
   tiny: {
     flavor: "compute.c4m16s8e60"
-    image: "rocky8.5_ofed+cuda"
+    image: "TEST_Rocky86_login"
   }
   gpu: {
     flavor: "gpu.c30m120s32e6000"
-    image: "rocky8.5_ofed+cuda+driver"
+    image: "TEST_Rocky86_login"
   }
 }
 
@@ -42,6 +42,19 @@ lg-0015: "large"
 lg-0016: "large"
 lg-0017: "large"
 lg-0018: "large"
+lg-0019: "large"
+lg-0020: "large"
+lg-0021: "large"
+lg-0022: "large"
+lg-0023: "large"
+lg-0024: "large"
+lg-0025: "large"
+lg-0026: "large"
+lg-0027: "large"
+lg-0028: "large"
+lg-0029: "large"
+lg-0030: "large"
+lg-0031: "large"
 
 std-0001: "standard"
 std-0002: "standard"
@@ -103,8 +116,6 @@ std-0057: "standard"
 std-0058: "standard"
 std-0059: "standard"
 std-0060: "standard"
-std-0061: "standard"
-std-0062: "standard"
 
 sm-0001: "small"
 sm-0002: "small"
@@ -134,10 +145,6 @@ sm-0025: "small"
 sm-0026: "small"
 sm-0027: "small"
 sm-0028: "small"
-sm-0029: "small"
-sm-0030: "small"
-sm-0031: "small"
-sm-0032: "small"
 
 t-0001: "tiny"
 t-0002: "tiny"
@@ -161,7 +168,30 @@ gpu-0003: "gpu"
 gpu-0004: "gpu"
 gpu-0005: "gpu"
 gpu-0006: "gpu"
+gpu-0007: "gpu"
+gpu-0008: "gpu"
+gpu-0009: "gpu"
+gpu-0001: "gpu"
+gpu-0011: "gpu"
+gpu-0012: "gpu"
+gpu-0013: "gpu"
+gpu-0014: "gpu"
+gpu-0015: "gpu"
+gpu-0016: "gpu"
 }
+
+# /* sm-0029: "small"
+# sm-0030: "small"
+# sm-0031: "small"
+# sm-0032: "small"
+# sm-0033: "small"
+# sm-0034: "small"
+# sm-0035: "small"
+# sm-0036: "small"
+# sm-0037: "small"
+# sm-0038: "small"
+# sm-0039: "small"
+# sm-0040: "small" */
 
 ##########################################
 
@@ -179,11 +209,11 @@ login_ips = {
 }
 #
 
-login_image = "rocky8.5_ofed+cuda"
+login_image = "TEST_Rocky86_login"
 
 proxy_name = "login-1"
 
-control_image = "rocky8.5_ofed+cuda"
+control_image = "TEST_Rocky86_login"
 control_flavor = "gen.c16m32s32"
 control_ip = "10.60.106.230"
 
@@ -191,7 +221,7 @@ control_ip = "10.60.106.230"
 
 cluster_name  = "vs"
 cluster_slurm_name = "vermilion"
-cluster_availability_zone = "vermilion-az1"
+cluster_availability_zone = "esif"
 
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 
@@ -202,13 +232,12 @@ cluster_network = "compute"
 cluster_subnet = "compute-subnet"
 
 storage_network = "storage"
-storage_subnet = "storage"
+storage_subnet = "storage-subnet"
 
 control_network = "control"
 control_subnet = "control-subnet"
 
-#compute_image = "rocky8.5_ofed+cuda"
-#compute_image = "gpu_2021_11_12"
+
 ###########  ^^^^^^^^^^^^^^^ CHANGE THIS
 #compute_images = {} # allows overrides for specific nodes, by name
 compute_images = {}
