@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v22.9.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.16.0
+    version: v0.17.0 # workaround for elrepo apptainer changes
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: feature/no-install
