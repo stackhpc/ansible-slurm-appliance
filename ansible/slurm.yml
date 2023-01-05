@@ -19,16 +19,6 @@
     - import_role:
         name: stackhpc.slurm_openstack_tools.rebuild
 
-- name: Workaround https://github.com/openhpc/ohpc/issues/1644
-  hosts: compute
-  become: yes
-  gather_facts: no
-  tasks:
-    - name: Install old apptainer version to unbreak ohpc-base-compute package
-      dnf:
-        name: https://github.com/apptainer/apptainer/releases/download/v1.1.3/apptainer-1.1.3-1.x86_64.rpm
-        disable_gpg_check: true
-
 - name: Setup slurm
   hosts: openhpc
   become: yes
