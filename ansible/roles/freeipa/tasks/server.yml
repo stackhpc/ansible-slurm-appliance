@@ -16,7 +16,7 @@
         --ds-password {{ freeipa_ds_password | quote }}
         --admin-password {{ freeipa_admin_password | quote }} 
         --ip-address={{ freeipa_server_ip }}
-        --setup-dns
+        {% if freeipa_setup_dns | bool %}--setup-dns{% endif %}
         --auto-reverse
         --auto-forwarders
         --no-dnssec-validation
