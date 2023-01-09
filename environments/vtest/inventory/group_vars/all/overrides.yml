@@ -4,3 +4,8 @@ NREL_RELEASEVER: "8.6"
 
 #ceph.yml
 os_manila_mount_ceph_version: pacific
+
+# sync_slurm_allocations vars
+slurm_sync_allocations_install_path: "/opt/lex/sync_slurm_allocations"
+sync_slurm_allocations_clustername: "vtest"
+slurm_lex_accounting_clustername: "vtest"
