@@ -1,0 +1,29 @@
+- hosts: all
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Install dependencies for ohpc-base-compute
+      # from dnf repoquery --requires ohpc-base-compute
+      dnf:
+        name:
+          - yum-utils
+          - binutils
+          - cairo-devel
+          - libicu
+          - libpciaccess
+          - libpsm2
+          - librdmacm
+          - libseccomp
+          - libunwind
+          - numactl
+          - perl-interpreter
+          - python3
+          #- singularity doesn't exist, it's called singularity-ce (EPEL) or singularity-ohpc
+    - name: Install ohpc-base-compute
+      shell:
+        cmd: rpm -Uvh --nodeps $(repoquery --archlist=x86_64 --location ohpc-base-compute-2.6)
+      register: _rpm_ohpc_base_compute
+      failed_when:
+        - _rpm_ohpc_base_compute.rc != 0
+        - "'is already installed' not in _rpm_ohpc_base_compute.stderr"
+      changed_when: "'is already installed' not in _rpm_ohpc_base_compute.stderr"

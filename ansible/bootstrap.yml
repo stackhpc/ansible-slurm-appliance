@@ -13,18 +13,18 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
-- hosts: cluster
-  gather_facts: false
-  tasks:
-    - name: Add users
-      ansible.builtin.user: "{{ item }}"
-      with_items: "{{ appliances_local_users }}"
-      become_method: "sudo"
-      # Need to change working directory otherwise we try to switch back to non-existent directory.
-      become_flags: '-i'
-      become: true
-    - name: Reset ssh connection to allow user changes to affect ansible_user
-      meta: reset_connection
+# - hosts: cluster
+#   gather_facts: false
+#   tasks:
+#     - name: Add users
+#       ansible.builtin.user: "{{ item }}"
+#       with_items: "{{ appliances_local_users }}"
+#       become_method: "sudo"
+#       # Need to change working directory otherwise we try to switch back to non-existent directory.
+#       become_flags: '-i'
+#       become: true
+#     - name: Reset ssh connection to allow user changes to affect ansible_user
+#       meta: reset_connection
 
 - hosts: selinux
   gather_facts: false
@@ -38,21 +38,21 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
-- hosts: firewalld
-  gather_facts: false
-  become: yes
-  tags: firewalld
-  tasks:
-    - import_role:
-        name: firewalld
+# - hosts: firewalld
+#   gather_facts: false
+#   become: yes
+#   tags: firewalld
+#   tasks:
+#     - import_role:
+#         name: firewalld
 
-- hosts: fail2ban
-  gather_facts: false
-  become: yes
-  tags: fail2ban
-  tasks:
-    - import_role:
-        name: fail2ban
+# - hosts: fail2ban
+#   gather_facts: false
+#   become: yes
+#   tags: fail2ban
+#   tasks:
+#     - import_role:
+#         name: fail2ban
 
 - hosts: update
   gather_facts: false
@@ -100,7 +100,7 @@
     - update
   tasks:
     - name: Check for pending reboot from package updates
-      stat: 
+      stat:
         path: /var/run/reboot-required
       register: update_reboot_required
     - debug:

@@ -18,25 +18,33 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   - nano
   - python39-devel
 
+  - slurm-libpmi-ohpc
+  - slurm-sview-ohpc
+  - slurm-libpmi-ohpc
   - docs-ohpc
+  - EasyBuild-ohpc
+  - ohpc-autotools
+  - cmake-ohpc
+  - hwloc-ohpc
+  - singularity-ohpc
+  - slurm-libpmi-ohpc
+  - slurm-sview-ohpc
+  - slurm-libpmi-ohpc
   - ohpc-base
   - ohpc-base-compute
   - ohpc-slurm-client
   - lmod-ohpc
-  - ohpc-autotools
-  - cmake-ohpc
-  - hwloc-ohpc
   - nhc-ohpc
   - valgrind-ohpc
   - clustershell
   - conman-ohpc
   - magpie-ohpc
   - charliecloud-ohpc
-  - singularity-ohpc
-  - gnu9-compilers-ohpc
 
-# - EasyBuild-ohpc
 
+
+  # - gnu9-compilers-ohpc
+  # - openmpi4-gnu9-ohpc
   # - intel-compilers-devel-ohpc
   # - intel-oneapi-toolkit-release-ohpc
 
@@ -47,6 +55,7 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   # - mvapich2-intel-ohpc
   # - openmpi4-intel-ohpc
   # - openmpi4-gnu9-ohpc
+
   # #openmpi-*-ohpc mvapich2-*-ohpc intel-mpi-ohpc
 
 
@@ -86,10 +95,6 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   #- boost-gnu9-mpich-ohpc
   #- boost-gnu9-mvapich2-ohpc
   #- boost-gnu9-openmpi4-ohpc
-
-  #- slurm-libpmi-ohpc
-  #- slurm-sview-ohpc
-  #- slurm-libpmi-ohpc
 
 # - python3
 # - make

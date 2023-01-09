@@ -1,0 +1,9 @@
+---
+# sync_slurm_allocations vars
+slurm_sync_allocations_install_path: "/nopt/nrel/vs/admin/sync_slurm_allocations"
+slurm_sync_allocations_log_path: "/var/log"
+slurm_sync_allocations_log_file: "sync_slurm_accounting.log"
+# slurm_sync_allocations_vault_file: "vault"
+# slurm_sync_allocations_vault_secret_file: "sync_slurm_allocations_secret.yml"
+slurm_sync_allocations_slurm_path: "/bin"
+sync_slurm_allocations_clustername: "vermilion"

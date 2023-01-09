@@ -1,4 +1,3 @@
-
 # - name: " "
 #   hosts: control,login,compute
 #   tags: nrel_
@@ -7,17 +6,32 @@
 #     - include_role:
 #         name:
 
-- name: "Set releasever and local repos"
-  hosts: control,login,compute
-  tags: nrel_releasever
+# - name: "Set releasever and local repos"
+#   hosts: all
+#   tags: nrel_releasever
+#   become: true
+#   tasks:
+#     - include_role:
+#         name: releasever-config
+
+- name: "fix possibly bad repo pointers"
+  hosts: all
+  tags:
+    - vs_pre
+    - nrel_repofix
+
   become: true
+  tags:
+    - vs_pre
   tasks:
-    - include_role:
-        name: releasever-config
+    - shell:
+        cmd: for FF in `ls /etc/yum.repos.d/Rocky*`; do sed -i 's#gov/rocky/#gov/rocky-vault/#g' $FF; done
 
 - name: NREL pre - Ensure times are correct
   hosts: all
-  tags: set_time_on_servers
+  tags:
+    - vs_pre
+    - set_time_on_servers
   become: true
   vars:
     ntp_servers:
@@ -26,88 +40,122 @@
       - "server ds3.hpc.nrel.gov iburst"
       - "server ds4.nrel.gov iburst"
   tasks:
+    - name: Set timezone to Americas/Denver
+      timezone:
+        name: America/Denver
     - include_role:
         name: ansible-role-ntp
 
-- name: "dnf upgrade"
-  hosts: control,login,compute
-  tags: dnf_initial_update
+- name: "force time"
+  hosts: all
+  tags:
+    - vs_pre
+    - vs_force_chrony
   become: true
   tasks:
-    - name: dnf fix challenging dependency issues
-      dnf:
-        name: "*"
-        allowerasing: true
-        nobest: true
+    - name: Force chronyd to set time
+      shell:
+        cmd: systemctl stop chronyd; chronyd -q 'server ds2.hpc.nrel.gov iburst' ; systemctl start chronyd
 
 # Stupid dependency hack
-- name: re-install libibverbs openmpi tcpdump
-  hosts: cluster
-  tags: dependency_dnf_hack
+- name: NREL PRE - re-install libibverbs openmpi
+  hosts: all
+  tags:
+    - vs_pre
+    - dependency_dnf_hack
   become: true
   vars:
-    packages:
+    rm_packages:
       - libibverbs
       - openmpi
-      - tcpdump
+
+    packages:
+      - autoconf
+      - automake
+      - binutils
+      - bison
+      - byacc
+      - ctags
+      - diffstat
+      - gcc
+      - gcc-c++
+      - gdb
+      - glibc-devel
+      - ltrace
+      - make
+      - patchutils
+      - strace
+      - vim
+      - nano
+      # policycoreutils-python-utils setools-console setroubleshoot
   tasks:
-    - dnf:
-        name: "{{packages}}"
+    - name: rm problem packages
+      dnf:
+        name: "{{rm_packages}}"
         state: absent
-    - dnf:
+        allowerasing: true
+    - name: Add useful packages
+      dnf:
         name: "{{packages}}"
         state: present
+        nobest: true
 
-- name: "NREL pre - Mount cephfs volumes"
-  hosts: control,login,compute
-  tags: cephfs_mounts
-  become: true
-  tasks:
-    - include_role:
-        name: vs_hpc_mounts
+# - name: "NREL PRE - dnf packages"
+#   hosts: all
+#   tags: dnf_initial_update
+#   become: true
+#   tasks:
+#     - lineinfile:
+#         path: /etc/yum.repos.d/cuda-rhel8.repo
+#         regexp: '^enabled'
+#         line: enabled=0
 
-- name: "NREL pre - set cluster root password"
-  hosts: all
-  tags: root_pass_cli
-  become: true
-  tasks:
-    - name: include root if called
-      include_role:
-        name: root_pass_cli
-      when: new_root_pass is defined
+#     - name: dnf fix challenging dependency issues
+#       dnf:
+#         name: "*"
+#         nobest: true
+#         allowerasing: true
+#         skip_broken: true
 
-- name: "NREL pre - set admin hostnames to hpc.nrel.gov domain"
-  hosts: control,login
-  tags: set_hpc_hostname
-  become: true
-  tasks:
-    - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
+# - name: "NREL pre - set cluster root password"
+#   hosts: all
+#   tags: root_pass_cli
+#   become: true
+#   tasks:
+#     - name: include root if called
+#       include_role:
+#         name: root_pass_cli
+#       when: new_root_pass is defined
 
-- name: "NREL pre - install ldap requirements to nodes"
+# - name: "NREL pre - set admin hostnames to hpc.nrel.gov domain"
+#   hosts: control,login
+#   tags: set_hpc_hostname
+#   become: true
+#   tasks:
+#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
+
+- name: NREL pre - nrel-proto fixes - compute nodes
   hosts: compute
-  tags: vermilion_ldap_client
   become: true
-  tasks:
-    - include_role:
-        name: vermilion_ldap_client
-
-- name: NREL pre - rel-proto fixes - compute nodes
-  hosts: compute
-  become: true
+  tags:
+    - vs_pre
   tasks:
     - name: Create scratch directory - should be on local SSD on real cluster
-      file:
-        src: /mnt
-        dest: "{{ item }}"
-        state: link
-      loop:
-        - /tmp/scratch
-        - /var/scratch
+      # file:
+      #   src: /mnt
+      #   dest: "{{ item }}"
+      #   state: link
+      # loop:
+      #   - /tmp/scratch
+      #   - /var/scratch
+      shell: rmdir /var/scratch /tmp/scratch; ln -s /mnt /var/scratch ; ln -s /mnt /tmp/scratch
+      ignore_errors: true
 
 - name: vstack_common_config
   hosts: control,login,compute
   become: true
   tags:
+    - vs_pre
     - vstack_common_config
   tasks:
     - include_role:
@@ -123,7 +171,9 @@
 
 - name: "admin util configs"
   hosts: login,control
-  tags: set_admin_configs
+  tags:
+    - vs_pre
+    - set_admin_configs
   become: true
   tasks:
     - include_role:
@@ -142,7 +192,9 @@
   hosts:
     - cluster
   become: true
-  tags: etc_hosts
+  tags:
+    - vs_pre
+    - etc_hosts
   tasks:
     - name: Internal DNS workaround - generate /etc/hosts file content
       # which interface is used as ansible_host is defined by terraform (see `access_network`) so this is deterministic for multi-rail hosts
@@ -164,7 +216,9 @@
   hosts:
     - cluster
   become: true
-  tags: etc_hosts
+  tags:
+    - vs_pre
+    - uid_gid_hack
   tasks:
     - name: "set newuidmap/newgidmap perms so containers will start"
       file:
@@ -174,29 +228,27 @@
         - /usr/bin/newgidmap
         - /usr/bin/newuidmap
 
-- name: install ldap requirements to nodes
+- name: "NREL pre - install ldap requirements to nodes"
   hosts: compute
-  tags: vermilion_ldap_client
+  tags:
+    - vs_pre
+    - vermilion_ldap_client
   become: true
   tasks:
     - include_role:
         name: vermilion_ldap_client
 
-# - name: ensure desired packages are installed
+# - name: "NREL pre - Mount cephfs volumes"
 #   hosts: all
-#   become: true
-#   vars:
-#     packages:
-#       - rsyslog
 #   tags:
-#     - nrel_base_packages
+#     - vs_pre
+#     - vs_cephfs_mounts
+#   become: true
 #   tasks:
-#     - yum:
-#         state: present
-#         name: "{{ packages }}"
+#     - include_role:
+#         name: vs_hpc_mounts
 
-
-# #### This is a TOTAL hack or elase podman container will not load
+# #### This is a TOTAL hack or else podman container will not load
 # - name: fix perms on etc/subuid subgid files
 #   hosts: control
 #   become: true
