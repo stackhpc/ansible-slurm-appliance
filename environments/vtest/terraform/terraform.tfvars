@@ -23,12 +23,13 @@ compute_types = {
 #######################################
 compute_names = {
 # Node-inventory.txt
-vlg-001: "large"
-vsm-001: "small"
-vgpu-001: "gpu"
+vtlg-001: "large"
+vtsm-001: "small"
+vtgpu-001: "gpu"
 }
 ###################################################
 
+#---- login node info ----
 login_names = {
   vtlogin-1: "test.gen.c8m16s16"
   vtadmin: "test.gen.c8m16s16"
@@ -39,11 +40,14 @@ login_ips = {
 }
 
 login_image = "TEST_Rocky86_login"
+login_flavor = "vermilion_util_c8m15"
+#---- /login ----
 
 proxy_name = "vtlogin-1"
 
+#---- CONTROL node info ----
 control_image = "TEST_Rocky86_login"
-control_flavor = "test.gen.c8m16s16"
+control_flavor = "vermilion_util_c8m15"
 control_ip = "10.60.107.240"
 
 ###################################################

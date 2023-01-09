@@ -185,7 +185,7 @@ resource "openstack_compute_instance_v2" "logins" {
 
   name = "${var.cluster_name}-${each.key}"
   image_name = var.login_image
-  flavor_name = each.value
+  flavor_name = var.control_flavor
   key_pair = var.key_pair
   config_drive = true
   availability_zone = var.cluster_availability_zone
@@ -204,6 +204,7 @@ resource "openstack_compute_instance_v2" "logins" {
   }
 
 }
+#  flavor_name = each.value
 
 # --- slurm compute ---
 

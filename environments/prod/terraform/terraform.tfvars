@@ -1,23 +1,23 @@
 compute_types = {
   large: {
     flavor: "compute.c60m240s120e1000"
-    image: "TEST_Rocky86_login"
+    image: "vs_rocky86_20221231"
   }
   standard: {
     flavor: "compute.c30m120s60e500"
-    image: "TEST_Rocky86_login"
+    image: "vs_rocky86_20221231"
   }
   small: {
     flavor: "compute.c16m64s32e250"
-    image: "TEST_Rocky86_login"
+    image: "vs_rocky86_20221231"
   }
   tiny: {
     flavor: "compute.c4m16s8e60"
-    image: "TEST_Rocky86_login"
+    image: "vs_rocky86_20221231"
   }
   gpu: {
     flavor: "gpu.c30m120s32e6000"
-    image: "TEST_Rocky86_login"
+    image: "vs_rocky86_20221231"
   }
 }
 
@@ -63,9 +63,7 @@ lg-0036: "large"
 lg-0037: "large"
 lg-0038: "large"
 lg-0039: "large"
-lg-0040: "large"
-lg-0041: "large"
-lg-0042: "large"
+
 
 std-0001: "standard"
 std-0002: "standard"
@@ -182,27 +180,17 @@ gpu-0006: "gpu"
 gpu-0007: "gpu"
 gpu-0008: "gpu"
 gpu-0009: "gpu"
-gpu-0001: "gpu"
+gpu-0010: "gpu"
 gpu-0011: "gpu"
 gpu-0012: "gpu"
 gpu-0013: "gpu"
 gpu-0014: "gpu"
 gpu-0015: "gpu"
 gpu-0016: "gpu"
+gpu-0017: "gpu"
+
 }
 
-# /* sm-0029: "small"
-# sm-0030: "small"
-# sm-0031: "small"
-# sm-0032: "small"
-# sm-0033: "small"
-# sm-0034: "small"
-# sm-0035: "small"
-# sm-0036: "small"
-# sm-0037: "small"
-# sm-0038: "small"
-# sm-0039: "small"
-# sm-0040: "small" */
 
 ##########################################
 
@@ -220,13 +208,16 @@ login_ips = {
 }
 #
 
-login_image = "TEST_Rocky86_login"
+login_image = "vs_rocky86_20221231"
+login_flavor = "vermilion_util_c8m15"
+
+
+control_image = "vs_rocky86_20221231"
+control_flavor = "vermilion_util_c8m15"
+
+control_ip = "10.60.106.230"
 
 proxy_name = "login-1"
-
-control_image = "TEST_Rocky86_login"
-control_flavor = "gen.c16m32s32"
-control_ip = "10.60.106.230"
 
 #######################################
 

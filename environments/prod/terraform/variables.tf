@@ -115,6 +115,11 @@ variable "login_ips" {
     description = "Map of login names -> floating IP"
 }
 
+variable "login_flavor" {
+    type = string
+    description = "Name of instance flavor for NREL login nodes"
+}
+
 variable "control_flavor" {
     type = string
     description = "Name of instance flavor for control node"
