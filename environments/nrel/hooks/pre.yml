@@ -141,15 +141,13 @@
     - vs_pre
   tasks:
     - name: Create scratch directory - should be on local SSD on real cluster
-      # file:
-      #   src: /mnt
-      #   dest: "{{ item }}"
-      #   state: link
-      # loop:
-      #   - /tmp/scratch
-      #   - /var/scratch
-      shell: rmdir /var/scratch /tmp/scratch; ln -s /mnt /var/scratch ; ln -s /mnt /tmp/scratch
-      ignore_errors: true
+      file:
+        src: /mnt
+        dest: "{{ item }}"
+        state: link
+      loop:
+        - /tmp/scratch
+        - /var/scratch
 
 - name: vstack_common_config
   hosts: control,login,compute
