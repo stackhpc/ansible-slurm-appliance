@@ -18,34 +18,46 @@
     mode: u=rw,og=r
   when: freeipa_setup_dns | bool
 
-# TODO: FIXME:
-# - name: Check for keytab from previous enrolement
-#   stat:
-#     path: "{{ _freeipa_keytab_backup_path }}krb5.keytab"
-#   register: _stat_backup_keytab
+- name: Retrieve persisted keytab from previous enrolement
+  slurp:
+    src: "{{ _freeipa_keytab_backup_path }}"
+  delegate_to: control
+  register: _slurp_persisted_keytab
+  failed_when: false
 
-# - name: Renrole with FreeIPA using backed-up keytab
-#   # reenrolment requires --force-join and --password, or --keytab
-#   # renrolement means:
-#   #  1. A new host certificate is issued
-#   #  2. The old host certificate is revoked
-#   #  3. New SSH keys are generated
-#   #  4. ipaUniqueID is preserved
-#   # and ALSO that the keytab is changed!
-#   command:
-#     cmd: >
-#       ipa-client-install
-#         --unattended
-#         --mkhomedir
-#         --enable-dns-updates
-#         --keytab {{ _freeipa_keytab_backup_path }}krb5.keytab
-#   when: _stat_backup_keytab.stat.exists
-#   register: ipa_client_install_keytab
-#   changed_when: ipa_client_install_keytab.rc == 0
-#   failed_when: >
-#     ipa_client_install_keytab.rc !=0 and
-#     'IPA client is already configured' not in ipa_client_install_keytab.stderr
-#   # TODO: find a way to NOT reenrole, if necessary??
+- debug:
+    var: _slurp_persisted_keytab
+
+- name: Write persisted keytab from previous enrolment
+  copy:
+    content: "{{ _slurp_persisted_keytab.content | b64decode }}"
+    dest: /tmp/krb5.keytab
+    owner: root
+    group: root
+    mode: ug=rw,o=
+  when: '"content" in _slurp_persisted_keytab'
+
+- name: Renrole with FreeIPA using backed-up keytab
+  # reenrolment requires --force-join and --password, or --keytab
+  # renrolement means:
+  #  1. A new host certificate is issued
+  #  2. The old host certificate is revoked
+  #  3. New SSH keys are generated
+  #  4. ipaUniqueID is preserved
+  # and ALSO that the keytab is changed!
+  command:
+    cmd: >
+      ipa-client-install
+        --unattended
+        --mkhomedir
+        --enable-dns-updates
+        --keytab /tmp/krb5.keytab
+  when: '"content" in _slurp_persisted_keytab'
+  register: ipa_client_install_keytab
+  changed_when: ipa_client_install_keytab.rc == 0
+  failed_when: >
+    ipa_client_install_keytab.rc !=0 and
+    'IPA client is already configured' not in ipa_client_install_keytab.stderr
 
 - name: Enrole with FreeIPA using random password
   # Note --password is overloaded - it's bulkpassword unless --principal or --force-join is used in which case it's admin password
@@ -56,15 +68,31 @@
         --mkhomedir
         --enable-dns-updates
         --password '{{ freeipa_host_password }}'
+  when: '"content" not in _slurp_persisted_keytab'
   register: ipa_client_install_password
   changed_when: ipa_client_install_password.rc == 0
   failed_when: >
     ipa_client_install_password.rc != 0 and
     'IPA client is already configured' not in ipa_client_install_password.stderr
 
-- name: Backup keytab
-  copy:
-    remote_src: true
+- name: Retrieve current keytab
+  slurp:
     src: /etc/krb5.keytab
+  register: _slurp_current_keytab
+  failed_when: false
+
+- name: Ensure keytab backup directory exists
+  file:
+    path: "{{ _freeipa_keytab_backup_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: ug=wrX,o=
+  delegate_to: control
+
+- name: Persist keytab
+  copy:
+    content: "{{ _slurp_current_keytab.content | b64decode }}"
     dest: "{{ _freeipa_keytab_backup_path }}"
-  when: appliances_state_dir is defined
+  delegate_to: control
+  # when: appliances_state_dir is defined

@@ -11,4 +11,4 @@ freeipa_user_defaults:
   ipa_user: admin
 freeipa_users: [] # see community.general.ipa_user
 
-# _freeipa_keytab_backup_path: "{{ appliances_state_dir | default ('') }}/freeipa/{{ inventory_hostname }}/" # must end in / to ensure directory creation TODO: FIXME
+_freeipa_keytab_backup_path: "{{ hostvars[groups['control'].0].appliances_state_dir  }}/freeipa/{{ inventory_hostname }}/krb5.keytab"
