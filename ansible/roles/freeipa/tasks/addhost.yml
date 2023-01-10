@@ -1,3 +1,10 @@
+- name: Ensure freeipa_server_ip is first in freeipa_client host's resolv.conf
+  lineinfile:
+    path: /etc/resolv.conf
+    line: nameserver {{ freeipa_server_ip }}
+    firstmatch: true
+    insertbefore: '^nameserver'
+
 - name: Add host to IPA
   # annoyingly this always shows as changed!
   community.general.ipa_host:
@@ -11,8 +18,7 @@
     validate_certs: false
   delegate_to: "{{ groups['freeipa_server'].0 }}"
   register: _ipa_host_add
-- debug:
-    var: _ipa_host_add
 
-- set_fact:
-    freeipa_client_randompassword: "{{ _ipa_host_add.host.randompassword }}" # could use ipa host-mod --random to set a new one, if necessary
+- name: Set fact for ipa host password
+  set_fact:
+    freeipa_host_password: "{{ _ipa_host_add.host.randompassword }}"

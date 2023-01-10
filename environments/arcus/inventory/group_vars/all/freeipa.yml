@@ -1,3 +1,4 @@
+freeipa_setup_dns: true
 freeipa_users:
   - name: testuser # can't use rocky as $HOME isn't shared!
     password: "{{ vault_testuser_password }}"

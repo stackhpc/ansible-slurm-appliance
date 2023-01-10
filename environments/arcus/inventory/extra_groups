@@ -1,3 +1,10 @@
 [rebuild:children]
 control
 compute
+
+[freeipa_server:children]
+control
+
+[freeipa_client:children]
+login
+compute

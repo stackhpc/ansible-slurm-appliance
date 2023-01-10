@@ -7,18 +7,6 @@
     - etc_hosts
   run_once: yes
 
-- name: Ensure role vars without defaults and TLD are defined
-  assert:
-    that: item is defined
-    fail_msg: "var {{ item }} must be defined when freeipa is enabled"
-  loop:
-    - freeipa_realm
-    - freeipa_ds_password
-    - freeipa_admin_password
-    - freeipa_server_ip # needed on server for installation, needed on client for resolv.conf
-    - tld
-  run_once: yes
-
 - name: Get hostname as reported by command
   command: hostname
   register: _freeipa_validate_hostname

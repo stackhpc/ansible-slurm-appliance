@@ -1,4 +1,3 @@
 - name: Add users to freeipa
-  # this falls back to the keys from ansible.builtin.user, where they're equivalent
   community.general.ipa_user: "{{ freeipa_user_defaults | combine(item) }}"
   loop: "{{ freeipa_users }}"

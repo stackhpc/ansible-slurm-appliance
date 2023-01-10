@@ -13,6 +13,26 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
+- hosts: all
+  gather_facts: false
+  tags: resolv_conf
+  become: yes
+  tasks:
+    - name: Set nameservers in /etc/resolv.conf
+      copy:
+        content: |
+          # Created by slurm appliance ansible/bootstrap.yml
+          search {{ openhpc_cluster_name }}.{{ tld }}
+          
+          {% for ns in appliances_nameservers[0:3] %}
+          nameserver {{ ns }}
+          {% endfor %}
+        dest: /etc/resolv.conf
+        owner: root
+        group: root
+        mode: u=rw,og=r
+      when: appliances_nameservers | length > 0
+
 - hosts: etc_hosts
   gather_facts: false
   tags: etc_hosts
@@ -70,6 +90,33 @@
         state: "{{ selinux_state }}"
         policy: "{{ selinux_policy }}"
       register: sestatus
+
+- hosts: freeipa_server
+  # done here as it might be providing DNS
+  tags:
+    - freeipa
+    - freeipa_server
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Install freeipa server
+      import_role:
+        name: freeipa
+        tasks_from: server.yml
+
+- hosts: freeipa_client
+  tags:
+    - freeipa
+    - freeipa_server # as this is only relevant if using freeipa_server
+  gather_facts: no
+  become: yes
+  tasks:
+    - import_role:
+        name: freeipa
+        tasks_from: addhost.yml
+      when: groups['freeipa_server'] | length > 0
+
+# --- tasks after here require access to package repos ---
 
 - hosts: firewalld
   gather_facts: false

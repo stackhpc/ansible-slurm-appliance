@@ -3,8 +3,8 @@
 ansible_user: rocky
 appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
-#appliances_state_dir: # define an absolute path here to use for persistent state
-releasever: '8.6'
+#appliances_state_dir: # define an absolute path here to use for persistent state: NB: This is defined as /var/lib/state in inventory by the default Terraform
+appliances_nameservers: [] # if non-empty, supply up to 3 nameserver addresses to replace content of /etc/resolv.conf
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.

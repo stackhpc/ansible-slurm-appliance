@@ -16,24 +16,55 @@
     owner: root
     group: root
     mode: u=rw,og=r
+  when: freeipa_setup_dns | bool
 
-- name: Enrole with FreeIPA
-  # reenrolment requires --force-join and --password, or --keytab
-  # renrolement means:
-  #  1. A new host certificate is issued
-  #  2. The old host certificate is revoked
-  #  3. New SSH keys are generated
-  #  4. ipaUniqueID is preserved
-  # --password is overloaded - its bulkpassword unless --principal or --force-join is used in which case it's admin password
-  command: >
-    ipa-client-install
-      --unattended
-      --mkhomedir
-      --enable-dns-updates
-      --principal admin
-      --password {{ freeipa_admin_password | quote }}
-  register: ipa_client_install
-  changed_when: ipa_client_install.rc == 0
+# TODO: FIXME:
+# - name: Check for keytab from previous enrolement
+#   stat:
+#     path: "{{ _freeipa_keytab_backup_path }}krb5.keytab"
+#   register: _stat_backup_keytab
+
+# - name: Renrole with FreeIPA using backed-up keytab
+#   # reenrolment requires --force-join and --password, or --keytab
+#   # renrolement means:
+#   #  1. A new host certificate is issued
+#   #  2. The old host certificate is revoked
+#   #  3. New SSH keys are generated
+#   #  4. ipaUniqueID is preserved
+#   # and ALSO that the keytab is changed!
+#   command:
+#     cmd: >
+#       ipa-client-install
+#         --unattended
+#         --mkhomedir
+#         --enable-dns-updates
+#         --keytab {{ _freeipa_keytab_backup_path }}krb5.keytab
+#   when: _stat_backup_keytab.stat.exists
+#   register: ipa_client_install_keytab
+#   changed_when: ipa_client_install_keytab.rc == 0
+#   failed_when: >
+#     ipa_client_install_keytab.rc !=0 and
+#     'IPA client is already configured' not in ipa_client_install_keytab.stderr
+#   # TODO: find a way to NOT reenrole, if necessary??
+
+- name: Enrole with FreeIPA using random password
+  # Note --password is overloaded - it's bulkpassword unless --principal or --force-join is used in which case it's admin password
+  command:
+    cmd: >
+      ipa-client-install
+        --unattended
+        --mkhomedir
+        --enable-dns-updates
+        --password '{{ freeipa_host_password }}'
+  register: ipa_client_install_password
+  changed_when: ipa_client_install_password.rc == 0
   failed_when: >
-    ipa_client_install.rc != 0 and
-    'IPA client is already configured' not in ipa_client_install.stderr
+    ipa_client_install_password.rc != 0 and
+    'IPA client is already configured' not in ipa_client_install_password.stderr
+
+- name: Backup keytab
+  copy:
+    remote_src: true
+    src: /etc/krb5.keytab
+    dest: "{{ _freeipa_keytab_backup_path }}"
+  when: appliances_state_dir is defined
