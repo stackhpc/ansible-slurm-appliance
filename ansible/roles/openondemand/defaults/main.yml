@@ -4,17 +4,13 @@
 openondemand_auth: # "oidc" or "basic_pam"
 openondemand_mapping_users: []
 
-# Variables for openondemand_auth='oidc'
+## Variables for `openondemand_auth=oidc` :
 openondemand_oidc_client_id:
 openondemand_oidc_client_secret:
 openondemand_oidc_provider_url:
 openondemand_oidc_crypto_passphrase:
 openondemand_oidc_remote_user_claim: preferred_username
 openondemand_oidc_scope: openid profile preferred_username
-openondemand_mapping_users: []
-
-# Variables for openondemand_auth='basic_pam'
-# None.
 
 # SSL Certificates
 openondemand_ssl_cert: /etc/pki/tls/certs/localhost.crt
