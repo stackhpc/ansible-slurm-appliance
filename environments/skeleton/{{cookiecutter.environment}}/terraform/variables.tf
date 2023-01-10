@@ -55,10 +55,16 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
-variable "block_device_prefix" {
+variable "state_volume_device_path" {
     type = string
-    description = "Prefix for block device names"
-    default = "sd"
+    description = "Path to block device for state"
+    default = "/dev/sdb"
+}
+
+variable "home_volume_device_path" {
+    type = string
+    description = "Path to block device name for home directories"
+    default = "/dev/sdc"
 }
 
 variable "state_dir" {
