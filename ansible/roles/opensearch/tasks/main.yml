@@ -1,5 +1,15 @@
 ---
 
+- name: Check for existing opendistro service
+  stat:
+    path: /etc/systemd/system/opendistro.service
+  register: _opensearch_opendistro_service
+
+- name: Migrate opendistro data
+  import_tasks:
+    file: migrate-opendistro.yml
+  when: _opensearch_opendistro_service.stat.exists
+
 - name: Increase maximum number of virtual memory maps
   # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
   ansible.posix.sysctl:
