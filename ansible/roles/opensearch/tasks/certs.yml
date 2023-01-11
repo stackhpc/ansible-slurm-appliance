@@ -6,39 +6,65 @@
     group: "{{ opensearch_podman_user }}"
     mode: ug=rwx,o=
 
-# Based on https://opensearch.org/docs/latest/security-plugin/configuration/generate-certificates/
-- name: Generate private key
-  command:
-    cmd: openssl genrsa -out root-ca-key.pem 2048
-    chdir: "{{ opensearch_config_path }}/certs"
-    creates: root-ca-key.pem
-  become_user: "{{ opensearch_podman_user }}"
+# Cert generation based on https://opensearch.org/docs/latest/security-plugin/configuration/generate-certificates/
+
+- name: Generate root private key
+  community.crypto.openssl_privatekey:
+    path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rw,o=
+    return_content: false
+
+- name: Generate root CSR
+  # Required as cert has to have a subject
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
+    country_name: XX
+  register: _opensearch_root_csr
 
 - name: Generate root cert
-  command:
-    cmd: "openssl req -new -x509 -sha256 -key root-ca-key.pem -out root-ca.pem -days {{ opensearch_certs_duration }} -subj '/C=XX'"
-    chdir: "{{ opensearch_config_path }}/certs"
-    creates: root-ca.pem
-  become_user: "{{ opensearch_podman_user }}"
+  community.crypto.x509_certificate:
+    provider: selfsigned
+    selfsigned_not_after: "+{{ opensearch_certs_duration }}d"
+    ignore_timestamps: false # so will be regenerated when run if necessary
+    privatekey_path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
+    path: "{{ opensearch_config_path }}/certs/root-ca.pem"
+    csr_content: "{{ _opensearch_root_csr.csr }}"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rw,o=
+    return_content: false
+
+- name: Generate node private key in pkcs8 format
+  community.crypto.openssl_privatekey:
+    path: "{{ opensearch_config_path }}/certs/esnode-key.pem"
+    format: pkcs8
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rw,o=
+    return_content: false
+
+- name: Generate node CSR
+  # Required as cert has to have a subject and subject_alt_name
+  # Actual subject_alt_name is irrelevant as using enforce_hostname_verification=false
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ opensearch_config_path }}/certs/esnode-key.pem"
+    country_name: XX
+    subject_alt_name:
+      - "DNS:esnode.dns.a-record"
+  register: _opensearch_node_csr
 
 - name: Generate node cert
-  # FIXME: need a way to regenerate a new one on expiry?
-  shell:
-    cmd: |
-      openssl genrsa -out esnode-key-temp.pem 2048
-      openssl pkcs8 -inform PEM -outform PEM -in esnode-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out esnode-key.pem
-      openssl req -new -key esnode-key.pem -subj "/C=XX" -out esnode.csr
-      echo 'subjectAltName=DNS:esnode.dns.a-record' > esnode.ext
-      openssl x509 -req -in esnode.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out esnode.pem -days {{ opensearch_certs_duration }} -extfile esnode.ext
-    chdir: "{{ opensearch_config_path }}/certs"
-    creates: esnode.pem
-  become_user: "{{ opensearch_podman_user }}"
-
-- name: Remove temporary cert files
-  file:
-    path: "{{ opensearch_config_path }}/certs/{{ item }}"
-    state: absent
-  loop:
-    - esnode-key-temp.pem
-    - esnode.csr
-    - esnode.ext
+  community.crypto.x509_certificate:
+    provider: ownca
+    ownca_not_after: "+{{ opensearch_certs_duration }}d"
+    ignore_timestamps: false # so will be regenerated when run if necessary
+    ownca_path: "{{ opensearch_config_path }}/certs/root-ca.pem"
+    ownca_privatekey_path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
+    path: "{{ opensearch_config_path }}/certs/esnode.pem"
+    csr_content: "{{ _opensearch_node_csr.csr }}"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rw,o=
+    return_content: false
