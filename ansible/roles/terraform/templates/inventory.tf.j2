@@ -3,7 +3,7 @@ resource "local_file" "hosts" {
     content  = <<EOT
 # define host addresses:
 {% for inventory_hostname in groups['all'] | sort %}
-{{ inventory_hostname }} ansible_host=${openstack_networking_port_v2.{{ inventory_hostname }}.all_fixed_ips[0]}
+{{ inventory_hostname }} ansible_host=${openstack_networking_port_v2.{{ inventory_hostname }}.all_fixed_ips[0]} instance_id=${openstack_compute_instance_v2.{{ inventory_hostname }}.id}
 {% endfor %}
 
 # define groups for partitions:
