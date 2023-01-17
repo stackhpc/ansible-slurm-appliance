@@ -14,6 +14,7 @@ all:
 
     # OPTIONAL variables:
     cluster_tld: invalid # top-level domain for cluster (FQDN is nodename.cluster_name.cluster_tld)
+    node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
     node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
     node_security_groups: ["default"]
     node_user_data: ''
