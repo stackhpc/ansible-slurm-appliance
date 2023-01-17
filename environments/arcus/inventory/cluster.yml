@@ -3,7 +3,7 @@ all:
     # REQUIRED variables:
     cluster_key_pair: slurm-app-ci
     cluster_name: "{{ lookup('env', 'CI_CLUSTER_NAME') }}"
-    node_image_name: openhpc-221118-1422.qcow2 # https://github.com/stackhpc/slurm_image_builder/pull/12 TODO: FIXME
+    node_image_name: openhpc-230106-1107.qcow2 # https://github.com/stackhpc/slurm_image_builder/pull/13
     node_flavor: vm.alaska.cpu.general.small
     node_network_name: WCDC-iLab-60
     node_subnet_name: WCDC-iLab-60
