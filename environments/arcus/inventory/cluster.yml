@@ -3,10 +3,10 @@ all:
     # REQUIRED variables:
     cluster_key_pair: slurm-app-ci
     cluster_name: "{{ lookup('env', 'CI_CLUSTER_NAME') }}"
+    cluster_network_name: WCDC-iLab-60
+    cluster_subnet_name: WCDC-iLab-60
     node_image_name: openhpc-230106-1107.qcow2 # https://github.com/stackhpc/slurm_image_builder/pull/13
     node_flavor: vm.alaska.cpu.general.small
-    node_network_name: WCDC-iLab-60
-    node_subnet_name: WCDC-iLab-60
     
     # OPTIONAL variables:
     openhpc_slurm_partitions:
