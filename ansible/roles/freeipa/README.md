@@ -6,22 +6,23 @@ Support FreeIPA in the appliance. In production use it is expected the FreeIPA s
 # FreeIPA Client
 
 ## Usage
-- Add hosts to the `freeipa_client` group and run (at a minimum) the `iam.yml` playbook.
+- Add hosts to the `freeipa_client` group and run (at a minimum) the `ansible/iam.yml` playbook.
 - Host names must match the domain name. By default (using the skeleton Terraform) hostnames are of the form `nodename.cluster_name.tld` where `cluster_name` and `tld` are Terraform variables.
 - Hosts discover the FreeIPA server from DNS records. If using an external FreeIPA server and the default nameservers do not have these records, the external FreeIPA server could be used as the nameserver directly by setting `freeipa_setup_dns: true` and `freeipa_server_ip`.
 - For production use (i.e. with an external FreeIPA server), a random one-time password (OTP) should be generated when adding hosts to FreeIPA (e.g. using `ipa host-add --random ...`). This password should be set as a hostvar `freeipa_host_password`. Initial host enrolment will use this OTP to enrole the host. After this it becomes irrelevant so it does not need to be committed to git. This approach means the appliance does not require the FreeIPA administrator password.
-- The `control` host must define `appliances_state_dir` on persistent storage. This is used to backup keytabs to allow FreeIPA clients to be renroled after e.g. reimaging. Note that:
+- The `control` host must define `appliances_state_dir` (on persistent storage). This is used to backup keytabs to allow FreeIPA clients to be renroled after e.g. reimaging. Note that:
   - This is implemented when using the skeleton Terraform; on the control node `appliances_state_dir` defaults to `/var/lib/state` which is mounted from a volume.
   - Nodes are not re-enroled by a Slurm-driven reimage (see the [rebuild role's readme](../../collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md)) as that does not run this role.
+  - If both a backed-up keytab and `freeipa_host_password` exist, the former is used.
 
 
 ## Role Variables for Clients
 
-- `freeipa_host_password`. Required for initial enrolment only, freeIPA host password as described above.
+- `freeipa_host_password`. Required for initial enrolment only, FreeIPA host password as described above.
 - `freeipa_setup_dns`: Optional, whether to use the FreeIPA server as the client's nameserver. Defaults to `true` when `freeipa_server` contains a host, otherwise `false`.
 - `freeipa_server_ip`: IP address of FreeIPA server. Only required for client if `freeipa_setup_dns` is true. Default in common environment is `ansible_host` of `freeipa_server` host.
 
-See also use of `appliances_state_dir` on the control node above.
+See also use of `appliances_state_dir` on the control node as described above.
 
 # FreeIPA Server
 As noted above this is only intended for development and testing.
