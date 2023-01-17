@@ -4,33 +4,30 @@
 
 all:
   vars:
-    # Must be provided in an environment:
+    # REQUIRED variables - to be defined in an environment:
+    cluster_key_pair: "{{ undef(hint='cluster_key_pair must be defined') }}"
     cluster_name: "{{ undef(hint='cluster_name must be defined') }}"
-    image_name: "{{ undef(hint='image_name must be defined') }}"
-    flavor: "{{ undef(hint='flavor must be defined') }}"
-    key_pair: "{{ undef(hint='key_pair must be defined') }}"
-    network_name: "{{ undef(hint='network_name must be defined') }}"
-    subnet_name: "{{ undef(hint='subnet_name must be defined') }}"
+    node_image_name: "{{ undef(hint='node_image_name must be defined') }}"
+    node_flavor: "{{ undef(hint='node_flavor must be defined') }}"
+    node_network_name: "{{ undef(hint='node_network_name must be defined') }}"
+    node_subnet_name: "{{ undef(hint='node_subnet_name must be defined') }}"
 
-    # top-level domain for cluster (FQDN is nodename.clustername.tld):
-    tld: invalid
-
-    # terraform lifecycle:
-    tf_ignore_changes:
-      - image_name
+    # OPTIONAL variables:
+    cluster_tld: invalid # top-level domain for cluster (FQDN is nodename.cluster_name.cluster_tld)
+    node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
+    node_security_groups: ["default"]
+    node_user_data: ''
     
     # openstack volume options - note hostvars too:
     state_volume_size: 150 # GB
     home_volume_size: 100 # GB
     state_volume_device_path: /dev/vdb
     home_volume_device_path: /dev/vdc
-    volumes: []
+    node_volumes: []
     
-    # terrraform openstack_networking_port_v2:binding
-    vnic_profile: {}
-    vnic_type: normal
-    
-    security_groups: ["default"]
+    # terraform openstack_networking_port_v2:binding
+    node_vnic_profile: {}
+    node_vnic_type: normal
 
     # this default works when there are no child groups in the 'compute' group
     # and no partition customisation is required
@@ -42,7 +39,7 @@ control:
     control:
   vars:
     appliances_state_dir: /var/lib/state
-    volumes: # could move to defaults
+    node_volumes:
       - label: state
         description: State for control node
         size: "{{ state_volume_size }}"
@@ -52,7 +49,7 @@ control:
         size: "{{ home_volume_size }}"
         mount_point: /exports/home
         mount_options: 'x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service'
-    user_data: |
+    node_user_data: |
       #cloud-config
       fs_setup:
         - label: state
@@ -71,7 +68,7 @@ login:
   hosts:
     login:
   vars:
-    security_groups: # again could move to defaults
+    node_security_groups:
       - default
       - SSH
       - HTTPS

@@ -1,11 +1,11 @@
 data "openstack_images_image_v2" "{{ inventory_hostname }}" {
-  name = "{{ hostvars[inventory_hostname].image_name }}"
+  name = "{{ hostvars[inventory_hostname].node_image_name }}"
 }
 
-{% for volume in hostvars[inventory_hostname].volumes | default([]) %}
+{% for volume in hostvars[inventory_hostname].node_volumes | default([]) %}
 
 resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.label }}" {
-    name = "{{ inventory_hostname }}-{{ cluster_name }}-{{ volume.label }}"
+    name = "{{ inventory_hostname }}-{{ cluster_name }}-{{ volume.label }}" # TODO: fixme
     description = "{{ volume.description | default('') }}"
     size = {{ volume.size }}
 }
@@ -14,7 +14,7 @@ resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.
 
 resource "openstack_networking_port_v2" "{{ inventory_hostname }}" {
 
-  name = "{{ inventory_hostname }}.{{ cluster_name }}.{{ tld }}"
+  name = "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
   network_id = data.openstack_networking_network_v2.cluster_net.id
   admin_state_up = "true"
 
@@ -23,25 +23,25 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}" {
   }
 
   security_group_ids = [
-  {% for secgroup in hostvars[inventory_hostname].security_groups %}
+  {% for secgroup in hostvars[inventory_hostname].node_security_groups %}
     data.openstack_networking_secgroup_v2.{{ secgroup }}.id,
   {% endfor %}
   ]
 
   binding {
-    vnic_type = "{{ hostvars[inventory_hostname].vnic_type }}"
-    profile = "{{ hostvars[inventory_hostname].vnic_profile | to_json }}"
+    vnic_type = "{{ hostvars[inventory_hostname].node_vnic_type }}"
+    profile = "{{ hostvars[inventory_hostname].node_vnic_profile | to_json }}"
   }
 }
 
 resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   
-  name = "{{ inventory_hostname }}.{{ cluster_name }}.{{ tld }}"
+  name = "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
   image_name = data.openstack_images_image_v2.{{ inventory_hostname }}.name
-  flavor_name = "{{ hostvars[inventory_hostname].flavor }}"
-  key_pair = "{{ hostvars[inventory_hostname].key_pair }}"
+  flavor_name = "{{ hostvars[inventory_hostname].node_flavor }}"
+  key_pair = "{{ cluster_key_pair }}"
   
-  {% if hostvars[inventory_hostname].volumes | default([]) | length %}
+  {% if hostvars[inventory_hostname].node_volumes | default([]) | length %}
   # root device:
   block_device {
       uuid = data.openstack_images_image_v2.{{ inventory_hostname }}.id
@@ -52,7 +52,7 @@ resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   }
   {% endif %}
 
-  {% for volume in hostvars[inventory_hostname].volumes | default([]) %}
+  {% for volume in hostvars[inventory_hostname].node_volumes | default([]) %}
   block_device {
       destination_type = "volume"
       source_type  = "volume"
@@ -70,14 +70,14 @@ resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
     environment_root = "{{ appliances_environment_root }}"
   }
 
-  {% if user_data is defined %}
+  {% if node_user_data is defined and node_user_data != '' %}
   user_data = <<-EOT
-      {{ user_data | indent(6) }}
+      {{ node_user_data | indent(6) }}
   EOT
   {% endif %}
 
   lifecycle{
-    ignore_changes = [{{ tf_ignore_changes | join(', ') }}]
+    ignore_changes = [{{ node_tf_ignore_changes | join(', ') }}]
   }
 
 }

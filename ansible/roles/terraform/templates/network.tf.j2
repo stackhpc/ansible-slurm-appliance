@@ -1,14 +1,14 @@
 
 data "openstack_networking_network_v2" "cluster_net" {
-  name           = "{{ network_name }}"
+  name           = "{{ node_network_name }}"
 }
 
 data "openstack_networking_subnet_v2" "cluster_subnet" {
 
-  name            = "{{ subnet_name }}"
+  name            = "{{ node_subnet_name }}"
 }
 
-{% for secgroup in hostvars.values() | map(attribute='security_groups', default=[]) | flatten | unique %}
+{% for secgroup in hostvars.values() | map(attribute='node_security_groups', default=[]) | flatten | unique %}
 data "openstack_networking_secgroup_v2" "{{ secgroup }}" {
 
   name = "{{ secgroup }}"
