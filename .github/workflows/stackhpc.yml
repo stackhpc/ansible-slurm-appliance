@@ -68,7 +68,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          ansible-playbook ansible/adhoc/provision.yml -e tf_autoapprove=yes
+          ansible-playbook ansible/provision.yml -e tf_autoapprove=yes
 
       - name: Get server provisioning failure messages
         id: provision_failure
