@@ -1,5 +1,4 @@
 [all:vars]
-ansible_user=rocky
 openhpc_cluster_name=${cluster_name}
 tld=${tld}
 
