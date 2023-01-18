@@ -1,47 +1,72 @@
+#jinja2: lstrip_blocks: "True"
 data "openstack_images_image_v2" "{{ inventory_hostname }}" {
-  name = "{{ hostvars[inventory_hostname].node_image_name }}"
+  name = "{{ node_image_name }}"
 }
 
-{% for volume in hostvars[inventory_hostname].node_volumes | default([]) %}
+{# create a list of all security groups across all interfaces for this node, possibly falling back to node_default_security_groups #}
+{% set all_interface_secgroups = (node_interfaces | map(attribute='security_groups', default=(node_default_security_groups | default([]) )) | flatten) %}
+{% for secgroup in all_interface_secgroups %}
+data "openstack_networking_secgroup_v2" "{{inventory_hostname }}_{{ secgroup }}" {
+  name = "{{ secgroup }}"
+}
+{% endfor %}
 
+{% for volume in node_volumes | default([]) %}
 resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.label }}" {
     name = "{{ node_fqdn }}:{{ volume.label }}"
     description = "{{ volume.description | default('') }}"
     size = {{ volume.size }}
 }
-
 {% endfor %}
 
-resource "openstack_networking_port_v2" "{{ inventory_hostname }}" {
+{% for interface in node_interfaces %}
+resource "openstack_networking_port_v2" "{{ inventory_hostname }}_{{ interface.network_name }}" {
 
   name = "{{ node_fqdn }}"
-  network_id = data.openstack_networking_network_v2.cluster_net.id
-  admin_state_up = "true"
+  network_id = data.openstack_networking_network_v2.{{ interface.network_name }}.id
+  admin_state_up = true
 
+  {% if 'fixed_ip' in interface %}
   fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
-  }
+  {% if 'subname_name' in interface.fixed_ip %}
+    subnet_id = data.openstack_networking_subnet_v2.{{ interface.network_name }}_{{  interface.fixed_ip.subname_name }}.id
+  {% endif %}
+  {% if 'ip_address' in interface.fixed_ip %}
+    ip_address = "{{ interface.fixed_ip.ip_address }}"
+  {% endif %}
+  {% endif %}
+
+  {% if 'port_security_enabled' in interface %}
+  port_security_enabled = {{ interface.port_security_enabled | bool | to_json }}
+  {% endif %}
 
   security_group_ids = [
-  {% for secgroup in hostvars[inventory_hostname].node_security_groups %}
-    data.openstack_networking_secgroup_v2.{{ secgroup }}.id,
+  {% for secgroup in interface.security_groups | default(node_default_security_groups) | default([]) %}
+    data.openstack_networking_secgroup_v2.{{inventory_hostname }}_{{ secgroup }}.id,
   {% endfor %}
   ]
-
+  
+  {% if 'binding' in interface %}
   binding {
-    vnic_type = "{{ hostvars[inventory_hostname].node_vnic_type }}"
-    profile = "{{ hostvars[inventory_hostname].node_vnic_profile | to_json }}"
+    {% if 'vnic_type' in interface.binding %}
+    vnic_type = "{{ interface.binding.vnic_type }}"
+    {% endif %}
+    {% if 'profile' in interface.binding %}
+    profile = "{{ interface.binding.profile | to_json }}"
+    {% endif %}
   }
+  {% endif %}
 }
+{% endfor %}
 
 resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
-  
+
   name = "{{ node_fqdn }}"
   image_name = data.openstack_images_image_v2.{{ inventory_hostname }}.name
-  flavor_name = "{{ hostvars[inventory_hostname].node_flavor }}"
+  flavor_name = "{{ node_flavor }}"
   key_pair = "{{ cluster_key_pair }}"
   
-  {% if hostvars[inventory_hostname].node_volumes | default([]) | length %}
+  {% if node_volumes | default([]) | length > 0 %}
   # root device:
   block_device {
       uuid = data.openstack_images_image_v2.{{ inventory_hostname }}.id
@@ -52,7 +77,7 @@ resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   }
   {% endif %}
 
-  {% for volume in hostvars[inventory_hostname].node_volumes | default([]) %}
+  {% for volume in node_volumes | default([]) %}
   block_device {
       destination_type = "volume"
       source_type  = "volume"
@@ -61,10 +86,16 @@ resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   }
   {% endfor %}
 
+  {% for interface in node_interfaces %}
   network {
-    port = openstack_networking_port_v2.{{ inventory_hostname }}.id
+    port = openstack_networking_port_v2.{{ inventory_hostname }}_{{ interface.network_name }}.id  
+    {% if 'access_network' in interface %}
+    access_network = {{ interface.access_network | to_json }}
+    {% elif loop.last %}
     access_network = true
+    {% endif %}
   }
+  {% endfor %}
 
   metadata = {
     environment_root = "{{ appliances_environment_root }}"

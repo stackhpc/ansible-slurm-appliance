@@ -7,8 +7,7 @@ all:
     # REQUIRED variables - to be defined in an environment:
     cluster_key_pair: "{{ undef(hint='cluster_key_pair must be defined') }}"
     cluster_name: "{{ undef(hint='cluster_name must be defined') }}"
-    cluster_network_name: "{{ undef(hint='cluster_network_name must be defined') }}"
-    cluster_subnet_name: "{{ undef(hint='cluster_subnet_name must be defined') }}"
+    node_interfaces: "{{ undef(hint='node_interfaces must be defined') }}"
     node_image_name: "{{ undef(hint='node_image_name must be defined') }}"
     node_flavor: "{{ undef(hint='node_flavor must be defined') }}"
 
@@ -16,7 +15,6 @@ all:
     cluster_tld: invalid # top-level domain for cluster (FQDN is nodename.cluster_name.cluster_tld)
     node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
     node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
-    node_security_groups: ["default"]
     node_user_data: ''
     
     # openstack volume options - note hostvars too:
@@ -36,8 +34,6 @@ all:
       - name: "compute"
 
 control:
-  hosts:
-    control:
   vars:
     appliances_state_dir: /var/lib/state
     node_volumes:
@@ -66,10 +62,8 @@ control:
         - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
 
 login:
-  hosts:
-    login:
   vars:
-    node_security_groups:
+    node_default_security_groups:
       - default
       - SSH
       - HTTPS

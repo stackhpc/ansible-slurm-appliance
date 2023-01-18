@@ -1,16 +1,18 @@
+{# networks/subnets get specified as part of per-node interfaces, but aren't themselves node-specific so define once here: #}
+{% set unique_network_names = (hostvars | json_query('*.node_interfaces[].network_name') | unique | sort ) %}
+{% set unique_network_subnet_pairs = (hostvars | json_query('*.node_interfaces[].[network_name, fixed_ip.subnet_name]') | unique | sort ) %}
 
-data "openstack_networking_network_v2" "cluster_net" {
-  name           = "{{ cluster_network_name }}"
+{% for network_name in unique_network_names %}
+data "openstack_networking_network_v2" "{{ network_name }}" {
+  name = "{{ network_name }}"
 }
+{% endfor %}
 
-data "openstack_networking_subnet_v2" "cluster_subnet" {
-
-  name            = "{{ cluster_subnet_name }}"
+{% for (network_name, subnet_name) in unique_network_subnet_pairs %}
+{% if subnet_name is not none %}
+data "openstack_networking_subnet_v2" "{{ network_name }}_{{ subnet_name }}" {
+  network_id = data.openstack_networking_network_v2.{{ network_name }}.id
+  name = "{{ network.subnet_name }}"
 }
-
-{% for secgroup in hostvars.values() | map(attribute='node_security_groups', default=[]) | flatten | unique %}
-data "openstack_networking_secgroup_v2" "{{ secgroup }}" {
-
-  name = "{{ secgroup }}"
-}
+{% endif %}
 {% endfor %}
