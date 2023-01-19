@@ -21,8 +21,7 @@ all:
     # overrides:
     home_volume_size: 10 # only need tiny volumes for CI/test
     state_volume_size: 10
-    state_volume_device_path: /dev/sdb # have virtio-scsi enabled on image
-    home_volume_device_path: /dev/sdc
+    volume_device_prefix: /dev/sd # have virtio-scsi enabled on image
 
 control:
   hosts:

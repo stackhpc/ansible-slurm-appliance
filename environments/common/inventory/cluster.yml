@@ -24,14 +24,28 @@ all:
     # openstack volume options - note hostvars too:
     state_volume_size: 150 # GB
     home_volume_size: 100 # GB
-    state_volume_device_path: /dev/vdb
-    home_volume_device_path: /dev/vdc
+    volume_device_prefix: /dev/vd
     node_volumes: []
     
     # this default works when there are no child groups in the 'compute' group
     # and no partition customisation is required
     openhpc_slurm_partitions:
       - name: "compute"
+    
+    node_user_data: |
+      #cloud-config
+      fs_setup:
+      {% for volume in node_volumes %}
+        - label: {{ volume.label }}
+          filesystem: ext4
+      {# e.g. first volume mounted by default at /dev/vdb #}
+          device: {{ volume_device_prefix }}{{ 'abcdefg'[loop.index] }}
+          partition: auto
+      {% endfor %}
+      mounts:
+      {% for volume in node_volumes %}
+        - [LABEL={{ volume.label }}, {{ volume.mount_point }}, auto, "{{ volume.mount_options | default('') }}"]
+      {% endfor %}
 
 control:
   vars:
@@ -46,20 +60,6 @@ control:
         size: "{{ home_volume_size }}"
         mount_point: /exports/home
         mount_options: 'x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service' # TODO: FIXME
-    node_user_data: |
-      #cloud-config
-      fs_setup:
-        - label: state
-          filesystem: ext4
-          device: {{ state_volume_device_path }}
-          partition: auto
-        - label: home
-          filesystem: ext4
-          device: {{ home_volume_device_path }}
-          partition: auto
-      mounts:
-        - [LABEL=state, {{ appliances_state_dir }}]
-        - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
 
 login:
   vars:
