@@ -13,7 +13,12 @@ Restart=always
 # see also https://opensearch.org/docs/2.0/opensearch/install/important-settings/
 ExecStart=/usr/bin/podman run \
     --network=host \
-    --sdnotify=conmon --cgroups=no-conmon -d --replace --name opensearch --restart=no --user opensearch \
+    --sdnotify=conmon \
+    --cgroups=no-conmon \
+    --detach \
+    --replace \
+    --name opensearch \
+    --restart=no --user opensearch \
     --ulimit memlock=-1:-1 --ulimit nofile=65536:65536 \
     --volume {{ opensearch_data_path }}:/usr/share/opensearch/data:U \
     --volume {{ opensearch_config_path }}/internal_users.yml:/usr/share/opensearch/config/opensearch-security/internal_users.yml:U \

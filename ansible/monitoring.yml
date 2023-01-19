@@ -1,7 +1,7 @@
 # ---
 # # NOTE: Requires slurmdbd
 
-- name: Setup elasticsearch
+- name: Setup OpenSearch
   hosts: opensearch
   tags: opensearch
   tasks:

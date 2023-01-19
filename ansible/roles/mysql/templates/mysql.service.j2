@@ -16,12 +16,16 @@ ExecStartPre=+install -d -o {{ mysql_podman_user }} -g {{ mysql_podman_user }} -
 ExecStartPre=+chown -R {{ mysql_podman_user }}:{{ mysql_podman_user }} {{ mysql_datadir }}
 ExecStart=/usr/bin/podman run \
     --network=host \
-    --sdnotify=conmon --cgroups=no-conmon \
-    --detach --replace --name mysql --restart=no \
+    --sdnotify=conmon \
+    --cgroups=no-conmon \
+    --detach \
+    --replace \
+    --name mysql \
+    --restart=no \
     --user mysql \
     --volume {{ mysql_datadir }}:/var/lib/mysql:U \
     --publish 3306:3306 \
-    -e MYSQL_ROOT_PASSWORD=${MYSQL_INITIAL_ROOT_PASSWORD} \
+    --env MYSQL_ROOT_PASSWORD=${MYSQL_INITIAL_ROOT_PASSWORD} \
     mysql:{{ mysql_tag }}{%- for opt in mysql_mysqld_options %} \
     --{{ opt }}{% endfor %}
 

@@ -28,8 +28,8 @@
     mode: 0770
   become: true
   loop:
-    - "{{ opensearch_config_path }}/"
-    - "{{ opensearch_data_path }}/"
+    - "{{ opensearch_config_path }}"
+    - "{{ opensearch_data_path }}"
   when: "'started' in opensearch_state" # don't run during image build
 
 - name: Create certs

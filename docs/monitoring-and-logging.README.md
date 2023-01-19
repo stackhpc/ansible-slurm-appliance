@@ -11,7 +11,7 @@ Parses log files and ships them to elasticsearch. Note we use the version shippe
 Visualisation tool that supports multiple different datasources. In our stack,
 we use it to visualise prometheus and elasticsearch data.
 
-### [opensearch](https://opendistro.github.io/)
+### [opensearch](https://https://opensearch.org/)
 
 A search engine that provides full text search over a collection of JSON documents. In this project,
 the main use is for the archiving and retrieval of log files.
