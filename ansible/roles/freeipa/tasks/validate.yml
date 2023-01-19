@@ -16,3 +16,4 @@
   # see section 2.7 of redhat guide to installing identity management
   assert:
     that: _freeipa_validate_hostname.stdout | split('.') | length >= 3
+    fail_msg: "Hostname {{ _freeipa_validate_hostname.stdout }} is not fully-qualified (a.b.c)"
