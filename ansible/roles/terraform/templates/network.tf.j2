@@ -1,13 +1,20 @@
-{# networks/subnets get specified as part of per-node interfaces, but aren't themselves node-specific so define once here: #}
-{% set unique_network_names = (hostvars | json_query('*.node_interfaces[].network_name') | unique | sort ) %}
-{% set unique_network_subnet_pairs = (hostvars | json_query('*.node_interfaces[].[network_name, fixed_ip.subnet_name]') | unique | sort ) %}
+#jinja2: lstrip_blocks: "True"
 
+# NB: This template runs on localhost so has 'all' groupvars
+
+{# Networks/subnets/security groups aren't node-specific, although they are specified as part of a node #}
+{# So this aggregates them from all hosts to avoid creating host-specific TF resources #}
+
+# Networks
+{% set unique_network_names = (hostvars | json_query('*.node_interfaces[].network_name') | unique | sort ) %}
 {% for network_name in unique_network_names %}
 data "openstack_networking_network_v2" "{{ network_name }}" {
   name = "{{ network_name }}"
 }
 {% endfor %}
 
+# Subnets
+{% set unique_network_subnet_pairs = (hostvars | json_query('*.node_interfaces[].[network_name, fixed_ip.subnet_name]') | unique | sort ) %}
 {% for (network_name, subnet_name) in unique_network_subnet_pairs %}
 {% if subnet_name is not none %}
 data "openstack_networking_subnet_v2" "{{ network_name }}_{{ subnet_name }}" {
@@ -15,4 +22,12 @@ data "openstack_networking_subnet_v2" "{{ network_name }}_{{ subnet_name }}" {
   name = "{{ network.subnet_name }}"
 }
 {% endif %}
+{% endfor %}
+
+# Security groups
+{% set unique_security_groups = (hostvars | json_query('*.node_interfaces[].security_groups[]') | unique | sort ) %}
+{% for secgroup in unique_security_groups %}
+data "openstack_networking_secgroup_v2" "{{ secgroup }}" {
+  name = "{{ secgroup }}"
+}
 {% endfor %}

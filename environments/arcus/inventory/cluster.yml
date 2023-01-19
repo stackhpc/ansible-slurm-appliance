@@ -3,8 +3,10 @@ all:
     # REQUIRED variables:
     cluster_key_pair: slurm-app-ci
     cluster_name: "{{ lookup('env', 'CI_CLUSTER_NAME') }}"
+    cluster_network_name: WCDC-iLab-60
     node_interfaces:
-      - network_name: WCDC-iLab-60
+      - network_name: "{{ cluster_network_name }}"
+        security_groups: "{{ node_default_security_groups }}"
         binding:
           vnic_type: direct
     # cluster_subnet_name: WCDC-iLab-60
@@ -25,6 +27,7 @@ all:
 control:
   hosts:
     control:
+  vars:
 
 login:
   hosts:

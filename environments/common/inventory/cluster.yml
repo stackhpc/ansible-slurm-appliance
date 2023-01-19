@@ -6,14 +6,18 @@ all:
   vars:
     # REQUIRED variables - to be defined in an environment:
     cluster_key_pair: "{{ undef(hint='cluster_key_pair must be defined') }}"
-    cluster_name: "{{ undef(hint='cluster_name must be defined') }}"
-    node_interfaces: "{{ undef(hint='node_interfaces must be defined') }}"
+    cluster_network_name: # NB: either cluster_network_name OR node_interfaces must be defined
     node_image_name: "{{ undef(hint='node_image_name must be defined') }}"
     node_flavor: "{{ undef(hint='node_flavor must be defined') }}"
 
     # OPTIONAL variables:
-    cluster_tld: invalid # top-level domain for cluster (FQDN is nodename.cluster_name.cluster_tld)
+    cluster_name: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"
+    cluster_tld: invalid
     node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
+    node_default_security_groups: ['default']
+    node_interfaces:
+      - network_name: "{{ cluster_network_name }}"
+        security_groups: "{{ node_default_security_groups }}"
     node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
     node_user_data: ''
     
@@ -24,10 +28,6 @@ all:
     home_volume_device_path: /dev/vdc
     node_volumes: []
     
-    # terraform openstack_networking_port_v2:binding
-    node_vnic_profile: {}
-    node_vnic_type: normal
-
     # this default works when there are no child groups in the 'compute' group
     # and no partition customisation is required
     openhpc_slurm_partitions:
@@ -45,7 +45,7 @@ control:
         description: Home for cluster
         size: "{{ home_volume_size }}"
         mount_point: /exports/home
-        mount_options: 'x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service'
+        mount_options: 'x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service' # TODO: FIXME
     node_user_data: |
       #cloud-config
       fs_setup:

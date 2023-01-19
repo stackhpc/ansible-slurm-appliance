@@ -3,14 +3,6 @@ data "openstack_images_image_v2" "{{ inventory_hostname }}" {
   name = "{{ node_image_name }}"
 }
 
-{# create a list of all security groups across all interfaces for this node, possibly falling back to node_default_security_groups #}
-{% set all_interface_secgroups = (node_interfaces | map(attribute='security_groups', default=(node_default_security_groups | default([]) )) | flatten) %}
-{% for secgroup in all_interface_secgroups %}
-data "openstack_networking_secgroup_v2" "{{inventory_hostname }}_{{ secgroup }}" {
-  name = "{{ secgroup }}"
-}
-{% endfor %}
-
 {% for volume in node_volumes | default([]) %}
 resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.label }}" {
     name = "{{ node_fqdn }}:{{ volume.label }}"
@@ -41,8 +33,8 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}_{{ interface.n
   {% endif %}
 
   security_group_ids = [
-  {% for secgroup in interface.security_groups | default(node_default_security_groups) | default([]) %}
-    data.openstack_networking_secgroup_v2.{{inventory_hostname }}_{{ secgroup }}.id,
+  {% for secgroup in interface.security_groups | default([]) %}
+    data.openstack_networking_secgroup_v2.{{ secgroup }}.id,
   {% endfor %}
   ]
   
