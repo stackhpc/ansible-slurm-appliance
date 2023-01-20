@@ -10,6 +10,11 @@
     file: migrate-opendistro.yml
   when: _opensearch_opendistro_service.stat.exists
 
+- name: Remove opendistro service
+  file:
+    path: /etc/systemd/system/opendistro.service
+    state: absent
+
 - name: Increase maximum number of virtual memory maps
   # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
   ansible.posix.sysctl:
