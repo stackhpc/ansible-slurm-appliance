@@ -1,13 +1,16 @@
-- hosts: freeipa_server
+- hosts: freeipa_client
   tags:
     - freeipa
-    - freeipa_server
-  gather_facts: yes
+    - freeipa_server # as this is only relevant if using freeipa_server
+    - freeipa_host
+  gather_facts: no
   become: yes
   tasks:
-    - import_role:
+    - name: Add freeipa hosts
+      import_role:
         name: freeipa
-        tasks_from: users.yml
+        tasks_from: addhost.yml
+      when: groups['freeipa_server'] | length > 0
 
 - hosts: freeipa_client
   tags:
@@ -16,14 +19,29 @@
   gather_facts: yes
   become: yes
   tasks:
-    - import_role:
+    - name: Enrole freeipa clients
+      import_role:
         name: freeipa
         tasks_from: client.yml
+
+- hosts: freeipa_server
+  tags:
+    - freeipa
+    - freeipa_server
+    - users
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Add freeipa users
+      import_role:
+        name: freeipa
+        tasks_from: users.yml
 
 - hosts: basic_users
   become: yes
   tags:
     - basic_users
+    - users
   gather_facts: yes
   tasks:
     - import_role:
