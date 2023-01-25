@@ -111,6 +111,10 @@ resource "openstack_compute_instance_v2" "control" {
 
   user_data = <<-EOF
     #cloud-config
+    hostname: control
+    fqdn: control.${var.cluster_name}.${var.tld}
+    prefer_fqdn_over_hostname: true
+
     fs_setup:
       - label: state
         filesystem: ext4
@@ -152,6 +156,13 @@ resource "openstack_compute_instance_v2" "login" {
     environment_root = var.environment_root
   }
 
+  user_data = <<-EOF
+    #cloud-config
+    hostname: ${each.key}
+    fqdn: ${each.key}.${var.cluster_name}.${var.tld}
+    prefer_fqdn_over_hostname: true
+  EOF
+
   lifecycle{
     ignore_changes = [
       image_name,
@@ -177,6 +188,13 @@ resource "openstack_compute_instance_v2" "compute" {
   metadata = {
     environment_root = var.environment_root
   }
+
+  user_data = <<-EOF
+    #cloud-config
+    hostname: ${each.key}
+    fqdn: ${each.key}.${var.cluster_name}.${var.tld}
+    prefer_fqdn_over_hostname: true
+  EOF
 
   lifecycle{
     ignore_changes = [
