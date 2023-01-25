@@ -13,25 +13,14 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
-- hosts: all
+- name: Write /etc/resolv/conf
+  hosts: resolv_conf
+  become: yes
   gather_facts: false
   tags: resolv_conf
-  become: yes
   tasks:
-    - name: Set nameservers in /etc/resolv.conf
-      copy:
-        content: |
-          # Created by slurm appliance ansible/bootstrap.yml
-          search {{ openhpc_cluster_name }}.{{ tld }}
-          
-          {% for ns in appliances_nameservers[0:3] %}
-          nameserver {{ ns }}
-          {% endfor %}
-        dest: /etc/resolv.conf
-        owner: root
-        group: root
-        mode: u=rw,og=r
-      when: appliances_nameservers | length > 0
+    - import_role:
+        name: resolv_conf
 
 - hosts: etc_hosts
   gather_facts: false
@@ -40,6 +29,14 @@
   tasks:
     - import_role:
         name: etc_hosts
+
+- hosts: proxy
+  gather_facts: false
+  tags: proxy
+  become: yes
+  tasks:
+    - import_role:
+        name: proxy
 
 - hosts: cluster
   gather_facts: false
