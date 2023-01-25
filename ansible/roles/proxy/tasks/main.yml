@@ -22,7 +22,7 @@
     path: /etc/yum.conf
     section: main
     option: "proxy"
-    value: "{{ http_proxy }}"
+    value: "{{ proxy_http_proxy }}"
     no_extra_spaces: true
     owner: root
     group: root
