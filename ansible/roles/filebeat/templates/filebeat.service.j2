@@ -24,7 +24,7 @@ ExecStart=/usr/bin/podman run \
     --volume /var/log/:/logs:ro \
     --volume /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro \
     --detach=True docker.elastic.co/beats/filebeat-oss:{{ filebeat_version }} \
-    --env -strict.perms=false -d "*"
+    -e -strict.perms=false -d "*"
 ExecStop=/usr/bin/podman stop --ignore filebeat -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f filebeat
 KillMode=none
