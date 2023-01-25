@@ -1,3 +1,4 @@
 - name: Add users to freeipa
+  # This uses DNS to find the ipa server, which works as this is running on the enrolled ipa server
   community.general.ipa_user: "{{ freeipa_user_defaults | combine(item) }}"
   loop: "{{ freeipa_users }}"

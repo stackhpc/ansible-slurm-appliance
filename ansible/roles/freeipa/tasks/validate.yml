@@ -1,19 +1,18 @@
-- name: Ensure incompatible functionality is not enabled
-  assert:
-    that: groups[item] | length == 0
-    fail_msg: "The group {{ item }} contains hosts - this cannot be used with freeipa enabled"
-  loop:
-    - basic_users
-    - etc_hosts
-  run_once: yes
-
 - name: Get hostname as reported by command
   command: hostname
   register: _freeipa_validate_hostname
   changed_when: false
+  when: "'freeipa_server' in group_names"
 
 - name: Ensure hostname is fully-qualified
   # see section 2.7 of redhat guide to installing identity management
   assert:
     that: _freeipa_validate_hostname.stdout | split('.') | length >= 3
-    fail_msg: "Hostname {{ _freeipa_validate_hostname.stdout }} is not fully-qualified (a.b.c)"
+    fail_msg: "FreeIPA server hostname '{{ _freeipa_validate_hostname.stdout }}' is not fully-qualified (a.b.c)"
+  when: "'freeipa_server' in group_names"
+
+- name: Ensure control node has persistent storage defined
+  assert:
+    that: "{{ 'appliances_state_dir' in hostvars['control'] }}"
+    fail_msg: "Variable appliances_state_dir must be defined on the control node (pointing to persistent storage) when using the freeipa role."
+  run_once: true

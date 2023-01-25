@@ -1,14 +1,23 @@
-- name: Ensure freeipa_server_ip is first in freeipa_client host's resolv.conf
-  lineinfile:
-    path: /etc/resolv.conf
-    line: nameserver {{ freeipa_server_ip }}
-    firstmatch: true
-    insertbefore: '^nameserver'
+- name: Get ipa host information
+  # This uses DNS to find the ipa server, which works as this is running on the enrolled ipa server
+  # It doesn't fail even if the host doesn't exist
+  community.general.ipa_host:
+    name: "{{ fqdn }}"
+    ip_address: "{{ freeipa_client_ip }}"
+    ipa_host: "{{ groups['freeipa_server'].0 }}"
+    ipa_pass: "{{ vault_freeipa_admin_password }}"
+    ipa_user: admin
+    state: present
+    validate_certs: false
+  delegate_to: "{{ groups['freeipa_server'].0 }}"
+  register: _ipa_host_check
+  check_mode: yes
+  changed_when: false
 
 - name: Add host to IPA
-  # annoyingly this always shows as changed!
+  # Using random_password=true this unenroles an enroled host, hence the check above
   community.general.ipa_host:
-    name: "{{ [inventory_hostname, openhpc_cluster_name, tld] | join('.') }}" # don't want to use ansible_ variables as might not have host in play e.g. during image build
+    name: "{{ fqdn }}"
     ip_address: "{{ freeipa_client_ip }}"
     ipa_host: "{{ groups['freeipa_server'].0 }}"
     ipa_pass: "{{ vault_freeipa_admin_password }}"
@@ -17,8 +26,10 @@
     state: present
     validate_certs: false
   delegate_to: "{{ groups['freeipa_server'].0 }}"
+  when: "'sshpubkeyfp' not in _ipa_host_check.host"
   register: _ipa_host_add
 
 - name: Set fact for ipa host password
   set_fact:
     freeipa_host_password: "{{ _ipa_host_add.host.randompassword }}"
+  when: _ipa_host_add.changed

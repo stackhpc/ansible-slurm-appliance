@@ -4,29 +4,12 @@
   dnf:
     name: ipa-client
 
-- name: Set IPA server as nameserver
-  copy:
-    dest: /etc/resolv.conf
-    content: |
-      ; Created by slurm appliance/ansible/roles/freeipa/tasks/client.yml
-      ;
-
-      nameserver {{ freeipa_server_ip }}
-      nameserver 131.111.12.20
-    owner: root
-    group: root
-    mode: u=rw,og=r
-  when: freeipa_setup_dns | bool
-
 - name: Retrieve persisted keytab from previous enrolement
   slurp:
     src: "{{ _freeipa_keytab_backup_path }}"
   delegate_to: control
   register: _slurp_persisted_keytab
   failed_when: false
-
-- debug:
-    var: _slurp_persisted_keytab
 
 - name: Write persisted keytab from previous enrolment
   copy:
