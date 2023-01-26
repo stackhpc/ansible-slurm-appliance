@@ -1,0 +1,13 @@
+---
+# See https://opensearch.org/docs/latest/security-plugin/configuration/yaml#internal_usersyml
+
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+admin:
+  hash: "{{ opensearch_admin_password_hash }}"
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "Admin user"
