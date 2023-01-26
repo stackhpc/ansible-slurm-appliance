@@ -1,6 +1,0 @@
----
-# Used to set passwords
-#opendistro_internal_users_path:
-
-opendistro_podman_user: "{{ ansible_user }}"
-opendistro_data_path: "/usr/share/elasticsearch/data"  # path to host data directory

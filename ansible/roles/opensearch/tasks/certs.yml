@@ -1,0 +1,70 @@
+- name: Ensure host certs directory exists
+  file:
+    path: "{{ opensearch_config_path }}/certs"
+    state: directory
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rwx,o=
+
+# Cert generation based on https://opensearch.org/docs/latest/security-plugin/configuration/generate-certificates/
+
+- name: Generate root private key
+  community.crypto.openssl_privatekey:
+    path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rw,o=
+    return_content: false
+
+- name: Generate root CSR
+  # Required as cert has to have a subject
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
+    country_name: XX
+  register: _opensearch_root_csr
+
+- name: Generate root cert
+  community.crypto.x509_certificate:
+    provider: selfsigned
+    selfsigned_not_after: "+{{ opensearch_certs_duration }}d"
+    ignore_timestamps: false # so will be regenerated when run if necessary
+    privatekey_path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
+    path: "{{ opensearch_config_path }}/certs/root-ca.pem"
+    csr_content: "{{ _opensearch_root_csr.csr }}"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rw,o=
+    return_content: false
+
+- name: Generate node private key in pkcs8 format
+  community.crypto.openssl_privatekey:
+    path: "{{ opensearch_config_path }}/certs/esnode-key.pem"
+    format: pkcs8
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rw,o=
+    return_content: false
+
+- name: Generate node CSR
+  # Required as cert has to have a subject and subject_alt_name
+  # Actual subject_alt_name is irrelevant as using enforce_hostname_verification=false
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ opensearch_config_path }}/certs/esnode-key.pem"
+    country_name: XX
+    subject_alt_name:
+      - "DNS:esnode.dns.a-record"
+  register: _opensearch_node_csr
+
+- name: Generate node cert
+  community.crypto.x509_certificate:
+    provider: ownca
+    ownca_not_after: "+{{ opensearch_certs_duration }}d"
+    ignore_timestamps: false # so will be regenerated when run if necessary
+    ownca_path: "{{ opensearch_config_path }}/certs/root-ca.pem"
+    ownca_privatekey_path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
+    path: "{{ opensearch_config_path }}/certs/esnode.pem"
+    csr_content: "{{ _opensearch_node_csr.csr }}"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: ug=rw,o=
+    return_content: false
