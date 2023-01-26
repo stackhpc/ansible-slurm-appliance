@@ -1,8 +1,0 @@
----
-
-- name: Create systemd unit file
-  template:
-    dest: /etc/systemd/system/opendistro.service
-    src: opendistro.service.j2
-  become: true
-  notify: Restart opendistro container

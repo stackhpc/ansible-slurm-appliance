@@ -17,7 +17,7 @@ variable "create_nodes" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-230106-1107.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/13
+    default = "openhpc-230110-1629.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/14
     # default = "Rocky-8-GenericCloud-Base-8.7-20221130.0.x86_64.qcow2"
     # default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 }
@@ -31,7 +31,7 @@ module "cluster" {
     vnic_type = "direct"
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "vm.alaska.cpu.general.small"
+        flavor: "vm.alaska.cpu.general.quarter"
         image: var.cluster_image
     }
     login_nodes = {
