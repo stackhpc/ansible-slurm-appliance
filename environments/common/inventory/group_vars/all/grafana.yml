@@ -2,7 +2,7 @@
 
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
-grafana_version: '8.5.9'
+grafana_version: '9.0.3'
 
 # need to copy some role defaults here so we can use in inventory:
 grafana_port: 3000
@@ -63,8 +63,8 @@ grafana_datasources:
     url: "http://{{ prometheus_address }}:9090" # default prometheus port
     editable: true
   - name: slurmstats
-    type: grafana-es-open-distro-datasource
-    url: "https://{{ elasticsearch_address }}:9200"
+    type: grafana-opensearch-datasource
+    url: "https://{{ opensearch_address }}:9200"
     basicAuth: true
     basicAuthUser: admin
     secureJsonData:
@@ -72,13 +72,14 @@ grafana_datasources:
     withCredentials: true
     jsonData:
       tlsSkipVerify: true
-      database: "filebeat-*"
+      database: filebeat-*
       timeField: "@timestamp"
-    es_version: 70
+    flavor: opensearch
     editable: true
+    # readOnly: false
 
 grafana_plugins:
-  - grafana-es-open-distro-datasource
+  - grafana-opensearch-datasource
 
 # want to set grafana_server.serve_from_sub_path if have Open Ondemand to proxy:
 grafana_server:

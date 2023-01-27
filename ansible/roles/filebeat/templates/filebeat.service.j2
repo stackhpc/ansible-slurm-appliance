@@ -12,7 +12,19 @@ After=network-online.target
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=always
-ExecStart=/usr/bin/podman run --network slirp4netns:cidr={{ podman_cidr }} --sdnotify=conmon --cgroups=no-conmon --replace --name filebeat --user root --restart=always --security-opt label=disable --volume /var/log/:/logs:ro --volume /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro --detach=True docker.elastic.co/beats/filebeat-oss:7.9.3 -e -strict.perms=false -d "*"
+ExecStart=/usr/bin/podman run \
+    --network=host \
+    --sdnotify=conmon \
+    --cgroups=no-conmon \
+    --replace \
+    --name filebeat \
+    --user root \
+    --restart=always \
+    --security-opt label=disable \
+    --volume /var/log/:/logs:ro \
+    --volume /etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro \
+    --detach=True docker.elastic.co/beats/filebeat-oss:{{ filebeat_version }} \
+    -e -strict.perms=false -d "*"
 ExecStop=/usr/bin/podman stop --ignore filebeat -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f filebeat
 KillMode=none

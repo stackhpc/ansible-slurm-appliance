@@ -14,6 +14,14 @@ variable "create_nodes" {
     default = true
 }
 
+variable "cluster_image" {
+    description = "single image for all cluster nodes - a convenience for CI"
+    type = string
+    default = "openhpc-230110-1629.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/14
+    # default = "Rocky-8-GenericCloud-Base-8.7-20221130.0.x86_64.qcow2"
+    # default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
+}
+
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
@@ -23,23 +31,23 @@ module "cluster" {
     vnic_type = "direct"
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "vm.alaska.cpu.general.small"
-        image: "openhpc-220830-2042.qcow2"
+        flavor: "vm.alaska.cpu.general.quarter"
+        image: var.cluster_image
     }
     login_nodes = {
         login-0: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220830-2042.qcow2"
+            image: var.cluster_image
         }
     }
     compute_types = {
         small: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220830-2042.qcow2"
+            image: var.cluster_image
         }
         extra: {
             flavor: "vm.alaska.cpu.general.small"
-            image: "openhpc-220830-2042.qcow2"
+            image: var.cluster_image
         }
     }
     compute_nodes = {
@@ -51,4 +59,7 @@ module "cluster" {
     create_nodes = var.create_nodes
     
     environment_root = var.environment_root
+    # Can reduce volume size a lot for short-lived CI clusters:
+    state_volume_size = 10
+    home_volume_size = 20
 }

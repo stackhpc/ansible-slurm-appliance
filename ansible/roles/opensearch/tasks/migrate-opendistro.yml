@@ -1,0 +1,28 @@
+# Migrate data from existing containerised opendistro v1.12.0 to containerised opensearch 2.1.0.
+#
+# This relies on:
+# - Both opendistro and opensearch using host directories for data. See `_default_opendistro_data_path` below
+# - Pre-upgrade group `opendistro` and current group `opensearch` containing the same host.
+#
+# NB: If `opendistro_data_path` was set to something non-default it MUST be set again in the `opensearch` group_vars,
+# as the `opendistro` group will not exist in the groups.
+
+# NB: This deliberately does not remove the opendistro data - this could be done manually if required.
+
+- name: Stop opendistro
+  ansible.builtin.systemd:
+    name: opendistro.service
+    state: stopped
+    enabled: false
+
+- name: Copy opendistro data directory
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ opendistro_data_path | default(_default_opendistro_data_path) }}"
+    dest: "{{ opensearch_data_path | dirname }}/" # copying a directory, so need to specify the parent for destination
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: 0770
+  vars:
+    # from environments/common/inventory/group_vars/all/opendistro.yml:
+    _default_opendistro_data_path: "{{ appliances_state_dir | default('/usr/share') }}/elasticsearch/data"

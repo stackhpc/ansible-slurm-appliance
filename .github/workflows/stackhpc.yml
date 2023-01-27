@@ -53,21 +53,13 @@ jobs:
         shell: bash
         env:
           arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-      
-      - name: Provision ports, inventory and other infrastructure apart from nodes
-        run: |
-          . venv/bin/activate
-          . environments/${{ matrix.cloud }}/activate
-          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          TF_VAR_create_nodes=false terraform apply -auto-approve
-      
+            
       - name: Setup environment-specific inventory/terraform inputs
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           ansible-playbook ansible/adhoc/generate-passwords.yml
           echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
-          ansible-playbook ansible/adhoc/template-cloud-init.yml
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
