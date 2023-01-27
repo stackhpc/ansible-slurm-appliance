@@ -2,17 +2,3 @@
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
   import_playbook: "{{ appliances_environment_root }}/../nrel/hooks/post.yml"
-
-- name: install nvidia driver
-  hosts: vermilion_gpu
-  become: true
-  tasks:
-    - name: "install nvidia driver to GPU nodes"
-      dnf:
-        disable_gpg_check: true
-        validate_certs: false
-        state: present
-        name: https://us.download.nvidia.com/tesla/460.106.00/nvidia-driver-local-repo-rhel8-460.106.00-1.0-1.x86_64.rpm
-      tags:
-        - vs_post_plays
-        - install_nvidia_driver

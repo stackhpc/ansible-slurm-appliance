@@ -101,16 +101,16 @@
     - include_role:
         name: ansible_ipa_ldap_fix
 
-# - name: install nvidia driver
-#   hosts: vermilion_gpu
-#   become: true
-#   tags:
-#     - install_nvidia_driver
-#   tasks:
-#     - dnf:
-#         disable_gpg_check: true
-#         validate_certs: false
-#         name: 'https://us.download.nvidia.com/tesla/460.106.00/nvidia-driver-local-repo-rhel8-460.106.00-1.0-1.x86_64.rpm'
+- name: "Nvidia A100 video driver install"
+  hosts: vermilion_gpu
+  become: true
+  tags:
+    - vs_nvidia_a100_driver_install
+  tasks:
+    - include_role:
+        name: vs_nvidia_a100_driver_install
+
+# https://github.nrel.gov/hpc/vs_nvidia_a100_driver_install.git
 
 # - name: register_aco_idm
 #   hosts: control,login:

@@ -10,7 +10,6 @@ ipaclient_ntp_servers:
   - ds1.hpc.nrel.gov
   - ds2.hpc.nrel.gov
   - ds3.hpc.nrel.gov
-  - ds4.nrel.gov
 
 ipaserver_domain: hpc.nrel.gov
 ipaserver_realm: HPC.NREL.GOV
