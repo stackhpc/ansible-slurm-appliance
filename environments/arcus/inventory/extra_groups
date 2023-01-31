@@ -8,3 +8,6 @@ control
 [freeipa_client:children]
 login
 compute
+
+[resolv_conf:children]
+freeipa_client

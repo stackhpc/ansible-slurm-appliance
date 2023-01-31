@@ -1,0 +1,2 @@
+resolv_conf_nameservers:
+  - "{{ hostvars[groups['freeipa_server'].0].ansible_host }}"
