@@ -51,7 +51,9 @@
         --mkhomedir
         --enable-dns-updates
         --password '{{ freeipa_host_password }}'
-  when: '"content" not in _slurp_persisted_keytab'
+  when:
+    - '"content" not in _slurp_persisted_keytab'
+    - freeipa_host_password is defined
   register: ipa_client_install_password
   changed_when: ipa_client_install_password.rc == 0
   failed_when: >
