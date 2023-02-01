@@ -2,7 +2,7 @@ resource "local_file" "hosts" {
   content  = templatefile("${path.module}/inventory.tpl",
                           {
                             "cluster_name": var.cluster_name,
-                            "tld": var.tld,
+                            "cluster_domain_suffix": var.cluster_domain_suffix,
                             "control": openstack_networking_port_v2.control,
                             "state_dir": var.state_dir,
                             "logins": openstack_networking_port_v2.login,

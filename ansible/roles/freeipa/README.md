@@ -7,7 +7,7 @@ Support FreeIPA in the appliance. In production use it is expected the FreeIPA s
 
 ## Usage
 - Add hosts to the `freeipa_client` group and run (at a minimum) the `ansible/iam.yml` playbook.
-- Host names must match the domain name. By default (using the skeleton Terraform) hostnames are of the form `nodename.cluster_name.tld` where `cluster_name` and `tld` are Terraform variables.
+- Host names must match the domain name. By default (using the skeleton Terraform) hostnames are of the form `nodename.cluster_name.cluster_domain_suffix` where `cluster_name` and `cluster_domain_suffix` are Terraform variables.
 - Hosts discover the FreeIPA server FQDN (and their own domain) from DNS records. If this is not automatically the case (e.g. when using the in-appliance FreeIPA development server) the `resolv_conf` role run by `ansible/bootstrap.yml` can be used to add the FreeIPA server as the nameserver.
 - For production use with an external FreeIPA server, a random one-time password (OTP) must be generated when adding hosts to FreeIPA (e.g. using `ipa host-add --random ...`). This password should be set as a hostvar `freeipa_host_password`. Initial host enrolment will use this OTP to enrole the host. After this it becomes irrelevant so it does not need to be committed to git. This approach means the appliance does not require the FreeIPA administrator password.
 - For development use with the in-appliance FreeIPA server, `freeipa_host_password` will be automatically generated in memory.
@@ -32,6 +32,8 @@ As noted above this is only intended for development and testing.
 - As well as configuring the FreeIPA server, the role will also:
   - Add ansible hosts in the group `freeipa_client` as FreeIPA hosts.
   - Optionally control users in FreeIPA - see `freeipa_users` below.
+
+The FreeIPA GUI will be available on `https://<freeipa_server_ip>/ipa/ui`.
 
 ## Role Variables for Server
 

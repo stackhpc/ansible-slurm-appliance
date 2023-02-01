@@ -1,5 +1,5 @@
 # Created by slurm appliance ansible/roles/resolv_conf
-search {{ openhpc_cluster_name }}.{{ tld }}
+search {{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}
 
 {% for ns in resolv_conf_nameservers[0:3] %}
 nameserver {{ ns }}
