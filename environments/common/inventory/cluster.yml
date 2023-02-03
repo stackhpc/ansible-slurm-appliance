@@ -5,7 +5,7 @@
 all:
   vars:
     # REQUIRED variables - to be defined in an environment:
-    cluster_key_pair:
+    cluster_key_pair: # YES
     cluster_network_name: # NB: either cluster_network_name OR node_interfaces must be defined
     # Either node_image_name or node_image_id must be defined:
     #node_image_name:
@@ -17,8 +17,8 @@ all:
     # OPTIONAL variables:
     cluster_name: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"
     cluster_tld: invalid
-    node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
-    cluster_security_groups:
+    node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}" # can't be in role, needed elsewhere
+    cluster_security_groups:  # not required in ansible
       - name: secgroup-cluster
         description: "Rules for the whole Slurm cluster"
         rules:
@@ -39,7 +39,7 @@ all:
             protocol: tcp
             port: 443
 
-    node_interfaces:
+    node_interfaces: # not sure we want this in ansible?? except we need to define defaults here
       - network_name: "{{ cluster_network_name }}"
         security_groups:
           - secgroup-cluster
@@ -47,18 +47,16 @@ all:
     node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
     # node_floating_ip_address: 
     
-    # openstack volume options - note hostvars too:
+    # sizes of default control volumes - see control hostvars:
     state_volume_size: 150 # GB
     home_volume_size: 100 # GB
-    volume_device_prefix: /dev/vd
-    node_volumes: []
     
     # this default works when there are no child groups in the 'compute' group
     # and no partition customisation is required
     openhpc_slurm_partitions:
       - name: "compute"
     
-    node_user_data: |
+    node_user_data: | # don't need this from ansible, could move to role? it might grow other role-depedent bits though ...
       #cloud-config
       {% if cluster_ssh_keys is defined %}
       {% for ssh_key in cluster_ssh_keys %}
@@ -70,7 +68,7 @@ all:
         - label: {{ volume.label }}
           filesystem: ext4
       {# e.g. first volume mounted by default at /dev/vdb #}
-          device: {{ volume_device_prefix }}{{ 'abcdefg'[loop.index] }}
+          device: {{ node_volume_device_prefix | default('/dev/vd')}}{{ 'abcdefg'[loop.index] }}
           partition: auto
       {% endfor %}
       mounts:
@@ -82,6 +80,7 @@ control:
   vars:
     appliances_state_dir: /var/lib/state
     node_volumes:
+      # Default control node volume configuration:
       - label: state
         description: State for control node
         size: "{{ state_volume_size }}"
@@ -90,7 +89,7 @@ control:
         description: Home for cluster
         size: "{{ home_volume_size }}"
         mount_point: /exports/home
-        mount_options: 'x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service' # TODO: FIXME
+        mount_options: 'x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service'
 
 login:
   vars:
