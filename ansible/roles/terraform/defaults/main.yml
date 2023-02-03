@@ -5,5 +5,4 @@ tf_cluster_templates: # these are templated once per cluster, on localhost
   - inventory.tf.j2
 tf_host_templates: # these are templated by each host
   - node.tf.j2
-tf_state: present
-tf_autoapprove: no
+tf_autoapprove: false

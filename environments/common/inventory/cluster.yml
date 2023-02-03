@@ -1,24 +1,20 @@
-# Yaml-format ansible inventory with default hostvars. It should be overriden/extended by an environment's own cluster.yml file.
-# NB: This is the lowest-possible priority - it will be overridden by inventory files in other inventories, 'all' group_vars, etc.
-# Host and group vars defined here are available even when no hosts have been provisioned (e.g. during provisioning or image build).
+# This specifies default values for the node_* and cluster_* variables defining the cluster infrastructure.
+# For the full description of options see ansible/roles/terraform/README.md.
+# Note this file has the lowest-possible inventory priority; it will be overridden by inventory files in other inventories, 'all' group_vars, etc.
+
+# The following cluster_* and node_* variables are not defined here and so MUST be defined in an environment:
+# - Either cluster_key_pair or cluster_ssh_keys
+# - cluster_network_name, or else override the default node_interfaces definition
+# - Either node_image_name or node_image_id
+# - Either node_flavor_name or node_flavor_id
 
 all:
   vars:
-    # REQUIRED variables - to be defined in an environment:
-    cluster_key_pair: # YES
-    cluster_network_name: # NB: either cluster_network_name OR node_interfaces must be defined
-    # Either node_image_name or node_image_id must be defined:
-    #node_image_name:
-    #node_image_id:
-    # Either node_flavor_name or node_flavor_id must be defined:
-    #node_flavor_name:
-    #node_flavor_id:
-
-    # OPTIONAL variables:
-    cluster_name: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"
     cluster_tld: invalid
-    node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}" # can't be in role, needed elsewhere
-    cluster_security_groups:  # not required in ansible
+    cluster_name: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"
+    cluster_partitions: # default for no child groups in the 'compute' group and no customisation of partitions
+      - name: "compute"
+    cluster_security_groups:
       - name: secgroup-cluster
         description: "Rules for the whole Slurm cluster"
         rules:
@@ -38,24 +34,13 @@ all:
           - direction: ingress
             protocol: tcp
             port: 443
-
-    node_interfaces: # not sure we want this in ansible?? except we need to define defaults here
+    
+    node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
+    node_interfaces:
       - network_name: "{{ cluster_network_name }}"
         security_groups:
           - secgroup-cluster
-    
     node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
-    # node_floating_ip_address: 
-    
-    # sizes of default control volumes - see control hostvars:
-    state_volume_size: 150 # GB
-    home_volume_size: 100 # GB
-    
-    # this default works when there are no child groups in the 'compute' group
-    # and no partition customisation is required
-    openhpc_slurm_partitions:
-      - name: "compute"
-    
     node_user_data: | # don't need this from ansible, could move to role? it might grow other role-depedent bits though ...
       #cloud-config
       {% if cluster_ssh_keys is defined %}
@@ -64,17 +49,21 @@ all:
       {% endfor %}
       {% endif %}
       fs_setup:
-      {% for volume in node_volumes %}
+      {% for volume in node_volumes | default([]) %}
         - label: {{ volume.label }}
-          filesystem: ext4
+          filesystem: {{ volume.filesystem | default('ext4') }}
       {# e.g. first volume mounted by default at /dev/vdb #}
           device: {{ node_volume_device_prefix | default('/dev/vd')}}{{ 'abcdefg'[loop.index] }}
           partition: auto
       {% endfor %}
       mounts:
-      {% for volume in node_volumes %}
+      {% for volume in node_volumes | default([]) %}
         - [LABEL={{ volume.label }}, {{ volume.mount_point }}, auto, "{{ volume.mount_options | default('') }}"]
       {% endfor %}
+    
+    # Convenience variables - define sizes (in GB) of default control node volume configuration - see control hostvars:
+    state_volume_size: 150
+    home_volume_size: 100
 
 control:
   vars:
@@ -98,3 +87,8 @@ login:
         security_groups:
           - secgroup-cluster
           - secgroup-login
+
+# Default: 2x compute nodes in single partition (no child groups)
+compute:
+  hosts:
+    compute-[0:1]:

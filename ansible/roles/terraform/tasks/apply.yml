@@ -21,7 +21,7 @@
 - name: Execute Terraform plan
   community.general.terraform:
     project_path: "{{ tf_project_path }}"
-    state: "{{ tf_state }}"
+    state: present
     plan_file: tf.plan
     force_init: yes
   when: |

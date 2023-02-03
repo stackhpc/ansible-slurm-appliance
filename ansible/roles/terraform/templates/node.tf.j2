@@ -40,7 +40,7 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}_{{ interface.n
   {% endif %}
 
   {% if 'port_security_enabled' in interface %}
-  port_security_enabled = {{ interface.port_security_enabled | bool | to_json }}
+  port_security_enabled = {{ interface.port_security_enabled | bool | to_json }}{# json used here to provide correct quoting #}
   {% endif %}
 
   security_group_ids = [

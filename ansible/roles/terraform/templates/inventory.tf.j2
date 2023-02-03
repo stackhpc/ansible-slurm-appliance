@@ -13,7 +13,7 @@ resource "local_file" "hosts" {
                         ${indent(16,yamlencode(openstack_compute_instance_v2.{{ inventory_hostname }}.network))}
 {%      endfor %}
 
-        # define groups for partitions:
+        # auto-define groups for Slurm partitions:
 {%      for part in (openhpc_slurm_partitions | sort(attribute='name') ) %}
         {{ cluster_name }}_{{ part.name }}:
             children:
