@@ -3,9 +3,11 @@
 # This template runs on each host, so it is host-specific
 
 # Define image for the node:
+{% if node_image_id is not defined %}
 data "openstack_images_image_v2" "{{ inventory_hostname }}" {
   name = "{{ node_image_name }}"
 }
+{% endif %}
 
 # Define volume(s) for the node:
 {% for volume in node_volumes | default([]) %}
@@ -64,12 +66,19 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}_{{ interface.n
 resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
 
   name = "{{ node_fqdn }}"
+  
+  {% if node_image_id is not defined %}
   image_name = data.openstack_images_image_v2.{{ inventory_hostname }}.name
+  {% else %}
+  image_id = "{{ node_image_id }}"
+  {% endif %}
+
   {% if node_flavor_name is defined %}
   flavor_name = "{{ node_flavor_name }}"
   {% else %}
   flavor_id = "{{ node_flavor_id }}"
   {% endif %}
+  
   {% if cluster_key_pair is defined %}
   key_pair = "{{ cluster_key_pair }}"
   {% endif %}
@@ -77,7 +86,11 @@ resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   {% if node_volumes | default([]) | length > 0 %}
   # root device:
   block_device {
+      {% if node_image_id is not defined %}
       uuid = data.openstack_images_image_v2.{{ inventory_hostname }}.id
+      {% else %}
+      uuid = "{{ node_image_id }}"
+      {% endif %}
       source_type  = "image"
       destination_type = "local"
       boot_index = 0
