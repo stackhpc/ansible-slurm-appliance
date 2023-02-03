@@ -19,7 +19,6 @@ all:
       - network_name: "{{ cluster_network_name }}"
         security_groups: "{{ node_default_security_groups }}"
     node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
-    node_user_data: ''
     
     # openstack volume options - note hostvars too:
     state_volume_size: 150 # GB
@@ -34,6 +33,11 @@ all:
     
     node_user_data: |
       #cloud-config
+      {% if cluster_ssh_keys is defined %}
+      {% for ssh_key in cluster_ssh_keys %}
+        - {{ ssh_key }}
+      {% endfor %}
+      {% endif %}
       fs_setup:
       {% for volume in node_volumes %}
         - label: {{ volume.label }}
