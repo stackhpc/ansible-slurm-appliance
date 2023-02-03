@@ -8,7 +8,7 @@ on:
   pull_request:
 jobs:
   openstack:
-    if if: ${{ github.event.label.name != 'no-ci' }}
+    if: ${{ github.event.label.name != 'no-ci' }}
     name: openstack-ci-${{ matrix.cloud }}
     strategy:
       matrix:
