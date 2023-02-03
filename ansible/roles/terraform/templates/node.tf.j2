@@ -13,6 +13,9 @@ resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.
     name = "{{ node_fqdn }}:{{ volume.label }}"
     description = "{{ volume.description | default('') }}"
     size = {{ volume.size }}
+    {% if volume.type is defined %}
+    volume_type = "{{ volume.type }}"
+    {% endif %}
 }
 {% endfor %}
 
