@@ -44,8 +44,8 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}_{{ interface.n
   {% endif %}
 
   security_group_ids = [
-  {% for secgroup in interface.security_groups | default([]) %}
-    data.openstack_networking_secgroup_v2.{{ secgroup }}.id,
+  {% for secgroup_name in interface.security_groups | default([]) %}
+    openstack_networking_secgroup_v2.{{ cluster_name}}_{{ secgroup_name }}.id,
   {% endfor %}
   ]
   

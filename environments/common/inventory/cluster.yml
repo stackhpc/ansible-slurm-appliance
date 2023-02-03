@@ -18,10 +18,32 @@ all:
     cluster_name: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"
     cluster_tld: invalid
     node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
-    node_default_security_groups: ['default']
+    cluster_security_groups:
+      - name: secgroup-cluster
+        description: "Rules for the whole Slurm cluster"
+        rules:
+          # Allow all egress for all cluster nodes
+          - direction: egress
+          # Allow all ingress between cluster nodes
+          - direction: ingress
+            remote_group: "secgroup-cluster"
+      - name: secgroup-login
+        description: "Rules for login nodes"
+        rules:
+          # Allow SSH from anywhere to login nodes
+          - direction: ingress
+            protocol: tcp
+            port: 22
+          # Allow HTTPS from anywhere to login node
+          - direction: ingress
+            protocol: tcp
+            port: 443
+
     node_interfaces:
       - network_name: "{{ cluster_network_name }}"
-        security_groups: "{{ node_default_security_groups }}"
+        security_groups:
+          - secgroup-cluster
+    
     node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
     # node_floating_ip_address: 
     
@@ -72,7 +94,8 @@ control:
 
 login:
   vars:
-    node_default_security_groups:
-      - default
-      - SSH
-      - HTTPS
+    node_interfaces:
+      - network_name: "{{ cluster_network_name }}"
+        security_groups:
+          - secgroup-cluster
+          - secgroup-login
