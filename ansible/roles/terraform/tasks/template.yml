@@ -1,6 +1,6 @@
 - name: Template host-independent Terraform configuration files
   template:
-    src: "{{ [tf_template_path, item ] | flatten(skip_nulls=True) | join('/') }}"
+    src: "{{ item }}"
     dest: "{{ tf_project_path }}/{{ item | splitext | first }}"
   loop: "{{ tf_cluster_templates }}"
   run_once: true
@@ -8,7 +8,7 @@
 
 - name: Template host-dependent Terraform configuration files
   template:
-    src: "{{ [tf_template_path, item ] | flatten(skip_nulls=True) | join('/') }}"
+    src: "{{ item }}"
     dest: "{{ tf_project_path }}/{{inventory_hostname }}_{{ item | splitext | first }}"
   loop: "{{ tf_host_templates }}"
   delegate_to: localhost
