@@ -69,6 +69,7 @@ resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   flavor_name = "{{ node_flavor_name }}"
   {% else %}
   flavor_id = "{{ node_flavor_id }}"
+  {% endif %}
   {% if cluster_key_pair is defined %}
   key_pair = "{{ cluster_key_pair }}"
   {% endif %}
