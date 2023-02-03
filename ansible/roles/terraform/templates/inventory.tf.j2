@@ -9,6 +9,8 @@ resource "local_file" "hosts" {
 {%      for inventory_hostname in groups['all'] | sort %}
                 {{ inventory_hostname}}:
                     ansible_host: ${[for n in openstack_compute_instance_v2.{{ inventory_hostname }}.network: n if n.access_network][0].fixed_ip_v4 }
+                    networks:
+                        ${indent(16,yamlencode(openstack_compute_instance_v2.{{ inventory_hostname }}.network))}
 {%      endfor %}
 
         # define groups for partitions:
