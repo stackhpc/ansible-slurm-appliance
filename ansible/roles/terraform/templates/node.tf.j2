@@ -119,3 +119,11 @@ resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
   }
 
 }
+
+# Define floating IP association for the node:
+{% if node_floating_ip_address is defined %}
+resource "openstack_compute_floatingip_associate_v2" "{{ inventory_hostname }}" {
+  floating_ip = "{{ node_floating_ip_address }}"
+  instance_id = openstack_compute_instance_v2.{{ inventory_hostname }}.id
+}
+{% endif %}

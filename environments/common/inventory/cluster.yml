@@ -21,6 +21,7 @@ all:
       - network_name: "{{ cluster_network_name }}"
         security_groups: "{{ node_default_security_groups }}"
     node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
+    # node_floating_ip_address: 
     
     # openstack volume options - note hostvars too:
     state_volume_size: 150 # GB
