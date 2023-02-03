@@ -6,9 +6,3 @@ terraform {
     }
   }
 }
-
-# The identity scope we are operating in
-# Used to output the OpenStack project ID as a fact for provisioned hosts
-data "openstack_identity_auth_scope_v3" "scope" {
-  name = "{{ cluster_name }}"
-}
