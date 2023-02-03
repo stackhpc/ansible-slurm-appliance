@@ -4,14 +4,18 @@
 resource "local_file" "hosts" {
     content  = <<-EOT
         # define host addresses:
+        all:
+            hosts:
 {%      for inventory_hostname in groups['all'] | sort %}
-        {{ inventory_hostname}} ansible_host=${[for n in openstack_compute_instance_v2.{{ inventory_hostname }}.network: n if n.access_network][0].fixed_ip_v4 }
+                {{ inventory_hostname}}:
+                    ansible_host: ${[for n in openstack_compute_instance_v2.{{ inventory_hostname }}.network: n if n.access_network][0].fixed_ip_v4 }
 {%      endfor %}
 
         # define groups for partitions:
 {%      for part in (openhpc_slurm_partitions | sort(attribute='name') ) %}
-        [{{ cluster_name }}_{{ part.name }}:children]
-        {{ part.name }}
+        {{ cluster_name }}_{{ part.name }}:
+            children:
+                {{ part.name }}
 {%      endfor %}
     EOT
     filename = "../inventory/hosts"
