@@ -1,10 +1,10 @@
 tf_project_path: "{{ appliances_environment_root }}/terraform/"
 tf_template_path: # default uses normal ansible search path
-tf_single_templates:
+tf_cluster_templates: # these are templated once per cluster, on localhost
   - main.tf.j2
   - network.tf.j2
   - inventory.tf.j2
-tf_host_templates:
+tf_host_templates: # these are templated by each host
   - node.tf.j2
 tf_state: present
 tf_autoapprove: no

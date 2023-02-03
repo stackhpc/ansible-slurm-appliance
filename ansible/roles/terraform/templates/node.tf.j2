@@ -1,8 +1,13 @@
 #jinja2: lstrip_blocks: "True"
+
+# This template runs on each host, so it is host-specific
+
+# Define image for the node:
 data "openstack_images_image_v2" "{{ inventory_hostname }}" {
   name = "{{ node_image_name }}"
 }
 
+# Define volume(s) for the node:
 {% for volume in node_volumes | default([]) %}
 resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.label }}" {
     name = "{{ node_fqdn }}:{{ volume.label }}"
@@ -11,6 +16,7 @@ resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.
 }
 {% endfor %}
 
+# Define port(s) for the node:
 {% for interface in node_interfaces %}
 resource "openstack_networking_port_v2" "{{ inventory_hostname }}_{{ interface.network_name }}" {
 
@@ -51,6 +57,7 @@ resource "openstack_networking_port_v2" "{{ inventory_hostname }}_{{ interface.n
 }
 {% endfor %}
 
+# Define instance for the node
 resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
 
   name = "{{ node_fqdn }}"
