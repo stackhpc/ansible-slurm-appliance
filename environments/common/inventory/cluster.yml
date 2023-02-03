@@ -5,10 +5,12 @@
 all:
   vars:
     # REQUIRED variables - to be defined in an environment:
-    cluster_key_pair: "{{ undef(hint='cluster_key_pair must be defined') }}"
+    cluster_key_pair:
     cluster_network_name: # NB: either cluster_network_name OR node_interfaces must be defined
     node_image_name: "{{ undef(hint='node_image_name must be defined') }}"
-    node_flavor: "{{ undef(hint='node_flavor must be defined') }}"
+    # Either node_flavor_name or node_flavor_id must be defined:
+    #node_flavor_name:
+    #node_flavor_id:
 
     # OPTIONAL variables:
     cluster_name: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"

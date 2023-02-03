@@ -65,7 +65,10 @@ resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
 
   name = "{{ node_fqdn }}"
   image_name = data.openstack_images_image_v2.{{ inventory_hostname }}.name
-  flavor_name = "{{ node_flavor }}"
+  {% if node_flavor_name is defined %}
+  flavor_name = "{{ node_flavor_name }}"
+  {% else %}
+  flavor_id = "{{ node_flavor_id }}"
   {% if cluster_key_pair is defined %}
   key_pair = "{{ cluster_key_pair }}"
   {% endif %}
