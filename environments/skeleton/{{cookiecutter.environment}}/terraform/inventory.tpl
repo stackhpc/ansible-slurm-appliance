@@ -1,5 +1,6 @@
 [all:vars]
 openhpc_cluster_name=${cluster_name}
+cluster_domain_suffix=${cluster_domain_suffix}
 
 [control]
 ${control.name} ansible_host=${control.all_fixed_ips[0]}

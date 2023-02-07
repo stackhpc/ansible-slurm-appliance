@@ -1,6 +1,12 @@
 variable "cluster_name" {
     type = string
-    description = "Name for cluster, used as prefix for resources"
+    description = "Name of cluster, used as part of domain name"
+}
+
+variable "cluster_domain_suffix" {
+    type = string
+    description = "Domain suffix for cluster"
+    default = "invalid"
 }
 
 variable "cluster_net" {

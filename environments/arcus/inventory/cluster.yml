@@ -1,0 +1,53 @@
+all:
+  vars:
+    ## REQUIRED variables:
+    cluster_key_pair: slurm-app-ci
+    cluster_network_name: WCDC-iLab-60
+    # Define direct-mode ports for RoCE (otherwise as per default):
+    node_interfaces:
+      - network_name: "{{ cluster_network_name }}"
+        binding:
+          vnic_type: direct
+        security_groups:
+          - secgroup-cluster
+    node_image_name: openhpc-230106-1107.qcow2 # https://github.com/stackhpc/slurm_image_builder/pull/13
+    node_flavor_name: vm.alaska.cpu.general.small
+
+    ## OPTIONAL variables:
+    # Cluster name defined by github action:
+    cluster_name: "{{ lookup('env', 'CI_CLUSTER_NAME') }}" 
+    # Want to test multiple partitions:
+    cluster_partitions:
+      - name: extra
+      - name: small
+    # Only need tiny volumes for CI/test:
+    home_volume_size: 10 
+    state_volume_size: 10
+    # Have virtio-scsi enabled on image:
+    node_volume_device_prefix: /dev/sd 
+
+control:
+  hosts:
+    control:
+  vars:
+
+login:
+  hosts:
+    login:
+  vars:
+    node_interfaces:
+      - network_name: "{{ cluster_network_name }}"
+        binding:
+          vnic_type: direct
+        security_groups:
+          - secgroup-cluster
+          - secgroup-login
+
+compute:
+  children:
+    small:
+      hosts:
+        compute-[0:1]:
+    extra:
+      hosts:
+        compute-[2:3]:

@@ -34,3 +34,5 @@ roles/*
 !roles/mysql/**
 !roles/systemd/
 !roles/systemd/**
+!roles/terraform/
+!roles/terraform/**

@@ -1,0 +1,94 @@
+# This specifies default values for the node_* and cluster_* variables defining the cluster infrastructure.
+# For the full description of options see ansible/roles/terraform/README.md.
+# Note this file has the lowest-possible inventory priority; it will be overridden by inventory files in other inventories, 'all' group_vars, etc.
+
+# The following cluster_* and node_* variables are not defined here and so MUST be defined in an environment:
+# - Either cluster_key_pair or cluster_ssh_keys
+# - cluster_network_name, or else override the default node_interfaces definition
+# - Either node_image_name or node_image_id
+# - Either node_flavor_name or node_flavor_id
+
+all:
+  vars:
+    cluster_tld: invalid
+    cluster_name: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"
+    cluster_partitions: # default for no child groups in the 'compute' group and no customisation of partitions
+      - name: "compute"
+    cluster_security_groups:
+      - name: secgroup-cluster
+        description: "Rules for the whole Slurm cluster"
+        rules:
+          # Allow all egress for all cluster nodes
+          - direction: egress
+          # Allow all ingress between cluster nodes
+          - direction: ingress
+            remote_group: "secgroup-cluster"
+      - name: secgroup-login
+        description: "Rules for login nodes"
+        rules:
+          # Allow SSH from anywhere to login nodes
+          - direction: ingress
+            protocol: tcp
+            port: 22
+          # Allow HTTPS from anywhere to login node
+          - direction: ingress
+            protocol: tcp
+            port: 443
+    
+    node_fqdn: "{{ inventory_hostname }}.{{ cluster_name }}.{{ cluster_tld }}"
+    node_interfaces:
+      - network_name: "{{ cluster_network_name }}"
+        security_groups:
+          - secgroup-cluster
+    node_tf_ignore_changes: [] # terraform attributes to ignore for node changes
+    node_user_data: | # don't need this from ansible, could move to role? it might grow other role-depedent bits though ...
+      #cloud-config
+      {% if cluster_ssh_keys is defined %}
+      {% for ssh_key in cluster_ssh_keys %}
+        - {{ ssh_key }}
+      {% endfor %}
+      {% endif %}
+      fs_setup:
+      {% for volume in node_volumes | default([]) %}
+        - label: {{ volume.label }}
+          filesystem: {{ volume.filesystem | default('ext4') }}
+      {# e.g. first volume mounted by default at /dev/vdb #}
+          device: {{ node_volume_device_prefix | default('/dev/vd')}}{{ 'abcdefg'[loop.index] }}
+          partition: auto
+      {% endfor %}
+      mounts:
+      {% for volume in node_volumes | default([]) %}
+        - [LABEL={{ volume.label }}, {{ volume.mount_point }}, auto, "{{ volume.mount_options | default('') }}"]
+      {% endfor %}
+    
+    # Convenience variables - define sizes (in GB) of default control node volume configuration - see control hostvars:
+    state_volume_size: 150
+    home_volume_size: 100
+
+control:
+  vars:
+    appliances_state_dir: /var/lib/state
+    node_volumes:
+      # Default control node volume configuration:
+      - label: state
+        description: State for control node
+        size: "{{ state_volume_size }}"
+        mount_point: "{{ appliances_state_dir }}"
+      - label: home
+        description: Home for cluster
+        size: "{{ home_volume_size }}"
+        mount_point: /exports/home
+        mount_options: 'x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service'
+
+login:
+  vars:
+    node_interfaces:
+      - network_name: "{{ cluster_network_name }}"
+        security_groups:
+          - secgroup-cluster
+          - secgroup-login
+
+# Default: 2x compute nodes in single partition (no child groups)
+compute:
+  hosts:
+    compute-[0:1]:

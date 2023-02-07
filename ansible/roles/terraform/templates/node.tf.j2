@@ -1,0 +1,143 @@
+#jinja2: lstrip_blocks: "True"
+
+# This template runs on each host, so it is host-specific
+
+# Define image for the node:
+{% if node_image_id is not defined %}
+data "openstack_images_image_v2" "{{ inventory_hostname }}" {
+  name = "{{ node_image_name }}"
+}
+{% endif %}
+
+# Define volume(s) for the node:
+{% for volume in node_volumes | default([]) %}
+resource "openstack_blockstorage_volume_v3" "{{ inventory_hostname }}_{{ volume.label }}" {
+    name = "{{ node_fqdn }}:{{ volume.label }}"
+    description = "{{ volume.description | default('') }}"
+    size = {{ volume.size }}
+    {% if volume.type is defined %}
+    volume_type = "{{ volume.type }}"
+    {% endif %}
+}
+{% endfor %}
+
+# Define port(s) for the node:
+{% for interface in node_interfaces %}
+resource "openstack_networking_port_v2" "{{ inventory_hostname }}_{{ interface.network_name }}" {
+
+  name = "{{ node_fqdn }}"
+  network_id = data.openstack_networking_network_v2.{{ interface.network_name }}.id
+  admin_state_up = true
+
+  {% if 'fixed_ip' in interface %}
+  fixed_ip {
+  {% if 'subname_name' in interface.fixed_ip %}
+    subnet_id = data.openstack_networking_subnet_v2.{{ interface.network_name }}_{{  interface.fixed_ip.subname_name }}.id
+  {% endif %}
+  {% if 'ip_address' in interface.fixed_ip %}
+    ip_address = "{{ interface.fixed_ip.ip_address }}"
+  {% endif %}
+  {% endif %}
+
+  {% if 'port_security_enabled' in interface %}
+  port_security_enabled = {{ interface.port_security_enabled | bool | to_json }}{# json used here to provide correct quoting #}
+  {% endif %}
+
+  security_group_ids = [
+  {% for secgroup_name in interface.security_groups | default([]) %}
+    openstack_networking_secgroup_v2.{{ cluster_name}}_{{ secgroup_name }}.id,
+  {% endfor %}
+  ]
+  
+  {% if 'binding' in interface %}
+  binding {
+    {% if 'vnic_type' in interface.binding %}
+    vnic_type = "{{ interface.binding.vnic_type }}"
+    {% endif %}
+    {% if 'profile' in interface.binding %}
+    profile = "{{ interface.binding.profile | to_json }}"
+    {% endif %}
+  }
+  {% endif %}
+}
+{% endfor %}
+
+# Define instance for the node
+resource "openstack_compute_instance_v2" "{{ inventory_hostname }}" {
+
+  name = "{{ node_fqdn }}"
+  
+  {% if node_image_id is not defined %}
+  image_name = data.openstack_images_image_v2.{{ inventory_hostname }}.name
+  {% else %}
+  image_id = "{{ node_image_id }}"
+  {% endif %}
+
+  {% if node_flavor_name is defined %}
+  flavor_name = "{{ node_flavor_name }}"
+  {% else %}
+  flavor_id = "{{ node_flavor_id }}"
+  {% endif %}
+  
+  {% if cluster_key_pair is defined %}
+  key_pair = "{{ cluster_key_pair }}"
+  {% endif %}
+  
+  {% if node_volumes | default([]) | length > 0 %}
+  # root device:
+  block_device {
+      {% if node_image_id is not defined %}
+      uuid = data.openstack_images_image_v2.{{ inventory_hostname }}.id
+      {% else %}
+      uuid = "{{ node_image_id }}"
+      {% endif %}
+      source_type  = "image"
+      destination_type = "local"
+      boot_index = 0
+      delete_on_termination = true
+  }
+  {% endif %}
+
+  {% for volume in node_volumes | default([]) %}
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.{{ inventory_hostname }}_{{ volume.label }}.id
+  }
+  {% endfor %}
+
+  {% for interface in node_interfaces %}
+  network {
+    port = openstack_networking_port_v2.{{ inventory_hostname }}_{{ interface.network_name }}.id  
+    {% if 'access_network' in interface %}
+    access_network = {{ interface.access_network | to_json }}
+    {% elif loop.last %}
+    access_network = true
+    {% endif %}
+  }
+  {% endfor %}
+
+  metadata = {
+    environment_root = "{{ appliances_environment_root }}"
+  }
+
+  {% if node_user_data is defined and node_user_data != '' %}
+  user_data = <<-EOT
+      {{ node_user_data | indent(6) }}
+  EOT
+  {% endif %}
+
+  lifecycle{
+    ignore_changes = [{{ node_tf_ignore_changes | join(', ') }}]
+  }
+
+}
+
+# Define floating IP association for the node:
+{% if node_floating_ip_address is defined %}
+resource "openstack_compute_floatingip_associate_v2" "{{ inventory_hostname }}" {
+  floating_ip = "{{ node_floating_ip_address }}"
+  instance_id = openstack_compute_instance_v2.{{ inventory_hostname }}.id
+}
+{% endif %}

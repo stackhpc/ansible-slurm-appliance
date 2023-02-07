@@ -8,6 +8,7 @@ on:
   pull_request:
 jobs:
   openstack:
+    if: ${{ github.event.label.name != 'no-ci' }}
     name: openstack-ci-${{ matrix.cloud }}
     strategy:
       matrix:
@@ -19,7 +20,7 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      TF_VAR_cluster_name: ci${{ github.run_id }}
+      CI_CLUSTER_NAME: ci${{ github.run_id }}
     steps:
       - uses: actions/checkout@v2
 
@@ -39,12 +40,12 @@ jobs:
       - name: Install ansible etc
         run: dev/setup-env.sh
 
-      - name: Install terraform
-        uses: hashicorp/setup-terraform@v1
+      # - name: Install terraform
+      #   uses: hashicorp/setup-terraform@v2
       
-      - name: Initialise terraform
-        run: terraform init
-        working-directory: ${{ github.workspace }}/environments/${{ matrix.cloud }}/terraform
+      # - name: Initialise terraform
+      #   run: terraform init
+      #   working-directory: ${{ github.workspace }}/environments/${{ matrix.cloud }}/terraform
         
       - name: Write clouds.yaml
         run: |
@@ -63,13 +64,12 @@ jobs:
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      - name: Provision servers
+      - name: Provision cluster
         id: provision_servers
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform apply -auto-approve
+          ansible-playbook ansible/provision.yml -e tf_autoapprove=yes
 
       - name: Get server provisioning failure messages
         id: provision_failure
@@ -156,7 +156,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' ${TF_VAR_cluster_name}-compute-[0-3]"
+          ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' compute-[0-3]"
           ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
           ansible-playbook -v ansible/ci/check_slurm.yml
       

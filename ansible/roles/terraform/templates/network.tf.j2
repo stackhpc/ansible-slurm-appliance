@@ -1,0 +1,51 @@
+#jinja2: lstrip_blocks: "True"
+
+# NB: This template runs on localhost so has 'all' groupvars
+
+{# Networks/subnets groups are specified as part of a node but aren't actually node-specific (data) resources, so this aggregates them #}
+
+# Networks
+{% set unique_network_names = (hostvars | json_query('*.node_interfaces[].network_name') | unique | sort ) %}
+{% for network_name in unique_network_names %}
+data "openstack_networking_network_v2" "{{ network_name }}" {
+  name = "{{ network_name }}"
+}
+{% endfor %}
+
+# Subnets
+{% set unique_network_subnet_pairs = (hostvars | json_query('*.node_interfaces[].[network_name, fixed_ip.subnet_name]') | unique | sort ) %}
+{% for (network_name, subnet_name) in unique_network_subnet_pairs %}
+{% if subnet_name is not none %}
+data "openstack_networking_subnet_v2" "{{ network_name }}_{{ subnet_name }}" {
+  network_id = data.openstack_networking_network_v2.{{ network_name }}.id
+  name = "{{ network.subnet_name }}"
+}
+{% endif %}
+{% endfor %}
+
+# Security groups
+{% for secgroup in cluster_security_groups %}
+resource "openstack_networking_secgroup_v2" "{{ cluster_name}}_{{ secgroup.name }}" {
+  name = "{{cluster_name}}_{{ secgroup.name }}"
+  description = "{{ secgroup.description }}"
+  delete_default_rules = true
+}
+
+{%  for secrule in secgroup.rules %}
+resource "openstack_networking_secgroup_rule_v2" "{{cluster_name}}_{{ secgroup.name }}_{{ loop.index0 }}" {
+  direction = "{{ secrule.direction }}"
+  ethertype = "{{ secrule.ethertype | default('IPv4') }}"
+  {% if 'remote_group' in secrule %}
+  remote_group_id = openstack_networking_secgroup_v2.{{cluster_name}}_{{ secrule.remote_group }}.id
+  {% endif %}
+  {% if 'protocol' in secrule %}
+  protocol = "{{ secrule.protocol }}"
+  {% endif %}
+  {% if 'port' in secrule %}
+  port_range_min = {{ secrule.port }}
+  port_range_max = {{ secrule.port }}
+  {% endif %}
+  security_group_id = openstack_networking_secgroup_v2.{{ cluster_name }}_{{ secgroup.name }}.id
+}
+{%  endfor %}
+{% endfor %}
