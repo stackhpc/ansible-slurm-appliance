@@ -2,5 +2,5 @@
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
 {% for inventory_hostname in groups['etc_hosts'] | sort -%}
-{{ hostvars[inventory_hostname]['ansible_host'] }} {% if cluster_domain_suffix is defined %}{{ node_fqdn }}{% endif %} {{ inventory_hostname }}
+{{ hostvars[inventory_hostname]['ansible_host'] }} {% if cluster_domain_suffix is defined %}{{ hostvars[inventory_hostname]['node_fqdn'] }}{% endif %} {{ inventory_hostname }}
 {% endfor -%}
