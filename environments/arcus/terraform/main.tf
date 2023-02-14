@@ -17,7 +17,7 @@ variable "create_nodes" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-230110-1629.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/14
+    default = "openhpc-230214-1026.qcow2" # https://github.com/stackhpc/slurm_image_builder/pull/15
     # default = "Rocky-8-GenericCloud-Base-8.7-20221130.0.x86_64.qcow2"
     # default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 }
