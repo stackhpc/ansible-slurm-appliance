@@ -17,9 +17,9 @@ roles:
     name: cloudalchemy.grafana
     version: service-state
     # No versions available
-  - src: https://github.com/stackhpc/ood-ansible.git
+  - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
-    version: shpc/releasever # based on v2.0.8
+    version: v2.0.8
 
 collections:
 - name: containers.podman
