@@ -1,5 +1,7 @@
 # Clean up a Packer build VM
 
+- meta: flush_handlers
+
 - name: Remove dnf caches
   command: dnf clean all
 
