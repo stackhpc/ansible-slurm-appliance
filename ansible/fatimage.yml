@@ -1,0 +1,89 @@
+# Builder version of site.yml just installing binaries
+
+- import_playbook: bootstrap.yml
+
+- hosts: builder
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Disable firewalld
+      # This is enabled on installation, which isn't what we want
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: false
+
+    # - import_playbook: filesystems.yml
+    - name: nfs
+      dnf:
+        name: nfs-utils
+
+    # - import_playbook: slurm.yml
+    - name: OpenHPC
+      import_role:
+        name: stackhpc.openhpc
+        tasks_from: install.yml
+
+    - name: Include distribution variables for osc.ood
+      include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky.yml"
+    # FUTURE: install-apps.yml - this is git clones
+
+    # - import_playbook: portal.yml
+    - name: Open Ondemand server
+      import_role:
+        name: osc.ood
+        tasks_from: install-package.yml
+    - name: Open Ondemand remote desktop
+      import_role:
+        name: openondemand
+        tasks_from: vnc_compute.yml
+        
+    # - import_playbook: monitoring.yml:
+    #   opensearch - containerised, nothing to do
+    # slurm_stats - nothing to do
+    # filebeat - containerised - nothing to do
+
+    - import_role:
+        name: cloudalchemy.node_exporter
+        tasks_from: preflight.yml
+    - import_role:
+        name: cloudalchemy.node_exporter
+        tasks_from: install.yml
+
+    - name: openondemand exporter
+      dnf:
+        name: ondemand_exporter 
+
+    - name: slurm exporter
+      import_role:
+        name: slurm_exporter
+        tasks_from: install
+      vars:
+        slurm_exporter_state: stopped
+      # dnf:
+      #   name: "https://github.com/stackhpc/prometheus-slurm-exporter/releases/download/{{ slurm_exporter_version }}/prometheus-slurm-exporter-{{ slurm_exporter_version }}-{{slurm_exporter_release}}.el8.x86_64.rpm"
+      #   disable_gpg_check: yes
+      # vars: # ansible/roles/slurm_exporter/defaults/main.yml:
+      #   slurm_exporter_version: '0.20'
+      #   slurm_exporter_release: '2'
+
+    - import_role:
+        name: cloudalchemy.prometheus
+        tasks_from: preflight.yml
+    - import_role:
+        name: cloudalchemy.prometheus
+        tasks_from: install.yml
+    
+    - name: Include distribution variables for cloudalchemy.grafana
+      include_vars: "{{ appliances_repository_root }}/ansible/roles/cloudalchemy.grafana/vars/redhat.yml"
+    - import_role:
+        name: cloudalchemy.grafana
+        tasks_from: install.yml
+
+    # - import_playbook: iam.yml - nothing to do
+
+    - name: Cleanup image
+      import_tasks: cleanup.yml
+
+    - name: Shutdown Packer VM
+      community.general.shutdown:

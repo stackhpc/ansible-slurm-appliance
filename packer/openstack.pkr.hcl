@@ -1,8 +1,21 @@
 # Use like:
 #   $ PACKER_LOG=1 packer build --on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
-# "timestamp" template function replacement:s
-locals { timestamp = formatdate("YYMMDD-hhmm", timestamp())}
+packer {
+  required_plugins {
+    git = {
+      version = ">= 0.3.2"
+      source = "github.com/ethanmdavidson/git"
+    }
+  }
+}
+
+data "git-commit" "cwd-head" { }
+
+locals {
+    git_commit = data.git-commit.cwd-head.hash
+    timestamp = formatdate("YYMMDD-hhmm", timestamp())
+}
 
 # Path pointing to root of repository - automatically set by environment variable PKR_VAR_repo_root
 variable "repo_root" {
@@ -77,7 +90,7 @@ source "openstack" "openhpc" {
   ssh_bastion_username = "${var.ssh_bastion_username}"
   ssh_bastion_private_key_file = "${var.ssh_bastion_private_key_file}"
   security_groups = "${var.security_groups}"
-  image_name = "ohpc-${source.name}-${local.timestamp}" # also provides a unique legal instance hostname (in case of parallel packer builds)
+  image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # " # also provides a unique legal instance hostname (in case of parallel packer builds)
   image_visibility = "${var.image_visibility}"
 }
 
@@ -87,20 +100,32 @@ build {
     name = "compute"
   }
 
-  source "source.openstack.openhpc" {
-    name = "login"
-  }
-
-  source "source.openstack.openhpc" {
-    name = "control"
-  }
-
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/site.yml"
     groups = concat(["builder"], split("-", "${source.name}"))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "./ansible-inventory.sh", "-vv", "-e", "@extra_vars.yml"]
+    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@extra_vars.yml"]
+  }
+
+  post-processor "manifest" {
+    custom_data  = {
+      source = "${source.name}"
+    }
+  }
+}
+
+build {
+  source "source.openstack.openhpc" {
+    name = "fatimage"
+  }
+
+  provisioner "ansible" {
+    playbook_file = "${var.repo_root}/ansible/fatimage.yml"
+    groups = ["builder", "control", "compute", "login"]
+    keep_inventory_file = true # for debugging
+    use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
+    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", ]
   }
 
   post-processor "manifest" {
