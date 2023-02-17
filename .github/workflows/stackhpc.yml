@@ -63,7 +63,7 @@ jobs:
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      - name: Provision servers
+      - name: Provision nodes using fat image
         id: provision_servers
         run: |
           . venv/bin/activate
@@ -90,7 +90,7 @@ jobs:
           terraform destroy -auto-approve
         if: ${{ always() && steps.provision_servers.outcome == 'failure' && contains(steps.provision_failure.messages, 'not enough hosts available') }}
 
-      - name: Directly configure cluster
+      - name: Configure cluster
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
@@ -135,24 +135,16 @@ jobs:
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      - name: Build packer images
+      - name: Build environment-specific compute image
         id: packer_build
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
           cd packer/
-          PACKER_LOG=1 packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
-          ../dev/output_manifest.py packer-manifest.json # Sets NEW_{COMPUTE,CONTROL,LOGIN}_IMAGE_ID outputs
+          PACKER_LOG=1 packer build -except openstack.fatimage -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+          ../dev/output_manifest.py packer-manifest.json # Sets NEW_COMPUTE_IMAGE_ID outputs
 
-      - name: Test reimage of login nodes (via rebuild adhoc)
-        run: |
-          . venv/bin/activate
-          . environments/${{ matrix.cloud }}/activate
-          ansible-playbook -v --limit login ansible/adhoc/rebuild.yml -e rebuild_image=${{ steps.packer_build.outputs.NEW_LOGIN_IMAGE_ID }}
-          ansible login -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
-          ansible-playbook -v ansible/ci/check_slurm.yml
-
-      - name: Test reimage of compute nodes (via slurm)
+      - name: Test reimage of compute nodes to new environment-specific image (via slurm)
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
@@ -160,14 +152,13 @@ jobs:
           ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
           ansible-playbook -v ansible/ci/check_slurm.yml
       
-      - name: Test reimage of control node (via rebuild adhoc)
+      - name: Test reimage of control and login node to same image (via rebuild adhoc)
         run: |
           . venv/bin/activate
           . environments/${{ matrix.cloud }}/activate
-          ansible-playbook -v --limit control ansible/adhoc/rebuild.yml -e rebuild_image=${{ steps.packer_build.outputs.NEW_CONTROL_IMAGE_ID }}
-          ansible control -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
-          ansible-playbook ansible/slurm.yml --tags openhpc # configures partitions
-          ansible-playbook ansible/monitoring.yml --tags prometheus # configures scrapes
+          ansible-playbook -v --limit control,login ansible/adhoc/rebuild.yml
+          ansible all -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
+          ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
       
       - name: Check sacct state survived reimage
