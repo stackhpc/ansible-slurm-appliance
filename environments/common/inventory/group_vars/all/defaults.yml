@@ -21,7 +21,7 @@ grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 
 ############################# bootstrap: local user configuration #########################
 
-# Parameters for these users replicate what gets created using image openhpc-220526-1354.qcow2 image + appliance run.
+# Parameters for these users are consistent with the "fat" image build from https://github.com/stackhpc/slurm_image_builder
 # Note RockyLinux 8.5 defines system user/groups in range 201-999
 appliances_local_users_ansible_user_name: "{{ ansible_ssh_user | default(ansible_user) }}"
 appliances_local_users_podman: # also used in environments/common/inventory/group_vars/all/podman.yml:podman_users
