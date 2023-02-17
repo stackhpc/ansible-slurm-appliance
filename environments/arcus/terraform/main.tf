@@ -31,22 +31,22 @@ module "cluster" {
     vnic_type = "direct"
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "vm.alaska.cpu.general.quarter"
+        flavor: "vm.ska.cpu.general.quarter"
         image: var.cluster_image
     }
     login_nodes = {
         login-0: {
-            flavor: "vm.alaska.cpu.general.small"
+            flavor: "vm.ska.cpu.general.small"
             image: var.cluster_image
         }
     }
     compute_types = {
         small: {
-            flavor: "vm.alaska.cpu.general.small"
+            flavor: "vm.ska.cpu.general.small"
             image: var.cluster_image
         }
         extra: {
-            flavor: "vm.alaska.cpu.general.small"
+            flavor: "vm.ska.cpu.general.small"
             image: var.cluster_image
         }
     }
