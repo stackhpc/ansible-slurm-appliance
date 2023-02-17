@@ -4,6 +4,7 @@
   systemd:
     daemon_reload: true
     name: prometheus-slurm-exporter
-    state: "{{ 'restarted' if slurm_exporter_state != 'stopped' }}"
+    state: restarted
   when:
     - not ansible_check_mode
+    - slurm_exporter_state != 'stopped'
