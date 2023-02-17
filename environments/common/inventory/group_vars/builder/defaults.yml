@@ -4,7 +4,6 @@
 # defined elsewhere the group that is ordered lower will determine the values.
 openhpc_slurm_service_started: false
 nfs_client_mnt_state: present
-update_enable: true
 block_devices_partition_state: skip
 block_devices_filesystem_state: skip
 block_devices_mount_state: present
