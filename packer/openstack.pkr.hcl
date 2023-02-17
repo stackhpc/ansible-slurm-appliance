@@ -35,6 +35,11 @@ variable "source_image_name" {
   type = string
 }
 
+variable "fatimage_source_image_name" {
+  type = string
+  default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
+}
+
 variable "flavor" {
   type = string
 }
@@ -81,7 +86,6 @@ variable "ssh_bastion_private_key_file" {
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
   networks = "${var.networks}"
-  source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
   ssh_username = "${var.ssh_username}"
   ssh_timeout = "20m"
   ssh_private_key_file = "${var.ssh_private_key_file}" # TODO: doc same requirements as for qemu build?
@@ -98,6 +102,7 @@ source "openstack" "openhpc" {
 build {
   source "source.openstack.openhpc" {
     name = "compute"
+    source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
   }
 
   provisioner "ansible" {
@@ -118,6 +123,7 @@ build {
 build {
   source "source.openstack.openhpc" {
     name = "fatimage"
+    source_image_name = "${var.fatimage_source_image_name}" # NB: must already exist in OpenStack
   }
 
   provisioner "ansible" {
