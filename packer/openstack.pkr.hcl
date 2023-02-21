@@ -94,7 +94,6 @@ source "openstack" "openhpc" {
   ssh_bastion_username = "${var.ssh_bastion_username}"
   ssh_bastion_private_key_file = "${var.ssh_bastion_private_key_file}"
   security_groups = "${var.security_groups}"
-  image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # " # also provides a unique legal instance hostname (in case of parallel packer builds)
   image_visibility = "${var.image_visibility}"
 }
 
@@ -103,6 +102,7 @@ build {
   source "source.openstack.openhpc" {
     name = "compute"
     source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
+    image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # also provides a unique legal instance hostname (in case of parallel packer builds)
   }
 
   provisioner "ansible" {
@@ -120,10 +120,11 @@ build {
   }
 }
 
+# The "fat" image build with all binaries:
 build {
   source "source.openstack.openhpc" {
-    name = "fatimage"
     source_image_name = "${var.fatimage_source_image_name}" # NB: must already exist in OpenStack
+    image_name = "${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # similar to name from slurm_image_builder
   }
 
   provisioner "ansible" {
