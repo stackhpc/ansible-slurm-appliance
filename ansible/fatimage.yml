@@ -1,0 +1,125 @@
+# Builder version of site.yml just installing binaries
+
+- import_playbook: bootstrap.yml
+
+- hosts: builder
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Disable firewalld
+      # This is enabled on installation, which isn't what we want
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: false
+
+    # - import_playbook: filesystems.yml
+    - name: nfs
+      dnf:
+        name: nfs-utils
+
+    # - import_playbook: slurm.yml
+    - name: OpenHPC
+      import_role:
+        name: stackhpc.openhpc
+        tasks_from: install.yml
+
+    - name: Include distribution variables for osc.ood
+      include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky.yml"
+    # FUTURE: install-apps.yml - this is git clones
+
+    # - import_playbook: portal.yml
+    - name: Open Ondemand server
+      import_role:
+        name: osc.ood
+        tasks_from: install-package.yml
+    - name: Open Ondemand remote desktop
+      import_role:
+        name: openondemand
+        tasks_from: vnc_compute.yml
+
+    # - import_playbook: monitoring.yml:
+    #   opensearch - containerised, nothing to do
+    # slurm_stats - nothing to do
+    # filebeat - containerised - nothing to do
+
+    - import_role:
+      # can't only run cloudalchemy.node_exporter/tasks/install.yml as needs vars from preflight.yml and triggers service start
+      # however starting node exporter is ok
+        name: cloudalchemy.node_exporter
+
+    - name: openondemand exporter
+      dnf:
+        name: ondemand_exporter 
+
+    - name: slurm exporter
+      import_role:
+        name: slurm_exporter
+        tasks_from: install
+      vars:
+        slurm_exporter_state: stopped
+
+    - import_role:
+        name: cloudalchemy.prometheus
+        tasks_from: preflight.yml
+
+    # can't run cloudalchemy.prometheus/tasks/install.yml as it triggers a unit start
+    # so below is a partial extraction of this:
+    - name: create prometheus system group
+      group:
+        name: prometheus
+        system: true
+        state: present
+
+    - name: create prometheus system user
+      user:
+        name: prometheus
+        system: true
+        shell: "/usr/sbin/nologin"
+        group: prometheus
+        createhome: false
+        home: "{{ prometheus_db_dir }}"
+
+    - name: download prometheus binary to local folder
+      become: false
+      get_url:
+        url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
+        dest: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
+        checksum: "sha256:{{ __prometheus_checksum }}"
+      register: _download_archive
+      until: _download_archive is succeeded
+      retries: 5
+      delay: 2
+
+    - name: unpack prometheus binaries
+      become: false
+      unarchive:
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
+        dest: "/tmp"
+        creates: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/prometheus"
+
+    - name: propagate official prometheus and promtool binaries
+      copy:
+        remote_src: yes
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}"
+        dest: "{{ _prometheus_binary_install_dir }}/{{ item }}"
+        mode: 0755
+        owner: root
+        group: root
+      with_items:
+        - prometheus
+        - promtool
+
+    - name: Include distribution variables for cloudalchemy.grafana
+      include_vars: "{{ appliances_repository_root }}/ansible/roles/cloudalchemy.grafana/vars/redhat.yml"
+    - import_role:
+        name: cloudalchemy.grafana
+        tasks_from: install.yml
+
+    # - import_playbook: iam.yml - nothing to do
+
+    - name: Cleanup image
+      import_tasks: cleanup.yml
+
+    - name: Shutdown Packer VM
+      community.general.shutdown:
