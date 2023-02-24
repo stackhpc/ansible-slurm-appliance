@@ -1,0 +1,3 @@
+---
+# Default to 10GB
+cvmfs_quota_limit_mb: 10000

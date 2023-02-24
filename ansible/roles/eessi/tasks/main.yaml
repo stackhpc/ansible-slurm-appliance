@@ -1,0 +1,19 @@
+---
+- name: Install CVMFS repo
+  yum:
+    name: https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
+- name: Install CVMFS
+  yum:
+    name: cvmfs
+- name: Install EESSI CVMFS config
+  yum:
+    name: https://github.com/EESSI/filesystem-layer/releases/download/latest/cvmfs-config-eessi-latest.noarch.rpm
+- name: Add base CVMFS config
+  template:
+    src: default.local.j2
+    dest: /etc/cvmfs/default.local
+# TODO: make this idempotent?
+- name: Ensure CVMFS config is setup
+  command:
+    cmd: "cvmfs_config setup"
+  become: true

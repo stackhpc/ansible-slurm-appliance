@@ -13,6 +13,10 @@ login
 control
 compute
 
+[eessi:children]
+# All Slurm nodes.
+openhpc
+
 [hpctests:children]
 # Login group to use for running mpi-based testing.
 login
