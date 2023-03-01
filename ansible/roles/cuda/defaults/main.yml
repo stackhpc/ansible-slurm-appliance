@@ -1,0 +1,5 @@
+cuda_distro: rhel8
+cuda_repo: "https://developer.download.nvidia.com/compute/cuda/repos/{{ cuda_distro }}/x86_64/cuda-{{ cuda_distro }}.repo"
+cuda_packages:
+  - cuda
+  - nvidia-gds

@@ -104,3 +104,6 @@ opensearch
 grafana
 control
 prometheus
+
+[cuda]
+# Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
