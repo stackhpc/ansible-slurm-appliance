@@ -1,0 +1,5 @@
+ofed_install: true
+ofed_version: 5.8-2.0.3.0
+ofed_download_url: https://content.mellanox.com/ofed/MLNX_OFED-{{ ofed_version }}/MLNX_OFED_SRC-{{ ofed_version }}.tgz
+ofed_tmp_dir: /tmp
+ofed_packages: all

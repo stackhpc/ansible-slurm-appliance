@@ -1,0 +1,68 @@
+# NB: This assumes the running kernel is the one we want to build against, i.e. any updates/reboots have been done
+# Implements https://docs.nvidia.com/networking/display/MLNXOFEDv561033/Installing+MLNX_OFED#InstallingMLNX_OFED-InstallingOFEDonCommunityOperatingSystems
+
+- name: Download and unpack Mellanox OFED source tarball
+  ansible.builtin.unarchive:
+    src: "{{ ofed_download_url }}"
+    dest: "{{ ofed_tmp_dir }}"
+    remote_src: yes
+
+- name: Determine running kernel
+  # not using facts
+  command:
+    cmd: uname -r
+  register: _ofed_running_kernel
+  changed_when: false
+
+- name: Install build prerequisites
+  # mostly from just running the script and seeing what it says!
+  dnf:
+    name:
+      - "kernel-devel-{{ _ofed_running_kernel.stdout}}"
+      - perl
+      - rpm-build
+      - gcc-gfortran
+      - libmnl-devel
+      - numactl-devel
+      - gcc
+      - gcc-c++
+      - kernel-modules-extra
+      - zlib-devel
+      - iptables-devel
+      - elfutils-devel
+      - perl-generators
+      - openssl-devel
+      - lsof
+      - systemd-devel
+      - libnl3-devel
+      - pciutils-devel
+      - binutils-devel
+      - gdb-headless
+      - glibc-devel
+      - flex
+      - libdb-devel
+      - python36
+      - fuse-devel
+      - libusbx-devel
+      - python3-docutils
+      - bison
+      - python3-Cython
+      - tcsh
+      - libselinux-devel
+      - libstdc++-devel
+      - glib2-devel
+      - cmake
+      - pkgconf-pkg-config
+      - libtool
+      - pciutils
+      - patch
+      - valgrind-devel
+      - kernel-rpm-macros
+      - python36-devel
+  register: ofed_build_deps
+
+- name: Run install script
+  command:
+    cmd: "{{ ofed_tmp_dir }}/MLNX_OFED_SRC-{{ ofed_version}}/install.pl --{{ ofed_packages }}"
+
+# TODO: delete ofed temp stuff /tmp
