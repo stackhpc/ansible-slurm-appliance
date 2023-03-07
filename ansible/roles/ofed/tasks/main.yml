@@ -59,6 +59,8 @@
       - valgrind-devel
       - kernel-rpm-macros
       - python36-devel
+    enablerepo:
+      - powertools
   register: ofed_build_deps
 
 - name: Run install script
