@@ -10,6 +10,7 @@
   file:
     path: /etc/resolv.conf
     state: absent
+  when: "'resolv_conf' not in group_names" # if its been overriden, deleting it is the wrong thing to do
 
 - name: Delete any injected ssh config for rocky
   file:
