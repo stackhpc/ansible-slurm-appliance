@@ -1,6 +1,20 @@
 # Builder version of site.yml just installing binaries
 
+- name: Run pre.yml hook
+  vars:
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+    hook_path: "{{ appliances_environment_root }}/hooks/pre.yml"
+  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
+  when: hook_path | exists
+
 - import_playbook: bootstrap.yml
+
+- name: Run post-bootstrap.yml hook
+  vars:
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+    hook_path: "{{ appliances_environment_root }}/hooks/post-bootstrap.yml"
+  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
+  when: hook_path | exists
 
 - hosts: builder
   become: yes
@@ -118,6 +132,17 @@
 
     # - import_playbook: iam.yml - nothing to do
 
+- name: Run post.yml hook
+  vars:
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+    hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
+  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
+  when: hook_path | exists
+
+- hosts: builder
+  become: yes
+  gather_facts: no
+  tasks:
     - name: Cleanup image
       import_tasks: cleanup.yml
 
