@@ -57,3 +57,7 @@
   when: 
     - proxy_systemd | bool
     - _copy_systemd_proxy.changed | default(false)
+
+- name: Reset connection to get new /etc/environment
+  meta: reset_connection
+  # NB: conditionals not supported
