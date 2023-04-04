@@ -7,7 +7,7 @@ ansible_ssh_common_args='-o ProxyCommand="ssh rocky@${proxy_fip} -W %h:%p"'
 ${control.name} ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}'
 
 [admin]
-${cluster_name}-vtadmin
+${cluster_name}-vt-admin
 
 [login]
 %{ for login in logins ~}
@@ -21,10 +21,19 @@ ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.acc
 
 ## Define groups for slurm parititions:
 [${cluster_name}_lg]
-${cluster_name}-vlg-001
+${cluster_name}-vt-lg-001
+${cluster_name}-vt-lg-002
 
 [${cluster_name}_sm]
-${cluster_name}-vsm-001
+${cluster_name}-vt-sm-001
+${cluster_name}-vt-sm-002
 
 [${cluster_name}_gpu]
-${cluster_name}-vgpu-001
+${cluster_name}-vt-gpu-001
+
+
+# vt-lg-001: "large"
+# vt-lg-002: "large"
+# vt-sm-001: "small"
+# vt-sm-002: "small"
+# vt-gpu-001: "gpu"
