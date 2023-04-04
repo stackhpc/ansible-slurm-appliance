@@ -76,8 +76,8 @@ roles:
     src: git+git@github.nrel.gov:hpc/ipaclient.git
     type: git
 
-  - name: vs_hpc_mounts
-    src: git+git@github.nrel.gov:hpc/vs_hpc_mounts.git
+  - name: aco_ceph_mounts
+    src: git+https://github.nrel.gov/hpc/aco_ceph_mount.git
     type: git
 
   # - name: releasever-config
