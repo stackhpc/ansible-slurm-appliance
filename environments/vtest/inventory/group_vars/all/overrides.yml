@@ -10,5 +10,4 @@ slurm_lex_accounting_dev: False
 slurm_lex_accounting_clustername: "{{ vermilion_cluster_name_prefix }}"
 
 sync_slurm_allocations_clustername: "{{ vermilion_cluster_name_prefix }}"
-sync_slurm_allocations_clustername: "{{ vermilion_cluster_name_prefix }}"
 slurm_sync_allocations_log_file: "sync_slurm_accounting_{{ vermilion_cluster_name_prefix }}.log"
