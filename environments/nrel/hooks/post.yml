@@ -25,6 +25,46 @@
     - include_role:
         name: vs-set-ephemeral-mounts
 
+#moved from pre.yml
+
+- name: "Apply configs to control nodes"
+  hosts: control
+  tags: set_vermilion_control_setup
+  become: true
+  tasks:
+    - include_role:
+        name: vermilion_control_setup
+
+- name: vstack_common_config
+  hosts: control,login,compute
+  become: true
+  tags:
+    - vs_pre
+    - vstack_common_config
+  tasks:
+    - include_role:
+        name: vstack_common_config
+
+- name: "login node only configs"
+  hosts: login
+  tags: set_login_configs
+  become: true
+  tasks:
+    - include_role:
+        name: vermilion_login_nodes
+
+- name: "admin util configs"
+  hosts: login,control
+  tags:
+    - vs_pre
+    - set_admin_configs
+  become: true
+  tasks:
+    - include_role:
+        name: vstack_admin_config
+
+
+
 - name: sync_slurm_allocations install on admin node
   hosts: admin
   become: true

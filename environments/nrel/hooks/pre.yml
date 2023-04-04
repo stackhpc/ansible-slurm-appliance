@@ -19,10 +19,7 @@
   tags:
     - vs_pre
     - nrel_repofix
-
   become: true
-  tags:
-    - vs_pre
   tasks:
     - shell:
         cmd: for FF in `ls /etc/yum.repos.d/Rocky*`; do sed -i 's#gov/rocky/#gov/rocky-vault/#g' $FF; done
@@ -149,41 +146,6 @@
         - /tmp/scratch
         - /var/scratch
 
-- name: vstack_common_config
-  hosts: control,login,compute
-  become: true
-  tags:
-    - vs_pre
-    - vstack_common_config
-  tasks:
-    - include_role:
-        name: vstack_common_config
-
-- name: "login node only configs"
-  hosts: login
-  tags: set_login_configs
-  become: true
-  tasks:
-    - include_role:
-        name: vermilion_login_nodes
-
-- name: "admin util configs"
-  hosts: login,control
-  tags:
-    - vs_pre
-    - set_admin_configs
-  become: true
-  tasks:
-    - include_role:
-        name: vstack_admin_config
-
-- name: "Apply configs to control nodes"
-  hosts: control
-  tags: set_vermilion_control_setup
-  become: true
-  tasks:
-    - include_role:
-        name: vermilion_control_setup
 
 # Builds the /etc/hosts inventory files.
 - name: nrel-proto fixes - workaround no internal DNS
@@ -236,16 +198,17 @@
     - include_role:
         name: vermilion_ldap_client
 
-# - name: "NREL pre - Mount cephfs volumes"
-#   hosts: all
-#   tags:
-#     - vs_pre
-#     - vs_cephfs_mounts
-#   become: true
-#   tasks:
-#     - include_role:
-#         name: vs_hpc_mounts
-
+- name: "NREL pre - Mount cephfs volumes"
+  hosts: all
+  tags:
+    - vs_pre
+    - aco_ceph_mounts
+  become: true
+  tasks:
+    - include_role:
+        name: aco_ceph_mount
+      tags:
+        - aco_ceph_mount
 # #### This is a TOTAL hack or else podman container will not load
 # - name: fix perms on etc/subuid subgid files
 #   hosts: control
