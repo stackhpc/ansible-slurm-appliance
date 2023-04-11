@@ -1,14 +1,21 @@
 # Packer-based image build
 
-This workflow uses Packer with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images. These images can be used during cluster creation or to update an existing cluster. Building images reduces the number of package downloads when deploying a large cluster, and ensures that nodes can be recreated even if packages are changed in repositories (e.g. due to Rocky Linux or OpenHPC updates).
+The appliance contains code and configuration to use Packer with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images. Two types of images can be built:
 
-Packer creates OpenStack VMs and configures them by running `ansible/site.yml` in the same way as for direct configuration of instances using Ansible. However (by default) in Packer builds a `yum update *` step is run. This is not the default for direct configuration, to avoid modifying existing nodes. Packer will upload the resulting images to OpenStack with a name which includes a timestamp.
+1. A "fat" image, containing binaries for all nodes, but no configuration. By default, this is done in StackHPC's CI workflow and the image made available to clients. The fat image is intended to be used as the base image for a cluster. This:
+    - Ensures the cluster is using binaries which have been tested in CI.
+    - Ensures deployment and further image builds can be completed even if packages are changed in upstream repositories (e.g. due to Rocky Linux or OpenHPC updates).
+    - Reduces the number of package downloads to improve deployment speed.
 
-Building images is likely to require Ansible host/group variables to be set in inventory to provide required configuration information. This may (depending on the inventory generation approach) require nodes to deployed before building images. See developer notes below for more information.
+    This build starts from a RockyLinux GenericCloud image and runs yum update.
+
+2. An environment-specific compute node image, which additionally contains all configuration etc. to allow an instance booted with such an image to join a cluster. This allows Slurm to be used to reimage compute nodes for upgrades, see [stackhpc.slurm_openstack_tools.rebuild/README.md](../ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md). This build starts from a "fat" image and does not run yum update.
 
 # Build Process
 
-- Create an application credential with sufficient authorisation to upload images (this may or may not be the `member` role, depending on your OpenStack configuration).
+Building an environment-specific compute node image will[^1] require a cluster to be provisioned to complete the Ansible host/group variables in inventory for the environment.
+
+- Ensure the current OpenStack credentials have sufficient authorisation to upload images (this may or may not require the `member` role for an application credential, depending on your OpenStack configuration).
 - Create a file `environments/<environment>/builder.pkrvars.hcl` containing at a minimum e.g.:
   
   ```hcl
@@ -18,7 +25,7 @@ Building images is likely to require Ansible host/group variables to be set in i
   ssh_keypair_name = "slurm-app-ci"                     # Name of an existing keypair in OpenStack. The private key must be on the host running Packer.
   ```
   
-  The network(s) used for the Packer VMs must provide for outbound internet access but do not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.). These items are configured but not enabled in the Packer VMs.
+  The network used for the Packer VM must provide outbound internet access but does not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.).
   
   For additional options such as non-default private key locations or jumphost configuration see the variable descriptions in `./openstack.pkr.hcl`.
 
@@ -32,24 +39,17 @@ Building images is likely to require Ansible host/group variables to be set in i
 - Build images using the variable definition file:
 
         cd packer
-        PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+        PACKER_LOG=1 /usr/bin/packer build -except openstack.fatimage --on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
   Note the builder VMs are added to the `builder` group to differentiate them from "real" nodes - see developer notes below.
 
-This will build images for the `compute`, `login` and `control` ansible groups. To add additional builds add a new `source` in `openstack.pkr.hcl`.
+- The built image will be automatically uploaded to OpenStack with a name prefixed `ohpc-` and including a timestamp and a shortened git hash.
 
-To build only specific images use e.g. `-only openstack.login`.
-
-Instances using built compute and login images should immediately join the cluster, as long as they are in the Slurm configuration. If reimaging existing nodes, consider doing this via Slurm - see [stackhpc.slurm_openstack_tools.rebuild/README.md](../ansible/collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md).
-
-Instances using built control images will require re-running the `ansible/site.yml` playbook on the entire cluster, as the following aspects cannot be configured inside the image:
-- Slurm configuration (the "slurm.conf" file)
-- Grafana dashboard import (assuming default use of control node for Grafana)
-- Prometheus scrape configuration (ditto)
+[^1]: With the default Terraform at least.
 
 # Notes for developers
 
-The Packer build VMs are added to both the `builder` group and the appropriate `login`, `compute` or `control` group. The former group allows `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the Packer builds, e.g. for services which should not be started.
+Packer build VMs are added to both the `builder` group and other groups (e.g. `compute`) as appropriate. The former group allows `environments/common/inventory/group_vars/builder/defaults.yml` to set variables specifically for the Packer builds, e.g. for services which should not be started.
 
 Note that hostnames in the Packer VMs are not the same as the equivalent "real" hosts. Therefore variables required inside a Packer VM must be defined as group vars, not hostvars.
 

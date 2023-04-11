@@ -1,0 +1,21 @@
+# Clean up a Packer build VM
+
+- meta: flush_handlers
+
+- name: Remove dnf caches
+  command: dnf clean all
+
+- name: Delete /etc/resolv.conf
+  # required as if cloud-init (rather than network manager) controls this on next boot it won't be entirely overrwritten
+  file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: Delete any injected ssh config for rocky
+  file:
+    path: /home/rocky/.ssh/
+    state: absent
+
+- name: Run cloud-init cleanup
+  command: cloud-init clean --logs --seed
+
