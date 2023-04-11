@@ -1,0 +1,56 @@
+[nfs:children]
+openhpc
+
+[mysql:children]
+control
+
+[prometheus:children]
+control
+
+[grafana:children]
+control
+
+[alertmanager:children]
+control
+
+[node_exporter:children]
+cluster
+
+[opensearch:children]
+control
+
+[slurm_stats:children]
+control
+
+[filebeat:children]
+slurm_stats
+
+# NB: [rebuild] not defined here as this template is used in CI, which does not run in openstack
+
+[update:children]
+cluster
+
+[fail2ban:children]
+# Hosts to install fail2ban on to protect SSH
+login
+
+[block_devices:children]
+# Environment-specific so not defined here
+
+[basic_users]
+# Add `openhpc` group to add Slurm users via creation of users on each node.
+
+[openondemand:children]
+# Host to run Open Ondemand server on - subset of login
+login
+
+[openondemand_desktop:children]
+# Subset of compute to run a interactive desktops on via Open Ondemand
+compute
+
+[openondemand_jupyter:children]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+compute
+
+[etc_hosts]
+# Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md

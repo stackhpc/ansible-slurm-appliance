@@ -1,0 +1,14 @@
+---
+- hosts: all
+  name: Fix broken DNS config by allowing NetworkManager to manage /etc/resolv.conf
+  tasks:
+    - name: Ensure cloud-init generated NetworkManager config is removed
+      become: true
+      ansible.builtin.file:
+        path: /etc/NetworkManager/conf.d/99-cloud-init.conf
+        state: absent
+    - name: Restart NetworkManager.service
+      become: true
+      ansible.builtin.service:
+        name: NetworkManager
+        state: restarted
