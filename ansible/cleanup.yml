@@ -5,10 +5,18 @@
 - name: Remove dnf caches
   command: dnf clean all
 
+# If image build happens on a Neutron subnet with property dns_namservers defined, then cloud-init
+# disables NetworkManager's control of /etc/resolv.conf and appends nameservers itself.
+# We don't want network configuration during instance boot to depend on the configuration
+# of the network the builder was on, so we reset these aspects.
 - name: Delete /etc/resolv.conf
-  # required as if cloud-init (rather than network manager) controls this on next boot it won't be entirely overrwritten
   file:
     path: /etc/resolv.conf
+    state: absent
+
+- name: Reenable NetworkManager control of resolv.conf
+  file:
+    path: /etc/NetworkManager/conf.d/99-cloud-init.conf
     state: absent
 
 - name: Delete any injected ssh config for rocky
@@ -18,4 +26,3 @@
 
 - name: Run cloud-init cleanup
   command: cloud-init clean --logs --seed
-
