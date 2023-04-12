@@ -19,9 +19,9 @@
     path: /etc/NetworkManager/conf.d/99-cloud-init.conf
     state: absent
 
-- name: Delete any injected ssh config for rocky
+- name: Delete any injected ssh config for ansible_user
   file:
-    path: /home/rocky/.ssh/
+    path: "/home/{{ ansible_user }}/.ssh/"
     state: absent
 
 - name: Run cloud-init cleanup
