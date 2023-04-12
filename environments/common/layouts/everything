@@ -54,3 +54,6 @@ compute
 
 [etc_hosts]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+
+[eessi:children]
+openhpc

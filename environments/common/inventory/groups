@@ -14,8 +14,7 @@ control
 compute
 
 [eessi:children]
-# All Slurm nodes.
-openhpc
+# Hosts on which EESSI stack should be configured
 
 [hpctests:children]
 # Login group to use for running mpi-based testing.
