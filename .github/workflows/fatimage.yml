@@ -55,7 +55,7 @@ jobs:
         id: manifest
         run: |
           . venv/bin/activate
-          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer-manifest.json)
+          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
           while ! openstack image show -f value -c name $IMAGE_ID; do
             sleep 30
           done
