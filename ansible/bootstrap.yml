@@ -99,6 +99,7 @@
 - name: Setup EESSI
   hosts: eessi
   tags: eessi
+  become: true
   tasks:
     - name: Install and configure EESSI
       import_role:
