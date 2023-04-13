@@ -1,6 +1,8 @@
 ---
 - name: Run EESSI test job
   hosts: login # TODO: Limit this to single node when there are multiple?
+  become: true
+  become_user: testuser
   tasks:
     - name: Clone eessi-demo repo
       ansible.builtin.git:
