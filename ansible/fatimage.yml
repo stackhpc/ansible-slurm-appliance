@@ -108,6 +108,7 @@
     - name: unpack prometheus binaries
       become: false
       unarchive:
+        remote_src: yes
         src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
         dest: "/tmp"
         creates: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/prometheus"
@@ -143,6 +144,7 @@
   become: yes
   gather_facts: no
   tasks:
+    # - meta: end_here
     - name: Cleanup image
       import_tasks: cleanup.yml
 
