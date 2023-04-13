@@ -48,14 +48,14 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd packer/
-          packer init
+          packer init .
           PACKER_LOG=1 packer build -only openstack.openhpc -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
       - name: Get created image name from manifest
         id: manifest
         run: |
           . venv/bin/activate
-          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer-manifest.json)
+          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
           while ! openstack image show -f value -c name $IMAGE_ID; do
             sleep 30
           done
