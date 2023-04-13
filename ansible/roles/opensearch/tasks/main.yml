@@ -1,0 +1,85 @@
+---
+
+- name: Check for existing opendistro service
+  stat:
+    path: /etc/systemd/system/opendistro.service
+  register: _opensearch_opendistro_service
+
+- name: Migrate opendistro data
+  import_tasks:
+    file: migrate-opendistro.yml
+  when: _opensearch_opendistro_service.stat.exists
+
+- name: Remove opendistro service
+  file:
+    path: /etc/systemd/system/opendistro.service
+    state: absent
+
+- name: Increase maximum number of virtual memory maps
+  # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    state: present
+    reload: yes
+  become: true
+
+- name: Ensure required opensearch host directories exist
+  file:
+    state: directory
+    path: "{{ item }}"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: 0770
+  become: true
+  loop:
+    - "{{ opensearch_config_path }}"
+    - "{{ opensearch_data_path }}"
+  when: "'started' in opensearch_state" # don't run during image build
+
+- name: Create certs
+  import_tasks: certs.yml
+  when: "'started' in opensearch_state" # don't run during image build
+
+- name: Template general configuration
+  ansible.builtin.template:
+    src: opensearch.yml.j2
+    dest: "{{ opensearch_config_path }}/opensearch.yml"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    # NOTE: root user in container maps to user on host, so this will appear as
+    # owned by root in the container.
+    mode: 0660
+  notify: Restart opensearch service
+  become: true
+  when: "'started' in opensearch_state" # don't run during image build
+
+- name: Template internal user configuration
+  template:
+      src: "{{ opensearch_internal_users_path }}"
+      dest: "{{ opensearch_config_path }}/internal_users.yml"
+      owner: "{{ opensearch_podman_user }}"
+      group: "{{ opensearch_podman_user }}"
+      # NOTE: root user in container maps to user on host, so this will appear as
+      # owned by root in the container.
+      mode: 0660
+  notify: Restart opensearch service
+  become: true
+  when: "'started' in opensearch_state" # don't run during image build
+
+- name: Create systemd unit file
+  template:
+    dest: /etc/systemd/system/opensearch.service
+    src: opensearch.service.j2
+  become: true
+  notify: Restart opensearch service
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Ensure opensearch service state
+  systemd:
+    name: opensearch.service
+    state: "{{ opensearch_state }}"
+    enabled: "{{ opensearch_systemd_service_enabled }}"
+  become: true

@@ -7,9 +7,3 @@
   assert:
     that: podman_tmp_fstype.stdout == 'tmpfs'
     fail_msg: "{{ podman_tmp_fstype }} (variable podman_tmp_fstype) must be on tmpfs"
-    
-- name: Check host IPs are not within podman network CIDR
-  assert:
-    that: ( podman_cidr | ansible.netcommon.network_in_network(item)) == false
-    fail_msg: "Address {{ item }} for {{ inventory_hostname }} is in podman network range {{ podman_cidr }} - set `podman_cidr` to avoid host network address ranges"
-  loop: "{{ ansible_all_ipv4_addresses }}"

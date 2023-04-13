@@ -14,14 +14,13 @@ internal_address: "{{ inventory_hostname }}"
 api_address: "{{ inventory_hostname }}"
 
 # Service endpoints
-elasticsearch_address: "{{ hostvars[groups['opendistro'].0].api_address }}"
+opensearch_address: "127.0.0.1"
 prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
 grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 
 ############################# bootstrap: local user configuration #########################
 
-# Parameters for these users replicate what gets created using image openhpc-220526-1354.qcow2 image + appliance run.
 # Note RockyLinux 8.5 defines system user/groups in range 201-999
 appliances_local_users_ansible_user_name: "{{ ansible_ssh_user | default(ansible_user) }}"
 appliances_local_users_podman: # also used in environments/common/inventory/group_vars/all/podman.yml:podman_users
