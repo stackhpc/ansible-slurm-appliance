@@ -16,7 +16,7 @@
 
 - name: Disable NetworkManager control of resolv.conf
   ansible.builtin.copy:
-    src: NetworkManager-dns-none.conf.j2
+    src: NetworkManager-dns-none.conf
     dest: /etc/NetworkManager/conf.d/90-dns-none.conf
     owner: root
     group: root
