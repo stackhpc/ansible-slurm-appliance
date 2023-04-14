@@ -1,0 +1,30 @@
+- name: Read nameservers from /etc/resolv.conf
+  ansible.builtin.slurp:
+    src: /etc/resolv.conf
+  register: _slurp_resolv_conf
+
+- name: Set nameservers in /etc/resolv.conf
+  # Might need to set this for freeipa_server host, but freeipa server install
+  # will then change it to point to 127.0.0.1.
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: u=rw,og=r
+  when: "'127.0.0.1' not in (_slurp_resolv_conf.content | b64decode)"
+
+- name: Disable NetworkManager control of resolv.conf
+  ansible.builtin.copy:
+    src: NetworkManager-dns-none.conf
+    dest: /etc/NetworkManager/conf.d/90-dns-none.conf
+    owner: root
+    group: root
+    mode: u=rw,og=r
+  register: _copy_nm_config
+
+- name: Reload NetworkManager
+  ansible.builtin.systemd:
+    name: NetworkManager
+    state: reloaded
+  when: _copy_nm_config.changed | default(false)

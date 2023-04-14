@@ -34,3 +34,9 @@ roles/*
 !roles/mysql/**
 !roles/systemd/
 !roles/systemd/**
+!roles/freeipa/
+!roles/freeipa/**
+!roles/proxy/
+!roles/proxy/**
+!roles/resolv_conf/
+!roles/resolv_conf/**
