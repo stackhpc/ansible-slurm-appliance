@@ -1,0 +1,64 @@
+
+name: Build fat image
+on:
+  workflow_dispatch:
+jobs:
+  openstack:
+    name: openstack-build-arcus
+    concurrency: ${{ github.ref }} # to branch/PR
+    runs-on: ubuntu-20.04
+    env:
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "${arcus_SSH_KEY}" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        env:
+          arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
+
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/.stackhpc/bastion_fingerprint >> ~/.ssh/known_hosts
+        shell: bash
+      
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+      
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${arcus_CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+        env:
+          arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
+            
+      - name: Setup environment
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+        
+      - name: Build fat image with packer
+        id: packer_build
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          cd packer/
+          packer init .
+          PACKER_LOG=1 packer build -only openstack.openhpc -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+
+      - name: Get created image name from manifest
+        id: manifest
+        run: |
+          . venv/bin/activate
+          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
+          while ! openstack image show -f value -c name $IMAGE_ID; do
+            sleep 30
+          done
+          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          echo "::set-output name=IMAGE_ID::$IMAGE_ID"
+          echo "::set-output name=IMAGE_NAME::$IMAGE_NAME"

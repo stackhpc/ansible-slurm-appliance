@@ -28,12 +28,12 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- name: Shutdown Packer VM
+- name: Clean up and shutdown Packer VM
   hosts: builder
   gather_facts: no
   become: yes
   tasks:
+    - import_tasks: cleanup.yml
     - community.general.shutdown:
-  # TODO: should remove /etc/resolv.conf here too
-  
+
 ...

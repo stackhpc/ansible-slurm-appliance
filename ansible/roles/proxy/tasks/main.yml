@@ -1,0 +1,63 @@
+- name: Define configuration in /etc/environment
+  tags: proxy
+  lineinfile:
+    path: "/etc/environment"
+    create: yes
+    owner: root
+    group: root
+    mode: o=rw,go=r
+    state: present
+    regexp: "{{ item.key }}=.*"
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - key: http_proxy
+      value: "{{ proxy_http_proxy }}"
+    - key: https_proxy
+      value: "{{ proxy_https_proxy }}"
+    - key: no_proxy
+      value: "{{ proxy_no_proxy }}"
+
+- name: Define dnf proxy
+  ini_file:
+    path: /etc/dnf/dnf.conf
+    section: main
+    option: "proxy"
+    value: "{{ proxy_http_proxy }}"
+    no_extra_spaces: true
+    owner: root
+    group: root
+    mode: o=rw,go=r
+  when: proxy_dnf | bool
+
+- name: Create systemd configuration directory
+  file:
+    path: /etc/systemd/system.conf.d/
+    state: directory
+    owner: root
+    group: root
+    mode: ug=rw,o=rX
+  when: proxy_systemd | bool
+
+- name: Define proxy configuration for systemd units
+  community.general.ini_file:
+    path: /etc/systemd/system.conf.d/90-proxy.conf
+    section: Manager
+    option: DefaultEnvironment
+    value: >
+        "http_proxy={{ proxy_http_proxy }}" "https_proxy={{ proxy_http_proxy }}" "no_proxy={{ proxy_no_proxy }}"
+    no_extra_spaces: true
+    owner: root
+    group: root
+    mode: ug=rw,o=r
+  register: _copy_systemd_proxy
+  when: proxy_systemd | bool
+
+- name: Restart systemd
+  command: systemctl daemon-reexec
+  when: 
+    - proxy_systemd | bool
+    - _copy_systemd_proxy.changed | default(false)
+
+- name: Reset connection to get new /etc/environment
+  meta: reset_connection
+  # NB: conditionals not supported
