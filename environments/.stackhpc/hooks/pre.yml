@@ -1,3 +1,18 @@
+- hosts: localhost
+  become: no
+  gather_facts: false
+  tasks:
+    - block: 
+      - name: Setup ssh
+        shell: |
+          set -x
+          mkdir ~/.ssh
+          echo "{{ lookup('env', 'BASTION_SSH_KEY') }}" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+      - name: Add bastion's ssh key to known_hosts
+        shell: cat {{ appliances_environment_root }}/bastion_fingerprint >> ~/.ssh/known_hosts
+    when: "lookup('env', 'HOSTNAME') != 'steveb-deploy'"
+
 - hosts: control:!builder
   become: yes
   gather_facts: false

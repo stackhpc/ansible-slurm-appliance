@@ -15,21 +15,9 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       TF_VAR_cluster_name: ci${{ github.run_id }}
+      BASTION_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup ssh
-        run: |
-          set -x
-          mkdir ~/.ssh
-          echo "${arcus_SSH_KEY}" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-        env:
-          arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
-
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprint >> ~/.ssh/known_hosts
-        shell: bash
       
       - name: Install ansible etc
         run: dev/setup-env.sh
