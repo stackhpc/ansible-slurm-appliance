@@ -13,6 +13,12 @@
         shell: cat {{ appliances_environment_root }}/bastion_fingerprint >> ~/.ssh/known_hosts
     when: "lookup('env', 'HOSTNAME') != 'steveb-deploy'"
 
+- hosts: all
+  become: no
+  gather_facts: false
+  tasks:
+    - wait_for_connection:
+
 - hosts: control:!builder
   become: yes
   gather_facts: false
