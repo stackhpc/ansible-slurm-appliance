@@ -1,0 +1,52 @@
+#####
+## WARNING
+##
+## The groups specified here should replicate the groups in the StackHPC Slurm appliance environments
+##
+## https://github.com/stackhpc/ansible-slurm-appliance/blob/main/environments/common/inventory/groups
+## https://github.com/stackhpc/ansible-slurm-appliance/blob/main/environments/common/layouts/everything
+#####
+# These groups should represent the everything layout
+cluster_groups_required:
+  login:         ["{{ cluster_name }}_login"]
+  control:       ["{{ cluster_name }}_control"]
+  compute:       ["{{ cluster_name }}_compute"]
+  openhpc:       [login, control, compute]
+  cluster:       [openhpc]
+  selinux:       [cluster]
+  nfs:           [cluster]
+  mysql:         [control]
+  update:        [cluster]
+  basic_users:   [cluster]
+  fail2ban:      [login]
+  firewalld:     [fail2ban]
+  # ignore these for the moment:
+  #etc_hosts:     []
+  # cloud_init:   [etc_hosts]
+  systemd:        [opensearch, grafana, control, prometheus]
+
+# These are the additional groups required for monitoring (see everything layout)
+cluster_groups_monitoring:
+  podman:        [opensearch, filebeat, mysql]
+  prometheus:    [control]
+  grafana:       [control]
+  alertmanager:  [control]
+  node_exporter: [cluster]
+  opensearch:    [control]
+  slurm_stats:   [control]
+  filebeat:      [slurm_stats]
+
+# Additional groups for OOD
+cluster_groups_ood:
+  openondemand:         [login]
+  openondemand_jupyter: [compute]
+  openondemand_desktop: [compute]
+
+# Additional groups for running the cluster validation
+cluster_groups_validation:
+  hpctests: [login]
+
+# Additional groups for Zenith support
+cluster_groups_zenith:
+  # Any hosts in the grafana and openondemand groups should go in the zenith group
+  zenith: [grafana, openondemand]

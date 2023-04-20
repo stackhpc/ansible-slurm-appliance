@@ -1,0 +1,17 @@
+namespace: stackhpc
+name: slurm_appliance
+version: 0.1.0
+description: Infrastructure provisioning and configuration of a Slurm platform using Ansible
+readme: README.md
+authors:
+  - "Steve Brasier <steveb@stackhpc.com>"
+  - "Matt Anson <matta@stackhpc.com>"
+license:
+  - "Apache-2.0"
+repository: "https://github.com/stackhpc/ansible-slurm-appliance"
+
+dependencies:
+  community.general: "6.5.0"
+  containers.podman: "1.10.1"
+  community.grafana: "1.5.4"
+
