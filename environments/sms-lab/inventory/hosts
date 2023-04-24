@@ -2,17 +2,17 @@
 openhpc_cluster_name=scott-test-cluster
 
 [control]
-scott-test-cluster-control ansible_host=10.0.0.238
+scott-test-cluster-control ansible_host=10.0.1.120
 
 [control:vars]
 # NB needs to be set on group not host otherwise it is ignored in packer build!
 appliances_state_dir=/var/lib/state
 
 [login]
-scott-test-cluster-login-0 ansible_host=10.0.3.110
+scott-test-cluster-login-0 ansible_host=10.0.3.119
 
 [compute]
-scott-test-cluster-compute-0 ansible_host=10.0.1.101
+scott-test-cluster-compute-0 ansible_host=10.0.0.150
 
 # Define groups for slurm parititions:
 [scott-test-cluster_small]
