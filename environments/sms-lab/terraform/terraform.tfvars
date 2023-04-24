@@ -1,11 +1,7 @@
 cluster_name  = "scott-test-cluster"
-# compute_names = ["compute-0", "compute-1"]
 key_pair      = "slurm-key"
-# network       = "stackhpc-ipv4-geneve"
 cluster_net = "stackhpc-ipv4-geneve"
 cluster_subnet = "stackhpc-ipv4-geneve-subnet"
-# compute_image  = "Rocky-8-GenericCloud-8.5-20211114.2.x86_64"
-# compute_flavor = "general.v1.small"
 compute_nodes = {
     compute-0: "small"
     # compute-1: "small"
@@ -13,17 +9,17 @@ compute_nodes = {
 compute_types = {
     small: {
         flavor: "general.v1.small"
-        image: "openhpc-230221-1226-raw"
+        image: "openhpc-230412-1447-raw"
     }
 }
 control_node = {
     flavor: "general.v1.small"
-    image: "openhpc-230221-1226-raw"
+    image: "openhpc-230412-1447-raw"
 }
 login_nodes = {
     login-0: {
         flavor: "general.v1.small"
-        image: "openhpc-230221-1226-raw"
+        image: "openhpc-230412-1447-raw"
     }
 }
 
