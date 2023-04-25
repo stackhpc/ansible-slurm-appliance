@@ -1,21 +1,43 @@
 ---
-- name: Install CVMFS repo
-  yum:
+- name: Download Cern GPG key
+  command: wget http://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM -O cvmfs-key.gpg
+
+- name: Import downloaded GPG key
+  command: rpm --import cvmfs-key.gpg
+
+- name: Add CVMFS repo
+  dnf:
     name: https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
-    # NOTE: Can't find any docs on obtaining gpg key
-    disable_gpg_check: true
+
 - name: Install CVMFS
-  yum:
+  dnf:
     name: cvmfs
+
 - name: Install EESSI CVMFS config
-  yum:
+  dnf:
     name: https://github.com/EESSI/filesystem-layer/releases/download/latest/cvmfs-config-eessi-latest.noarch.rpm
-    # NOTE: Can't find any docs on obtaining gpg key
+    # NOTE: Can't find any docs on obtaining gpg key - maybe downloading directly from github is ok?
     disable_gpg_check: true
+
+# Alternative version using official repo - still no GPG key :(
+# - name: Add EESSI repo
+#   dnf: 
+#     name: http://repo.eessi-infra.org/eessi/rhel/8/noarch/eessi-release-0-1.noarch.rpm
+
+# - name: Install EESSI CVMFS config
+#   dnf:
+#     name: cvmfs-config-eessi
+
 - name: Add base CVMFS config
-  template:
-    src: default.local.j2
+  community.general.ini_file:
     dest: /etc/cvmfs/default.local
+    section: null
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+    no_extra_spaces: true
+  loop: "{{ cvmfs_config | dict2items }}"
+    
+
 # NOTE: Not clear how to make this idempotent
 - name: Ensure CVMFS config is setup
   command:
