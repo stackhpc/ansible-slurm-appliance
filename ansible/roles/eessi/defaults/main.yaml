@@ -3,7 +3,7 @@
 cvmfs_quota_limit_mb: 10000
 
 cvmfs_config_default:
-  CVMFS_CLIENT_PROFILE: single"
+  CVMFS_CLIENT_PROFILE: single
   CVMFS_QUOTA_LIMIT: "{{ cvmfs_quota_limit_mb }}"
 
 cvmfs_config_overrides: {}
