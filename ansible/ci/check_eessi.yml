@@ -1,20 +1,28 @@
 ---
 - name: Run EESSI test job
-  hosts: login # TODO: Limit this to single node when there are multiple?
-  become: true
-  become_user: testuser
+  hosts: login[0]
+  vars:
+    eessi_test_rootdir: /home/eessi_test
   tasks:
+    - name: Create test root directory
+      file:
+        path: "{{ eessi_test_rootdir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: true
+      
     - name: Clone eessi-demo repo
       ansible.builtin.git:
         repo: "https://github.com/eessi/eessi-demo.git"
-        dest: ~/eessi-demo
+        dest: "{{ eessi_test_rootdir }}/eessi-demo"
 
     - name: Run test job
       ansible.builtin.shell:
         cmd: |
           source /cvmfs/pilot.eessi-hpc.org/latest/init/bash
           srun ./run.sh
-        chdir: ~/eessi-demo/TensorFlow
+        chdir: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow"
         executable: /bin/bash
       register: job_output
 
