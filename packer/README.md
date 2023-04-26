@@ -39,7 +39,7 @@ Building an environment-specific compute node image will[^1] require a cluster t
 - Build images using the variable definition file:
 
         cd packer
-        PACKER_LOG=1 /usr/bin/packer build -except openstack.fatimage --on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+        PACKER_LOG=1 /usr/bin/packer build -except openstack.openhpc --on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
   Note the builder VMs are added to the `builder` group to differentiate them from "real" nodes - see developer notes below.
 
