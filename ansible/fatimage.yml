@@ -18,6 +18,8 @@
       dnf:
         name: nfs-utils
 
+    - import_playbook: extras.yml
+
     # - import_playbook: slurm.yml
     - name: OpenHPC
       import_role:
