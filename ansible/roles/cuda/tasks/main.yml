@@ -37,6 +37,12 @@
     path: /etc/profile.d/sh.local
     line: 'export PATH=$PATH:$(ls -1d /usr/local/cuda-* | sort -V | tail -1)/bin'
 
+- name: Enable NVIDIA Persistence Daemon
+  systemd:
+    name: nvidia-persistenced
+    enabled: true
+    state: started
+
 - name: Reboot
   ansible.builtin.reboot:
     post_reboot_delay: 30
