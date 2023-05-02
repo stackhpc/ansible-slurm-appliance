@@ -19,7 +19,7 @@ prometheus_alert_rules: []
 # Can set a hostvar 'env' to an arbitrary string to group prometheus targets, e.g. rack.
 # env: location-1
 prometheus_targets:
-  node: "{{ groups.get('node_exporter', []) | reject('equalto', 'localhost') | prometheus_node_exporter_targets(env | default('ungrouped')) }}"
+  node: "{{ groups.get('node_exporter', []) | reject('equalto', 'localhost') | stackhpc.slurmapp_ops.prometheus_node_exporter_targets(env | default('ungrouped')) }}"
 
 prometheus_scrape_configs_default:
 - job_name: "prometheus"
