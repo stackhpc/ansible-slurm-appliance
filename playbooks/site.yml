@@ -4,8 +4,8 @@
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/pre.yml"
-  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
-  when: hook_path | exists
+  import_playbook: "{{ hook_path if hook_path | stackhpc.slurmapp_ops.exists else 'noop.yml' }}"
+  when: hook_path | stackhpc.slurmapp_ops.exists
 
 - import_playbook: validate.yml
 - import_playbook: bootstrap.yml
@@ -14,8 +14,8 @@
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post-bootstrap.yml"
-  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
-  when: hook_path | exists
+  import_playbook: "{{ hook_path if hook_path | stackhpc.slurmapp_ops.exists else 'noop.yml' }}"
+  when: hook_path | stackhpc.slurmapp_ops.exists
 
 - import_playbook: filesystems.yml
 - import_playbook: slurm.yml
@@ -27,8 +27,8 @@
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
-  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
-  when: hook_path | exists
+  import_playbook: "{{ hook_path if hook_path | stackhpc.slurmapp_ops.exists else 'noop.yml' }}"
+  when: hook_path | stackhpc.slurmapp_ops.exists
 
 - name: Clean up and shutdown Packer VM
   hosts: builder
