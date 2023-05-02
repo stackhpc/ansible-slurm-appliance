@@ -53,7 +53,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook ansible/adhoc/generate-passwords.yml
+          ansible-playbook stackhpc.slurmapp_ops.create_secrets
           echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
@@ -90,14 +90,14 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible all -m wait_for_connection
-          ansible-playbook -v ansible/site.yml
-          ansible-playbook -v ansible/ci/check_slurm.yml
+          ansible-playbook -v stackhpc.slurmapp_ops.configure
+          ansible-playbook -v $APPLIANCES_ENVIRONMENT_ROOT/ci/check_slurm.yml
 
       - name: Run MPI-based tests
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml
+          ansible-playbook -v stackhpc.slurmapp_ops.hpctests
 
       - name: Confirm Open Ondemand is up (via SOCKS proxy)
         run: |
@@ -105,7 +105,7 @@ jobs:
           . environments/.stackhpc/activate
           
           # load ansible variables into shell:
-          ansible-playbook ansible/ci/output_vars.yml \
+          ansible-playbook $APPLIANCES_ENVIRONMENT_ROOT/ci/output_vars.yml \
             -e output_vars_hosts=openondemand \
             -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
             -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
@@ -146,28 +146,28 @@ jobs:
       #     . environments/.stackhpc/activate
       #     ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' ${TF_VAR_cluster_name}-compute-[0-3]"
       #     ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
-      #     ansible-playbook -v ansible/ci/check_slurm.yml
+      #     ansible-playbook -v $APPLIANCES_ENVIRONMENT_ROOT/ci/check_slurm.yml
       
       - name: Test reimage of all nodes (via rebuild adhoc)
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -v --limit control,login ansible/adhoc/rebuild.yml
+          ansible-playbook -v --limit control,login stackhpc.slurmapp_ops.rebuild
           ansible all -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
-          ansible-playbook -v ansible/site.yml
-          ansible-playbook -v ansible/ci/check_slurm.yml
+          ansible-playbook -v stackhpc.slurmapp_ops.configure
+          ansible-playbook -v $APPLIANCES_ENVIRONMENT_ROOT/ci/check_slurm.yml
       
       - name: Check sacct state survived reimage
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
+          ansible-playbook -v $APPLIANCES_ENVIRONMENT_ROOT/ci/check_sacct_hpctests.yml
 
       - name: Check MPI-based tests are shown in Grafana
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/ci/check_grafana.yml
+          ansible-playbook -v $APPLIANCES_ENVIRONMENT_ROOT/ci/check_grafana.yml
 
       - name: Delete infrastructure
         run: |
@@ -181,4 +181,4 @@ jobs:
       #   run: |
       #     . venv/bin/activate
       #     . environments/.stackhpc/activate
-      #     ansible-playbook -vv ansible/ci/delete_images.yml
+      #     ansible-playbook -v $APPLIANCES_ENVIRONMENT_ROOT/ci/delete_images.yml
