@@ -1,5 +1,0 @@
----
-
-- name: Assert that filebeat_config_path is defined
-  assert:
-    that: filebeat_config_path is defined

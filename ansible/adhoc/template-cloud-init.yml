@@ -1,9 +1,0 @@
-- hosts: cloud_init
-  become: no
-  gather_facts: no
-  tasks:
-    - name: Template out cloud-init userdata
-      import_role:
-        name: cloud_init
-        tasks_from: template.yml
-      delegate_to: localhost

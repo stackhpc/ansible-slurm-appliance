@@ -1,6 +1,0 @@
----
-- name: Restart filewalld
-  service:
-    name: firewalld
-    state: restarted
-  when: firewalld_state != 'stopped'

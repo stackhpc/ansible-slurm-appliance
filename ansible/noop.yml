@@ -1,9 +1,0 @@
----
-
-# This file exists so that we can conditionally import a playbook. The path
-# must exist, but we can use a when conditional so that it is not actually
-# run
-
-- hosts: localhost
-  gather_facts: false
-  tasks: []

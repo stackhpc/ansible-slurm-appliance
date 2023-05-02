@@ -1,7 +1,0 @@
-#systemd_dropins:
-#   <unit_name>:
-#     group: <required>
-#     comment: <optional>
-#     content: <required>
-
-systemd_restart: false
