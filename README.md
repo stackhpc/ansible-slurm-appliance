@@ -102,40 +102,40 @@ NB: This section describes generic instructions - check for any environment-spec
 
 2. Deploy instances - see environment-specific instructions.
 
-3. Generate passwords:
+3. Create secrets:
 
-        ansible-playbook ansible/adhoc/generate-passwords.yml
+        ansible-playbook stackhpc.slurmapp_ops.create_secrets
 
-    This will output a set of passwords in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
+    This will output a set of secrets in `environments/<environment>/inventory/group_vars/all/secrets.yml`. It is recommended that these are encrpyted and then commited to git using:
 
-        ansible-vault encrypt inventory/group_vars/all/secrets.yml
+        ansible-vault encrypt $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/secrets.yml
 
     See the [Ansible vault documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for more details.
 
 4. Deploy the appliance:
 
-        ansible-playbook ansible/site.yml
+        ansible-playbook stackhpc.slurmapp_ops.configure
 
    or if you have encrypted secrets use:
 
-        ansible-playbook ansible/site.yml --ask-vault-password
+        ansible-playbook --ask-vault-password ansible-playbook stackhpc.slurmapp_ops.configure
 
-    Tags as defined in the various sub-playbooks defined in `ansible/` may be used to only run part of the `site` tasks.
+    Tags as defined in the various playbooks defined in the `slurmapp_ops` collection may be used to only run part of the `configure` tasks.
 
-5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
+5. The [slurmapp_ops](https://github.com/stackhpc/ansible-collection-slurmapp-ops) collection also contains some "utility" playbooks for managing a running appliance. Run these by activating the environment and using:
 
-        ansible-playbook ansible/adhoc/<playbook name>
+        ansible-playbook stackhpc.slurmapp_ops.<playbook_name>
 
    Currently they include the following (see each playbook for links to documentation):
-    - `hpctests.yml`: MPI-based cluster tests for latency, bandwidth and floating point performance.
-    - `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for reimaging nodes on an in-production cluster - see `ansible/roles/rebuild` for that).
-    - `restart-slurm.yml`: Restart all Slurm daemons in the correct order.
-    - `update-packages.yml`: Update specified packages on cluster nodes.
+    - `hpctests`: MPI-based cluster tests for latency, bandwidth and floating point performance.
+    - `rebuild`: Rebuild nodes with existing or new images (NB: Compute nodes can generally be reimaged from Slurm for less disruption - see the `slurmapp_ops.rebuild` role).
+    - `restart_slurm`: Restart all Slurm daemons in the correct order.
+    - `update_packages`: Update specified packages on cluster nodes.
 
 ## Adding new functionality
 Please contact us for specific advice, but in outline this generally involves:
 - Adding a role.
-- Adding a play calling that role into an existing playbook in `ansible/`, or adding a new playbook there and updating `site.yml`.
+- Adding a play calling that role into an existing playbook in `slurmapp_ops`, or adding a new playbook there and updating the `configure` playbook.
 - Adding a new (empty) group named after the role into `environments/common/inventory/groups` and a non-empty example group into `environments/common/layouts/everything`.
 - Adding new default group vars into `environments/common/inventory/group_vars/all/<rolename>/`.
 - Updating the default Packer build variables in `environments/common/inventory/group_vars/builder/defaults.yml`.
