@@ -1,5 +1,5 @@
 namespace: stackhpc
-name: slurm_appliance
+name: slurmapp_ops
 version: 0.1.0
 description: Infrastructure provisioning and configuration of a Slurm platform using Ansible
 readme: README.md
