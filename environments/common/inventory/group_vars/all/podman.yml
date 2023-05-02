@@ -1,1 +1,0 @@
-podman_users: "{{ [appliances_local_users_podman] }}" # user to use for podman
