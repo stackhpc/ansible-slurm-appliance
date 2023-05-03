@@ -112,6 +112,16 @@
         tasks_from: config.yml
       tags: config
 
+- name: Setup EESSI
+  hosts: eessi
+  tags: eessi
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install and configure EESSI
+      import_role:
+        name: eessi
+
 - hosts: update
   gather_facts: false
   become: yes
