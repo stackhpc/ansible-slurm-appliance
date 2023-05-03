@@ -55,6 +55,9 @@ compute
 [etc_hosts]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
 
+[eessi:children]
+openhpc
+
 [resolv_conf]
 # Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md
 
