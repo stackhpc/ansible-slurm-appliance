@@ -1,0 +1,34 @@
+---
+- name: Run EESSI test job
+  hosts: login[0]
+  vars:
+    eessi_test_rootdir: /home/eessi_test
+  tasks:
+    - name: Create test root directory
+      file:
+        path: "{{ eessi_test_rootdir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: true
+      
+    - name: Clone eessi-demo repo
+      ansible.builtin.git:
+        repo: "https://github.com/eessi/eessi-demo.git"
+        dest: "{{ eessi_test_rootdir }}/eessi-demo"
+
+    - name: Run test job
+      ansible.builtin.shell:
+        cmd: |
+          source /cvmfs/pilot.eessi-hpc.org/latest/init/bash
+          srun ./run.sh
+        chdir: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow"
+        executable: /bin/bash
+      register: job_output
+
+    - name: Fail if job output contains error
+      fail:
+        # Note: Job prints live progress bar to terminal, so use regex filter to remove this from stdout
+        msg: "Test job using EESSI modules failed. Job output was: {{ job_output.stdout | regex_replace('\b', '') }}"        
+      when: '"Epoch 5/5" not in job_output.stdout'
+      
