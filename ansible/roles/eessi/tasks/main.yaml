@@ -1,6 +1,8 @@
 ---
 - name: Download Cern GPG key
-  command: wget http://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM -O cvmfs-key.gpg
+  ansible.builtin.get_url:
+    url: http://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM 
+    dest: ./cvmfs-key.gpg
 
 - name: Import downloaded GPG key
   command: rpm --import cvmfs-key.gpg
