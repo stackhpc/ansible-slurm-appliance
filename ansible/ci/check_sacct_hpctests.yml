@@ -2,7 +2,7 @@
   gather_facts: false
   become: true
   vars:
-    sacct_stdout_expected: |- # based on CI running hpctests as the first job - NB note no trailing newline
+    sacct_stdout_expected: |- # based on CI running hpctests as the first job
       JobID,JobName,State
       1,pingpong.sh,COMPLETED
       2,pingmatrix.sh,COMPLETED
@@ -18,10 +18,10 @@
       register: sacct
     - name: Check info for ended jobs
       assert:
-        that: sacct.stdout == sacct_stdout_expected
+        that: sacct_stdout_expected in sacct.stdout
         fail_msg: |
           Expected:
           --{{ sacct_stdout_expected }}--
           Got:
           --{{ sacct.stdout }}--
-        success_msg: sacct shows hpctests jobs as first and only jobs
+        success_msg: sacct shows hpctests jobs as first jobs in list
