@@ -96,6 +96,11 @@ variable "ssh_bastion_private_key_file" {
   default = "~/.ssh/id_rsa"
 }
 
+variable "floating_ip_network" {
+  type = string
+  default = null
+}
+
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
   networks = "${var.networks}"
@@ -137,6 +142,7 @@ build {
 # The "fat" image build with all binaries:
 build {
   source "source.openstack.openhpc" {
+    floating_ip_network = "${var.floating_ip_network}"
     source_image = "${var.fatimage_source_image}"
     source_image_name = "${var.fatimage_source_image_name}" # NB: must already exist in OpenStack
     image_name = "${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # similar to name from slurm_image_builder
