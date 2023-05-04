@@ -31,13 +31,26 @@ variable "networks" {
   type = list(string)
 }
 
+# Must supply either source_image_name or source_image
 variable "source_image_name" {
   type = string
+  default = null
 }
 
+variable "source_image" {
+  type = string
+  default = null
+}
+
+# Must supply either fatimage_source_image_name or fatimage_source_image
 variable "fatimage_source_image_name" {
   type = string
-  default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
+  default = null
+}
+
+variable "fatimage_source_image" {
+  type = string
+  default = null
 }
 
 variable "flavor" {
@@ -83,6 +96,11 @@ variable "ssh_bastion_private_key_file" {
   default = "~/.ssh/id_rsa"
 }
 
+variable "floating_ip_network" {
+  type = string
+  default = null
+}
+
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
   networks = "${var.networks}"
@@ -101,6 +119,7 @@ source "openstack" "openhpc" {
 build {
   source "source.openstack.openhpc" {
     name = "compute"
+    source_image = "${var.source_image}"
     source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
     image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # also provides a unique legal instance hostname (in case of parallel packer builds)
   }
@@ -123,6 +142,8 @@ build {
 # The "fat" image build with all binaries:
 build {
   source "source.openstack.openhpc" {
+    floating_ip_network = "${var.floating_ip_network}"
+    source_image = "${var.fatimage_source_image}"
     source_image_name = "${var.fatimage_source_image_name}" # NB: must already exist in OpenStack
     image_name = "${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # similar to name from slurm_image_builder
   }

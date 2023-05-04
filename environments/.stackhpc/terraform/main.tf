@@ -17,7 +17,7 @@ variable "create_nodes" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-230412-1447-e3769af6.qcow2" # https://github.com/stackhpc/ansible-slurm-appliance/pull/258
+    default = "openhpc-230503-0944-bf8c3f63.qcow2" # https://github.com/stackhpc/ansible-slurm-appliance/pull/252
     # default = "Rocky-8-GenericCloud-Base-8.7-20221130.0.x86_64.qcow2"
     # default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 }

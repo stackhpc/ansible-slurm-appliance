@@ -13,6 +13,9 @@ login
 control
 compute
 
+[eessi:children]
+# Hosts on which EESSI stack should be configured
+
 [hpctests:children]
 # Login group to use for running mpi-based testing.
 login
