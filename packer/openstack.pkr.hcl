@@ -101,6 +101,11 @@ variable "floating_ip_network" {
   default = null
 }
 
+variable "manifest_output_path" {
+  type = string
+  default = "packer-manifest.json"
+}
+
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
   networks = "${var.networks}"
@@ -133,6 +138,7 @@ build {
   }
 
   post-processor "manifest" {
+    output = "${var.manifest_output_path}"
     custom_data  = {
       source = "${source.name}"
     }
@@ -157,6 +163,7 @@ build {
   }
 
   post-processor "manifest" {
+    output = "${var.manifest_output_path}"
     custom_data  = {
       source = "${source.name}"
     }
