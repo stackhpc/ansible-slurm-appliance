@@ -22,13 +22,14 @@ grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 
 # Note RockyLinux 8.5 defines system user/groups in range 201-999
 appliances_local_users_ansible_user_name: "{{ ansible_ssh_user | default(ansible_user) }}"
+appliances_local_users_podman_uid: 1001 # UID for podman user - normally next UID after default user
 appliances_local_users_podman: # also used in environments/common/inventory/group_vars/all/podman.yml:podman_users
     name: podman
     comment: Used for running all containers
     # Would like to set subuid so that we that we know what will appear in /etc/subuid
     # See: https://github.com/ansible/ansible/issues/68199
     home: /var/lib/podman
-    uid: 1001
+    uid: "{{ appliances_local_users_podman_uid }}"
 
 appliances_local_users_default:
     - user:
