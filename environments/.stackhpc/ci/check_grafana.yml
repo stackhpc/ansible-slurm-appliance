@@ -11,7 +11,7 @@
         timeout: 315 # slurm stats cron job runs every 5 mins
       
     - name: Query grafana for expected hpctests jobs
-      grafana_elasticsearch_query:
+      stackhpc.slurmapp_ops.grafana_elasticsearch_query:
         grafana_url: http://{{ grafana_api_address }}:{{ grafana_port }}
         grafana_username: grafana
         grafana_password: "{{ vault_grafana_admin_password }}"
