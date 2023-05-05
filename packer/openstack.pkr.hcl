@@ -101,8 +101,32 @@ variable "floating_ip_network" {
   default = null
 }
 
+variable "use_blockstorage_volume" {
+  type = bool
+  default = false
+}
+
+variable "volume_size" {
+  type = number
+  default = null # When not specified use the size of the builder instance root disk
+}
+
+variable "image_disk_format" {
+  type = string
+  default = null # When not specified use the image default
+}
+
+variable "metadata" {
+  type = map(string)
+  default = {}
+}
+
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
+  volume_size = "${var.volume_size}"
+  use_blockstorage_volume = "${var.use_blockstorage_volume}"
+  image_disk_format = "${var.image_disk_format}"
+  metadata = "${var.metadata}"
   networks = "${var.networks}"
   ssh_username = "${var.ssh_username}"
   ssh_timeout = "20m"
@@ -121,7 +145,7 @@ build {
     name = "compute"
     source_image = "${var.source_image}"
     source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
-    image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # also provides a unique legal instance hostname (in case of parallel packer builds)
+    image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # also provides a unique legal instance hostname (in case of parallel packer builds)
   }
 
   provisioner "ansible" {
@@ -145,7 +169,7 @@ build {
     floating_ip_network = "${var.floating_ip_network}"
     source_image = "${var.fatimage_source_image}"
     source_image_name = "${var.fatimage_source_image_name}" # NB: must already exist in OpenStack
-    image_name = "${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # similar to name from slurm_image_builder
+    image_name = "${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # similar to name from slurm_image_builder
   }
 
   provisioner "ansible" {
