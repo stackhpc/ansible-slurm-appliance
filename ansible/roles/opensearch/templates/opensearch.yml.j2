@@ -32,3 +32,5 @@ plugins.security.system_indices.enabled: true
 
 # Fake version for filebeat: https://opensearch.org/docs/2.4/tools/index/#agents-and-ingestion-tools
 compatibility.override_main_response_version: true
+
+{% if opensearch_debug | default(false) | bool %}logger.level: debug{% endif %}
