@@ -72,6 +72,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
+          sleep 5
           TF_FAIL_MSGS="$(../../skeleton/\{\{cookiecutter.environment\}\}/terraform/getfaults.py  $PWD)"
           echo TF failure messages: $TF_FAIL_MSGS
           echo "::set-output name=messages::${TF_FAIL_MSGS}"
