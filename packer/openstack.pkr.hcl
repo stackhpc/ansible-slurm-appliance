@@ -101,6 +101,11 @@ variable "floating_ip_network" {
   default = null
 }
 
+variable "manifest_output_path" {
+  type = string
+  default = "packer-manifest.json"
+}
+
 variable "use_blockstorage_volume" {
   type = bool
   default = false
@@ -157,6 +162,7 @@ build {
   }
 
   post-processor "manifest" {
+    output = "${var.manifest_output_path}"
     custom_data  = {
       source = "${source.name}"
     }
@@ -181,6 +187,7 @@ build {
   }
 
   post-processor "manifest" {
+    output = "${var.manifest_output_path}"
     custom_data  = {
       source = "${source.name}"
     }
