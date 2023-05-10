@@ -3,3 +3,4 @@
 #filebeat_config_path: undefined # REQUIRED. Path to filebeat.yml configuration file template
 filebeat_podman_user: "{{ ansible_user }}" # User that runs the filebeat container
 filebeat_version: 7.12.1 # latest usable with opensearch - see https://opensearch.org/docs/2.4/tools/index/#compatibility-matrix-for-beats
+filebeat_debug: false
