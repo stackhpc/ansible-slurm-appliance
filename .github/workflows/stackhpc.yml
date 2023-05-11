@@ -66,13 +66,13 @@ jobs:
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform apply -auto-approve
 
-      - name: Delete infrastructure if provisioning failed or run cancelled
+      - name: Delete infrastructure if provisioning failed
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve
-        if: always() && steps.provision_servers.outcome == 'failure'
+        if: failure() && steps.provision_servers.outcome == 'failure'
 
       - name: Configure cluster
         run: |
