@@ -64,11 +64,12 @@ variable "ssh_username" {
 
 variable "ssh_private_key_file" {
   type = string
-  default = "~/.ssh/id_rsa"
+  default = null
 }
 
 variable "ssh_keypair_name" {
   type = string
+  default = null
 }
 
 variable "security_groups" {
