@@ -28,3 +28,8 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
   become: true
+
+- name: Set fact for UCX_NET_DEVICES
+  set_fact:
+    hpctests_ucx_net_devices: "{{ hpctests_ucx_net_devices.get(hpctests_partition, 'all') }}"
+  when: hpctests_ucx_net_devices is mapping
