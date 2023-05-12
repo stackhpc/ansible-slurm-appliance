@@ -1,6 +1,6 @@
 # cuda
 
-Install NVIDIA CUDA.
+Install NVIDIA CUDA. The CUDA binaries are added to the PATH for all users, and the [NVIDIA persistence daemon](https://docs.nvidia.com/deploy/driver-persistence/index.html#persistence-daemon) is enabled.
 
 ## Prerequisites
 
