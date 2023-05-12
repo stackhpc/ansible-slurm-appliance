@@ -54,3 +54,5 @@ output.elasticsearch:
   ssl.verification_mode: none
   username: "admin"
   password: "{{ vault_elasticsearch_admin_password }}"
+
+{% if filebeat_debug | default(false) | bool %}logging.level: debug{% endif %}

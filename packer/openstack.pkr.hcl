@@ -31,13 +31,26 @@ variable "networks" {
   type = list(string)
 }
 
+# Must supply either source_image_name or source_image
 variable "source_image_name" {
   type = string
+  default = null
 }
 
+variable "source_image" {
+  type = string
+  default = null
+}
+
+# Must supply either fatimage_source_image_name or fatimage_source_image
 variable "fatimage_source_image_name" {
   type = string
-  default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
+  default = null
+}
+
+variable "fatimage_source_image" {
+  type = string
+  default = null
 }
 
 variable "flavor" {
@@ -51,11 +64,12 @@ variable "ssh_username" {
 
 variable "ssh_private_key_file" {
   type = string
-  default = "~/.ssh/id_rsa"
+  default = null
 }
 
 variable "ssh_keypair_name" {
   type = string
+  default = null
 }
 
 variable "security_groups" {
@@ -83,8 +97,42 @@ variable "ssh_bastion_private_key_file" {
   default = "~/.ssh/id_rsa"
 }
 
+variable "floating_ip_network" {
+  type = string
+  default = null
+}
+
+variable "manifest_output_path" {
+  type = string
+  default = "packer-manifest.json"
+}
+
+variable "use_blockstorage_volume" {
+  type = bool
+  default = false
+}
+
+variable "volume_size" {
+  type = number
+  default = null # When not specified use the size of the builder instance root disk
+}
+
+variable "image_disk_format" {
+  type = string
+  default = null # When not specified use the image default
+}
+
+variable "metadata" {
+  type = map(string)
+  default = {}
+}
+
 source "openstack" "openhpc" {
   flavor = "${var.flavor}"
+  volume_size = "${var.volume_size}"
+  use_blockstorage_volume = "${var.use_blockstorage_volume}"
+  image_disk_format = "${var.image_disk_format}"
+  metadata = "${var.metadata}"
   networks = "${var.networks}"
   ssh_username = "${var.ssh_username}"
   ssh_timeout = "20m"
@@ -101,8 +149,9 @@ source "openstack" "openhpc" {
 build {
   source "source.openstack.openhpc" {
     name = "compute"
+    source_image = "${var.source_image}"
     source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
-    image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # also provides a unique legal instance hostname (in case of parallel packer builds)
+    image_name = "ohpc-${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # also provides a unique legal instance hostname (in case of parallel packer builds)
   }
 
   provisioner "ansible" {
@@ -114,6 +163,7 @@ build {
   }
 
   post-processor "manifest" {
+    output = "${var.manifest_output_path}"
     custom_data  = {
       source = "${source.name}"
     }
@@ -123,8 +173,10 @@ build {
 # The "fat" image build with all binaries:
 build {
   source "source.openstack.openhpc" {
+    floating_ip_network = "${var.floating_ip_network}"
+    source_image = "${var.fatimage_source_image}"
     source_image_name = "${var.fatimage_source_image_name}" # NB: must already exist in OpenStack
-    image_name = "${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}.qcow2" # similar to name from slurm_image_builder
+    image_name = "${source.name}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # similar to name from slurm_image_builder
   }
 
   provisioner "ansible" {
@@ -136,6 +188,7 @@ build {
   }
 
   post-processor "manifest" {
+    output = "${var.manifest_output_path}"
     custom_data  = {
       source = "${source.name}"
     }

@@ -36,3 +36,9 @@ roles/*
 !roles/systemd/**
 !roles/cuda/
 !roles/cuda/**
+!roles/freeipa/
+!roles/freeipa/**
+!roles/proxy/
+!roles/proxy/**
+!roles/resolv_conf/
+!roles/resolv_conf/**

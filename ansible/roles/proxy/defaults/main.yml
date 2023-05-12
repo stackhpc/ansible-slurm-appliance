@@ -1,0 +1,5 @@
+# proxy_http_proxy: 
+proxy_https_proxy: "{{ proxy_http_proxy }}"
+proxy_no_proxy: "{{ (['localhost', '127.0.0.1'] + groups['all'] + hostvars.values() | map(attribute='ansible_host')) | sort | join(',') }}"
+proxy_dnf: true
+proxy_systemd: true

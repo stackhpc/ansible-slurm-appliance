@@ -1,4 +1,4 @@
-- hosts: control
+- hosts: control:!builder
   become: yes
   gather_facts: false
   tasks:
