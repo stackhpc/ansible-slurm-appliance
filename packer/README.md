@@ -22,9 +22,10 @@ Building an environment-specific compute node image will[^1] require a cluster t
   flavor = "general.v1.small"                           # VM flavor to use for builder VMs
   networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
   source_image_name = "Rocky-8.5-GenericCloud"          # Name of source image. This must exist in OpenStack and should be a Rocky Linux 8.5 GenericCloud-based image.
-  ssh_keypair_name = "slurm-app-ci"                     # Name of an existing keypair in OpenStack. The private key must be on the host running Packer.
   ```
   
+  This configuration will generate and use an ephemeral SSH key for communicating with the Packer VM. If this is undesirable, set `ssh_keypair_name` to the name of an existing keypair in OpenStack. The private key must be on the host running Packer, and its path can be set using `ssh_private_key_file`.
+
   The network used for the Packer VM must provide outbound internet access but does not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.).
   
   For additional options such as non-default private key locations or jumphost configuration see the variable descriptions in `./openstack.pkr.hcl`.
