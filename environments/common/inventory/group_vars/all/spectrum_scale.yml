@@ -1,0 +1,35 @@
+# The ibm.spectrum_scale roles are used to configure hosts in the `spectrum_scale` group as a GPFS cluster
+# without local storage but mounting remote GPFS filesystem(s).
+#
+# NB: group_vars are mostly prefixed scale_.
+# See ansible/collections/ansible_collections/ibm/spectrum_scale/roles/docs/VARIABLES.md for definitions
+
+# --- Installation ---
+scale_install_localpkg_path: "{{ undef('scale_install_localpkg_path is required') }}"
+# e.g.: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}/Spectrum_Scale_Erasure_Code-5.1.6.1-x86_64-Linux-install"
+# Fix issues with spectrum_scale/roles/core_install/tasks/upgrade.yml when using _localpkg_path:
+scale_install_needsupdate: false
+scale_install_updated: false
+
+# --- Node preparation ---
+scale_prepare_enable_ssh_login: true
+scale_prepare_restrict_ssh_address: false
+scale_prepare_disable_ssh_hostkeycheck: false
+scale_prepare_exchange_keys: true
+scale_prepare_disable_firewall: false # might need changing if node is in both login (->fail2ban->firewalld) and spectrum_scale groups
+
+# --- Remote mount configuration ---
+# See roles/remotemount_configure/README.md for definitions
+# scale_remotemount_debug: true
+scale_remotemount_storage_gui_username: "{{ undef('scale_remotemount_storage_gui_username is required') }}"
+scale_remotemount_storage_gui_password: "{{ undef('scale_remotemount_storage_gui_password is required') }}"
+scale_remotemount_storage_gui_hostname: "{{ undef('scale_remotemount_storage_gui_hostname is required') }}"
+scale_remotemount_client_no_gui: true
+
+# Define the remote filesystems and local mountpoints:
+scale_remotemount_filesystem_name: "{{ undef('scale_remotemount_filesystem_name is required') }}"
+# At a minimum this is e.g.:
+# - scale_reotemount_client_filesystem_name: scratch
+#   scale_remotemount_client_remotemount_path: /gpfs/scratch
+#   scale_remotemount_storage_filesystem_name: tdc_scratch
+# See examples in roles/remotemount_configure/README.md for full options

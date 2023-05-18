@@ -63,3 +63,6 @@ openhpc
 
 [proxy]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
+
+[spectrum_scale]
+# Hosts to install IMB Spectrum Scale (GPFS) on - see environments/common/inventory/group_vars/all/spectrum_scale.yml

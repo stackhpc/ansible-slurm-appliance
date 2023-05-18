@@ -16,3 +16,28 @@
   tasks:
     - include_role:
         name: stackhpc.nfs
+
+- name: Setup SpectrumScale
+  hosts: spectrum_scale
+  become: yes
+  gather_facts: yes
+  tags:
+    - spectrum_scale
+  collections:
+    - ibm.spectrum_scale
+  vars:
+    ansible_distribution: RedHat # Rocky not officially supported
+  tasks:
+    - include_role:
+        name: ibm.spectrum_scale.core_prepare
+    - include_role:
+        name: ibm.spectrum_scale.core_install
+    - include_role:
+        name: ibm.spectrum_scale.core_configure
+      when: "'builder' not in group_names"
+    - include_role:
+        name: ibm.spectrum_scale.remotemount_configure
+      when: "'builder' not in group_names"
+    - include_role:
+        name: ibm.spectrum_scale.core_verify
+      when: "'builder' not in group_names"
