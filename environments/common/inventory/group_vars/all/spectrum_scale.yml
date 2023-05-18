@@ -21,15 +21,22 @@ scale_prepare_disable_firewall: false # might need changing if node is in both l
 # --- Remote mount configuration ---
 # See roles/remotemount_configure/README.md for definitions
 # scale_remotemount_debug: true
+
+scale_remotemount_filesystem_name: [] # default will not perform any configuration for remote mounts
+# This defines the remote filesystems and local mountpoints. A minimal example is:
+# - scale_reotemount_client_filesystem_name: scratch
+#   scale_remotemount_client_remotemount_path: /gpfs/scratch
+#   scale_remotemount_storage_filesystem_name: tdc_scratch
+# See further examples in roles/remotemount_configure/README.md for full options
+#
+# **NB:** The IBM roles cannot manage all changes to scale_remotemount_filesystem_name once filesystems have been mounted.
+# To reset the configuration, run the following as root on any spectrum_scale node before re-running ansible:
+#   # Unmount all remote GPFS filesystems:
+#   [root@compute-0 cloud-user]# /usr/lpp/mmfs/bin/mmumount all_remote -N all
+#   # Delete all local information about the remote filesystems:
+#   [root@compute-0 cloud-user]# /usr/lpp/mmfs/bin/mmremotefs delete all
+
 scale_remotemount_storage_gui_username: "{{ undef('scale_remotemount_storage_gui_username is required') }}"
 scale_remotemount_storage_gui_password: "{{ undef('scale_remotemount_storage_gui_password is required') }}"
 scale_remotemount_storage_gui_hostname: "{{ undef('scale_remotemount_storage_gui_hostname is required') }}"
 scale_remotemount_client_no_gui: true
-
-# Define the remote filesystems and local mountpoints:
-scale_remotemount_filesystem_name: "{{ undef('scale_remotemount_filesystem_name is required') }}"
-# At a minimum this is e.g.:
-# - scale_reotemount_client_filesystem_name: scratch
-#   scale_remotemount_client_remotemount_path: /gpfs/scratch
-#   scale_remotemount_storage_filesystem_name: tdc_scratch
-# See examples in roles/remotemount_configure/README.md for full options
