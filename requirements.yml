@@ -24,7 +24,7 @@ roles:
 collections:
   - name: ansible-collection-slurmapp-ops
     version: feature/ansible-collection
-    source: git@github.com:stackhpc/ansible-collection-slurmapp-ops.git
+    source: https://github.com/stackhpc/ansible-collection-slurmapp-ops
     type: git
   - name: containers.podman
   - name: community.grafana
