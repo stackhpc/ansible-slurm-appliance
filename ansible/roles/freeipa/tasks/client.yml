@@ -60,6 +60,15 @@
     ipa_client_install_password.rc != 0 and
     'IPA client is already configured' not in ipa_client_install_password.stderr
 
+- name: Ensure NFS RPC security service is running
+  # This service is installed by nfs-utils, which attempts to start it.
+  # It has ConditionPathExists=/etc/krb5.keytab which fails if host is not enroled.
+  # This task avoids a reboot.
+  systemd:
+    name: rpc-gssd.service
+    state: started
+    enabled: true
+
 - name: Retrieve current keytab
   slurp:
     src: /etc/krb5.keytab
