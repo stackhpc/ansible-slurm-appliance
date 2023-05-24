@@ -1,0 +1,7 @@
+- hosts: cuda
+  become: yes
+  gather_facts: no
+  tags: cuda
+  tasks:
+    - import_role:
+        name: cuda

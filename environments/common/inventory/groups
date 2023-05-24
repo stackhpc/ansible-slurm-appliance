@@ -104,6 +104,8 @@ grafana
 control
 prometheus
 
+[cuda]
+# Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 [resolv_conf]
 # Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md
 

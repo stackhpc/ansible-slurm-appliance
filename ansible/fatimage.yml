@@ -32,6 +32,12 @@
       dnf:
         name: nfs-utils
 
+- import_playbook: extras.yml
+
+- hosts: builder
+  become: yes
+  gather_facts: no
+  tasks:
     # - import_playbook: slurm.yml
     - name: OpenHPC
       import_role:
