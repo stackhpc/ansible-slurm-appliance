@@ -3,3 +3,4 @@ etc_hosts_hosts: "{{ groups['etc_hosts'] }}"
 etc_hosts_hostvars:
   - ansible_host
   - inventory_hostname
+etc_hosts_extra_hosts: ''
