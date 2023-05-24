@@ -18,6 +18,7 @@
   when: hook_path | exists
 
 - import_playbook: filesystems.yml
+- import_playbook: extras.yml
 - import_playbook: slurm.yml
 - import_playbook: portal.yml
 - import_playbook: monitoring.yml
