@@ -1,0 +1,8 @@
+- hosts: cuda
+  become: yes
+  gather_facts: no
+  tags: cuda_samples
+  tasks:
+    - import_role:
+        name: cuda
+        tasks_from: samples.yml
