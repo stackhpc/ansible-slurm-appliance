@@ -41,7 +41,7 @@
   systemd:
     name: nvidia-persistenced
     enabled: true
-    state: started
+    state: "{{ cuda_persistenced_state }}"
 
 - name: Reboot
   ansible.builtin.reboot:

@@ -11,3 +11,4 @@ Requires OFED to be installed to provide required kernel-* packages.
 - `cuda_distro`: Optional. Default `rhel8`.
 - `cuda_repo`: Optional. Default `https://developer.download.nvidia.com/compute/cuda/repos/{{ cuda_distro }}/x86_64/cuda-{{ cuda_distro }}.repo`
 - `cuda_packages`: Optional. Default: `['cuda', 'nvidia-gds']`.
+- `cuda_persistenced_state`: Optional. State of systemd `nvidia-persistenced` service. Values as [ansible.builtin.systemd:state](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html#parameter-state). Default `started`.

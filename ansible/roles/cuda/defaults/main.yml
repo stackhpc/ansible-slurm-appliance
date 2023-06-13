@@ -11,3 +11,4 @@ cuda_samples_programs:
   - deviceQuery
   - bandwidthTest
 # cuda_devices: # discovered from deviceQuery run
+cuda_persistenced_state: started
