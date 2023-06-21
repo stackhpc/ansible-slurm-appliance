@@ -7,6 +7,10 @@ packer {
       version = ">= 0.3.2"
       source = "github.com/ethanmdavidson/git"
     }
+    openstack = {
+      version = ">= 1.0.0"
+      source  = "github.com/hashicorp/openstack"
+    }
   }
 }
 
