@@ -159,7 +159,7 @@ build {
     groups = concat(["builder"], split("-", "${source.name}"))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/${source.name}_extravars.yml"]
+    extra_arguments = ["--limit", "builder,localhost", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/${source.name}_extravars.yml"]
   }
 
   post-processor "manifest" {
@@ -184,7 +184,7 @@ build {
     groups = ["builder", "control", "compute", "login"]
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/${source.name}_extravars.yml"]
+    extra_arguments = ["--limit", "builder,localhost", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/${source.name}_extravars.yml"]
   }
 
   post-processor "manifest" {
