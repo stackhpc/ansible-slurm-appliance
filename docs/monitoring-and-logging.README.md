@@ -11,11 +11,10 @@ Parses log files and ships them to elasticsearch. Note we use the version shippe
 Visualisation tool that supports multiple different datasources. In our stack,
 we use it to visualise prometheus and elasticsearch data.
 
-### [opendistro](https://opendistro.github.io/)
+### [opensearch](https://https://opensearch.org/)
 
-An open-source distribution of elasticsearch. Elasticsearch is a search engine that provides full
-text search over a collection of JSON documents. In this project, the main use is for the archiving
-and retrieval of log files.
+A search engine that provides full text search over a collection of JSON documents. In this project,
+the main use is for the archiving and retrieval of log files.
 
 ### [prometheus](https://prometheus.io/)
 
@@ -97,11 +96,7 @@ The `grafana` group controls the placement of the grafana service. Load balancin
 
 ### Access
 
-The default URL is:
-
-> https://<ip_of_first_node_in_grafana_group>:3000
-
-The port can be controlled with the `grafana_port` variable.
+If Open Ondemand is enabled then by default this is used to proxy Grafana, otherwise Grafana is accessed through the first . See `grafana_url` in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml). The port used (variable `grafana_port`) defaults to `3000`.
 
 The default credentials for the admin user are:
 
@@ -112,7 +107,7 @@ Where `vault_grafana_admin_password` is a variable containing the actual passwor
 
 ### grafana dashboards
 
-The appliance ships with a default set of dashboards. The set of dashboards can be configured via the `grafana_dashboards` variable. The dashboards are published to grafana.com and are referenced by URL.
+The appliance ships with a default set of dashboards. The set of dashboards can be configured via the `grafana_dashboards` variable. The dashboards are either internal to the [grafana-dashboards role](../ansible/roles/grafana-dashboards/files/) or downloaded from grafana.com.
 
 #### node exporter
 
@@ -160,33 +155,33 @@ The default configuration configures the following datasources:
 
 This can be customised with the `grafana_datasources` variable.
 
-## opendistro
+## opensearch
 
-This section details the configuration of Open Distro.
+This section details the configuration of OpenSearch.
 
 ### Defaults
 
-The internal `opendistro` role is ued to configure the service. The list of variables that can be customised can found in:
+The internal `opensearch` role is used to configure the service. The list of variables that can be customised can found in:
 
-> [ansible/roles/opendistro/defaults/main.yml](../ansible/roles/opendistro/defaults/main.yml)
+> [ansible/roles/opensearch/defaults/main.yml](../ansible/roles/opensearch/defaults/main.yml)
 
 The appliance defaults are in the following file:
 
-> [environments/common/inventory/group_vars/all/opendistro.yml](../environments/common/inventory/group_vars/all/opendistro.yml)
+> [environments/common/inventory/group_vars/all/opensearch.yml](../environments/common/inventory/group_vars/all/opensearch.yml)
 
 ### Placement
 
-The `opendistro` group determines the placement of the opendistro service. Load balancing is currently unsupported so it is important that you only assign one host to this group.
+The `opensearch` group determines the placement of the OpenSearch service. Load balancing is currently unsupported so it is important that you only assign one host to this group.
 
 ### Access
 
-By default opendistro only listens on the loopback interface. It should therefore be placed on the same node as `filebeat` which needs to access the opendistro API.
+By default, OpenSearch only listens on the loopback interface. It should therefore be placed on the same node as `filebeat` and `grafana` which need to access the OpenSearch API.
 
 ### Users
 
 The default set of users is defined in:
 
-> [environments/common/files/opendistro/internal_users.yml](../environments/common/files/opendistro/internal_users.yml)
+> [environments/common/files/opensearch/internal_users.yml](../environments/common/files/opensearch/internal_users.yml)
 
 This defines an the following accounts:
 
@@ -202,12 +197,12 @@ the credentials should be treated with extreme care.
 
 To override the default set of users, you can customize the variable:
 
-> [environments/common/files/opendistro/internal_users.yml](../environments/common/files/opendistro/internal_users.yml)
+> [environments/common/files/opensearch/internal_users.yml](../environments/common/files/opensearch/internal_users.yml)
 
-You can change this file by modifying the variable, `opendistro_internal_users_path`, where the default can be
+You can change this file by modifying the variable, `opensearch_internal_users_path`, where the default can be
 found in:
 
-> [environments/common/inventory/group_vars/all/opendistro.yml](../environments/common/inventory/group_vars/all/opendistro.yml)
+> [environments/common/inventory/group_vars/all/opensearch.yml](../environments/common/inventory/group_vars/all/opensearch.yml)
 
 ## Prometheus
 

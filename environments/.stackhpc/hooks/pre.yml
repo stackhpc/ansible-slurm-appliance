@@ -1,0 +1,17 @@
+- hosts: control:!builder
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Write CI-generated inventory and secrets for debugging
+      ansible.builtin.copy:
+        dest: /etc/ci-config/
+        src: "{{ item }}"
+        directory_mode: 0400
+        mode: 0400
+        owner: root
+        group: root
+      no_log: true
+      loop:
+        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts"
+        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/secrets.yml"
+        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/test_user.yml"

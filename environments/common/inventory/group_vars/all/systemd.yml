@@ -1,11 +1,11 @@
 _systemd_requiresmount_statedir: |
   [Unit]
-  RequiresMountsFor={{ appliances_state_dir }}
+  RequiresMountsFor={{ appliances_state_dir | default('') }}
 
 _systemd_dropins_statedir:
   # mysql not included as role handles state dir correctly
-  opendistro:
-    group: opendistro
+  opensearch:
+    group: opensearch
     content: "{{ _systemd_requiresmount_statedir }}"
   grafana-server:
     group: grafana

@@ -4,8 +4,8 @@ roles/*
 # Whitelist roles that are checked into this repository.
 !roles/filebeat/
 !roles/filebeat/**
-!roles/opendistro/
-!roles/opendistro/**
+!roles/opensearch/
+!roles/opensearch/**
 !roles/podman/
 !roles/podman/**
 !roles/grafana-dashboards/
@@ -34,6 +34,8 @@ roles/*
 !roles/mysql/**
 !roles/systemd/
 !roles/systemd/**
+!roles/cuda/
+!roles/cuda/**
 !roles/freeipa/
 !roles/freeipa/**
 !roles/proxy/

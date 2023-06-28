@@ -1,0 +1,36 @@
+### This section copies a running container's default config ###
+cluster.name: docker-cluster
+
+# Bind to all interfaces because we don't know what IP address Docker will assign to us.
+network.host: 0.0.0.0
+
+# # minimum_master_nodes need to be explicitly set when bound on a public IP
+# # set to 1 to allow single node clusters
+# discovery.zen.minimum_master_nodes: 1
+
+# Setting network.host to a non-loopback address enables the annoying bootstrap checks. "Single-node" mode disables them again.
+# discovery.type: single-node
+
+### Custom config section ###
+
+# Security config:
+plugins.security.ssl.transport.pemcert_filepath: certs/esnode.pem
+plugins.security.ssl.transport.pemkey_filepath: certs/esnode-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: certs/root-ca.pem
+plugins.security.ssl.transport.enforce_hostname_verification: false
+plugins.security.ssl.http.enabled: true
+plugins.security.ssl.http.pemcert_filepath: certs/esnode.pem
+plugins.security.ssl.http.pemkey_filepath: certs/esnode-key.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: certs/root-ca.pem
+plugins.security.allow_unsafe_democertificates: false
+plugins.security.allow_default_init_securityindex: true
+plugins.security.audit.type: internal_opensearch
+plugins.security.enable_snapshot_restore_privilege: true
+plugins.security.check_snapshot_restore_write_privileges: true
+plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+plugins.security.system_indices.enabled: true
+
+# Fake version for filebeat: https://opensearch.org/docs/2.4/tools/index/#agents-and-ingestion-tools
+compatibility.override_main_response_version: true
+
+{% if opensearch_debug | default(false) | bool %}logger.level: debug{% endif %}

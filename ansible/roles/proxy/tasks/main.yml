@@ -17,9 +17,9 @@
     - key: no_proxy
       value: "{{ proxy_no_proxy }}"
 
-- name: Define dnf/yum proxy
+- name: Define dnf proxy
   ini_file:
-    path: /etc/yum.conf
+    path: /etc/dnf/dnf.conf
     section: main
     option: "proxy"
     value: "{{ proxy_http_proxy }}"
@@ -57,3 +57,7 @@
   when: 
     - proxy_systemd | bool
     - _copy_systemd_proxy.changed | default(false)
+
+- name: Reset connection to get new /etc/environment
+  meta: reset_connection
+  # NB: conditionals not supported

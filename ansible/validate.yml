@@ -38,15 +38,6 @@
         tasks_from: validate.yml
       tags: validate
 
-- name: Validate opendistro configuration
-  hosts: opendistro
-  tags: opendistro
-  tasks:
-    - import_role:
-        name: opendistro
-        tasks_from: validate.yml
-      tags: validate
-
 - name: Validate rebuild configuration
   hosts: rebuild
   gather_facts: false

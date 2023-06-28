@@ -1,19 +1,13 @@
 # ---
 # # NOTE: Requires slurmdbd
 
-- name: Setup elasticsearch
-  hosts: opendistro
-  tags: opendistro
+- name: Setup OpenSearch
+  hosts: opensearch
+  tags: opensearch
   tasks:
     - import_role:
-        name: opendistro
-        tasks_from: config.yml
-      tags: config
-
-    - import_role:
-        name: opendistro
-        tasks_from: deploy.yml
-      tags: deploy
+        name: opensearch
+      become: true
 
 - name: Setup slurm stats
   hosts: slurm_stats

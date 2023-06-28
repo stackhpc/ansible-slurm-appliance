@@ -13,8 +13,7 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
-- name: Write /etc/resolv/conf
-  hosts: resolv_conf
+- hosts: resolv_conf
   become: yes
   gather_facts: false
   tags: resolv_conf
@@ -127,6 +126,16 @@
         name: podman
         tasks_from: config.yml
       tags: config
+
+- name: Setup EESSI
+  hosts: eessi
+  tags: eessi
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install and configure EESSI
+      import_role:
+        name: eessi
 
 - hosts: update
   gather_facts: false

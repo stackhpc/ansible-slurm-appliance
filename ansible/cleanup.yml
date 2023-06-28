@@ -1,0 +1,32 @@
+# Clean up a Packer build VM
+
+- meta: flush_handlers
+
+- name: Remove dnf caches
+  command: dnf clean all
+
+# If image build happens on a Neutron subnet with property dns_namservers defined, then cloud-init
+# disables NetworkManager's control of /etc/resolv.conf and appends nameservers itself.
+# We don't want network configuration during instance boot to depend on the configuration
+# of the network the builder was on, so we reset these aspects.
+- name: Delete /etc/resolv.conf
+  file:
+    path: /etc/resolv.conf
+    state: absent
+  when: "'resolv_conf' not in group_names" # if its been overriden, deleting it is the wrong thing to do
+
+- name: Reenable NetworkManager control of resolv.conf
+  # NB: This *doesn't* delete the 90-dns-none.conf file created by the resolv_conf role
+  # as if nameservers are explicitly being set by that role we don't want to allow NM
+  # to override it again.
+  file:
+    path: /etc/NetworkManager/conf.d/99-cloud-init.conf
+    state: absent
+
+- name: Delete any injected ssh config for ansible_user
+  file:
+    path: "/home/{{ ansible_user }}/.ssh/"
+    state: absent
+
+- name: Run cloud-init cleanup
+  command: cloud-init clean --logs --seed

@@ -18,11 +18,25 @@
     dest: "{{ hpctests_rootdir }}/pingpong/pingpong.sh"
 
 - name: Run pingpong
-  shell: sbatch --wait pingpong.sh
-  become: no
-  args:
-    chdir: "{{ hpctests_rootdir }}/pingpong"
-  register: hpctests_pingpong_sbatch
+  block:
+    - name: Submit jobscript
+      shell: sbatch --wait pingpong.sh
+      become: no
+      args:
+        chdir: "{{ hpctests_rootdir }}/pingpong"
+      register: hpctests_pingpong_sbatch
+  rescue:
+    - name: Get slurm job output
+      slurp:
+        src: "{{ hpctests_rootdir }}/pingpong/pingpong.sh.out"
+      register: _pingpong_out
+    - name: Show job output
+      debug:
+        msg: |
+          PingPong output was:
+          
+          {{ _pingpong_out.content | b64decode }}
+      failed_when: true
 
 - set_fact:
     _pingpong_jobid: "{{ hpctests_pingpong_sbatch.stdout.split()[-1] }}"

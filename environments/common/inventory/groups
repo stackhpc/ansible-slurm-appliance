@@ -13,6 +13,9 @@ login
 control
 compute
 
+[eessi:children]
+# Hosts on which EESSI stack should be configured
+
 [hpctests:children]
 # Login group to use for running mpi-based testing.
 login
@@ -26,7 +29,7 @@ openhpc
 
 [podman:children]
 # Hosts running containers for below services:
-opendistro
+opensearch
 filebeat
 mysql
 
@@ -39,12 +42,12 @@ mysql
 [alertmanager]
 # TODO:
 
-[opendistro]
+[opensearch]
 # Single node to host ElasticSearch search engine for Slurm monitoring.
 
 [slurm_stats]
 # Single node to run tools to integrate Slurm's accounting information with ElasticSearch.
-# NB: Host must be in `openhpc` group (for `sacct` command) and `opendistro` group.
+# NB: Host must be in `openhpc` group (for `sacct` command) and `opensearch` group.
 
 [filebeat]
 # Single node to parses log files for ElasticSearch - must be co-located with `slurm_stats`.
@@ -96,7 +99,7 @@ fail2ban
 
 [systemd:children]
 # Hosts to make systemd unit adjustments on
-opendistro
+opensearch
 grafana
 control
 prometheus
@@ -111,6 +114,9 @@ prometheus
 # Allows defining variables common to freeipa_server and _client
 freeipa_server
 freeipa_client
+
+[cuda]
+# Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
 [resolv_conf]
 # Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md

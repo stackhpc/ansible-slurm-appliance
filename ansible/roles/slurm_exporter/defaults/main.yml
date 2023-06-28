@@ -1,5 +1,5 @@
 ---
 # see https://github.com/stackhpc/prometheus-slurm-exporter/releases - version follows upstream, release is stackhpc build
-slurm_exporter_version: '0.20'
-slurm_exporter_release: '2'
+slurm_exporter_version: '0.21'
+slurm_exporter_release: '1'
 slurm_exporter_state: started

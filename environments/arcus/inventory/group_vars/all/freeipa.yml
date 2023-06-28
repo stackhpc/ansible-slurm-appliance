@@ -1,6 +1,0 @@
-freeipa_users:
-  - name: testuser # can't use rocky as $HOME isn't shared!
-    password: "{{ vault_testuser_password }}"
-    givenname: test
-    sn: test
-    krbpasswordexpiration: "{{ lookup('pipe', 'date --date \"1 day\" +%Y%m%d%H%M%S') }}" # password will work for 24hrs

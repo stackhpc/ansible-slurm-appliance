@@ -1,0 +1,3 @@
+# Used to override anything defined in a concrete environment
+update_enable: false
+openhpc_slurm_partitions: [] # as no compute nodes will be in play, but partition definition might exist in inventory
