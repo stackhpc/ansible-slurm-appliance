@@ -13,6 +13,6 @@
 
 - name: Ensure control node has persistent storage defined
   assert:
-    that: "{{ 'appliances_state_dir' in hostvars['control'] }}"
+    that: "{{ 'appliances_state_dir' in hostvars[groups['control'] | first ] }}"
     fail_msg: "Variable appliances_state_dir must be defined on the control node (pointing to persistent storage) when using the freeipa role."
   run_once: true
