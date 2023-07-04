@@ -1,13 +1,21 @@
+[basic_users:children]
+cluster
+
 [rebuild:children]
 control
 compute
 
-[freeipa_server:children]
-control
+[etc_hosts:children]
+cluster
 
-[freeipa_client:children]
-login
-compute
-
-[resolv_conf:children]
-freeipa_client
+# -- Example of enabling FreeIPA with in-appliance (dev-only) server
+# [freeipa_server:children]
+# control
+# 
+# [freeipa_client:children]
+# login
+# compute
+# 
+# [resolv_conf:children]
+# freeipa_client
+# --- end of FreeIPA example ---
