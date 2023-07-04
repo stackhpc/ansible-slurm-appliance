@@ -4,8 +4,7 @@ Hosts in the `etc_hosts` groups have `/etc/hosts` created with entries of the fo
 
 By default, an entry is created for each host in this group as follows:
 - The value of `ansible_host` is used as the IP_address.
-- If `cluster_domain_suffix` is defined then `node_fqdn` is used as the canonical hostname and `inventory_hostname` as an alias.
-- If `cluster_domain_suffix` is not defined then `inventory_hostname` is used as the canonical hostname.
+- If `node_fqdn` is defined then that is used as the canonical hostname and `inventory_hostname` as an alias. Otherwise `inventory_hostname` is used as the canonical hostname.
 This may need overriding for multi-homed hosts or hosts with multiple aliases.
 
 # Variables
