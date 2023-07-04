@@ -36,13 +36,3 @@
       import_role:
         name: freeipa
         tasks_from: users.yml
-
-- hosts: basic_users
-  become: yes
-  tags:
-    - basic_users
-    - users
-  gather_facts: yes
-  tasks:
-    - import_role:
-        name: basic_users

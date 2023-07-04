@@ -1,3 +1,13 @@
+- hosts: basic_users
+  become: yes
+  tags:
+    - basic_users
+    - users
+  gather_facts: yes
+  tasks:
+    - import_role:
+        name: basic_users
+
 - hosts: cuda
   become: yes
   gather_facts: no
