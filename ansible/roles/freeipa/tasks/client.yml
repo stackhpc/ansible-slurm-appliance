@@ -7,7 +7,7 @@
 - name: Retrieve persisted keytab from previous enrolement
   slurp:
     src: "{{ _freeipa_keytab_backup_path }}"
-  delegate_to: control
+  delegate_to: "{{ groups['control'] | first }}"
   register: _slurp_persisted_keytab
   failed_when: false
 
@@ -73,11 +73,10 @@
     owner: root
     group: root
     mode: ug=wrX,o=
-  delegate_to: control
+  delegate_to: "{{ groups['control'] | first }}"
 
 - name: Persist keytab
   copy:
     content: "{{ _slurp_current_keytab.content | b64decode }}"
     dest: "{{ _freeipa_keytab_backup_path }}"
-  delegate_to: control
-  # when: appliances_state_dir is defined
+  delegate_to: "{{ groups['control'] | first }}"
