@@ -10,12 +10,6 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
-variable "create_nodes" {
-    description = "Whether to create nodes (servers) or just ports and other infra"
-    type = bool # can't use bool as want to pass from command-line
-    default = true
-}
-
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
@@ -33,6 +27,8 @@ variable "vnic_type" {}
 variable "control_node_flavor" {}
 
 variable "other_node_flavor" {}
+
+variable "volume_backed_instances" {}
 
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
@@ -68,7 +64,7 @@ module "cluster" {
         compute-2: "extra"
         compute-3: "extra"
     }
-    create_nodes = var.create_nodes
+    volume_backed_instances = var.volume_backed_instances
     
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:

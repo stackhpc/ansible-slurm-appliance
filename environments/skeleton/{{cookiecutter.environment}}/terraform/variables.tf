@@ -109,8 +109,14 @@ variable "nonlogin_security_groups" {
     ]
 }
 
-variable "create_nodes" {
-    description = "Whether to create nodes (servers) or just ports and other infra"
-    type = bool # can't use bool as want to pass from command-line
-    default = true
+variable "volume_backed_instances" {
+    description = "Whether to use volumes for root disks"
+    type = bool
+    default = false
+}
+
+variable "root_volume_size" {
+    description = "Size of volume for root volumes if using volume backed instances, in Gb"
+    type = number
+    default = 40
 }
