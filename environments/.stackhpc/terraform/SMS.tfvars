@@ -1,5 +1,5 @@
-cluster_net = "stackhpc-ci-geneve"
-cluster_subnet = "stackhpc-ci-geneve-subnet"
+cluster_net = "stackhpc-ipv4-geneve"
+cluster_subnet = "stackhpc-ipv4-geneve-subnet"
 vnic_type = "direct"
 control_node_flavor = "general.v1.medium"
 other_node_flavor = "general.v1.tiny"
