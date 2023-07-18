@@ -1,0 +1,5 @@
+cluster_net = "stackhpc-ci-geneve"
+cluster_subnet = "stackhpc-ci-geneve-subnet"
+vnic_type = "normal"
+control_node_flavor = "vm.ska.cpu.general.quarter"
+other_node_flavor = "vm.ska.cpu.general.small"

@@ -59,7 +59,6 @@ jobs:
           . environments/.stackhpc/activate
           ansible-playbook ansible/adhoc/generate-passwords.yml
           echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
-          TODO: move TF vars to correct place
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
@@ -69,14 +68,14 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform apply -auto-approve
+          terraform apply -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
 
       - name: Delete infrastructure if provisioning failed
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform destroy -auto-approve
+          terraform destroy -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
       - name: Configure cluster
@@ -174,7 +173,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform destroy -auto-approve
+          terraform destroy -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
         if: ${{ success() || cancelled() }}
 
       # - name: Delete images

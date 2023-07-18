@@ -1,3 +1,5 @@
+# This terraform configuration uses the "skeleton" terraform, so that is checked by CI.
+
 variable "environment_root" {
     type = string
     description = "Path to environment root, automatically set by activate script"
@@ -22,31 +24,41 @@ variable "cluster_image" {
     # default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 }
 
+variable "cluster_net" {}
+
+variable "cluster_subnet" {}
+
+variable "vnic_type" {}
+
+variable "control_node_flavor" {}
+
+variable "other_node_flavor" {}
+
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
     cluster_name = var.cluster_name
-    cluster_net = "WCDC-iLab-60"
-    cluster_subnet = "WCDC-iLab-60"
-    vnic_type = "direct"
+    cluster_net = var.cluster_net
+    cluster_subnet = var.cluster_subnet
+    vnic_type = var.vnic_type
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "vm.ska.cpu.general.quarter"
+        flavor: var.control_node_flavor
         image: var.cluster_image
     }
     login_nodes = {
         login-0: {
-            flavor: "vm.ska.cpu.general.small"
+            flavor: var.other_node_flavor
             image: var.cluster_image
         }
     }
     compute_types = {
         small: {
-            flavor: "vm.ska.cpu.general.small"
+            flavor: var.other_node_flavor
             image: var.cluster_image
         }
         extra: {
-            flavor: "vm.ska.cpu.general.small"
+            flavor: var.other_node_flavor
             image: var.cluster_image
         }
     }

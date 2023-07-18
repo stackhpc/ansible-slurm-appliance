@@ -1,0 +1,5 @@
+cluster_net = "WCDC-iLab-60"
+cluster_subnet = "WCDC-iLab-60"
+vnic_type = "direct"
+control_node_flavor = "general.v1.medium"
+other_node_flavor = "general.v1.tiny"
