@@ -8,7 +8,7 @@ on:
   pull_request:
 jobs:
   openstack:
-    name: openstack-ci-arcus # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
+    name: openstack-ci
     concurrency: ${{ github.ref }} # to branch/PR
     runs-on: ubuntu-20.04
     env:
@@ -22,13 +22,15 @@ jobs:
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${arcus_SSH_KEY}" > ~/.ssh/id_rsa
+          echo "${BASTION_SSH_KEY}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         env:
-          arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
+          ARCUS_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
+          SMS_SSH_KEY: ${{ secrets.SMS_SSH_KEY }}
+          BASTION_SSH_KEY: ${{ vars.CI_CLOUD }}_SSH_KEY
 
       - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprint >> ~/.ssh/known_hosts
+        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
       
       - name: Install ansible etc
@@ -44,10 +46,12 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${arcus_CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
+          echo "${CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
         shell: bash
         env:
-          arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
+          ARCUS_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
+          SMS_CLOUDS_YAML: ${{ secrets.SMS_CLOUDS_YAML }}
+          CLOUDS_YAML: ${{ vars.CI_CLOUD }}_CLOUDS_YAML }}
             
       - name: Setup environment-specific inventory/terraform inputs
         run: |
@@ -55,6 +59,7 @@ jobs:
           . environments/.stackhpc/activate
           ansible-playbook ansible/adhoc/generate-passwords.yml
           echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
+          TODO: move TF vars to correct place
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
