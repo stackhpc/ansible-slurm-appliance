@@ -22,13 +22,10 @@ jobs:
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${BASTION_SSH_KEY}" > ~/.ssh/id_rsa
+          echo "${{ secrets[format('{0}_SSH_KEY', vars.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
-        env:
-          ARCUS_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
-          SMS_SSH_KEY: ${{ secrets.SMS_SSH_KEY }}
-          BASTION_SSH_KEY: ${{ vars.CI_CLOUD }}_SSH_KEY
-
+        shell: bash
+        
       - name: Add bastion's ssh key to known_hosts
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
@@ -46,13 +43,9 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
-        env:
-          ARCUS_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-          SMS_CLOUDS_YAML: ${{ secrets.SMS_CLOUDS_YAML }}
-          CLOUDS_YAML: ${{ vars.CI_CLOUD }}_CLOUDS_YAML }}
-            
+
       - name: Setup environment-specific inventory/terraform inputs
         run: |
           . venv/bin/activate
