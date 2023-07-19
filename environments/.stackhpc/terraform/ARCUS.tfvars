@@ -4,3 +4,5 @@ vnic_type = "normal"
 control_node_flavor = "vm.ska.cpu.general.quarter"
 other_node_flavor = "vm.ska.cpu.general.small"
 volume_backed_instances = false
+state_volume_device_path = "/dev/sdb"
+home_volume_device_path = "/dev/sdc"

@@ -13,7 +13,7 @@ variable "cluster_name" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-230503-0944-bf8c3f63.qcow2" # https://github.com/stackhpc/ansible-slurm-appliance/pull/252
+    default = "openhpc-230503-0944-bf8c3f63" # https://github.com/stackhpc/ansible-slurm-appliance/pull/252
     # default = "Rocky-8-GenericCloud-Base-8.7-20221130.0.x86_64.qcow2"
     # default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 }
@@ -29,6 +29,10 @@ variable "control_node_flavor" {}
 variable "other_node_flavor" {}
 
 variable "volume_backed_instances" {}
+
+variable "state_volume_device_path" {}
+
+variable "home_volume_device_path" {}
 
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
@@ -70,4 +74,7 @@ module "cluster" {
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10
     home_volume_size = 20
+
+    state_volume_device_path = var.state_volume_device_path
+    home_volume_device_path = var.home_volume_device_path
 }
