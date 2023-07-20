@@ -145,7 +145,7 @@ jobs:
       #     ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
       #     ansible-playbook -v ansible/ci/check_slurm.yml
       
-      - name: Test reimage of all nodes (via rebuild adhoc)
+      - name: Test reimage of login and control nodes (via rebuild adhoc)
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
