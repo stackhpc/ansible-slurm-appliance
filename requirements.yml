@@ -8,9 +8,6 @@ roles:
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: feature/no-install
     name: cloudalchemy.node_exporter
-  - src: https://github.com/cloudalchemy/ansible-prometheus.git
-    version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
-    name: cloudalchemy.prometheus
   - src: cloudalchemy.alertmanager
     version: 0.19.1
   - src: https://github.com/stackhpc/ansible-grafana.git
@@ -27,4 +24,6 @@ collections:
 - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
   type: git
   version: v0.2.0
+- name: prometheus.prometheus
+  version: 0.5.1
 ...
