@@ -1,3 +1,5 @@
+# This terraform configuration uses the "skeleton" terraform, so that is checked by CI.
+
 variable "environment_root" {
     type = string
     description = "Path to environment root, automatically set by activate script"
@@ -8,45 +10,55 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
-variable "create_nodes" {
-    description = "Whether to create nodes (servers) or just ports and other infra"
-    type = bool # can't use bool as want to pass from command-line
-    default = true
-}
-
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-230503-0944-bf8c3f63.qcow2" # https://github.com/stackhpc/ansible-slurm-appliance/pull/252
+    default = "openhpc-230503-0944-bf8c3f63" # https://github.com/stackhpc/ansible-slurm-appliance/pull/252
     # default = "Rocky-8-GenericCloud-Base-8.7-20221130.0.x86_64.qcow2"
     # default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 }
+
+variable "cluster_net" {}
+
+variable "cluster_subnet" {}
+
+variable "vnic_type" {}
+
+variable "control_node_flavor" {}
+
+variable "other_node_flavor" {}
+
+variable "volume_backed_instances" {}
+
+variable "state_volume_device_path" {}
+
+variable "home_volume_device_path" {}
 
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
     cluster_name = var.cluster_name
-    cluster_net = "WCDC-iLab-60"
-    cluster_subnet = "WCDC-iLab-60"
-    vnic_type = "direct"
+    cluster_net = var.cluster_net
+    cluster_subnet = var.cluster_subnet
+    vnic_type = var.vnic_type
     key_pair = "slurm-app-ci"
     control_node = {
-        flavor: "vm.ska.cpu.general.quarter"
+        flavor: var.control_node_flavor
         image: var.cluster_image
     }
     login_nodes = {
         login-0: {
-            flavor: "vm.ska.cpu.general.small"
+            flavor: var.other_node_flavor
             image: var.cluster_image
         }
     }
     compute_types = {
         small: {
-            flavor: "vm.ska.cpu.general.small"
+            flavor: var.other_node_flavor
             image: var.cluster_image
         }
         extra: {
-            flavor: "vm.ska.cpu.general.small"
+            flavor: var.other_node_flavor
             image: var.cluster_image
         }
     }
@@ -56,10 +68,13 @@ module "cluster" {
         compute-2: "extra"
         compute-3: "extra"
     }
-    create_nodes = var.create_nodes
+    volume_backed_instances = var.volume_backed_instances
     
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10
     home_volume_size = 20
+
+    state_volume_device_path = var.state_volume_device_path
+    home_volume_device_path = var.home_volume_device_path
 }

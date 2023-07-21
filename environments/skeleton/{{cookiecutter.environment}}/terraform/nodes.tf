@@ -7,6 +7,18 @@ data "openstack_images_image_v2" "control" {
   name = var.control_node.image
 }
 
+data "openstack_images_image_v2" "login" {
+  for_each = var.login_nodes
+
+  name = each.value.image
+}
+
+data "openstack_images_image_v2" "compute" {
+  for_each = var.compute_nodes
+
+  name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
+}
+
 resource "openstack_networking_port_v2" "login" {
 
   for_each = toset(keys(var.login_nodes))
@@ -68,7 +80,7 @@ resource "openstack_networking_port_v2" "compute" {
 
 resource "openstack_compute_instance_v2" "control" {
   
-  for_each = var.create_nodes ? toset(["control"]) : toset([])
+  for_each = toset(["control"])
   
   name = "${var.cluster_name}-${each.key}"
   image_name = data.openstack_images_image_v2.control.name
@@ -79,7 +91,8 @@ resource "openstack_compute_instance_v2" "control" {
   block_device {
       uuid = data.openstack_images_image_v2.control.id
       source_type  = "image"
-      destination_type = "local"
+      destination_type = var.volume_backed_instances ? "volume" : "local"
+      volume_size = var.volume_backed_instances ? var.root_volume_size : null
       boot_index = 0
       delete_on_termination = true
   }
@@ -138,12 +151,24 @@ resource "openstack_compute_instance_v2" "control" {
 
 resource "openstack_compute_instance_v2" "login" {
 
-  for_each = var.create_nodes ? var.login_nodes : {}
+  for_each = var.login_nodes
   
   name = "${var.cluster_name}-${each.key}"
   image_name = each.value.image
   flavor_name = each.value.flavor
   key_pair = var.key_pair
+
+  dynamic "block_device" {
+    for_each = var.volume_backed_instances ? [1]: []
+    content {
+      uuid = data.openstack_images_image_v2.login[each.key].id
+      source_type  = "image"
+      destination_type = "volume"
+      volume_size = var.root_volume_size
+      boot_index = 0
+      delete_on_termination = true
+    }
+  }
   
   network {
     port = openstack_networking_port_v2.login[each.key].id
@@ -169,12 +194,24 @@ resource "openstack_compute_instance_v2" "login" {
 
 resource "openstack_compute_instance_v2" "compute" {
 
-  for_each = var.create_nodes ? var.compute_nodes : {}
+  for_each = var.compute_nodes
   
   name = "${var.cluster_name}-${each.key}"
   image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
+
+  dynamic "block_device" {
+    for_each = var.volume_backed_instances ? [1]: []
+    content {
+      uuid = data.openstack_images_image_v2.compute[each.key].id
+      source_type  = "image"
+      destination_type = "volume"
+      volume_size = var.root_volume_size
+      boot_index = 0
+      delete_on_termination = true
+    }
+  }
   
   network {
     port = openstack_networking_port_v2.compute[each.key].id

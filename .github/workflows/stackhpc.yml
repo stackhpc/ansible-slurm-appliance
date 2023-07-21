@@ -8,27 +8,31 @@ on:
   pull_request:
 jobs:
   openstack:
-    name: openstack-ci-arcus # Arcus OpenStack in rcp-cloud-portal-demo project, with RoCE
+    name: openstack-ci
     concurrency: ${{ github.ref }} # to branch/PR
     runs-on: ubuntu-20.04
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       TF_VAR_cluster_name: ci${{ github.run_id }}
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Record which cloud CI is running on
+        run: |
+          echo CI_CLOUD: ${{ vars.CI_CLOUD }}
 
       - name: Setup ssh
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${arcus_SSH_KEY}" > ~/.ssh/id_rsa
+          echo "${{ secrets[format('{0}_SSH_KEY', vars.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
-        env:
-          arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
-
+        shell: bash
+        
       - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprint >> ~/.ssh/known_hosts
+        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
       
       - name: Install ansible etc
@@ -44,11 +48,9 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${arcus_CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
-        env:
-          arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-            
+
       - name: Setup environment-specific inventory/terraform inputs
         run: |
           . venv/bin/activate
@@ -64,14 +66,14 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform apply -auto-approve
+          terraform apply -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
 
       - name: Delete infrastructure if provisioning failed
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform destroy -auto-approve
+          terraform destroy -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
       - name: Configure cluster
@@ -143,7 +145,7 @@ jobs:
       #     ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
       #     ansible-playbook -v ansible/ci/check_slurm.yml
       
-      - name: Test reimage of all nodes (via rebuild adhoc)
+      - name: Test reimage of login and control nodes (via rebuild adhoc)
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
@@ -169,7 +171,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform destroy -auto-approve
+          terraform destroy -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
         if: ${{ success() || cancelled() }}
 
       # - name: Delete images
