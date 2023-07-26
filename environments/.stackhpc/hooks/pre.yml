@@ -2,6 +2,12 @@
   become: yes
   gather_facts: false
   tasks:
+    - name: Ensure CI_CLOUD is set
+      assert:
+        that: "lookup('env', 'CI_CLOUD') != ''"
+        fail_msg: "Did you forget to `export CI_CLOUD={SMS,ARCUS}` when running manually?"
+      delegate_to: localhost
+
     - name: Write CI-generated inventory and secrets for debugging
       ansible.builtin.copy:
         dest: /etc/ci-config/
