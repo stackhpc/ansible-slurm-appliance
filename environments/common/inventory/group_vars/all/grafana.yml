@@ -79,7 +79,7 @@ grafana_datasources:
     # readOnly: false
 
 grafana_plugins:
-  - grafana-opensearch-datasource 2.6.2
+  - grafana-opensearch-datasource 2.8.1
 
 # want to set grafana_server.serve_from_sub_path if have Open Ondemand to proxy:
 grafana_server:
