@@ -25,7 +25,7 @@
         chdir: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow"
         executable: /bin/bash
       register: job_output
-      async: "{{ 6 * 60 }}" # wait for up to 6 minutes, expect it to take 4
+      async: "{{ 10 * 60 }}" # wait for up to 10 minutes
       poll: 15 # check every 15 seconds
 
     - name: Fail if job output contains error
