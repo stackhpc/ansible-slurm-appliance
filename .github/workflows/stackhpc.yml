@@ -90,11 +90,11 @@ jobs:
           . environments/.stackhpc/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
 
-      # - name: Run EESSI tests
-      #   run: |
-      #     . venv/bin/activate
-      #     . environments/.stackhpc/activate
-      #     ansible-playbook -vv ansible/ci/check_eessi.yml
+      - name: Run EESSI tests
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ansible-playbook -vv ansible/ci/check_eessi.yml
 
       - name: Confirm Open Ondemand is up (via SOCKS proxy)
         run: |
