@@ -4,3 +4,4 @@
   template:
     src: systemd.{{ podman_service_type }}.service.j2
     dest: /etc/systemd/system/{{ podman_service_name }}.service
+  register: podman_systemd_unit
