@@ -1,6 +1,6 @@
 flavor = "general.v1.tiny"
 networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"] # stackhpc-ipv4-geneve
-source_image_name = "openhpc-230503-0944-bf8c3f63" # https://github.com/stackhpc/ansible-slurm-appliance/pull/252
+source_image_name = "openhpc-230804-1754-80b8d714" # https://github.com/stackhpc/ansible-slurm-appliance/pull/298
 fatimage_source_image_name = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 ssh_keypair_name = "slurm-app-ci"
 ssh_private_key_file = "~/.ssh/id_rsa"
