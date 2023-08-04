@@ -51,16 +51,6 @@ appliances_local_users_default:
         system: true
     
     - group:
-        name: prometheus
-        gid: 976
-      user:
-        name: prometheus
-        uid: 981
-        home: "{{ prometheus_db_dir }}"
-        shell: /usr/sbin/nologin
-      enable: "{{ 'prometheus' in group_names }}"
-    
-    - group:
         name: grafana
         gid: 979
       user:
