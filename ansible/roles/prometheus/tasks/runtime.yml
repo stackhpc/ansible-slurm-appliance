@@ -1,0 +1,76 @@
+---
+# Based on cloudalchemy.prometheus/tasks/configure.yml so to support same configurations
+# Main changes for containerisation are:
+# - user/group of files should be podman
+# - cannot reload service
+
+- name: Ensure Prometheus host directories exists
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: podman
+    group: podman
+    recurse: true
+  loop:
+    - "{{ prometheus_config_dir }}"
+    - "{{ prometheus_config_dir }}/rules"
+    - "{{ prometheus_config_dir }}/file_sd"
+    - "{{ prometheus_db_dir }}" # this should be on a volume, so can't do during install==image build
+
+- name: Configure alerting rules file
+  template:
+    src: "alert.rules.j2"
+    dest: "{{ prometheus_config_dir }}/rules/ansible_managed.rules"
+    owner: podman
+    group: podman
+    mode: 0644
+    # validate: "{{ _prometheus_binary_install_dir }}/promtool check rules %s" # TODO: is in container, could use it
+  when: prometheus_alert_rules != []
+  notify: Restart Prometheus
+
+- name: Copy custom alerting rule files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ prometheus_config_dir }}/rules/"
+    owner: podman
+    group: podman
+    mode: 0644
+    # validate: "{{ _prometheus_binary_install_dir }}/promtool check rules %s" # see above
+  with_fileglob: "{{ prometheus_alert_rules_files }}"
+  notify: Restart Prometheus
+
+- name: Configure Prometheus
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ prometheus_config_dir }}/prometheus.yml"
+    #validate: "{{ _prometheus_binary_install_dir }}/promtool check config %s" see above
+  notify: Restart Prometheus
+
+- name: Configure Prometheus web
+  copy:
+    content: "{{ prometheus_web_config | to_nice_yaml(indent=2) }}"
+    dest: "{{ prometheus_config_dir }}/web.yml"
+    owner: podman
+    group: podman
+    mode: 0644
+
+- name: Configure prometheus static targets
+  copy:
+    content: |
+      #jinja2: lstrip_blocks: True
+      {{ item.value | to_nice_yaml(indent=2) }}
+    dest: "{{ prometheus_config_dir }}/file_sd/{{ item.key }}.yml"
+    force: true
+    owner: podman
+    group: podman
+    mode: 0644
+  with_dict: "{{ prometheus_targets }}"
+  when: prometheus_targets != {}
+
+- meta: flush_handlers # handles restarts due to config changes
+
+- name: Ensure Prometheus service state
+  systemd:
+    name: prometheus
+    enabled: true
+    state: "{{ 'restarted' if (podman_systemd_unit.changed | default(false)) else 'started' }}"
