@@ -46,7 +46,7 @@
   "gnetId": 13535,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1607441312744,
+  "iteration": 1607441312745,
   "links": [],
   "panels": [
     {
@@ -150,7 +150,7 @@
             }
           ],
           "query": "*",
-          "queryType": "randomWalk",
+          "queryType": "lucene",
           "refId": "A",
           "timeField": "@timestamp"
         }

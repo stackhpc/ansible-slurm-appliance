@@ -63,6 +63,7 @@ grafana_datasources:
     url: "http://{{ prometheus_address }}:9090" # default prometheus port
     editable: true
   - name: slurmstats
+    # see https://github.com/grafana/opensearch-datasource#configure-the-data-source-with-provisioning
     type: grafana-opensearch-datasource
     url: "https://{{ opensearch_address }}:9200"
     basicAuth: true
@@ -74,12 +75,15 @@ grafana_datasources:
       tlsSkipVerify: true
       database: filebeat-*
       timeField: "@timestamp"
-    flavor: opensearch
+      # Have to set flavor and version, but ansible/roles/opensearch/templates/opensearch.yml.j2 fakes version for filebeat
+      # so need to set to fake version here:
+      version: '7.10.2'
+      flavor: elasticsearch
     editable: true
     # readOnly: false
 
 grafana_plugins:
-  - grafana-opensearch-datasource
+  - grafana-opensearch-datasource 2.8.1
 
 # want to set grafana_server.serve_from_sub_path if have Open Ondemand to proxy:
 grafana_server:
