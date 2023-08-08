@@ -28,7 +28,9 @@ variable "control_node_flavor" {}
 
 variable "other_node_flavor" {}
 
-variable "volume_backed_instances" {}
+variable "volume_backed_instances" {
+    default = false
+}
 
 variable "state_volume_device_path" {}
 
