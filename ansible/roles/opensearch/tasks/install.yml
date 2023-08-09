@@ -12,4 +12,8 @@
   template:
     dest: /etc/systemd/system/opensearch.service
     src: opensearch.service.j2
-  notify: Restart opensearch service
+  register: _opensearch_unit
+
+- name: Reload opensearch unit file
+  command: systemctl daemon-reload
+  when: _opensearch_unit.changed
