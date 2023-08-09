@@ -19,6 +19,6 @@
         command: "openstack image save --file {{ ci_image }} {{ ci_image }}"
       
       - name: Upload image to s3
-        command: "s3cmd put {{ ci_image }} s3://openhpc-images "
+        command: "s3cmd put {{ ci_image }}.qcow2 s3://openhpc-images "
       
       when: "ci_image not in s3_ls.stdout"
