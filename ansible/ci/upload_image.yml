@@ -1,0 +1,24 @@
+- hosts: localhost
+  gather_facts: no
+  become: no
+  tasks:
+    - name: List images in Arcus S3 release bucket
+      command: s3cmd ls s3://openhpc-images
+      register: s3_ls
+
+    - name: Get current CI terraform image name
+      set_fact:
+        ci_image: "{{ lookup('file', appliances_environment_root + '/terraform/main.tf') | regex_search('openhpc-[0-9a-z-]+') }}"
+
+    - name: Show extracted current CI terraform image name
+      debug:
+        msg: "Current image from terraform main.tf: {{ ci_image }}"
+
+    - block:
+      - name: Download image to local storage
+        command: "openstack image save --file {{ ci_image }} {{ ci_image }}"
+      
+      - name: Upload image to s3
+        command: "s3cmd put {{ ci_image }} s3://openhpc-images "
+      
+      when: "ci_image not in s3_ls.stdout"
