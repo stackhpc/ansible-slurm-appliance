@@ -15,15 +15,6 @@
     path: /etc/systemd/system/opendistro.service
     state: absent
 
-- name: Increase maximum number of virtual memory maps
-  # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
-  ansible.posix.sysctl:
-    name: vm.max_map_count
-    value: '262144'
-    state: present
-    reload: yes
-  become: true
-
 - name: Ensure required opensearch host directories exist
   file:
     state: directory
@@ -35,11 +26,9 @@
   loop:
     - "{{ opensearch_config_path }}"
     - "{{ opensearch_data_path }}"
-  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Create certs
   import_tasks: certs.yml
-  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Template general configuration
   ansible.builtin.template:
@@ -52,7 +41,6 @@
     mode: 0660
   notify: Restart opensearch service
   become: true
-  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Template internal user configuration
   template:
@@ -65,19 +53,10 @@
       mode: 0660
   notify: Restart opensearch service
   become: true
-  when: "'started' in opensearch_state" # don't run during image build
-
-- name: Create systemd unit file
-  template:
-    dest: /etc/systemd/system/opensearch.service
-    src: opensearch.service.j2
-  become: true
-  notify: Restart opensearch service
 
 - name: Pull container
   containers.podman.podman_image:
     name: "opensearchproject/opensearch:{{ opensearch_version }}"
-  become: true
   become_user: "{{ opensearch_podman_user }}"
 
 - name: Flush handlers

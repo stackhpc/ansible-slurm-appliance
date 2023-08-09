@@ -1,0 +1,15 @@
+# safe to use during build
+
+- name: Increase maximum number of virtual memory maps
+  # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    state: present
+    reload: yes
+
+- name: Create systemd unit file
+  template:
+    dest: /etc/systemd/system/opensearch.service
+    src: opensearch.service.j2
+  notify: Restart opensearch service
