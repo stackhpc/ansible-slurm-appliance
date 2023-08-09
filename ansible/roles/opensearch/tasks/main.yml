@@ -74,6 +74,12 @@
   become: true
   notify: Restart opensearch service
 
+- name: Pull container
+  containers.podman.podman_image:
+    name: "opensearchproject/opensearch:{{ opensearch_version }}"
+  become: true
+  become_user: "{{ opensearch_podman_user }}"
+
 - name: Flush handlers
   meta: flush_handlers
 
