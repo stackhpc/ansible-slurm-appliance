@@ -15,6 +15,17 @@
     path: /etc/systemd/system/opendistro.service
     state: absent
 
+- name: Enumerate files in data directory
+  find:
+    path: "{{ opensearch_data_path }}"
+  register: _find_opensearch_data
+
+- name: Archive incorrectly indexed data
+  import_tasks: archive_data.yml
+  when:
+    - _find_opensearch_data.files | length > 0
+    - "'slurm_jobid_index' not in _find_opensearch_data.files | map(attribute='path') | map('basename')"
+
 - name: Ensure required opensearch host directories exist
   file:
     state: directory
@@ -26,6 +37,15 @@
   loop:
     - "{{ opensearch_config_path }}"
     - "{{ opensearch_data_path }}"
+
+- name: Set indexed data flag
+  copy:
+    dest: "{{ opensearch_data_path }}/slurm_jobid_index"
+    content: |
+      This is a flag file to indicate that filebeat is pushing data
+      indexed by Slurm JobID to prevent duplicate OpenSearch records
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
 
 - name: Create certs
   import_tasks: certs.yml
