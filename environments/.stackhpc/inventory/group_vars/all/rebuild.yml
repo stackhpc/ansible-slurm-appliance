@@ -1,3 +1,0 @@
-# rebuilding volume-backed instances requires the image to be specified
-# this is a bit hacky and can go away if/when ansible templates terraform
-rebuild_image: "{{ lookup('file', appliances_environment_root + '/terraform/main.tf') | regex_search('openhpc-[0-9a-z-]*') }}"
