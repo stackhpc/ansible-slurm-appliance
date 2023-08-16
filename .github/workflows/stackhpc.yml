@@ -40,6 +40,8 @@ jobs:
 
       - name: Install terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform: v1.5.5
       
       - name: Initialise terraform
         run: terraform init
