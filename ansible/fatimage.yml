@@ -59,6 +59,11 @@
         tasks_from: vnc_compute.yml
 
     # - import_playbook: monitoring.yml:
+    - import_role:
+        name: opensearch
+        tasks_from: install.yml
+      become: true
+
     #   opensearch - containerised, nothing to do
     # slurm_stats - nothing to do
     # filebeat - containerised - nothing to do

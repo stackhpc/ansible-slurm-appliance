@@ -7,6 +7,11 @@
   tasks:
     - import_role:
         name: opensearch
+        tasks_from: install.yml
+      become: true
+    - import_role:
+        name: opensearch
+        tasks_from: runtime.yml
       become: true
 
 - name: Setup slurm stats
