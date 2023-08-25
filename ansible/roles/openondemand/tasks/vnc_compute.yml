@@ -29,6 +29,7 @@
     name: pip
     virtualenv: /opt/websockify
     virtualenv_command: python3 -m venv
+    state: latest
   tags: install
 
 - name: Install websockify package in venv
