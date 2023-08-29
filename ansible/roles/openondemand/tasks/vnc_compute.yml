@@ -27,6 +27,7 @@
   # Requires separate step so that the upgraded pip is used to install packages
   pip:
     name: pip
+    state: latest
     virtualenv: /opt/websockify
     virtualenv_command: python3 -m venv
   tags: install
@@ -34,6 +35,7 @@
 - name: Install websockify package in venv
   pip:
     name: websockify
+    version: 0.11.0
     virtualenv: /opt/websockify
     virtualenv_command: python3 -m venv
   tags: install

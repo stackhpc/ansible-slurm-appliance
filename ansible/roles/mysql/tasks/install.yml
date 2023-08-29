@@ -1,7 +1,7 @@
 - name: Install python mysql client
   pip:
     name: pymysql
-    state: present
+    version: 1.1.0
 
 - name: Create systemd mysql container unit file
   template:
