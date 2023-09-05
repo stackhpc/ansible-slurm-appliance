@@ -11,7 +11,7 @@
   # Requires separate step so that the upgraded pip is used to install packages
   pip:
     name: pip
-    state: latest
+    version: 23.2.1
     virtualenv: /opt/jupyter-py39
     virtualenv_command: python3.9 -m venv
   tags: install
