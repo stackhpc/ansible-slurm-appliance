@@ -21,6 +21,6 @@ nfs_configurations:
         server: "{{ inventory_hostname == 'localhost' }}"
         clients: "{{ inventory_hostname in groups['cluster'] }}" # TODO, should be slurm really I guess
     nfs_server: "{{ hostvars['localhost'].ansible_host }}"
-    nfs_export: "{{ appliances_repository_root }}/slurm/build/"
+    nfs_export: "{{ appliances_environment_root }}/slurm/build/"
     nfs_client_mnt_point: "/slurm"
     # nfs_client_mnt_state: absent
