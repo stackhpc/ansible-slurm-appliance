@@ -23,10 +23,17 @@
   hosts: openhpc
   become: yes
   tags:
+    - slurm
     - openhpc
   tasks:
-    - import_role:
+    - include_role:
         name: stackhpc.openhpc
+        tasks_from: "install-{{ openhpc_install_type }}.yml"
+      tags: install
+    - include_role:
+        name: stackhpc.openhpc
+        tasks_from: runtime.yml
+      tags: runtime
 
 - name: Set locked memory limits on user-facing nodes
   hosts:
