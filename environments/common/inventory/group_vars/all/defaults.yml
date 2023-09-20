@@ -48,7 +48,6 @@ appliances_local_users_default:
         shell: /sbin/nologin
         uid: 202
         system: true
-      enable: "{{ 'control' in group_names }}"
     
     - group:
         name: prometheus
