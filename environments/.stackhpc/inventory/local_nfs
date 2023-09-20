@@ -1,0 +1,8 @@
+nfs:
+    hosts:
+        localhost:
+            ansible_connection: local
+            ansible_python_interpreter: "{{ansible_playbook_python}}"
+            # ansible_host: '192.168.3.95' # interface on "portal-internal" network
+            nfs_interface: eth0
+            ansible_host: "{{ ((lookup('pipe', 'ip -4 --json addr show ' + nfs_interface) | from_json | first).addr_info | first).local }}"
