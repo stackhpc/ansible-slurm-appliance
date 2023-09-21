@@ -12,38 +12,46 @@
 
 - name: Install VNC-related packages
   tags: install
-  yum:
+  dnf:
     name:
       - turbovnc-3.0.1
       - nmap-ncat
-      - python3
+      - python3.9
 
 - name: Install Xfce desktop
   tags: install
   yum:
     name: '@Xfce'
   
+# - name: Ensure python3.9 installed
+#   dnf:
+#     name: python39
+#   tags: install
+
 - name: Install websockify venv
   # Requires separate step so that the upgraded pip is used to install packages
   pip:
     name: pip
-    virtualenv: /opt/websockify
-    virtualenv_command: python3 -m venv
+    state: latest
+    virtualenv: /opt/websockify-py39
+    virtualenv_command: python3.9 -m venv
   tags: install
 
 - name: Install websockify package in venv
   pip:
     name: websockify
-    virtualenv: /opt/websockify
+    virtualenv: /opt/websockify-py39
     virtualenv_command: python3 -m venv
   tags: install
 
 - name: Symlink websockify to where Open Ondemand expects
-  file:
-    src: /opt/websockify/bin/websockify
-    dest: /opt/websockify/run
-    state: link
-
+  file: "{{ item }}"
+  loop:
+    - path: /opt/websockify
+      state: directory
+    - src: /opt/websockify-py39/bin/websockify
+      dest: /opt/websockify/run
+      state: link
 - name: Disable screensaver # as users might not have passwords
   yum:
     name: xfce4-screensaver
