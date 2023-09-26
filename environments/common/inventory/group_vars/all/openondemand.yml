@@ -13,7 +13,7 @@
 # or include regex special characters.
 openondemand_host_regex: "{{ (groups['compute'] + groups['grafana']) | to_ood_regex }}"
 
-ondemand_package: ondemand-2.0.29
+ondemand_package: ondemand-3.0.1
 
 openondemand_dashboard_links: # TODO: should really only be deployed if grafana is deployed and proxying configured
   - name: Grafana
