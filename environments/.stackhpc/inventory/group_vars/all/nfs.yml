@@ -16,11 +16,12 @@ nfs_configurations:
     nfs_server: "{{ nfs_server_default }}"
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
+    # nfs_client_mnt_state: absent
   - comment: Export slurm directory from localhost
     nfs_enable:
         server: "{{ inventory_hostname == 'localhost' }}"
         clients: "{{ inventory_hostname in groups['cluster'] }}" # TODO, should be slurm really I guess
     nfs_server: "{{ hostvars['localhost'].ansible_host }}"
     nfs_export: "{{ appliances_environment_root }}/slurm/build/"
-    nfs_client_mnt_point: "/slurm"
+    nfs_client_mnt_point: "/nopt/slurm"
     # nfs_client_mnt_state: absent

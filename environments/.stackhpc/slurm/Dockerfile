@@ -2,6 +2,7 @@ FROM rockylinux:8 as build-stage
 
 ARG SLURM_VERSION=23.02.5 # From https://www.schedmd.com/downloads.php
 ARG SLURM_PREFIX=/slurm # Should match directory Slurm is installed at
+ARG SLURM_SYSCONFDIR=/etc/slurm # Should match directory slurm.conf will be in
 
 RUN set -ex \
     && yum makecache \
@@ -51,7 +52,7 @@ RUN set -x && ./configure \
         --enable-debug \
         --prefix=${SLURM_PREFIX} \
         --without-rpath \
-        --sysconfdir=/etc/slurm \
+        --sysconfdir=${SLURM_SYSCONFDIR} \
         --with-mysql_config=/usr/bin
 
 RUN set -x && make install

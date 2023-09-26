@@ -9,13 +9,13 @@ openhpc_generic_packages: # system package installs:
   - mpitests-openmpi
 
 # define paths to slurm on NFS clients:
-openhpc_sbin_dir: /slurm/23.02.5/sbin
-openhpc_lib_dir: /slurm/23.02.5/lib/slurm
-openhpc_bin_dir: /slurm/23.02.5/bin
+openhpc_sbin_dir: /nopt/slurm/23.02.5/sbin
+openhpc_lib_dir: /nopt/slurm/23.02.5/lib/slurm
+openhpc_bin_dir: /nopt/slurm/23.02.5/bin
+openhpc_slurm_conf_path: /nopt/slurm/etc/slurm.conf
 
 # modify slurm.conf:
 openhpc_config_extra:
   SlurmctldDebug: debug
   SlurmdDebug: debug
   Epilog: '<absent>' # required b/c the default slurm.conf uses an Epilog provided by openhpc pkgs
-  # PluginDir: "{{ openhpc_lib_dir }}"
