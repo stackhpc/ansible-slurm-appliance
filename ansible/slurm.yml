@@ -23,7 +23,6 @@
   hosts: openhpc
   become: yes
   tags:
-    - slurm
     - openhpc
   tasks:
     - include_role:
