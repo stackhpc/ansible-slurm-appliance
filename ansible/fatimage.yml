@@ -45,7 +45,7 @@
         tasks_from: install.yml
 
     - name: Include distribution variables for osc.ood
-      include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky.yml"
+      include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky/8.yml"
     # FUTURE: install-apps.yml - this is git clones
 
     # - import_playbook: portal.yml
