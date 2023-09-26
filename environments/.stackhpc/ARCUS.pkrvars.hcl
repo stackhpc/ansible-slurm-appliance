@@ -1,5 +1,8 @@
 flavor = "vm.ska.cpu.general.small"
-networks = ["a262aabd-e6bf-4440-a155-13dbc1b5db0e"] # WCDC-iLab-60
+use_blockstorage_volume = true
+volume_size = 10 # GB
+image_disk_format = "qcow2"
+networks = ["4b6b2722-ee5b-40ec-8e52-a6610e14cc51"] # portal-internal (DNS broken on ilab-60)
 source_image_name = "openhpc-230804-1754-80b8d714" # https://github.com/stackhpc/ansible-slurm-appliance/pull/298
 fatimage_source_image_name = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 ssh_keypair_name = "slurm-app-ci"
