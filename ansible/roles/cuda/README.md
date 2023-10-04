@@ -2,6 +2,8 @@
 
 Install NVIDIA CUDA. The CUDA binaries are added to the PATH for all users, and the [NVIDIA persistence daemon](https://docs.nvidia.com/deploy/driver-persistence/index.html#persistence-daemon) is enabled.
 
+To avoid unwanted package updates which break functionality, on first use this role enables the dkms-flavour `nvidia-driver` DNF module stream which has the current highest version number. The `latest-dkms` stream is not enabled, and subsequent runs of the role will *not* switch which stream is enabled even if later version streams become available. If an upgrade of the `nvidia-driver` module is required, the currently-enabled stream and all packages should be manually removed.
+
 ## Prerequisites
 
 Requires OFED to be installed to provide required kernel-* packages.
