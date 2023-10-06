@@ -5,7 +5,7 @@
 
 - name: Set fact for discovered cuda version
   set_fact:
-    cuda_version_tuple: "{{ (_cuda_samples_version.content | b64decode | from_json).cuda.version | split('.') }}" # e.g. '12.1.0'
+    _cuda_version_tuple: "{{ (_cuda_samples_version.content | b64decode | from_json).cuda.version | split('.') }}" # e.g. '12.1.0'
 
 - name: Ensure cuda_samples_path exists
   file:
