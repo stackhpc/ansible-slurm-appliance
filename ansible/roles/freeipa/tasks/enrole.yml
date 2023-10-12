@@ -1,9 +1,5 @@
 # based on https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/installing_identity_management/assembly_installing-an-idm-client_installing-identity-management
 
-- name: Install FreeIPA client package
-  dnf:
-    name: ipa-client
-
 - name: Retrieve persisted keytab from previous enrolement
   slurp:
     src: "{{ _freeipa_keytab_backup_path }}"

@@ -19,10 +19,14 @@
   gather_facts: yes
   become: yes
   tasks:
+    - name: Install freeipa client
+      import_role:
+        name: freeipa
+        tasks_from: client-install.yml
     - name: Enrole freeipa clients
       import_role:
         name: freeipa
-        tasks_from: client.yml
+        tasks_from: enrole.yml
 
 - hosts: freeipa_server
   tags:
