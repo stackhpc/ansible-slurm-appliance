@@ -13,7 +13,7 @@ variable "cluster_name" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-230503-0944-bf8c3f63" # https://github.com/stackhpc/ansible-slurm-appliance/pull/252
+    default = "openhpc-230926-1343-e3d3e307" # https://github.com/stackhpc/ansible-slurm-appliance/pull/314
     # default = "Rocky-8-GenericCloud-Base-8.7-20221130.0.x86_64.qcow2"
     # default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2"
 }
@@ -28,7 +28,9 @@ variable "control_node_flavor" {}
 
 variable "other_node_flavor" {}
 
-variable "volume_backed_instances" {}
+variable "volume_backed_instances" {
+    default = false
+}
 
 variable "state_volume_device_path" {}
 

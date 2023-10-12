@@ -15,14 +15,16 @@
     path: /etc/systemd/system/opendistro.service
     state: absent
 
-- name: Increase maximum number of virtual memory maps
-  # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
-  ansible.posix.sysctl:
-    name: vm.max_map_count
-    value: '262144'
-    state: present
-    reload: yes
-  become: true
+- name: Enumerate files in data directory
+  find:
+    path: "{{ opensearch_data_path }}"
+  register: _find_opensearch_data
+
+- name: Archive incorrectly indexed data
+  import_tasks: archive_data.yml
+  when:
+    - _find_opensearch_data.files | length > 0
+    - "'slurm_jobid_index' not in _find_opensearch_data.files | map(attribute='path') | map('basename')"
 
 - name: Ensure required opensearch host directories exist
   file:
@@ -35,11 +37,18 @@
   loop:
     - "{{ opensearch_config_path }}"
     - "{{ opensearch_data_path }}"
-  when: "'started' in opensearch_state" # don't run during image build
+
+- name: Set indexed data flag
+  copy:
+    dest: "{{ opensearch_data_path }}/slurm_jobid_index"
+    content: |
+      This is a flag file to indicate that filebeat is pushing data
+      indexed by Slurm JobID to prevent duplicate OpenSearch records
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
 
 - name: Create certs
   import_tasks: certs.yml
-  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Template general configuration
   ansible.builtin.template:
@@ -52,7 +61,6 @@
     mode: 0660
   notify: Restart opensearch service
   become: true
-  when: "'started' in opensearch_state" # don't run during image build
 
 - name: Template internal user configuration
   template:
@@ -65,14 +73,11 @@
       mode: 0660
   notify: Restart opensearch service
   become: true
-  when: "'started' in opensearch_state" # don't run during image build
 
-- name: Create systemd unit file
-  template:
-    dest: /etc/systemd/system/opensearch.service
-    src: opensearch.service.j2
-  become: true
-  notify: Restart opensearch service
+- name: Pull container
+  containers.podman.podman_image:
+    name: "opensearchproject/opensearch:{{ opensearch_version }}"
+  become_user: "{{ opensearch_podman_user }}"
 
 - name: Flush handlers
   meta: flush_handlers

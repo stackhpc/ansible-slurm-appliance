@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
 jobs:
   openstack:
-    name: openstack-build-arcus
+    name: openstack-imagebuild
     concurrency: ${{ github.ref }} # to branch/PR
     runs-on: ubuntu-20.04
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v2
 
@@ -17,13 +18,12 @@ jobs:
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${arcus_SSH_KEY}" > ~/.ssh/id_rsa
+          echo "${{ secrets[format('{0}_SSH_KEY', vars.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
-        env:
-          arcus_SSH_KEY: ${{ secrets.ARCUS_SSH_KEY }}
+        shell: bash
 
       - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprint >> ~/.ssh/known_hosts
+        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
       
       - name: Install ansible etc
@@ -32,11 +32,9 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${arcus_CLOUDS_YAML}" > ~/.config/openstack/clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
-        env:
-          arcus_CLOUDS_YAML: ${{ secrets.ARCUS_CLOUDS_YAML }}
-            
+
       - name: Setup environment
         run: |
           . venv/bin/activate
@@ -49,7 +47,7 @@ jobs:
           . environments/.stackhpc/activate
           cd packer/
           packer init .
-          PACKER_LOG=1 packer build -only openstack.openhpc -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+          PACKER_LOG=1 packer build -only openstack.openhpc -on-error=ask -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
 
       - name: Get created image name from manifest
         id: manifest
