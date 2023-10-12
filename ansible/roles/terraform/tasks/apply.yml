@@ -1,0 +1,44 @@
+- name: Create Terraform plan
+  community.general.terraform:
+    binary_path: "{{ terraform_binary_path or omit }}"
+    project_path: "{{ terraform_project_path }}"
+    state: planned
+    backend_config: "{{ terraform_backend_config }}"
+    plan_file: terraform.plan
+    force_init: yes
+    init_reconfigure: yes
+    variables: "{{ terraform_variables }}"
+  register: _tf_plan
+
+- name: Show Terraform plan
+  debug:
+    msg: "{{ _tf_plan.stdout }}"
+
+- name: Prompt to approve Terraform plan execution
+  pause:
+    prompt: "Do you want to execute this plan? (Only 'yes' executes)"
+  register: _tf_approve_plan
+  when:
+    - "'No changes. Your infrastructure matches the configuration.' not in _tf_plan.stdout"
+    - 'not terraform_autoapprove | bool'
+
+- name: End host if Terraform plan is not approved
+  ansible.builtin.meta: end_host
+  when: "not (( terraform_autoapprove | bool ) or ( _tf_approve_plan.user_input | default(false) | bool ))"
+
+- name: Provision infrastructure using Terraform
+  community.general.terraform:
+    binary_path: "{{ terraform_binary_path or omit }}"
+    project_path: "{{ terraform_project_path }}"
+    state: "{{ terraform_state }}"
+    backend_config: "{{ terraform_backend_config }}"
+    force_init: yes
+    init_reconfigure: yes
+    variables: "{{ terraform_variables }}"
+    plan_file: terraform.plan
+  register: terraform_provision
+
+- name: Show Terraform provision output
+  debug:
+    msg: "{{ terraform_provision.stdout }}"
+  when: "'stdout' in terraform_provision"

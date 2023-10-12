@@ -1,0 +1,148 @@
+#jinja2:lstrip_blocks: True
+terraform {
+  required_version = ">= 0.14"
+  required_providers {
+    openstack = {
+      source = "terraform-provider-openstack/openstack"
+    }
+  }
+}
+
+# --- volumes ---
+{% for volume_name, volume in cluster_volumes.items() %}
+resource "openstack_blockstorage_volume_v3" "{{ volume_name }}" {
+    name = "{{ cluster_name }}-{{ volume_name }}"
+    description = "{{ volume.description }}"
+    size = "{{ volume.size }}"
+}
+{% endfor %}
+
+{% for instance_hostlist, _instance in cluster_instances.items() %}
+{%  set hostgroup = instance_hostlist.split('-')[0] %}{# NB: assumes prefix- format #}
+### --- hostgroup {{ hostgroup }} ---
+{%  set instance = cluster_instance_defaults | combine(_instance) %}
+
+{# NB: Currently secgroups apply to all ports on each instance #}
+data "openstack_networking_secgroup_v2" "{{ hostgroup }}" {
+  for_each = toset({{ instance.secgroup_names | to_json }})
+
+  name = each.key
+}
+
+{%    for port in instance.ports %}
+{%      set port_tf_name = (hostgroup, port.network_name) | join('_') | replace('-', '_') %}
+
+data "openstack_networking_network_v2" "{{ port_tf_name }}" {
+  name = "{{ port.network_name }}"
+}
+
+{% if 'subnet_name' in port %}
+data "openstack_networking_subnet_v2" "{{ port_tf_name }}" {
+  name = "{{ port.subnet_name }}"
+}
+{% endif %}
+
+resource "openstack_networking_port_v2" "{{ port_tf_name }}" {
+    for_each = toset({{ instance_hostlist | expand_hostlist | to_json }})
+    
+    name = "{{ cluster_name }}-${each.key}-{{ port.network_name }}"
+    network_id = data.openstack_networking_network_v2.{{ port_tf_name }}.id
+
+    {% if 'subnet_name' in port %}
+    fixed_ip {
+      subnet_id = data.openstack_networking_subnet_v2.{{ port_tf_name }}.id
+    }
+    {% endif %}
+    
+    security_group_ids = [for sg in data.openstack_networking_secgroup_v2.{{ hostgroup }}: sg.id]
+
+    binding {
+      vnic_type = "{{ port.vnic_type | default('normal') }}"
+      profile = {{ port.binding_profile | to_json if 'binding_profile' in port else 'null' }}
+    }
+}
+{%    endfor %}{# instance.ports #}
+
+data "openstack_images_image_v2"  "{{ hostgroup }}" {
+  name = "{{ instance.image_name }}"
+}
+
+resource "openstack_compute_instance_v2" "{{ hostgroup }}" {
+    for_each = toset({{ instance_hostlist | expand_hostlist | to_json }})
+    
+    name = "{{ cluster_name }}-${each.key}"
+    image_name = data.openstack_images_image_v2.{{ hostgroup }}.name
+    {% if instance and 'flavor_name' in instance %}
+    flavor_name = "{{ instance.flavor_name }}"
+    {% else %}
+    flavor_id = "{{ instance.flavor_id }}"
+    {% endif %}
+    key_pair = "{{ instance.key_pair }}"
+    {% if instance.volumes | default([]) | length or instance.root_volume_size | default(None) %}
+    # root disk:
+    block_device {
+        uuid = data.openstack_images_image_v2.{{ hostgroup }}.id
+        source_type = "image"
+        destination_type = "{{ 'volume' if instance.root_volume_size | default(None) else 'local' }}"
+        volume_size = {{ instance.root_volume_size if instance.root_volume_size | default(None) else 'null' }}
+        boot_index = 0
+        delete_on_termination = true
+     }
+    {%  for volume_name in instance.volumes | default([]) %}
+    block_device {
+      destination_type = "volume"
+      source_type = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.{{ volume_name }}.id
+    }
+    {%  endfor %}
+    {% endif %}
+    {% for port in instance.ports %}
+    {%   set port_tf_name = (hostgroup, port.network_name) | join('_') | replace('-', '_') %}
+    network {
+      port = openstack_networking_port_v2.{{ port_tf_name }}[each.key].id
+    }
+    {% endfor %}
+
+    metadata = {
+      environment_root = "{{ appliances_environment_root }}"
+    }
+     
+    user_data = <<-EOF
+    #cloud-config
+    fs_setup:
+    {% for volume_name, volume in instance.get('volumes', {}).items() %}
+    - label: {{ volume_name }}
+      filesystem: ext4
+      device: {{ volume.device_path }}
+      partition: auto
+    {% endfor %}
+    mounts:
+    {% for volume_name, volume in instance.get('volumes', {}).items() %}
+    - [LABEL={{ volume_name }}, {{ volume.mount_point }}, auto, "{{ volume.mount_options | default('') }}" ]
+    {% endfor %}
+    EOF
+
+}
+
+{% endfor %}{# cluster_instances.items() #}
+
+resource "local_file" "hosts" {
+  content = <<-EOF
+    {% for instance_hostlist, _instance in cluster_instances.items() %}
+    {% set hostgroup = instance_hostlist.split('-')[0] %}
+    [{{ hostgroup }}]
+    {%  for hostkey in instance_hostlist | expand_hostlist %}
+    {% set inventory_hostname = cluster_name + '-' + hostkey %}
+    {{ inventory_hostname }} ansible_host=${openstack_compute_instance_v2.{{ hostgroup }}["{{ hostkey }}"].network[0].fixed_ip_v4}
+    {%  endfor %}
+
+    {% for extra_group in _instance.extra_groups | default([]) %}
+    [{{ extra_group }}:children]
+    {{ hostgroup }}
+    {%  endfor %}
+
+    {% endfor %}
+  EOF
+  filename = "../inventory/hosts"
+}
