@@ -1,0 +1,6 @@
+- hosts: localhost
+  become: no
+  gather_facts: no
+  tasks:
+    - import_role:
+        name: terraform

@@ -1,0 +1,38 @@
+cluster_name: "{{ undef(hint='cluster_name must be defined in environment') }}"
+
+cluster_volumes:
+  state:
+    description: Persistent state
+    size: 150 # GB
+  home:
+    description: User home directories
+    size: 100 # GB
+
+cluster_instance_defaults: # overriden by entries in cluster_instances
+  # image_name: required str
+  # flavor_name: required str
+  # key_pair: required str
+  # ports: required list of maps:
+  #   - network_name: # required str (tf standard: network_id)
+  #     subnet_name: # optional str (tf standard: subnet_id)
+  #     vnic_type: optional str
+  #     binding_profile: optional yaml
+  # root_volume_size: # optional int, size in GB to use volume-backed instances. Missing or null to use local root disk
+  # volumes: [] # optional list of maps, volumes to attach. TODO: describe these
+  # extra_groups: [] # optional list of str, names of extra inventory groups for this host
+  secgroup_names:
+    - default
+
+cluster_instances: # each key below becomes a TF for_each set
+  login:
+    secgroup_names: [default, SSH]
+  compute-[0-1]: # TODO: this is problematic for cases where we want to define a count. Consider making the key the primary group, and adding a hostexpression/count parameter
+  control:
+    volumes:
+      state:
+        device_path: /dev/sdb
+        mount_point: /var/lib/state
+      home:
+        device_path: /dev/sdc
+        mount_point: /exports/home
+        mount_options: x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service

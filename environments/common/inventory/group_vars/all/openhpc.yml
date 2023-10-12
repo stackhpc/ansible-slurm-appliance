@@ -2,7 +2,7 @@
 
 # See: https://github.com/stackhpc/ansible-role-openhpc
 # for variable definitions
-
+openhpc_cluster_name: "{{ cluster_name }}"
 openhpc_enable:
   control: "{{ inventory_hostname in groups['control'] }}"
   batch: "{{ inventory_hostname in groups['compute'] }}"
