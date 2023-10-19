@@ -4,10 +4,12 @@
   become: no
   gather_facts: no
   tasks:
+    - name: Pause
+      pause:
+        seconds: "{{ 60 * 5 }}" # seconds
     - name: Wait for connection
       wait_for_connection:
-        delay: 5
-        timeout: "{{ 60 * 5 }}" # seconds
+        timeout: 30 # seconds
 
 - name: Run pre.yml hook
   vars:
