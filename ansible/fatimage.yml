@@ -1,5 +1,14 @@
 # Builder version of site.yml just installing binaries
 
+- hosts: builder
+  become: no
+  gather_facts: no
+  tasks:
+    - name: Wait for connection
+      wait_for_connection:
+        delay: 5
+        timeout: "{{ 60 * 5 }}" # seconds
+
 - name: Run pre.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
