@@ -31,3 +31,4 @@
           prefix = "{{ podman_registry_address }}"
           location = "{{ podman_registry_address }}"
           insecure = true
+      when: "ci_cloud == 'ARCUS'"
