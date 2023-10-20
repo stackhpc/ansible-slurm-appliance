@@ -2,10 +2,6 @@
   gather_facts: no
   become: yes
   tasks:
-    - name: Check fixes for cve-2023-41914 can be applied
-      import_role:
-        name: cve-2023-41914
-        tasks_from: validate.yml
     - name: Apply fixes for cve-2023-41914
       import_role:
         name: cve-2023-41914
