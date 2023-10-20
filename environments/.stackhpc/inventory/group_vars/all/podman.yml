@@ -1,0 +1,2 @@
+arcus_podman_registry_address: 192.168.3.95:5000
+podman_registry_address: "{{ arcus_podman_registry_address if ci_cloud == 'ARCUS' else '' }}"
