@@ -1,5 +1,22 @@
 # Builder version of site.yml just installing binaries
 
+- hosts: builder:
+  become: no
+  gather_facts: no
+  tasks:
+    - name: debug ssh
+      command:
+        cmd: "ssh -v {{ ansible_ssh_common_args }} {{ ansible_user}}@{{ ansible_host }} hostname"
+      delegate_to: localhost
+
+    - name: Get hostname (= final image name)
+      command: hostname
+      register: _hostname
+
+    - name: Report hostname (= final image name)
+      debug:
+        msg: "{{ _hostname.stdout }}"
+
 - name: Run pre.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
