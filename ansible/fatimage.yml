@@ -1,6 +1,6 @@
 # Builder version of site.yml just installing binaries
 
-- hosts: builder:
+- hosts: builder
   become: no
   gather_facts: no
   tasks:
