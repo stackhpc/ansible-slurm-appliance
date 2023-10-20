@@ -6,7 +6,7 @@
   tasks:
     - name: debug ssh
       command:
-        cmd: "ssh -v {{ ansible_ssh_common_args }} {{ ansible_user}}@{{ ansible_host }} hostname"
+        cmd: "ssh -v {{ ansible_ssh_common_args }} -o StrictHostKeyChecking=no {{ ansible_user}}@{{ ansible_host }} hostname"
       delegate_to: localhost
 
     - name: Get hostname (= final image name)
