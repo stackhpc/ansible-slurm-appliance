@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v22.9.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.20.0 # Allow multiple empty partitions by @sjpb in #156
+    version: rl9
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: feature/no-install
