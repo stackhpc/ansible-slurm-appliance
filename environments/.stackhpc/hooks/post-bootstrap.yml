@@ -1,0 +1,18 @@
+- hosts: podman:!builder
+  become: yes
+  gather_facts: false
+  tags: podman
+  tasks:
+    - name: Configure container registry mirror to avoid docker.io ratelimits
+      copy:
+        dest: /etc/containers/registries.conf.d/003-arcus-mirror.conf
+        content: |
+          [[registry]]
+          location="docker.io/library/"
+          prefix="docker.io/library/"
+
+          [[registry.mirror]]
+          location = "{{ podman_registry_address }}"
+          insecure = true
+      when: "ci_cloud == 'ARCUS'"
+
