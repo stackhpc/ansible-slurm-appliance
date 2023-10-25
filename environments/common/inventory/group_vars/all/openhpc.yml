@@ -17,9 +17,6 @@ openhpc_slurm_control_host: "{{ hostvars[groups['control'].0].api_address }}"
 openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
 openhpc_slurm_partitions:
   - name: "compute"
-openhpc_pre_packages_default:
-  # EPEL packages:
-  - apptainer # has to be installed before ohpc-base-compute else singularity-ce gets installed which clashes
 openhpc_packages_default:
   # system packages
   - podman
@@ -30,9 +27,7 @@ openhpc_packages_default:
   # EPEL packages:
   - apptainer
   - podman-compose
-openhpc_pre_packages_extra: []
 openhpc_packages_extra: []
-openhpc_pre_packages: "{{ openhpc_pre_packages_default + openhpc_pre_packages_extra }}"
 openhpc_packages: "{{ openhpc_packages_default + openhpc_packages_extra }}"
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_login_only_nodes: login
