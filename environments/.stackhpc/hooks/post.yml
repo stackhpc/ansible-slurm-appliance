@@ -1,8 +1,0 @@
-- hosts: builder
-  gather_facts: no
-  become: yes
-  tasks:
-    - name: Apply fixes for cve-2023-41914
-      import_role:
-        name: cve-2023-41914
-        tasks_from: install-rpms.yml
