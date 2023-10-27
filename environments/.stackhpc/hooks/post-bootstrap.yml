@@ -1,0 +1,16 @@
+- hosts: podman:!builder
+  become: yes
+  gather_facts: false
+  tags: podman
+  tasks:
+    - name: Configure container image registry for unqualified searches to avoid docker.io ratelimits
+      copy:
+        dest: /etc/containers/registries.conf.d/003-arcus-unqualfied-overrides.conf
+        content: |
+          unqualified-search-registries = ['{{ podman_registry_address  | split('/') | first }}', 'registry.access.redhat.com', 'registry.redhat.io', 'docker.io']
+
+          [[registry]]
+          prefix = "{{ podman_registry_address }}"
+          location = "{{ podman_registry_address }}"
+          insecure = true
+      when: "ci_cloud == 'ARCUS'"

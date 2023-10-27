@@ -1,4 +1,15 @@
-- hosts: cuda
+- name: Setup EESSI
+  hosts: eessi
+  tags: eessi
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install and configure EESSI
+      import_role:
+        name: eessi
+
+- name: Setup CUDA
+  hosts: cuda
   become: yes
   gather_facts: no
   tags: cuda
