@@ -7,7 +7,8 @@
   gather_facts: no
   vars:
     cluster_prefix: "{{ undef(hint='cluster_prefix must be defined') }}" # e.g. ci4005969475
-    cluster_network: WCDC-iLab-60
+    ci_vars_file: "{{ appliances_environment_root + '/terraform/' + lookup('env', 'CI_CLOUD') }}.tfvars"
+    cluster_network: "{{ lookup('ansible.builtin.ini', 'cluster_net', file=ci_vars_file, type='properties') | trim('\"') }}"
   tasks:
     - name: Get control host IP
       set_fact:
