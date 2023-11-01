@@ -1,0 +1,45 @@
+---
+- name: Install Terraform binary
+  include_role:
+    name: stackhpc.terraform.install
+
+- name: Make Terraform project directory
+  file:
+    path: "{{ image_build_terraform_project_path }}"
+    state: directory
+
+- name: Write backend configuration
+  copy:
+    content: |
+      terraform {
+        backend "{{ terraform_backend_type }}" { }
+      }
+    dest: "{{ image_build_terraform_project_path }}/backend.tf"
+
+- name: Template Terraform files into project directory
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ image_build_terraform_project_path }}/{{ item }}"
+  loop:
+    - outputs.tf
+    - providers.tf
+    - resources.tf
+
+- name: Provision infrastructure using Terraform
+  terraform:
+    binary_path: "{{ terraform_binary_path or omit }}"
+    project_path: "{{ image_build_terraform_project_path }}"
+    state: "{{ terraform_state }}"
+    backend_config: "{{ terraform_backend_config }}"
+    force_init: yes
+    init_reconfigure: yes
+    variables: "{{ image_build_terraform_variables | default(omit) }}"
+  register: image_build_terraform_provision
+
+- name: Set image build infrastructure facts
+  set_fact:
+    image_build_network_id: "{{ image_build_terraform_provision.outputs.network_id.value }}"
+    image_build_floating_ip_network: "{{ image_build_terraform_provision.outputs.floating_ip_network_id.value }}"
+    image_build_source_image_id: "{{ image_build_terraform_provision.outputs.source_image_name.value }}"
+    image_build_security_group_id: "{{ image_build_terraform_provision.outputs.security_group_id.value }}"
+  when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")

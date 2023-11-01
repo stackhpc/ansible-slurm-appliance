@@ -1,0 +1,27 @@
+output "network_id" {
+  description = "The image build network ID"
+  value       = data.openstack_networking_network_v2.caas_image_build_network.id
+}
+
+output "source_image_name" {
+  description = "The id of the image used to build the cluster nodes"
+  {% if image_build_source_image_id is defined %}
+  value       = "{{ image_build_source_image_id }}"
+  {% else %}
+  value       = data.openstack_images_image_ids_v2.image_build_source_image.ids[0]
+  {% endif %}
+}
+
+output "floating_ip_network_id" {
+  description = "Network to allocate floating IPs from"
+  value = data.openstack_networking_network_v2.caas_image_build_external_network.id
+}
+
+output "security_group_id" {
+  description = "Security group ID to associate with the builder instance"
+  {% if image_build_security_group_id is defined %}
+  value = "{{ image_build_security_group_id }}"
+  {% else %}
+  value = openstack_networking_secgroup_v2.caas_image_build_secgroup.id
+  {% endif %}
+}

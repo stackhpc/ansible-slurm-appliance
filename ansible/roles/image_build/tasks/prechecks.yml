@@ -1,0 +1,22 @@
+---
+
+- name: Check required vars are defined
+  assert:
+    that:
+      - "{{ item }} is defined"
+    fail_msg: "{{ item }} is not defined"
+  loop:
+    - image_build_network_id
+    - image_build_floating_ip_network
+    - image_build_source_image_id
+    - image_build_security_group_id
+
+- name: Ensure builder access mode
+  fail:
+    msg: >- 
+      Set either image_build_ssh_bastion_host or 
+      image_build_attach_floating_ip to access the image
+      build instance via a bastion or directly
+  when:
+    - image_build_ssh_bastion_host is defined 
+    - image_build_attach_floating_ip is defined and image_build_attach_floating_ip

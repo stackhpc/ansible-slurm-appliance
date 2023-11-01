@@ -1,0 +1,97 @@
+#jinja2: trim_blocks:False
+
+######
+###### Image build network
+######
+
+data "openstack_networking_network_v2" "caas_image_build_external_network" {
+  external = true
+}
+
+{% if image_build_network_id is not defined %}
+{% if image_build_network_name is not defined %}
+# Create a network
+resource "openstack_networking_network_v2" "caas_image_build_network" {
+  name           = "{{ image_build_cluster_name }}"
+  admin_state_up = "true"
+}
+
+resource "openstack_networking_subnet_v2" "caas_image_build_subnet" {
+  name       = "{{ image_build_cluster_name }}"
+  network_id = "${openstack_networking_network_v2.caas_image_build_network.id}"
+  cidr       = "192.168.244.0/24"
+  {% if image_build_nameservers is defined %}
+  dns_nameservers = [
+  {% for nameserver in image_build_nameservers %}
+    "{{ nameserver }}"{{ ',' if not loop.last }}
+  {% endfor %}
+  ]
+  {% endif %}
+  ip_version = 4
+}
+
+resource "openstack_networking_router_v2" "caas_image_build_router" {
+  name                = "{{ image_build_cluster_name }}"
+  admin_state_up      = true
+  external_network_id = "${data.openstack_networking_network_v2.caas_image_build_external_network.id}"
+}
+
+resource "openstack_networking_router_interface_v2" "caas_image_build_router_interface" {
+  router_id = "${openstack_networking_router_v2.caas_image_build_router.id}"
+  subnet_id = "${openstack_networking_subnet_v2.caas_image_build_subnet.id}"
+}
+{% endif %}
+{% endif %}
+
+# Get existing network resource data by name, from either the created
+# network or the network name if supplied
+data "openstack_networking_network_v2" "caas_image_build_network" {
+  {% if image_build_network_id is defined %}
+  network_id = "{{ image_build_network_id }}"
+  {% elif image_build_network_name is defined %}
+  name = "{{ image_build_network_name }}"
+  {% else %}
+  network_id = "${openstack_networking_network_v2.caas_image_build_network.id}"  
+  {% endif %}
+}
+
+{% if image_build_source_image_id is not defined %}
+######
+###### Image build base image
+######
+
+data "openstack_images_image_ids_v2" "image_build_source_image" {
+  name_regex = "{{ image_build_existing_image_regex }}"
+  sort       = "{{ image_build_existing_image_sort_attributes }}"
+}
+{% endif %}
+
+{% if image_build_security_group_id is not defined %}
+######
+###### Image build security groups
+######
+
+# Security group to hold specific rules for the image build instance
+resource "openstack_networking_secgroup_v2" "caas_image_build_secgroup" {
+  name                 = "{{ image_build_cluster_name }}"
+  description          = "Specific rules for caas image build"
+  delete_default_rules = true   # Fully manage with terraform
+}
+
+## Allow all egress for the image build instance
+resource "openstack_networking_secgroup_rule_v2" "caas_image_build_secgroup_egress_v4" {
+  direction         = "egress"
+  ethertype         = "IPv4"
+  security_group_id = "${openstack_networking_secgroup_v2.caas_image_build_secgroup.id}"
+}
+
+## Allow ingress on port 22 (SSH) from anywhere for the image build instance
+resource "openstack_networking_secgroup_rule_v2" "caas_image_build_secgroup_ingress_ssh_v4" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 22
+  port_range_max    = 22
+  security_group_id = "${openstack_networking_secgroup_v2.caas_image_build_secgroup.id}"
+}
+{% endif %}

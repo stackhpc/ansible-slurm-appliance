@@ -1,0 +1,103 @@
+---
+
+- name: Install script for attaching to pod infra containers
+  copy:
+    src: podman-pod-infra-attach.sh
+    dest: /usr/bin/
+    mode: +x
+  become: true
+
+- name: Create systemd unit for Zenith pod
+  template:
+    src: pod.service.j2
+    dest: /etc/systemd/system/{{ zenith_proxy_service_name }}.service
+  become: true
+  register: zenith_proxy_pod_systemd_unit
+
+- name: Ensure Zenith pod is started and enabled
+  service:
+    name: "{{ zenith_proxy_service_name }}.service"
+    state: "{{ 'restarted' if zenith_proxy_pod_systemd_unit is changed else 'started' }}"
+    enabled: yes
+    daemon_reload: "{{ zenith_proxy_pod_systemd_unit is changed }}"
+  become: true
+
+- block:
+    - name: Create systemd unit file for MITM proxy
+      template:
+        src: mitm.service.j2
+        dest: /etc/systemd/system/{{ zenith_proxy_mitm_service_name }}.service
+      register: zenith_proxy_mitm_systemd_unit
+
+    - name: Ensure MITM proxy is started and enabled
+      service:
+        name: "{{ zenith_proxy_mitm_service_name }}.service"
+        state: "{{ 'restarted' if zenith_proxy_mitm_systemd_unit is changed else 'started' }}"
+        enabled: yes
+        daemon_reload: "{{ zenith_proxy_mitm_systemd_unit is changed }}"
+  become: true
+  when: zenith_proxy_mitm_enabled
+
+- name: Ensure Zenith config directory exists
+  file:
+    path: /etc/zenith/{{ zenith_proxy_service_name }}
+    state: directory
+  become: true
+
+- name: Write Zenith client configuration
+  template:
+    src: zenith-client.yaml.j2
+    dest: /etc/zenith/{{ zenith_proxy_service_name }}/client.yaml
+  become: true
+  register: zenith_proxy_client_config_file
+
+- name: Create directory to persist SSH key
+  file:
+    path: "{{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh"
+    state: directory
+    owner: "{{ zenith_proxy_podman_user }}"
+    group: "{{ zenith_proxy_podman_user }}"
+  become: true
+
+- name: Initialise Zenith client
+  # Use a foreground command rather than the podman_container module as I could not
+  # work out the combination of parameters that produced the desired behaviour :-(
+  command: >-
+    podman run
+      --name {{ zenith_proxy_service_name }}-init
+      --replace
+      --volume /etc/zenith/{{ zenith_proxy_service_name }}:/etc/zenith:ro
+      --volume {{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh:/home/zenith/.ssh
+      {{ zenith_proxy_client_image }}
+      zenith-client init
+  become: true
+  become_user: "{{ zenith_proxy_podman_user }}"
+  register: zenith_proxy_client_init
+  changed_when: zenith_proxy_client_init.rc == 0
+  failed_when: >-
+    zenith_proxy_client_init.rc != 0 and
+    "token has already been used" not in zenith_proxy_client_init.stderr
+
+- name: Create systemd unit file for Zenith client
+  template:
+    src: client.service.j2
+    dest: /etc/systemd/system/{{ zenith_proxy_client_service_name }}.service
+  become: true
+  register: zenith_proxy_client_systemd_unit
+
+- name: Ensure Zenith client is started and enabled
+  service:
+    name: "{{ zenith_proxy_client_service_name }}.service"
+    state: >-
+      {{
+        'restarted'
+        if (
+            zenith_proxy_client_config_file is changed or
+            zenith_proxy_client_systemd_unit is changed or
+            zenith_proxy_client_init is changed
+        )
+        else 'started'
+      }}
+    enabled: yes
+    daemon_reload: "{{ zenith_proxy_client_systemd_unit is changed }}"
+  become: true

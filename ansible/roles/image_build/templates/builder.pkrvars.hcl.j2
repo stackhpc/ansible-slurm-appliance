@@ -1,0 +1,38 @@
+repo_root = "{{ playbook_dir }}/vendor/stackhpc/ansible-slurm-appliance"
+environment_root = "{{ playbook_dir }}/image_build"
+networks = ["{{ image_build_network_id }}"]
+{% if image_build_ssh_username is defined %}
+ssh_username = "{{ image_build_ssh_username }}"
+{% endif %}
+{% if image_build_ssh_bastion_host is defined %}
+ssh_bastion_host = "{{ image_build_ssh_bastion_host }}"
+{% endif %}
+{% if image_build_ssh_bastion_username is defined %}
+ssh_bastion_username = "{{ image_build_ssh_bastion_username }}"
+{% endif %}
+{% if image_build_ssh_bastion_private_key_file is defined %}
+ssh_bastion_private_key_file = "{{ image_build_ssh_bastion_private_key_file }}"
+{% endif %}
+{% if image_build_attach_floating_ip %}
+floating_ip_network = "{{ image_build_floating_ip_network }}"
+{% endif %}
+security_groups = ["{{ image_build_security_group_id }}"]
+fatimage_source_image = "{{ image_build_source_image_id }}"
+{% if image_build_ssh_keypair_name is defined %}
+ssh_keypair_name = "{{ image_build_ssh_keypair_name }}"
+{% endif %}
+{% if image_build_ssh_private_key_file is defined %}
+ssh_private_key_file = "{{ image_build_ssh_private_key_file }}"
+{% endif %}
+flavor = "{{ image_build_flavor_name }}"
+metadata = {
+{% for k,v in image_build_metadata.items() %}
+  "{{ k }}" = "{{ v }}"
+{% endfor %}
+}
+use_blockstorage_volume = {{ image_build_use_blockstorage_volume | string | lower }}
+{% if image_build_use_blockstorage_volume %}
+volume_size = {{ image_build_volume_size }}
+image_disk_format = "{{ image_build_image_disk_format }}"
+{% endif %}
+manifest_output_path = "/tmp/builder.manifest.json"
