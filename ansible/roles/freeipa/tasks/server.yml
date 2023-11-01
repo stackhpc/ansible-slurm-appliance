@@ -11,6 +11,22 @@
     that: _freeipa_validate_hostname.stdout | split('.') | length >= 3
     fail_msg: "freeipa_server hostname '{{ _freeipa_validate_hostname.stdout }}' is not fully-qualified (a.b.c)"
 
+- name: Check for virtual servers in httpd configuration of freeipa_server
+  # e.g. fatimage with OOD config; community.general.ipa_host fails with "401 Unauthorized: No session cookie found"
+  # https://lists.fedoraproject.org/archives/list/freeipa-users@lists.fedorahosted.org/message/7RH7XDFR35KDPYJ7AQCQI2H2EOWIZCWA/
+  find:
+    path: /etc/httpd/conf.d/
+    contains: '<VirtualHost'
+    read_whole_file: false
+    pattern: '*.conf'
+  register: _find_httpd_conf
+
+- name: Assert no other name-based virtual servers on freeipa_server
+  assert:
+    that: item.path == '/etc/httpd/conf.d/ssl.conf' # this one is OK
+    fail_msg: "freeipa_server host must not have other virtual servers defined: see {{ item.path }}"
+  loop: "{{ _find_httpd_conf.files }}"
+
 - name: Install freeipa server packages
   dnf:
     name: '@idm:DL1/dns'
@@ -34,6 +50,7 @@
         --no-ntp
         --unattended
         --no-ui-redirect
+    # TODO: add no_log here as password exposed
         
   register: _ipa_server_install
   changed_when: _ipa_server_install.rc == 0
