@@ -23,8 +23,7 @@
         --no-ntp
         --unattended
         --no-ui-redirect
-    # TODO: add no_log here as password exposed
-        
+  no_log: "{{ no_log | default(true) }}"
   register: _ipa_server_install
   changed_when: _ipa_server_install.rc == 0
   failed_when: >
