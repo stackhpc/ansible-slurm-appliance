@@ -1,0 +1,6 @@
+# Skip plotting pingpong as matplotlib not in runner environment
+hpctests_pingpong_plot: false
+
+# In CaaS, the Ansible controller is an ephemeral AWX pod, so all that matters is that
+# this is a location that is writable by the container user
+hpctests_outdir: "{{ playbook_dir }}/.tmp/hpctests"

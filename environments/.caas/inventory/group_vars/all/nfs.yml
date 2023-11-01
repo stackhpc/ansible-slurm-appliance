@@ -1,0 +1,17 @@
+# Use the IP address instead
+nfs_server: "{{ hostvars[groups['control'] | first ].ansible_default_ipv4.address }}"
+
+nfs_configurations:
+  - comment: Export /exports/home from Slurm control node as /home
+    nfs_enable:
+        server:  "{{ inventory_hostname in groups['control'] }}"
+        clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
+    nfs_export: "/exports/home" # assumes skeleton TF is being used
+    nfs_client_mnt_point: "/home"
+  - comment: Export /var/lib/state from Slurm control node to OOD
+    nfs_enable:
+        server:  "{{ inventory_hostname in groups['control'] }}"
+        clients: "{{ inventory_hostname in groups['openondemand'] }}"
+    nfs_export: "{{ appliances_state_dir }}"
+    nfs_client_mnt_point: "{{ appliances_state_dir }}"
+    nfs_client_mnt_options: "x-systemd.required-by=zenith-ood.service,x-systemd.before=zenith-ood.service"

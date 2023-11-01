@@ -1,0 +1,21 @@
+# Account for the fact we are running outside of the expected environment system:
+# NB: this only works for playbooks in ansible/*, not in ansible/adhoc!
+appliances_repository_root: "{{ playbook_dir }}/../"
+
+# Read the secrets from the Ansible local facts on the control host
+vault_azimuth_user_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password }}"
+vault_grafana_admin_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_grafana_admin_password }}"
+vault_elasticsearch_admin_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_elasticsearch_admin_password }}"
+vault_elasticsearch_kibana_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_elasticsearch_kibana_password }}"
+vault_mysql_root_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_mysql_root_password }}"
+vault_mysql_slurm_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_mysql_slurm_password }}"
+vault_openhpc_mungekey: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_openhpc_mungekey }}"
+
+# Override this to cope with the case where the podman group just doesn't exist
+appliances_local_users_podman_enable: "{{ groups.get('podman', []) | length > 0 }}"
+
+# The server name for Open OnDemand depends on whether Zenith is enabled or not
+openondemand_servername_default: "{{ hostvars[groups['openstack'][0]].cluster_gateway_ip | replace('.', '-') ~ '.sslip.io' }}"
+openondemand_servername: "{{ zenith_fqdn_ood | default(openondemand_servername_default) }}"
+
+appliances_state_dir: /var/lib/state

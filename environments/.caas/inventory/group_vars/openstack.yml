@@ -1,0 +1,29 @@
+# The default Terraform state key for backends that support it
+terraform_state_key: "cluster/{{ cluster_id }}/tfstate"
+
+# Set up the terraform backend
+terraform_backend_type: "{{ 'consul' if 'CONSUL_HTTP_ADDR' in ansible_env else 'local' }}"
+terraform_backend_config_defaults:
+  consul:
+    path: "{{ terraform_state_key }}"
+    gzip: "true"
+  local: {}
+terraform_backend_config: "{{ terraform_backend_config_defaults[terraform_backend_type] }}"
+
+terraform_binary_directory: "{{ playbook_dir }}/bin"
+terraform_binary_path: "{{ terraform_binary_directory }}/terraform"
+terraform_project_path: "{{ playbook_dir }}/terraform"
+
+terraform_state: "{{ cluster_state | default('present') }}"
+cluster_ssh_user: rocky
+
+# Set the size of the state volume to metrics_db_maximum_size + 10
+state_volume_size: "{{ metrics_db_maximum_size + 10 }}"
+
+# Provision a single "standard" compute partition using the supplied
+# node count and flavor
+openhpc_slurm_partitions:
+  - name: "standard"
+    count: "{{ compute_count }}"
+    flavor: "{{ compute_flavor }}"
+    default: "YES"
