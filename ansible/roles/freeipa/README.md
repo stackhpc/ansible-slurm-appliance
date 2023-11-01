@@ -41,7 +41,7 @@ Support FreeIPA in the appliance. In production use it is expected the FreeIPA s
 See also use of `appliances_state_dir` on the control node as described above.
 
 # FreeIPA Server
-As noted above this is only intended for development and testing.
+As noted above this is only intended for development and testing. Note it cannot be run on the `openondemand` node as no other virtual servers must be defined in the Apache configuration.
 
 ## Usage
 - Add a single host to the `freeipa_server` group and run (at a minimum) the `ansible/bootstrap.yml` and `ansible/iam.yml` playbooks.
