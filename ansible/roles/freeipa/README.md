@@ -62,7 +62,7 @@ These role variables are only required when using `freeipa_server`:
 - `freeipa_server_ip`: Optional, IP address of freeipa_server host. Default is `ansible_host` of the `freeipa_server` host. Default `false`. 
 - `freeipa_setup_dns`: Optional bool, whether to configure the FreeIPA server as an integrated DNS server and define a zone and records. NB: This also controls whether `freeipa_client` hosts use the `freeipa_server` host for name resolution. Default `true` when `freeipa_server` contains a host.
 - `freeipa_client_ip`: Optional, IP address of FreeIPA client. Default is `ansible_host`.
-- `freeipa_users`: A list of dicts as per parameters for [community.general.ipa_user](https://docs.ansible.com/ansible/latest/collections/community/general/ipa_user_module.html). Note that:
+- `freeipa_users`: A list of dicts defining users to add, with keys/values as for [community.general.ipa_user](https://docs.ansible.com/ansible/latest/collections/community/general/ipa_user_module.html): Note that:
   - `name`, `givenname` (firstname) and `sn` (surname) are required.
-  - `ipa_pass` and `ipa_user` are automatically supplied.
+  - `ipa_host`, `ipa_port`, `ipa_prot`, `ipa_user`, `validate_certs` are automatically provided and cannot be overridden.
   - If `password` is set, the value should *not* be a hash (unlike `ansible.builtin.user` as used by the `basic_users` role), and it must be changed on first login. `krbpasswordexpiration` does not appear to be able to override this.
