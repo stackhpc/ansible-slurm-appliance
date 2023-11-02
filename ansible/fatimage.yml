@@ -35,7 +35,7 @@
         enabled: false
 
     # - import_playbook: iam.yml
-    - name: Install freeipa client
+    - name: Install FreeIPA client
       import_role:
         name: freeipa
         tasks_from: client-install.yml

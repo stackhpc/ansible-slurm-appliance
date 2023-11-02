@@ -6,7 +6,7 @@
   gather_facts: no
   become: yes
   tasks:
-    - name: Add freeipa hosts
+    - name: Ensure FreeIPA client hosts are added to the FreeIPA server
       import_role:
         name: freeipa
         tasks_from: addhost.yml
@@ -19,14 +19,14 @@
   gather_facts: yes
   become: yes
   tasks:
-    - name: Install freeipa client
+    - name: Install FreeIPA client
       import_role:
         name: freeipa
         tasks_from: client-install.yml
-    - name: Enrole freeipa clients
+    - name: Enrol FreeIPA client
       import_role:
         name: freeipa
-        tasks_from: enrole.yml
+        tasks_from: enrol.yml
 
 - hosts: freeipa_server
   tags:
@@ -36,7 +36,7 @@
   gather_facts: yes
   become: yes
   tasks:
-    - name: Add freeipa users
+    - name: Add FreeIPA users
       import_role:
         name: freeipa
         tasks_from: users.yml

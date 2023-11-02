@@ -90,7 +90,7 @@
   gather_facts: yes
   become: yes
   tasks:
-    - name: Install freeipa server
+    - name: Install FreeIPA server
       import_role:
         name: freeipa
         tasks_from: server.yml
