@@ -8,4 +8,4 @@ mysql_mysqld_options:
   - --innodb-lock-wait-timeout=900
 
 mysql_root_password: "{{ vault_mysql_root_password }}"
-# mysql_datadir: "{{ appliances_state_dir | default('/var/lib') }}/mysql" # TODO: currently on PVC
+mysql_datadir: "{{ appliances_state_dir | default('/var/lib') }}/mysql"
