@@ -2,7 +2,7 @@
 
 - name: Setup DB
   hosts: mysql
-  become: true
+  become: yes
   tags:
     - mysql
   tasks:

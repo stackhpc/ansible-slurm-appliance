@@ -2,16 +2,9 @@
   dnf:
     name: python3-pip
 
-- name: Install python mysql client and dependencies
+- name: Install python packages
   # TODO: FIXME: doing this in the system python doesn't seem right
   pip:
     name:
-      - pymysql
-      - cryptography # avoids error "'cryptography' package is required for sha256_password or caching_sha2_password auth methods"
+      - kubernetes # TODO: move this to k8s module?
     state: present
-
-- name: Create systemd mysql container unit file
-  template:
-    dest: /etc/systemd/system/mysql.service
-    src: mysql.service.j2
-  register: _mysql_unitfile
