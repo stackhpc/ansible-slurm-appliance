@@ -1,0 +1,49 @@
+# modifed from https://github.com/k3s-io/k3s-ansible/blob/master/roles/k3s/node/tasks/main.yml
+
+- name: Ensure k3s token directory exists
+  file:
+    state: directory
+    path: "{{ k3s_token_file | dirname }}"
+    owner: root
+    group: root
+    mode: ug=rw,o=
+
+- name: Create k3s token file
+  copy:
+    content: "{{ ks3_token }}"
+    dest: "{{ k3s_token_file }}"
+    owner: root
+    group: root
+    mode: ug=rw,o=
+  register: _ks3_token_file
+
+- name: Ensure k3s service state
+  systemd:
+    name: "k3s-{{ k3s_node_type }}"
+    state: started # TODO: add logic to stop it?
+    enabled: yes
+
+- name: Copy config file to user home directory
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: ~{{ ansible_user }}/.kube/config
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "u=rw,g=,o="
+  when: k3s_node_type == 'server'
+  # TODO: this fails sometimes if service hasn't started yet
+
+- name: Create kubectl symlink
+  file:
+    src: /usr/local/bin/k3s
+    dest: /usr/local/bin/kubectl
+    state: link
+  when: k3s_node_type == 'server'
+
+- name: Create crictl symlink
+  file:
+    src: /usr/local/bin/k3s
+    dest: /usr/local/bin/crictl
+    state: link
+  when: k3s_node_type == 'server'

@@ -1,0 +1,86 @@
+---
+# Tasks here should be safe to run during an image build
+
+# modified from https://github.com/k3s-io/k3s-ansible/blob/master/roles/prereq/tasks/main.yml
+- name: Set SELinux to disabled state
+  selinux:
+    state: disabled
+
+- name: Enable IPv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    reload: yes
+
+- name: Enable IPv6 forwarding
+  sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: "1"
+    state: present
+    reload: yes
+
+- name: Add br_netfilter to /etc/modules-load.d/
+  copy:
+    content: "br_netfilter"
+    dest: /etc/modules-load.d/br_netfilter.conf
+    mode: "u=rw,g=,o="
+
+- name: Load br_netfilter
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Set bridge-nf-call-iptables (just to be sure)
+  sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+    reload: yes
+  loop:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+
+- name: Add /usr/local/bin to sudo secure_path
+  lineinfile:
+    line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin'
+    regexp: "Defaults(\\s)*secure_path(\\s)*="
+    state: present
+    insertafter: EOF
+    path: /etc/sudoers
+    validate: 'visudo -cf %s'
+
+# modified from https://github.com/k3s-io/k3s-ansible/blob/master/roles/download/tasks/main.yml
+- name: Download k3s binary x64
+  get_url:
+    url: https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/k3s
+    checksum: sha256:https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/sha256sum-amd64.txt
+    dest: /usr/local/bin/k3s
+    owner: root
+    group: root
+    mode: 0755
+
+# modified from https://github.com/k3s-io/k3s-ansible/blob/master/roles/k3s/master/tasks/main.yml
+
+- name: Template K3s service file
+  template:
+    src: k3s.service.j2
+    dest: "/etc/systemd/system/k3s-{{ k3s_node_type }}.service"
+    owner: root
+    group: root
+    mode: 0755
+  register: _ks3_service
+
+- name: Ensure k3s service updated
+  systemd:
+    name: "k3s-{{ k3s_node_type }}"
+    daemon_reload: "{{ _ks3_service.changed }}"
+    enabled: yes
+
+- name: Create directory .kube
+  file:
+    path: ~{{ ansible_user }}/.kube
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: "u=rwx,g=rx,o="
+  when: k3s_node_type == 'server'

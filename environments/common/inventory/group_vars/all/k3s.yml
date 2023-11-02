@@ -1,0 +1,3 @@
+k3s_data_dir: "{{ appliances_state_dir | default('/var/lib/') }}/k3s"
+k3s_node_type: "{{ 'server' if 'control' in group_names else 'agent' }}"
+ks3_token: "{{ vault_ks3_token }}"

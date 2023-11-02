@@ -27,7 +27,7 @@ openhpc
 [builder]
 # Do not add hosts here manually - used as part of Packer image build pipeline. See packer/README.md.
 
-[podman:children]
+[k3s:children]
 # Hosts running containers for below services:
 opensearch
 filebeat

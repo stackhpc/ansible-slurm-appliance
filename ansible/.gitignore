@@ -44,3 +44,5 @@ roles/*
 !roles/resolv_conf/**
 !roles/cve-2023-41914
 !roles/cve-2023-41914/**
+!roles/k3s/
+!roles/k3s/**

@@ -1,0 +1,8 @@
+---
+k3s_version: v1.28.3+k3s1
+k3s_node_type: "{{ undefined('k3s_node_type must be defined as server or agent') }}"
+ks3_token: "{{ undefined('ks3_token must be defined') }}" # https://docs.k3s.io/cli/token#server. Must be [a-z0-9]{6}.[a-z0-9]{16}
+k3s_token_file: /etc/k3s/k3s_token_file
+k3s_data_dir: /var/lib/rancher/k3s # https://docs.k3s.io/cli/agent#data NB: see https://docs.k3s.io/advanced#enabling-selinux-enforcement
+k3s_agent_args: ''
+#k3s_server_address

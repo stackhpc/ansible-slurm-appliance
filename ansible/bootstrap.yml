@@ -98,19 +98,18 @@
     - import_role:
         name: fail2ban
 
-- name: Setup podman
-  hosts: podman
-  tags: podman
+- name: Setup k3s
+  hosts: k3s
+  tags: k3s
+  become: true
+  gather_facts: false
   tasks:
     - import_role:
-        name: podman
-        tasks_from: prereqs.yml
-      tags: prereqs
-
+        name: k3s
+        tasks_from: install.yml
     - import_role:
-        name: podman
-        tasks_from: config.yml
-      tags: config
+        name: k3s
+        tasks_from: configure.yml
 
 - name: Setup EESSI
   hosts: eessi

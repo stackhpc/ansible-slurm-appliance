@@ -6,6 +6,7 @@ slurm_appliance_secrets:
   vault_mysql_root_password: "{{ secrets_openhpc_mysql_root_password | default(vault_mysql_root_password | default(lookup('password', '/dev/null'))) }}"
   vault_mysql_slurm_password: "{{ secrets_openhpc_mysql_slurm_password | default(vault_mysql_slurm_password | default(lookup('password', '/dev/null'))) }}"
   vault_openhpc_mungekey: "{{ secrets_openhpc_mungekey | default(vault_openhpc_mungekey | default(secrets_openhpc_mungekey_default)) }}"
+  vault_ks3_token: "{{ vault_ks3_token | default(lookup('password', '/dev/null', chars=['ascii_letters', 'digits'])) }}"
 
 secrets_openhpc_mungekey_default:
   content: "{{ lookup('pipe', 'dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64') }}"
