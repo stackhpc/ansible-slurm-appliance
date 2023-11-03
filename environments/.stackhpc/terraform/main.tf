@@ -33,10 +33,6 @@ variable "volume_backed_instances" {
     default = false
 }
 
-variable "state_volume_device_path" {}
-
-variable "home_volume_device_path" {}
-
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
@@ -78,6 +74,4 @@ module "cluster" {
     state_volume_size = 10
     home_volume_size = 20
 
-    state_volume_device_path = var.state_volume_device_path
-    home_volume_device_path = var.home_volume_device_path
 }
