@@ -4,15 +4,14 @@
 - name: Setup OpenSearch
   hosts: opensearch
   tags: opensearch
+  become: yes
   tasks:
     - import_role:
         name: opensearch
         tasks_from: install.yml
-      become: true
     - import_role:
         name: opensearch
-        tasks_from: runtime.yml
-      become: true
+        tasks_from: configure.yml
 
 - name: Setup slurm stats
   hosts: slurm_stats

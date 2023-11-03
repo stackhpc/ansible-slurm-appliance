@@ -1,0 +1,46 @@
+apiVersion: opensearch.opster.io/v1
+kind: OpenSearchCluster
+metadata:
+  name: opensearch-cluster
+  namespace: default
+spec:
+  general:
+    serviceName: opensearch-cluster
+    version: 2.3.0
+  dashboards:
+    enable: false
+    version: 2.3.0 # required even when not enabled
+    replicas: 1 # required even when not enabled
+  nodePools:
+    - component: nodes
+      replicas: 1
+      diskSize: "5Gi"
+      nodeSelector:
+      resources:
+         requests:
+            memory: "2Gi"
+            cpu: "500m"
+         limits:
+            memory: "2Gi"
+            cpu: "500m"
+      roles:
+        - "cluster_manager"
+        - "data"
+      persistance:
+        hostPath: # can't use local-storage as doesn't have dynamic provisioning
+          path: "{{ opensearch_data_path }}"
+  security:
+    tls:
+      transport:
+        # https://github.com/Opster/opensearch-k8s-operator/blob/main/docs/userguide/main.md#node-transport:
+        # > The Operator will then generate a CA certificate and one certificate per node, and then use the CA to sign the node certificates.
+        # > These certificates are valid for one year. Note that the Operator does not currently have certificate renewal implemented.
+        generate: true # Have the operator generate and sign certificates
+        perNode: true  # Separate certificate per node
+      http:
+        generate: true  # Have the Operator generate and sign certificates - NB 1yr validity, no autorenewal!
+    config:
+      securityConfigSecret:
+        name: opensearch-securityconfig-secret
+      adminCredentialsSecret:
+        name: opensearch-admincreds-secret

@@ -1,0 +1,32 @@
+# TODO: ensure migration (only from the version which fixed indexing)
+- name: Ensure local directory for volume
+  file:
+    path: "{{ opensearch_data_path }}"
+    state: directory
+    # TODO: user/group?
+
+# helm repo add opensearch-operator https://opster.github.io/opensearch-k8s-operator/
+- name: Ensure opensearch-operator helm repo
+  kubernetes.core.helm_repository:
+    name: opensearch-operator # "{{ opensearch_operator_helm_version }}" ' TODO: how to control version?
+    repo_url: https://opster.github.io/opensearch-k8s-operator/
+  no_log: "{{ no_log }}"
+
+# helm install opensearch-operator opensearch-operator/opensearch-operator
+- name: Ensure opensearch-operator installed
+  kubernetes.core.helm:
+    name: opensearch-operator
+    chart_ref: opensearch-operator/opensearch-operator
+    release_namespace: default
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Ensure opensearch cluster resources
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+    namespace: default
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+  loop:
+    - opensearch-admincreds-secret.yaml.j2
+    - opensearch-securityconfig-secret.yaml.j2
+    - opensearch-cluster.yaml.j2
+    # wait: true # TODO: needs supporting specifically for pvc
