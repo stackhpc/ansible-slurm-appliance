@@ -96,3 +96,11 @@
       - kubernetes
     state: present
 
+- name: Install k9s
+  unarchive:
+    src: https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz # TODO: parameterise
+    dest: /usr/local/bin
+    remote_src: yes
+    # owner: "{{ ansible_user }}" # ?
+    # group: "{{ ansible_user }}" # ?
+  when: k3s_node_type == 'server'
