@@ -9,3 +9,7 @@ mysql_mysqld_options:
 
 mysql_root_password: "{{ vault_mysql_root_password }}"
 mysql_datadir: "{{ appliances_state_dir | default('/var/lib') }}/mysql"
+mysql_data_size: 10Gi # TODO: work out sensible value/implications
+mysql_database: "{{ openhpc_slurmdbd_mysql_database }}"
+mysql_user: "{{ openhpc_slurmdbd_mysql_username }}"
+mysql_password: "{{ vault_mysql_slurm_password }}"

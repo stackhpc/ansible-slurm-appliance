@@ -4,7 +4,7 @@ metadata:
   name: mysql-pv
 spec:
   capacity:
-    storage: 10Gi
+    storage: "{{ mysql_data_size }}"
   volumeMode: Filesystem
   accessModes:
   - ReadWriteOnce

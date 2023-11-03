@@ -1,17 +1,16 @@
-- name: Create local directory for volume
+- name: Ensure local directory for volume
   file:
     path: "{{ mysql_datadir }}"
     state: directory
     # TODO: user/group?
 
-- name: Create mysql pod
+- name: Ensure mysql pod
   kubernetes.core.k8s:
     template: "{{ item }}"
     namespace: default
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     # wait: true # TODO: needs supporting specifically for pvc
   loop:
-    - local-sc.yaml
     - mysql-pv.yaml.j2
     - mysql-pvc.yaml.j2
     - mysql-deployment.yaml.j2

@@ -84,3 +84,15 @@
     owner: "{{ ansible_user }}"
     mode: "u=rwx,g=rx,o="
   when: k3s_node_type == 'server'
+
+# TODO: FIXME: Not sure using system python here is correct
+- name: Install pip
+  dnf:
+    name: python3-pip
+
+- name: Install python packages for k3s
+  pip:
+    name:
+      - kubernetes
+    state: present
+

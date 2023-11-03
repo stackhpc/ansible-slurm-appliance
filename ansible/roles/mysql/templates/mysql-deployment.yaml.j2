@@ -26,25 +26,23 @@ spec:
           image: docker.io/library/mysql:{{ mysql_tag }}
           env:
             - name: MYSQL_DATABASE
-              value: slurm_acct_db # TODO: be nice to link this to environments/common/inventory/group_vars/all/mysql.yml:mysql_databases
+              value: "{{ mysql_database }}"
             - name: MYSQL_ROOT_PASSWORD
-              value: "{{ mysql_root_password }}" # ignored once mysql is initialised
+              value: "{{ mysql_root_password }}"
             - name: MYSQL_USER
-              value: slurm
+              value: "{{ mysql_user }}"
             - name: MYSQL_PASSWORD
-              value: "{{ vault_mysql_slurm_password }}" # TODO: leaky abstraction
-          args: {{ mysql_mysqld_options }} # TODO: leaky abstraction
+              value: "{{ mysql_password }}"
+          args: {{ mysql_mysqld_options }}
           ports:
             - containerPort: 3306
               hostPort: 3306
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: mysql-data
-      # hostname: mysql
       restartPolicy: Always
       hostNetwork: true
       volumes:
         - name: mysql-data
           persistentVolumeClaim:
             claimName: mysql-data
-      # TODO: need to pass throught the innodb options too

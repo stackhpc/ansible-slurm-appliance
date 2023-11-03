@@ -3,7 +3,6 @@ _systemd_requiresmount_statedir: |
   RequiresMountsFor={{ appliances_state_dir | default('') }}
 
 _systemd_dropins_statedir:
-  # mysql not included as role handles state dir correctly
   opensearch:
     group: opensearch
     content: "{{ _systemd_requiresmount_statedir }}"
