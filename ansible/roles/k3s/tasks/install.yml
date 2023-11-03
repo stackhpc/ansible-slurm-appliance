@@ -96,11 +96,28 @@
       - kubernetes
     state: present
 
+- name: Check installed Helm version
+  command:
+    cmd: /usr/local/bin/helm version --sort
+  register: _helm_version
+  failed_when: false
+  changed_when: false
+
+- name: Install Helm
+  # ansible.builtin.unarchive with include fails for some reason
+  shell:
+    cmd: curl --output - https://get.helm.sh/helm-{{ k3s_helm_version }}-linux-amd64.tar.gz | tar zxv 'linux-amd64/helm' --strip-components 1 # TODO: parameterise
+    chdir: /usr/local/bin
+  when:
+    - _helm_version.stdout | default('') | split('+') | first != k3s_helm_version
+    - k3s_node_type == 'server'
+
 - name: Install k9s
   unarchive:
     src: https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz # TODO: parameterise
     dest: /usr/local/bin
     remote_src: yes
-    # owner: "{{ ansible_user }}" # ?
-    # group: "{{ ansible_user }}" # ?
+    # owner: ?
+    # group: ?
+    # mode: ?
   when: k3s_node_type == 'server'

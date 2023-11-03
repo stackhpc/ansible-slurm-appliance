@@ -107,9 +107,11 @@
     - import_role:
         name: k3s
         tasks_from: install.yml
+      tags: install
     - import_role:
         name: k3s
         tasks_from: configure.yml
+      tags: configure
 
 - name: Setup EESSI
   hosts: eessi

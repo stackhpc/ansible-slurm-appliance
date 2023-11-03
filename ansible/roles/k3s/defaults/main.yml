@@ -6,3 +6,4 @@ k3s_token_file: /etc/k3s/k3s_token_file
 k3s_data_dir: /var/lib/rancher/k3s # https://docs.k3s.io/cli/agent#data NB: see https://docs.k3s.io/advanced#enabling-selinux-enforcement
 k3s_agent_args: ''
 #k3s_server_address
+k3s_helm_version: 'v3.13.1'
