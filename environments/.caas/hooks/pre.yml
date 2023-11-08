@@ -1,8 +1,5 @@
 ---
 
-- name: DEBUG: RUNNING PRE
-  meta: end_here
-
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack

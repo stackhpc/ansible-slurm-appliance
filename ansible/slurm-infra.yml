@@ -11,15 +11,17 @@
           APPLIANCES_ENVIRONMENT_ROOT: {{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}
           appliances_environment_root: {{ appliances_environment_root }}
           PWD: {{ lookup('env', 'PWD' )}}"
-    - command:
-        cmd: "realpath ."
     - stat:
-        path: environments/.caas/hooks/pre.yml
-    - stat:
-        path: ../environments/.caas/hooks/pre.yml
-    - stat:
-        path: project/environments/.caas/hooks/pre.yml
-
+        path: "{{ hook_path }}"
+      vars:
+        hook_path: "{{ appliances_environment_root }}/hooks/pre.yml"
+    - debug:
+        msg: |
+          environments/.caas/hooks/pre.yml: {{ 'environments/.caas/hooks/pre.yml' | exists }}
+          ../environments/.caas/hooks/pre.yml: {{ '../environments/.caas/hooks/pre.yml' | exists }}
+          project/environments/.caas/hooks/pre.yml: {{ 'project/environments/.caas/hooks/pre.yml' | exists }}
+      vars:
+        hook_path: "{{ appliances_environment_root }}/hooks/pre.yml"
 
 - name: DEBUG - try pre.yml hook
   vars:

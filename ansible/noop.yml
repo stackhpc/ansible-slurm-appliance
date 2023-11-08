@@ -8,4 +8,4 @@
   gather_facts: false
   tasks:
     - debug:
-        msg: "got a noop"
+        msg: "got a noop on hook_path: {{ hook_path }}"
