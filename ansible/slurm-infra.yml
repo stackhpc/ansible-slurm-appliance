@@ -8,6 +8,25 @@
         msg: |
           ansible_inventory_sources: {{ ansible_inventory_sources }}
           ansible_config_file: {{ ansible_config_file }}
+          APPLIANCES_ENVIRONMENT_ROOT: {{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}
+          appliances_environment_root: {{ appliances_environment_root }}
+          PWD: {{ lookup('env', 'PWD' )}}"
+    - command:
+        cmd: "realpath ."
+    - stat:
+        path: environments/.caas/hooks/pre.yml
+    - stat:
+        path: ../environments/.caas/hooks/pre.yml
+    - stat:
+        path: project/environments/.caas/hooks/pre.yml
+
+
+- name: DEBUG - try pre.yml hook
+  vars:
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+    hook_path: "{{ appliances_environment_root }}/hooks/pre.yml"
+  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
+  when: hook_path | exists
 
 # # Provision the infrastructure using Terraform
 # - name: Provision infrastructure

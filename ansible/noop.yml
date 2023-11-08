@@ -6,4 +6,6 @@
 
 - hosts: localhost
   gather_facts: false
-  tasks: []
+  tasks:
+    - debug:
+        msg: "got a noop"
