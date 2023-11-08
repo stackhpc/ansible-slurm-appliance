@@ -1,0 +1,14 @@
+#freeipa_realm:
+freeipa_domain: "{{ freeipa_realm | lower }}"
+#freeipa_ds_password:
+#freeipa_admin_password:
+#freeipa_server_ip:
+freeipa_setup_dns: "{{ groups['freeipa_server'] | length > 0 }}"
+freeipa_client_ip: "{{ ansible_host }}" # when run on freeipa_client group!
+# freeipa_host_password:
+freeipa_user_defaults:
+  ipa_pass: "{{ freeipa_admin_password | quote }}"
+  ipa_user: admin
+freeipa_users: [] # see community.general.ipa_user
+
+_freeipa_keytab_backup_path: "{{ hostvars[groups['control'].0].appliances_state_dir  }}/freeipa/{{ inventory_hostname }}/krb5.keytab"

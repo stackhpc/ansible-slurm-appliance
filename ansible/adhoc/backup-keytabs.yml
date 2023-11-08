@@ -1,0 +1,11 @@
+# Use ONE of the following tags on this playbook:
+#   - retrieve: copies keytabs out of the state volume to the environment
+#   - deploy: copies keytabs from the environment to the state volume
+
+- hosts: freeipa_client
+  become: yes
+  gather_facts: no
+  tasks:
+    - import_role:
+        name: freeipa
+        tasks_from: backup-keytabs.yml

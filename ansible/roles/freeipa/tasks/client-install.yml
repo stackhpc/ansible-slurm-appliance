@@ -1,0 +1,4 @@
+
+- name: Install FreeIPA client package
+  dnf:
+    name: ipa-client

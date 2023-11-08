@@ -1,0 +1,87 @@
+# based on https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/installing_identity_management/assembly_installing-an-idm-client_installing-identity-management
+
+- name: Retrieve persisted keytab from previous enrolement
+  slurp:
+    src: "{{ _freeipa_keytab_backup_path }}"
+  delegate_to: "{{ groups['control'] | first }}"
+  register: _slurp_persisted_keytab
+  failed_when: false
+
+- name: Write persisted keytab from previous enrolment
+  copy:
+    content: "{{ _slurp_persisted_keytab.content | b64decode }}"
+    dest: /tmp/krb5.keytab
+    owner: root
+    group: root
+    mode: ug=rw,o=
+  when: '"content" in _slurp_persisted_keytab'
+
+- name: Re-enrol with FreeIPA using backed-up keytab
+  # Re-enrolment requires --force-join and --password, or --keytab
+  # Re-rolement means:
+  #  1. A new host certificate is issued
+  #  2. The old host certificate is revoked
+  #  3. New SSH keys are generated
+  #  4. ipaUniqueID is preserved
+  # and ALSO that the keytab is changed!
+  command:
+    cmd: >
+      ipa-client-install
+        --unattended
+        --mkhomedir
+        --enable-dns-updates
+        --keytab /tmp/krb5.keytab
+  when: '"content" in _slurp_persisted_keytab'
+  register: ipa_client_install_keytab
+  changed_when: ipa_client_install_keytab.rc == 0
+  failed_when: >
+    ipa_client_install_keytab.rc !=0 and
+    'IPA client is already configured' not in ipa_client_install_keytab.stderr
+
+- name: Enrol with FreeIPA using random password
+  # Note --password is overloaded - it's bulkpassword unless --principal or --force-join is used in which case it's admin password
+  command:
+    cmd: >
+      ipa-client-install
+        --unattended
+        --mkhomedir
+        --enable-dns-updates
+        --password '{{ freeipa_host_password }}'
+  when:
+    - '"content" not in _slurp_persisted_keytab'
+    - freeipa_host_password is defined
+  register: ipa_client_install_password
+  changed_when: ipa_client_install_password.rc == 0
+  failed_when: >
+    ipa_client_install_password.rc != 0 and
+    'IPA client is already configured' not in ipa_client_install_password.stderr
+
+- name: Ensure NFS RPC security service is running
+  # This service is installed by nfs-utils, which attempts to start it.
+  # It has ConditionPathExists=/etc/krb5.keytab which fails if host is not enroled.
+  # This task avoids a reboot.
+  systemd:
+    name: rpc-gssd.service
+    state: started
+    enabled: true
+
+- name: Retrieve current keytab
+  slurp:
+    src: /etc/krb5.keytab
+  register: _slurp_current_keytab
+  failed_when: false
+
+- name: Ensure keytab backup directory exists
+  file:
+    path: "{{ _freeipa_keytab_backup_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: ug=wrX,o=
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Persist keytab
+  copy:
+    content: "{{ _slurp_current_keytab.content | b64decode }}"
+    dest: "{{ _freeipa_keytab_backup_path }}"
+  delegate_to: "{{ groups['control'] | first }}"

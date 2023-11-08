@@ -1,8 +1,42 @@
-- hosts: basic_users
-  become: yes
+- hosts: freeipa_client
   tags:
-    - basic_users
-  gather_facts: yes
+    - freeipa
+    - freeipa_server # as this is only relevant if using freeipa_server
+    - freeipa_host
+  gather_facts: no
+  become: yes
   tasks:
-    - import_role:
-        name: basic_users
+    - name: Ensure FreeIPA client hosts are added to the FreeIPA server
+      import_role:
+        name: freeipa
+        tasks_from: addhost.yml
+      when: groups['freeipa_server'] | length > 0
+
+- hosts: freeipa_client
+  tags:
+    - freeipa
+    - freeipa_client
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Install FreeIPA client
+      import_role:
+        name: freeipa
+        tasks_from: client-install.yml
+    - name: Enrol FreeIPA client
+      import_role:
+        name: freeipa
+        tasks_from: enrol.yml
+
+- hosts: freeipa_server
+  tags:
+    - freeipa
+    - freeipa_server
+    - users
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Add FreeIPA users
+      import_role:
+        name: freeipa
+        tasks_from: users.yml

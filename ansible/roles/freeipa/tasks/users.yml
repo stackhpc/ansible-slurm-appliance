@@ -1,0 +1,27 @@
+- name: Add users to freeipa
+  # This uses DNS to find the ipa server, which works as this is running on the enrolled ipa server
+  community.general.ipa_user:
+    displayname: "{{ item.displayname | default(omit) }}"
+    gidnumber: "{{ item.gidnumber | default(omit) }}"
+    givenname: "{{ item.givenname }}"
+    #ipa_host
+    ipa_pass: "{{ freeipa_admin_password | quote }}"
+    #ipa_port
+    #ipa_prot
+    ipa_timeout: "{{ item.ipa_timeout | default(omit) }}"
+    #ipa_user
+    krbpasswordexpiration: "{{ item.krbpasswordexpiration | default(omit) }}"
+    loginshell: "{{ item.loginshell | default(omit) }}"
+    mail: "{{ item.mail | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+    sn: "{{ item.sn }}"
+    sshpubkey: "{{ item.sshpubkey | default(omit) }}"
+    state: "{{ item.state | default(omit) }}"
+    telephonenumber: "{{ item.telephonenumber | default(omit) }}"
+    title: "{{ item.title | default(omit) }}"
+    uid: "{{ item.name | default(item.uid) }}"
+    uidnumber: "{{ item.uidnumber | default(omit) }}"
+    update_password: "{{ item.update_password | default(omit) }}"
+    userauthtype: "{{ item.userauthtype | default(omit) }}"
+    #validate_certs
+  loop: "{{ freeipa_users }}"

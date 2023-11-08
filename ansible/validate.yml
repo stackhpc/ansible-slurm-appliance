@@ -75,3 +75,11 @@
         - openondemand
         - openondemand_server
         - grafana
+
+- name: Validate freeipa configuration
+  hosts: freeipa
+  tags: freeipa
+  tasks:
+    - import_role:
+        name: freeipa
+        tasks_from: validate.yml
