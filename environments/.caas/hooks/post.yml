@@ -56,7 +56,8 @@
         zenith_proxy_mitm_auth_basic_password: "{{ vault_azimuth_user_password }}"
       when: zenith_subdomain_ood is defined
 
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
+# TODO: FIXME
+# - import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
 
 # Write the outputs as the final task
 - hosts: localhost

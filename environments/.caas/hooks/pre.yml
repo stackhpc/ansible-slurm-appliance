@@ -6,6 +6,16 @@
   roles:
     - cluster_infra
 
+- name: DEBUG - show host groups
+  hosts: all
+  become: no
+  gather_facts: no
+  tasks:
+    - debug:
+        var: group_names
+    - meta: end_here
+
+# FIXME: replace with etc_hosts
 # Setup tasks now that all hosts have been added to the correct groups
 - hosts: cluster
   become: yes
