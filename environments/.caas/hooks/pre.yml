@@ -28,11 +28,13 @@
   roles:
     - persist_openhpc_secrets
 
-# validate.yml asserts presence of a control group which doesn't exist when 
-# destroying infra, so only validate when we're not destroying
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/validate.yml
-  when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")
+# TODO: FIXME:
+# # validate.yml asserts presence of a control group which doesn't exist when 
+# # destroying infra, so only validate when we're not destroying
+# - import_playbook: ansible/validate.yml
+#   when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")
 
+# TODO: FIXME: maybe by doing the user move in cloud-init?
 # The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
 # This can disrupt the SSH connection, particularly because we use the login host as a jump host
 # So we move the home directory on the login node and reset the connections first
@@ -51,90 +53,3 @@
   tasks:
     - name: Reset persistent SSH connections
       meta: reset_connection
-
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/bootstrap.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/filesystems.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/slurm.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/portal.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/iam.yml
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/monitoring.yml
-
-- name: Persist login hostkey across rebuilds
-# Need NFS for this so can't do it before the appliance plays
-  hosts: login
-  gather_facts: no
-  become: yes
-  roles:
-    - persist_hostkeys
-
-# Configure the Zenith clients that are required
-# First, ensure that podman is installed on all hosts that will run Zenith clients
-- hosts: zenith,!podman
-  tasks:
-    - import_role:
-        name: podman
-        tasks_from: prereqs.yml
-    - import_role:
-        name: podman
-        tasks_from: config.yml
-
-- hosts: grafana
-  tasks:
-    - name: Deploy the Zenith client for Grafana
-      include_role:
-        name: zenith_proxy
-      vars:
-        zenith_proxy_service_name: zenith-monitoring
-        # Use the IP address for the upstream host
-        zenith_proxy_upstream_host: "{{ ansible_default_ipv4.address }}"
-        zenith_proxy_upstream_port: "{{ grafana_port }}"
-        zenith_proxy_client_token: "{{ zenith_token_monitoring }}"
-        zenith_proxy_client_auth_params:
-          tenancy-id: "{{ openstack_project_id }}"
-        zenith_proxy_mitm_enabled: yes
-        zenith_proxy_mitm_auth_inject: basic
-        zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
-        zenith_proxy_mitm_auth_basic_password: "{{ grafana_security.admin_password }}"
-      when: zenith_subdomain_monitoring is defined
-
-- hosts: openondemand
-  tasks:
-    - name: Deploy the Zenith client for OOD
-      include_role:
-        name: zenith_proxy
-      vars:
-        zenith_proxy_service_name: zenith-ood
-        # Use the IP address for the upstream host
-        zenith_proxy_upstream_scheme: https
-        zenith_proxy_upstream_host: "{{ ansible_default_ipv4.address }}"
-        zenith_proxy_upstream_port: 443
-        zenith_proxy_client_token: "{{ zenith_token_ood }}"
-        zenith_proxy_client_auth_params:
-          tenancy-id: "{{ openstack_project_id }}"
-        zenith_proxy_mitm_enabled: yes
-        zenith_proxy_mitm_auth_inject: basic
-        zenith_proxy_mitm_auth_basic_username: azimuth
-        zenith_proxy_mitm_auth_basic_password: "{{ vault_azimuth_user_password }}"
-      when: zenith_subdomain_ood is defined
-
-- import_playbook: vendor/stackhpc/ansible-slurm-appliance/ansible/adhoc/hpctests.yml
-
-# Write the outputs as the final task
-- hosts: localhost
-  tasks:
-    - debug: var=outputs
-      vars:
-        # Ansible has a fit when there are two 'hostvars' evaluations in a resolution chain,
-        # so we have to repeat logic here unfortunately
-        outputs: >-
-          {{-
-            { "cluster_access_ip": hostvars[groups['openstack'][0]].cluster_gateway_ip } |
-              combine(
-                {
-                  "openondemand_url": "https://" ~ (hostvars[groups['openstack'][0]].cluster_gateway_ip | replace('.', '-')) ~ ".sslip.io",
-                  "azimuth_user_password": hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password
-                }
-                if zenith_fqdn_ood is not defined
-                else {}
-              )
-          }}
