@@ -25,7 +25,7 @@
       vars:
         zenith_proxy_service_name: zenith-monitoring
         # Use the IP address for the upstream host
-        zenith_proxy_upstream_host: "{{ ansible_default_ipv4.address }}"
+        zenith_proxy_upstream_host: "{{ internal_address }}"
         zenith_proxy_upstream_port: "{{ grafana_port }}"
         zenith_proxy_client_token: "{{ zenith_token_monitoring }}"
         zenith_proxy_client_auth_params:
@@ -45,7 +45,7 @@
         zenith_proxy_service_name: zenith-ood
         # Use the IP address for the upstream host
         zenith_proxy_upstream_scheme: https
-        zenith_proxy_upstream_host: "{{ ansible_default_ipv4.address }}"
+        zenith_proxy_upstream_host: "{{ internal_address }}"
         zenith_proxy_upstream_port: 443
         zenith_proxy_client_token: "{{ zenith_token_ood }}"
         zenith_proxy_client_auth_params:
