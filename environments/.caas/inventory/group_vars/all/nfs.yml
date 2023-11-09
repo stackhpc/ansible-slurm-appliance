@@ -1,3 +1,5 @@
+nfs_server: "{{ nfs_server_default }}"
+
 nfs_configurations:
   - comment: Export /exports/home from Slurm control node as /home
     nfs_enable:
