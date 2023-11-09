@@ -1,5 +1,15 @@
 ---
 
+- hosts: all
+  become: no
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: |
+          appliances_environment_root: {{ appliances_environment_root }}
+          appliances_repository_root: {{ appliances_repository_root }}
+    - meta: end_here
+
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
