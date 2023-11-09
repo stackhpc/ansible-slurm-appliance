@@ -4,6 +4,7 @@
 
 - name: Ensure control node is in inventory
   hosts: all
+  gather_facts: false
   tasks:
     - assert:
         that: groups['control'] | length
@@ -11,6 +12,7 @@
 
 - name: Validate openhpc configuration
   hosts: openhpc
+  gather_facts: false
   tags: openhpc
   tasks:
     - assert:
@@ -22,6 +24,7 @@
     
 - name: Validate podman configuration
   hosts: podman
+  gather_facts: false
   tags: podman
   tasks:
     - import_role:
@@ -31,6 +34,7 @@
 
 - name: Validate filebeat configuration
   hosts: filebeat
+  gather_facts: false
   tags: filebeat
   tasks:
     - import_role:
