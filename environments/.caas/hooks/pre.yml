@@ -6,19 +6,6 @@
   roles:
     - cluster_infra
 
-- name: DEBUG
-  hosts: all
-  become: no
-  gather_facts: no
-  tasks:
-    - name: debug groups
-      debug:
-        var: group_names
-    # - name: debug hostvars
-    #   debug:
-    #     msg: "{{ hostvars[inventory_hostname] | to_nice_yaml }}"
-    # - meta: end_here
-
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
   hosts: control
