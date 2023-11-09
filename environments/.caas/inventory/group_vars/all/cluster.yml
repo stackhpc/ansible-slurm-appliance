@@ -1,5 +1,7 @@
 # Account for the fact we are running outside of the expected environment system:
-appliances_repository_root: "{{ appliances_environment_root + '/../../' | normpath }}"
+caas_inventory: "{{ ansible_inventory_sources | last }}" # ansible_inventory_sources is absolute
+appliances_environment_root: "{{ caas_inventory | dirname }}"
+appliances_repository_root: "{{ appliances_environment_root | dirname | dirname }}"
 
 # Read the secrets from the Ansible local facts on the control host
 vault_azimuth_user_password: "{{ hostvars[groups['control'][0]].ansible_local.openhpc_secrets.vault_azimuth_user_password }}"
