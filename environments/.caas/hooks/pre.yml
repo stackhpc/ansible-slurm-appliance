@@ -38,11 +38,15 @@
   roles:
     - persist_openhpc_secrets
 
-# TODO: FIXME:
-# # validate.yml asserts presence of a control group which doesn't exist when 
-# # destroying infra, so only validate when we're not destroying
-# - import_playbook: ansible/validate.yml
-#   when: cluster_state is not defined or (cluster_state is defined and cluster_state != "absent")
+# validate.yml asserts presence of a control group which doesn't exist when
+# destroying infra, so only validate when we're not destroying
+- hosts: openstack
+  gather_facts: no
+  become: no
+  tasks:
+    - set_fact:
+        appliances_validate: false
+      when: "cluster_state | default('') == 'absent'"
 
 # TODO: FIXME: maybe by doing the user move in cloud-init?
 # The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run

@@ -8,6 +8,7 @@
   when: hook_path | exists
 
 - import_playbook: validate.yml
+  when: "{{ appliances_validate | default(true) }}"
 - import_playbook: bootstrap.yml
 
 - name: Run post-bootstrap.yml hook
