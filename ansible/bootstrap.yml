@@ -28,6 +28,10 @@
   tasks:
     - import_role:
         name: etc_hosts
+    - name: DEBUG /etc/hosts
+      command:
+        cmd: cat /etc/hosts
+    - meta: end_here
 
 - hosts: proxy
   gather_facts: false

@@ -6,29 +6,30 @@
   roles:
     - cluster_infra
 
-- name: DEBUG - show host groups
+- name: DEBUG
   hosts: all
   become: no
   gather_facts: no
   tasks:
     - debug:
         var: group_names
-    - meta: end_here
+    - debug:
+        msg: "{{ hostvars[inventory_hostname] | to_nice_yaml }}"
 
-# FIXME: replace with etc_hosts
-# Setup tasks now that all hosts have been added to the correct groups
-- hosts: cluster
-  become: yes
-  tasks:
-    # Ensure that the hosts in the cluster can all refer to each other by their hostname
-    - name: Populate /etc/hosts with cluster hosts
-      lineinfile:
-        path: /etc/hosts
-        regexp: "{{ hostvars[host].inventory_hostname }}"
-        line: "{{ hostvars[host].ansible_default_ipv4.address }} {{ hostvars[host].inventory_hostname }}"
-      loop: "{{ ansible_play_hosts }}"
-      loop_control:
-        loop_var: host
+# # FIXME: replace with etc_hosts
+# # Setup tasks now that all hosts have been added to the correct groups
+# - hosts: cluster
+#   become: yes
+#   tasks:
+#     # Ensure that the hosts in the cluster can all refer to each other by their hostname
+#     - name: Populate /etc/hosts with cluster hosts
+#       lineinfile:
+#         path: /etc/hosts
+#         regexp: "{{ hostvars[host].inventory_hostname }}"
+#         line: "{{ hostvars[host].ansible_default_ipv4.address }} {{ hostvars[host].inventory_hostname }}"
+#       loop: "{{ ansible_play_hosts }}"
+#       loop_control:
+#         loop_var: host
 
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
