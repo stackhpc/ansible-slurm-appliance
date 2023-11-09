@@ -1,0 +1,12 @@
+# This file provides examples of using freeipa role variables. These are NOT functional in CI as freeipa_{server,client} groups are not defined.
+
+# NB: Users defined this way have expired passwords
+freeipa_users:
+  - name: testuser # can't use rocky as $HOME isn't shared!
+    password: "{{ test_user_password }}"
+    givenname: test
+    sn: test
+
+# freeipa_client hosts must use a FreeIPA server for name resolution - requires hosts to be in group `resolv_conf`.
+resolv_conf_nameservers:
+  - "{{ hostvars[groups['freeipa_server'].0].ansible_host }}"

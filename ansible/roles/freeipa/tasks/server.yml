@@ -1,0 +1,63 @@
+# Based on https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/installing_identity_management/preparing-the-system-for-ipa-server-installation_installing-identity-management#host-name-and-dns-requirements-for-ipa_preparing-the-system-for-ipa-server-installation
+
+- name: Install freeipa server packages
+  dnf:
+    name: '@idm:DL1/dns'
+    state: present
+
+- name: Install ipa server
+# TODO: make no-ui-redirect and dns configurable??
+# TODO: set file mask as per docs? Would be hard to cope with failures. Doesn't appear to be necessary actually.
+  command:
+    cmd: >
+      ipa-server-install
+        --realm {{ freeipa_realm | quote }}
+        --domain {{ freeipa_domain | lower | quote }}
+        --ds-password {{ freeipa_ds_password | quote }}
+        --admin-password {{ freeipa_admin_password | quote }} 
+        --ip-address={{ freeipa_server_ip }}
+        {% if freeipa_setup_dns | bool %}--setup-dns{% endif %}
+        --auto-reverse
+        --auto-forwarders
+        --no-dnssec-validation
+        --no-ntp
+        --unattended
+        --no-ui-redirect
+  no_log: "{{ no_log | default(true) }}"
+  register: _ipa_server_install
+  changed_when: _ipa_server_install.rc == 0
+  failed_when: >
+    (_ipa_server_install.rc != 0) and
+    ('IPA server is already configured' not in _ipa_server_install.stderr)
+
+- name: Disable redirects to hard-coded domain
+  # see https://pagure.io/freeipa/issue/7479
+  replace: path=/etc/httpd/conf.d/ipa-rewrite.conf regexp='{{ item.regexp }}' replace='{{ item.replace }}'
+  with_items:
+    # RewriteRule ^/$ https://${FQDN}/ipa/ui [L,NC,R=301] - irrelevant if using --no-ui-redirect
+    - regexp: '^(RewriteRule \^/\$) (https://.*)(/ipa/ui.*)$'
+      replace: '\1 \3'
+    # RewriteRule ^/ipa/(.*) - occurs twice
+    - regexp: '^(RewriteRule \^\/ipa\/\(.*)$' 
+      replace: '#\1'
+    - regexp: '^(RewriteCond .*)$'
+      replace: '#\1'
+    # RewriteRule ^/(.*)          https://${FQDN}/$1 [L,R=301]
+    - regexp: '^(RewriteRule \^/\(\.\*\).*)$'
+      replace: '#\1'
+  register: _replace_freeipa_rewrites
+
+- name: Deactivate HTTP RefererError
+  replace:
+    path: '/usr/lib/python3.6/site-packages/ipaserver/rpcserver.py'
+    regexp: '{{ item }}'
+    replace: '\1pass  # \2'
+  with_items:
+    - "^([ ]*)(return self.marshal\\(result, RefererError\\(referer)"
+  register: _replace_rpcserver_referrer
+
+- name: Reload apache configuration
+  service:
+    name: httpd
+    state: reloaded
+  when: _replace_freeipa_rewrites.changed or _replace_rpcserver_referrer.changed

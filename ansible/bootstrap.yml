@@ -82,6 +82,21 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
+- hosts: freeipa_server
+  # Done here as it might be providing DNS
+  tags:
+    - freeipa
+    - freeipa_server
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Install FreeIPA server
+      import_role:
+        name: freeipa
+        tasks_from: server.yml
+
+# --- tasks after here require access to package repos ---
+
 - hosts: firewalld
   gather_facts: false
   become: yes
