@@ -11,10 +11,13 @@
   become: no
   gather_facts: no
   tasks:
-    - debug:
+    - name: debug groups
+      debug:
         var: group_names
-    - debug:
-        msg: "{{ hostvars[inventory_hostname] | to_nice_yaml }}"
+    # - name: debug hostvars
+    #   debug:
+    #     msg: "{{ hostvars[inventory_hostname] | to_nice_yaml }}"
+    # - meta: end_here
 
 # # FIXME: replace with etc_hosts
 # # Setup tasks now that all hosts have been added to the correct groups

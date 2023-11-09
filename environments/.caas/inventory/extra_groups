@@ -1,2 +1,7 @@
 [etc_hosts:children]
 cluster
+
+[zenith:children]
+# TODO: originally only when: zenith_subdomain_monitoring is defined
+grafana
+openondemand
