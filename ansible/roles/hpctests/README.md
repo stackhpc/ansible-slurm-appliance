@@ -38,6 +38,8 @@ The following variables should not generally be changed:
 - `hpctests_pingpong_plot`: Whether to plot pingpong results. Default `yes`.
 - `hpctests_hpl_modules`: As above but for hpl tests.
 - `hpctests_hpl_version`: Version of HPL
+- `hpctests_extra_paths`: List of additional paths to add to $PATH in `pingpong` and `pingmatrix` sbatch scripts.
+- `hpctests_pingpong_command`: Command to use to run IMB-MPI1 pingpong.
 
 Dependencies
 ------------

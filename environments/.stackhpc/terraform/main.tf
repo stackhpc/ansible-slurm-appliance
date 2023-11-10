@@ -13,8 +13,8 @@ variable "cluster_name" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-231027-0916-893570de" # https://github.com/stackhpc/ansible-slurm-appliance/pull/324
-    # default = "Rocky-8-GenericCloud-Base-8.8-20230518.0.x86_64.qcow2"
+    # default = "openhpc-231027-0916-893570de" # https://github.com/stackhpc/ansible-slurm-appliance/pull/324
+    default = "Rocky-8-GenericCloud-Base-8.8-20230518.0.x86_64.qcow2"
 }
 
 variable "cluster_net" {}
@@ -66,8 +66,6 @@ module "cluster" {
     compute_nodes = {
         compute-0: "small"
         compute-1: "small"
-        compute-2: "extra"
-        compute-3: "extra"
     }
     volume_backed_instances = var.volume_backed_instances
     

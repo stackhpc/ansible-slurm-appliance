@@ -53,10 +53,9 @@
   gather_facts: no
   tasks:
     # - import_playbook: slurm.yml
-    - name: OpenHPC
-      import_role:
+    - include_role:
         name: stackhpc.openhpc
-        tasks_from: install.yml
+        tasks_from: "install-{{ openhpc_install_type }}.yml"
 
     - name: Include distribution variables for osc.ood
       include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky/8.yml"
