@@ -1,0 +1,50 @@
+---
+- name: Run EESSI test job
+  hosts: login[0]
+  vars:
+    eessi_test_rootdir: /home/eessi_test
+  tasks:
+    - name: Create test root directory
+      file:
+        path: "{{ eessi_test_rootdir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: true
+      
+    - name: Clone eessi-demo repo
+      ansible.builtin.git:
+        repo: "https://github.com/eessi/eessi-demo.git"
+        dest: "{{ eessi_test_rootdir }}/eessi-demo"
+
+    - name: Create batch script
+      copy:
+        dest: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow/tensorflow.sh"
+        content: |
+          #!/usr/bin/env bash
+          #SBATCH --output=%x.out
+          #SBATCH --error=%x.out
+          source /cvmfs/pilot.eessi-hpc.org/latest/init/bash
+          srun ./run.sh
+
+    - name: Run test job
+      ansible.builtin.shell:
+        cmd: sbatch --wait tensorflow.sh
+        chdir: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow"
+      register: job_output
+
+    - name: Retrieve job output
+      slurp:
+        src: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow/tensorflow.sh.out"
+      register: _tensorflow_out
+      no_log: true # as its base64 encoded so useless
+
+    - name: Show job output
+      debug:
+        msg: "{{ _tensorflow_out.content | b64decode }}"
+
+    - name: Fail if job output contains error
+      fail:
+        # Note: Job prints live progress bar to terminal, so use regex filter to remove this from stdout
+        msg: "Test job using EESSI modules failed. Job output was: {{ job_output.stdout | regex_replace('\b', '') }}"        
+      when: '"Epoch 5/5" not in _tensorflow_out.content | b64decode'

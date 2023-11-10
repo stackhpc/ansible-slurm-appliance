@@ -1,0 +1,47 @@
+# container-opensearch.service
+
+[Unit]
+Description=Podman container-opensearch.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network.target
+After=network-online.target
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=always
+# paths below based on https://opensearch.org/docs/latest/opensearch/configuration/ and https://opensearch.org/docs/latest/security-plugin/configuration/yaml
+# see also https://opensearch.org/docs/2.0/opensearch/install/important-settings/
+ExecStart=/usr/bin/podman run \
+    --network=host \
+    --sdnotify=conmon \
+    --cgroups=no-conmon \
+    --detach \
+    --replace \
+    --name opensearch \
+    --restart=no --user opensearch \
+    --ulimit memlock=-1:-1 --ulimit nofile=65536:65536 \
+    --volume {{ opensearch_data_path }}:/usr/share/opensearch/data:U \
+    --volume {{ opensearch_config_path }}/internal_users.yml:/usr/share/opensearch/config/opensearch-security/internal_users.yml:U \
+    --volume {{ opensearch_config_path }}/opensearch.yml:/usr/share/opensearch/config/opensearch.yml:U \
+    --volume {{ opensearch_config_path}}/certs:/usr/share/opensearch/config/certs:U \
+    --env node.name=opensearch \
+    --env discovery.type=single-node \
+    --env bootstrap.memory_lock=true \
+    --env "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" \
+    --env DISABLE_INSTALL_DEMO_CONFIG=true \
+    opensearchproject/opensearch:{{ opensearch_version }}
+ExecStop=/usr/bin/podman stop --ignore opensearch -t 10
+# note for some reason this returns status=143 which makes systemd show the unit as failed, not stopped
+ExecStopPost=/usr/bin/podman rm --ignore -f opensearch
+SuccessExitStatus=143 SIGTERM
+KillMode=none
+Type=notify
+NotifyAccess=all
+LimitNOFILE=65536
+LimitMEMLOCK=infinity
+User={{ opensearch_podman_user }}
+Group={{ opensearch_podman_user }}
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target default.target

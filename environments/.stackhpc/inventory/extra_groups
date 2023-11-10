@@ -1,0 +1,24 @@
+[basic_users:children]
+cluster
+
+[rebuild:children]
+control
+compute
+
+[etc_hosts:children]
+cluster
+
+# -- Example of enabling FreeIPA with an in-appliance (dev-only) server
+# NB: The etc_hosts and basic_users group definitions above should be commented out
+# The freeipa_* hosts will pick up configuration from environments/.stackhpc/inventory/group_vars/all/freeipa.yml
+
+# [freeipa_server:children]
+# control
+# 
+# [freeipa_client:children]
+# login
+# compute
+# 
+# [resolv_conf:children]
+# freeipa_client
+# --- end of FreeIPA example ---

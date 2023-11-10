@@ -1,7 +1,0 @@
-openondemand_auth: basic_pam
-openondemand_host_regex: '({{ openhpc_cluster_name }}-compute-\d+)|({{ groups["grafana"] | first }})' # allows proxying to compute nodes for apps and control for monitoring
-openondemand_jupyter_partition: small
-openondemand_desktop_partition: small
-#openondemand_dashboard_support_url: 
-#openondemand_dashboard_docs_url:
-#openondemand_filesapp_paths:

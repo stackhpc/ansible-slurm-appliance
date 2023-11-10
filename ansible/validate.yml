@@ -38,15 +38,6 @@
         tasks_from: validate.yml
       tags: validate
 
-- name: Validate opendistro configuration
-  hosts: opendistro
-  tags: opendistro
-  tasks:
-    - import_role:
-        name: opendistro
-        tasks_from: validate.yml
-      tags: validate
-
 - name: Validate rebuild configuration
   hosts: rebuild
   gather_facts: false
@@ -57,30 +48,38 @@
         tasks_from: validate.yml
       tags: validate
 
-# - name: Validate openondemand configuration
-#   hosts:
-#     - openondemand
-#     - grafana
-#   gather_facts: false
-#   tags:
-#     - openondemand
-#     - openondemand_server
-#     - grafana
-#   tasks:
-#     - import_role:
-#         name: openondemand
-#         tasks_from: validate.yml
-#       # This set of tasks will run if there are grafana hosts configured.
-#       # It is a valid configuration to have a grafana group with hosts
-#       # when *not* deploying openondemand. This would mean that openondemand
-#       # vars validated in the below task are not set in a way that passes
-#       # this set of validation tasks. To ensure that this validation does
-#       # not fail with a valid config, only run these tasks when the
-#       # openondemand group both exists *and* contains hosts.
-#       when:
-#         - "'openondemand' in groups"
-#         - groups['openondemand'] | length > 0
-#       tags:
-#         - openondemand
-#         - openondemand_server
-#         - grafana
+- name: Validate openondemand configuration
+  hosts:
+    - openondemand
+    - grafana
+  gather_facts: false
+  tags:
+    - openondemand
+    - openondemand_server
+    - grafana
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: validate.yml
+      # This set of tasks will run if there are grafana hosts configured.
+      # It is a valid configuration to have a grafana group with hosts
+      # when *not* deploying openondemand. This would mean that openondemand
+      # vars validated in the below task are not set in a way that passes
+      # this set of validation tasks. To ensure that this validation does
+      # not fail with a valid config, only run these tasks when the
+      # openondemand group both exists *and* contains hosts.
+      when:
+        - "'openondemand' in groups"
+        - groups['openondemand'] | length > 0
+      tags:
+        - openondemand
+        - openondemand_server
+        - grafana
+
+- name: Validate freeipa configuration
+  hosts: freeipa
+  tags: freeipa
+  tasks:
+    - import_role:
+        name: freeipa
+        tasks_from: validate.yml

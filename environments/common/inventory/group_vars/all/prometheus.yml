@@ -3,9 +3,11 @@
 # See: https://github.com/cloudalchemy/ansible-prometheus
 # for variable definitions
 
+prometheus_version: 2.27.0 # default from ansible/roles/cloudalchemy.prometheus/defaults/main.yml
 prometheus_web_external_url: "http://{{ prometheus_address }}:9090"
 prometheus_storage_retention: "31d"
 prometheus_storage_retention_size: "100GB"
+prometheus_db_dir: "{{ appliances_state_dir | default('/var/lib') }}/prometheus"
 
 prometheus_alertmanager_config: []
 

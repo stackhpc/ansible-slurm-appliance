@@ -1,0 +1,63 @@
+- name: Read cuda version file
+  slurp:
+    src: /usr/local/cuda/version.json
+  register: _cuda_samples_version
+
+- name: Set fact for discovered cuda version
+  set_fact:
+    _cuda_version_tuple: "{{ (_cuda_samples_version.content | b64decode | from_json).cuda.version | split('.') }}" # e.g. '12.1.0'
+
+- name: Ensure cuda_samples_path exists
+  file:
+    state: directory
+    path: "{{ cuda_samples_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Download cuda sample release
+  unarchive:
+    remote_src: yes
+    src: "{{ cuda_samples_release_url }}"
+    dest: "{{ cuda_samples_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Build cuda samples
+  shell:
+    cmd: make
+    chdir: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/Samples/1_Utilities/{{ item }}"
+    creates: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/bin/x86_64/linux/release/{{ item }}"
+  loop: "{{ cuda_samples_programs }}"
+
+- name: Run cuda deviceQuery
+  command:
+    cmd: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/bin/x86_64/linux/release/deviceQuery"
+  register: _cuda_devicequery
+
+- name: Set fact for cuda devices
+  set_fact:
+    cuda_devices: "{{ _cuda_devicequery.stdout | regex_findall('Device (\\d+):') }}"
+
+- name: Run cuda bandwidth test
+  command:
+    cmd: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/bin/x86_64/linux/release/bandwidthTest --device={{ item }}"
+  register: _cuda_bandwidthtest
+  loop: "{{ cuda_devices }}"
+  loop_control:
+    label: "Device {{ item }}" # e.g '0'
+
+- name: Summarise bandwidth test output
+  debug:
+    msg: |
+      {{ _parts[1].splitlines()[0] | trim }}
+      Bandwidths: (Gb/s)
+      Host to Device: {{ _parts[2].split()[-1] }}
+      Device to Host: {{ _parts[3].split()[-1] }}
+      Device to Device: {{ _parts[4].split()[-1] }}
+      {{ ': '.join(_parts[5].split('=') | map('trim')) }}
+      {{ _parts[6] }}
+  loop: "{{ _cuda_bandwidthtest.results }}"
+  vars:
+    _parts: "{{ item.stdout.split('\n\n') }}"
+  loop_control:
+    label: "Device {{ item.item }}" # e.g '0'

@@ -1,0 +1,8 @@
+# Created by slurm appliance ansible/roles/resolv_conf
+{% if cluster_domain_suffix is defined %}
+search {{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}
+{% endif %}
+
+{% for ns in resolv_conf_nameservers[0:3] %}
+nameserver {{ ns }}
+{% endfor %}

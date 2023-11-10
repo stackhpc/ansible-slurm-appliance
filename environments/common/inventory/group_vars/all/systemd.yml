@@ -1,0 +1,23 @@
+_systemd_requiresmount_statedir: |
+  [Unit]
+  RequiresMountsFor={{ appliances_state_dir | default('') }}
+
+_systemd_dropins_statedir:
+  # mysql not included as role handles state dir correctly
+  opensearch:
+    group: opensearch
+    content: "{{ _systemd_requiresmount_statedir }}"
+  grafana-server:
+    group: grafana
+    content: "{{ _systemd_requiresmount_statedir }}"
+  slurmdbd:
+    group: openhpc
+    content: "{{ _systemd_requiresmount_statedir }}"
+  slurmctld:
+    group: openhpc
+    content: "{{ _systemd_requiresmount_statedir }}"
+  prometheus:
+    group: prometheus
+    content: "{{ _systemd_requiresmount_statedir }}"
+
+systemd_dropins: "{{ _systemd_dropins_statedir if appliances_state_dir is defined else {} }}"

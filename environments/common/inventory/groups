@@ -13,8 +13,12 @@ login
 control
 compute
 
-[hpctests]
+[eessi:children]
+# Hosts on which EESSI stack should be configured
+
+[hpctests:children]
 # Login group to use for running mpi-based testing.
+login
 
 [cluster:children]
 # All nodes in the appliance - add e.g. service nodes not running Slurm here.
@@ -25,8 +29,9 @@ openhpc
 
 [podman:children]
 # Hosts running containers for below services:
-opendistro
+opensearch
 filebeat
+mysql
 
 [prometheus]
 # Single node to host monitoring server.
@@ -37,12 +42,12 @@ filebeat
 [alertmanager]
 # TODO:
 
-[opendistro]
+[opensearch]
 # Single node to host ElasticSearch search engine for Slurm monitoring.
 
 [slurm_stats]
 # Single node to run tools to integrate Slurm's accounting information with ElasticSearch.
-# NB: Host must be in `openhpc` group (for `sacct` command) and `opendistro` group.
+# NB: Host must be in `openhpc` group (for `sacct` command) and `opensearch` group.
 
 [filebeat]
 # Single node to parses log files for ElasticSearch - must be co-located with `slurm_stats`.
@@ -87,4 +92,36 @@ fail2ban
 # # Subset of compute to run a interactive desktops on via Open Ondemand
 
 [openondemand_jupyter]
-# # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+
+[etc_hosts]
+# Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+
+[systemd:children]
+# Hosts to make systemd unit adjustments on
+opensearch
+grafana
+control
+prometheus
+
+[freeipa_server]
+# Hosts to be a FreeIPA server. **NB**: Intended only for test/development use. See ansible/roles/freeipa/README.md
+
+[freeipa_client]
+# Hosts to be a FreeIPA client. See ansible/roles/freeipa/README.md
+
+[freeipa:children]
+# Allows defining variables common to freeipa_server and _client
+freeipa_server
+freeipa_client
+
+[cuda]
+# Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
+
+[resolv_conf]
+# Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md
+
+[proxy]
+# Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
+
+

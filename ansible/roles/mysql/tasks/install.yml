@@ -1,0 +1,10 @@
+- name: Install python mysql client
+  pip:
+    name: pymysql
+    state: present
+
+- name: Create systemd mysql container unit file
+  template:
+    dest: /etc/systemd/system/mysql.service
+    src: mysql.service.j2
+  register: _mysql_unitfile

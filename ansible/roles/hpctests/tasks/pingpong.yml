@@ -18,11 +18,25 @@
     dest: "{{ hpctests_rootdir }}/pingpong/pingpong.sh"
 
 - name: Run pingpong
-  shell: sbatch --wait pingpong.sh
-  become: no
-  args:
-    chdir: "{{ hpctests_rootdir }}/pingpong"
-  register: hpctests_pingpong_sbatch
+  block:
+    - name: Submit jobscript
+      shell: sbatch --wait pingpong.sh
+      become: no
+      args:
+        chdir: "{{ hpctests_rootdir }}/pingpong"
+      register: hpctests_pingpong_sbatch
+  rescue:
+    - name: Get slurm job output
+      slurp:
+        src: "{{ hpctests_rootdir }}/pingpong/pingpong.sh.out"
+      register: _pingpong_out
+    - name: Show job output
+      debug:
+        msg: |
+          PingPong output was:
+          
+          {{ _pingpong_out.content | b64decode }}
+      failed_when: true
 
 - set_fact:
     _pingpong_jobid: "{{ hpctests_pingpong_sbatch.stdout.split()[-1] }}"
@@ -48,17 +62,21 @@
 
 - name: Plot image
   shell:
-    cmd: "python {{lookup('env', 'APPLIANCES_REPO_ROOT') }}/ansible/roles/hpctests/files/plot_imb_pingpong.py {{ _pingpong_local_output }}"
+    cmd: "python {{ role_path }}/files/plot_imb_pingpong.py {{ _pingpong_local_output }}"
     creates: "{{ _pingpong_local_output | dirname }}/latency.png"
   register: _pingpong_plot
   delegate_to: localhost
+  when: hpctests_pingpong_plot | bool
   
 - debug:
     msg: |
-      Summary for pingpong (2x scheduler-selected nodes) job {{ _pingpong_jobid }} (using interface {{ hpctests_ucx_net_devices }}):
-      nodes: {{ hpctests_pingpong_run_nodes.stdout.split()[1] }}
-      zero-size msg latency: {{ hpctests_pingpong_out['columns']['latency'][0] }} us
-      max bandwidth: {{ hpctests_pingpong_out['columns']['bandwidth'] | max }} Mbytes/s ({{ (hpctests_pingpong_out['columns']['bandwidth'] | max) / 125.0 }} Gbit/s)
+      Summary for pingpong using 2x scheduler-selected nodes in '{{ hpctests_partition }}' partition, job ID {{ _pingpong_jobid }}, device '{{ hpctests_ucx_net_devices }}':
 
+      Nodes: {{ hpctests_pingpong_run_nodes.stdout.split()[1] }}
+      Zero-size msg latency: {{ hpctests_pingpong_out['columns']['latency'][0] }} us
+      Max bandwidth: {{ hpctests_pingpong_out['columns']['bandwidth'] | max }} Mbytes/s ({{ (hpctests_pingpong_out['columns']['bandwidth'] | max) / 125.0 }} Gbit/s)
+
+      {% if hpctests_pingpong_plot %}
       See plot on localhost:
       {{ _pingpong_plot.stdout }}
+      {% endif %}

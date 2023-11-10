@@ -1,0 +1,7 @@
+cluster_net = "portal-internal"
+cluster_subnet = "portal-internal"
+vnic_type = "normal"
+control_node_flavor = "vm.ska.cpu.general.quarter"
+other_node_flavor = "vm.ska.cpu.general.small"
+state_volume_device_path = "/dev/sdb"
+home_volume_device_path = "/dev/sdc"

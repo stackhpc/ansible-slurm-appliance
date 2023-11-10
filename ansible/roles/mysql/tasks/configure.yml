@@ -1,0 +1,37 @@
+- name: Create environment file for mysql server root password
+  # NB: This doesn't trigger a restart on changes as it will be ignored once mysql is initialised
+  copy:
+    dest: /etc/sysconfig/mysqld
+    content: |
+      MYSQL_INITIAL_ROOT_PASSWORD='{{ mysql_root_password }}'
+    owner: root
+    group: root
+    mode: u=rw,go=
+
+- name: Ensure mysql service state
+  systemd:
+    name: mysql
+    state: "{{ mysql_state | default('restarted' if _mysql_unitfile.changed else 'started') }}"
+    enabled: "{{ mysql_systemd_service_enabled }}"
+    daemon_reload: "{{ _mysql_unitfile.changed }}"
+
+- block:
+  - name: Wait for mysql to initialise
+    # NB: It is not sufficent to wait_for the port
+    community.mysql.mysql_info:
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+    no_log: "{{ no_log | default(true) }}"
+    register: _mysql_info
+    until: "'version' in _mysql_info"
+    retries: 90
+    delay: 2
+
+  - name: Ensure mysql databases created
+    community.mysql.mysql_db: "{{ item }}"
+    loop: "{{ mysql_databases}}"
+
+  - name: Ensure mysql users present
+    community.mysql.mysql_user: "{{ item }}"
+    loop: "{{ mysql_users }}"
+  when: "mysql_state | default('unspecified') != 'stopped'"

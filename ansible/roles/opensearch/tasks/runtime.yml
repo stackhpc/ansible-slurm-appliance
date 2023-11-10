@@ -1,0 +1,90 @@
+---
+
+- name: Check for existing opendistro service
+  stat:
+    path: /etc/systemd/system/opendistro.service
+  register: _opensearch_opendistro_service
+
+- name: Migrate opendistro data
+  import_tasks:
+    file: migrate-opendistro.yml
+  when: _opensearch_opendistro_service.stat.exists
+
+- name: Remove opendistro service
+  file:
+    path: /etc/systemd/system/opendistro.service
+    state: absent
+
+- name: Enumerate files in data directory
+  find:
+    path: "{{ opensearch_data_path }}"
+  register: _find_opensearch_data
+
+- name: Archive incorrectly indexed data
+  import_tasks: archive_data.yml
+  when:
+    - _find_opensearch_data.files | length > 0
+    - "'slurm_jobid_index' not in _find_opensearch_data.files | map(attribute='path') | map('basename')"
+
+- name: Ensure required opensearch host directories exist
+  file:
+    state: directory
+    path: "{{ item }}"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    mode: 0770
+  become: true
+  loop:
+    - "{{ opensearch_config_path }}"
+    - "{{ opensearch_data_path }}"
+
+- name: Set indexed data flag
+  copy:
+    dest: "{{ opensearch_data_path }}/slurm_jobid_index"
+    content: |
+      This is a flag file to indicate that filebeat is pushing data
+      indexed by Slurm JobID to prevent duplicate OpenSearch records
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+
+- name: Create certs
+  import_tasks: certs.yml
+
+- name: Template general configuration
+  ansible.builtin.template:
+    src: opensearch.yml.j2
+    dest: "{{ opensearch_config_path }}/opensearch.yml"
+    owner: "{{ opensearch_podman_user }}"
+    group: "{{ opensearch_podman_user }}"
+    # NOTE: root user in container maps to user on host, so this will appear as
+    # owned by root in the container.
+    mode: 0660
+  notify: Restart opensearch service
+  become: true
+
+- name: Template internal user configuration
+  template:
+      src: "{{ opensearch_internal_users_path }}"
+      dest: "{{ opensearch_config_path }}/internal_users.yml"
+      owner: "{{ opensearch_podman_user }}"
+      group: "{{ opensearch_podman_user }}"
+      # NOTE: root user in container maps to user on host, so this will appear as
+      # owned by root in the container.
+      mode: 0660
+  notify: Restart opensearch service
+  become: true
+
+- name: Pull container
+  containers.podman.podman_image:
+    name: "opensearchproject/opensearch:{{ opensearch_version }}"
+  become_user: "{{ opensearch_podman_user }}"
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Ensure opensearch service state
+  systemd:
+    name: opensearch.service
+    state: "{{ opensearch_state }}"
+    enabled: "{{ opensearch_systemd_service_enabled }}"
+  become: true

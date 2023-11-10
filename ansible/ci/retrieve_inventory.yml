@@ -1,0 +1,33 @@
+# Retrieve inventory from a deployed CI arcus environment by reversing arcus/inventory/hooks/pre.yml
+# Usage example:
+#   ansible-playbook ansible/ci/retrieve_inventory.yml -e cluster_prefix=ci4005969475
+#
+- hosts: localhost
+  become: no
+  gather_facts: no
+  vars:
+    cluster_prefix: "{{ undef(hint='cluster_prefix must be defined') }}" # e.g. ci4005969475
+    ci_vars_file: "{{ appliances_environment_root + '/terraform/' + lookup('env', 'CI_CLOUD') }}.tfvars"
+    cluster_network: "{{ lookup('ansible.builtin.ini', 'cluster_net', file=ci_vars_file, type='properties') | trim('\"') }}"
+  tasks:
+    - name: Get control host IP
+      set_fact:
+        control_ip: "{{ (lookup('pipe', 'openstack server show -f json ' + cluster_prefix + '-control') | from_json)['addresses'][cluster_network][0] }}"
+    - name: Add host into in-memory inventory
+      add_host:
+        name: cluster_control
+        groups: control
+        ansible_host: "{{ control_ip }}"
+
+- hosts: control
+  become: yes
+  gather_facts: no
+  tasks:
+    - ansible.builtin.fetch:
+        src: "/etc/ci-config/{{ item | basename }}"
+        dest: "{{ item }}"
+        flat: true
+      loop:
+        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts"
+        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/secrets.yml"
+        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/test_user.yml"

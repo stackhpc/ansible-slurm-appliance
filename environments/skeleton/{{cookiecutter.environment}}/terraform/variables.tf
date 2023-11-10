@@ -1,6 +1,12 @@
 variable "cluster_name" {
     type = string
-    description = "Name for cluster, used as prefix for resources"
+    description = "Name of cluster, used as part of domain name"
+}
+
+variable "cluster_domain_suffix" {
+    type = string
+    description = "Domain suffix for cluster"
+    default = "invalid"
 }
 
 variable "cluster_net" {
@@ -49,6 +55,36 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
+variable "state_volume_device_path" {
+    type = string
+    description = "Path to block device for state"
+    default = "/dev/sdb"
+}
+
+variable "home_volume_device_path" {
+    type = string
+    description = "Path to block device name for home directories"
+    default = "/dev/sdc"
+}
+
+variable "state_dir" {
+    type = string
+    description = "Path to state directory on control node"
+    default = "/var/lib/state"
+}
+
+variable "state_volume_size" {
+    type = number
+    description = "Size of state volume on control node, in GB"
+    default = 150 # GB
+}
+
+variable "home_volume_size" {
+    type = number
+    description = "Size of state volume on control node, in GB"
+    default = 100 # GB
+}
+
 variable "vnic_type" {
     type = string
     description = "VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
@@ -77,4 +113,16 @@ variable "nonlogin_security_groups" {
     default = [
         "default",  # allow all in-cluster services
     ]
+}
+
+variable "volume_backed_instances" {
+    description = "Whether to use volumes for root disks"
+    type = bool
+    default = false
+}
+
+variable "root_volume_size" {
+    description = "Size of volume for root volumes if using volume backed instances, in Gb"
+    type = number
+    default = 40
 }

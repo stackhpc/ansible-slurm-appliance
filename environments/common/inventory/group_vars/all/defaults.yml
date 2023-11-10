@@ -3,6 +3,7 @@
 ansible_user: rocky
 appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+#appliances_state_dir: # define an absolute path here to use for persistent state: NB: This is defined as /var/lib/state in inventory by the default Terraform
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.
@@ -12,34 +13,65 @@ internal_address: "{{ inventory_hostname }}"
 api_address: "{{ inventory_hostname }}"
 
 # Service endpoints
-elasticsearch_address: "{{ hostvars[groups['opendistro'].0].api_address }}"
+opensearch_address: "127.0.0.1"
 prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
 grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 
 ############################# bootstrap: local user configuration #########################
 
-appliances_local_users_default: "{{ ([appliances_local_users_podman] if appliances_local_users_podman_enable else []) + [appliances_local_users_ansible_user] + appliances_local_users_extra }}"
+# Note RockyLinux 8.5 defines system user/groups in range 201-999
+appliances_local_users_ansible_user_name: "{{ ansible_ssh_user | default(ansible_user) }}"
+appliances_local_users_podman_uid: 1001 # UID for podman user - normally next UID after default user
+appliances_local_users_podman: # also used in environments/common/inventory/group_vars/all/podman.yml:podman_users
+    name: podman
+    comment: Used for running all containers
+    # Would like to set subuid so that we that we know what will appear in /etc/subuid
+    # See: https://github.com/ansible/ansible/issues/68199
+    home: /var/lib/podman
+    uid: "{{ appliances_local_users_podman_uid }}"
+
+appliances_local_users_default:
+    - user:
+        name: "{{ appliances_local_users_ansible_user_name }}"
+        home: /var/lib/{{ appliances_local_users_ansible_user_name }}
+        move_home: true
+        local: true
+    
+    - user: "{{ appliances_local_users_podman }}"
+      enable: "{{ 'podman' in group_names }}"
+
+    - user:
+        name: slurm
+        comment: SLURM resource manager
+        home: /etc/slurm
+        shell: /sbin/nologin
+        uid: 202
+        system: true
+    
+    - group:
+        name: prometheus
+        gid: 976
+      user:
+        name: prometheus
+        uid: 981
+        home: "{{ prometheus_db_dir }}"
+        shell: /usr/sbin/nologin
+      enable: "{{ 'prometheus' in group_names }}"
+    
+    - group:
+        name: grafana
+        gid: 979
+      user:
+        name: grafana
+        comment: grafana user
+        uid: 984
+        home: /usr/share/grafana
+        shell: /sbin/nologin
+      enable: "{{ 'grafana' in group_names }}"
 
 # Overide this to add extra users whilst keeping the defaults.
-appliances_local_users_extra: []
+appliances_local_users_extra: [] # see format of appliances_local_users_default above
 appliances_local_users: "{{ appliances_local_users_default + appliances_local_users_extra }}"
-
-appliances_local_users_ansible_user_name: "{{ ansible_ssh_user | default(ansible_user) }}"
-appliances_local_users_ansible_user_home: /var/lib/{{ appliances_local_users_ansible_user_name }}
-appliances_local_users_ansible_user:
-    name: "{{ appliances_local_users_ansible_user_name }}"
-    home: "{{ appliances_local_users_ansible_user_home }}"
-    move_home: true
-    local: true
-
-appliances_local_users_podman_enable: "{{ groups['podman'] | length > 0 }}"
-appliances_local_users_podman_home: /var/lib/podman
-appliances_local_users_podman:
-    - name: podman
-      comment: Used for running all containers
-      # Would like to set subuid so that we that we know what will appear in /etc/subuid
-      # See: https://github.com/ansible/ansible/issues/68199
-      home: "{{ appliances_local_users_podman_home }}"
 
 ###########################################################################################

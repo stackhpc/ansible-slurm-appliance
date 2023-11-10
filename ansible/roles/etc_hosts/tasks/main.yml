@@ -1,0 +1,8 @@
+- name: Template out /etc/hosts
+  template:
+    src: "{{ etc_hosts_template }}"
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+  become: yes

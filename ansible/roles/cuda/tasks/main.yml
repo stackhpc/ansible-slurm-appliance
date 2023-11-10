@@ -1,0 +1,71 @@
+
+# Based on https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#redhat8-installation
+
+- name: Check for OFED
+  command:
+    cmd: dnf list --installed rdma-core
+  register: _dnf_rdma_core
+  changed_when: false
+
+- name: Assert OFED installed
+  assert: 
+    that: "'mlnx' in _dnf_rdma_core.stdout"
+    fail_msg: "Did not find 'mlnx' in installed rdma-core package, is OFED installed?"
+
+- name: Install cuda repo
+  get_url:
+    dest: "/etc/yum.repos.d/cuda-{{ cuda_distro }}.repo"
+    url: "{{ cuda_repo }}"
+
+- name: Check if nvidia driver module is enabled
+  shell:
+    cmd: dnf module list --enabled nvidia-driver
+  changed_when: false
+  failed_when: false
+  register: _cuda_driver_module_enabled
+
+- name: List nvidia driver dnf module stream versions
+  shell:
+    cmd: dnf module list nvidia-driver | grep -oP "\d+-dkms" | sort -V
+  # Output of interest from command is something like (some whitespace removed):
+  # "nvidia-driver 418-dkms   default [d], fm, ks    Nvidia driver for 418-dkms branch "
+  changed_when: false
+  register: _cuda_driver_module_streams
+  when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
+
+- name: Enable nvidia driver module
+  ansible.builtin.command: "dnf module enable -y nvidia-driver:{{ _cuda_driver_module_streams.stdout_lines | last }}"
+  register: _cuda_driver_module_enable
+  when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
+  changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
+
+- name: Install nvidia drivers # TODO: make removal possible?
+  ansible.builtin.command: dnf module install -y nvidia-driver
+  register: _cuda_driver_install
+  when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
+  changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
+
+- name: Install cuda packages
+  ansible.builtin.dnf:
+    name: "{{ cuda_packages }}"
+  register: cuda_package_install
+
+- name: Add cuda binaries to path
+  lineinfile:
+    path: /etc/profile.d/sh.local
+    line: 'export PATH=$PATH:$(ls -1d /usr/local/cuda-* | sort -V | tail -1)/bin'
+
+- name: Enable NVIDIA Persistence Daemon
+  systemd:
+    name: nvidia-persistenced
+    enabled: true
+    state: "{{ cuda_persistenced_state }}"
+
+- name: Reboot
+  ansible.builtin.reboot:
+    post_reboot_delay: 30
+  when: cuda_package_install.changed
+
+- name: Wait for hosts to be reachable
+  wait_for_connection:
+    sleep: 15

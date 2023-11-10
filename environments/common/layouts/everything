@@ -1,9 +1,6 @@
 [nfs:children]
 openhpc
 
-[hpctests:children]
-login
-
 [mysql:children]
 control
 
@@ -19,7 +16,7 @@ control
 [node_exporter:children]
 cluster
 
-[opendistro:children]
+[opensearch:children]
 control
 
 [slurm_stats:children]
@@ -54,6 +51,21 @@ login
 # # Subset of compute to run a interactive desktops on via Open Ondemand
 # compute
 
-# [openondemand_jupyter:children]
-# # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
-# compute
+[openondemand_jupyter:children]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+compute
+
+[etc_hosts]
+# Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+
+[cuda]
+# Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
+
+[eessi:children]
+openhpc
+
+[resolv_conf]
+# Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md
+
+[proxy]
+# Hosts to configure http/s proxies - see ansible/roles/proxy/README.md

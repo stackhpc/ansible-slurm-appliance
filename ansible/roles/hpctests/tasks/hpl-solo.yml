@@ -42,8 +42,8 @@
 - debug:
     msg: "Using {{ hpctests_hplsolo_ntasks }} process per node with P={{ hpctests_hplsolo_pq.grid.P }}, Q={{ hpctests_hplsolo_pq.grid.Q }} targeting {{ (hpctests_hpl_mem_frac | float)  * 100 }}% of {{ hpctests_nodeinfo.info['MEMORY'][0] }} MB memory per node, block size (NB) = {{ hpctests_hpl_NB }}, problem size (N) = {{ hpctests_hplsolo_N }}"
 
-- name: Get all nodes
-  shell: "sinfo --Node --noheader --format %N" # TODO: assumes only one partition, although actually excluding nodes not in the default partition should be fine.
+- name: Get all nodes in partition
+  shell: "sinfo --Node --noheader --format %N --partition={{ hpctests_partition }}"
   register: all_nodes
   changed_when: false
 
@@ -73,6 +73,11 @@
     dest: "{{ hpctests_rootdir }}/hpl-solo/hpl-solo.sh"
   vars:
     hpctests_hplsolo_ntasks: 2 # TODO: FIXME
+
+- name: Remove previous outputs
+  # As depending on the number of nodes there will be different numbers of output files for different partitions so won't all get overwritten
+  shell:
+    cmd: "rm -f {{ hpctests_rootdir }}/hpl-solo/hpl-solo.sh.*.out"
 
 - name: Run hpl-solo
   shell: sbatch --wait hpl-solo.sh
@@ -111,10 +116,11 @@
   tags: postpro
   debug:
     msg: |
-      Summary for hpl-solo ({{ hpctests_computes.stdout_lines | length }} nodes) job {{ hpctests_hplsolo_sbatch.stdout.split()[-1] }} using {{ hpctests_ucx_net_devices }}:
+      Summary for hpl-solo on {{ hpctests_computes.stdout_lines | length }} nodes in '{{ hpctests_partition }}' partition, job ID {{ hpctests_hplsolo_sbatch.stdout.split()[-1] }}, device '{{ hpctests_ucx_net_devices }}':
+
         Max:  {{ perf.stdout_lines | map('float') | max }} gflops
         Min:  {{ perf.stdout_lines | map('float') | min }} gflops
-        Mean: {{ (perf.stdout_lines | map('float') | sum) /  (hpctests_computes.stdout_lines | length) }} gflops
+        Mean: {{ (perf.stdout_lines | map('float') | sum) / (hpctests_computes.stdout_lines | length) }} gflops
 
       Individual node results (gflops):
       {{ dict(hpctests_computes.stdout_lines | zip(perf.stdout_lines | map('float') )) | to_nice_yaml }}

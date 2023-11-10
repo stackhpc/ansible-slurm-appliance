@@ -22,6 +22,11 @@ filebeat.inputs:
     fields_under_root: true
 
 processors:
+  # Want to use the Slurm JobID as the ElasticSearch id to avoid duplicated records
+  # Don't use filebeat.inputs:json.document_id as this removes the JobID from the record
+  - fingerprint:
+      fields: ["json.JobID"]
+      target_field: "@metadata._id"
   - timestamp:
       field: json.End
       layouts:
@@ -49,8 +54,10 @@ processors:
         - {from: "json.ElapsedRaw", type: "integer"}
 
 output.elasticsearch:
-  hosts: ["{{ elasticsearch_address }}:9200"]
+  hosts: ["{{ opensearch_address }}:9200"]
   protocol: "https"
   ssl.verification_mode: none
   username: "admin"
   password: "{{ vault_elasticsearch_admin_password }}"
+
+{% if filebeat_debug | default(false) | bool %}logging.level: debug{% endif %}

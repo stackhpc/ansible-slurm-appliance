@@ -1,8 +1,11 @@
 ---
 hpctests_rootdir:
-hpctests_pingmatrix_modules: [gnu9 openmpi4]
-hpctests_pingpong_modules: [gnu9 openmpi4 imb]
-hpctests_hpl_modules: [gnu9 openmpi4 openblas]
+hpctests_extra_paths: []
+hpctests_pingmatrix_modules: [gnu12 openmpi4]
+hpctests_pingpong_modules: [gnu12 openmpi4 imb]
+hpctests_pingpong_command: 'mpirun IMB-MPI1 pingpong' # NB 'srun --mpi=pmi2 IMB-MPI1 pingpong'  doesn't work in ohpc v2.1
+hpctests_pingpong_plot: yes
+hpctests_hpl_modules: [gnu12 openmpi4 openblas]
 hpctests_outdir: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hpctests"
 hpctests_ucx_net_devices: all
 hpctests_hpl_version: "2.3"
@@ -10,3 +13,4 @@ hpctests_hpl_NB: 192
 hpctests_hpl_mem_frac: 0.8
 hpctests_hpl_arch: linux64
 #hpctests_nodes:
+#hpctests_partition:

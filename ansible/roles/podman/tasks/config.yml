@@ -5,12 +5,25 @@
     content: |
       # WARNING: This file is managed by ansible, do not modify.
       # This is so non-root containers can use more resources. This is useful
-      # for opendistro.
+      # for opensearch.
       * soft memlock unlimited
       * hard memlock unlimited
       * soft nofile 65536
       * hard nofile 65536
     dest: /etc/security/limits.d/custom.conf
+  become: true
+
+- name: Up number of non-root kernel keys permitted per user
+  # See https://www.kernel.org/doc/html/v4.18/security/keys/core.html
+  ansible.posix.sysctl:
+    name: kernel.keys.maxkeys # /proc/sys/kernel/keys/maxkeys
+    value: 50000 # default is 200
+  become: true
+
+- name: Up size of non-root kernel keys permitted per user
+  ansible.posix.sysctl:
+    name: kernel.keys.maxbytes # /proc/sys/kernel/keys/maxbytes
+    value: 25000000 # set same as root. Non-root default is 20000
   become: true
 
 - name: reset ssh connection to allow user changes to affect 'current login user'
@@ -59,9 +72,6 @@
   loop: "{{ podman_user_info.results }}"
   become: yes
   register: podman_tmp
-
-- debug:
-    var: podman_tmp
 
 - name: Reset podman database
   # otherwise old config overrides!

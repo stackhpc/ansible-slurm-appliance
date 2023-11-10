@@ -1,0 +1,8 @@
+partitions.yml
+secrets.yml
+hosts
+terraform.tfvars
+.terraform.lock.hcl
+logs/
+hpctests/
+inventory/group_vars/all/test_user.yml

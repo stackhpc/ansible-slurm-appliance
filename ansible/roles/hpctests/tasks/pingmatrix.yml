@@ -61,6 +61,8 @@
 - name: Summarise results
   debug:
     msg: |
-      Summary for pingmatrix (pairwise on {{ slurm_names.stdout_lines | length }} nodes) job {{ hpctests_pingmatrix_sbatch.stdout.split()[-1] }} using {{ hpctests_ucx_net_devices }}:
+      Summary for pingmatrix pairwise over {{ slurm_names.stdout_lines | length }} nodes in '{{ hpctests_partition }}' partition, job ID {{ hpctests_pingmatrix_sbatch.stdout.split()[-1] }}, device '{{ hpctests_ucx_net_devices }}':
+      
       {{ nxnlatbw['stats'] | to_nice_yaml }}
+      
       Tabular output on ansible control host at {{ hpctests_outdir }}/pingmatrix.html

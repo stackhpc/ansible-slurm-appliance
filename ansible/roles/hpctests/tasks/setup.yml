@@ -1,7 +1,17 @@
 ---
 
+- name: Get partition information
+  shell: "sinfo --format %P --noheader"
+  register: _sinfo_partitions
+  changed_when: false
+
+- name: Select default partition if hpctests_partition not given
+  set_fact:
+    hpctests_partition: "{{ (_sinfo_partitions.stdout_lines  | select('contains', '*') | first)[:-1] }}"
+  when: hpctests_partition is not defined
+
 - name: Get info about compute nodes
-  shell: "sinfo --Node --noheader{%if hpctests_nodes is defined %} --nodes {{hpctests_nodes}}{% endif %} --format %N"
+  shell: "sinfo --Node --noheader{%if hpctests_nodes is defined %} --nodes {{hpctests_nodes}}{% endif %} --partition {{hpctests_partition}} --format %N"
   register: hpctests_computes
   changed_when: false
   failed_when: hpctests_computes.rc != 0
@@ -18,3 +28,8 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
   become: true
+
+- name: Set fact for UCX_NET_DEVICES
+  set_fact:
+    hpctests_ucx_net_devices: "{{ hpctests_ucx_net_devices.get(hpctests_partition, 'all') }}"
+  when: hpctests_ucx_net_devices is mapping

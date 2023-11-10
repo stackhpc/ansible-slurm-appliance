@@ -4,8 +4,8 @@ roles/*
 # Whitelist roles that are checked into this repository.
 !roles/filebeat/
 !roles/filebeat/**
-!roles/opendistro/
-!roles/opendistro/**
+!roles/opensearch/
+!roles/opensearch/**
 !roles/podman/
 !roles/podman/**
 !roles/grafana-dashboards/
@@ -28,3 +28,21 @@ roles/*
 !roles/slurm_exporter/**
 !roles/firewalld/
 !roles/firewalld/**
+!roles/etc_hosts/
+!roles/etc_hosts/**
+!roles/cloud_init/
+!roles/cloud_init/**
+!roles/mysql/
+!roles/mysql/**
+!roles/systemd/
+!roles/systemd/**
+!roles/cuda/
+!roles/cuda/**
+!roles/freeipa/
+!roles/freeipa/**
+!roles/proxy/
+!roles/proxy/**
+!roles/resolv_conf/
+!roles/resolv_conf/**
+!roles/cve-2023-41914
+!roles/cve-2023-41914/**

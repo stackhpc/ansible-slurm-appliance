@@ -5,13 +5,14 @@
 #SBATCH --output=%x.out
 #SBATCH --error=%x.out
 #SBATCH --exclusive
+#SBATCH --partition={{ hpctests_partition }}
 {%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_nodes }}{% endif %}
 
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
 echo SLURM_JOB_ID: $SLURM_JOB_ID
 echo UCX_NET_DEVICES: $UCX_NET_DEVICES
-module load {{ hpctests_pingpong_modules | join(' ' ) }}
+{% if hpctests_pingpong_modules %}module load {{ hpctests_pingpong_modules | join(' ' ) }}{% endif %}
+{% if hpctests_extra_paths %}export PATH={{ hpctests_extra_paths | join(':') }}:$PATH{% endif %}
 
-#srun --mpi=pmi2 IMB-MPI1 pingpong # doesn't work in ohpc v2.1
-mpirun IMB-MPI1 pingpong
+{{ hpctests_pingpong_command }}

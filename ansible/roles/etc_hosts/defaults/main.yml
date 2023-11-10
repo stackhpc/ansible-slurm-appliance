@@ -1,0 +1,3 @@
+etc_hosts_template: hosts.j2
+etc_hosts_hostvars: "{{ ['ansible_host'] + (['node_fqdn'] if node_fqdn is defined else []) + ['inventory_hostname'] }}"
+etc_hosts_extra_hosts: ''

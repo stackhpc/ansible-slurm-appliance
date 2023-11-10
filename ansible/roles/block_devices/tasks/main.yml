@@ -1,3 +1,8 @@
+- name: Warn role is deprecated
+  debug:
+    msg: "{{ 'Role block_devices is deprecated, see ansible/roles/block_devices/README.md' | warn }}"
+  when: block_devices_configurations | length > 0
+
 - name: Enumerate block device paths by serial number
   block_devices:
   register: _block_devices

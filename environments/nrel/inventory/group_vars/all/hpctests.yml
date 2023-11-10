@@ -1,0 +1,8 @@
+
+# Configure hpctests pingpong and pingmatrix to use system packages not OpenHPC modules:
+# TODO: KURT assuming this matches openhpc_generic_packages
+hpctests_extra_paths:
+  - /usr/lib64/openmpi/bin # for mpitests-openmpi
+hpctests_pingmatrix_modules: []
+hpctests_pingpong_modules: []
+hpctests_pingpong_command: mpirun mpitests-IMB-MPI1 pingpong

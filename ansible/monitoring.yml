@@ -1,33 +1,18 @@
 # ---
 # # NOTE: Requires slurmdbd
 
-- name: Setup podman
-  hosts: podman
-  tags: podman
+- name: Setup OpenSearch
+  hosts: opensearch
+  tags: opensearch
   tasks:
     - import_role:
-        name: podman
-        tasks_from: prereqs.yml
-      tags: prereqs
-
+        name: opensearch
+        tasks_from: install.yml
+      become: true
     - import_role:
-        name: podman
-        tasks_from: config.yml
-      tags: config
-
-- name: Setup elasticsearch
-  hosts: opendistro
-  tags: opendistro
-  tasks:
-    - import_role:
-        name: opendistro
-        tasks_from: config.yml
-      tags: config
-
-    - import_role:
-        name: opendistro
-        tasks_from: deploy.yml
-      tags: deploy
+        name: opensearch
+        tasks_from: runtime.yml
+      become: true
 
 - name: Setup slurm stats
   hosts: slurm_stats

@@ -1,0 +1,6 @@
+test_user_password: "{{ lookup('env', 'TESTUSER_PASSWORD') | default(vault_testuser_password, true) }}" # CI uses env, debug can set vault_testuser_password
+
+basic_users_users:
+  - name: testuser # can't use rocky as $HOME isn't shared!
+    password: "{{ test_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+    uid: 1005

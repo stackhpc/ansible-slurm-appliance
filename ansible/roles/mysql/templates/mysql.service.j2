@@ -1,0 +1,46 @@
+# mysql.service
+
+[Unit]
+Description=Podman container mysql.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network.target
+After=network-online.target
+RequiresMountsFor={{ mysql_datadir }} /etc/sysconfig/mysqld
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=always
+EnvironmentFile=/etc/sysconfig/mysqld
+# The above EnvironmentFile must define MYSQL_INITIAL_ROOT_PASSWORD
+ExecStartPre=+install -d -o {{ mysql_podman_user }} -g {{ mysql_podman_user }} -Z container_file_t {{ mysql_datadir }}
+ExecStartPre=+chown -R {{ mysql_podman_user }}:{{ mysql_podman_user }} {{ mysql_datadir }}
+ExecStart=/usr/bin/podman run \
+    --network=host \
+    --sdnotify=conmon \
+    --cgroups=no-conmon \
+    --detach \
+    --replace \
+    --name mysql \
+    --restart=no \
+    --user mysql \
+    --volume {{ mysql_datadir }}:/var/lib/mysql:U \
+    --publish 3306:3306 \
+    --env MYSQL_ROOT_PASSWORD=${MYSQL_INITIAL_ROOT_PASSWORD} \
+    mysql:{{ mysql_tag }}{%- for opt in mysql_mysqld_options %} \
+    --{{ opt }}{% endfor %}
+
+ExecStop=/usr/bin/podman stop --ignore mysql -t 10
+# note for some reason this returns status=143 which makes systemd show the unit as failed, not stopped
+ExecStopPost=/usr/bin/podman rm --ignore -f mysql
+SuccessExitStatus=143 SIGTERM
+KillMode=none
+Type=notify
+NotifyAccess=all
+LimitNOFILE=65536
+LimitMEMLOCK=infinity
+User={{ mysql_podman_user }}
+Group={{ mysql_podman_user }}
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target default.target

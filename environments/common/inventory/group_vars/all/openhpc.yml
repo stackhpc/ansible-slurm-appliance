@@ -2,7 +2,7 @@
 
 # See: https://github.com/stackhpc/ansible-role-openhpc
 # for variable definitions
-
+openhpc_install_type: ohpc # use "ohcp" for an OpenHPC-based system or "generic" if providing binaries
 openhpc_enable:
   control: "{{ inventory_hostname in groups['control'] }}"
   batch: "{{ inventory_hostname in groups['compute'] }}"
@@ -18,9 +18,15 @@ openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
 openhpc_slurm_partitions:
   - name: "compute"
 openhpc_packages_default:
+  # system packages
+  - podman
+  # OpenHPC packages
   - slurm-libpmi-ohpc # to allow intel mpi to work properly
-  - ohpc-gnu9-openmpi4-perf-tools # for hpctests
-  - openblas-gnu9-ohpc # for hpctests (HPL)
+  - ohpc-gnu12-openmpi4-perf-tools # for hpctests
+  - openblas-gnu12-ohpc # for hpctests (HPL)
+  # EPEL packages:
+  - apptainer
+  - podman-compose
 openhpc_packages_extra: []
 openhpc_packages: "{{ openhpc_packages_default + openhpc_packages_extra }}"
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
@@ -30,3 +36,4 @@ openhpc_config_default:
     - enable_configless
 openhpc_config_extra: {}
 openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_extra, list_merge='append') }}"
+openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if appliances_state_dir is defined else '/var/spool' }}"

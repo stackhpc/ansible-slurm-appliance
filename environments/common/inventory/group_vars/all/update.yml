@@ -4,7 +4,9 @@ update_enable: false
 # These variables define the packages updates and are passed to ansible's yum module parameters with the same names: https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html
 update_name: '*'
 update_state: latest
-update_exclude: omit
+update_exclude:
+  - grafana
+  - apptainer # see https://github.com/stackhpc/ansible-slurm-appliance/pull/245
 update_disablerepo: omit
 # Log changes during update here on localhost:
 update_log_path:  "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/logs/{{ inventory_hostname }}-updates.log"

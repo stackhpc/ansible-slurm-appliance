@@ -7,7 +7,7 @@
     - mysql
   tasks:
     - include_role:
-        name:  geerlingguy.mysql
+        name:  mysql
 
 - name: Setup slurm-driven reimage
   hosts: rebuild
@@ -25,8 +25,14 @@
   tags:
     - openhpc
   tasks:
-    - import_role:
+    - include_role:
         name: stackhpc.openhpc
+        tasks_from: "install-{{ openhpc_install_type }}.yml"
+      tags: install
+    - include_role:
+        name: stackhpc.openhpc
+        tasks_from: runtime.yml
+      tags: runtime
 
 - name: Set locked memory limits on user-facing nodes
   hosts:
