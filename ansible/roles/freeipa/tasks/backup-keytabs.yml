@@ -1,0 +1,14 @@
+- name: Retrieve keytabs to localhost
+  fetch:
+    src: "{{ _freeipa_keytab_backup_path }}"
+    dest: "{{ appliances_environment_root }}/keytabs/{{ inventory_hostname }}/"
+    flat: true
+  delegate_to: "{{ groups['control'].0 }}"
+  tags: retrieve
+
+- name: Copy keytabs back to control node
+  copy:
+    src: "{{ appliances_environment_root }}/keytabs/{{ inventory_hostname }}/"
+    dest: "{{ _freeipa_keytab_backup_path | dirname }}"
+  delegate_to: "{{ groups['control'].0 }}"
+  tags: deploy

@@ -10,7 +10,7 @@
         mode: 0400
         owner: root
         group: root
-      no_log: true
+      no_log: "{{ no_log | default(true) }}"
       loop:
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/secrets.yml"

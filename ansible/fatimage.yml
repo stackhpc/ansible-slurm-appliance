@@ -1,5 +1,12 @@
 # Builder version of site.yml just installing binaries
 
+- hosts: builder
+  become: no
+  gather_facts: no
+  tasks:
+    - name: Report hostname (= final image name)
+      command: hostname
+
 - name: Run pre.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
@@ -27,6 +34,13 @@
         state: stopped
         enabled: false
 
+    # - import_playbook: iam.yml
+    - name: Install FreeIPA client
+      import_role:
+        name: freeipa
+        tasks_from: client-install.yml
+      when: "'freeipa_client' in group_names"
+
     # - import_playbook: filesystems.yml
     - name: nfs
       dnf:
@@ -44,7 +58,7 @@
         tasks_from: "install-{{ openhpc_install_type }}.yml"
 
     - name: Include distribution variables for osc.ood
-      include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky.yml"
+      include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky/8.yml"
     # FUTURE: install-apps.yml - this is git clones
 
     # - import_playbook: portal.yml
@@ -140,8 +154,6 @@
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
-
-    # - import_playbook: iam.yml - nothing to do
 
 - name: Run post.yml hook
   vars:

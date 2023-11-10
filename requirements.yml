@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v22.9.1
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: feat/no-ohpc
+    version: feat/no-ohpc # https://github.com/stackhpc/ansible-role-openhpc/pull/162
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: feature/no-install
@@ -19,7 +19,7 @@ roles:
     # No versions available
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
-    version: v2.0.8
+    version: v3.0.6
 
 collections:
 - name: containers.podman
