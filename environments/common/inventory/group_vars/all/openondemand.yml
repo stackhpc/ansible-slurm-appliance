@@ -178,7 +178,7 @@ openondemand_scrape_configs:
     - targets:
       - "{{ openondemand_address }}:9301"
       labels:
-        environment: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"
+        environment: "{{ appliances_environment_name }}"
         service: "openondemand"
 
 openondemand_dashboard:
