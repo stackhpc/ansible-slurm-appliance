@@ -24,78 +24,68 @@
     - shell:
         cmd: for FF in `ls /etc/yum.repos.d/Rocky*`; do sed -i 's#gov/rocky/#gov/rocky-vault/#g' $FF; done
 
+    - name: "change root password"
+      user:
+        name: root
+        update_password: always
+        password: "{{ vault_vs_root_pass|password_hash('sha256') }}"
+
 - name: NREL pre - Ensure times are correct
   hosts: all
   tags:
     - vs_pre
     - set_time_on_servers
   become: true
-  vars:
-    ntp_servers:
-      - "server ds1.hpc.nrel.gov iburst"
-      - "server ds2.hpc.nrel.gov iburst"
-      - "server ds3.hpc.nrel.gov iburst"
-      - "server ds4.nrel.gov iburst"
   tasks:
     - name: Set timezone to Americas/Denver
       timezone:
         name: America/Denver
     - include_role:
-        name: ansible-role-ntp
+        name: aco.core.ntp
 
-- name: "force time"
-  hosts: all
-  tags:
-    - vs_pre
-    - vs_force_chrony
-  become: true
-  tasks:
-    - name: Force chronyd to set time
-      shell:
-        cmd: systemctl stop chronyd; chronyd -q 'server ds2.hpc.nrel.gov iburst' ; systemctl start chronyd
+# This may be unnecessary now.
+# # Stupid dependency hack
+# - name: NREL PRE - re-install libibverbs openmpi
+#   hosts: all
+#   tags:
+#     - vs_pre
+#     - dependency_dnf_hack
+#   become: true
+#   vars:
+#     rm_packages:
+#       - libibverbs
+#       - openmpi
 
-# Stupid dependency hack
-- name: NREL PRE - re-install libibverbs openmpi
-  hosts: all
-  tags:
-    - vs_pre
-    - dependency_dnf_hack
-  become: true
-  vars:
-    rm_packages:
-      - libibverbs
-      - openmpi
-
-    packages:
-      - autoconf
-      - automake
-      - binutils
-      - bison
-      - byacc
-      - ctags
-      - diffstat
-      - gcc
-      - gcc-c++
-      - gdb
-      - glibc-devel
-      - ltrace
-      - make
-      - patchutils
-      - strace
-      - vim
-      - nano
-      # policycoreutils-python-utils setools-console setroubleshoot
-  tasks:
-    - name: rm problem packages
-      dnf:
-        name: "{{rm_packages}}"
-        state: absent
-        allowerasing: true
-    - name: Add useful packages
-      dnf:
-        name: "{{packages}}"
-        state: present
-        nobest: true
+#     packages:
+#       - autoconf
+#       - automake
+#       - binutils
+#       - bison
+#       - byacc
+#       - ctags
+#       - diffstat
+#       - gcc
+#       - gcc-c++
+#       - gdb
+#       - glibc-devel
+#       - ltrace
+#       - make
+#       - patchutils
+#       - strace
+#       - vim
+#       - nano
+#       # policycoreutils-python-utils setools-console setroubleshoot
+#   tasks:
+#     - name: rm problem packages
+#       dnf:
+#         name: "{{rm_packages}}"
+#         state: absent
+#         allowerasing: true
+#     - name: Add useful packages
+#       dnf:
+#         name: "{{packages}}"
+#         state: present
+#         nobest: true
 
 # - name: "NREL PRE - dnf packages"
 #   hosts: all
@@ -131,21 +121,6 @@
 #   tasks:
 #     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
 
-- name: NREL pre - nrel-proto fixes - compute nodes
-  hosts: compute
-  become: true
-  tags:
-    - vs_pre
-  tasks:
-    - name: Create scratch directory - should be on local SSD on real cluster
-      file:
-        src: /mnt
-        dest: "{{ item }}"
-        state: link
-      loop:
-        - /tmp/scratch
-        - /var/scratch
-
 
 # Builds the /etc/hosts inventory files.
 - name: nrel-proto fixes - workaround no internal DNS
@@ -171,22 +146,23 @@
         state: present
         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
 
-# ref: Error: cannot setup namespace using "/usr/bin/newuidmap": should have setuid or have filecaps setuid:
-- name: "podman uid-gid workaround"
-  hosts:
-    - cluster
-  become: true
-  tags:
-    - vs_pre
-    - uid_gid_hack
-  tasks:
-    - name: "set newuidmap/newgidmap perms so containers will start"
-      file:
-        path: "{{ item }}"
-        mode: '4755'
-      loop:
-        - /usr/bin/newgidmap
-        - /usr/bin/newuidmap
+# This may be fixed now
+# # ref: Error: cannot setup namespace using "/usr/bin/newuidmap": should have setuid or have filecaps setuid:
+# - name: "podman uid-gid workaround"
+#   hosts:
+#     - cluster
+#   become: true
+#   tags:
+#     - vs_pre
+#     - uid_gid_hack
+#   tasks:
+#     - name: "set newuidmap/newgidmap perms so containers will start"
+#       file:
+#         path: "{{ item }}"
+#         mode: '4755'
+#       loop:
+#         - /usr/bin/newgidmap
+#         - /usr/bin/newuidmap
 
 - name: "NREL pre - install ldap requirements to nodes"
   hosts: compute
@@ -198,6 +174,8 @@
     - include_role:
         name: vermilion_ldap_client
 
+
+# TODO: KBENDL - check compatibility with new playbook
 - name: "NREL pre - Mount cephfs volumes"
   hosts: all
   tags:
@@ -209,81 +187,8 @@
         name: aco_ceph_mount
       tags:
         - aco_ceph_mount
-# #### This is a TOTAL hack or else podman container will not load
-# - name: fix perms on etc/subuid subgid files
-#   hosts: control
-#   become: true
-#   tags:
-#     - nrel_base_packages
-#     - nrel_base_packagessubid
-#   vars:
-#     etcsubvars: |
-#       stack:100000:65536
-#       podman:100000:65536
-#       rocky:165536:65536
-#   tasks:
-#     - copy:
-#         content: "{{ etcsubvars }}"
-#         mode: '4755'
-#         dest: "{{ item }}"
-#         owner: root
-#         group: root
-#       loop:
-#         - /etc/subuid
-#         - /etc/subgid
-    # - file:
-    #     state: touch
-    #     mode: '4755'
-    #     name: "{{ item }}"
-    #     owner: podman
-    #     group: podman
-    #   loop:
-    #     - /etc/subuid
-    #     - /etc/subgid
 
-
-# - name: "NREL pre - add ceph repos"
-#   hosts: all
-#   tags: do_nrel_ceph_repo
-#   become: true
-#   tasks:
-#     - name: "NREL pre - Add Ceph repo"
-#       yum_repository:
-#         name: ceph
-#         description: repo for ceph
-#         baseurl: "{{ os_manila_mount_ceph_repo_base }}"
-#         gpgcheck: 0
-#         gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
-#       when:
-#         - (ansible_os_family == 'RedHat') or (ansible_os_family == 'Rocky')
-#         - os_manila_mount_pkgs_install | default(true) | bool
-
-
-#################################################################
-# vtest
-# pre.yml
-
-# - name: nrel-proto fixes - workaround no internal DNS
-#   hosts:
-#     - cluster
-#   become: true
-#   tags: etc_hosts
-#   tasks:
-#     - name: Internal DNS workaround - generate /etc/hosts file content
-#       # which interface is used as ansible_host is defined by terraform (see `access_network`) so this is deterministic for multi-rail hosts
-#       set_fact:
-#         etc_hosts_content: |
-#           {% for host in groups['cluster'] %}{{ hostvars[host]['ansible_host'] }} {{ host }}.novalocal {{ host }}
-#           {% endfor %}
-#       run_once: true
-
-#     - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
-#       blockinfile:
-#         path: /etc/hosts
-#         create: yes
-#         state: present
-#         block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
-
+# TODO - get latest playbook
 # - name: Ensure yum repos are local
 #   hosts: all
 #   tags: ansible_yum_config
@@ -291,18 +196,3 @@
 #   tasks:
 #     - include_role:
 #         name: ansible_yum_config
-# - name: Modify slurm.conf
-#   hosts: openhpc
-#   tags: openhpc
-#   gather_facts: false
-#   tasks:
-#     - community.general.ini_file:
-#         path: ../../../ansible/roles/stackhpc.openhpc/templates/slurm.conf.j2
-#         option: "{{ item[0] }}"
-#         section: null
-#         value: "{{ item[1] }}"
-#         no_extra_spaces: true
-#         create: no
-#       loop: "{{ slurm_conf_extraparams }}"
-#       delegate_to: localhost
-#       run_once: true
