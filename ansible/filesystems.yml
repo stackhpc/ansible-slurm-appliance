@@ -8,40 +8,11 @@
     - include_role:
         name: block_devices
 
-# - name: Setup NFS
-#   hosts: nfs
-#   become: true
-#   tags:
-#     - nfs
-#   tasks:
-#     - include_role:
-#         name: stackhpc.nfs
-
-- name: Mount OpenStack Manila shares
-  hosts: os_manila
+- name: Setup NFS
+  hosts: nfs
+  become: true
   tags:
-    - os_manila
+    - nfs
   tasks:
-    - name: Gather information about Manila shares
-      import_role:
-        name: os_manila_mount
-      vars:
-        os_manila_mount_action: lookup
-        os_manila_mount_auth:
-          project_domain_name: "{{ lookup('env', 'OS_PROJECT_DOMAIN_NAME') }}"
-          user_domain_name: "{{ lookup('env', 'OS_USER_DOMAIN_NAME') }}"
-          project_name: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
-          username: "{{ lookup('env', 'OS_USERNAME') }}"
-          password: "{{ lookup('env', 'OS_PASSWORD') }}"
-          auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
-      delegate_to: localhost
-      run_once: true
-    - name: debug os_manila_mount_facts
-      debug:
-        var: os_manila_mount_facts
-    - name: Mount Manila shares
-      include_role:
-        name: os_manila_mount
-      vars:
-        os_manila_mount_action: mount
-        os_manila_mount_facts: "{{ secrets_os_manila_mount_facts }}"
+    - include_role:
+        name: stackhpc.nfs
