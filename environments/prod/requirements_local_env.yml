@@ -26,10 +26,13 @@ roles:
     src: git+git@github.nrel.gov:hpc/vermilion_control_setup.git
     type: git
 
-  - name: ansible-role-ntp
-    src: git+https://github.com/kbendl/ansible-role-ntp
-    version: rocky
+# checked
+  - name: aco.core.ntp
+    src: git+https://github.nrel.gov/acoinf/aco.core.ntp
+    version: main
+    type: git
 
+# checked
   - name: vs-set-ephemeral-mounts
     src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
     type: git
