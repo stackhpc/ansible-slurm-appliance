@@ -14,6 +14,7 @@ After={{ zenith_proxy_mitm_service_name }}.service
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Type=simple
 Restart=always
+RestartSec=5
 User={{ zenith_proxy_podman_user }}
 Group={{ zenith_proxy_podman_user }}
 ExecStart=/usr/bin/podman run \
