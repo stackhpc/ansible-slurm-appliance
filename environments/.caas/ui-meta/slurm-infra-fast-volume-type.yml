@@ -110,7 +110,7 @@ usage_template: |-
 services:
   - name: ood
     label: Open OnDemand
-    icon_url: https://github.com/stackhpc/caas-slurm-appliance/raw/main/assets/ood-icon.png
+    icon_url: https://github.com/stackhpc/ansible-slurm-appliance/raw/main/environments/.caas/assets/ood-icon.png
   - name: monitoring
     label: Monitoring
     icon_url: https://raw.githubusercontent.com/cncf/artwork/master/projects/prometheus/icon/color/prometheus-icon-color.png
