@@ -15,13 +15,13 @@ zenith_proxy_pod_name: "{{ zenith_proxy_service_name }}"
 zenith_proxy_client_container_name: "{{ zenith_proxy_client_service_name }}"
 zenith_proxy_mitm_container_name: "{{ zenith_proxy_mitm_service_name }}"
 
+zenith_proxy_image_tag: '0.1.0'
+
 zenith_proxy_client_image_repository: ghcr.io/stackhpc/zenith-client
-zenith_proxy_client_image_tag: main
-zenith_proxy_client_image: "{{ zenith_proxy_client_image_repository }}:{{ zenith_proxy_client_image_tag }}"
+zenith_proxy_client_image: "{{ zenith_proxy_client_image_repository }}:{{ zenith_proxy_image_tag }}"
 
 zenith_proxy_mitm_image_repository: ghcr.io/stackhpc/zenith-proxy
-zenith_proxy_mitm_image_tag: main
-zenith_proxy_mitm_image: "{{ zenith_proxy_mitm_image_repository }}:{{ zenith_proxy_mitm_image_tag }}"
+zenith_proxy_mitm_image: "{{ zenith_proxy_mitm_image_repository }}:{{ zenith_proxy_image_tag }}"
 
 zenith_proxy_upstream_scheme: http
 zenith_proxy_upstream_host: "{{ undef(hint = 'zenith_proxy_upstream_host is required') }}"
