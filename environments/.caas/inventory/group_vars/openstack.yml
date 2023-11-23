@@ -11,7 +11,7 @@ terraform_backend_config_defaults:
 terraform_backend_config: "{{ terraform_backend_config_defaults[terraform_backend_type] }}"
 
 terraform_binary_directory: "{{ playbook_dir }}/bin"
-terraform_binary_path: "{{ terraform_binary_directory }}/terraform"
+# terraform_binary_path: "{{ terraform_binary_directory }}/terraform"
 terraform_project_path: "{{ playbook_dir }}/terraform"
 
 terraform_state: "{{ cluster_state | default('present') }}"
