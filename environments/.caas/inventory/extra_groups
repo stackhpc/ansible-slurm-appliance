@@ -1,0 +1,9 @@
+[basic_users:children]
+cluster
+
+[etc_hosts:children]
+cluster
+
+[zenith:children]
+grafana
+openondemand

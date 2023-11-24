@@ -1,0 +1,57 @@
+---
+
+zenith_registrar_url: "{{ undef(hint = 'zenith_registrar_url is required') }}"
+zenith_registrar_verify_ssl: true
+zenith_sshd_host: "{{ undef(hint = 'zenith_sshd_host is required') }}"
+zenith_sshd_port: 22
+
+zenith_proxy_podman_user: "{{ ansible_user }}"
+
+zenith_proxy_service_name: "{{ undef(hint = 'zenith_proxy_service_name is required') }}"
+zenith_proxy_client_service_name: "{{ zenith_proxy_service_name }}-client"
+zenith_proxy_mitm_service_name: "{{ zenith_proxy_service_name }}-mitm"
+
+zenith_proxy_pod_name: "{{ zenith_proxy_service_name }}"
+zenith_proxy_client_container_name: "{{ zenith_proxy_client_service_name }}"
+zenith_proxy_mitm_container_name: "{{ zenith_proxy_mitm_service_name }}"
+
+zenith_proxy_image_tag: '0.1.0'
+
+zenith_proxy_client_image_repository: ghcr.io/stackhpc/zenith-client
+zenith_proxy_client_image: "{{ zenith_proxy_client_image_repository }}:{{ zenith_proxy_image_tag }}"
+
+zenith_proxy_mitm_image_repository: ghcr.io/stackhpc/zenith-proxy
+zenith_proxy_mitm_image: "{{ zenith_proxy_mitm_image_repository }}:{{ zenith_proxy_image_tag }}"
+
+zenith_proxy_upstream_scheme: http
+zenith_proxy_upstream_host: "{{ undef(hint = 'zenith_proxy_upstream_host is required') }}"
+zenith_proxy_upstream_port: "{{ undef(hint = 'zenith_proxy_upstream_port is required') }}"
+zenith_proxy_upstream_read_timeout:
+
+zenith_proxy_client_token: "{{ undef(hint = 'zenith_proxy_client_token is required') }}"
+zenith_proxy_client_auth_skip: false
+zenith_proxy_client_auth_params: {}
+
+zenith_proxy_mitm_enabled: no
+zenith_proxy_mitm_listen_port: 8080
+zenith_proxy_mitm_auth_inject: none  # valid values are 'basic' and 'bearer'
+zenith_proxy_mitm_auth_basic_username: >-
+  {{
+    undef(hint = 'zenith_proxy_mitm_auth_basic_username is required')
+    if zenith_proxy_mitm_auth_inject == "basic"
+    else None
+  }}
+zenith_proxy_mitm_auth_basic_password: >-
+  {{
+    undef(hint = 'zenith_proxy_mitm_auth_basic_password is required')
+    if zenith_proxy_mitm_auth_inject == "basic"
+    else None
+  }}
+zenith_proxy_mitm_auth_bearer_header_name: Authorization
+zenith_proxy_mitm_auth_bearer_header_prefix: Bearer
+zenith_proxy_mitm_auth_bearer_token: >-
+  {{
+    undef(hint = 'zenith_proxy_mitm_auth_bearer_token is required')
+    if zenith_proxy_mitm_auth_inject == "bearer"
+    else None
+  }}

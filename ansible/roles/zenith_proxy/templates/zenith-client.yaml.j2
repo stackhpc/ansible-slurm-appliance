@@ -1,0 +1,27 @@
+ssh_identity_path: /home/zenith/.ssh/id_zenith
+
+# Init options
+registrar_url: {{ zenith_registrar_url }}
+token: {{ zenith_proxy_client_token }}
+verify_ssl: {{ 'yes' if zenith_registrar_verify_ssl else 'no' }}
+
+# Connect options
+server_address: {{ zenith_sshd_host }}
+server_port: {{ zenith_sshd_port }}
+{% if zenith_proxy_mitm_enabled %}
+backend_protocol: http
+forward_to_host: 127.0.0.1
+forward_to_port: {{ zenith_proxy_mitm_listen_port }}
+{% else %}
+backend_protocol: {{ zenith_proxy_upstream_scheme }}
+forward_to_host: {{ zenith_proxy_upstream_host }}
+forward_to_port: {{ zenith_proxy_upstream_port }}
+{% endif %}
+{% if zenith_proxy_upstream_read_timeout %}
+read_timeout: {{ zenith_proxy_upstream_read_timeout }}
+{% endif %}
+skip_auth: {{ 'yes' if zenith_proxy_client_auth_skip else 'no' }}
+{% if zenith_proxy_client_auth_params %}
+auth_params:
+  {{ zenith_proxy_client_auth_params | to_nice_yaml | indent(2) }}
+{% endif %}

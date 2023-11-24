@@ -1,0 +1,45 @@
+---
+
+# Provision the infrastructure using Terraform
+- name: Provision infrastructure
+  hosts: openstack
+  roles:
+    - cluster_infra
+
+# Ensure that the secrets are generated and persisted on the control host
+- name: Generate and persist secrets
+  hosts: control
+  gather_facts: no
+  become: yes
+  roles:
+    - persist_openhpc_secrets
+
+# validate.yml asserts presence of a control group which doesn't exist when
+# destroying infra, so only validate when we're not destroying
+- hosts: openstack
+  gather_facts: no
+  become: no
+  tasks:
+    - set_fact:
+        appliances_validate: false
+      when: "cluster_state | default('') == 'absent'"
+
+# TODO: FIXME: maybe by doing the user move in cloud-init?
+# The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
+# This can disrupt the SSH connection, particularly because we use the login host as a jump host
+# So we move the home directory on the login node and reset the connections first
+- hosts: login
+  gather_facts: false
+  tasks:
+    - name: Set up Ansible user
+      user: "{{ (appliances_local_users_default | selectattr('user.name', 'eq', appliances_local_users_ansible_user_name))[0]['user'] }}"
+      become_method: "sudo"
+      # Need to change working directory otherwise we try to switch back to non-existent directory.
+      become_flags: '-i'
+      become: true
+
+- hosts: cluster
+  gather_facts: no
+  tasks:
+    - name: Reset persistent SSH connections
+      meta: reset_connection
