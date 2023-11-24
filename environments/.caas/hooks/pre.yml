@@ -1,15 +1,5 @@
 ---
 
-- name: debug
-  hosts:
-    - localhost
-    - openstack
-  become: no
-  gather_facts: no
-  tasks:
-    - debug:
-        msg: "Starting pre-hook"
-
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
