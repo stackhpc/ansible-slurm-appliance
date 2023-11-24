@@ -130,7 +130,7 @@ resource "openstack_compute_instance_v2" "control" {
       - mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $(readlink -f $(ls /dev/disk/by-id/*${volume.id} | head -n1 ))
       %{endfor}
     mounts:
-      - [LABEL=state, ${var.state_dir}]
+      - [LABEL=state, ${var.state_dir}, auto, "x-systemd.after=cloudinit.service"]
       - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
   EOF
 
