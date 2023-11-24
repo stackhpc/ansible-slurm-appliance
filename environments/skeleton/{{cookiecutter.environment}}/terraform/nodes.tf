@@ -127,7 +127,7 @@ resource "openstack_compute_instance_v2" "control" {
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
     bootcmd:
       %{for volume in [openstack_blockstorage_volume_v3.state, openstack_blockstorage_volume_v3.home]}
-      - mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $(readlink -f $(ls /dev/disk/by-id/*${volume.id} | head -n1 ))
+      - mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 ))
       %{endfor}
     mounts:
       - [LABEL=state, ${var.state_dir}, auto, "x-systemd.after=cloudinit.service"]
