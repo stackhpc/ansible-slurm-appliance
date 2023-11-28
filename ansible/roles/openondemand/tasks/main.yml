@@ -128,3 +128,16 @@
 #   loop:
 #     - /var/www/ood/public
 #     - /usr/share/ondemand-dex/web/themes/
+
+- name: Keyscan login host
+  command:
+    cmd: "ssh-keyscan -t ssh-ed25519 {{ openondemand_clusters.slurm.v2.login.host }}"
+  register: _openondemand_login_key
+
+- name: Add login hostkey to known hosts
+  copy:
+    dest: /etc/ssh/known_hosts
+    content: "{{ _openondemand_login_key.stdout }}"
+    owner: root
+    group: root
+    mode: o=rw,go=r
