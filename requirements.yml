@@ -1,7 +1,8 @@
 ---
 roles:
-  - src: stackhpc.nfs
-    version: v22.9.1
+  - src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
+    version: fix/stale-nfs # TODO: release
+    name: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
     version: v0.23.0 # https://github.com/stackhpc/ansible-role-openhpc/pull/165
     name: stackhpc.openhpc
