@@ -24,13 +24,15 @@ openondemand_dashboard_links_grafana:
     url: "{{ grafana_url_openondemand_proxy }}"
 openondemand_dashboard_links: "{{ openondemand_dashboard_links_grafana if groups['grafana'] | length > 0 }}"
 
+openondemand_login_host: localhost
+
 openondemand_clusters:
   slurm:
     v2:
       metadata:
         title: "{{ openhpc_cluster_name }}" # interpolation here works as openondemand is lexically after openhpc
       login:
-        host: "{{ hostvars[groups['login'].0].api_address }}"
+        host: "{{ openondemand_login_host }}"
         default: true
       job:
         adapter: slurm
