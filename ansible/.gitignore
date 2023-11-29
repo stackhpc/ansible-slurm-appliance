@@ -40,8 +40,6 @@ roles/*
 !roles/proxy/**
 !roles/resolv_conf/
 !roles/resolv_conf/**
-!roles/cve-2023-41914
-!roles/cve-2023-41914/**
 !roles/cluster_infra/
 !roles/cluster_infra/**
 !roles/image_build_infra/
@@ -55,3 +53,5 @@ roles/*
 !roles/persist_hostkeys/
 !roles/persist_hostkeys/**
 !roles/requirements.yml
+!roles/prometheus/
+!roles/prometheus/**
