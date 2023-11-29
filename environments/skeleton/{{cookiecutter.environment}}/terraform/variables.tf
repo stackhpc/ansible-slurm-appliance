@@ -55,18 +55,6 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
-variable "state_volume_device_path" {
-    type = string
-    description = "Path to block device for state"
-    default = "/dev/sdb"
-}
-
-variable "home_volume_device_path" {
-    type = string
-    description = "Path to block device name for home directories"
-    default = "/dev/sdc"
-}
-
 variable "state_dir" {
     type = string
     description = "Path to state directory on control node"

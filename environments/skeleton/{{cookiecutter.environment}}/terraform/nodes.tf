@@ -126,18 +126,13 @@ resource "openstack_compute_instance_v2" "control" {
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
     
-    fs_setup:
-      - label: state
-        filesystem: ext4
-        device: ${var.state_volume_device_path}
-        partition: auto
-      - label: home
-        filesystem: ext4
-        device: ${var.home_volume_device_path}
-        partition: auto
+    bootcmd:
+      %{for volume in [openstack_blockstorage_volume_v3.state, openstack_blockstorage_volume_v3.home]}
+      - mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 ))
+      %{endfor}
 
     mounts:
-      - [LABEL=state, ${var.state_dir}]
+      - [LABEL=state, ${var.state_dir}, auto]
       - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
   EOF
 
