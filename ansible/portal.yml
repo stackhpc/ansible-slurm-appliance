@@ -16,9 +16,17 @@
   become: yes
   gather_facts: yes
   tasks:
+    # Temporary workaround for https://github.com/TurboVNC/turbovnc/issues/387
+    # Assumes that if the repo exists, host is using a fat image, in which case
+    # vnc_compute.yml has already run
+    - name: Check for TurboVNC repo
+      stat:
+        path: /etc/yum.repos.d/TurboVNC.repo
+      register: _turbovnc_repo
     - import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+      when: not _turbovnc_repo.stat.exists
 
 - hosts: openondemand_jupyter
   tags:

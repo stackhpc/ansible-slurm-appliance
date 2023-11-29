@@ -1,0 +1,19 @@
+# Temporary workaround for https://github.com/TurboVNC/turbovnc/issues/387
+
+- hosts: all
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Check for TurboVNC repo
+      stat:
+        path: /etc/yum.repos.d/TurboVNC.repo
+      register: _turbovnc_repo
+    - name: Disable TurboVNC repo
+      community.general.ini_file:
+        path: /etc/yum.repos.d/TurboVNC.repo
+        section: TurboVNC
+        option: enabled
+        value: '0'
+        no_extra_spaces: true
+        create: false
+      when: _turbovnc_repo.stat.exists
