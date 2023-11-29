@@ -132,8 +132,8 @@ resource "openstack_compute_instance_v2" "control" {
       %{endfor}
 
     mounts:
-      - [LABEL=state, ${var.state_dir}, auto]
-      - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
+      - [LABEL=state, ${var.state_dir}, auto, "defaults,x-systemd.requires=cloud-init.service,_netdev,comment=cloudconfig"]
+      - [LABEL=home, /exports/home, auto, "defaults,x-systemd.requires=cloud-init.service,_netdev,comment=cloudconfig,x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
   EOF
 
   lifecycle{
