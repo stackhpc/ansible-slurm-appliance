@@ -12,4 +12,11 @@ slurm_sync_allocations_log_file: "sync_slurm_accounting_vtest.log"
 #slurm_sync_allocations_slurm_path: "/usr/sbin"
 
 #slurm_sync_allocations_install_path: "/nopt/{{sync_slurm_allocations_clustername}}/lex/slurm_sync_allocations"
+#https://mirrors.hpc.nrel.gov/rocky/9.2/extras/x86_64/os/Packages/c/centos-release-ceph-pacific-1.0-2.el9.noarch.rpm
 
+# sync_slurm_allocations vars
+slurm_lex_accounting_dev: False
+#slurm_lex_accounting_clustername: "{{ vermilion_cluster_name_prefix }}"
+
+#sync_slurm_allocations_clustername: "{{ vermilion_cluster_name_prefix }}"
+#slurm_sync_allocations_log_file: "sync_slurm_accounting_{{ vermilion_cluster_name_prefix }}.log"
