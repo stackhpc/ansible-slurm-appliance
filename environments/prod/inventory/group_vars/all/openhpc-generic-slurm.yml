@@ -9,10 +9,10 @@ openhpc_generic_packages: # system package installs:
 
 # define paths to slurm on nodes:
 # TODO: KURT
-openhpc_sbin_dir: /nopt/slurm/23.02.5/sbin
-openhpc_lib_dir: /nopt/slurm/23.02.5/lib/slurm
-openhpc_bin_dir: /nopt/slurm/23.02.5/bin
-openhpc_slurm_conf_path: /nopt/slurm/etc/slurm.conf
+openhpc_sbin_dir:        /nopt/vtest/slurm/23.11.0/sbin
+openhpc_lib_dir:         /nopt/vtest/slurm/23.11.0/lib/slurm
+openhpc_bin_dir:         /nopt/vtest/slurm/23.11.0/bin
+openhpc_slurm_conf_path: /nopt/vtest/slurm/etc/slurm.conf
 
 # modify slurm.conf:
 # TODO: KURT merge with whatever you currently have for openhpc_config_extra
