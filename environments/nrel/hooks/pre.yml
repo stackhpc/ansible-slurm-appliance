@@ -180,13 +180,13 @@
   hosts: all
   tags:
     - vs_pre
-    - aco_ceph_mounts
+    - aco.core.cephfs
   become: true
   tasks:
     - include_role:
-        name: aco_ceph_mount
+        name: aco.core.cephfs
       tags:
-        - aco_ceph_mount
+        - aco.core.cephfs
 
 # TODO - get latest playbook
 # - name: Ensure yum repos are local
