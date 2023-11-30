@@ -21,18 +21,23 @@ ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.acc
 
 ## Define groups for slurm parititions:
 [${cluster_name}_lg]
-${cluster_name}-vt-lg-[001:031]
+#${cluster_name}-vtlg-[001:031]
+${cluster_name}-vtlg-[001:002]
 
 [${cluster_name}_sm]
-${cluster_name}-vt-sm-001
-${cluster_name}-vt-sm-002
+${cluster_name}-vtsm-[001:002]
 
 [${cluster_name}_t]
-${cluster_name}-vt-t-001
-${cluster_name}-vt-t-002
+${cluster_name}-vtt-[001:002]
 
+# partition vs capability? Flavor issue with different sizes of RAM.
 [${cluster_name}_gpu]
-${cluster_name}-vt-gpu-[001:0017]
+#${cluster_name}-vtgpu-[001:017]
+${cluster_name}-vtgpu-[001:002]
+
+[${cluster_name}_gpu3]
+#${cluster_name}-vtgpu-[001:017]
+${cluster_name}-vtgpu3-[001:002]
 
 
 # vt-lg-001: "large"

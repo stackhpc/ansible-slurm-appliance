@@ -1,58 +1,66 @@
 compute_types = {
   large: {
     flavor: "test.compute.c60m240s8e1k"
-    image: "vs_rocky86_20221231"
+    image: "slurm_rocky93_rc"
   }
   standard: {
     flavor: "test.compute.c30m120s60e5000"
-    image: "vs_rocky86_20221231"
+    image: "slurm_rocky93_rc"
   }
   small: {
     flavor: "test.compute.c8m32s8e60"
-    image: "vs_rocky86_20221231"
+    image: "slurm_rocky93_rc"
   }
   tiny: {
     flavor: "test.compute.c4m16s8e60"
-    image: "vs_rocky86_20221231"
+    image: "slurm_rocky93_rc"
   }
   gpu: {
-    flavor: "test.gpu.c30m120s16e5000"
-    image: "vs_rocky86_20221231"
+    flavor: "slurm_test_gpu_gpu0"
+    image: "slurm_rocky93_rc"
+  }
+  gpu3: {
+    flavor: "slurm_test_gpu_gpu3"
+    image: "slurm_rocky93_rc"
   }
 }
 #######################################
 compute_names = {
 # Node-inventory.txt
-vt-lg-001: "large"
-vt-lg-002: "large"
-vt-sm-001: "small"
-vt-sm-002: "small"
-vt-gpu-001: "gpu"
+vtlg-001: "large"
+vtlg-002: "large"
+vtsm-001: "small"
+vtsm-002: "small"
+vtt-001: "small"
+vtt-002: "small"
+vtgpu3-001: "gpu3"
+vtgpu3-002: "gpu3"
 }
 ###################################################
 
 #---- login node info ----
 # name: flavor
 login_names = {
-  vt-login-1: "test.gen.c8m16s16"
-  vt-admin: "test.gen.c8m16s16"
+  vtest-login-1: "slurm_test_service"
+  vtest-admin: "slurm_test_service"
 }
+
 # name: IPaddr
 login_ips = {
-  vt-login-1: "10.60.107.241"
-  vt-admin: "10.60.107.243"
+  vtest-login-1: "10.60.107.241"
+  vttest-admin: "10.60.107.243"
 }
-login_image = "vs_rocky86_20221231"
-login_flavor = "test_admin_c8m16s16"
-# login_flavor = "test.gen.c8m16s16"
+
+login_image = "slurm_rocky93_rc"
+login_flavor = "slurm_test_service"
+
 #---- /login ----
 
-proxy_name = "vt-login-1"
+proxy_name = "vtest-admin"
 
 #---- CONTROL node info ----
-control_image = "vs_rocky86_20221231"
-# control_flavor = "test.gen.c8m16s16"
-control_flavor = "test_admin_c8m16s16"
+control_image = "slurm_rocky93_rc"
+control_flavor = "slurm_test_service"
 control_ip = "10.60.107.240"
 
 ###################################################
@@ -81,6 +89,3 @@ control_subnet = "control-subnet"
 ###########  ^^^^^^^^^^^^^^^ CHANGE THIS
 ##compute_images = {} # allows overrides for specific nodes, by name
 compute_images = {}
-
-#openstack port create --network external --fixed-ip subnet=external,ip-address=10.60.107.240 vtest_control_port
-#openstack port create --network external --fixed-ip subnet=external,ip-address=10.60.107.241 vtest_login1_port
