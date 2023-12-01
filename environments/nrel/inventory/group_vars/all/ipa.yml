@@ -15,4 +15,4 @@ ipaserver_domain: hpc.nrel.gov
 ipaserver_realm: HPC.NREL.GOV
 ipaserver_setup_firewalld: no
 ipaserver_setup_dns: no
-ipa_ds_server: ds1.hpc.nrel.gov
+ipa_ds_server: ds.hpc.nrel.gov

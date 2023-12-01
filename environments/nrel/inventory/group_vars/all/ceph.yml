@@ -43,6 +43,7 @@ ACO_CEPH_MOUNT_DATA:
     FSTYPE: "ceph"
     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
     CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
+
   - NAME: "projects"
     STORAGE_SERVER: "softiron"
     CEPH_ID: "nrel"
@@ -63,24 +64,24 @@ ACO_CEPH_MOUNT_DATA:
 
 
 
-FSTAB_ENTRIES:
-  - SRC: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789:/volumes/_nogroup/15071be0-2c8f-46be-ae0f-d2ecc0c89430
-    PATH: /nopt
-    FSTYPE: ceph
-    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.nopt.secret
+# FSTAB_ENTRIES:
+#   - SRC: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789:/volumes/_nogroup/15071be0-2c8f-46be-ae0f-d2ecc0c89430
+#     PATH: /nopt
+#     FSTYPE: ceph
+#     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.nopt.secret
 
-  - SRC: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789:/volumes/_nogroup/efea823b-b78a-46bb-9e37-6e4f10e59462
-    PATH: /scratch
-    FSTYPE: ceph
-    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.scratch.secret
+#   - SRC: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789:/volumes/_nogroup/efea823b-b78a-46bb-9e37-6e4f10e59462
+#     PATH: /scratch
+#     FSTYPE: ceph
+#     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.scratch.secret
 
-  - SRC: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789:/volumes/_nogroup/12aa91d9-5297-4c1d-a8f2-e1dde1f3e3dd
-    PATH: /home
-    FSTYPE: ceph
-    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.home.secret
+#   - SRC: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789:/volumes/_nogroup/12aa91d9-5297-4c1d-a8f2-e1dde1f3e3dd
+#     PATH: /home
+#     FSTYPE: ceph
+#     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.home.secret
 
-  - SRC: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789:/volumes/_nogroup/572f375c-7b29-486f-8e12-aecbd3b4cfb4
-    PATH: /projects
-    FSTYPE: ceph
-    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.projects.secret
+#   - SRC: 10.60.96.12:6789,10.60.96.13:6789,10.60.96.14:6789:/volumes/_nogroup/572f375c-7b29-486f-8e12-aecbd3b4cfb4
+#     PATH: /projects
+#     FSTYPE: ceph
+#     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.projects.secret
 
