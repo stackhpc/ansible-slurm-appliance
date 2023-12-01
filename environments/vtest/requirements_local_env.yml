@@ -51,6 +51,10 @@ roles:
     src: git+https://github.nrel.gov/acoinf/aco.core.logging.git
     type: git
 
+  - name: aco.core.cephfs
+    src: git+https://github.com/acoinf/aco.core.cephfs
+    type: git
+
   - name: ansible_ipa_ldap_fix
     src: git+https://github.nrel.gov/hpc/ansible_ipa_ldap_fix.git
     type: git
