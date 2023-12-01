@@ -14,27 +14,48 @@ ${cluster_name}-vt-admin
 ${login.name} ansible_host=${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in login.network: net.name => [ net.fixed_ip_v4 ] })}'
 %{ endfor ~}
 
-[compute]
+[compute: children]
+compute_all
+compute_lg
+compute_std
+compute_sm
+compute_t
+compute_gpu0
+compute_gpu3
+
+[compute_gpu: children]
+compute_gpu0
+compute_gpu3
+
+[compute_all]
 %{ for compute in computes ~}
 ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in compute.network: net.name => [ net.fixed_ip_v4 ] })}'
 %{ endfor ~}
 
+[compute_lg]
 ## Define groups for slurm parititions:
 [${cluster_name}_lg]
 #${cluster_name}-vtlg-[001:031]
 ${cluster_name}-vtlg-[001:002]
 
+[compute_std]
+#
+
+[compute_sm]
 [${cluster_name}_sm]
 ${cluster_name}-vtsm-[001:002]
 
+[compute_t]
 [${cluster_name}_t]
 ${cluster_name}-vtt-[001:002]
 
+[compute_gpu0
 # partition vs capability? Flavor issue with different sizes of RAM.
 [${cluster_name}_gpu]
 #${cluster_name}-vtgpu-[001:017]
 ${cluster_name}-vtgpu-[001:002]
 
+[compute_gpu3]
 [${cluster_name}_gpu3]
 #${cluster_name}-vtgpu-[001:017]
 ${cluster_name}-vtgpu3-[001:002]
