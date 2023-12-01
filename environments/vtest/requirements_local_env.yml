@@ -43,6 +43,10 @@ x
 #
 
 roles:
+  - name: vs.core.vastmount
+    src: git+https://github.nrel.gov/acoinf/vs.core.vastmount.git
+    type: git
+
   - name: aco.core.motd
     src: git+https://github.nrel.gov/acoinf/aco.core.motd.git
     type: git
