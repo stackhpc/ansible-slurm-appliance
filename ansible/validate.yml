@@ -2,6 +2,14 @@
 
 # Fail early if configuration is invalid
 
+- name: Validate secrets created
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - import_role:
+        name: passwords
+        tasks_from: validate.yml
+
 - name: Ensure control node is in inventory
   hosts: all
   gather_facts: false

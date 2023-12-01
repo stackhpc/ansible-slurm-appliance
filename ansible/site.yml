@@ -9,7 +9,7 @@
   when: hook_path | exists
 
 - import_playbook: validate.yml
-  when: "{{ appliances_validate | default(true) }}"
+  when: appliances_validate | default(true)
 
 - import_playbook: bootstrap.yml
 
