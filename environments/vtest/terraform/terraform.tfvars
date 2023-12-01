@@ -16,11 +16,11 @@ compute_types = {
     image: "slurm_rocky93_rc"
   }
   gpu: {
-    flavor: "slurm_test_gpu_gpu0"
+    flavor: "slurm_test_gpu0"
     image: "slurm_rocky93_rc"
   }
   gpu3: {
-    flavor: "slurm_test_gpu_gpu3"
+    flavor: "slurm_test_gpu3"
     image: "slurm_rocky93_rc"
   }
 }
