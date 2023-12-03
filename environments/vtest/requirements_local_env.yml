@@ -1,66 +1,24 @@
 ---
-# from THIS directory, run:
-#
-# (venv) vtest/ [centos@slurmdeploy vtest]
-# $ rm -r ./roles/*
-# $ ansible-galaxy install --roles-path ./roles -r requirements_local_env.yml
-#
-x
-
-#  - name: ansible_wait_30
-#    src: git+git@github.nrel.gov:hpc/ansible_wait_30.git
-#    type: git
-
-######
-# TODO: All the "lex" integration stuff has diverged and need to be re-addressed.
-######
-  # - name: cluster_config_manager
-  #   src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
-  #   type: git
-  #   version: feature/galaxy-role-install
-#
-  # - name: cluster_dataset_manager
-  #   src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
-  #   type: git
-  #   version: feature/generic_for_vermilion
-#
-  # - name: sync_slurm_allocations
-  #   src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
-  #   type: git
-  #   version: feature/port_from_eagle_to_generic
-#
-  # - name: slurm_lex_accounting
-  #   src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
-  #   type: git
-  #   version: master
-
----
-# from THIS directory, run:
-#
-# (venv) vtest/ [centos@slurmdeploy vtest]
-# $ rm -r ./roles/*
-# $ ansible-galaxy install --roles-path ./roles -r requirements_local_env.yml
-#
 
 roles:
   - name: vs.core.vastmount
-    src: git+https://github.nrel.gov/acoinf/vs.core.vastmount.git
+    src: git+git@github.nrel.gov:acoinf/vs.core.vastmount.git
     type: git
 
   - name: aco.core.motd
-    src: git+https://github.nrel.gov/acoinf/aco.core.motd.git
+    src: git+git@github.nrel.gov:acoinf/aco.core.motd.git
     type: git
 
   - name: aco.core.logging
-    src: git+https://github.nrel.gov/acoinf/aco.core.logging.git
+    src: git+git@github.nrel.gov:acoinf/aco.core.logging.git
     type: git
 
   - name: aco.core.cephfs
-    src: git+https://github.com/acoinf/aco.core.cephfs
+    src: git+git@github.nrel.gov:acoinf/aco.core.cephfs
     type: git
 
   - name: ansible_ipa_ldap_fix
-    src: git+https://github.nrel.gov/hpc/ansible_ipa_ldap_fix.git
+    src: git+git@github.nrel.gov:hpc/ansible_ipa_ldap_fix.git
     type: git
 
   - name: vstack_admin_config
@@ -80,7 +38,7 @@ roles:
     type: git
 
   - name: aco.core.ntp
-    src: git+https://github.com/acoinf/aco.core.ntp
+    src: git+git@github.nrel.gov:acoinf/aco.core.ntp
     type: git
 
   - name: vs-set-ephemeral-mounts
@@ -108,26 +66,3 @@ roles:
   - name: vs_nvidia_a100_driver_install
     src: git+git@github.nrel.gov:hpc/vs_nvidia_a100_driver_install.git
     type: git
-
-######
-# TODO: All the "lex" integration stuff has diverged and need to be re-addressed.
-######
-  # - name: cluster_config_manager
-  #   src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
-  #   type: git
-  #   version: feature/galaxy-role-install
-#
-  # - name: cluster_dataset_manager
-  #   src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
-  #   type: git
-  #   version: feature/generic_for_vermilion
-#
-  # - name: sync_slurm_allocations
-  #   src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
-  #   type: git
-  #   version: feature/port_from_eagle_to_generic
-#
-  # - name: slurm_lex_accounting
-  #   src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
-  #   type: git
-  #   version: master
