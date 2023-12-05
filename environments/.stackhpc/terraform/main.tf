@@ -13,7 +13,7 @@ variable "cluster_name" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    default = "openhpc-231201-1606-1b453aff" # https://github.com/stackhpc/ansible-slurm-appliance/pull/340
+    default = "openhpc-231205-1542-059b54c3" # https://github.com/stackhpc/ansible-slurm-appliance/pull/340
     # default = "Rocky-8-GenericCloud-Base-8.8-20230518.0.x86_64.qcow2"
 }
 
