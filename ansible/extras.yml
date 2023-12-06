@@ -1,4 +1,4 @@
-- hosts: basic_users
+- hosts: basic_users:!builder
   become: yes
   tags:
     - basic_users
