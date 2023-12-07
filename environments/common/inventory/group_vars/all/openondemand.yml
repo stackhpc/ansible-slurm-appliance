@@ -107,7 +107,6 @@ openondemand_apps_desktop_default:
     ---
     script:
       job_name: "ood-desktop"
-      copy_environment: true
       native:
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
