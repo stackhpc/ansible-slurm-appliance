@@ -1,0 +1,7 @@
+terraform_templates: [main.tf.j2]
+terraform_project_path:
+terraform_autoapprove: false
+terraform_binary_path:
+terraform_backend_config: {}
+terraform_variables: {}
+terraform_state: present

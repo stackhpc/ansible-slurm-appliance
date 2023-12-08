@@ -1,0 +1,36 @@
+ci_cluster_name: "{{ lookup('env', 'CI_CLUSTER_NAME') }}"
+dev_cluster_name: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') | basename | split('-') | last }}" # dev directories use slurm-app-$FEATURE for directories
+cluster_name: "{{ ci_cluster_name | default(dev_cluster_name, true) }}" # true means use default if value is empty string
+
+cluster_volumes: # can reduce the size a lot for dev/CI
+  state:
+    description: Persistent state
+    size: 10 # GB
+  home:
+    description: User home directories
+    size: 10 # GB
+
+# TODO: support SMS-labs here too
+cluster_instance_defaults:
+  image_name: openhpc-230926-1343-e3d3e307 # https://github.com/stackhpc/ansible-slurm-appliance/pull/314
+  flavor_name: vm.ska.cpu.general.small
+  key_pair: slurm-app-ci
+  ports:
+    - network_name: portal-internal # required str (tf standard: network_id)
+  secgroup_names:
+    - default
+
+cluster_instances:
+  login:
+    secgroup_names: [default, SSH]
+  compute-[0-3]:
+  control:
+    flavor_name: vm.ska.cpu.general.quarter
+    volumes:
+      state:
+        device_path: /dev/sdb
+        mount_point: /var/lib/state
+      home:
+        device_path: /dev/sdc
+        mount_point: /exports/home
+        mount_options: x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service

@@ -1,0 +1,7 @@
+- name: Template Terraform configurations
+  template:
+    src: "{{ item }}"
+    dest: "{{ terraform_project_path }}/{{ (item | splitext | first) if item.endswith('.j2') else item }}"
+  loop: "{{ terraform_templates }}"
+
+- include_tasks: apply.yml

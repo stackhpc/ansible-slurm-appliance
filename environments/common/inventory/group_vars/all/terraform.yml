@@ -1,0 +1,1 @@
+terraform_project_path: "{{ appliances_environment_root }}/terraform"
