@@ -57,29 +57,6 @@
     - terraform_state == "present"
     - cluster_upgrade_system_packages is not defined or not cluster_upgrade_system_packages
 
-- name: Detect volume device prefix from image metadata
-  block:
-    - name: Get image metadata from OpenStack API
-      openstack.cloud.image_info:
-        image: "{{ cluster_previous_image | default(cluster_image) }}"
-      register: cluster_image_info
-    - name: Check only single image found
-      assert:
-        that: cluster_image_info.images | length == 1
-        fail_msg: "Multiple images found for 'cluster_image' {{ cluster_image }}"
-    - name: Set volume_device_prefix fact
-      set_fact:
-        block_device_prefix: >-
-           {{
-              'sd' if (cluster_image_info.images | first).hw_scsi_model is defined and
-              (cluster_image_info.images | first).hw_scsi_model in scsi_models
-              else 'vd'
-           }}
-  # Only run when block_device_prefix isn't set as an extravar
-  when:
-    - block_device_prefix is not defined
-    - cluster_image is defined
-
 - name: Template Terraform files into project directory
   template:
     src: >-

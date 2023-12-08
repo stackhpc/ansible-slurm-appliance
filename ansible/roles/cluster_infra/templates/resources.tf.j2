@@ -358,18 +358,13 @@ resource "openstack_compute_instance_v2" "control" {
     {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
       - {{ ssh_key }}
     {%- endfor %}
-    fs_setup:
-      - label: state
-        filesystem: ext4
-        device: /dev/{{ block_device_prefix }}b
-        partition: auto
-      - label: home
-        filesystem: ext4
-        device: /dev/{{ block_device_prefix }}c
-        partition: auto
+    bootcmd:
+    %{for volume in [openstack_blockstorage_volume_v3.state, openstack_blockstorage_volume_v3.home]}
+    - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
+    %{endfor}
     mounts:
-        - [LABEL=state, /var/lib/state, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
-        - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
+        - [LABEL=state, {{ appliances_state_dir }}, auto]
+        - [LABEL=home, /exports/home, auto]
   EOF
 }
 
