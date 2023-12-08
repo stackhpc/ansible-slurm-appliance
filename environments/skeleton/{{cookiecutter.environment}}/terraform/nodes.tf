@@ -141,12 +141,6 @@ resource "openstack_compute_instance_v2" "control" {
       - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
   EOF
 
-  lifecycle{
-    ignore_changes = [
-      image_name,
-      ]
-    }
-
 }
 
 resource "openstack_compute_instance_v2" "login" {
@@ -184,12 +178,6 @@ resource "openstack_compute_instance_v2" "login" {
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
   EOF
 
-  lifecycle{
-    ignore_changes = [
-      image_name,
-      ]
-    }
-
 }
 
 resource "openstack_compute_instance_v2" "compute" {
@@ -226,11 +214,5 @@ resource "openstack_compute_instance_v2" "compute" {
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
   EOF
-
-  lifecycle{
-    ignore_changes = [
-      image_name,
-      ]
-    }
 
 }
