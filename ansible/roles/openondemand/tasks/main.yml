@@ -131,16 +131,16 @@
 
 - name: Keyscan login host
   command:
-    cmd: "ssh-keyscan -t ssh-ed25519 {{ openondemand_clusters.slurm.v2.login.host }}"
+    cmd: "ssh-keyscan {{ openondemand_clusters.slurm.v2.login.host }}"
   register: _openondemand_login_key
   changed_when: false
 
-- name: Add login hostkey to known hosts
-  lineinfile:
-    path: /etc/ssh/known_hosts
+- name: Add login hostkeys to known hosts
+  blockinfile:
+    path: /etc/ssh/ssh_known_hosts
     create: true
-    line: "{{ _openondemand_login_key.stdout }}"
-    regexp: "^{{ openondemand_clusters.slurm.v2.login.host}}"
+    block: "{{ _openondemand_login_key.stdout }}"
+    marker: "# {mark} ANSIBLE MANGED BLOCK: openondemand login host" # allows other tasks to use blockinfile on this file
     owner: root
     group: root
     mode: o=rw,go=r
