@@ -140,7 +140,7 @@
     path: /etc/ssh/ssh_known_hosts
     create: true
     block: "{{ _openondemand_login_key.stdout_lines | sort | join('\n') }}"
-    marker: "# {mark} ANSIBLE MANGED BLOCK: openondemand login host" # allows other tasks to use blockinfile on this file
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: openondemand login host" # allows other tasks to use blockinfile on this file
     owner: root
     group: root
     mode: o=rw,go=r
