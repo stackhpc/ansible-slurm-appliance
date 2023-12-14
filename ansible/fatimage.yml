@@ -41,10 +41,16 @@
         tasks_from: client-install.yml
       when: "'freeipa_client' in group_names"
 
-    # - import_playbook: filesystems.yml
-    - name: nfs
+    # - import_playbook: filesystems.yml:
+    - name: Install nfs packages
       dnf:
         name: nfs-utils
+      when: "'nfs' in group_names"
+    - name: Install Manila client packages
+      include_role:
+        name: stackhpc.os-manila-mount
+        tasks_from: install.yml
+      when: "'manila' in group_names"
 
 - import_playbook: extras.yml
 

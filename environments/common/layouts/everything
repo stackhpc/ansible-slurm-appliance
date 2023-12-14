@@ -66,3 +66,6 @@ openhpc
 
 [proxy]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
+
+[manila]
+# Hosts to configure for manila fileshares

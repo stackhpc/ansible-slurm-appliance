@@ -20,6 +20,9 @@ roles:
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
     version: v3.0.6
+  - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
+    name: stackhpc.os-manila-mount
+    version: feat/openstack-sdk # TODO: replace with release
 
 collections:
   - name: containers.podman
