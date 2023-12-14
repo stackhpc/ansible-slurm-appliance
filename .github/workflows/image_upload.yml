@@ -1,0 +1,53 @@
+name: Upload CI-tested image to Arcus S3
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Test deployment and reimage on OpenStack
+    types:
+      - complete
+    branches:
+      - main # only want to run after merge has successfully passed CI
+jobs:
+  image_upload:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    concurrency: ${{ github.ref }} # to branch/PR
+    env:
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record which cloud CI is running on
+        run: |
+          echo CI_CLOUD: ${{ vars.CI_CLOUD }}
+
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Write s3cmd configuration
+        run: |
+          echo "${{ secrets['ARCUS_S3CFG'] }}" > ~/.s3cfg
+        shell: bash
+
+      - name: Install s3cmd
+        run: |
+          sudo apt-get --yes install s3cmd
+
+      - name: Upload latest image if missing
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ansible-playbook -v ansible/ci/upload_image.yml
