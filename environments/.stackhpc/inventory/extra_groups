@@ -22,3 +22,8 @@ cluster
 # [resolv_conf:children]
 # freeipa_client
 # --- end of FreeIPA example ---
+
+[manila:children]
+# TODO: add to caas too
+login
+compute

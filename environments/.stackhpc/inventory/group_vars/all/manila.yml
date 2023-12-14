@@ -1,0 +1,8 @@
+os_manila_mount_shares:
+  - share_name: "{{ openhpc_cluster_name }}-scratch"
+    share_user: "{{ ansible_user }}"
+    mount_path: /scratch
+    mount_user: "{{ ansible_user }}"
+    mount_group: "{{ ansible_user }}"
+
+os_manila_mount_ceph_version: nautilus
