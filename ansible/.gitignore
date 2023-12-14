@@ -53,5 +53,3 @@ roles/*
 !roles/persist_hostkeys/
 !roles/persist_hostkeys/**
 !roles/requirements.yml
-!roles/prometheus/
-!roles/prometheus/**
