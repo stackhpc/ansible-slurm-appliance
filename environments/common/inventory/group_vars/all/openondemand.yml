@@ -1,11 +1,20 @@
 ---
 
-# See: ansible/roles/openondemand/README.md 
-# for variable definitions.
+# Defaults for Open Ondemand configuration.
+# See ansible/roles/openondemand/README.md for all definitions.
 
 # NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
-# openondemand_servername: '' # Must be defined when using openondemand
+# --- Variables likely to need environment-specific overrides ---
+openondemand_servername: "{{ hostvars[ groups['openondemand'] | first].ansible_host }}"
+# This assumes access via a SOCKS proxy. If not, set to external address - see full description in ansible/roles/openondemand/README.md
+openondemand_auth: basic_pam
+openondemand_jupyter_partition: "{{ openhpc_slurm_partitions[0]['name'] }}"
+openondemand_desktop_partition: "{{ openhpc_slurm_partitions[0]['name'] }}"
+openondemand_dashboard_support_url: ''
+openondemand_dashboard_docs_url: ''
+openondemand_filesapp_paths: []
+# --- end --
 
 # Regex defining hosts which openondemand can proxy; the default regex is compute nodes (for apps) and grafana host,
 # e.g. if the group `compute` has hosts `compute-{0,1,2,..}` this will be '(compute-\d+)|(control)'.
@@ -149,8 +158,6 @@ openondemand_apps_jupyter_default:
 openondemand_apps_jupyter: "{{ {'jupyter':openondemand_apps_jupyter_default} if openondemand_jupyter_partition | default(none) else {} }}"
 
 # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
-openondemand_dashboard_support_url: ''
-openondemand_dashboard_docs_url: ''
 openondemand_apps:
   files:
     env:
