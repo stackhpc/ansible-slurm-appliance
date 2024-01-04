@@ -10,6 +10,7 @@
     state: directory
     owner: podman
     group: podman
+    mode: ug=rwX,o=
     recurse: true
   loop:
     - "{{ prometheus_config_dir }}"

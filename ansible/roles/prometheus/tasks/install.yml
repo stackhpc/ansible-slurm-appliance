@@ -15,7 +15,7 @@
     podman_service_type: container
     podman_service_image: "{{ prometheus_container_image }}"
     podman_service_volumes:
-      - "{{ prometheus_config_dir }}:/etc/prometheus/:ro"
+      - "{{ prometheus_config_dir }}:/etc/prometheus/:U,ro"
       - "{{ prometheus_db_dir }}:/prometheus:U"
     podman_service_command: | # TODO: make retention time/size runtime configurable (can't be specified in config yml)
       --config.file=/etc/prometheus/prometheus.yml \
