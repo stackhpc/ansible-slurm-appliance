@@ -17,7 +17,7 @@
     podman_service_volumes:
       - "{{ prometheus_config_dir }}:/etc/prometheus/:U,ro"
       - "{{ prometheus_db_dir }}:/prometheus:U"
-    podman_service_command: | # TODO: make retention time/size runtime configurable (can't be specified in config yml)
+    podman_service_command: |
       --config.file=/etc/prometheus/prometheus.yml \
       --storage.tsdb.path=/prometheus \
       --web.console.libraries=/usr/share/prometheus/console_libraries \
