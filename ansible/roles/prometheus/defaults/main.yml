@@ -1,5 +1,5 @@
 prometheus_container_image: "prom/prometheus"
-prometheus_version:  "v2.36.2"
+prometheus_version:  "v2.48.1"
 
 # Variables below are compatible with the deprecated, non-containerised [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role
 prometheus_alert_rules: []
