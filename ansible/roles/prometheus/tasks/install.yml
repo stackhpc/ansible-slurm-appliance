@@ -1,0 +1,25 @@
+---
+
+- name: Install systemd unit for Prometheus
+  include_role:
+    name: podman
+    tasks_from: systemd-unit.yml
+  vars:
+    podman_service_name: prometheus
+    podman_service_type: container
+    podman_service_image: "{{ prometheus_container_image }}:{{ prometheus_version }}"
+    podman_service_volumes:
+      - "{{ prometheus_config_dir }}:/etc/prometheus/:U,ro"
+      - "{{ prometheus_db_dir }}:/prometheus:U"
+    podman_service_command: |
+      --config.file=/etc/prometheus/prometheus.yml \
+      --storage.tsdb.path=/prometheus \
+      --web.console.libraries=/usr/share/prometheus/console_libraries \
+      --web.console.templates=/usr/share/prometheus/consoles \
+      --storage.tsdb.retention.size={{ prometheus_storage_retention_size }} \
+      --storage.tsdb.retention.time={{ prometheus_storage_retention }}
+    podman_service_network: host
+
+- name: Reload Prometheus unit file
+  command: systemctl daemon-reload
+  when: podman_systemd_unit.changed

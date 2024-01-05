@@ -1,0 +1,52 @@
+[Unit]
+Description=Podman container-{{ podman_service_name }}.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network.target
+After=network-online.target
+{% if podman_service_pod is defined and podman_service_pod %}
+BindsTo={{ podman_service_pod }}.service
+PartOf={{ podman_service_pod }}.service
+After={{ podman_service_pod }}.service
+{% endif %}
+{% for service in podman_service_wants %}
+Wants={{ service }}.service
+After={{ service }}.service
+{% endfor %}
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Type=simple
+Restart=always
+User={{ podman_service_user }}
+Group={{ podman_service_group }}
+ExecStart=/usr/bin/podman run \
+    --cgroups=no-conmon \
+    --replace \
+    --restart=no \
+    --name {{ podman_service_name }} \
+{% if podman_service_network is defined %}
+    --network {{ podman_service_network }} \
+{% endif %}
+{% if podman_service_pod is defined and podman_service_pod %}
+    --pod {{ podman_service_pod }} \
+{% endif %}
+{% for port in podman_service_ports %}
+    --publish {{ port }} \
+{% endfor %}
+{% for name, value in podman_service_env.items() %}
+    --env {{ (name + "=" + value) | quote }} \
+{% endfor %}
+{% for volume in podman_service_volumes %}
+    --volume {{ volume }} \
+{% endfor %}
+{% if podman_service_command is defined %}
+    {{ podman_service_image }} \
+    {{ podman_service_command }}
+{% else %}
+    {{ podman_service_image }}
+{% endif %}
+ExecStop=/usr/bin/podman stop --ignore -t 10 {{ podman_service_name }}
+ExecStopPost=/usr/bin/podman rm --ignore -f {{ podman_service_name }}
+
+[Install]
+WantedBy=multi-user.target default.target
