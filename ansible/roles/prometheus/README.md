@@ -2,7 +2,7 @@
 Creates a systemd service `prometheus` which uses the `podman` user to run a containerised [Prometheus](https://github.com/prometheus/prometheus) monitoring system.
 
 Note this contains two task books:
-    - `install.yml`: This is safe to run during a Packer build. It pulls the container image and creates the systemd unit file.
+    - `install.yml`: This is safe to run during a Packer build. It creates the systemd unit file.
     - `runtime.yml`: This cannot be run during a Packer build. It templates out config and restarts/starts the service as required.
 
 ## Role Variables
