@@ -68,6 +68,12 @@
   with_dict: "{{ prometheus_targets }}"
   when: prometheus_targets != {}
 
+- name: Pull image for Prometheus
+  containers.podman.podman_image:
+    name: "{{ prometheus_container_image }}:{{ prometheus_version }}"
+  become_user: podman
+  notify: Restart Prometheus
+
 - meta: flush_handlers # handles restarts due to config changes
 
 - name: Ensure Prometheus service state

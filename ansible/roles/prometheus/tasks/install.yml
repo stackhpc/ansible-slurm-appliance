@@ -1,11 +1,5 @@
 ---
 
-- name: Pull image for Prometheus
-  containers.podman.podman_image:
-    name: "{{ prometheus_container_image }}:{{ prometheus_version }}"
-  become: yes
-  become_user: podman
-
 - name: Install systemd unit for Prometheus
   include_role:
     name: podman
