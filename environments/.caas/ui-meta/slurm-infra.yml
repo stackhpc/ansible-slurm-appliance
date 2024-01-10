@@ -63,16 +63,6 @@ parameters:
     options:
       checkboxLabel: Run post-configuration validation?
 
-  - name: home_manila_share
-    label: Home directories
-    description: Enable persistent home directories shared between all platforms in this tenancy via Manila/CephFS
-    kind: boolean
-    required: false
-    default: true
-    immutable: true # avoids user surprises!
-    options:
-      checkboxLabel: Cross-platform persistent home directories
-
 usage_template: |-
   # Accessing the cluster using Open OnDemand
 
