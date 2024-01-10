@@ -9,4 +9,4 @@ os_manila_mount_shares: []
   #   mount_user:
   #   mount_group
 
-# os_manila_mount_ceph_version: pacific # role default
+# os_manila_mount_ceph_version: nautilus # role default

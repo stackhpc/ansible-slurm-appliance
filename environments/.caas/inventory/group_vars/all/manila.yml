@@ -1,0 +1,9 @@
+caas_manila_home:
+  - share_name: azimuth-platform-share-test # TODO: remove test!
+    mount_path: /home
+    mount_user: root
+    mount_group: root
+    mount_mode: u=rwX,go=rX
+
+# home_manila_share set by platform UI:
+os_manila_mount_shares: "{{ caas_manila_home if home_manila_share | bool else [] }}"
