@@ -40,21 +40,6 @@ variable "volume_backed_instances" {
     default = false
 }
 
-resource "openstack_sharedfilesystem_share_v2" "scratch" {
-  name             = "${var.cluster_name}-scratch"
-  description      = "test share for ${var.cluster_name}-scratch"
-  share_proto      = "CEPHFS"
-  share_type       = "ceph01_cephfs" # no default set on arcus
-  size             = 1 # GB
-}
-
-resource "openstack_sharedfilesystem_share_access_v2" "rocky" {
-  share_id     = openstack_sharedfilesystem_share_v2.scratch.id
-  access_type  = "cephx"
-  access_to    = "rocky"
-  access_level = "rw"
-}
-
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
