@@ -13,4 +13,4 @@ caas_manila_project:
   mount_group: root
   mount_mode: ugo=rwX
 
-os_manila_mount_shares: "{{ ([caas_manila_home] if cluster_home_manila_share | bool else []) + ([caas_manila_project] if cluster_project_manila_share | bool else []) }}""
+os_manila_mount_shares: "{{ ([caas_manila_home] if cluster_home_manila_share | bool else []) + ([caas_manila_project] if cluster_project_manila_share | bool else []) }}"

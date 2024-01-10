@@ -84,12 +84,12 @@ resource "openstack_sharedfilesystem_share_v2" "home" {
   name = "{{ cluster_name }}-home"
   description = "Home for control node"
   share_proto = "CEPHFS"
-  share_type = "{{ cluster_manila_share_type }}"
+  share_type = "{{ cluster_home_manila_share_type }}"
   size = "{{ home_volume_size }}"
 }
 
 resource "openstack_sharedfilesystem_share_access_v2" "home" {
-  share_id     = openstack_sharedfilesystem_share_v2.scratch.id
+  share_id     = openstack_sharedfilesystem_share_v2.home.id
   access_type  = "cephx"
   access_to    = "{{ cluster_id }}" # TODO: is this guranteed to be unique across all projects? Presumably?
   access_level = "rw"
