@@ -79,7 +79,22 @@ resource "openstack_blockstorage_volume_v3" "state" {
     size = "{{ state_volume_size }}"
 }
 
-{% if not home_manila_share %}
+{% if cluster_home_manila_share | bool %}
+resource "openstack_sharedfilesystem_share_v2" "home" {
+  name = "{{ cluster_name }}-home"
+  description = "Home for control node"
+  share_proto = "CEPHFS"
+  share_type = "{{ cluster_manila_share_type }}"
+  size = "{{ home_volume_size }}"
+}
+
+resource "openstack_sharedfilesystem_share_access_v2" "home" {
+  share_id     = openstack_sharedfilesystem_share_v2.scratch.id
+  access_type  = "cephx"
+  access_to    = "{{ cluster_id }}" # TODO: is this guranteed to be unique across all projects? Presumably?
+  access_level = "rw"
+}
+{% else %}
 resource "openstack_blockstorage_volume_v3" "home" {
     name = "{{ cluster_name }}-home"
     description = "Home for control node"
@@ -336,7 +351,7 @@ resource "openstack_compute_instance_v2" "control" {
       uuid = openstack_blockstorage_volume_v3.state.id
   }
 
-  {% if not home_manila_share %}
+  {% if not cluster_home_manila_share | bool %}
   # home volume:
   block_device {
       destination_type = "volume"
@@ -363,12 +378,12 @@ resource "openstack_compute_instance_v2" "control" {
       - {{ ssh_key }}
     {%- endfor %}
     bootcmd:
-    %{for volume in [openstack_blockstorage_volume_v3.state, {% if not home_manila_share %} openstack_blockstorage_volume_v3.home {% endif %}]}
+    %{for volume in [openstack_blockstorage_volume_v3.state, {% if not cluster_home_manila_share | bool %} openstack_blockstorage_volume_v3.home {% endif %}]}
     - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
     %{endfor}
     mounts:
         - [LABEL=state, {{ appliances_state_dir }}, auto]
-        {% if not home_manila_share %}
+        {% if not cluster_home_manila_share | bool %}
         - [LABEL=home, /exports/home, auto]
         {% endif %}
   EOF

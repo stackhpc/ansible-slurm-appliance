@@ -17,5 +17,4 @@ caas_nfs_home:
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
 
-# home_manila_share set by platform UI:
-nfs_configurations: "{{ caas_nfs_ood_state + (caas_nfs_home if not home_manila_share | bool else []) }}"
+nfs_configurations: "{{ caas_nfs_ood_state + (caas_nfs_home if not cluster_home_manila_share | bool else []) }}"
