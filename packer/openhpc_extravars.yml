@@ -1,1 +1,1 @@
-update_enable: true
+workaround_ansible_issue_61497: yes # extravars files can't be empty
