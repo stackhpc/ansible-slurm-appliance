@@ -5,3 +5,9 @@
     src: filebeat.service.j2
   become: true
   notify: Restart filebeat container
+
+- name: Pull container image
+  containers.podman.podman_image:
+    name: "docker.elastic.co/beats/filebeat-oss"
+    tag: "{{ filebeat_version }}"
+  become_user: "{{ filebeat_podman_user }}"

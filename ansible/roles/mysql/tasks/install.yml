@@ -8,3 +8,9 @@
     dest: /etc/systemd/system/mysql.service
     src: mysql.service.j2
   register: _mysql_unitfile
+
+- name: Pull container image
+  containers.podman.podman_image:
+    name: "mysql"
+    tag: "{{ mysql_tag }}"
+  become_user: "{{ mysql_podman_user }}"
