@@ -5,18 +5,21 @@ locals {
 
 data "openstack_images_image_v2" "control" {
   name = var.control_node.image
+  most_recent = true
 }
 
 data "openstack_images_image_v2" "login" {
   for_each = var.login_nodes
 
   name = each.value.image
+  most_recent = true
 }
 
 data "openstack_images_image_v2" "compute" {
   for_each = var.compute_nodes
 
   name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
+  most_recent = true
 }
 
 resource "openstack_networking_port_v2" "login" {
@@ -83,7 +86,7 @@ resource "openstack_compute_instance_v2" "control" {
   for_each = toset(["control"])
   
   name = "${var.cluster_name}-${each.key}"
-  image_name = data.openstack_images_image_v2.control.name
+  image_id = data.openstack_images_image_v2.control.id
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
   
@@ -143,7 +146,7 @@ resource "openstack_compute_instance_v2" "login" {
   for_each = var.login_nodes
   
   name = "${var.cluster_name}-${each.key}"
-  image_name = each.value.image
+  image_id = data.openstack_images_image_v2.login[each.key].id
   flavor_name = each.value.flavor
   key_pair = var.key_pair
 
@@ -180,7 +183,7 @@ resource "openstack_compute_instance_v2" "compute" {
   for_each = var.compute_nodes
   
   name = "${var.cluster_name}-${each.key}"
-  image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
+  image_id = data.openstack_images_image_v2.compute[each.key].id
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
 
