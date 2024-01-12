@@ -8,6 +8,4 @@ fatimage_source_image_name = "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qc
 ssh_keypair_name = "slurm-app-ci"
 ssh_private_key_file = "~/.ssh/id_rsa"
 security_groups = ["default", "SSH"]
-// ssh_bastion_host = "128.232.222.183"
-// ssh_bastion_username = "slurm-app-ci"
 floating_ip_network = "CUDN-Internet" # Use FIP to avoid docker ratelimits on portal-internal outbound IP
