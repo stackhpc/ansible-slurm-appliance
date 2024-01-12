@@ -1,4 +1,4 @@
 ---
 
-# Set Prometheus storage retention size
-prometheus_storage_retention_size: "{{ metrics_db_maximum_size }}GB"
+# We reserve 10GB of the state volume for cluster state, the rest is for metrics
+prometheus_storage_retention_size: "{{ state_volume_size - 10 }}GB"
