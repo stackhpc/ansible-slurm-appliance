@@ -4,10 +4,14 @@
     dest: /etc/systemd/system/filebeat.service
     src: filebeat.service.j2
   become: true
-  notify: Restart filebeat container
+  register: _filebeat_unit
 
 - name: Pull container image
   containers.podman.podman_image:
     name: "docker.elastic.co/beats/filebeat-oss"
     tag: "{{ filebeat_version }}"
   become_user: "{{ filebeat_podman_user }}"
+
+- name: Reload filebeat unit file
+  command: systemctl daemon-reload
+  when: _filebeat_unit.changed

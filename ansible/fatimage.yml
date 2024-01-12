@@ -77,10 +77,10 @@
         name: opensearch
         tasks_from: install.yml
       become: true
-
-    #   opensearch - containerised, nothing to do
     # slurm_stats - nothing to do
-    # filebeat - containerised - nothing to do
+    - import_role:
+        name: filebeat
+        tasks_from: install.yml
 
     - import_role:
       # can't only run cloudalchemy.node_exporter/tasks/install.yml as needs vars from preflight.yml and triggers service start
