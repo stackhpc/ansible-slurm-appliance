@@ -92,12 +92,12 @@ variable "image_visibility" {
 
 variable "ssh_bastion_host" {
   type = string
-  default = ""
+  default = null
 }
 
 variable "ssh_bastion_username" {
   type = string
-  default = ""
+  default = null
 }
 
 variable "ssh_bastion_private_key_file" {
