@@ -52,7 +52,11 @@
   become: yes
   gather_facts: no
   tasks:
-    # - import_playbook: slurm.yml
+    # - import_playbook: slurm.yml:
+    - name: Setup DB
+      include_role:
+        name: mysql
+        tasks_from: install.yml
     - name: OpenHPC
       import_role:
         name: stackhpc.openhpc
