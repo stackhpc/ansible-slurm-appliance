@@ -28,38 +28,5 @@
     path: "/home/{{ ansible_user }}/.ssh/"
     state: absent
 
-# A podman pause process is started by `podman pull`, and causes an error
-#   Error: cannot re-exec process to join the existing user namespace
-# in podman commands in the booted image due to its pidfile.
-# Later podman versions may cleanup the pidfile automatically.
-# NB: This hard-codes the default config that only `podman` user (=1001) runs containers.
-- name: Check for running podman containers
-  command:
-    cmd: podman ps
-  become_user: podman
-  register: podman_ps
-  changed_when: false
-
-- name: Ensure no containers are running
-  assert:
-    that: podman_ps.stdout_lines | length == 1 # header only
-    fail_msg: "podman user has running containers:\n{{ podman_ps.stdout }}"
-
-- name: Get PID of podman pause process
-  command:
-    cmd: cat /tmp/podman-run-1001/libpod/tmp/pause.pid
-  register: podman_pause_pidfile
-  changed_when: false
-
-- name: Kill pause process
-  command:
-    cmd: "kill {{ podman_pause_pidfile.stdout }}"
-  become_user: podman
-
-- name: Remove pause pidfile
-  file:
-    path: /tmp/podman-run-1001/libpod/tmp/pause.pid
-    state: absent
-
 - name: Run cloud-init cleanup
   command: cloud-init clean --logs --seed
