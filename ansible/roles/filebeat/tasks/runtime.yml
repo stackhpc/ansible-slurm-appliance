@@ -27,3 +27,13 @@
       mode: 0600
   notify: Restart filebeat container
   become: true
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Ensure filebeat service state
+  systemd:
+    name: filebeat.service
+    state: started
+    enabled: true
+  become: true
