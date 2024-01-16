@@ -24,6 +24,6 @@ cluster
 # --- end of FreeIPA example ---
 
 [manila:children]
-# TODO: add to caas too
+# Allows demo; also installs manila client in fat image
 login
 compute
