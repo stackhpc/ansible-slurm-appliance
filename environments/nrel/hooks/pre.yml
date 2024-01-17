@@ -14,21 +14,21 @@
 #     - include_role:
 #         name: releasever-config
 
-- name: "fix possibly bad repo pointers"
-  hosts: all
-  tags:
-    - vs_pre
-    - nrel_repofix
-  become: true
-  tasks:
-    - shell:
-        cmd: for FF in `ls /etc/yum.repos.d/Rocky*`; do sed -i 's#gov/rocky/#gov/rocky-vault/#g' $FF; done
+# - name: "fix possibly bad repo pointers"
+#   hosts: all
+#   tags:
+#     - vs_pre
+#     - nrel_repofix
+#   become: true
+#   tasks:
+#     - shell:
+#         cmd: for FF in `ls /etc/yum.repos.d/Rocky*`; do sed -i 's#gov/rocky/#gov/rocky-vault/#g' $FF; done
 
-    - name: "change root password"
-      user:
-        name: root
-        update_password: always
-        password: "{{ vault_vs_root_pass|password_hash('sha256') }}"
+#     - name: "change root password"
+#       user:
+#         name: root
+#         update_password: always
+#         password: "{{ vault_vs_root_pass|password_hash('sha256') }}"
 
 - name: NREL pre - Ensure times are correct
   hosts: all

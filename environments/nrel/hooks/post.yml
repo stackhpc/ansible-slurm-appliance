@@ -142,7 +142,9 @@
         name: ansible_ipa_ldap_fix
 
 - name: "Nvidia A100 video driver install"
-  hosts: vermilion_gpu
+  hosts:
+    - compute_gpu0
+    - compute_gpu3
   become: true
   tags:
     - vs_nvidia_a100_driver_install

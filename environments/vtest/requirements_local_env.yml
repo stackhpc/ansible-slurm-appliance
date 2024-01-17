@@ -1,6 +1,17 @@
 ---
-
 roles:
+  - name: aco.prov.yum
+    src: git+git@github.nrel.gov:acoinf/aco.prov.yum.git
+    version: main
+
+  - name: root_pass
+    src: git+git@github.nrel.gov:hpc/ansible_root_pass.git
+    version: master
+
+  - name: os_stackmgr_user
+    src: git+git@github.nrel.gov:hpc/openstack_stackmgr_user.git
+    version: master
+
   - name: vs.core.vastmount
     src: git+git@github.nrel.gov:acoinf/vs.core.vastmount.git
     type: git
@@ -23,7 +34,7 @@ roles:
 
   - name: vstack_admin_config
     src: git+git@github.nrel.gov:hpc/vstack_admin_config.git
-    type: git
+    type: gqit
 
   - name: vstack_common_config
     src: git+git@github.nrel.gov:hpc/vstack_common_config.git

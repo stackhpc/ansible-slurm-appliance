@@ -296,18 +296,22 @@ resource "openstack_compute_instance_v2" "computes" {
   key_pair = var.key_pair
   config_drive = true
   availability_zone = var.cluster_availability_zone
+  #availability_zone_hints = "{{ var.cluster_availability_zone }}:vs-0519-u03a"
 
   network {
     port = openstack_networking_port_v2.compute_control[each.key].id
+    #name = "control"
   }
 
   network {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
+    #name = "compute"
     access_network = true
   }
 
   network {
     port = openstack_networking_port_v2.compute_storage[each.key].id
+    #name = "storage"
   }
 
 }

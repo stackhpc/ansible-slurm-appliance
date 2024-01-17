@@ -1,18 +1,15 @@
+
 compute_types = {
-  large: {
-    flavor: "test.compute.c60m240s8e1k"
-    image: "slurm_rocky93_rc"
-  }
-  standard: {
-    flavor: "test.compute.c30m120s60e5000"
+  tiny: {
+    flavor: "test.compute.c4m16s8e60"
     image: "slurm_rocky93_rc"
   }
   small: {
     flavor: "test.compute.c8m32s8e60"
     image: "slurm_rocky93_rc"
   }
-  tiny: {
-    flavor: "test.compute.c4m16s8e60"
+  standard: {
+    flavor: "test.compute.c30m120s60e5000"
     image: "slurm_rocky93_rc"
   }
   gpu: {
@@ -23,44 +20,43 @@ compute_types = {
     flavor: "slurm_test_gpu3"
     image: "slurm_rocky93_rc"
   }
+  large: {
+    flavor: "slurm_test_compute_lg_amd"
+    image: "slurm_rocky93_rc"
+  }
+  large_intel: {
+    flavor: "slurm_test_compute_lg_intel"
+    image: "slurm_rocky93_rc"
+  }
 }
-#######################################
-compute_names = {
-# Node-inventory.txt
-vtlg-001: "large"
-vtlg-002: "large"
-vtsm-001: "small"
-vtsm-002: "small"
-vtt-001: "small"
-vtt-002: "small"
-vtgpu3-001: "gpu3"
-vtgpu3-002: "gpu3"
-}
-###################################################
+# #############################################
+# SEE: compute_names.auto.tfvars
+#      for node instances that will be created.
+# #############################################
 
 #---- login node info ----
 # name: flavor
 login_names = {
-  vtest-login-1: "slurm_test_service"
-  vtest-admin: "slurm_test_service"
+  login-1: "vermilion_util_c8m15"
+  admin: "vermilion_util_c8m15"
 }
 
 # name: IPaddr
 login_ips = {
-  vtest-login-1: "10.60.107.241"
-  vttest-admin: "10.60.107.243"
+  login-1: "10.60.107.241"
+  admin: "10.60.107.243"
 }
 
-login_image = "slurm_rocky93_rc"
-login_flavor = "slurm_test_service"
+login_image = "slurm_rocky93_rc2"
+login_flavor = "vermilion_util_c8m15"
 
 #---- /login ----
 
-proxy_name = "vtest-admin"
+proxy_name = "admin"
 
 #---- CONTROL node info ----
 control_image = "slurm_rocky93_rc"
-control_flavor = "slurm_test_service"
+control_flavor = "vermilion_util_c8m15"
 control_ip = "10.60.107.240"
 
 ###################################################
@@ -71,7 +67,8 @@ cluster_availability_zone = "esif"
 
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 
-key_pair = "slurmdeploy"
+#key_pair = "slurmdeploy"
+key_pair = "vsdeployer"
 
 external_network = "external"
 cluster_network = "compute"
