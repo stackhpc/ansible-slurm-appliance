@@ -84,7 +84,7 @@ resource "openstack_sharedfilesystem_share_v2" "home" {
   name = "{{ cluster_name }}-home"
   description = "Home for control node"
   share_proto = "CEPHFS"
-  share_type = "{{ cluster_home_manila_share_type }}"
+  share_type = {{ '"' + cluster_home_manila_share_type + '"' | default('null') }}
   size = "{{ home_volume_size }}"
 }
 
