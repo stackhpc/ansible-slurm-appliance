@@ -6,13 +6,19 @@ openhpc_packages_extra: "{{ openhpc_packages_extra_nrel}}"
 openhpc_slurm_partitions:
   - name: "sm"
     default: YES
-    maxtime: "1-0" # 1 days 0 hours
+    maxtime: "4-0" # 1 days 0 hours
   - name: "gpu"
     default: NO
-    maxtime: "1-0" # 1 days 0 hours
+    maxtime: "4-0" # 1 days 0 hours
   - name: "lg"
     default: NO
-    maxtime: "1-0" # 1 days 0 hours
+    maxtime: "4-0" # 1 days 0 hours
+  # - name: "gpu8a100"
+  #   default: NO
+  #   maxtime: "4-0" # 1 days 0 hours
+  # - name: "gpu4a100"
+  #   default: NO
+  #   maxtime: "4-0" # 1 days 0 hours
   # - name: "std"
   #   default: YES
   #   maxtime: "1-0" # 1 days 0 hours
