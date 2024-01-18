@@ -37,9 +37,10 @@ compute_types = {
 #---- login node info ----
 # name: flavor
 login_names = {
-  login-1: "vermilion_util_c8m15"
-  admin: "vermilion_util_c8m15"
+  vtlogin-1: "vermilion_util_c8m15"
+  vtadmin: "vermilion_util_c8m15"
 }
+proxy_name = "vtadmin"
 
 # name: IPaddr
 login_ips = {
@@ -50,9 +51,6 @@ login_ips = {
 login_image = "slurm_rocky93_rc2"
 login_flavor = "vermilion_util_c8m15"
 
-#---- /login ----
-
-proxy_name = "admin"
 
 #---- CONTROL node info ----
 control_image = "slurm_rocky93_rc"
