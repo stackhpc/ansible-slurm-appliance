@@ -1,5 +1,6 @@
 locals {
-  user_data_path = "${var.environment_root}/cloud_init/${var.cluster_name}-%s.userdata.yml"
+  secrets_path = "${var.environment_root}/inventory/group_vars/all/secrets.yml"
+  munge_key_base64 = yamldecode(file(local.secrets_path))["vault_openhpc_mungekey"].content
 }
 
 
@@ -211,6 +212,25 @@ resource "openstack_compute_instance_v2" "compute" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
+
+    write_files:
+      # NB all this only works for fatimage where users are already defined
+      # munge key:
+      - encoding: base64
+        path: /etc/munge/munge.key
+        owner: munge:munge
+        permissions: '0400'
+        content: |
+          ${indent(10,local.munge_key_base64)}
+      # slurmctld location: TODO: needs to support both openhpc_slurm_control_host_address and openhpc_slurm_control_host
+      - encoding: text/plain
+        path: /etc/sysconfig/slurmd
+        owner: root:root
+        permissions: '0644'
+        # openhpc_slurm_control_host.api_address -> inventory_hostname -> control.name
+        content: "SLURMD_OPTIONS='--conf-server ${var.cluster_name}-control'"
+      # TODO: etc_hosts is required, at least on arcus
+      # and we can't really do this in the current sequence ...
   EOF
 
 }
