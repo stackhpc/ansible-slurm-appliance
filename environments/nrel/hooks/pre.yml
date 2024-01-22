@@ -1,91 +1,36 @@
-# - name: " "
-#   hosts: control,login,compute
-#   tags: nrel_
-#   become: true
-#   tasks:
-#     - include_role:
-#         name:
+---
 
-# - name: "Set releasever and local repos"
-#   hosts: all
-#   tags: nrel_releasever
-#   become: true
-#   tasks:
-#     - include_role:
-#         name: releasever-config
+- name: "Do the preliminary node setups"
+  hosts: all
+  tags: pre_tasks_all
+  become: true
+  tasks:
+    - include_role:
+        name: vshpc.prov.pre-tasks
 
-# - name: "fix possibly bad repo pointers"
-#   hosts: all
-#   tags:
-#     - vs_pre
-#     - nrel_repofix
-#   become: true
-#   tasks:
-#     - shell:
-#         cmd: for FF in `ls /etc/yum.repos.d/Rocky*`; do sed -i 's#gov/rocky/#gov/rocky-vault/#g' $FF; done
-
-#     - name: "change root password"
-#       user:
-#         name: root
-#         update_password: always
-#         password: "{{ vault_vs_root_pass|password_hash('sha256') }}"
-
-- name: NREL pre - Ensure times are correct
+# TODO: KBENDL - check compatibility with new playbook
+- name: "NREL pre - Mount cephfs volumes"
   hosts: all
   tags:
     - vs_pre
-    - set_time_on_servers
+    - aco.core.cephfs
   become: true
   tasks:
-    - name: Set timezone to Americas/Denver
-      timezone:
-        name: America/Denver
     - include_role:
-        name: aco.core.ntp
+        name: aco.core.cephfs
+      tags:
+        - aco.core.cephfs
 
-# This may be unnecessary now.
-# # Stupid dependency hack
-# - name: NREL PRE - re-install libibverbs openmpi
-#   hosts: all
-#   tags:
-#     - vs_pre
-#     - dependency_dnf_hack
-#   become: true
-#   vars:
-#     rm_packages:
-#       - libibverbs
-#       - openmpi
+    # - name: Set timezone to Americas/Denver
+    #   timezone:
+    #     name: America/Denver
+    #   tags:
+    #     - pre_set_time_on_servers
 
-#     packages:
-#       - autoconf
-#       - automake
-#       - binutils
-#       - bison
-#       - byacc
-#       - ctags
-#       - diffstat
-#       - gcc
-#       - gcc-c++
-#       - gdb
-#       - glibc-devel
-#       - ltrace
-#       - make
-#       - patchutils
-#       - strace
-#       - vim
-#       - nano
-#       # policycoreutils-python-utils setools-console setroubleshoot
-#   tasks:
-#     - name: rm problem packages
-#       dnf:
-#         name: "{{rm_packages}}"
-#         state: absent
-#         allowerasing: true
-#     - name: Add useful packages
-#       dnf:
-#         name: "{{packages}}"
-#         state: present
-#         nobest: true
+    # - include_role:
+    #     name: aco.core.ntp
+    #   tags:
+    #     - pre_set_time_on_servers
 
 # - name: "NREL PRE - dnf packages"
 #   hosts: all
@@ -121,31 +66,6 @@
 #   tasks:
 #     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
 
-
-# Builds the /etc/hosts inventory files.
-- name: nrel-proto fixes - workaround no internal DNS
-  hosts:
-    - cluster
-  become: true
-  tags:
-    - vs_pre
-    - etc_hosts
-  tasks:
-    - name: Internal DNS workaround - generate /etc/hosts file content
-      # which interface is used as ansible_host is defined by terraform (see `access_network`) so this is deterministic for multi-rail hosts
-      set_fact:
-        etc_hosts_content: |
-          {% for host in groups['cluster'] %}{{ hostvars[host]['ansible_host'] }} {{ host }}.novalocal {{ host }}
-          {% endfor %}
-      run_once: true
-
-    - name: Internal DNS workaround  - create entries in /etc/hosts for all nodes
-      blockinfile:
-        path: /etc/hosts
-        create: yes
-        state: present
-        block: "{{ hostvars[ansible_play_hosts[0]].etc_hosts_content }}"
-
 # This may be fixed now
 # # ref: Error: cannot setup namespace using "/usr/bin/newuidmap": should have setuid or have filecaps setuid:
 # - name: "podman uid-gid workaround"
@@ -164,30 +84,6 @@
 #         - /usr/bin/newgidmap
 #         - /usr/bin/newuidmap
 
-- name: "NREL pre - install ldap requirements to nodes"
-  hosts: compute
-  tags:
-    - vs_pre
-    - vermilion_ldap_client
-  become: true
-  tasks:
-    - include_role:
-        name: vermilion_ldap_client
-
-
-# TODO: KBENDL - check compatibility with new playbook
-- name: "NREL pre - Mount cephfs volumes"
-  hosts: all
-  tags:
-    - vs_pre
-    - aco.core.cephfs
-  become: true
-  tasks:
-    - include_role:
-        name: aco.core.cephfs
-      tags:
-        - aco.core.cephfs
-
 # TODO - get latest playbook
 # - name: Ensure yum repos are local
 #   hosts: all
@@ -196,3 +92,4 @@
 #   tasks:
 #     - include_role:
 #         name: ansible_yum_config
+# git@github.nrel.gov:acoinf/vshpc.prov.pre-tasks.git

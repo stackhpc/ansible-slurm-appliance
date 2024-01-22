@@ -1,21 +1,47 @@
 ---
 
-- name: install X stuff from powertools to login hosts
-  hosts: login
+# This may be unnecessary now.
+# # Stupid dependency hack
+- name: NREL POST COMPUTE packages
+  hosts: compute
+  tags:
+    - vs_pre
+    - dependency_dnf_hack
   become: true
   vars:
+    rm_packages:
+      - httpd
+    #  - openmpi
+
     packages:
-      - xorg-x11-server-Xorg
-      - xorg-x11-xauth
-      - xorg-x11-apps
-  tags:
-    - post_powertools
-    - post_x11
-  tasks:
-    - yum:
-        #enablerepo: powertools
-        state: present
-        name: "{{ packages }}"
+      - binutils
+      - vim
+      - nano
+      - python-pip
+      - readline
+      - ncurses
+      - man2html
+      - jq
+      - bzip2
+      - rng-tools
+      - wget
+
+# - name: install X stuff from powertools to login hosts
+#   hosts: login
+#   become: true
+#   vars:
+#     packages:
+#       - xorg-x11-server-Xorg
+#       - xorg-x11-xauth
+#       - xorg-x11-apps
+#   tags:
+#     - post_powertools
+#     - post_x11
+#   tasks:
+#     - yum:
+#         #enablerepo: powertools
+#         state: present
+#         name: "{{ packages }}"
 
 - name: "Set/fix the the ephemeral ssd mounts"
   hosts: compute
@@ -25,68 +51,6 @@
     - include_role:
         name: vs-set-ephemeral-mounts
 
-#moved from pre.yml
-
-- name: "Apply configs to control nodes"
-  hosts: control
-  tags: set_vermilion_control_setup
-  become: true
-  tasks:
-    - include_role:
-        name: vermilion_control_setup
-
-- name: vstack_common_config
-  hosts: control,login,compute
-  become: true
-  tags:
-    - vs_pre
-    - vstack_common_config
-  tasks:
-    - include_role:
-        name: vstack_common_config
-
-- name: "login node only configs"
-  hosts: login
-  tags: set_login_configs
-  become: true
-  tasks:
-    - include_role:
-        name: vermilion_login_nodes
-
-- name: "admin util configs"
-  hosts: login,control
-  tags:
-    - vs_pre
-    - set_admin_configs
-  become: true
-  tasks:
-    - include_role:
-        name: vstack_admin_config
-
-
-
-- name: sync_slurm_allocations install on admin node
-  hosts: admin
-  become: true
-  tags:
-    - sync_slurm_allocations_admin
-  vars:
-    sync_slurm_allocations_clustername: "{{ cluster_slurm_name }}"
-  tasks:
-    - include_role:
-        name: sync_slurm_allocations
-
-- name: cluster_dataset_manager create project directories
-  hosts: admin
-  become: true
-  tags:
-    - cluster_dataset_manager
-  vars:
-    cluster_dataset_manager_name: "{{ cluster_slurm_name }}"
-  tasks:
-    - include_role:
-        name: cluster_dataset_manager
-
 - name: pam_mkhomedir_plus
   hosts: login
   become: true
@@ -94,63 +58,87 @@
     - pam_mkhomedir_plus
   tasks:
     - include_role:
-        name: pam_mkhomedir_plus
+        name: vshpc.prov.pam_mkhomedir_plus
 
-- name: slurm_lex_accounting
-  hosts: control
-  become: true
-  tags:
-    - slurm_lex_accounting
-  tasks:
-    - include_role:
-        name: slurm_lex_accounting
-  vars:
-    slurm_lex_accounting_dev: False
-    slurm_lex_accounting_clustername: "{{ cluster_slurm_name }}"
 
-- name: vstack_admin_config
-  hosts: control,login
-  become: true
-  tags:
-    - vstack_admin_config
-  tasks:
-    - include_role:
-        name: vstack_admin_config
 
-- name: add kernel modules to compute and login nodes
-  hosts: login,compute
-  become: true
-  tags:
-    - post_powertools
-    - post_kernel_headers
-  tasks:
-    - yum:
-        enablerepo: powertools
-        state: present
-        name: "{{ packages }}"
-      vars:
-        packages:
-          - kernel-devel
+# - name: sync_slurm_allocations install on admin node
+#   hosts: admin
+#   become: true
+#   tags:
+#     - sync_slurm_allocations_admin
+#   vars:
+#     sync_slurm_allocations_clustername: "{{ cluster_slurm_name }}"
+#   tasks:
+#     - include_role:
+#         name: sync_slurm_allocations
 
-- name: IPA and LDAP san fix
-  hosts: all
-  become: true
-  tags:
-    - ipa_ldap_fix
-  tasks:
-    - include_role:
-        name: ansible_ipa_ldap_fix
+# - name: cluster_dataset_manager create project directories
+#   hosts: admin
+#   become: true
+#   tags:
+#     - cluster_dataset_manager
+#   vars:
+#     cluster_dataset_manager_name: "{{ cluster_slurm_name }}"
+#   tasks:
+#     - include_role:
+#         name: cluster_dataset_manager
 
-- name: "Nvidia A100 video driver install"
-  hosts:
-    - compute_gpu0
-    - compute_gpu3
-  become: true
-  tags:
-    - vs_nvidia_a100_driver_install
-  tasks:
-    - include_role:
-        name: vs_nvidia_a100_driver_install
+# - name: slurm_lex_accounting
+#   hosts: control
+#   become: true
+#   tags:
+#     - slurm_lex_accounting
+#   tasks:
+#     - include_role:
+#         name: slurm_lex_accounting
+#   vars:
+#     slurm_lex_accounting_dev: False
+#     slurm_lex_accounting_clustername: "{{ cluster_slurm_name }}"
+
+# - name: vstack_admin_config
+#   hosts: control,login
+#   become: true
+#   tags:
+#     - vstack_admin_config
+#   tasks:
+#     - include_role:
+#         name: vstack_admin_config
+
+# - name: add kernel modules to compute and login nodes
+#   hosts: login,compute
+#   become: true
+#   tags:
+#     - post_powertools
+#     - post_kernel_headers
+#   tasks:
+#     - yum:
+#         enablerepo: powertools
+#         state: present
+#         name: "{{ packages }}"
+#       vars:
+#         packages:
+#           - kernel-devel
+
+# - name: IPA and LDAP san fix
+#   hosts: all
+#   become: true
+#   tags:
+#     - ipa_ldap_fix
+#   tasks:
+#     - include_role:
+#         name: ansible_ipa_ldap_fix
+
+# - name: "Nvidia A100 video driver install"
+#   hosts:
+#     - compute_gpu0
+#     - compute_gpu3
+#   become: true
+#   tags:
+#     - vs_nvidia_a100_driver_install
+#   tasks:
+#     - include_role:
+#         name: vs_nvidia_a100_driver_install
 
 # https://github.nrel.gov/hpc/vs_nvidia_a100_driver_install.git
 
