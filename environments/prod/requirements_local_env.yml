@@ -7,29 +7,49 @@
 #
 
 roles:
+  - name: vshpc.prov.pre-tasks
+    src: git+git@github.nrel.gov:acoinf/vshpc.prov.pre-tasks.git
+    type: git
+
   - name: ansible_ipa_ldap_fix
     src: git+https://github.nrel.gov/hpc/ansible_ipa_ldap_fix.git
     type: git
 
-  - name: vstack_admin_config
-    src: git+git@github.nrel.gov:hpc/vstack_admin_config.git
+  - name: aco.prov.yum
+    src: git+git@github.nrel.gov:acoinf/aco.prov.yum.git
+    version: main
+
+  - name: root_pass
+    src: git+git@github.nrel.gov:hpc/ansible_root_pass.git
+    version: master
+
+  - name: os_stackmgr_user
+    src: git+git@github.nrel.gov:hpc/openstack_stackmgr_user.git
+    version: master
+
+  - name: vs.core.vastmount
+    src: git+git@github.nrel.gov:acoinf/vs.core.vastmount.git
     type: git
 
-  - name: vstack_common_config
-    src: git+git@github.nrel.gov:hpc/vstack_common_config.git
+  - name: aco.core.motd
+    src: git+git@github.nrel.gov:acoinf/aco.core.motd.git
     type: git
 
-  - name: vermilion_login_nodes
-    src: git+git@github.nrel.gov:hpc/vermilion_login_nodes.git
+  - name: aco.core.logging
+    src: git+git@github.nrel.gov:acoinf/aco.core.logging.git
     type: git
 
-  - name: vermilion_control_setup
-    src: git+git@github.nrel.gov:hpc/vermilion_control_setup.git
+  - name: aco.core.cephfs
+    src: git+git@github.nrel.gov:acoinf/aco.core.cephfs
     type: git
 
-  - name: ansible-role-ntp
-    src: git+https://github.com/kbendl/ansible-role-ntp
-    version: rocky
+  - name: ansible_ipa_ldap_fix
+    src: git+git@github.nrel.gov:hpc/ansible_ipa_ldap_fix.git
+    type: git
+
+  - name: aco.core.ntp
+    src: git+git@github.nrel.gov:acoinf/aco.core.ntp
+    type: git
 
   - name: vs-set-ephemeral-mounts
     src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
@@ -43,10 +63,10 @@ roles:
     src: git+git@github.nrel.gov:hpc/root_pass_cli.git
     type: git
 
-  - name: pam_mkhomedir_plus
-    src: git+git@github.nrel.gov:hpc/pam_mkhomedir_plus.git
+  - name: vshpc.prov.pam_mkhomedir_plus
+    src: git+git@github.nrel.gov:acoinf/vshpc.prov.pam_mkhomedir_plus.git
     type: git
-    version: master
+    version: main
     #version: feature/ansible-galaxy
 
   - name: ipaclient
