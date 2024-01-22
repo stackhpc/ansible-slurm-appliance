@@ -1,0 +1,26 @@
+openhpc_install_type: generic # i.e. don't want OpenHPC
+openhpc_generic_packages: # system package installs:
+  # below are default in the role, required to get slurm to work:
+  - munge
+  - mariadb-connector-c # only actually needed on slurmdbd
+  - hwloc-libs          # only actuall needed on slurmd
+  # below added here to get pingpong and pingmatrix hpctests working:
+  - mpitests-openmpi
+
+# define paths to slurm on nodes:
+# TODO: KURT
+slurm_build_version: 23.11.1
+slurm_build_path: /nopt/vtest/slurm
+slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
+#
+openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
+openhpc_lib_dir: "{{ slurm_build_dir }}/slurm"
+openhpc_bin_dir: "{{ slurm_build_dir }}/bin"
+openhpc_slurm_conf_path: "{{ slurm_build_dir }}/etc/slurm.conf"
+
+# modify slurm.conf:
+# TODO: KURT merge with whatever you currently have for openhpc_config_extra
+openhpc_config_extra:
+  SlurmctldDebug: debug
+  SlurmdDebug: debug
+  Epilog: '{{ slurm_build_path }}/scripts/slurm.epilog.clean' # # TODO: KURT replace with path on nodes to Epilog
