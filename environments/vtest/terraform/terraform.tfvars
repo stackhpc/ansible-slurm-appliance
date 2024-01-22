@@ -2,31 +2,31 @@
 compute_types = {
   tiny: {
     flavor: "test.compute.c4m16s8e60"
-    image: "slurm_rocky93_rc"
+    image: "slurm_rocky93_kbs"
   }
   small: {
     flavor: "test.compute.c8m32s8e60"
-    image: "slurm_rocky93_rc"
+    image: "slurm_rocky93_kbs"
   }
   standard: {
     flavor: "test.compute.c30m120s60e5000"
-    image: "slurm_rocky93_rc"
+    image: "slurm_rocky93_kbs"
   }
   gpu: {
     flavor: "slurm_test_gpu0"
-    image: "slurm_rocky93_rc"
+    image: "slurm_rocky93_kbs"
   }
   gpu3: {
     flavor: "slurm_test_gpu3"
-    image: "slurm_rocky93_rc"
+    image: "slurm_rocky93_kbs"
   }
   large: {
     flavor: "slurm_test_compute_lg_amd"
-    image: "slurm_rocky93_rc"
+    image: "slurm_rocky93_kbs"
   }
   large_intel: {
     flavor: "slurm_test_compute_lg_intel"
-    image: "slurm_rocky93_rc"
+    image: "slurm_rocky93_kbs"
   }
 }
 # #############################################
@@ -37,10 +37,10 @@ compute_types = {
 #---- login node info ----
 # name: flavor
 login_names = {
-  vtlogin-1: "vermilion_util_c8m15"
-  vtadmin: "vermilion_util_c8m15"
+  login-1: "vermilion_util_c8m15"
+  admin: "vermilion_util_c8m15"
 }
-proxy_name = "vtadmin"
+proxy_name = "admin"
 
 # name: IPaddr
 login_ips = {
@@ -48,12 +48,12 @@ login_ips = {
   admin: "10.60.107.243"
 }
 
-login_image = "slurm_rocky93_rc2"
+login_image = "slurm_rocky93_kbs"
 login_flavor = "vermilion_util_c8m15"
 
 
 #---- CONTROL node info ----
-control_image = "slurm_rocky93_rc"
+control_image = "slurm_rocky93_kbs"
 control_flavor = "vermilion_util_c8m15"
 control_ip = "10.60.107.240"
 
