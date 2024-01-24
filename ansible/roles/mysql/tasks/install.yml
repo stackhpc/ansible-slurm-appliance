@@ -17,6 +17,6 @@
 
 - name: Pull container image
   containers.podman.podman_image:
-    name: "mysql"
+    name: docker.io/library/mysql
     tag: "{{ mysql_tag }}"
   become_user: "{{ mysql_podman_user }}"
