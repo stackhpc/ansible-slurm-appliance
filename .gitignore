@@ -8,7 +8,7 @@ ansible-vault.pass
 ._*
 *.DS_Store
 *.py[cod]
-
+TESTONLY
 # editor stuff
 ###############################
 *.komodoproject
