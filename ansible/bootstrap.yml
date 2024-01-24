@@ -105,29 +105,16 @@
     - import_role:
         name: firewalld
 
-# - hosts: fail2ban
-#   gather_facts: false
-#   become: yes
-#   tags: fail2ban
-#   tasks:
-#     - import_role:
-#         name: fail2ban
-
-- name: Setup podman
-  hosts: podman
-  tags: podman
+- hosts: fail2ban
+  gather_facts: false
+  become: yes
+  tags: fail2ban
   tasks:
     - import_role:
-        name: podman
-        tasks_from: prereqs.yml
-      tags: prereqs
-
-    - import_role:
-        name: podman
-        tasks_from: config.yml
-      tags: config
+        name: fail2ban
 
 - name: Setup podman
+  gather_facts: false
   hosts: podman
   tags: podman
   tasks:
@@ -185,7 +172,7 @@
     - update
   tasks:
     - name: Check for pending reboot from package updates
-      stat:
+      stat: 
         path: /var/run/reboot-required
       register: update_reboot_required
     - debug:
@@ -200,4 +187,3 @@
     - name: update facts
       setup:
       when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
-

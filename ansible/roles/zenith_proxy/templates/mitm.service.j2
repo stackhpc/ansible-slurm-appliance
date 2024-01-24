@@ -1,0 +1,46 @@
+
+
+[Unit]
+Description=Podman {{ zenith_proxy_mitm_service_name }}.service
+Wants=network.target
+After=network-online.target
+BindsTo={{ zenith_proxy_service_name }}.service
+PartOf={{ zenith_proxy_service_name }}.service
+After={{ zenith_proxy_service_name }}.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Type=simple
+Restart=always
+User={{ zenith_proxy_podman_user }}
+Group={{ zenith_proxy_podman_user }}
+ExecStart=/usr/bin/podman run \
+  --cgroups=no-conmon \
+  --replace \
+  --restart=no \
+  --pod {{ zenith_proxy_pod_name }} \
+  --name {{ zenith_proxy_mitm_container_name }} \
+  --security-opt label=disable \
+  --env ZENITH_PROXY_LISTEN_PORT={{ zenith_proxy_mitm_listen_port }} \
+  --env ZENITH_PROXY_UPSTREAM_SCHEME={{ zenith_proxy_upstream_scheme }} \
+  --env ZENITH_PROXY_UPSTREAM_HOST={{ zenith_proxy_upstream_host }} \
+  --env ZENITH_PROXY_UPSTREAM_PORT={{ zenith_proxy_upstream_port }} \
+{% if zenith_proxy_upstream_read_timeout %}
+  --env ZENITH_PROXY_READ_TIMEOUT={{ zenith_proxy_upstream_read_timeout }} \
+{% endif %}
+{% if zenith_proxy_mitm_auth_inject == "basic" %}
+  --env ZENITH_PROXY_AUTH_INJECT=basic \
+  --env ZENITH_PROXY_AUTH_BASIC_USERNAME={{ zenith_proxy_mitm_auth_basic_username }} \
+  --env {{ "ZENITH_PROXY_AUTH_BASIC_PASSWORD={}".format(zenith_proxy_mitm_auth_basic_password) | quote }} \
+{% elif zenith_proxy_mitm_auth_inject == "bearer" %}
+  --env ZENITH_PROXY_AUTH_INJECT=bearer \
+  --env ZENITH_PROXY_AUTH_BEARER_HEADER={{ zenith_proxy_mitm_auth_bearer_header_name }} \
+  --env ZENITH_PROXY_AUTH_BEARER_PREFIX={{ zenith_proxy_mitm_auth_bearer_header_prefix }} \
+  --env ZENITH_PROXY_AUTH_BEARER_TOKEN={{ zenith_proxy_mitm_auth_bearer_token }} \
+{% endif %}
+  {{ zenith_proxy_mitm_image }}
+ExecStop=/usr/bin/podman stop --ignore -t 10 {{ zenith_proxy_mitm_container_name }}
+ExecStopPost=/usr/bin/podman rm --ignore -f {{ zenith_proxy_mitm_container_name }}
+
+[Install]
+WantedBy=multi-user.target default.target

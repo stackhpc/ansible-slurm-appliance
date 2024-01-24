@@ -1,0 +1,81 @@
+- debug:
+    msg: |
+      terraform_backend_type: {{ terraform_backend_type }}
+      terraform_state: {{ terraform_state }}
+      cluster_upgrade_system_packages: {{ cluster_upgrade_system_packages | default('undefined') }}
+
+# We need to convert the floating IP id to an address for Terraform
+# if we we have cluster_floating_ip, otherwise assume that we're
+# assigning the FIP in Terraform and that it will be available in
+# outputs.cluster_gateway_ip.
+- block:
+    - name: Look up floating IP
+      include_role:
+        name: stackhpc.terraform.infra
+        tasks_from: lookup_floating_ip
+      vars:
+        os_floating_ip_id: "{{ cluster_floating_ip }}"
+
+    - name: Set floating IP address fact
+      set_fact:
+        cluster_floating_ip_address: "{{ os_floating_ip_info.floating_ip_address }}"
+  when: cluster_floating_ip is defined
+
+- name: Install Terraform binary
+  include_role:
+    name: stackhpc.terraform.install
+
+- name: Make Terraform project directory
+  file:
+    path: "{{ terraform_project_path }}"
+    state: directory
+
+- name: Write backend configuration
+  copy:
+    content: |
+      terraform {
+        backend "{{ terraform_backend_type }}" { }
+      }
+    dest: "{{ terraform_project_path }}/backend.tf"
+
+# Patching in this appliance is implemented as a switch to a new base image
+# So unless explicitly patching, we want to use the same image as last time
+# To do this, we query the previous Terraform state before updating
+- block:
+    - name: Get previous Terraform state
+      stackhpc.terraform.terraform_output:
+        binary_path: "{{ terraform_binary_path }}"
+        project_path: "{{ terraform_project_path }}"
+        backend_config: "{{ terraform_backend_config }}"
+      register: cluster_infra_terraform_output
+
+    - name: Extract image from Terraform state
+      set_fact:
+        cluster_previous_image: "{{ cluster_infra_terraform_output.outputs.cluster_image.value }}"
+      when: '"cluster_image" in cluster_infra_terraform_output.outputs'
+  when:
+    - terraform_state == "present"
+    - cluster_upgrade_system_packages is not defined or not cluster_upgrade_system_packages
+
+- name: Template Terraform files into project directory
+  template:
+    src: >-
+      {{ 
+        "{}{}.j2".format(
+          (
+             cluster_terraform_template_dir ~ "/" 
+             if cluster_terraform_template_dir is defined 
+             else ""
+          ),
+          item
+        )
+      }}
+    dest: "{{ terraform_project_path }}/{{ item }}"
+  loop:
+    - outputs.tf
+    - providers.tf
+    - resources.tf
+
+- name: Provision infrastructure
+  include_role:
+    name: stackhpc.terraform.infra

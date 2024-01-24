@@ -12,8 +12,6 @@ roles/*
 !roles/grafana-dashboards/**
 !roles/passwords/
 !roles/passwords/**
-!roles/os_manila_mount/
-!roles/os_manila_mount/**
 !roles/fail2ban/
 !roles/fail2ban/**
 !roles/hpctests/
@@ -30,8 +28,6 @@ roles/*
 !roles/firewalld/**
 !roles/etc_hosts/
 !roles/etc_hosts/**
-!roles/cloud_init/
-!roles/cloud_init/**
 !roles/mysql/
 !roles/mysql/**
 !roles/systemd/
@@ -44,5 +40,16 @@ roles/*
 !roles/proxy/**
 !roles/resolv_conf/
 !roles/resolv_conf/**
-!roles/cve-2023-41914
-!roles/cve-2023-41914/**
+!roles/cluster_infra/
+!roles/cluster_infra/**
+!roles/image_build_infra/
+!roles/image_build_infra/**
+!roles/persist_openhpc_secrets/
+!roles/persist_openhpc_secrets/**
+!roles/zenith_proxy/
+!roles/zenith_proxy/**
+!roles/image_build/
+!roles/image_build/**
+!roles/persist_hostkeys/
+!roles/persist_hostkeys/**
+!roles/requirements.yml

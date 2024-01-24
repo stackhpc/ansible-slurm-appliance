@@ -2,7 +2,7 @@
 - name: Enable TurboVNC repo
   tags: install
   get_url:
-    url: https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
+    url: https://raw.githubusercontent.com/TurboVNC/repo/main/TurboVNC.repo
     dest: /etc/yum.repos.d/TurboVNC.repo
 
 - name: Install EPEL

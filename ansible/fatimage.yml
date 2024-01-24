@@ -52,8 +52,13 @@
   become: yes
   gather_facts: no
   tasks:
-    # - import_playbook: slurm.yml
-    - include_role:
+    # - import_playbook: slurm.yml:
+    - name: Setup DB
+      include_role:
+        name: mysql
+        tasks_from: install.yml
+    - name: OpenHPC
+      include_role:
         name: stackhpc.openhpc
         tasks_from: "install-{{ openhpc_install_type }}.yml"
 
@@ -76,10 +81,10 @@
         name: opensearch
         tasks_from: install.yml
       become: true
-
-    #   opensearch - containerised, nothing to do
     # slurm_stats - nothing to do
-    # filebeat - containerised - nothing to do
+    - import_role:
+        name: filebeat
+        tasks_from: install.yml
 
     - import_role:
       # can't only run cloudalchemy.node_exporter/tasks/install.yml as needs vars from preflight.yml and triggers service start

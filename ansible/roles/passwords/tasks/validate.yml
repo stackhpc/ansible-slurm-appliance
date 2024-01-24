@@ -1,0 +1,4 @@
+- name: Assert secrets created
+  assert:
+    that: (hostvars[inventory_hostname].keys() | select('contains', 'vault_') | length) > 1 # 1 as may have vault_testuser_password defined in dev
+    fail_msg: "No inventory variables 'vault_*' found: Has ansible/adhoc/generate-passwords.yml been run?"

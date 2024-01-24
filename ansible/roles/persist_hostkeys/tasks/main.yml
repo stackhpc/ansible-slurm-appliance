@@ -1,0 +1,33 @@
+---
+
+- name: Ensure hostkeys directory exists on persistent storage
+  file:
+    path: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Copy hostkeys from persistent storage
+  # won't fail if no keys are in persistent storage
+  copy:
+    src: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/"
+    dest: /etc/ssh/
+    remote_src: true
+
+- name: Find hostkeys
+  find:
+    path: /etc/ssh/
+    patterns: ssh_host_*_key*
+  register: _find_ssh_keys
+
+- name: Persist hostkeys
+  copy:
+    dest: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/"
+    src: "{{ item }}"
+    remote_src: true
+    mode: preserve
+  loop: "{{ _find_ssh_keys.files | map(attribute='path') }}"
+
+- meta: reset_connection
+

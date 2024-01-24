@@ -26,19 +26,12 @@
           # Collection currently requires root for all tasks.
           become: true
 
-- name: Setup filebeat
+- name: Deploy filebeat
   hosts: filebeat
   tags: filebeat
   tasks:
     - import_role:
         name: filebeat
-        tasks_from: config.yml
-      tags: config
-
-    - import_role:
-        name: filebeat
-        tasks_from: deploy.yml
-      tags: deploy
 
 - name: Deploy node_exporter
   hosts: node_exporter

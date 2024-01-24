@@ -1,8 +1,7 @@
 ansible==6.0.0
-openstacksdk==0.61.0
+openstacksdk
 python-openstackclient
 jmespath
-os_client_config
 passlib[bcrypt]==1.7.4
 cookiecutter
 selinux # this is a shim to avoid having to use --system-site-packages, you still need sudo yum install libselinux-python3
