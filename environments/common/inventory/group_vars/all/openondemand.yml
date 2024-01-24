@@ -13,14 +13,18 @@
 # or include regex special characters.
 openondemand_host_regex: "{{ (groups['compute'] + groups['grafana']) | to_ood_regex }}"
 
-ondemand_package: ondemand-3.0.1
+ondemand_package: ondemand-3.0.3
 
-openondemand_dashboard_links: # TODO: should really only be deployed if grafana is deployed and proxying configured
+# Add grafana to dashboard links to OOD only if grafana group is available
+openondemand_dashboard_links_grafana:
   - name: Grafana
     app_name: grafana
     category: Monitoring
     description: Dashboards
     url: "{{ grafana_url_openondemand_proxy }}"
+openondemand_dashboard_links: "{{ openondemand_dashboard_links_grafana if groups['grafana'] | length > 0 }}"
+
+openondemand_login_host: localhost
 
 openondemand_clusters:
   slurm:
@@ -28,7 +32,7 @@ openondemand_clusters:
       metadata:
         title: "{{ openhpc_cluster_name }}" # interpolation here works as openondemand is lexically after openhpc
       login:
-        host: "{{ hostvars[groups['login'].0].api_address }}"
+        host: "{{ openondemand_login_host }}"
         default: true
       job:
         adapter: slurm
@@ -52,21 +56,23 @@ openondemand_clusters:
             export -f xfce4-session
             %s
           set_host: host=$(hostname -s)
-      custom:
-        # embed grafana panels in Jobs app: https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
-        grafana:
-          host: "{{ grafana_url }}"
-          orgId: 1
-          dashboard:
-            name: "node-exporter-slurm"
-            uid: "node-exporter-slurm"
-            panels:
-              cpu: 77
-              memory: 78
-          labels:
-            cluster: "cluster"
-            host: "host"
-            jobid: "jobid"
+      custom: "{{ openondemand_clusters_grafana if groups['grafana'] | length > 0 else {} }}"
+
+openondemand_clusters_grafana:
+  # embed grafana panels in Jobs app: https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
+  grafana:
+    host: "{{ grafana_url }}"
+    orgId: 1
+    dashboard:
+      name: "node-exporter-slurm"
+      uid: "node-exporter-slurm"
+      panels:
+        cpu: 77
+        memory: 78
+    labels:
+      cluster: "cluster"
+      host: "host"
+      jobid: "jobid"
 
 ood_install_apps_defaults:
   jupyter:
@@ -174,7 +180,7 @@ openondemand_scrape_configs:
     - targets:
       - "{{ openondemand_address }}:9301"
       labels:
-        environment: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_NAME') }}"
+        environment: "{{ appliances_environment_name }}"
         service: "openondemand"
 
 openondemand_dashboard:

@@ -1,0 +1,53 @@
+output "cluster_gateway_ip" {
+  description = "The IP address of the gateway used to contact the cluster nodes"
+  value       =  openstack_compute_floatingip_associate_v2.login_floatingip_assoc.floating_ip
+}
+
+{% if cluster_ssh_private_key_file is not defined %}
+output "cluster_ssh_private_key" {
+  description = "The private component of the keypair generated on cluster provision"
+  value = openstack_compute_keypair_v2.cluster_keypair.private_key
+  sensitive   = true
+}
+{% endif %}
+
+output "cluster_nodes" {
+  description = "A list of the nodes in the cluster from which an Ansible inventory will be populated"
+  value       = concat(
+    [
+      {
+        name          = openstack_compute_instance_v2.login.name
+        ip            = openstack_compute_instance_v2.login.network[0].fixed_ip_v4
+        groups        = ["login", "{{ cluster_name }}_login"],
+        facts  = {
+          openstack_project_id = data.openstack_identity_auth_scope_v3.scope.project_id
+        }
+      },
+      {
+        name          = openstack_compute_instance_v2.control.name
+        ip            = openstack_compute_instance_v2.control.network[0].fixed_ip_v4
+        groups        = ["control", "{{ cluster_name }}_control"],
+        facts  = {
+          openstack_project_id = data.openstack_identity_auth_scope_v3.scope.project_id
+        }
+      }
+    ],
+    {% for partition in openhpc_slurm_partitions %}
+    [
+      for compute in openstack_compute_instance_v2.{{ partition.name }}: {
+        name          = compute.name
+        ip            = compute.network[0].fixed_ip_v4
+        groups        = ["compute", "{{ cluster_name }}_compute", "{{ cluster_name }}_{{ partition.name }}"],
+        facts  = {
+          openstack_project_id = data.openstack_identity_auth_scope_v3.scope.project_id
+        }
+      }
+    ]{{ ',' if not loop.last }}
+    {% endfor %}
+  )
+}
+
+output "cluster_image" {
+  description = "The id of the image used to build the cluster nodes"
+  value       = "{{ cluster_previous_image | default(cluster_image) }}"
+}

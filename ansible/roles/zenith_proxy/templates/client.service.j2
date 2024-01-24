@@ -1,0 +1,34 @@
+[Unit]
+Description=Podman {{ zenith_proxy_client_service_name }}.service
+Wants=network.target
+After=network-online.target
+BindsTo={{ zenith_proxy_service_name }}.service
+PartOf={{ zenith_proxy_service_name }}.service
+After={{ zenith_proxy_service_name }}.service
+{% if zenith_proxy_mitm_enabled %}
+Wants={{ zenith_proxy_mitm_service_name }}.service
+After={{ zenith_proxy_mitm_service_name }}.service
+{% endif %}
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Type=simple
+Restart=always
+RestartSec=5
+User={{ zenith_proxy_podman_user }}
+Group={{ zenith_proxy_podman_user }}
+ExecStart=/usr/bin/podman run \
+  --cgroups=no-conmon \
+  --replace \
+  --restart=no \
+  --pod {{ zenith_proxy_pod_name }} \
+  --name {{ zenith_proxy_client_container_name }} \
+  --security-opt label=disable \
+  --volume /etc/zenith/{{ zenith_proxy_service_name }}:/etc/zenith:ro \
+  --volume {{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh:/home/zenith/.ssh \
+  {{ zenith_proxy_client_image }}
+ExecStop=/usr/bin/podman stop --ignore -t 10 {{ zenith_proxy_client_container_name }}
+ExecStopPost=/usr/bin/podman rm --ignore -f {{ zenith_proxy_client_container_name }}
+
+[Install]
+WantedBy=multi-user.target default.target

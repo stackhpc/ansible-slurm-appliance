@@ -9,4 +9,4 @@ update_exclude:
   - apptainer # see https://github.com/stackhpc/ansible-slurm-appliance/pull/245
 update_disablerepo: omit
 # Log changes during update here on localhost:
-update_log_path:  "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/logs/{{ inventory_hostname }}-updates.log"
+update_log_path:  "{{ appliances_environment_root }}/logs/{{ inventory_hostname }}-updates.log"

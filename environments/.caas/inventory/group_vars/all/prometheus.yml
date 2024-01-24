@@ -1,0 +1,4 @@
+---
+
+# Set Prometheus storage retention size
+prometheus_storage_retention_size: "{{ metrics_db_maximum_size }}GB"

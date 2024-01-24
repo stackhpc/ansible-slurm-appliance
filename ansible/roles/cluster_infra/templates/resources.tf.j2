@@ -1,0 +1,447 @@
+#jinja2: trim_blocks:False
+#####
+##### The identity scope we are operating in
+##### Used to output the OpenStack project ID as a fact for provisioned hosts
+#####
+data "openstack_identity_auth_scope_v3" "scope" {
+  name = "{{ cluster_name }}"
+}
+
+#####
+##### Security groups for the cluster
+#####
+
+# Security group to hold common rules for the cluster
+resource "openstack_networking_secgroup_v2" "secgroup_slurm_cluster" {
+  name                 = "{{ cluster_name }}-secgroup-slurm-cluster"
+  description          = "Rules for the slurm cluster nodes"
+  delete_default_rules = true   # Fully manage with terraform
+}
+
+# Security group to hold specific rules for the login node
+resource "openstack_networking_secgroup_v2" "secgroup_slurm_login" {
+  name                 = "{{ cluster_name }}-secgroup-slurm-login"
+  description          = "Specific rules for the slurm login node"
+  delete_default_rules = true   # Fully manage with terraform
+}
+
+## Allow all egress for all cluster nodes
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_cluster_rule_egress_v4" {
+  direction         = "egress"
+  ethertype         = "IPv4"
+  security_group_id = "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+}
+
+## Allow all ingress between nodes in the cluster
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_cluster_rule_ingress_internal_v4" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  remote_group_id   = "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+}
+
+## Allow ingress on port 22 (SSH) from anywhere for the login nodes
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_ssh_v4" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 22
+  port_range_max    = 22
+  security_group_id = "${openstack_networking_secgroup_v2.secgroup_slurm_login.id}"
+}
+
+## Allow ingress on port 443 (HTTPS) from anywhere for the login nodes
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_https_v4" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 443
+  port_range_max    = 443
+  security_group_id = "${openstack_networking_secgroup_v2.secgroup_slurm_login.id}"
+}
+
+## Allow ingress on port 80 (HTTP) from anywhere for the login nodes
+resource "openstack_networking_secgroup_rule_v2" "secgroup_slurm_login_rule_ingress_http_v4" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 80
+  port_range_max    = 80
+  security_group_id = "${openstack_networking_secgroup_v2.secgroup_slurm_login.id}"
+}
+
+#####
+##### Volumes
+#####
+resource "openstack_blockstorage_volume_v3" "state" {
+    name = "{{ cluster_name }}-state"
+    description = "State for control node"
+    size = "{{ state_volume_size }}"
+}
+
+resource "openstack_blockstorage_volume_v3" "home" {
+    name = "{{ cluster_name }}-home"
+    description = "Home for control node"
+    size = "{{ home_volume_size }}"
+    {% if use_home_volume_type_fast is defined and use_home_volume_type_fast %}
+    {% if home_volume_type_fast is defined %}
+    volume_type = "{{ home_volume_type_fast }}"
+    {% endif %}
+    {% endif %}
+}
+
+######
+###### Cluster network
+######
+
+# Always get cluster_external_network network and subnet data
+data "openstack_networking_network_v2" "cluster_external_network" {
+  name = "{{ cluster_external_network }}"
+}
+
+data "openstack_networking_subnet_ids_v2" "cluster_external_subnets" {
+  network_id = "${data.openstack_networking_network_v2.cluster_external_network.id}"
+}
+
+{% if cluster_network is not defined %}
+# Create a new network
+resource "openstack_networking_network_v2" "cluster_network" {
+  name           = "{{ cluster_name }}-net"
+  admin_state_up = "true"
+}
+
+resource "openstack_networking_subnet_v2" "cluster_subnet" {
+  name       = "{{ cluster_name }}-subnet"
+  network_id = "${openstack_networking_network_v2.cluster_network.id}"
+  cidr       = "{{ cluster_cidr | default('192.168.44.0/24') }}"
+  {% if cluster_nameservers is defined %}
+  dns_nameservers = [
+  {% for nameserver in cluster_nameservers %}
+    "{{ nameserver }}"{{ ',' if not loop.last }}
+  {% endfor %}
+  ]
+  {% endif %}
+  ip_version = 4
+}
+
+resource "openstack_networking_router_v2" "cluster_router" {
+  name                = "{{ cluster_name }}-router"
+  admin_state_up      = true
+  external_network_id = "${data.openstack_networking_network_v2.cluster_external_network.id}"
+}
+
+resource "openstack_networking_router_interface_v2" "cluster_router_interface" {
+  router_id = "${openstack_networking_router_v2.cluster_router.id}"
+  subnet_id = "${openstack_networking_subnet_v2.cluster_subnet.id}"
+}
+{% endif %}
+
+# Get existing network resource data by name, from either the created
+# network or the network name if supplied
+data "openstack_networking_network_v2" "cluster_network" {
+  {% if cluster_network is not defined %}
+  network_id = "${openstack_networking_network_v2.cluster_network.id}"
+  {% else %}
+  name = "{{ cluster_network }}"
+  {% endif %}
+}
+
+data "openstack_networking_subnet_v2" "cluster_subnet" {
+  # Get subnet data from the subnet we create, or if it exists already
+  # get it from the cluster network data above
+  {% if cluster_network is not defined %}
+  subnet_id = "${openstack_networking_subnet_v2.cluster_subnet.id}"
+  {% else %}
+  network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
+  {% endif %}
+}
+
+#####
+##### Cluster ports
+#####
+
+resource "openstack_networking_port_v2" "login" {
+  name = "{{ cluster_name }}-login-0"
+  network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = "${data.openstack_networking_subnet_v2.cluster_subnet.id}"
+  }
+
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}",
+    "${openstack_networking_secgroup_v2.secgroup_slurm_login.id}"
+  ]
+
+  binding {
+    vnic_type = "{{ cluster_vnic_type | default('normal') }}"
+    {% if cluster_vnic_profile is defined %}
+    profile = <<EOF
+    {{ cluster_vnic_profile | to_json }}
+    EOF
+    {% endif %}
+  }
+}
+
+resource "openstack_networking_port_v2" "control" {
+  name = "{{ cluster_name }}-control-0"
+  network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = "${data.openstack_networking_subnet_v2.cluster_subnet.id}"
+  }
+
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+  ]
+
+  binding {
+    vnic_type = "{{ cluster_vnic_type | default('normal') }}"
+    {% if cluster_vnic_profile is defined %}
+    profile = <<EOF
+    {{ cluster_vnic_profile | to_json }}
+    EOF
+    {% endif %}
+  }
+}
+
+{% for partition in openhpc_slurm_partitions %}
+resource "openstack_networking_port_v2" "{{ partition.name }}" {
+  count = {{ partition.count }}
+  name = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
+  network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = "${data.openstack_networking_subnet_v2.cluster_subnet.id}"
+  }
+
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+  ]
+
+  binding {
+    vnic_type = "{{ cluster_vnic_type | default('normal') }}"
+    {% if cluster_vnic_profile is defined %}
+    profile = <<EOF
+    {{ cluster_vnic_profile | to_json }}
+    EOF
+    {% endif %}
+  }
+}
+
+{% endfor %}
+
+#####
+##### Deploy key
+#####
+{% if cluster_ssh_private_key_file is not defined %}
+resource "openstack_compute_keypair_v2" "cluster_keypair" {
+  name = "{{ cluster_name }}-deploy-key"
+}
+{% endif %}
+
+#####
+##### Cluster nodes
+#####
+
+resource "openstack_compute_instance_v2" "login" {
+  name      = "{{ cluster_name }}-login-0"
+  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
+  {% if login_flavor_name is defined %}
+  flavor_name = "{{ login_flavor_name }}"
+  {% else %}
+  flavor_id = "{{ login_flavor }}"
+  {% endif %}
+
+  network {
+    port = "${openstack_networking_port_v2.login.id}"
+  }
+
+  # root device:
+  block_device {
+      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
+      source_type  = "image"
+      {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
+      volume_size = {{ cluster_root_volume_size | default("20") }}
+      destination_type = "volume"
+      {% if cluster_root_volume_type is defined %}
+      volume_type = "{{ cluster_root_volume_type }}"
+      {% endif %}
+      {% else %}
+      destination_type = "local"
+      {% endif %}
+      boot_index = 0
+      delete_on_termination = true
+  }
+
+  # Use cloud-init to inject the SSH keys
+  user_data = <<-EOF
+    #cloud-config
+    ssh_authorized_keys:
+    {%- if cluster_user_ssh_public_key is defined %}
+      - {{ cluster_user_ssh_public_key }}
+    {%- endif %}
+    {%- if cluster_deploy_ssh_public_key is defined %}
+      - {{ cluster_deploy_ssh_public_key }}
+    {%- endif %}
+    {%- if cluster_ssh_private_key_file is not defined %}
+      - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
+    {%- endif %}
+    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
+      - {{ ssh_key }}
+    {%- endfor %}
+  EOF
+}
+
+resource "openstack_compute_instance_v2" "control" {
+  name      = "{{ cluster_name }}-control-0"
+  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
+  {% if control_flavor_name is defined %}
+  flavor_name = "{{ control_flavor_name }}"
+  {% else %}
+  flavor_id = "{{ control_flavor }}"
+  {% endif %}
+
+  network {
+    port = "${openstack_networking_port_v2.control.id}"
+  }
+
+  # root device:
+  block_device {
+      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
+      source_type  = "image"
+      {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
+      volume_size = {{ cluster_root_volume_size | default("20") }}
+      destination_type = "volume"
+      {% if cluster_root_volume_type is defined %}
+      volume_type = "{{ cluster_root_volume_type }}"
+      {% endif %}
+      {% else %}
+      destination_type = "local"
+      {% endif %}
+      boot_index = 0
+      delete_on_termination = true
+  }
+
+  # state volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.state.id
+  }
+
+  # home volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.home.id
+  }
+
+  # Use cloud-init to a) inject SSH keys b) configure volumes
+  user_data = <<-EOF
+    #cloud-config
+    ssh_authorized_keys:
+    {%- if cluster_user_ssh_public_key is defined %}
+      - {{ cluster_user_ssh_public_key }}
+    {%- endif %}
+    {%- if cluster_deploy_ssh_public_key is defined %}
+      - {{ cluster_deploy_ssh_public_key }}
+    {%- endif %}
+    {%- if cluster_ssh_private_key_file is not defined %}
+      - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
+    {%- endif %}
+    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
+      - {{ ssh_key }}
+    {%- endfor %}
+    bootcmd:
+    %{for volume in [openstack_blockstorage_volume_v3.state, openstack_blockstorage_volume_v3.home]}
+    - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
+    %{endfor}
+    mounts:
+        - [LABEL=state, {{ appliances_state_dir }}, auto]
+        - [LABEL=home, /exports/home, auto]
+  EOF
+}
+
+{% for partition in openhpc_slurm_partitions %}
+resource "openstack_compute_instance_v2" "{{ partition.name }}" {
+  count = {{ partition.count }}
+
+  name      = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
+  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
+  {% if 'flavor_name' in partition %}
+  flavor_name = "{{ partition.flavor_name }}"
+  {% else %}
+  flavor_id = "{{ partition.flavor }}"
+  {% endif %}
+
+  network {
+    port = openstack_networking_port_v2.{{ partition.name }}[count.index].id
+  }
+
+  # root device:
+  block_device {
+      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
+      source_type  = "image"
+      {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
+      volume_size = {{ cluster_root_volume_size | default("20") }}
+      destination_type = "volume"
+      {% if cluster_root_volume_type is defined %}
+      volume_type = "{{ cluster_root_volume_type }}"
+      {% endif %}
+      {% else %}
+      destination_type = "local"
+      {% endif %}
+      boot_index = 0
+      delete_on_termination = true
+  }
+
+  # Use cloud-init to inject the SSH keys
+  user_data = <<-EOF
+    #cloud-config
+    ssh_authorized_keys:
+    {%- if cluster_user_ssh_public_key is defined %}
+      - {{ cluster_user_ssh_public_key }}
+    {%- endif %}
+    {%- if cluster_deploy_ssh_public_key is defined %}
+      - {{ cluster_deploy_ssh_public_key }}
+    {%- endif %}
+    {%- if cluster_ssh_private_key_file is not defined %}
+      - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
+    {%- endif %}
+    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
+      - {{ ssh_key }}
+    {%- endfor %}
+  EOF
+}
+
+{% endfor %}
+
+#####
+##### Floating IP association for login node
+#####
+{% if cluster_floating_ip_address is not defined %}
+# Create a new floating IP
+resource "openstack_networking_floatingip_v2" "cluster_floating_ip" {
+  pool       = "${data.openstack_networking_network_v2.cluster_external_network.name}"
+  subnet_ids = "${data.openstack_networking_subnet_ids_v2.cluster_external_subnets.ids}"
+}
+{% endif %}
+
+data "openstack_networking_floatingip_v2" "cluster_floating_ip" {
+  {% if cluster_floating_ip_address is not defined %}
+  address = "${openstack_networking_floatingip_v2.cluster_floating_ip.address}"
+  {% else %}
+  address = "{{ cluster_floating_ip_address }}"
+  {% endif %}
+}
+
+resource "openstack_compute_floatingip_associate_v2" "login_floatingip_assoc" {
+  floating_ip = "${data.openstack_networking_floatingip_v2.cluster_floating_ip.address}"
+  instance_id = "${openstack_compute_instance_v2.login.id}"
+}

@@ -5,18 +5,21 @@ locals {
 
 data "openstack_images_image_v2" "control" {
   name = var.control_node.image
+  most_recent = true
 }
 
 data "openstack_images_image_v2" "login" {
   for_each = var.login_nodes
 
   name = each.value.image
+  most_recent = true
 }
 
 data "openstack_images_image_v2" "compute" {
   for_each = var.compute_nodes
 
   name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
+  most_recent = true
 }
 
 resource "openstack_networking_port_v2" "login" {
@@ -83,7 +86,7 @@ resource "openstack_compute_instance_v2" "control" {
   for_each = toset(["control"])
   
   name = "${var.cluster_name}-${each.key}"
-  image_name = data.openstack_images_image_v2.control.name
+  image_id = data.openstack_images_image_v2.control.id
   flavor_name = var.control_node.flavor
   key_pair = var.key_pair
   
@@ -126,26 +129,15 @@ resource "openstack_compute_instance_v2" "control" {
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
     
-    fs_setup:
-      - label: state
-        filesystem: ext4
-        device: ${var.state_volume_device_path}
-        partition: auto
-      - label: home
-        filesystem: ext4
-        device: ${var.home_volume_device_path}
-        partition: auto
+    bootcmd:
+      %{for volume in [openstack_blockstorage_volume_v3.state, openstack_blockstorage_volume_v3.home]}
+      - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
+      %{endfor}
 
     mounts:
       - [LABEL=state, ${var.state_dir}]
-      - [LABEL=home, /exports/home, auto, "x-systemd.required-by=nfs-server.service,x-systemd.before=nfs-server.service"]
+      - [LABEL=home, /exports/home]
   EOF
-
-  lifecycle{
-    ignore_changes = [
-      image_name,
-      ]
-    }
 
 }
 
@@ -154,7 +146,7 @@ resource "openstack_compute_instance_v2" "login" {
   for_each = var.login_nodes
   
   name = "${var.cluster_name}-${each.key}"
-  image_name = each.value.image
+  image_id = data.openstack_images_image_v2.login[each.key].id
   flavor_name = each.value.flavor
   key_pair = var.key_pair
 
@@ -184,12 +176,6 @@ resource "openstack_compute_instance_v2" "login" {
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
   EOF
 
-  lifecycle{
-    ignore_changes = [
-      image_name,
-      ]
-    }
-
 }
 
 resource "openstack_compute_instance_v2" "compute" {
@@ -197,7 +183,7 @@ resource "openstack_compute_instance_v2" "compute" {
   for_each = var.compute_nodes
   
   name = "${var.cluster_name}-${each.key}"
-  image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
+  image_id = data.openstack_images_image_v2.compute[each.key].id
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
 
@@ -226,11 +212,5 @@ resource "openstack_compute_instance_v2" "compute" {
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
   EOF
-
-  lifecycle{
-    ignore_changes = [
-      image_name,
-      ]
-    }
 
 }

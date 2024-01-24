@@ -11,6 +11,10 @@ packer {
       version = ">= 1.0.0"
       source  = "github.com/hashicorp/openstack"
     }
+    ansible = {
+      version = ">= 1.1.1"
+      source  = "github.com/hashicorp/ansible"
+    }
   }
 }
 
@@ -88,12 +92,12 @@ variable "image_visibility" {
 
 variable "ssh_bastion_host" {
   type = string
-  default = ""
+  default = null
 }
 
 variable "ssh_bastion_username" {
   type = string
-  default = ""
+  default = null
 }
 
 variable "ssh_bastion_private_key_file" {

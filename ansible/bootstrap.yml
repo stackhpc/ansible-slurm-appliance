@@ -114,6 +114,7 @@
         name: fail2ban
 
 - name: Setup podman
+  gather_facts: false
   hosts: podman
   tags: podman
   tasks:

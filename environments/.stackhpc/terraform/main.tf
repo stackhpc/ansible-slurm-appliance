@@ -13,7 +13,7 @@ variable "cluster_name" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    # default = "openhpc-231027-0916-893570de" # https://github.com/stackhpc/ansible-slurm-appliance/pull/324
+    # default = "openhpc-240116-1156-aa8dba7d" # https://github.com/stackhpc/ansible-slurm-appliance/pull/351
     default = "Rocky-8-GenericCloud-Base-8.8-20230518.0.x86_64.qcow2"
 }
 
@@ -30,10 +30,6 @@ variable "other_node_flavor" {}
 variable "volume_backed_instances" {
     default = false
 }
-
-variable "state_volume_device_path" {}
-
-variable "home_volume_device_path" {}
 
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
@@ -74,6 +70,4 @@ module "cluster" {
     state_volume_size = 10
     home_volume_size = 20
 
-    state_volume_device_path = var.state_volume_device_path
-    home_volume_device_path = var.home_volume_device_path
 }

@@ -14,6 +14,12 @@
     src: opensearch.service.j2
   register: _opensearch_unit
 
+- name: Pull container image
+  containers.podman.podman_image:
+    name: "opensearchproject/opensearch"
+    tag: "{{ opensearch_version }}"
+  become_user: "{{ opensearch_podman_user }}"
+
 - name: Reload opensearch unit file
   command: systemctl daemon-reload
   when: _opensearch_unit.changed

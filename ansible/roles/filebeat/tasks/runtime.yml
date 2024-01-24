@@ -1,0 +1,39 @@
+---
+
+- name: Collect usernamespace facts
+  user_namespace_facts:
+
+- name: Set facts containing sub-ids
+  set_fact:
+    # filebeat user is 1000
+    filebeat_host_user_id: "{{ ansible_facts.subuid[filebeat_podman_user]['start'] + 1000 - 1 }}"
+    filebeat_host_group_id: "{{ ansible_facts.subgid[filebeat_podman_user]['start'] + 1000 - 1 }}"
+
+- name: Ensure parent directory exists
+  file:
+    state: directory
+    path: "/etc/filebeat"
+    owner: "{{ filebeat_host_user_id }}"
+    group: "{{ filebeat_host_group_id }}"
+    mode: 0770
+  become: true
+
+- name: Template configuration files
+  template:
+      src: "{{ filebeat_config_path }}"
+      dest: /etc/filebeat/filebeat.yml
+      owner: "{{ filebeat_host_user_id }}"
+      group: "{{ filebeat_host_group_id }}"
+      mode: 0600
+  notify: Restart filebeat container
+  become: true
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Ensure filebeat service state
+  systemd:
+    name: filebeat.service
+    state: started
+    enabled: true
+  become: true
