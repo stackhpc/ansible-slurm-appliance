@@ -10,7 +10,7 @@
 - include_role:
     name: osc.ood
     tasks_from: install-package.yml
-    vars_from: Rocky/8.yml
+    vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
     public: yes # Expose the vars from this role to the rest of the play
   # can't set vars: from a dict hence the workaround above
 
