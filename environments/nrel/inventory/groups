@@ -32,9 +32,9 @@ slurm_stats
 [spack:children]
 login
 
-[rebuild:children]
-control
-compute
+# [rebuild:children]
+# control
+# compute
 
 [update:children]
 cluster
@@ -67,3 +67,4 @@ fail2ban
 # [openondemand_jupyter:children]
 # # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
 # compute
+
