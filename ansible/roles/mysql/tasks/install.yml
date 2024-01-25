@@ -1,6 +1,12 @@
+- name: Install pip
+  dnf:
+    name: python3-pip
+
 - name: Install python mysql client
   pip:
-    name: pymysql
+    name:
+      - pymysql
+      - cryptography
     state: present
 
 - name: Create systemd mysql container unit file
@@ -11,6 +17,6 @@
 
 - name: Pull container image
   containers.podman.podman_image:
-    name: "mysql"
+    name: docker.io/library/mysql
     tag: "{{ mysql_tag }}"
   become_user: "{{ mysql_podman_user }}"
