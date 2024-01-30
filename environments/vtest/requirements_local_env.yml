@@ -4,22 +4,28 @@ roles:
   - name: vshpc.prov.pre-tasks
     src: git+git@github.nrel.gov:acoinf/vshpc.prov.pre-tasks.git
     type: git
-
-  - name: aco.prov.yum
-    src: git+git@github.nrel.gov:acoinf/aco.prov.yum.git
     version: main
 
-  - name: root_pass
-    src: git+git@github.nrel.gov:hpc/ansible_root_pass.git
-    version: master
+  # - name: aco.prov.yum
+  #   src: git+git@github.nrel.gov:acoinf/aco.prov.yum.git
+  #   version: main
+
+  # - name: root_pass
+  #   src: git+git@github.nrel.gov:hpc/ansible_root_pass.git
+  #   version: master
+
+  # - name: root_pass_cli
+  #   src: git+git@github.nrel.gov:hpc/root_pass_cli.git
+  #   type: git
 
   - name: os_stackmgr_user
     src: git+git@github.nrel.gov:hpc/openstack_stackmgr_user.git
+    type: git
     version: master
 
-  - name: vs.core.vastmount
-    src: git+git@github.nrel.gov:acoinf/vs.core.vastmount.git
-    type: git
+  # - name: vs.core.vastmount
+  #   src: git+git@github.nrel.gov:acoinf/vs.core.vastmount.git
+  #   type: git
 
   - name: aco.core.motd
     src: git+git@github.nrel.gov:acoinf/aco.core.motd.git
@@ -37,20 +43,16 @@ roles:
     src: git+git@github.nrel.gov:hpc/ansible_ipa_ldap_fix.git
     type: git
 
+  - name: vermilion_ldap_client
+    src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
+    type: git
+
   - name: aco.core.ntp
     src: git+git@github.nrel.gov:acoinf/aco.core.ntp
     type: git
 
   - name: vs-set-ephemeral-mounts
     src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
-    type: git
-
-  - name: vermilion_ldap_client
-    src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
-    type: git
-
-  - name: root_pass_cli
-    src: git+git@github.nrel.gov:hpc/root_pass_cli.git
     type: git
 
   - name: vshpc.prov.pam_mkhomedir_plus
