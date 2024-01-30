@@ -16,9 +16,6 @@ terraform_project_path: "{{ playbook_dir }}/terraform"
 terraform_state: "{{ cluster_state | default('present') }}"
 cluster_ssh_user: rocky
 
-# Set the size of the state volume to metrics_db_maximum_size + 10
-state_volume_size: "{{ metrics_db_maximum_size + 10 }}"
-
 # Provision a single "standard" compute partition using the supplied
 # node count and flavor
 openhpc_slurm_partitions:
