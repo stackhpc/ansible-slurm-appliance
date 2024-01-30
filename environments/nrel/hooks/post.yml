@@ -45,7 +45,7 @@
 
 - name: "Set/fix the the ephemeral ssd mounts"
   hosts: compute
-  tags: set-ephemeral-mounts
+  tags: vs-set-ephemeral-mounts
   become: true
   tasks:
     - include_role:
@@ -60,7 +60,15 @@
     - include_role:
         name: vshpc.prov.pam_mkhomedir_plus
 
-
+- name: clean_packages
+  hosts: login
+  become: true
+  tags:
+    - clean_packages
+  tasks:
+    - name: "post task - dnf clean all"
+      shell:
+        cmd: dnf clean all
 
 # - name: sync_slurm_allocations install on admin node
 #   hosts: admin

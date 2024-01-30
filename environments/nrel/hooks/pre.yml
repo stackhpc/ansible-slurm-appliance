@@ -2,7 +2,7 @@
 
 - name: "Do the preliminary node setups"
   hosts: all
-  tags: pre_tasks_all
+  # tags: pre_tasks_all
   become: true
   tasks:
     - include_role:
