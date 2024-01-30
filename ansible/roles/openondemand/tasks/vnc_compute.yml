@@ -17,6 +17,7 @@
       - turbovnc-3.0.1
       - nmap-ncat
       - python3.9
+      - dbus-x11
 
 - name: Install Xfce desktop
   tags: install

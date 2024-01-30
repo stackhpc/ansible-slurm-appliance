@@ -2,7 +2,7 @@
 
 # See: https://github.com/stackhpc/ansible-role-openhpc
 # for variable definitions
-
+openhpc_install_type: ohpc # use "ohcp" for an OpenHPC-based system or "generic" if providing binaries
 openhpc_enable:
   control: "{{ inventory_hostname in groups['control'] }}"
   batch: "{{ inventory_hostname in groups['compute'] }}"

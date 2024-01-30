@@ -16,7 +16,7 @@
 
 - name: Pull container image
   containers.podman.podman_image:
-    name: "opensearchproject/opensearch"
+    name: docker.io/opensearchproject/opensearch
     tag: "{{ opensearch_version }}"
   become_user: "{{ opensearch_podman_user }}"
 
