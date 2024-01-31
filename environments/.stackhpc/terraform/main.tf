@@ -1,5 +1,14 @@
 # This terraform configuration uses the "skeleton" terraform, so that is checked by CI.
 
+terraform {
+  required_version = ">= 0.14"
+  required_providers {
+    openstack = {
+      source = "terraform-provider-openstack/openstack"
+    }
+  }
+}
+
 variable "environment_root" {
     type = string
     description = "Path to environment root, automatically set by activate script"
@@ -13,7 +22,7 @@ variable "cluster_name" {
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
     type = string
-    # default = "openhpc-240116-1156-aa8dba7d" # https://github.com/stackhpc/ansible-slurm-appliance/pull/351
+    # default = "openhpc-240116-1604-b3563a08" # https://github.com/stackhpc/ansible-slurm-appliance/pull/344
     default = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2" # TODO: create packer build
 }
 
