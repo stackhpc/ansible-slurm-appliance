@@ -13,10 +13,3 @@ openhpc_sbin_dir:        /nopt/vtest/slurm/23.11.0/sbin
 openhpc_lib_dir:         /nopt/vtest/slurm/23.11.0/lib/slurm
 openhpc_bin_dir:         /nopt/vtest/slurm/23.11.0/bin
 openhpc_slurm_conf_path: /nopt/vtest/slurm/etc/slurm.conf
-
-# modify slurm.conf:
-# TODO: KURT merge with whatever you currently have for openhpc_config_extra
-openhpc_config_extra:
-  SlurmctldDebug: debug
-  SlurmdDebug: debug
-  Epilog: '<absent>' # # TODO: KURT replace with path on nodes to Epilog

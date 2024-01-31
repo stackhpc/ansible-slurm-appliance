@@ -100,6 +100,7 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
 # - make
 
 # Additional parameters to set in slurm.conf - use yaml format
+openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
 openhpc_config_extra:
   LaunchParameters: use_interactive_step
   FirstJobId: '50000000'
@@ -109,7 +110,6 @@ openhpc_config_extra:
   ReturnToService: '1'
   SlurmctldPidFile: /var/run/slurmctld.pid
   SlurmdPidFile: /var/run/slurmd.pid
-  SlurmdSpoolDir: /var/spool/slurm/slurmd
   StateSaveLocation: /var/spool/slurm/slurmctld
   SwitchType: 'switch/none'
   TaskPlugin: 'task/affinity'
