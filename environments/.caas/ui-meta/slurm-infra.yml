@@ -50,7 +50,7 @@ parameters:
   
   - name: home_volume_size
     label: Home volume size (GB)
-    description: The size of the cloud volume to use for home directories.
+    description: The size of the cloud volume or share to use for home directories.
     kind: cloud.volume_size
     immutable: true
     options:
