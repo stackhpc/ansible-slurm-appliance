@@ -70,7 +70,7 @@ variable "state_volume_size" {
 variable "home_volume_size" {
     type = number
     description = "Size of state volume on control node, in GB"
-    default = 100 # GB
+    default = 100 # GB, 0 means no home volume
 }
 
 variable "vnic_type" {
