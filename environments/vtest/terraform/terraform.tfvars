@@ -44,8 +44,8 @@ proxy_name = "admin"
 
 # name: IPaddr
 login_ips = {
-  login-1: "10.60.107.241"
-  admin: "10.60.107.243"
+  login-1: "10.60.126.35"
+  admin: "10.60.126.49"
 }
 
 login_image = "slurm_rocky93_kbs"
@@ -55,7 +55,7 @@ login_flavor = "vermilion_util_c8m15"
 #---- CONTROL node info ----
 control_image = "slurm_rocky93_kbs"
 control_flavor = "vermilion_util_c8m15"
-control_ip = "10.60.107.240"
+control_ip = "10.60.125.208"
 
 ###################################################
 
@@ -68,7 +68,7 @@ cluster_availability_zone = "esif"
 #key_pair = "slurmdeploy"
 key_pair = "vsdeployer"
 
-external_network = "external"
+external_network = "external2"
 cluster_network = "compute"
 cluster_subnet = "compute-subnet"
 
