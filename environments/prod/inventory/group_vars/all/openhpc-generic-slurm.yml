@@ -1,4 +1,3 @@
-openhpc_install_type: generic # i.e. don't want OpenHPC
 openhpc_generic_packages: # system package installs:
   # below are default in the role, required to get slurm to work:
   - munge

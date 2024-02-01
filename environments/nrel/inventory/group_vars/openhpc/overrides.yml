@@ -1,3 +1,4 @@
+openhpc_install_type: generic # i.e. don't want OpenHPC
 openhpc_packages_extra_nrel: # extra indirection to allow lab environment to filter this
   - bzip2
   - curl
