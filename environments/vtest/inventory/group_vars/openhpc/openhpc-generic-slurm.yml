@@ -1,9 +1,8 @@
 # define paths to slurm on nodes:
-# TODO: KURT
-slurm_build_version: 23.11.1
+slurm_build_version: '23.11.1' # quote to avoid ansible autoconversion weirdness
 slurm_build_path: /nopt/vtest/slurm
 slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
-#
+
 openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
 openhpc_lib_dir: "{{ slurm_build_dir }}/slurm"
 openhpc_bin_dir: "{{ slurm_build_dir }}/bin"
