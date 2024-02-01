@@ -1,11 +1,3 @@
-openhpc_generic_packages: # system package installs:
-  # below are default in the role, required to get slurm to work:
-  - munge
-  - mariadb-connector-c # only actually needed on slurmdbd
-  - hwloc-libs          # only actuall needed on slurmd
-  # below added here to get pingpong and pingmatrix hpctests working:
-  - mpitests-openmpi
-
 # define paths to slurm on nodes:
 # TODO: KURT
 openhpc_sbin_dir:        /nopt/vtest/slurm/23.11.0/sbin

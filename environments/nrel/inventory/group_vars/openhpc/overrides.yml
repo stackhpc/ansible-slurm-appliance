@@ -100,6 +100,15 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
 # - python3
 # - make
 
+# system package installs - generic slurm
+openhpc_generic_packages:
+  # below are default in the role, required to get slurm to work:
+  - munge
+  - mariadb-connector-c # only actually needed on slurmdbd
+  - hwloc-libs          # only actuall needed on slurmd
+  # below added here to get pingpong and pingmatrix hpctests working:
+  - mpitests-openmpi
+
 # Additional parameters to set in slurm.conf - use yaml format
 openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
 openhpc_state_save_location: /var/spool/slurm/slurmctld # TODO: move to persistent storage
