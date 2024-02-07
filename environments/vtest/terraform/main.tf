@@ -81,11 +81,28 @@ resource "openstack_networking_port_v2" "control_control" {
 resource "openstack_compute_instance_v2" "control" {
 
   name = "${var.cluster_name}-vtcontrol"
-  image_name = var.control_image
+  image_id = data.openstack_images_image_v2.control.id
   flavor_name = var.control_flavor
   key_pair = var.key_pair
   config_drive = true
   availability_zone = var.cluster_availability_zone
+
+  # root device:
+  block_device {
+      uuid = data.openstack_images_image_v2.control.id
+      source_type  = "image"
+      destination_type = "local"
+      boot_index = 0
+      delete_on_termination = true
+  }
+
+  # state volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = data.openstack_blockstorage_volume_v3.state.id
+  }
 
   network {
     port = openstack_networking_port_v2.control_cluster.id
@@ -100,6 +117,14 @@ resource "openstack_compute_instance_v2" "control" {
     access_network = true
   }
 
+  user_data = <<-EOF
+    #cloud-config
+    bootcmd:
+      - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(data.openstack_blockstorage_volume_v3.state.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L state $BLKDEV
+      
+    mounts:
+      - [LABEL=state, /var/lib/state]
+  EOF
 }
 
 # --- slurm logins ---
@@ -179,12 +204,14 @@ resource "openstack_networking_port_v2" "login_control" {
   }
 }
 
+# flavor_name = each.value
 resource "openstack_compute_instance_v2" "logins" {
 
   for_each = var.login_names
 
   name = "${var.cluster_name}-${each.key}"
   image_name = var.login_image
+
   flavor_name = var.control_flavor
   key_pair = var.key_pair
   config_drive = true
@@ -204,7 +231,6 @@ resource "openstack_compute_instance_v2" "logins" {
   }
 
 }
-#  flavor_name = each.value
 
 # --- slurm compute ---
 
@@ -296,22 +322,18 @@ resource "openstack_compute_instance_v2" "computes" {
   key_pair = var.key_pair
   config_drive = true
   availability_zone = var.cluster_availability_zone
-  #availability_zone_hints = "{{ var.cluster_availability_zone }}:vs-0519-u03a"
 
   network {
     port = openstack_networking_port_v2.compute_control[each.key].id
-    #name = "control"
   }
 
   network {
     port = openstack_networking_port_v2.compute_cluster[each.key].id
-    #name = "compute"
     access_network = true
   }
 
   network {
     port = openstack_networking_port_v2.compute_storage[each.key].id
-    #name = "storage"
   }
 
 }
