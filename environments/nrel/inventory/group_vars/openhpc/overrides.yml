@@ -1,3 +1,4 @@
+openhpc_install_type: generic # i.e. don't want OpenHPC
 openhpc_packages_extra_nrel: # extra indirection to allow lab environment to filter this
   - bzip2
   - curl
@@ -99,7 +100,18 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
 # - python3
 # - make
 
+# system package installs - generic slurm
+openhpc_generic_packages:
+  # below are default in the role, required to get slurm to work:
+  - munge
+  - mariadb-connector-c # only actually needed on slurmdbd
+  - hwloc-libs          # only actuall needed on slurmd
+  # below added here to get pingpong and pingmatrix hpctests working:
+  - mpitests-openmpi
+
 # Additional parameters to set in slurm.conf - use yaml format
+openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
+openhpc_state_save_location: /var/spool/slurm/slurmctld # TODO: move to persistent storage
 openhpc_config_extra:
   LaunchParameters: use_interactive_step
   FirstJobId: '50000000'
@@ -109,8 +121,6 @@ openhpc_config_extra:
   ReturnToService: '1'
   SlurmctldPidFile: /var/run/slurmctld.pid
   SlurmdPidFile: /var/run/slurmd.pid
-  SlurmdSpoolDir: /var/spool/slurm/slurmd
-  StateSaveLocation: /var/spool/slurm/slurmctld
   SwitchType: 'switch/none'
   TaskPlugin: 'task/affinity'
   # TaskPlugin: 'task/affinity,task/cgroup'
