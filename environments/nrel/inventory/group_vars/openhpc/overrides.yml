@@ -111,7 +111,6 @@ openhpc_generic_packages:
 
 # Additional parameters to set in slurm.conf - use yaml format
 openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
-openhpc_state_save_location: /var/spool/slurm/slurmctld # TODO: move to persistent storage
 openhpc_config_extra:
   LaunchParameters: use_interactive_step
   FirstJobId: '50000000'
