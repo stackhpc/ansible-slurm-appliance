@@ -1,0 +1,21 @@
+- name: Ensure build directory exists
+  file:
+    state: directory
+    path: "{{ appliances_environment_root }}/slurmbuild/{{ slurm_build_version }}"
+
+- name: Ensure build directory is empty
+  shell:
+    cmd: "rm -rvf {{ appliances_environment_root }}/slurmbuild/{{ slurm_build_version }}/*"
+  register: _empty_build_dir
+  changed_when: _empty_build_dir.stdout_lines | length > 0
+
+- name: Build container
+  command:
+    cmd: >-
+      podman --tmpdir=/mnt/image-storage/tmp build
+      --build-arg SLURM_PREFIX={{ slurm_build_dir }}
+      --build-arg SLURM_SYSCONFDIR={{ openhpc_slurm_conf_path | dirname }}
+      . -t slurm-{{ slurm_build_version }}
+      --output ./{{ slurm_build_version }}
+    chdir: "{{ appliances_environment_root }}/slurmbuild"
+    # TODO: doesn't look idempotent although it is

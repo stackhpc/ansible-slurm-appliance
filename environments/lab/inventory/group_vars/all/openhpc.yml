@@ -7,7 +7,7 @@ slurm_build_path: /nopt/vtest/slurm
 slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
 
 openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
-openhpc_lib_dir: "{{ slurm_build_dir }}/slurm"
+openhpc_lib_dir: "{{ slurm_build_dir }}/lib" # TODO: investigating RPATH shows it expects to find /nopt/vtest/slurm/23.11.0/lib/slurm which needs this
 openhpc_bin_dir: "{{ slurm_build_dir }}/bin"
 openhpc_slurm_conf_path: "{{ slurm_build_dir }}/etc/slurm.conf"
 

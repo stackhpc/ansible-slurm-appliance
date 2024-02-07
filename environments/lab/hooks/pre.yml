@@ -19,8 +19,49 @@
   hosts: compute
   become: true
   gather_facts: false
+  tags: scratch
   tasks:
     - name: Create scratch directory - on local SSD on prod
       file:
         path: /var/scratch
         state: directory
+
+- name: Build custom Slurm
+  hosts: localhost
+  become: no
+  gather_facts: no
+  tags: slurm
+  tasks:
+    - include_tasks: build.yml
+
+- name: Copy custom Slurm to storage
+  hosts: control # doens't matter, just needs to be one
+  become: yes
+  gather_facts: no
+  tags: slurm
+  tasks:
+    - name: Ensure shared slurm directory exists
+      file:
+        state: directory
+        path: "{{ slurm_build_dir }}"
+        owner: root
+        group: root
+        mode: u=rwX,go=rX
+    
+    - name: Copy custom slurm
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: u=rwx,go=rx
+      loop:
+        # - src: "{{ slurm_local_build_dir }}/sbin/"
+        #   dest: "{{ openhpc_sbin_dir }}"
+        - src: "{{ slurm_local_build_dir }}/lib/"
+          dest: "{{ openhpc_lib_dir }}"
+        # - src: "{{ slurm_local_build_dir }}/bin/"
+        #   dest: "{{ openhpc_bin_dir }}"
+      vars:
+        slurm_local_build_dir: "{{ appliances_environment_root }}/slurmbuild/{{ slurm_build_version }}"
+
