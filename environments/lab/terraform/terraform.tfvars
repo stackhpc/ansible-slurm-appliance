@@ -1,58 +1,85 @@
 compute_types = {
-    small: {
-        flavor: "general.v1.small"
-        image: "Rocky-8-GenericCloud-8.6.20220702.0.x86_64"
-    }
-    tiny: {
-        flavor: "general.v1.tiny"
-        image: "Rocky-8-GenericCloud-8.6.20220702.0.x86_64"
-    }
+  large: {
+    flavor: "compute.c60m240s120e1000"
+    image: "vs_rocky86_20221231"
+  }
+  standard: {
+    flavor: "compute.c30m120s60e500"
+    image: "vs_rocky86_20221231"
+  }
+  small: {
+    flavor: "vm.ska.cpu.general.small"
+    image: "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
+  }
+  tiny: {
+    flavor: "compute.c4m16s8e60"
+    image: "vs_rocky86_20221231"
+  }
+  gpu: {
+    flavor: "gpu.c30m120s32e6000"
+    image: "vs_rocky86_20221231"
+  }
 }
 
 compute_names = {
-    sm-001: "small"
-    sm-002: "small"
-    ty-001: "tiny"
-    ty-002: "tiny"
+# Node-inventory.txt
+
+
+sm-0001: "small"
+sm-0002: "small"
+
+
 }
 
+
+##########################################
+
 login_names = {
-    login-0: "general.v1.tiny"
-    admin: "general.v1.tiny"
+  login-1: "gen.c8m16s16"
 }
 #
 
-login_image = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64"
+login_ips = {
+  login-1: "10.60.105.223"
+}
+#
 
-proxy_name = "" # need to set something but its unused in lab
+login_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
+login_flavor = "vm.ska.cpu.general.small"
 
-control_image = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64"
-control_flavor = "general.v1.tiny"
+
+control_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
+control_flavor = "vm.ska.cpu.general.small"
+
+control_ip = "10.60.106.230"
+
+proxy_name = "login-1"
 
 #######################################
 
-cluster_name  = "nrel"
-cluster_slurm_name = "nrel" # as above
+cluster_name  = "vslab"
+cluster_slurm_name = "vermilion"
 cluster_availability_zone = "nova"
 
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 
 key_pair = "slurm-app-ci"
 
-external_network = "external"
-cluster_network = "nrel-compute"
-cluster_subnet = "nrel-compute"
+external_network = "CUDN-Internet"
+cluster_network = "lab-compute" # tf-deployed
+cluster_subnet = "lab-compute"
 
-storage_network = "nrel-storage"
-storage_subnet = "nrel-storage"
+storage_network = "lab-storage"  # tf-deployed
+storage_subnet = "lab-storage"
 
-control_network = "nrel-control"
-control_subnet = "nrel-control"
+control_network = "portal-internal"
+control_subnet = "portal-internal"
 
 
-# remove this block in the real environment:
-cluster_network_vnic_type = "normal"
-cluster_network_profile = {}
-storage_network_vnic_type = "normal"
-storage_network_profile = {}
-# end of non-default lab config
+###########  ^^^^^^^^^^^^^^^ CHANGE THIS
+#compute_images = {} # allows overrides for specific nodes, by name
+compute_images = {}
+
+# reserve ports for the above:
+#openstack port create --network external --fixed-ip subnet=external,ip-address=10.60.107.240 vtest_control_port
+#openstack port create --network external --fixed-ip subnet=external,ip-address=10.60.107.241 vtest_login1_port
