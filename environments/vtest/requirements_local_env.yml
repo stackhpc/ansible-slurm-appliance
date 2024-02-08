@@ -18,42 +18,50 @@ roles:
   #   src: git+git@github.nrel.gov:hpc/root_pass_cli.git
   #   type: git
 
-  - name: os_stackmgr_user
+  - name: openstack_stackmgr_user
     src: git+git@github.nrel.gov:hpc/openstack_stackmgr_user.git
     type: git
-    version: master
+    version: main
 
   # - name: vs.core.vastmount
   #   src: git+git@github.nrel.gov:acoinf/vs.core.vastmount.git
   #   type: git
+  #  version: main
 
   - name: aco.core.motd
     src: git+git@github.nrel.gov:acoinf/aco.core.motd.git
     type: git
+    version: main
 
   - name: aco.core.logging
     src: git+git@github.nrel.gov:acoinf/aco.core.logging.git
     type: git
+    version: main
 
   - name: aco.core.cephfs
     src: git+git@github.nrel.gov:acoinf/aco.core.cephfs
     type: git
+    version: main
 
   - name: ansible_ipa_ldap_fix
     src: git+git@github.nrel.gov:hpc/ansible_ipa_ldap_fix.git
     type: git
+    version: main
 
   - name: vermilion_ldap_client
     src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
     type: git
+    version: main
 
   - name: aco.core.ntp
     src: git+git@github.nrel.gov:acoinf/aco.core.ntp
     type: git
+    version: main
 
-  - name: vs-set-ephemeral-mounts
+    type: git
     src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
     type: git
+    version: main
 
   - name: vshpc.prov.pam_mkhomedir_plus
     src: git+git@github.nrel.gov:acoinf/vshpc.prov.pam_mkhomedir_plus.git
@@ -64,10 +72,12 @@ roles:
   - name: ipaclient
     src: git+git@github.nrel.gov:hpc/ipaclient.git
     type: git
+    version: main
 
   - name: vs_nvidia_a100_driver_install
     src: git+git@github.nrel.gov:hpc/vs_nvidia_a100_driver_install.git
     type: git
+    version: main
 
 ######
 # TODO: All the "lex" integration stuff has diverged and need to be re-addressed.
