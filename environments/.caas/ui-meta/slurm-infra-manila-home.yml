@@ -53,9 +53,9 @@ parameters:
       min_disk: 20
   
   - name: home_volume_size
-    label: Home volume size (GB)
-    description: The size of the cloud volume or share to use for home directories.
-    kind: cloud.volume_size
+    label: Home share size (GB)
+    description: The size of the share to use for home directories.
+    kind: integer
     immutable: true
     options:
       min: 10
