@@ -1,0 +1,127 @@
+# Exactly as for slurm-infra.yml but to allow for separate manila/non-manila home appliances
+name: "slurm-manila-home"
+label: "Slurm (CephFS home)"
+description: >- 
+  Batch cluster running the Slurm workload manager, the Open 
+  OnDemand web interface, and custom monitoring.
+
+  This version uses CephFS for home directories, deleted
+  when the platform is deleted.
+logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
+
+parameters:
+  - name: cluster_floating_ip
+    label: External IP
+    description: The external IP to use for the login node.
+    kind: cloud.ip
+    immutable: true
+
+  - name: login_flavor
+    label: Login node size
+    description: The size to use for the login node.
+    kind: cloud.size
+    immutable: true
+    options:
+      min_ram: 2048
+      min_disk: 20
+
+  - name: control_flavor
+    label: Control node size
+    description: The size to use for the control node.
+    kind: cloud.size
+    immutable: true
+    options:
+      min_ram: 2048
+      min_disk: 20
+
+  - name: compute_count
+    label: Compute node count
+    description: The number of compute nodes in the cluster.
+    kind: integer
+    options:
+      min: 1
+    default: 3
+
+  - name: compute_flavor
+    label: Compute node size
+    description: The size to use for the compute node.
+    kind: cloud.size
+    immutable: true
+    options:
+      count_parameter: compute_count
+      min_ram: 2048
+      min_disk: 20
+  
+  - name: home_volume_size
+    label: Home volume size (GB)
+    description: The size of the cloud volume or share to use for home directories.
+    kind: cloud.volume_size
+    immutable: true
+    options:
+      min: 10
+    default: 100
+
+  - name: state_volume_size
+    label: State volume size (GB)
+    description: |
+      The size of the state volume, used to hold and persist important files and data. Of
+      this volume, 10GB is set aside for cluster state and the remaining space is used
+      to store cluster metrics.
+
+      The oldest metrics records in the [Prometheus](https://prometheus.io/) database will be 
+      discarded to ensure that the database does not grow larger than this volume.
+    kind: cloud.volume_size
+    immutable: true
+    options:
+      min: 20
+    default: 20
+
+  - name: cluster_run_validation
+    label: Post-configuration validation
+    description: >-
+      If selected, post-configuration jobs will be executed to validate the core functionality
+      of the cluster when it is re-configured.
+    kind: boolean
+    required: false
+    default: true
+    options:
+      checkboxLabel: Run post-configuration validation?
+
+usage_template: |-
+  # Accessing the cluster using Open OnDemand
+
+  [Open OnDemand](https://openondemand.org/) is a web portal for managing HPC jobs, including graphical
+  environments such as [Jupyter Notebooks](https://jupyter.org/).
+
+  {% if cluster.outputs.openondemand_url %}
+  The Open OnDemand portal for this cluster is available at
+  [{{ cluster.outputs.openondemand_url.slice(8) }}]({{ cluster.outputs.openondemand_url }}).
+
+  Enter the username `azimuth` and password `{{ cluster.outputs.azimuth_user_password }}` when prompted.
+  {% else %}
+  The Open OnDemand portal for this cluster can be accessed from the services list.
+  {% endif %}
+
+  # Accessing the cluster using SSH
+
+  The cluster can be accessed over SSH via the external IP. The SSH public key of the user that
+  deployed the cluster is injected into the `azimuth` user:
+
+  ```
+  $ ssh azimuth@{{ cluster.outputs.cluster_access_ip | default('[cluster ip]') }}
+  [azimuth@{{ cluster.name }}-login-0 ~]$ sinfo
+  PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+  compute*     up 60-00:00:0    {{ "%3s" | format(cluster.parameter_values.compute_count) }}   idle {{ cluster.name }}-compute-[0-{{ cluster.parameter_values.compute_count - 1 }}]
+  ```
+
+  The `rocky` user can be accessed the same way and has passwordless `sudo` enabled.
+
+  SSH access can be granted to additional users by placing their SSH public key in `~azimuth/.ssh/authorized_keys`.
+
+services:
+  - name: ood
+    label: Open OnDemand
+    icon_url: https://github.com/stackhpc/ansible-slurm-appliance/raw/main/environments/.caas/assets/ood-icon.png
+  - name: monitoring
+    label: Monitoring
+    icon_url: https://raw.githubusercontent.com/cncf/artwork/master/projects/prometheus/icon/color/prometheus-icon-color.png
