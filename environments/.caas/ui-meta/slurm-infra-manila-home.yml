@@ -9,6 +9,8 @@ description: >-
   when the platform is deleted.
 logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
 
+requires_ssh_key: true
+
 parameters:
   - name: cluster_floating_ip
     label: External IP
