@@ -116,6 +116,15 @@ usage_template: |-
 
   SSH access can be granted to additional users by placing their SSH public key in `~azimuth/.ssh/authorized_keys`.
 
+  Note that home directories are deleted when the platform is destroyed.
+
+  If configured by the adminstrator, a project filesystem may be mounted at `/project`.
+  Content stored there will be available to all such configured workstations and Slurm
+  clusters, and will persist after deletion of workstations/clusters.
+
+  Other parts of the filesystem may be affected during a patch operation, including any
+  packages that have been installed using `dnf`.
+
 services:
   - name: ood
     label: Open OnDemand
