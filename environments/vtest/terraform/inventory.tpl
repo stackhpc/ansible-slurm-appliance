@@ -35,6 +35,10 @@ ${cluster_name}-vtlg-[001:002]
 ${cluster_name}-vtlg-intel-001
 
 #################################################################
+[a100:children]
+${cluster_name}_gpu
+${cluster_name}_gpu3
+
 [${cluster_name}_gpu]
 ${cluster_name}-vtgpu-[001:002]
 
