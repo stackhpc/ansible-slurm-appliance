@@ -18,7 +18,7 @@
     - include_tasks: build.yml
 
 - name: Copy custom Slurm to storage
-  hosts: control # doens't matter, just needs to be one
+  hosts: control
   become: yes
   gather_facts: no
   tags: slurm
@@ -26,7 +26,7 @@
     - name: Ensure shared slurm directory exists
       file:
         state: directory
-        path: "{{ slurm_build_dir }}"
+        path: "{{ slurm_build_dir }}" # NB this will be exported by nfs filesystems.yml
         owner: root
         group: root
         mode: u=rwX,go=rX
@@ -39,12 +39,12 @@
         group: root
         mode: u=rwx,go=rx
       loop:
-        # - src: "{{ slurm_local_build_dir }}/sbin/"
-        #   dest: "{{ openhpc_sbin_dir }}"
+        - src: "{{ slurm_local_build_dir }}/sbin/"
+          dest: "{{ openhpc_sbin_dir }}"
         - src: "{{ slurm_local_build_dir }}/lib/"
           dest: "{{ openhpc_lib_dir }}"
-        # - src: "{{ slurm_local_build_dir }}/bin/"
-        #   dest: "{{ openhpc_bin_dir }}"
+        - src: "{{ slurm_local_build_dir }}/bin/"
+          dest: "{{ openhpc_bin_dir }}"
       vars:
         slurm_local_build_dir: "{{ appliances_environment_root }}/slurmbuild/{{ slurm_build_version }}"
 
