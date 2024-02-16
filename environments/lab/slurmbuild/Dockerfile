@@ -1,4 +1,4 @@
-FROM rockylinux:8 as build-stage
+FROM rockylinux:9 as build-stage
 
 ARG SLURM_VERSION=23.11.0 # From https://www.schedmd.com/downloads.php
 ARG SLURM_PREFIX=/opt/slurm # Should match directory Slurm is installed at
@@ -9,7 +9,7 @@ RUN set -ex \
     && yum -y update \
     && yum -y install dnf-plugins-core epel-release \
     && yum -y install dnf-plugins-core \
-    && yum config-manager --set-enabled powertools \
+    && yum config-manager --set-enabled crb \
     && yum -y install \
        wget \
        bzip2 \
@@ -35,10 +35,9 @@ RUN set -ex \
        pmix-devel \
        hwloc \
        hwloc-devel \
+       dbus-devel \
     && yum clean all \
     && rm -rf /var/cache/yum
-
-RUN alternatives --set python /usr/bin/python3
 
 RUN pip3 install Cython nose
 
