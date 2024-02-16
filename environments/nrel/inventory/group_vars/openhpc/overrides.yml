@@ -178,7 +178,7 @@ openhpc_config_extra:
 
   # SCHEDULING
   SchedulerType: 'sched/backfill'
-  SelectType: 'select/cons_res'
+  SelectType: 'select/cons_tres'
   SelectTypeParameters: 'CR_Core'
   EnforcePartLimits: 'ALL'
   SchedulerParameters:
