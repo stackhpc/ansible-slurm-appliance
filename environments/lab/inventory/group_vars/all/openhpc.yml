@@ -14,5 +14,5 @@ openhpc_slurm_conf_path: "{{ slurm_build_dir }}/etc/slurm.conf"
 
 openhpc_slurm_partitions:
   - name: "sm"
-    default: NO
+    default: YES
     maxtime: "1-0" # 1 days 0 hours
