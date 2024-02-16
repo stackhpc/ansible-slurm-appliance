@@ -1,20 +1,3 @@
-- name: NREL lab fixes - Workaround no internal DNS
-  hosts: all
-  become: true
-  gather_facts: false
-  tags: etc_hosts
-  tasks:
-    - name: Create /etc/hosts for all nodes as DNS doesn't work
-      # the interface used as ansible_host is defined by terraform's `access_network` parameter, so this is deterministic for multi-rail hosts
-      blockinfile:
-        path: /etc/hosts
-        create: yes
-        state: present
-        block: |
-          {% for hostname in groups['all'] %}
-          {{ hostvars[hostname]['ansible_host'] }} {{ hostname }}
-          {% endfor %}
-
 - name: NREL lab fixes - For compute nodes
   hosts: compute
   become: true
