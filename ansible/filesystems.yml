@@ -16,3 +16,11 @@
   tasks:
     - include_role:
         name: stackhpc.nfs
+
+- name: Setup Manila share mounts
+  hosts: manila
+  become: true
+  tags: manila
+  tasks:
+    - include_role:
+        name: stackhpc.os-manila-mount

@@ -1,0 +1,16 @@
+caas_manila_home:
+  share_name: "{{ cluster_name }}-home"
+  mount_path: /home
+  mount_user: root
+  mount_group: root
+  mount_mode: u=rwX,go=rX
+
+cluster_project_manila_share_name: azimuth-project-share
+caas_manila_project:
+  share_name: "{{ cluster_project_manila_share_name }}"
+  mount_path: /project
+  mount_user: root
+  mount_group: root
+  mount_mode: ugo=rwX
+
+os_manila_mount_shares: "{{ ([caas_manila_home] if cluster_home_manila_share | bool else []) + ([caas_manila_project] if cluster_project_manila_share | bool else []) }}"
