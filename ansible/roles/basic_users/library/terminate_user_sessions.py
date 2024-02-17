@@ -56,13 +56,11 @@ def run_module():
 
     _, sessions_stdout, _ = module.run_command("loginctl --no-legend list-sessions", check_rc=True)
     for line in sessions_stdout.splitlines():
-        try:
-            session, uid, user = line.split()
-        except ValueError:
-            raise ValueError('failed to split "%s"' % line)
-            
+        session_info = line.split()
+        user = session_info[1]
+        session_id = session_info[0]
         if user == module.params['user']:
-            _, sessions_stdout, _ = module.run_command("loginctl terminate-session %s" % session, check_rc=True)
+            _, sessions_stdout, _ = module.run_command("loginctl terminate-session %s" % session_id, check_rc=True)
             result['changed'] = True
         
     # successful module exit:
