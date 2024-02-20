@@ -110,6 +110,7 @@ openhpc_generic_packages:
   - mpitests-openmpi
 
 # Additional parameters to set in slurm.conf - use yaml format
+openhpc_epilog: '/nopt/slurm/etc/epilog.d/*'
 openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
 openhpc_config_extra:
   LaunchParameters: use_interactive_step
@@ -135,7 +136,7 @@ openhpc_config_extra:
   # Prolog: '/nopt/slurm/etc/prolog.d/*'
   # PrologFlags: 'X11'
   # X11Parameters: 'local_xauthority'
-  # Epilog: '/nopt/slurm/etc/epilog.d/*'
+  Epilog: '<absent>' # /nopt/slurm/etc/epilog.d/*'
   # PrologEpilogTimeout: 180
   # UnkillableStepTimeout: 180
 
