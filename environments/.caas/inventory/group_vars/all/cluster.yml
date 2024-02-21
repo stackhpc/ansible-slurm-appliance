@@ -23,4 +23,4 @@ appliances_state_dir: /var/lib/state
 
 # Defaults for caas-provided extravars:
 cluster_project_manila_share: false
-cluster_home_manila_share: "{{ cluster_project_manila_share }}"
+cluster_home_manila_share: false
