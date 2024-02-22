@@ -14,3 +14,5 @@ block_devices_configurations: [] # as volumes will not be attached to Packer bui
 mysql_state: stopped # as it tries to connect to real mysql node
 opensearch_state: stopped # avoid writing config+certs+db into image
 cuda_persistenced_state: stopped # probably don't have GPU in Packer build VMs
+firewalld_enabled: false # dnf install of firewalld enables it
+firewalld_state: stopped # dnf install of firewalld enables it

@@ -27,13 +27,6 @@
   become: yes
   gather_facts: no
   tasks:
-    - name: Disable firewalld
-      # This is enabled on installation, which isn't what we want
-      systemd:
-        name: firewalld
-        state: stopped
-        enabled: false
-
     # - import_playbook: iam.yml
     - name: Install FreeIPA client
       import_role:
