@@ -3,12 +3,6 @@
     name: pymysql
     state: present
 
-- name: Create systemd mysql container unit file
-  template:
-    dest: /etc/systemd/system/mysql.service
-    src: mysql.service.j2
-  register: _mysql_unitfile
-
 - name: Pull container image
   containers.podman.podman_image:
     name: "mysql"

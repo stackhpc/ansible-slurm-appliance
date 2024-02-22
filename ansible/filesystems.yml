@@ -24,3 +24,14 @@
   tasks:
     - include_role:
         name: stackhpc.os-manila-mount
+        tasks_from: "{{ item }}.yml"
+      loop: "{{ manila_task_modes[appliances_task_mode] }}"
+      vars:
+        manila_task_modes:
+          main:
+            - main
+          runtime: # TODO: add a runtime.yml to this role
+            - lookup
+            - mount
+          #install:
+            # - install

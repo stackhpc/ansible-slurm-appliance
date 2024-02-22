@@ -4,15 +4,11 @@
 - name: Setup OpenSearch
   hosts: opensearch
   tags: opensearch
+  become: true
   tasks:
-    - import_role:
+    - include_role:
         name: opensearch
-        tasks_from: install.yml
-      become: true
-    - import_role:
-        name: opensearch
-        tasks_from: runtime.yml
-      become: true
+        tasks_from: "{{ appliances_task_mode }}.yml"
 
 - name: Setup slurm stats
   hosts: slurm_stats
@@ -30,14 +26,16 @@
   hosts: filebeat
   tags: filebeat
   tasks:
-    - import_role:
+    - include_role:
         name: filebeat
+        tasks_from: "{{ appliances_task_mode }}.yml"
 
 - name: Deploy node_exporter
   hosts: node_exporter
   tags: node_exporter
   tasks:
-    - import_role: name=cloudalchemy.node_exporter
+    - include_role:
+        name: cloudalchemy.node_exporter
 
 - name: Deploy OpenOndemand exporter
   hosts: openondemand
@@ -46,7 +44,7 @@
     - openondemand
     - openondemand_server
   tasks:
-    - import_role:
+    - include_role:
         name: openondemand
         tasks_from: exporter.yml
 
@@ -55,8 +53,9 @@
   become: true
   tags: slurm_exporter
   tasks:
-    - import_role:
+    - include_role:
         name: slurm_exporter
+      when: "appliances_task_mode != 'runtime'" # install starts it anyway
 
 - name: Setup core monitoring software
   hosts: prometheus
@@ -74,7 +73,7 @@
       set_fact:
         prometheus_skip_install: "{{ false if prometheus_version is defined else true }}" 
       when: "{{ (prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined] }}"
-    - import_role:
+    - include_role:
         name: cloudalchemy.prometheus
 
 - name: Deploy grafana
@@ -89,5 +88,5 @@
       vars:
         # We use internal roles to register the dashboards as the role does not support all options that we require.
         grafana_dashboards: []
-    - import_role: # done in same play so it can use handlers from cloudalchemy.grafana
+    - include_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards

@@ -8,6 +8,7 @@
   tasks:
     - include_role:
         name:  mysql
+        tasks_from: "{{ appliances_task_mode }}.yml"
 
 - name: Setup slurm-driven reimage
   hosts: rebuild
@@ -16,7 +17,7 @@
     - rebuild
     - openhpc
   tasks:
-    - import_role:
+    - include_role:
         name: stackhpc.slurm_openstack_tools.rebuild
 
 - name: Setup slurm
@@ -25,8 +26,9 @@
   tags:
     - openhpc
   tasks:
-    - import_role:
+    - include_role:
         name: stackhpc.openhpc
+        tasks_from: "{{ appliances_task_mode }}.yml"
 
 - name: Set locked memory limits on user-facing nodes
   hosts:

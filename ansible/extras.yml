@@ -15,8 +15,9 @@
   gather_facts: false
   tasks:
     - name: Install and configure EESSI
-      import_role:
+      include_role:
         name: eessi
+        tasks_from: "{{ appliances_task_mode }}.yml"
 
 - name: Setup CUDA
   hosts: cuda
