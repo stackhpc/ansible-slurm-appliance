@@ -340,33 +340,19 @@ resource "openstack_compute_instance_v2" "computes" {
 
 # --- floating ips ---
 
-resource "openstack_networking_floatingip_v2" "logins" {
-
-  for_each = var.login_names
-
-  pool = data.openstack_networking_network_v2.external.name
-  address = var.login_ips[each.key]
-}
-
 resource "openstack_compute_floatingip_associate_v2" "logins" {
   for_each = var.login_names
 
-  floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
+  floating_ip = var.login_ips[each.key]
   instance_id = openstack_compute_instance_v2.logins[each.key].id
    # networks are zero-indexed
   fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
 
 }
 
-resource "openstack_networking_floatingip_v2" "control" {
-
-  pool = data.openstack_networking_network_v2.external.name
-  address = var.control_ip
-}
-
 resource "openstack_compute_floatingip_associate_v2" "control" {
 
-  floating_ip = openstack_networking_floatingip_v2.control.address
+  floating_ip = var.control_ip
   instance_id = openstack_compute_instance_v2.control.id
    # networks are zero-indexed
   fixed_ip = openstack_compute_instance_v2.control.network.2.fixed_ip_v4
@@ -380,7 +366,7 @@ resource "local_file" "hosts" {
                           {
                             "cluster_name": var.cluster_name
                             "cluster_slurm_name": var.cluster_slurm_name
-                            "proxy_fip": openstack_networking_floatingip_v2.logins[var.proxy_name].address
+                            "proxy_fip": var.login_ips[var.proxy_name]
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,

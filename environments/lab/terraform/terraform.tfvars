@@ -40,7 +40,7 @@ login_names = {
 #
 
 login_ips = {
-  login-1: "10.60.105.223"
+  login-1: "128.232.226.207"
 }
 #
 
@@ -51,7 +51,7 @@ login_flavor = "vm.ska.cpu.general.small"
 control_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
 control_flavor = "vm.ska.cpu.general.small"
 
-control_ip = "10.60.106.230"
+control_ip = "128.232.226.198"
 
 proxy_name = "login-1"
 
