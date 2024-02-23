@@ -110,7 +110,6 @@ openhpc_generic_packages:
   - mpitests-openmpi
 
 # Additional parameters to set in slurm.conf - use yaml format
-openhpc_epilog: '/nopt/slurm/etc/epilog.d/*'
 openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
 openhpc_config_extra:
   LaunchParameters: use_interactive_step
