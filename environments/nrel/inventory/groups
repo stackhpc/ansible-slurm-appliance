@@ -39,9 +39,6 @@ login
 [update:children]
 cluster
 
-[os_manila:children]
-openhpc
-
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH
 login
