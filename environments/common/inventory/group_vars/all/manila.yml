@@ -1,0 +1,13 @@
+# Default configuration for manila file shares, see
+# https://github.com/stackhpc/ansible-role-os-manila-mount
+# for all variable definitions, and override in your environment.
+
+os_manila_mount_shares: []
+  # - share_name:
+  #   share_user:
+  #   mount_path:
+  #   mount_user:
+  #   mount_group:
+  #   mount_mode:
+
+# os_manila_mount_ceph_version: nautilus # role default for RockyLinux 8

@@ -22,3 +22,8 @@ cluster
 # [resolv_conf:children]
 # freeipa_client
 # --- end of FreeIPA example ---
+
+[manila:children]
+# Allows demo; also installs manila client in fat image
+login
+compute
