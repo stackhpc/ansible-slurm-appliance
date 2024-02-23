@@ -22,4 +22,3 @@
       vars:
         expected_sinfo:
           - "{{ openhpc_cluster_name }}-compute-[0-1] small* up 60-00:00:00 2 idle"
-          - "{{ openhpc_cluster_name }}-compute-[2-3] extra up 60-00:00:00 2 idle"
