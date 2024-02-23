@@ -1,0 +1,1 @@
+appliances_state_dir: /var/lib/state # see volume mount in environments/*/terraform/main.tf:openstack_compute_instance_v2.control:userdata
