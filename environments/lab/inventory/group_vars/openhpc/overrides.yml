@@ -1,11 +1,18 @@
-openhpc_rebuild_clouds: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/clouds.yaml"
 
-openhpc_packages_extra: "{{ openhpc_packages_extra_nrel | reject('match', '.*-impi-') }}" # don't have intel compilers available
+# openhpc_packages_extra: "{{ openhpc_packages_extra_nrel | reject('match', '.*-impi-') }}" # TODO: FIXME
+
+# define paths to slurm on nodes:
+slurm_build_version: '23.11.0' # quote to avoid ansible autoconversion weirdness
+slurm_build_path: /nopt/vtest/slurm
+slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
+
+openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
+openhpc_lib_dir: "{{ slurm_build_dir }}/slurm"
+openhpc_bin_dir: "{{ slurm_build_dir }}/bin"
+openhpc_slurm_conf_path: "{{ slurm_build_dir }}/etc/slurm.conf"
+
 
 openhpc_slurm_partitions:
   - name: "sm"
     default: NO
-    maxtime: "1-0" # 1 days 0 hours
-  - name: "ty"
-    default: YES
     maxtime: "1-0" # 1 days 0 hours
