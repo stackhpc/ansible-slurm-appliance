@@ -1,46 +1,46 @@
 openhpc_install_type: generic # i.e. don't want OpenHPC
 openhpc_packages_extra_nrel: # extra indirection to allow lab environment to filter this
-  - bzip2
-  - curl
-  - fio
-  - libaio
-  - libaio-devel
-  - git
-  - gzip
-  - make
-  - patch
-  - tar
-  - unzip
-  - wget
-  - xz
-  - zstd
-  - tmux
-  - vim
-  - nano
-  - python39-devel
+  # - bzip2
+  # - curl
+  # - fio
+  # - libaio
+  # - libaio-devel
+  # - git
+  # - gzip
+  # - make
+  # - patch
+  # - tar
+  # - unzip
+  # - wget
+  # - xz
+  # - zstd
+  # - tmux
+  # - vim
+  # - nano
+  # - python39-devel
 
-  - slurm-libpmi-ohpc
-  - slurm-sview-ohpc
-  - slurm-libpmi-ohpc
-  - docs-ohpc
-  - EasyBuild-ohpc
-  - ohpc-autotools
-  - cmake-ohpc
-  - hwloc-ohpc
-  - singularity-ohpc
-  - slurm-libpmi-ohpc
-  - slurm-sview-ohpc
-  - slurm-libpmi-ohpc
-  - ohpc-base
-  - ohpc-base-compute
-  - ohpc-slurm-client
-  - lmod-ohpc
-  - nhc-ohpc
-  - valgrind-ohpc
-  - clustershell
-  - conman-ohpc
-  - magpie-ohpc
-  - charliecloud-ohpc
+  # - slurm-libpmi-ohpc
+  # - slurm-sview-ohpc
+  # - slurm-libpmi-ohpc
+  # - docs-ohpc
+  # - EasyBuild-ohpc
+  # - ohpc-autotools
+  # - cmake-ohpc
+  # - hwloc-ohpc
+  # - singularity-ohpc
+  # - slurm-libpmi-ohpc
+  # - slurm-sview-ohpc
+  # - slurm-libpmi-ohpc
+  # - ohpc-base
+  # - ohpc-base-compute
+  # - ohpc-slurm-client
+  # - lmod-ohpc
+  # - nhc-ohpc
+  # - valgrind-ohpc
+  # - clustershell
+  # - conman-ohpc
+  # - magpie-ohpc
+  # - charliecloud-ohpc
 
 
 
@@ -179,7 +179,7 @@ openhpc_config_extra:
 
   # SCHEDULING
   SchedulerType: 'sched/backfill'
-  SelectType: 'select/cons_res'
+  SelectType: 'select/cons_tres'
   SelectTypeParameters: 'CR_Core'
   EnforcePartLimits: 'ALL'
   SchedulerParameters:
