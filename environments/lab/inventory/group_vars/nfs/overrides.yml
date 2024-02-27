@@ -1,6 +1,6 @@
 ---
 
-nfs_server: "{{ (hostvars[groups['control'] | first].server_networks)['nrel-storage'][0] }}"
+nfs_server: "{{ (hostvars[groups['control'] | first].server_networks)['lab-storage'][0] }}"
 nfs_enable:
   server:  "{{ inventory_hostname in groups['control'] }}"
   # Don't mount share on server where it is exported from...

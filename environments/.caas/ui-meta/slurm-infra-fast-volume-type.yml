@@ -5,12 +5,32 @@ description: >-
   OnDemand web interface, and custom monitoring.
 logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
 
+requires_ssh_key: true
+
 parameters:
   - name: cluster_floating_ip
     label: External IP
     description: The external IP to use for the login node.
     kind: cloud.ip
     immutable: true
+
+  - name: login_flavor
+    label: Login node size
+    description: The size to use for the login node.
+    kind: cloud.size
+    immutable: true
+    options:
+      min_ram: 2048
+      min_disk: 20
+
+  - name: control_flavor
+    label: Control node size
+    description: The size to use for the control node.
+    kind: cloud.size
+    immutable: true
+    options:
+      min_ram: 2048
+      min_disk: 20
 
   - name: compute_count
     label: Compute node count
@@ -23,16 +43,17 @@ parameters:
   - name: compute_flavor
     label: Compute node size
     description: The size to use for the compute node.
-    kind: "cloud.size"
+    kind: cloud.size
     immutable: true
     options:
+      count_parameter: compute_count
       min_ram: 2048
       min_disk: 20
   
   - name: home_volume_size
     label: Home volume size (GB)
-    description: The size of the cloud volume to use for home directories
-    kind: integer
+    description: The size of the cloud volume to use for home directories.
+    kind: cloud.volume_size
     immutable: true
     options:
       min: 10
@@ -51,19 +72,20 @@ parameters:
     options:
       checkboxLabel: Put home directories on high-performance storage?
 
-  - name: metrics_db_maximum_size
-    label: Metrics database size (GB)
+  - name: state_volume_size
+    label: State volume size (GB)
     description: |
+      The size of the state volume, used to hold and persist important files and data. Of
+      this volume, 10GB is set aside for cluster state and the remaining space is used
+      to store cluster metrics.
+
       The oldest metrics records in the [Prometheus](https://prometheus.io/) database will be 
-      discarded to ensure that the database does not grow larger than this size.
-      
-      **A cloud volume of this size +10GB will be created to hold and persist the metrics 
-      database and important Slurm files.**
-    kind: integer
+      discarded to ensure that the database does not grow larger than this volume.
+    kind: cloud.volume_size
     immutable: true
     options:
-      min: 10
-    default: 10
+      min: 20
+    default: 20
 
   - name: cluster_run_validation
     label: Post-configuration validation
@@ -106,6 +128,15 @@ usage_template: |-
   The `rocky` user can be accessed the same way and has passwordless `sudo` enabled.
 
   SSH access can be granted to additional users by placing their SSH public key in `~azimuth/.ssh/authorized_keys`.
+
+  Note that home directories are deleted when the platform is destroyed.
+
+  If configured by the adminstrator, a project filesystem may be mounted at `/project`.
+  Content stored there will be available to all such configured workstations and Slurm
+  clusters, and will persist after deletion of workstations/clusters.
+
+  Other parts of the filesystem may be affected during a patch operation, including any
+  packages that have been installed using `dnf`.
 
 services:
   - name: ood

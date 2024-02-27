@@ -1,6 +1,7 @@
 ansible==6.0.0
 openstacksdk
 python-openstackclient
+python-manilaclient
 jmespath
 passlib[bcrypt]==1.7.4
 cookiecutter

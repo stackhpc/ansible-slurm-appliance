@@ -81,11 +81,28 @@ resource "openstack_networking_port_v2" "control_control" {
 resource "openstack_compute_instance_v2" "control" {
 
   name = "${var.cluster_name}-control"
-  image_name = var.control_image
+  image_id = data.openstack_images_image_v2.control.id
   flavor_name = var.control_flavor
   key_pair = var.key_pair
   config_drive = true
   availability_zone = var.cluster_availability_zone
+
+  # root device:
+  block_device {
+      uuid = data.openstack_images_image_v2.control.id
+      source_type  = "image"
+      destination_type = "local"
+      boot_index = 0
+      delete_on_termination = true
+  }
+
+  # state volume:
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = data.openstack_blockstorage_volume_v3.state.id
+  }
 
   network {
     port = openstack_networking_port_v2.control_cluster.id
@@ -100,6 +117,14 @@ resource "openstack_compute_instance_v2" "control" {
     access_network = true
   }
 
+  user_data = <<-EOF
+    #cloud-config
+    bootcmd:
+      - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(data.openstack_blockstorage_volume_v3.state.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L state $BLKDEV
+      
+    mounts:
+      - [LABEL=state, /var/lib/state]
+  EOF
 }
 
 # --- slurm logins ---
@@ -315,33 +340,19 @@ resource "openstack_compute_instance_v2" "computes" {
 
 # --- floating ips ---
 
-resource "openstack_networking_floatingip_v2" "logins" {
-
-  for_each = var.login_names
-
-  pool = data.openstack_networking_network_v2.external.name
-  address = var.login_ips[each.key]
-}
-
 resource "openstack_compute_floatingip_associate_v2" "logins" {
   for_each = var.login_names
 
-  floating_ip = openstack_networking_floatingip_v2.logins[each.key].address
+  floating_ip = var.login_ips[each.key]
   instance_id = openstack_compute_instance_v2.logins[each.key].id
    # networks are zero-indexed
   fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
 
 }
 
-resource "openstack_networking_floatingip_v2" "control" {
-
-  pool = data.openstack_networking_network_v2.external.name
-  address = var.control_ip
-}
-
 resource "openstack_compute_floatingip_associate_v2" "control" {
 
-  floating_ip = openstack_networking_floatingip_v2.control.address
+  floating_ip = var.control_ip
   instance_id = openstack_compute_instance_v2.control.id
    # networks are zero-indexed
   fixed_ip = openstack_compute_instance_v2.control.network.2.fixed_ip_v4
@@ -355,7 +366,7 @@ resource "local_file" "hosts" {
                           {
                             "cluster_name": var.cluster_name
                             "cluster_slurm_name": var.cluster_slurm_name
-                            "proxy_fip": openstack_networking_floatingip_v2.logins[var.proxy_name].address
+                            "proxy_fip": var.login_ips[var.proxy_name]
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,

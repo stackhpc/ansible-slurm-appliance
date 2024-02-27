@@ -79,6 +79,22 @@ resource "openstack_blockstorage_volume_v3" "state" {
     size = "{{ state_volume_size }}"
 }
 
+{% if cluster_home_manila_share | bool %}
+resource "openstack_sharedfilesystem_share_v2" "home" {
+  name = "{{ cluster_name }}-home"
+  description = "Home for cluster"
+  share_proto = "CEPHFS"
+  share_type = {{ '"' + cluster_home_manila_share_type + '"' | default('null') }}
+  size = "{{ home_volume_size }}"
+}
+
+resource "openstack_sharedfilesystem_share_access_v2" "home" {
+  share_id     = openstack_sharedfilesystem_share_v2.home.id
+  access_type  = "cephx"
+  access_to    = "cluster_{{ cluster_id }}"
+  access_level = "rw"
+}
+{% else %}
 resource "openstack_blockstorage_volume_v3" "home" {
     name = "{{ cluster_name }}-home"
     description = "Home for control node"
@@ -89,6 +105,7 @@ resource "openstack_blockstorage_volume_v3" "home" {
     {% endif %}
     {% endif %}
 }
+{% endif %}
 
 ######
 ###### Cluster network
@@ -249,7 +266,7 @@ resource "openstack_compute_keypair_v2" "cluster_keypair" {
 
 resource "openstack_compute_instance_v2" "login" {
   name      = "{{ cluster_name }}-login-0"
-  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
+  image_id  = "{{ cluster_image }}"
   {% if login_flavor_name is defined %}
   flavor_name = "{{ login_flavor_name }}"
   {% else %}
@@ -262,7 +279,7 @@ resource "openstack_compute_instance_v2" "login" {
 
   # root device:
   block_device {
-      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
+      uuid = "{{ cluster_image }}"
       source_type  = "image"
       {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
       volume_size = {{ cluster_root_volume_size | default("20") }}
@@ -298,7 +315,7 @@ resource "openstack_compute_instance_v2" "login" {
 
 resource "openstack_compute_instance_v2" "control" {
   name      = "{{ cluster_name }}-control-0"
-  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
+  image_id  = "{{ cluster_image }}"
   {% if control_flavor_name is defined %}
   flavor_name = "{{ control_flavor_name }}"
   {% else %}
@@ -311,7 +328,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   # root device:
   block_device {
-      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
+      uuid = "{{ cluster_image }}"
       source_type  = "image"
       {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
       volume_size = {{ cluster_root_volume_size | default("20") }}
@@ -334,6 +351,7 @@ resource "openstack_compute_instance_v2" "control" {
       uuid = openstack_blockstorage_volume_v3.state.id
   }
 
+  {% if not cluster_home_manila_share | bool %}
   # home volume:
   block_device {
       destination_type = "volume"
@@ -341,6 +359,7 @@ resource "openstack_compute_instance_v2" "control" {
       boot_index = -1
       uuid = openstack_blockstorage_volume_v3.home.id
   }
+  {% endif %}
 
   # Use cloud-init to a) inject SSH keys b) configure volumes
   user_data = <<-EOF
@@ -359,12 +378,14 @@ resource "openstack_compute_instance_v2" "control" {
       - {{ ssh_key }}
     {%- endfor %}
     bootcmd:
-    %{for volume in [openstack_blockstorage_volume_v3.state, openstack_blockstorage_volume_v3.home]}
+    %{for volume in [openstack_blockstorage_volume_v3.state, {% if not cluster_home_manila_share | bool %} openstack_blockstorage_volume_v3.home {% endif %}]}
     - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
     %{endfor}
     mounts:
         - [LABEL=state, {{ appliances_state_dir }}, auto]
+        {% if not cluster_home_manila_share | bool %}
         - [LABEL=home, /exports/home, auto]
+        {% endif %}
   EOF
 }
 
@@ -373,7 +394,7 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
   count = {{ partition.count }}
 
   name      = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
-  image_id  = "{{ cluster_previous_image | default(cluster_image) }}"
+  image_id  = "{{ cluster_image }}"
   {% if 'flavor_name' in partition %}
   flavor_name = "{{ partition.flavor_name }}"
   {% else %}
@@ -386,7 +407,7 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
 
   # root device:
   block_device {
-      uuid = "{{ cluster_previous_image | default(cluster_image) }}"
+      uuid = "{{ cluster_image }}"
       source_type  = "image"
       {% if cluster_use_root_volumes is defined and cluster_use_root_volumes %}
       volume_size = {{ cluster_root_volume_size | default("20") }}

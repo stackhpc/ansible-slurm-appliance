@@ -82,5 +82,5 @@ control_subnet = "control-subnet"
 ##compute_image = "gpu_2021_11_12"
 
 ###########  ^^^^^^^^^^^^^^^ CHANGE THIS
-##compute_images = {} # allows overrides for specific nodes, by name
-compute_images = {}
+
+compute_images = {} # allows overrides for specific nodes, by name

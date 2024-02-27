@@ -7,3 +7,7 @@ cluster
 [zenith:children]
 grafana
 openondemand
+
+[manila:children]
+login
+compute

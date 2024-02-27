@@ -20,3 +20,7 @@ openondemand_servername_default: "{{ hostvars[groups['openstack'][0]].cluster_ga
 openondemand_servername: "{{ zenith_fqdn_ood | default(openondemand_servername_default) }}"
 
 appliances_state_dir: /var/lib/state
+
+# Defaults for caas-provided extravars:
+cluster_project_manila_share: false
+cluster_home_manila_share: "{{ cluster_project_manila_share }}"

@@ -38,25 +38,6 @@
       }
     dest: "{{ terraform_project_path }}/backend.tf"
 
-# Patching in this appliance is implemented as a switch to a new base image
-# So unless explicitly patching, we want to use the same image as last time
-# To do this, we query the previous Terraform state before updating
-- block:
-    - name: Get previous Terraform state
-      stackhpc.terraform.terraform_output:
-        binary_path: "{{ terraform_binary_path }}"
-        project_path: "{{ terraform_project_path }}"
-        backend_config: "{{ terraform_backend_config }}"
-      register: cluster_infra_terraform_output
-
-    - name: Extract image from Terraform state
-      set_fact:
-        cluster_previous_image: "{{ cluster_infra_terraform_output.outputs.cluster_image.value }}"
-      when: '"cluster_image" in cluster_infra_terraform_output.outputs'
-  when:
-    - terraform_state == "present"
-    - cluster_upgrade_system_packages is not defined or not cluster_upgrade_system_packages
-
 - name: Template Terraform files into project directory
   template:
     src: >-

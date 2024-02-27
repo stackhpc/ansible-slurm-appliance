@@ -1,5 +1,6 @@
 locals {
   user_data_path = "${var.environment_root}/cloud_init/${var.cluster_name}-%s.userdata.yml"
+  control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
 }
 
 
@@ -100,20 +101,14 @@ resource "openstack_compute_instance_v2" "control" {
       delete_on_termination = true
   }
 
-  # state volume:
-  block_device {
+  dynamic "block_device" {
+    for_each = local.control_volumes
+    content {
       destination_type = "volume"
       source_type  = "volume"
       boot_index = -1
-      uuid = openstack_blockstorage_volume_v3.state.id
-  }
-
-  # home volume:
-  block_device {
-      destination_type = "volume"
-      source_type  = "volume"
-      boot_index = -1
-      uuid = openstack_blockstorage_volume_v3.home.id
+      uuid = block_device.value.id # actually openstack_blockstorage_volume_v3 id
+    }
   }
 
   network {
@@ -130,13 +125,15 @@ resource "openstack_compute_instance_v2" "control" {
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
     
     bootcmd:
-      %{for volume in [openstack_blockstorage_volume_v3.state, openstack_blockstorage_volume_v3.home]}
+      %{for volume in local.control_volumes}
       - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
       %{endfor}
 
     mounts:
       - [LABEL=state, ${var.state_dir}]
+      %{if var.home_volume_size > 0}
       - [LABEL=home, /exports/home]
+      %{endif}
   EOF
 
 }

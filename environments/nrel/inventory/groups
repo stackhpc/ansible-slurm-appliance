@@ -20,7 +20,7 @@ control
 [node_exporter:children]
 cluster
 
-[opendistro:children]
+[opensearch:children]
 control
 
 [slurm_stats:children]
@@ -38,9 +38,6 @@ login
 
 [update:children]
 cluster
-
-[os_manila:children]
-openhpc
 
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH

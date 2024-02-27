@@ -25,3 +25,11 @@ data "openstack_networking_subnet_v2" "cluster" {
 data "openstack_networking_subnet_v2" "control" {
   name = var.control_subnet
 }
+
+data "openstack_images_image_v2" "control" {
+  name = var.control_image
+}
+
+data "openstack_blockstorage_volume_v3" "state" {
+    name = "${var.cluster_name}-state"
+}
