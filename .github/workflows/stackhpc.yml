@@ -20,11 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Record which cloud CI is running on
+      - name: Record settings for CI cloud
         run: |
           echo PR_LABELS: ${{ env.PR_LABELS }}
           echo CI_CLOUD: ${{ vars.CI_CLOUD }}
-      - run: exit 1 # DEBUG
 
       - name: Setup ssh
         run: |
