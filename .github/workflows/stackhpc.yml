@@ -15,14 +15,12 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       TF_VAR_cluster_name: ci${{ github.run_id }}
-      PR_LABELS: ${{ join(github.event.pull_request.labels.*.name) }} # only defined on PR, not main
-      CI_CLOUD: ${{ vars.CI_CLOUD }}
+      CI_CLOUD: ${{ contains(github.event.pull_request.labels.*.name, 'CI_CLOUD=LEAFCLOUD') && 'LEAFCLOUD' || vars.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Record settings for CI cloud
         run: |
-          echo PR_LABELS: ${{ env.PR_LABELS }}
           echo CI_CLOUD: ${{ vars.CI_CLOUD }}
 
       - name: Setup ssh
