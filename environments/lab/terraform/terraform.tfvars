@@ -39,9 +39,7 @@ login_names = {
 }
 #
 
-login_ips = {
-  login-1: "128.232.226.207"
-}
+login_ips = {} # Don't use FIPs for lab but need to define for symlinked variables.tf
 #
 
 login_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
@@ -51,7 +49,7 @@ login_flavor = "vm.ska.cpu.general.small"
 control_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
 control_flavor = "vm.ska.cpu.general.small"
 
-control_ip = "128.232.226.198"
+control_ip = "" # Don't use FIPs for lab but need to define for symlinked variables.tf
 
 proxy_name = "login-1"
 

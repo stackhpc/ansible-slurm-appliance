@@ -339,24 +339,7 @@ resource "openstack_compute_instance_v2" "computes" {
 }
 
 # --- floating ips ---
-
-resource "openstack_compute_floatingip_associate_v2" "logins" {
-  for_each = var.login_names
-
-  floating_ip = var.login_ips[each.key]
-  instance_id = openstack_compute_instance_v2.logins[each.key].id
-   # networks are zero-indexed
-  fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
-
-}
-
-resource "openstack_compute_floatingip_associate_v2" "control" {
-
-  floating_ip = var.control_ip
-  instance_id = openstack_compute_instance_v2.control.id
-   # networks are zero-indexed
-  fixed_ip = openstack_compute_instance_v2.control.network.2.fixed_ip_v4
-}
+# Deleted in lab as it is impossible to guarantee what's available
 
 # --- template ---
 
@@ -366,7 +349,7 @@ resource "local_file" "hosts" {
                           {
                             "cluster_name": var.cluster_name
                             "cluster_slurm_name": var.cluster_slurm_name
-                            "proxy_fip": var.login_ips[var.proxy_name]
+                            "proxy_fip": [for n in openstack_compute_instance_v2.logins[var.proxy_name].network: n.fixed_ip_v4 if n.access_network][0]
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,
