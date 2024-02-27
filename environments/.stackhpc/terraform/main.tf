@@ -69,20 +69,21 @@ module "cluster" {
         }
     }
     compute_types = {
-        small: {
+        standard: { # NB: can't call this default!
             flavor: var.other_node_flavor
             image: var.cluster_image
         }
-        extra: {
-            flavor: var.other_node_flavor
-            image: var.cluster_image
-        }
+        # Example of how to add another partition:
+        # extra: {
+        #     flavor: var.other_node_flavor
+        #     image: var.cluster_image
+        # }
     }
     compute_nodes = {
-        compute-0: "small"
-        compute-1: "small"
-        compute-2: "extra"
-        compute-3: "extra"
+        compute-0: "standard"
+        compute-1: "standard"
+        # compute-2: "extra"
+        # compute-3: "extra"
     }
     volume_backed_instances = var.volume_backed_instances
     
