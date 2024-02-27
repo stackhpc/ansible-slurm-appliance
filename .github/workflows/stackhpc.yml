@@ -15,14 +15,12 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       TF_VAR_cluster_name: ci${{ github.run_id }}
-      PR_LABELS: ${{ join(github.event.pull_request.labels.*.name) }} # only defined on PR, not main
       CI_CLOUD: ${{ vars.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Record settings for CI cloud
         run: |
-          echo PR_LABELS: ${{ env.PR_LABELS }}
           echo CI_CLOUD: ${{ vars.CI_CLOUD }}
 
       - name: Setup ssh
@@ -40,10 +38,10 @@ jobs:
       - name: Install ansible etc
         run: dev/setup-env.sh
 
-      - name: Install terraform
-        uses: hashicorp/setup-terraform@v1
+      - name: Install OpenTofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform: v1.5.5
+          tofu_version: 1.6.2
       
       - name: Initialise terraform
         run: terraform init
