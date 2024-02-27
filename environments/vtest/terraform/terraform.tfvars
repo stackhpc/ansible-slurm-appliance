@@ -40,12 +40,12 @@ login_names = {
   login-1: "vermilion_util_c8m15"
   admin: "vermilion_util_c8m15"
 }
-proxy_name = "admin"
+proxy_name = "vtadmin"
 
 # name: IPaddr
 login_ips = {
-  login-1: "10.60.105.71"
-  admin: "10.60.105.73"
+  vtlogin-1: "10.60.105.71"
+  vtadmin: "10.60.105.73"
 }
 
 login_image = "slurm_rocky93_kbs"
@@ -56,7 +56,7 @@ login_flavor = "vermilion_util_c8m15"
 control_image = "slurm_rocky93_kbs"
 control_flavor = "vermilion_util_c8m15"
 control_ip = "10.60.105.70"
-
+control_name = "vtcontrol"
 ###################################################
 
 cluster_name  = "vtest"
