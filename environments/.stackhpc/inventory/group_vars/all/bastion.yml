@@ -1,4 +1,7 @@
-ci_cloud: "{{ lookup('env', 'CI_CLOUD') }}"
+repo_ci_cloud: "{{ lookup('env', 'CI_CLOUD') }}" # repo variable
+# get e.g. LEAFCLOUD from CI_CLOUD=LEAFCLOUD label, only (possibly) set on PRs:
+pr_cloud: "{{ lookup('env', 'PR_LABELS') | split(',') | select('match', 'CI_CLOUD') | first | default('') | split('=') | last }}"
+ci_cloud: "{{ pr_cloud or repo_ci_cloud }}" # so PR labels win
 bastion_config:
   ARCUS:
     user: slurm-app-ci
