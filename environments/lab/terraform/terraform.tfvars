@@ -72,12 +72,4 @@ storage_subnet = "lab-storage"
 
 control_network = "portal-internal"
 control_subnet = "portal-internal"
-
-
-###########  ^^^^^^^^^^^^^^^ CHANGE THIS
-#compute_images = {} # allows overrides for specific nodes, by name
-compute_images = {}
-
-# reserve ports for the above:
-#openstack port create --network external --fixed-ip subnet=external,ip-address=10.60.107.240 vtest_control_port
-#openstack port create --network external --fixed-ip subnet=external,ip-address=10.60.107.241 vtest_login1_port
+compute_images = {} # allows overrides for specific nodes, by name
