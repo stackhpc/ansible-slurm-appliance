@@ -34,6 +34,14 @@ variable "vnic_type" {
     default = "normal"
 }
 
+variable "state_volume_type"{
+    default = "null"
+}
+
+variable "home_volume_type"{
+    default = "null"
+}
+
 variable "control_node_flavor" {}
 
 variable "other_node_flavor" {}
@@ -82,5 +90,8 @@ module "cluster" {
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10
     home_volume_size = 20
+
+    state_volume_type = var.state_volume_type
+    home_volume_type = var.home_volume_type
 
 }
