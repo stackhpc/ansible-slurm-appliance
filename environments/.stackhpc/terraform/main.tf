@@ -30,7 +30,9 @@ variable "cluster_net" {}
 
 variable "cluster_subnet" {}
 
-variable "vnic_type" {}
+variable "vnic_type" {
+    default = "normal"
+}
 
 variable "control_node_flavor" {}
 
