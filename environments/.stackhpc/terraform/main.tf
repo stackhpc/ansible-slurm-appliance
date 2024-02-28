@@ -30,7 +30,17 @@ variable "cluster_net" {}
 
 variable "cluster_subnet" {}
 
-variable "vnic_type" {}
+variable "vnic_type" {
+    default = "normal"
+}
+
+variable "state_volume_type"{
+    default = null
+}
+
+variable "home_volume_type"{
+    default = null
+}
 
 variable "control_node_flavor" {}
 
@@ -59,20 +69,21 @@ module "cluster" {
         }
     }
     compute_types = {
-        small: {
+        standard: { # NB: can't call this default!
             flavor: var.other_node_flavor
             image: var.cluster_image
         }
-        extra: {
-            flavor: var.other_node_flavor
-            image: var.cluster_image
-        }
+        # Example of how to add another partition:
+        # extra: {
+        #     flavor: var.other_node_flavor
+        #     image: var.cluster_image
+        # }
     }
     compute_nodes = {
-        compute-0: "small"
-        compute-1: "small"
-        compute-2: "extra"
-        compute-3: "extra"
+        compute-0: "standard"
+        compute-1: "standard"
+        # compute-2: "extra"
+        # compute-3: "extra"
     }
     volume_backed_instances = var.volume_backed_instances
     
@@ -80,5 +91,8 @@ module "cluster" {
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10
     home_volume_size = 20
+
+    state_volume_type = var.state_volume_type
+    home_volume_type = var.home_volume_type
 
 }
