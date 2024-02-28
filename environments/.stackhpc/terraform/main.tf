@@ -35,11 +35,11 @@ variable "vnic_type" {
 }
 
 variable "state_volume_type"{
-    default = "null"
+    default = null
 }
 
 variable "home_volume_type"{
-    default = "null"
+    default = null
 }
 
 variable "control_node_flavor" {}
