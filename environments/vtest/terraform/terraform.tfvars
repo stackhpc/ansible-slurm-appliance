@@ -56,7 +56,6 @@ login_flavor = "vermilion_util_c8m15"
 control_image = "slurm_rocky93_kbs"
 control_flavor = "vermilion_util_c8m15"
 control_ip = "10.60.105.70"
-control_name = "vtcontrol"
 ###################################################
 
 cluster_name  = "vtest"
