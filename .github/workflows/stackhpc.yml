@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Record which cloud CI is running on
+      - name: Record settings for CI cloud
         run: |
           echo CI_CLOUD: ${{ vars.CI_CLOUD }}
 
@@ -38,10 +38,10 @@ jobs:
       - name: Install ansible etc
         run: dev/setup-env.sh
 
-      - name: Install terraform
-        uses: hashicorp/setup-terraform@v1
+      - name: Install OpenTofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform: v1.5.5
+          tofu_version: 1.6.2
       
       - name: Initialise terraform
         run: terraform init
