@@ -1,5 +1,6 @@
 ---
 hpctests_rootdir:
+hpctests_pre_cmd: ''
 hpctests_pingmatrix_modules: [gnu12 openmpi4]
 hpctests_pingpong_modules: [gnu12 openmpi4 imb]
 hpctests_pingpong_plot: yes
