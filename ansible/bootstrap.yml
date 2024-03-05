@@ -45,6 +45,7 @@
         path: /etc/profile
         search_string: HOSTNAME=$(/usr/bin/hostnamectl --transient 2>/dev/null) || \
         state: absent
+      become: yes
     - name: Add system user groups
       ansible.builtin.group: "{{ item.group }}"
       loop: "{{ appliances_local_users }}"
