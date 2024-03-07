@@ -1,6 +1,7 @@
 flavor = "en1.xsmall"
 use_blockstorage_volume = true
-volume_size = 12 # GB. Compatible with SMS-lab's general.v1.tiny 
+volume_size = 12 # GB. Compatible with SMS-lab's general.v1.tiny
+volume_type = "unencrypted"
 image_disk_format = "qcow2"
 networks = ["909e49e8-6911-473a-bf88-0495ca63853c"] # slurmapp-ci
 source_image_name = "openhpc-230804-1754-80b8d714" # https://github.com/stackhpc/ansible-slurm-appliance/pull/298
