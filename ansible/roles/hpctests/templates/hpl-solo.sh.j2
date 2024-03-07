@@ -15,6 +15,6 @@ echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
 echo SLURM_JOB_ID: $SLURM_JOB_ID
 echo UCX_NET_DEVICES: $UCX_NET_DEVICES
 echo HPL arch: {{ hpctests_hpl_arch }}
-
+{{ hpctests_pre_cmd }}
 module load {{ hpctests_hpl_modules | join(' ' ) }}
 mpirun ./xhpl-{{ hpctests_hpl_arch }}
