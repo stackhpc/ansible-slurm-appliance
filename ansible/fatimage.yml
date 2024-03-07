@@ -68,15 +68,13 @@
         name: stackhpc.openhpc
         tasks_from: install.yml
 
-    - name: Include distribution variables for osc.ood
-      include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky/{{ ansible_distribution_major_version }}.yml"
-    # FUTURE: install-apps.yml - this is git clones
-
     # - import_playbook: portal.yml
     - name: Open Ondemand server
-      import_role:
+      include_role:
         name: osc.ood
         tasks_from: install-package.yml
+        vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
+    # # FUTURE: install-apps.yml - this is git clones
     - name: Open Ondemand remote desktop
       import_role:
         name: openondemand
