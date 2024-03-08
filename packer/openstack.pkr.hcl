@@ -120,6 +120,11 @@ variable "use_blockstorage_volume" {
   default = false
 }
 
+variable "volume_type" {
+  type = string
+  default = null
+}
+
 variable "volume_size" {
   type = number
   default = null # When not specified use the size of the builder instance root disk
@@ -139,6 +144,7 @@ source "openstack" "openhpc" {
   flavor = "${var.flavor}"
   volume_size = "${var.volume_size}"
   use_blockstorage_volume = "${var.use_blockstorage_volume}"
+  volume_type = var.volume_type
   image_disk_format = "${var.image_disk_format}"
   metadata = "${var.metadata}"
   networks = "${var.networks}"
