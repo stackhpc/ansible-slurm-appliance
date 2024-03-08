@@ -1,0 +1,12 @@
+- name: Apply filewalld configs
+  ansible.posix.firewalld: "{{ item }}"
+  notify: Restart filewalld
+  loop: "{{ firewalld_configs }}"
+
+- meta: flush_handlers
+
+- name: Ensure filewalld state
+  ansible.builtin.systemd:
+    name: firewalld
+    state: "{{ firewalld_state }}"
+    enabled: "{{ firewalld_enabled | default(true) }}"
