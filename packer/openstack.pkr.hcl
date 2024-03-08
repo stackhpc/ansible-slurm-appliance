@@ -39,12 +39,12 @@ variable "networks" {
   type = list(string)
 }
 
-# Must supply either fatimage_source_image_name or fatimage_source_image
 variable "os_version" {
   type = string
   description = "RL8 or RL9"
 }
 
+# Must supply either fatimage_source_image_name or fatimage_source_image
 variable "fatimage_source_image_name" {
   type = map(string)
   default = {

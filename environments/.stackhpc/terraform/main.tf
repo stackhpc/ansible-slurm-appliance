@@ -19,11 +19,19 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
+variable "os_version" {
+  type = string
+  description = "RL8 or RL9"
+}
+
 variable "cluster_image" {
     description = "single image for all cluster nodes - a convenience for CI"
-    type = string
-    # default = "openhpc-240307-1635-ff0f9833" # https://github.com/stackhpc/ansible-slurm-appliance/pull/376
-    default = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2" # TODO: create packer build
+    type = map(string)
+    default = {
+        # https://github.com/stackhpc/ansible-slurm-appliance/pull/353
+        RL8: "openhpc-RL8-240308-1440-411c59fd"
+        RL9: "openhpc-RL9-240308-1414-411c59fd"
+    }
 }
 
 variable "cluster_net" {}
