@@ -25,7 +25,7 @@ variable "os_version" {
 }
 
 variable "cluster_image" {
-    description = "single image for all cluster nodes - a convenience for CI"
+    description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
     type = map(string)
     default = {
         # https://github.com/stackhpc/ansible-slurm-appliance/pull/353
@@ -68,23 +68,23 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: var.control_node_flavor
-        image: var.cluster_image
+        image: var.cluster_image[var.os_version]
     }
     login_nodes = {
         login-0: {
             flavor: var.other_node_flavor
-            image: var.cluster_image
+            image: var.cluster_image[var.os_version]
         }
     }
     compute_types = {
         standard: { # NB: can't call this default!
             flavor: var.other_node_flavor
-            image: var.cluster_image
+            image: var.cluster_image[var.os_version]
         }
         # Example of how to add another partition:
         # extra: {
         #     flavor: var.other_node_flavor
-        #     image: var.cluster_image
+        #     image: var.cluster_image[var.os_version]
         # }
     }
     compute_nodes = {
