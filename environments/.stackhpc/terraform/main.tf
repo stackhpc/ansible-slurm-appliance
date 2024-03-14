@@ -19,11 +19,19 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
+variable "os_version" {
+  type = string
+  description = "RL8 or RL9"
+}
+
 variable "cluster_image" {
-    description = "single image for all cluster nodes - a convenience for CI"
-    type = string
-    default = "openhpc-240308-1011-0f0291c0" # https://github.com/stackhpc/ansible-slurm-appliance/pull/364
-    # default = "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2"
+    description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
+    type = map(string)
+    default = {
+        # https://github.com/stackhpc/ansible-slurm-appliance/pull/353
+        RL8: "openhpc-RL8-240313-1028-15f9ab38"
+        RL9: "openhpc-RL9-240313-1057-15f9ab38"
+    }
 }
 
 variable "cluster_net" {}
@@ -60,23 +68,23 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: var.control_node_flavor
-        image: var.cluster_image
+        image: var.cluster_image[var.os_version]
     }
     login_nodes = {
         login-0: {
             flavor: var.other_node_flavor
-            image: var.cluster_image
+            image: var.cluster_image[var.os_version]
         }
     }
     compute_types = {
         standard: { # NB: can't call this default!
             flavor: var.other_node_flavor
-            image: var.cluster_image
+            image: var.cluster_image[var.os_version]
         }
         # Example of how to add another partition:
         # extra: {
         #     flavor: var.other_node_flavor
-        #     image: var.cluster_image
+        #     image: var.cluster_image[var.os_version]
         # }
     }
     compute_nodes = {

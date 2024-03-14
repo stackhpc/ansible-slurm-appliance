@@ -11,7 +11,7 @@ Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=always
 # paths below based on https://opensearch.org/docs/latest/opensearch/configuration/ and https://opensearch.org/docs/latest/security-plugin/configuration/yaml
 # see also https://opensearch.org/docs/2.0/opensearch/install/important-settings/
-ExecStart=/usr/bin/podman run \
+ExecStart=/usr/bin/podman --cgroup-manager=cgroupfs run \
     --network=host \
     --sdnotify=conmon \
     --cgroups=no-conmon \
@@ -29,7 +29,7 @@ ExecStart=/usr/bin/podman run \
     --env bootstrap.memory_lock=true \
     --env "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" \
     --env DISABLE_INSTALL_DEMO_CONFIG=true \
-    opensearchproject/opensearch:{{ opensearch_version }}
+    docker.io/opensearchproject/opensearch:{{ opensearch_version }}
 ExecStop=/usr/bin/podman stop --ignore opensearch -t 10
 # note for some reason this returns status=143 which makes systemd show the unit as failed, not stopped
 ExecStopPost=/usr/bin/podman rm --ignore -f opensearch

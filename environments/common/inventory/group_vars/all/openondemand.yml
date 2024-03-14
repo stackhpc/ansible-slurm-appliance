@@ -49,6 +49,8 @@ openondemand_clusters:
             module purge
 
             export PATH=/opt/TurboVNC/bin:$PATH
+            # avoid "Failed to create secure directory (/run/user/*/pulse)"
+            export XDG_RUNTIME_DIR="$TMPDIR/xdg_runtime"
 
             # Workaround to avoid "Unable to contact settings server" when
             # lauching xfce4-session

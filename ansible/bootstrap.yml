@@ -40,7 +40,13 @@
 - hosts: cluster
   gather_facts: false
   tasks:
-    - name: Add groups
+    - name: Prevent ssh hanging if shared home is unavailable
+      lineinfile:
+        path: /etc/profile
+        search_string: HOSTNAME=$(/usr/bin/hostnamectl --transient 2>/dev/null) || \
+        state: absent
+      become: yes
+    - name: Add system user groups
       ansible.builtin.group: "{{ item.group }}"
       loop: "{{ appliances_local_users }}"
       when:
@@ -50,7 +56,7 @@
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: '-i'
       become: true
-    - name: Add users
+    - name: Add system users
       ansible.builtin.user: "{{ item.user }}"
       loop: "{{ appliances_local_users }}"
       when: item.enable | default(true) | bool
