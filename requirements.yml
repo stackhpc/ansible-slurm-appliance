@@ -22,7 +22,7 @@ roles:
     version: v3.0.6
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: feat/RL9 # TODO: bump to release
+    version: v24.2.0 # Support RockyLinux 9
 
 collections:
   - name: containers.podman
