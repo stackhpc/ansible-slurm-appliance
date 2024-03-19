@@ -14,7 +14,7 @@ EnvironmentFile=/etc/sysconfig/mysqld
 # The above EnvironmentFile must define MYSQL_INITIAL_ROOT_PASSWORD
 ExecStartPre=+install -d -o {{ mysql_podman_user }} -g {{ mysql_podman_user }} -Z container_file_t {{ mysql_datadir }}
 ExecStartPre=+chown -R {{ mysql_podman_user }}:{{ mysql_podman_user }} {{ mysql_datadir }}
-ExecStart=/usr/bin/podman run \
+ExecStart=/usr/bin/podman --cgroup-manager=cgroupfs run \
     --network=host \
     --sdnotify=conmon \
     --cgroups=no-conmon \
@@ -26,7 +26,7 @@ ExecStart=/usr/bin/podman run \
     --volume {{ mysql_datadir }}:/var/lib/mysql:U \
     --publish 3306:3306 \
     --env MYSQL_ROOT_PASSWORD=${MYSQL_INITIAL_ROOT_PASSWORD} \
-    mysql:{{ mysql_tag }}{%- for opt in mysql_mysqld_options %} \
+    docker.io/library/mysql:{{ mysql_tag }}{%- for opt in mysql_mysqld_options %} \
     --{{ opt }}{% endfor %}
 
 ExecStop=/usr/bin/podman stop --ignore mysql -t 10

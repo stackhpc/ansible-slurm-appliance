@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v23.12.1 # Tolerate state nfs file handles
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.23.0 # https://github.com/stackhpc/ansible-role-openhpc/pull/165
+    version: v0.24.0 # https://github.com/stackhpc/ansible-role-openhpc/pull/164
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
@@ -22,7 +22,7 @@ roles:
     version: v3.0.6
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: v24.1.0
+    version: v24.2.0 # Support RockyLinux 9
 
 collections:
   - name: containers.podman

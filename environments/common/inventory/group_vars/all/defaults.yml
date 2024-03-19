@@ -59,6 +59,7 @@ appliances_local_users_default:
         uid: 981
         home: "{{ prometheus_db_dir }}"
         shell: /usr/sbin/nologin
+        system: true
       enable: "{{ 'prometheus' in group_names }}"
     
     - group:
@@ -70,6 +71,7 @@ appliances_local_users_default:
         uid: 984
         home: /usr/share/grafana
         shell: /sbin/nologin
+        system: true
       enable: "{{ 'grafana' in group_names }}"
 
 # Overide this to add extra users whilst keeping the defaults.
