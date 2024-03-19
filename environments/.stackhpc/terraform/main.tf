@@ -19,18 +19,36 @@ variable "cluster_name" {
     description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
+variable "os_version" {
+  type = string
+  description = "RL8 or RL9"
+}
+
 variable "cluster_image" {
-    description = "single image for all cluster nodes - a convenience for CI"
-    type = string
-    default = "openhpc-240116-1604-b3563a08" # https://github.com/stackhpc/ansible-slurm-appliance/pull/344
-    # default = "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2"
+    description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
+    type = map(string)
+    default = {
+        # https://github.com/stackhpc/ansible-slurm-appliance/pull/353
+        RL8: "openhpc-RL8-240313-1028-15f9ab38"
+        RL9: "openhpc-RL9-240313-1057-15f9ab38"
+    }
 }
 
 variable "cluster_net" {}
 
 variable "cluster_subnet" {}
 
-variable "vnic_type" {}
+variable "vnic_type" {
+    default = "normal"
+}
+
+variable "state_volume_type"{
+    default = null
+}
+
+variable "home_volume_type"{
+    default = null
+}
 
 variable "control_node_flavor" {}
 
@@ -50,29 +68,30 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     control_node = {
         flavor: var.control_node_flavor
-        image: var.cluster_image
+        image: var.cluster_image[var.os_version]
     }
     login_nodes = {
         login-0: {
             flavor: var.other_node_flavor
-            image: var.cluster_image
+            image: var.cluster_image[var.os_version]
         }
     }
     compute_types = {
-        small: {
+        standard: { # NB: can't call this default!
             flavor: var.other_node_flavor
-            image: var.cluster_image
+            image: var.cluster_image[var.os_version]
         }
-        extra: {
-            flavor: var.other_node_flavor
-            image: var.cluster_image
-        }
+        # Example of how to add another partition:
+        # extra: {
+        #     flavor: var.other_node_flavor
+        #     image: var.cluster_image[var.os_version]
+        # }
     }
     compute_nodes = {
-        compute-0: "small"
-        compute-1: "small"
-        compute-2: "extra"
-        compute-3: "extra"
+        compute-0: "standard"
+        compute-1: "standard"
+        # compute-2: "extra"
+        # compute-3: "extra"
     }
     volume_backed_instances = var.volume_backed_instances
     
@@ -80,5 +99,8 @@ module "cluster" {
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10
     home_volume_size = 20
+
+    state_volume_type = var.state_volume_type
+    home_volume_type = var.home_volume_type
 
 }

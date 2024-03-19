@@ -1,12 +1,26 @@
 
 name: Build fat image
-on:
+'on':
   workflow_dispatch:
+    inputs:
+      use_RL9:
+        required: true
+        description: Include RL9 image build
+        type: boolean
+        default: false
 jobs:
   openstack:
     name: openstack-imagebuild
-    concurrency: ${{ github.ref }} # to branch/PR
     runs-on: ubuntu-20.04
+    concurrency: ${{ github.ref }}-{{ matrix.os_version }} # to branch/PR + OS
+    strategy:
+      matrix:
+        os_version: [RL8, RL9]
+        rl9_selected:
+          - ${{ inputs.use_RL9 == true }} # only potentially true for workflow_dispatch
+        exclude:
+          - os_version: RL9
+            rl9_selected: false
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -48,6 +62,8 @@ jobs:
           cd packer/
           packer init .
           PACKER_LOG=1 packer build -only openstack.openhpc -on-error=${{ vars.PACKER_ON_ERROR }} -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
+        env:
+          PKR_VAR_os_version: ${{ matrix.os_version }}
 
       - name: Get created image name from manifest
         id: manifest

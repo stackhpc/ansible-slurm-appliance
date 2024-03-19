@@ -8,7 +8,7 @@
 {%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}{% endif %}
 
 echo HPL arch: {{ hpctests_hpl_arch }}
-
+{{ hpctests_pre_cmd }}
 module load {{ hpctests_hpl_modules | join(' ' ) }}
 make arch={{ hpctests_hpl_arch }} clean_arch_all
 make arch={{ hpctests_hpl_arch }}
