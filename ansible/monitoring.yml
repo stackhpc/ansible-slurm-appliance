@@ -85,6 +85,7 @@
         fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
     - include_role:
         name: cloudalchemy.grafana
+        tasks_from: "{{ appliances_task_mode }}.yml"
       vars:
         # We use internal roles to register the dashboards as the role does not support all options that we require.
         grafana_dashboards: []

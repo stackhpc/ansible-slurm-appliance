@@ -149,8 +149,6 @@
         - prometheus
         - promtool
 
-    - name: Include distribution variables for cloudalchemy.grafana
-      include_vars: "{{ appliances_repository_root }}/ansible/roles/cloudalchemy.grafana/vars/redhat.yml"
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml

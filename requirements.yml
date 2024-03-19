@@ -15,7 +15,7 @@ roles:
     version: 0.19.1
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
-    version: service-state
+    version: feat/no-install # TODO: release
     # No versions available
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
