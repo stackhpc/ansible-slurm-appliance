@@ -11,3 +11,6 @@ openondemand
 [manila:children]
 login
 compute
+
+[podman:children]
+zenith
