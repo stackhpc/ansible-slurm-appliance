@@ -26,7 +26,7 @@
   changed_when: false
   failed_when:
     - _ofed_info.rc > 0
-    - "'No such file or directory' not in ofed_info.msg"
+    - "'No such file or directory' not in _ofed_info.msg"
   register: _ofed_info
 
 - name: Install build prerequisites
@@ -46,7 +46,7 @@
 # Below from https://docs.nvidia.com/networking/display/mlnxofedv24010331/user+manual
 - name: Run OFED install script
   shell:
-    cmd: "{{ ofed_tmp_dir }}/MLNX_OFED_LINUX-{{ ofed_version }}/mlnxofedinstall --add-kernel-support {% if not ofed_update_firmware %}--without-fw-update{% endif %} --force"
+    cmd: "{{ ofed_tmp_dir }}/MLNX_OFED_LINUX-{{ ofed_version }}-{{ ofed_distro }}{{ ofed_distro_version }}-{{ ofed_arch }}/mlnxofedinstall --add-kernel-support {% if not ofed_update_firmware %}--without-fw-update{% endif %} --force"
   register: _ofed_install
   when: "'MLNX_OFED_LINUX-' + ofed_version not in _ofed_info.stdout"
 
