@@ -2,21 +2,16 @@
 
 - name: Run pre.yml hook
   vars:
-    # hostvars not available here, so have to recalculate environment root:
-    appliances_environment_root: "{{ ansible_inventory_sources | last | dirname }}"
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/pre.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
-
-- import_playbook: validate.yml
-  when: appliances_validate | default(true)
 
 - import_playbook: bootstrap.yml
 
 - name: Run post-bootstrap.yml hook
   vars:
-    # hostvars not available here, so have to recalculate environment root:
-    appliances_environment_root: "{{ ansible_inventory_sources | last | dirname }}"
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post-bootstrap.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
@@ -32,7 +27,7 @@
         tasks_from: client-install.yml
       when: "'freeipa_client' in group_names"
 
-    # import_playbook: filesystems.yml:
+    # - import_playbook: filesystems.yml:
     - name: Install nfs packages
       dnf:
         name: nfs-utils
@@ -49,7 +44,7 @@
   become: yes
   gather_facts: yes
   tasks:
-    # import_playbook: slurm.yml:
+    # - import_playbook: slurm.yml:
     - name: Setup DB
       include_role:
         name: mysql
@@ -71,7 +66,7 @@
         name: openondemand
         tasks_from: vnc_compute.yml
 
-    # import_playbook: monitoring.yml:
+    # - import_playbook: monitoring.yml:
     - import_role:
         name: opensearch
         tasks_from: install.yml
@@ -149,26 +144,26 @@
         - prometheus
         - promtool
 
+    - name: Include distribution variables for cloudalchemy.grafana
+      include_vars: "{{ appliances_repository_root }}/ansible/roles/cloudalchemy.grafana/vars/redhat.yml"
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
 
 - name: Run post.yml hook
   vars:
-    # hostvars not available here, so have to recalculate environment root:
-    appliances_environment_root: "{{ ansible_inventory_sources | last | dirname }}"
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- name: Clean up and shutdown Packer VM
-  hosts: builder
-  gather_facts: no
+- hosts: builder
   become: yes
+  gather_facts: no
   tasks:
+    # - meta: end_here
     - name: Cleanup image
       import_tasks: cleanup.yml
-    - name: Shutdown Packer VM
-    community.general.shutdown:
 
-...
+    - name: Shutdown Packer VM
+      community.general.shutdown:
