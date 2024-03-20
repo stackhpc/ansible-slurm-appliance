@@ -108,8 +108,9 @@
   become: yes
   tags: firewalld
   tasks:
-    - import_role:
+    - include_role:
         name: firewalld
+      tasks_from: "{{ appliances_task_mode }}.yml"
 
 - hosts: fail2ban
   gather_facts: false
