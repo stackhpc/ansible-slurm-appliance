@@ -110,15 +110,16 @@
   tasks:
     - include_role:
         name: firewalld
-      tasks_from: "{{ appliances_task_mode }}.yml"
+        tasks_from: "{{ appliances_task_mode }}.yml"
 
 - hosts: fail2ban
   gather_facts: false
   become: yes
   tags: fail2ban
   tasks:
-    - import_role:
+    - include_role:
         name: fail2ban
+        tasks_from: "{{ appliances_task_mode }}.yml"
 
 - name: Setup podman
   gather_facts: false

@@ -1,26 +1,2 @@
----
-- name: Install EPEL repo
-  package:
-    name: epel-release
-
-- name: Install fail2ban packages
-  package:
-    name:
-      - fail2ban-server
-      - fail2ban-firewalld
-    state: present
-
-- name: Create config
-  template:
-    dest: /etc/fail2ban/jail.local
-    src: jail.local.j2
-  notify: Restart fail2ban
-
-- name: flush handlers
-  meta: flush_handlers
-
-- name: Ensure fail2ban running even if no config change
-  service:
-    name: fail2ban
-    state: started
-    enabled: true
+- import_tasks: install.yml
+- import_tasks: configure.yml
