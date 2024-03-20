@@ -159,21 +159,33 @@ source "openstack" "openhpc" {
   image_visibility = "${var.image_visibility}"
 }
 
-# The "fat" image build with all binaries:
+# "fat" image builds:
 build {
+
+  # non-OFED:
   source "source.openstack.openhpc" {
+    name = "openhpc"
     floating_ip_network = "${var.floating_ip_network}"
     source_image = "${var.fatimage_source_image[var.os_version]}"
     source_image_name = "${var.fatimage_source_image_name[var.os_version]}" # NB: must already exist in OpenStack
     image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # similar to name from slurm_image_builder
   }
 
+  # OFED:
+  source "source.openstack.openhpc" {
+    name = "openhpc-ofed" # this is the only difference from the above
+    floating_ip_network = "${var.floating_ip_network}"
+    source_image = "${var.fatimage_source_image[var.os_version]}"
+    source_image_name = "${var.fatimage_source_image_name[var.os_version]}"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
+  }
+
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
-    groups = ["builder", "control", "compute", "login"]
+    groups = concat(["builder", "control", "compute", "login"], [for g in split("-", "${source.name}"): g if g != "openhpc"])
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/${source.name}_extravars.yml"]
+    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/openhpc_extravars.yml"]
   }
 
   post-processor "manifest" {

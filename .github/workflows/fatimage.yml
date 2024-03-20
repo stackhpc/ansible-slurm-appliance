@@ -61,7 +61,7 @@ jobs:
           . environments/.stackhpc/activate
           cd packer/
           packer init .
-          PACKER_LOG=1 packer build -only openstack.openhpc -on-error=${{ vars.PACKER_ON_ERROR }} -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
+          PACKER_LOG=1 packer build -on-error=${{ vars.PACKER_ON_ERROR }} -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
 
