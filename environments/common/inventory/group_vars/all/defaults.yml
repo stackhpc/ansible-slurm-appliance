@@ -5,7 +5,7 @@ appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
 appliances_environment_name: "{{ appliances_environment_root | basename | regex_replace('\\W+', '') }}" # [a-zA-Z0-9_] only
 #appliances_state_dir: # define an absolute path here to use for persistent state: NB: This is defined as /var/lib/state in inventory by the default Terraform
-appliances_task_mode: main # main, install, runtime
+appliances_task_mode: main # which taskfiles to run from roles (when supported): main, configure
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.

@@ -1,4 +1,4 @@
 - name: Include install tasks
   ansible.builtin.include_tasks: install.yml
 - name: Include runtime tasks
-  ansible.builtin.include_tasks: runtime.yml
+  ansible.builtin.include_tasks: configure.yml

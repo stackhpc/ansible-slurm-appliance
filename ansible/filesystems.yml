@@ -30,8 +30,6 @@
         manila_task_modes:
           main:
             - main
-          runtime: # TODO: add a runtime.yml to this role
+          configure: # TODO: add a configure.yml to this role
             - lookup
             - mount
-          #install:
-            # - install

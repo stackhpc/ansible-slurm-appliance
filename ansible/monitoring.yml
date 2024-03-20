@@ -55,7 +55,7 @@
   tasks:
     - include_role:
         name: slurm_exporter
-      when: "appliances_task_mode != 'runtime'" # install starts it anyway
+      when: "appliances_task_mode != 'configure'" # install starts it anyway
 
 - name: Setup core monitoring software
   hosts: prometheus

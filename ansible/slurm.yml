@@ -28,7 +28,11 @@
   tasks:
     - include_role:
         name: stackhpc.openhpc
-        tasks_from: "{{ appliances_task_mode }}.yml"
+        tasks_from: "{{ _openhpc_task_mode[appliances_task_mode] }}.yml"
+      vars:
+        _openhpc_task_mode:
+          install: install
+          configure: runtime
 
 - name: Set locked memory limits on user-facing nodes
   hosts:
