@@ -201,4 +201,3 @@
   tasks:
     - include_role:
         name: ofed
-        tasks_from: main.yml
