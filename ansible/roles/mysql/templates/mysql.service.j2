@@ -14,7 +14,7 @@ EnvironmentFile=/etc/sysconfig/mysqld
 # The above EnvironmentFile must define MYSQL_INITIAL_ROOT_PASSWORD
 ExecStartPre=+install -d -o {{ mysql_podman_user }} -g {{ mysql_podman_user }} -Z container_file_t {{ mysql_datadir }}
 ExecStartPre=+chown -R {{ mysql_podman_user }}:{{ mysql_podman_user }} {{ mysql_datadir }}
-ExecStart=/usr/bin/podman --cgroup-manager=cgroupfs run \
+ExecStart=/usr/bin/podman run \
     --network=host \
     --sdnotify=conmon \
     --cgroups=no-conmon \

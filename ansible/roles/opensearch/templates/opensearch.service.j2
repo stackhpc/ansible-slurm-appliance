@@ -11,7 +11,7 @@ Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=always
 # paths below based on https://opensearch.org/docs/latest/opensearch/configuration/ and https://opensearch.org/docs/latest/security-plugin/configuration/yaml
 # see also https://opensearch.org/docs/2.0/opensearch/install/important-settings/
-ExecStart=/usr/bin/podman --cgroup-manager=cgroupfs run \
+ExecStart=/usr/bin/podman run \
     --network=host \
     --sdnotify=conmon \
     --cgroups=no-conmon \

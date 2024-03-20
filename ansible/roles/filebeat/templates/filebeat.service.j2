@@ -12,7 +12,7 @@ After=network-online.target
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=always
-ExecStart=/usr/bin/podman --cgroup-manager=cgroupfs run \
+ExecStart=/usr/bin/podman run \
     --network=host \
     --sdnotify=conmon \
     --cgroups=no-conmon \
