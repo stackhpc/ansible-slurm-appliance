@@ -124,15 +124,9 @@
   hosts: podman
   tags: podman
   tasks:
-    - import_role:
+    - include_role:
         name: podman
-        tasks_from: prereqs.yml
-      tags: prereqs
-
-    - import_role:
-        name: podman
-        tasks_from: config.yml
-      tags: config
+        tasks_from: "{{ appliances_task_mode }}.yml"
 
 - hosts: update
   gather_facts: false
