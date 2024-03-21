@@ -2,12 +2,12 @@
 name: Build fat image
 'on':
   workflow_dispatch:
-    inputs:
-      use_RL9:
-        required: true
-        description: Include RL9 image build
-        type: boolean
-        default: false
+    # inputs:
+    #   use_RL9:
+    #     required: true
+    #     description: Include RL9 image build
+    #     type: boolean
+    #     default: false
   push:
     branches:
       - ofed
@@ -19,11 +19,11 @@ jobs:
     strategy:
       matrix:
         os_version: [RL8, RL9]
-        rl9_selected:
-          - ${{ inputs.use_RL9 == true }} # only potentially true for workflow_dispatch
-        exclude:
-          - os_version: RL9
-            rl9_selected: false
+        # rl9_selected:
+        #   - ${{ inputs.use_RL9 == true }} # only potentially true for workflow_dispatch
+        # exclude:
+        #   - os_version: RL9
+        #     rl9_selected: false
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
