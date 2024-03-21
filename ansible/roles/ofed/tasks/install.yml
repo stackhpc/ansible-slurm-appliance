@@ -58,6 +58,8 @@
     chdir: "{{ ofed_tmp_dir }}/MLNX_OFED_LINUX-{{ ofed_version }}-{{ ofed_distro }}{{ ofed_distro_version }}-{{ ofed_arch }}/"
   register: _ofed_install
   when: "'MLNX_OFED_LINUX-' + ofed_version not in _ofed_info.stdout"
+  async: "{{ 45 * 60 }}" # wait for up to 45 minutes
+  poll: 15 # check every 15 seconds
 
 - name: Update initramfs
   command:
