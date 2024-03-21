@@ -16,6 +16,7 @@
   tasks:
     - include_role:
         name: stackhpc.nfs
+      # needs role patching directly appliances_task_mode 
 
 - name: Setup Manila share mounts
   hosts: manila
@@ -24,3 +25,12 @@
   tasks:
     - include_role:
         name: stackhpc.os-manila-mount
+        tasks_from: "{{ item }}.yml"
+      loop: "{{ manila_task_modes[appliances_task_mode] }}"
+      vars:
+        manila_task_modes:
+          main:
+            - main
+          configure: # TODO: add a configure.yml to this role
+            - lookup
+            - mount

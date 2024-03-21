@@ -8,6 +8,7 @@
     - import_role:
         name: openondemand
         tasks_from: main.yml
+    # this one is quite hard to sort for appliances_task_mode
 
 - hosts: openondemand_desktop
   tags:
@@ -19,6 +20,7 @@
     - import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+      when: "{{ appliances_task_mode != 'configure' }}" # is all install-time
 
 - hosts: openondemand_jupyter
   tags:
@@ -30,3 +32,4 @@
     - import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
+      when: "{{ appliances_task_mode != 'configure' }}" # is all install-time

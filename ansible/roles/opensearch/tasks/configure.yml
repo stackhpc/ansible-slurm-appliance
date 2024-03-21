@@ -15,6 +15,16 @@
     path: /etc/systemd/system/opendistro.service
     state: absent
 
+- name: Create systemd opendistro unit file
+  template:
+    dest: /etc/systemd/system/opensearch.service
+    src: opensearch.service.j2
+  register: _opensearch_unit
+
+- name: Reload opensearch unit file
+  command: systemctl daemon-reload
+  when: _opensearch_unit.changed
+
 - name: Enumerate files in data directory
   find:
     path: "{{ opensearch_data_path }}"

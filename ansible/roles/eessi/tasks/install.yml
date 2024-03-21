@@ -29,18 +29,3 @@
 # - name: Install EESSI CVMFS config
 #   dnf:
 #     name: cvmfs-config-eessi
-
-- name: Add base CVMFS config
-  community.general.ini_file:
-    dest: /etc/cvmfs/default.local
-    section: null
-    option: "{{ item.key }}"
-    value: "{{ item.value }}"
-    no_extra_spaces: true
-  loop: "{{ cvmfs_config | dict2items }}"
-    
-
-# NOTE: Not clear how to make this idempotent
-- name: Ensure CVMFS config is setup
-  command:
-    cmd: "cvmfs_config setup"

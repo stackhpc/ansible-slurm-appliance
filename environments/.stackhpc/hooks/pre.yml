@@ -1,3 +1,10 @@
+- hosts: builder
+  become: no
+  gather_facts: no
+  tasks:
+    - name: Report hostname (= final image name)
+      command: hostname
+
 - hosts: control:!builder
   become: yes
   gather_facts: false
