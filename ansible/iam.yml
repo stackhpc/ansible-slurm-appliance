@@ -23,6 +23,7 @@
       import_role:
         name: freeipa
         tasks_from: client-install.yml
+      when: "{{ appliances_task_mode != 'configure' }}"
     - name: Enrol FreeIPA client
       import_role:
         name: freeipa
