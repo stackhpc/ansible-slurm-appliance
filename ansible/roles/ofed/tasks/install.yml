@@ -52,7 +52,6 @@
       {% if not ofed_update_firmware %}--without-fw-update{% endif %}
       --force
       --skip-repo
-      {{ ofed_package_selection | join()}}
       {% for pkgsel in ofed_package_selection %}
       --{{ pkgsel }}
       {% endfor %}
