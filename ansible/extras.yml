@@ -27,3 +27,4 @@
   tasks:
     - import_role:
         name: cuda
+      when: "{{ appliances_task_mode != 'configure' }}" # everything is install-time
