@@ -18,7 +18,7 @@ ofed_build_packages: # may require additional packages depending on ofed_package
   - perl
   - rpm-build
 ofed_build_rl8_packages:
-  - gdb-headless RL8
+  - gdb-headless
   - python36
 ofed_package_selection: # list of package selection flags for mlnxofedinstall script
   - hpc

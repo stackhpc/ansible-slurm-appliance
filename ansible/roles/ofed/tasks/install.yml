@@ -30,10 +30,10 @@
   register: _ofed_info
 
 - name: Install build prerequisites
-  when: "'MLNX_OFED_LINUX-' + ofed_version not in _ofed_info.stdout"
-  # don't want to install a load of prereqs unnecessarily
   dnf:
     name: "{{ ofed_build_packages + (ofed_build_rl8_packages if ofed_distro_version == '8.9' else []) }}"
+  when: "'MLNX_OFED_LINUX-' + ofed_version not in _ofed_info.stdout"
+  # don't want to install a load of prereqs unnecessarily
 
 - name: Download and unpack Mellanox OFED tarball
   ansible.builtin.unarchive:
