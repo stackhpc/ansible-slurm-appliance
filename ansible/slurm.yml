@@ -33,6 +33,7 @@
         _openhpc_task_mode:
           install: install
           configure: runtime
+          main: main
 
 - name: Set locked memory limits on user-facing nodes
   hosts:
