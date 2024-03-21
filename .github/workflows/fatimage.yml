@@ -8,6 +8,9 @@ name: Build fat image
         description: Include RL9 image build
         type: boolean
         default: false
+  push:
+    branches:
+      - ofed
 jobs:
   openstack:
     name: openstack-imagebuild
