@@ -1,22 +1,5 @@
-- name: Persist login hostkey across rebuilds
-# Need NFS for this so can't do it before the appliance plays
-  hosts: login
-  gather_facts: no
-  become: yes
-  roles:
-    - persist_hostkeys
-
 # Configure the Zenith clients that are required
-# First, ensure that podman is installed on all hosts that will run Zenith clients
-- hosts: zenith,!podman
-  tasks:
-    - import_role:
-        name: podman
-        tasks_from: prereqs.yml
-    - import_role:
-        name: podman
-        tasks_from: config.yml
-
+# Note zenith hosts are in podman group
 - hosts: grafana
   tasks:
     - name: Deploy the Zenith client for Grafana
