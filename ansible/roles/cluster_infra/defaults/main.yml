@@ -1,5 +1,3 @@
-cluster_deploy_ssh_keys_extra: []
-
 # List of hw_scsi_models that result in block devices presenting as /dev/sdX
 # rather than /dev/vdX
 scsi_models:
