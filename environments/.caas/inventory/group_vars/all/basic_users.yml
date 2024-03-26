@@ -5,3 +5,8 @@ basic_users_users:
     uid: 1005
     public_key: "{{ cluster_user_ssh_public_key }}"
     shell: /bin/bash
+    append: true
+    groups:
+      - adm
+      - systemd-journal
+    sudo: azimuth ALL=(ALL) NOPASSWD:ALL
