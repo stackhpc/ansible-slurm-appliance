@@ -123,3 +123,6 @@ freeipa_client
 
 [proxy]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
+
+[persist_hostkeys]
+# Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.

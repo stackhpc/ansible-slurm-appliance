@@ -69,3 +69,6 @@ openhpc
 
 [manila]
 # Hosts to configure for manila fileshares
+
+[persist_hostkeys]
+# Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.

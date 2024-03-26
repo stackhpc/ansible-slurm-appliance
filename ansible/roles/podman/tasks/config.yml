@@ -26,6 +26,16 @@
     value: 25000000 # set same as root. Non-root default is 20000
   become: true
 
+- name: Configure podman to use cgroupfs as the cgroup manager
+  community.general.ini_file:
+  # is actually toml but there's no module for that
+    create: false # something's unexpected if it doesn't exist now
+    path: /usr/share/containers/containers.conf
+    section: engine
+    option: cgroup_manager
+    value: '"cgroupfs"'
+  become: true
+
 - name: reset ssh connection to allow user changes to affect 'current login user'
   meta: reset_connection
 
