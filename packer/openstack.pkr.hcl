@@ -162,7 +162,7 @@ source "openstack" "openhpc" {
 # "fat" image builds:
 build {
 
-  # non-CUDA:
+  # non-OFED:
   source "source.openstack.openhpc" {
     name = "openhpc"
     floating_ip_network = "${var.floating_ip_network}"
@@ -171,9 +171,9 @@ build {
     image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # similar to name from slurm_image_builder
   }
 
-  # CUDA:
+  # OFED:
   source "source.openstack.openhpc" {
-    name = "openhpc-cuda" # this is the only difference from the above
+    name = "openhpc-ofed" # this is the only difference from the above
     floating_ip_network = "${var.floating_ip_network}"
     source_image = "${var.fatimage_source_image[var.os_version]}"
     source_image_name = "${var.fatimage_source_image_name[var.os_version]}"
