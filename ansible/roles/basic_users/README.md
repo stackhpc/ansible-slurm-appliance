@@ -21,6 +21,7 @@ Role Variables
 - `uid` should be set, so that the UID/GID is consistent across the cluster (which Slurm requires).
 - `shell` if *not* set will be `/sbin/nologin` on the `control` node and the default shell on other users. Explicitly setting this defines the shell for all nodes.
 - An additional key `public_key` may optionally be specified to define a key to log into the cluster.
+- An additional key `sudo` may optionally be specified giving a string (possibly multiline) defining sudo rules to be templated.
 - Any other keys may present for other purposes (i.e. not used by this role).
 
 Dependencies

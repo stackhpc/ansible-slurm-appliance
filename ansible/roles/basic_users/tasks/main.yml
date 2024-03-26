@@ -42,3 +42,12 @@
   - item.ssh_public_key is defined
   - basic_users_manage_homedir
   run_once: true
+
+- name: Write sudo rules
+  copy:
+    dest: /etc/sudoers.d/80-{{ item.name}}-user
+    content: "{{ item.sudo }}"
+  loop: "{{ basic_users_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: "'sudo' in item"
