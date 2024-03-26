@@ -298,9 +298,6 @@ resource "openstack_compute_instance_v2" "login" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {%- if cluster_user_ssh_public_key is defined %}
-      - {{ cluster_user_ssh_public_key }}
-    {%- endif %}
     {%- if cluster_deploy_ssh_public_key is defined %}
       - {{ cluster_deploy_ssh_public_key }}
     {%- endif %}
