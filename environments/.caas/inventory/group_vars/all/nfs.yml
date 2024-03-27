@@ -13,7 +13,7 @@ caas_nfs_home:
   - comment: Export /exports/home from Slurm control node as /home
     nfs_enable:
         server:  "{{ inventory_hostname in groups['control'] }}"
-        clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
+        clients: "{{ inventory_hostname in groups['cluster'] }}"
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
 
