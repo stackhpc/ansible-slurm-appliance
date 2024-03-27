@@ -20,6 +20,9 @@ ofed_build_packages: # may require additional packages depending on ofed_package
 ofed_build_rl8_packages:
   - gdb-headless
   - python36
+  - gcc-gfortran
+  - tk
+  - tcl
 ofed_package_selection: # list of package selection flags for mlnxofedinstall script
   - hpc
   - with-nfsrdma
