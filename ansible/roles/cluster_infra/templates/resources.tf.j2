@@ -298,18 +298,12 @@ resource "openstack_compute_instance_v2" "login" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {%- if cluster_user_ssh_public_key is defined %}
-      - {{ cluster_user_ssh_public_key }}
-    {%- endif %}
     {%- if cluster_deploy_ssh_public_key is defined %}
       - {{ cluster_deploy_ssh_public_key }}
     {%- endif %}
     {%- if cluster_ssh_private_key_file is not defined %}
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
-    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
-      - {{ ssh_key }}
-    {%- endfor %}
   EOF
 }
 
@@ -365,18 +359,12 @@ resource "openstack_compute_instance_v2" "control" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {%- if cluster_user_ssh_public_key is defined %}
-      - {{ cluster_user_ssh_public_key }}
-    {%- endif %}
     {%- if cluster_deploy_ssh_public_key is defined %}
       - {{ cluster_deploy_ssh_public_key }}
     {%- endif %}
     {%- if cluster_ssh_private_key_file is not defined %}
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
-    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
-      - {{ ssh_key }}
-    {%- endfor %}
     bootcmd:
     %{for volume in [openstack_blockstorage_volume_v3.state, {% if not cluster_home_manila_share | bool %} openstack_blockstorage_volume_v3.home {% endif %}]}
     - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
@@ -426,18 +414,12 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {%- if cluster_user_ssh_public_key is defined %}
-      - {{ cluster_user_ssh_public_key }}
-    {%- endif %}
     {%- if cluster_deploy_ssh_public_key is defined %}
       - {{ cluster_deploy_ssh_public_key }}
     {%- endif %}
     {%- if cluster_ssh_private_key_file is not defined %}
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
-    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
-      - {{ ssh_key }}
-    {%- endfor %}
   EOF
 }
 
