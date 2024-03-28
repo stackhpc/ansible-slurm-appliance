@@ -9,6 +9,7 @@ ofed_build_packages: # may require additional packages depending on ofed_package
   - autoconf
   - automake
   - gcc
+  - gcc-gfortran
   - kernel-devel-{{ _ofed_loaded_kernel.stdout | trim }}
   - kernel-rpm-macros
   - libtool
@@ -17,12 +18,11 @@ ofed_build_packages: # may require additional packages depending on ofed_package
   - pciutils
   - perl
   - rpm-build
+  - tcl
+  - tk
 ofed_build_rl8_packages:
   - gdb-headless
   - python36
-  - gcc-gfortran
-  - tk
-  - tcl
 ofed_package_selection: # list of package selection flags for mlnxofedinstall script
   - hpc
   - with-nfsrdma
