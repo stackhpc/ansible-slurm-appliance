@@ -196,3 +196,11 @@
     - name: update facts
       setup:
       when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
+
+- hosts: ofed
+  gather_facts: no
+  become: yes
+  tags: ofed
+  tasks:
+    - include_role:
+        name: ofed

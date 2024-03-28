@@ -1,6 +1,7 @@
-flavor = "en1.xsmall"
+flavor = "ec1.medium"
 use_blockstorage_volume = true
 volume_size = 12 # GB. Compatible with SMS-lab's general.v1.tiny
+volume_size_ofed = 15 # GB
 volume_type = "unencrypted"
 image_disk_format = "qcow2"
 networks = ["909e49e8-6911-473a-bf88-0495ca63853c"] # slurmapp-ci
