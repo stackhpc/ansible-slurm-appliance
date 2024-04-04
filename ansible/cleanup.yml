@@ -23,9 +23,14 @@
     path: /etc/NetworkManager/conf.d/99-cloud-init.conf
     state: absent
 
+- name: Get remote environment for ansible_user
+  setup:
+    gather_subset: env
+  become: no
+
 - name: Delete any injected ssh config for ansible_user
   file:
-    path: "/home/{{ ansible_user }}/.ssh/"
+    path: "{{ ansible_env.HOME }}/.ssh/"
     state: absent
 
 - name: Run cloud-init cleanup
