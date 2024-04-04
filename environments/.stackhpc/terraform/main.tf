@@ -29,8 +29,8 @@ variable "cluster_image" {
     type = map(string)
     default = {
         # https://github.com/stackhpc/ansible-slurm-appliance/pull/353
-        RL8: "openhpc-RL8-240313-1028-15f9ab38"
-        RL9: "openhpc-RL9-240313-1057-15f9ab38"
+        RL8: "openhpc-ofed-RL8-240404-1407-e9fe3235"
+        RL9: "openhpc-ofed-RL9-240404-1503-e9fe3235"
     }
 }
 

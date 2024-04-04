@@ -23,7 +23,8 @@ jobs:
         rl9_selected:
           - ${{ inputs.use_RL9 == true }} # only potentially true for workflow_dispatch
         rl9_branch:
-          - ${{ startsWith(github.head_ref, 'rl9') == true }} # only potentially for pull_request, always false on merge
+          #- ${{ startsWith(github.head_ref, 'rl9') == true }} # only potentially for pull_request, always false on merge
+          - ${{ true }} # only potentially for pull_request, always false on merge
         exclude:
           - os_version: RL9
             rl9_selected: false
