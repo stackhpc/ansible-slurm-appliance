@@ -58,7 +58,7 @@ roles:
     type: git
     version: main
 
-    type: git
+  - name: vs-set-ephemeral-mounts
     src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
     type: git
     version: main
