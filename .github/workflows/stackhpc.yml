@@ -1,13 +1,13 @@
 
 name: Test deployment and reimage on OpenStack
 on:
-  # workflow_dispatch:
-  #   inputs:
-  #     use_RL9:
-  #       required: true
-  #       description: Include RL9 tests
-  #       type: boolean
-  #       default: false
+  workflow_dispatch:
+    inputs:
+      use_RL9:
+        required: true
+        description: Include RL9 tests
+        type: boolean
+        default: false
   # push:
   #   branches:
   #     - main
