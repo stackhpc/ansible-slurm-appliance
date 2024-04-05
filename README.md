@@ -3,7 +3,7 @@
 # StackHPC Slurm Appliance
 
 This repository contains playbooks and configuration to define a Slurm-based HPC environment including:
-- A Rocky Linux 8 and OpenHPC v2-based Slurm cluster.
+- A Rocky Linux 9 and OpenHPC v3-based Slurm cluster.
 - Shared fileystem(s) using NFS (with servers within or external to the cluster).
 - Slurm accounting using a MySQL backend.
 - A monitoring backend using Prometheus and ElasticSearch.
@@ -18,7 +18,8 @@ While it is tested on OpenStack it should work on any cloud, except for node reb
 ## Prerequisites
 It is recommended to check the following before starting:
 - You have root access on the "ansible deploy host" which will be used to deploy the appliance.
-- You can create instances using a Rocky 8 GenericCloud image (or an image based on that).
+- You can create instances using a Rocky 9 GenericCloud image (or an image based on that).
+    - **NB**: In general it is recommended to use the [latest released image](https://github.com/stackhpc/ansible-slurm-appliance/releases) which already contains the required packages. This is built and tested in StackHPC's CI. However the appliance will install the necessary packages if a GenericCloud image is used.
 - SSH keys get correctly injected into instances.
 - Instances have access to internet (note proxies can be setup through the appliance if necessary).
 - DNS works (if not this can be partially worked around but additional configuration will be required).
@@ -31,14 +32,7 @@ These instructions assume the deployment host is running Rocky Linux 8:
     sudo yum install -y git python38
     git clone https://github.com/stackhpc/ansible-slurm-appliance
     cd ansible-slurm-appliance
-    /usr/bin/python3.8 -m venv venv
-    . venv/bin/activate
-    pip install -U pip
-    pip install -r requirements.txt
-    # Install ansible dependencies ...
-    ansible-galaxy role install -r requirements.yml -p ansible/roles
-    ansible-galaxy collection install -r requirements.yml -p ansible/collections # ignore the path warning here
-
+    ./dev/setup-env.sh
 
 ## Overview of directory structure
 
