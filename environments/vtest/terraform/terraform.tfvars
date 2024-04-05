@@ -37,16 +37,18 @@ compute_types = {
 #---- login node info ----
 # name: flavor
 login_names = {
-  login-1: "vermilion_util_c8m15"
-  admin: "vermilion_util_c8m15"
+  vtlogin-1: "vermilion_util_c8m15"
+  vtadmin: "vermilion_util_c8m15"
 }
-proxy_name = "vtadmin"
+# vtadmin: "vermilion_util_c8m15"
+proxy_name = "vtlogin-1"
 
 # name: IPaddr
 login_ips = {
   vtlogin-1: "10.60.105.71"
   vtadmin: "10.60.105.73"
 }
+# vtadmin: "10.60.105.73"
 
 login_image = "slurm_rocky93_kbs"
 login_flavor = "vermilion_util_c8m15"
@@ -56,6 +58,7 @@ login_flavor = "vermilion_util_c8m15"
 control_image = "slurm_rocky93_kbs"
 control_flavor = "vermilion_util_c8m15"
 control_ip = "10.60.105.70"
+
 ###################################################
 
 cluster_name  = "vtest"
@@ -83,3 +86,4 @@ control_subnet = "control-subnet"
 ###########  ^^^^^^^^^^^^^^^ CHANGE THIS
 
 compute_images = {} # allows overrides for specific nodes, by name
+

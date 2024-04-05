@@ -7,7 +7,7 @@ ansible_ssh_common_args='-o ProxyCommand="ssh rocky@${proxy_fip} -W %h:%p"'
 ${control.name} ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}'
 
 [admin]
-${cluster_name}-admin
+${cluster_name}-vtadmin
 
 [login]
 %{ for login in logins ~}
