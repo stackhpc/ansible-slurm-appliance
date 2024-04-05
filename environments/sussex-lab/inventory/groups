@@ -1,0 +1,74 @@
+[nfs:children]
+openhpc
+
+[mysql:children]
+control
+
+[prometheus:children]
+control
+
+[grafana:children]
+control
+
+[alertmanager:children]
+control
+
+[node_exporter:children]
+cluster
+
+[opensearch:children]
+control
+
+[slurm_stats:children]
+control
+
+[filebeat:children]
+slurm_stats
+
+# NB: [rebuild] not defined here as this template is used in CI
+
+[update:children]
+cluster
+
+[fail2ban:children]
+# Hosts to install fail2ban on to protect SSH
+login
+
+[block_devices:children]
+# Environment-specific so not defined here
+
+[basic_users]
+# Add `openhpc` group to add Slurm users via creation of users on each node.
+
+[openondemand:children]
+# Host to run Open Ondemand server on - subset of login
+login
+
+[openondemand_desktop:children]
+# Subset of compute to run a interactive desktops on via Open Ondemand
+compute
+
+[openondemand_jupyter:children]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+compute
+
+[etc_hosts]
+# Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+
+[cuda]
+# Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
+
+[eessi:children]
+openhpc
+
+[resolv_conf]
+# Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md
+
+[proxy]
+# Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
+
+[manila]
+# Hosts to configure for manila fileshares
+
+[persist_hostkeys]
+# Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
