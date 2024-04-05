@@ -1,0 +1,23 @@
+- hosts: '!login'
+  become: yes
+  gather_facts: no
+  vars:
+    compute_net_gateway: 10.12.1.1
+  tasks:
+    # TODO: this will get lost on reboot!
+    - name: Check for default route on compute net
+      command: ip route show default via {{ compute_net_gateway }}
+      register: _ip_route_compute
+      changed_when: false
+    - name: Add route via gateway
+      command:
+        cmd: ip route add default via {{ compute_net_gateway }}
+    # this doesn't work as it needs a static address to change the gateway!
+    # - shell:
+    #     cmd: |
+    #       nmcli connection modify "System eth0" ipv4.gateway 10.12.1.1
+    #       nmcli connection up "System eth0"
+      when: "'default' not in _ip_route_compute.stdout"
+
+    - meta: reset_connection
+      when: "'default' not in _ip_route_compute.stdout"
