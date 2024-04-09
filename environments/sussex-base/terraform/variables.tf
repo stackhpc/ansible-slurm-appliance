@@ -49,17 +49,26 @@ variable "cluster_image_id" {
     description = "ID of default image for the cluster"
 }
 
-variable "compute_nodes" {
-    type = map(string)
-    description = "Mapping of compute nodename suffix -> flavor name"
-}
-
-# TODO: support
-# variable "compute_images" {
+# variable "compute_nodes" {
 #     type = map(string)
-#     default = {}
-#     description = "Mapping to override compute images from compute_types: key ->(str) node name, value -> (str) image name"
+#     description = "Mapping of compute nodename suffix -> flavor name"
 # }
+
+variable "compute" {
+    type = map
+    description = <<-EOF
+        Mapping defining compute infrastructure. Keys are names of groups. Values are a
+        mapping as follows:
+
+        Required:
+            nodes: List of node names
+            flavor: String flavor name
+        Optional:
+            image_id: Overrides variable cluster_image_id
+            vnic_type: Overrides variable vnic_type
+            vnic_profile: Overrides variable vnic_profile
+    EOF
+}
 
 variable "environment_root" {
     type = string

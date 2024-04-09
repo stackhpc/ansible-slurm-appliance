@@ -34,9 +34,14 @@ module "cluster" {
         }
     }
 
-    compute_nodes = {
-        standard-0: "en1.xsmall"
-        standard-1: "en1.xsmall"
+    compute = {
+      standard = {
+          flavor = "en1.xsmall"
+          nodes = [
+            "standard-0",
+            "standard-1",
+          ]
+      }
     }
 }
 

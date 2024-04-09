@@ -6,9 +6,7 @@ resource "local_file" "hosts" {
                             "control_instances": openstack_compute_instance_v2.control
                             "login_instances": openstack_compute_instance_v2.login
                             "login_fip": [for v in var.login_nodes: v.fip][0]
-                            "compute_instances": openstack_compute_instance_v2.compute
-                            # "compute_types": var.compute_types,
-                            # "compute_nodes": var.compute_nodes,
+                            "compute_groups": module.compute
                           },
                           )
   filename = "../inventory/hosts.yml"

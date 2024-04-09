@@ -21,10 +21,18 @@ login:
             instance_id: ${ login.id }
 %{ endfor ~}
 
-compute:
+%{ for group_name in keys(compute_groups) ~}
+${cluster_name}_${group_name}:
     hosts:
-%{ for compute in compute_instances ~}
-        ${ compute.name }:
-            ansible_host: ${[for n in compute.network: n.fixed_ip_v4 if n.access_network][0]}
-            instance_id: ${ compute.id }
+%{ for node in compute_groups[group_name]["compute_instances"] ~}
+        ${ node.name }:
+            ansible_host: ${node.access_ip_v4}
+            instance_id: ${ node.id }
+%{ endfor ~}
+%{ endfor ~}
+
+compute:
+    children:
+%{ for group_name in keys(compute_groups) ~}
+        ${cluster_name}_${group_name}:
 %{ endfor ~}
