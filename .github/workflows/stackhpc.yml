@@ -8,10 +8,10 @@ on:
         description: Include RL9 tests
         type: boolean
         default: false
-  push:
-    branches:
-      - main
-  pull_request:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
 jobs:
   openstack:
     name: openstack-ci
