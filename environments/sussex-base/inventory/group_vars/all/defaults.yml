@@ -1,2 +1,4 @@
 # cinder volume on control node, nfs mounted to others (TODO):
 appliances_state_dir: /var/lib/state
+
+node_fqdn: "{{ inventory_hostname }}.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
