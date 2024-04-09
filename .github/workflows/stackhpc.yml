@@ -3,9 +3,9 @@ name: Test deployment and reimage on OpenStack
 on:
   workflow_dispatch:
     inputs:
-      use_RL9:
+      use_RL8:
         required: true
-        description: Include RL9 tests
+        description: Include RL8 tests
         type: boolean
         default: false
   push:
@@ -20,15 +20,14 @@ jobs:
     strategy:
       matrix:
         os_version: [RL8, RL9]
-        rl9_selected:
-          - ${{ inputs.use_RL9 == true }} # only potentially true for workflow_dispatch
-        rl9_branch:
-          #- ${{ startsWith(github.head_ref, 'rl9') == true }} # only potentially for pull_request, always false on merge
-          - ${{ true }} # only potentially for pull_request, always false on merge
+        rl8_selected:
+          - ${{ inputs.use_RL8 == true }} # only potentially true for workflow_dispatch
+        rl8_branch:
+          - ${{ startsWith(github.head_ref, 'rl8') == true }} # only potentially for pull_request, always false on merge
         exclude:
-          - os_version: RL9
-            rl9_selected: false
-            rl9_branch: false
+          - os_version: RL8
+            rl8_selected: false
+            rl8_branch: false
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
