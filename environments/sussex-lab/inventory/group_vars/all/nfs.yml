@@ -2,9 +2,9 @@ nfs_configurations:
   - comment: Export /exports/home from nfs server as /home
     nfs_enable:
         server:  "{{ inventory_hostname in groups['nfs_server'] }}"
-        clients: "{{ inventory_hostname in groups['openhpc'] }}"
+        clients: "{{ inventory_hostname in groups['cluster'] }}" # need /home on nfs server for basic_users
     nfs_server: "{{ hostvars[groups['nfs_server'] | first].ansible_host }}"
-    nfs_export: "/exports/home" # assumes skeleton TF is being used
+    nfs_export: "/exports/home"
     nfs_client_mnt_point: "/home"
   - comment: Export {{ appliances_state_dir }} from control node to login for hostkey persistence
     nfs_enable:

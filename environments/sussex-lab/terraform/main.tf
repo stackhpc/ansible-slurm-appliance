@@ -12,13 +12,23 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
+variable "cluster_name" {
+    type = string
+    default = "sussexlab"
+}
+
+variable "cluster_image_id" {
+    type = string
+    default = "7ab9b19c-d1b2-40b6-b5b6-55ef69ae53dc" # openhpc-ofed-RL9-240404-1503-e9fe3235
+}
+
 module "cluster" {
     source = "../../sussex-base/terraform/"
     environment_root = var.environment_root
 
-    cluster_name = "sussexlab"
+    cluster_name = var.cluster_name
     key_pair = "slurm-app-ci"
-    cluster_image_id = "5e353672-c03c-43fc-9fb7-71ccaaee4047" # openhpc-RL9-240327-1026-4812f852
+    cluster_image_id = var.cluster_image_id
 
     tenant_net = "sussex-tenant"
     tenant_subnet = "sussex-tenant"
@@ -43,32 +53,4 @@ module "cluster" {
           ]
       }
     }
-}
-
-# TODO: give this a persistent volume used for home!
-resource "openstack_compute_instance_v2" "nfs_server" {
-
-  name = "sussexlab-nfs"
-  image_id = "5e353672-c03c-43fc-9fb7-71ccaaee4047" # openhpc-RL9-240327-1026-4812f852
-  flavor_name = "en1.xsmall"
-  key_pair = "slurm-app-ci"
-
-  network {
-    name = "sussex-storage"
-    access_network = true
-  }
-
-  security_groups = ["sussexlab-cluster"]
-
-  metadata = {
-    environment_root = var.environment_root
-  }
-}
-
-resource "local_file" "nfs" {
-  content  = <<-EOT
-  [nfs_server]
-  ${openstack_compute_instance_v2.nfs_server.name} ansible_host=${[for n in openstack_compute_instance_v2.nfs_server.network: n.fixed_ip_v4 if n.access_network][0]} instance_id=${ openstack_compute_instance_v2.nfs_server.id }
-  EOT
-  filename = "../inventory/additional_hosts"
 }
