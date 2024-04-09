@@ -1,19 +1,33 @@
-[all:vars]
-openhpc_cluster_name=${cluster_name}
-cluster_domain_suffix=${cluster_domain_suffix}
-ansible_ssh_common_args='-J rocky@${login_fip}'
+all:
+    vars:
+        openhpc_cluster_name: ${cluster_name}
+        cluster_domain_suffix: ${cluster_domain_suffix}
+        login_fip: ${login_fip}
+        ansible_ssh_common_args: -J {{ ansible_user}}@{{ login_fip }}
 
-[control]
+control:
+    hosts:
 %{ for control in control_instances ~}
-${ control.name } ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} node_fqdn=${ control.name }.${cluster_name}.${cluster_domain_suffix} instance_id=${ control.id }
+        ${ control.name }:
+            ansible_host: ${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]}
+            node_fqdn: ${ control.name }.${cluster_name}.${cluster_domain_suffix}
+            instance_id: ${ control.id }
 %{ endfor ~}
 
-[login]
+login:
+    hosts:
 %{ for login in login_instances ~}
-${ login.name } ansible_host=${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]} node_fqdn=${ login.name }.${cluster_name}.${cluster_domain_suffix} instance_id=${ login.id }
+        ${ login.name }:
+            ansible_host: ${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]}
+            node_fqdn: ${ login.name }.${cluster_name}.${cluster_domain_suffix}
+            instance_id: ${ login.id }
 %{ endfor ~}
 
-[compute]
+compute:
+    hosts:
 %{ for compute in compute_instances ~}
-${ compute.name } ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.access_network][0]} node_fqdn=${ compute.name }.${cluster_name}.${cluster_domain_suffix}  instance_id=${ compute.id }
+        ${ compute.name }:
+            ansible_host: ${[for n in compute.network: n.fixed_ip_v4 if n.access_network][0]}
+            node_fqdn: ${ compute.name }.${cluster_name}.${cluster_domain_suffix}
+            instance_id: ${ compute.id }
 %{ endfor ~}

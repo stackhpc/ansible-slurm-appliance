@@ -11,7 +11,7 @@ resource "local_file" "hosts" {
                             # "compute_nodes": var.compute_nodes,
                           },
                           )
-  filename = "../inventory/hosts"
+  filename = "../inventory/hosts.yml"
 }
 
 # resource "local_file" "partitions" {
