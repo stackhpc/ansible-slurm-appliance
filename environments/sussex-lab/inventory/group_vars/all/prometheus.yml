@@ -1,1 +1,1 @@
-prometheus_storage_retention_size: "10GB"
+prometheus_storage_retention_size: "8GB" # 10GB state volume
