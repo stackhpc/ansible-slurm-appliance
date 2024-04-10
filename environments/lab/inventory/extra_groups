@@ -1,7 +1,3 @@
 # Don't have os_manila for lab so fake it using NFS
 [nfs:children]
 openhpc
-
-# Don't have working internal DNS
-[etc_hosts:children]
-cluster
