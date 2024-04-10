@@ -65,4 +65,6 @@ fail2ban
 # # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
 # compute
 
-
+# Don't have working internal DNS
+[etc_hosts:children]
+cluster
