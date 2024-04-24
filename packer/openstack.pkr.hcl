@@ -130,6 +130,11 @@ variable "volume_size" {
   default = null # When not specified use the size of the builder instance root disk
 }
 
+variable "volume_size_ofed" {
+  type = number
+  default = null # When not specified use the size of the builder instance root disk
+}
+
 variable "image_disk_format" {
   type = string
   default = null # When not specified use the image default
@@ -141,39 +146,55 @@ variable "metadata" {
 }
 
 source "openstack" "openhpc" {
-  flavor = "${var.flavor}"
-  volume_size = "${var.volume_size}"
-  use_blockstorage_volume = "${var.use_blockstorage_volume}"
+  # Build VM:
+  flavor = var.flavor
+  use_blockstorage_volume = var.use_blockstorage_volume
   volume_type = var.volume_type
-  image_disk_format = "${var.image_disk_format}"
-  metadata = "${var.metadata}"
-  networks = "${var.networks}"
-  ssh_username = "${var.ssh_username}"
+  metadata = var.metadata
+  networks = var.networks
+  floating_ip_network = var.floating_ip_network
+  security_groups = var.security_groups
+  
+  # Input image:
+  source_image = "${var.fatimage_source_image[var.os_version]}"
+  source_image_name = "${var.fatimage_source_image_name[var.os_version]}" # NB: must already exist in OpenStack
+  
+  # SSH:
+  ssh_username = var.ssh_username
   ssh_timeout = "20m"
-  ssh_private_key_file = "${var.ssh_private_key_file}" # TODO: doc same requirements as for qemu build?
-  ssh_keypair_name = "${var.ssh_keypair_name}" # TODO: doc this
-  ssh_bastion_host = "${var.ssh_bastion_host}"
-  ssh_bastion_username = "${var.ssh_bastion_username}"
-  ssh_bastion_private_key_file = "${var.ssh_bastion_private_key_file}"
-  security_groups = "${var.security_groups}"
-  image_visibility = "${var.image_visibility}"
+  ssh_private_key_file = var.ssh_private_key_file
+  ssh_keypair_name = var.ssh_keypair_name # TODO: doc this
+  ssh_bastion_host = var.ssh_bastion_host
+  ssh_bastion_username = var.ssh_bastion_username
+  ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
+  
+  # Output image:
+  image_disk_format = var.image_disk_format
+  image_visibility = var.image_visibility
+  image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
 }
 
-# The "fat" image build with all binaries:
+# "fat" image builds:
 build {
+
+  # non-OFED:
   source "source.openstack.openhpc" {
-    floating_ip_network = "${var.floating_ip_network}"
-    source_image = "${var.fatimage_source_image[var.os_version]}"
-    source_image_name = "${var.fatimage_source_image_name[var.os_version]}" # NB: must already exist in OpenStack
-    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}" # similar to name from slurm_image_builder
+    name = "openhpc"
+    volume_size = var.volume_size
+  }
+
+  # OFED:
+  source "source.openstack.openhpc" {
+    name = "openhpc-ofed"
+    volume_size = var.volume_size_ofed
   }
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
-    groups = ["builder", "control", "compute", "login"]
+    groups = concat(["builder", "control", "compute", "login"], [for g in split("-", "${source.name}"): g if g != "openhpc"])
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/${source.name}_extravars.yml"]
+    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/openhpc_extravars.yml"]
   }
 
   post-processor "manifest" {
