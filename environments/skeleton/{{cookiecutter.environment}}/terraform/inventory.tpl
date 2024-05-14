@@ -10,6 +10,8 @@ control:
             ansible_host: ${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]}
             instance_id: ${ control.id }
 %{ endfor ~}
+    vars:
+        appliances_state_dir: ${state_dir} # NB needs to be set on group not host otherwise it is ignored in packer build!
 
 login:
     hosts:
