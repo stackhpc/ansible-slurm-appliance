@@ -84,7 +84,7 @@ resource "openstack_compute_instance_v2" "control" {
     
     bootcmd:
       %{for volume in local.control_volumes}
-      - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split("-", volume.name)[1])} $BLKDEV
+      - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(reverse(split("-", volume.name))[0])} $BLKDEV
       %{endfor}
 
     mounts:
