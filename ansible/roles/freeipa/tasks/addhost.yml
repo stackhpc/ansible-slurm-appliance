@@ -4,7 +4,6 @@
   community.general.ipa_host:
     name: "{{ node_fqdn }}"
     ip_address: "{{ freeipa_client_ip }}"
-    ipa_host: "{{ groups['freeipa_server'].0 }}"
     ipa_pass: "{{ vault_freeipa_admin_password }}"
     ipa_user: admin
     state: present
@@ -19,12 +18,12 @@
   community.general.ipa_host:
     name: "{{ node_fqdn }}"
     ip_address: "{{ freeipa_client_ip }}"
-    ipa_host: "{{ groups['freeipa_server'].0 }}"
     ipa_pass: "{{ vault_freeipa_admin_password }}"
     ipa_user: admin
     random_password: true
     state: present
     validate_certs: false
+    ipa_timeout: 30
   delegate_to: "{{ groups['freeipa_server'].0 }}"
   when: "'sshpubkeyfp' not in _ipa_host_check.host"
   register: _ipa_host_add
