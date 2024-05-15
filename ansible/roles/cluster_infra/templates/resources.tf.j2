@@ -116,6 +116,11 @@ data "openstack_networking_network_v2" "cluster_external_network" {
   name = "{{ cluster_external_network }}"
 }
 
+# Always get the SRIOV storage network 
+data "openstack_networking_network_v2" "portal_storage_direct" {
+  tags = ["portal-storage-direct"]
+}
+
 data "openstack_networking_subnet_ids_v2" "cluster_external_subnets" {
   network_id = "${data.openstack_networking_network_v2.cluster_external_network.id}"
 }
@@ -177,6 +182,11 @@ data "openstack_networking_subnet_v2" "cluster_subnet" {
 ##### Cluster ports
 #####
 
+###
+# Login node
+###
+
+# VXLAN
 resource "openstack_networking_port_v2" "login" {
   name = "{{ cluster_name }}-login-0"
   network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
@@ -201,6 +211,29 @@ resource "openstack_networking_port_v2" "login" {
   }
 }
 
+# Storage VLAN
+resource "openstack_networking_port_v2" "login_portal_storage" {
+  name           = "{{ cluster_name }}-login-0-portal-storage"
+  network_id     = data.openstack_networking_network_v2.portal_storage_direct.id
+  admin_state_up = "true"
+
+  # not sure if needed here
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}",
+    "${openstack_networking_secgroup_v2.secgroup_slurm_login.id}"
+  ]
+
+  # for now, until we set up flavors
+  binding {
+    vnic_type = "normal"
+  }
+}
+
+###
+# Control node
+###
+
+# VLXAN
 resource "openstack_networking_port_v2" "control" {
   name = "{{ cluster_name }}-control-0"
   network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
@@ -224,7 +257,29 @@ resource "openstack_networking_port_v2" "control" {
   }
 }
 
+# Storage VLAN
+
+resource "openstack_networking_port_v2" "control_portal_storage" {
+  name           = "{{ cluster_name }}-control-0-portal-storage"
+  network_id     = data.openstack_networking_network_v2.portal_storage_direct.id
+  admin_state_up = "true"
+
+  # not sure if needed here
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+  ]
+
+  # for now, until we set up flavors
+  binding {
+    vnic_type = "normal"
+  }
+}
+
+###
+# Workers
+###
 {% for partition in openhpc_slurm_partitions %}
+# VXLAN
 resource "openstack_networking_port_v2" "{{ partition.name }}" {
   count = {{ partition.count }}
   name = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
@@ -246,6 +301,24 @@ resource "openstack_networking_port_v2" "{{ partition.name }}" {
     {{ cluster_vnic_profile | to_json }}
     EOF
     {% endif %}
+  }
+}
+
+# Storage VLAN
+resource "openstack_networking_port_v2" "{{ partition.name }}_portal_storage" {
+  count          = {{ partition.count }}
+  name           = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}-portal-storage"
+  network_id     = data.openstack_networking_network_v2.portal_storage_direct.id
+  admin_state_up = "true"
+
+  # not sure if needed here
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+  ]
+
+  # for now, until we set up flavors
+  binding {
+    vnic_type = "normal"
   }
 }
 
@@ -274,7 +347,11 @@ resource "openstack_compute_instance_v2" "login" {
   {% endif %}
 
   network {
-    port = "${openstack_networking_port_v2.login.id}"
+    port = openstack_networking_port_v2.login.id
+  }
+
+  network {
+    port = openstack_networking_port_v2.login_portal_storage.id
   }
 
   # root device:
@@ -317,7 +394,11 @@ resource "openstack_compute_instance_v2" "control" {
   {% endif %}
 
   network {
-    port = "${openstack_networking_port_v2.control.id}"
+    port = openstack_networking_port_v2.control.id
+  }
+
+  network {
+    port = openstack_networking_port_v2.control_portal_storage.id
   }
 
   # root device:
@@ -391,6 +472,10 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
 
   network {
     port = openstack_networking_port_v2.{{ partition.name }}[count.index].id
+  }
+
+  network {
+    port = openstack_networking_port_v2.{{ partition.name }}_portal_storage[count.index].id
   }
 
   # root device:
