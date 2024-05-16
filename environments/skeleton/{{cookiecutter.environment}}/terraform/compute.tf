@@ -16,4 +16,5 @@ module "compute" {
   key_pair = var.key_pair
   environment_root = var.environment_root
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
+  cloud_config = lookup(each.value, "cloud_config", "")
 }

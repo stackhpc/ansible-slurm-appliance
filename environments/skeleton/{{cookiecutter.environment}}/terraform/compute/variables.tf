@@ -67,3 +67,9 @@ variable "root_volume_size" {
 variable "security_group_ids" {
     type = list
 }
+
+variable "cloud_config" {
+    type = string
+    description = "additional cloud-init cloud-config userdata"
+    default = ""
+}

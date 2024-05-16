@@ -82,6 +82,29 @@ module "cluster" {
         standard: { # NB: can't call this default!
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
+            # NB: something's odd with the munge key as it starts 'content'
+            # NB: nfs and slurmd config assumes control hostname is resolvable
+            cloud_config: <<-EOT
+                mounts:
+                    - ["debug-control:/exports/home", "/home", "nfs", "defaults", "0", "0"]
+                runcmd:
+                    - [systemctl, enable, munge]
+                    - [systemctl, start, munge]
+                    - [systemctl, enable, slurmd]
+                    - [systemctl, start, slurmd]
+                write_files:
+                    - path: /etc/munge/munge.key
+                      content: |
+                        ${indent(8, yamldecode(file(format("%s/%s", var.environment_root, "inventory/group_vars/all/secrets.yml")))["vault_openhpc_mungekey"])}
+                      owner: munge:munge
+                      permissions: 0o400
+                      encoding: base64
+                    - path: /etc/sysconfig/slurmd
+                      content: SLURMD_OPTIONS='--conf-server debug-control"'
+                      owner: root:root
+                      permissions: 0o644
+                      encoding: text/plain
+            EOT
         }
         # Example of how to add another partition:
         # extra: {

@@ -15,3 +15,14 @@
           location = "{{ podman_registry_address }}"
           insecure = true
       when: "ci_cloud == 'ARCUS'"
+
+- name: Workaround internal DNS not working
+  hosts: compute
+  become: no
+  gather_facts: false
+  tasks:
+    - name: Collect /etc/hosts
+      fetch:
+        src: /etc/hosts
+        dest: "{{ appliances_environment_root }}/hosts/{{ inventory_hostname }}"
+        flat: yes

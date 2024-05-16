@@ -51,6 +51,16 @@ resource "openstack_compute_instance_v2" "compute" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
+    ${var.cloud_config}
+    %{ if fileexists(format("%s/%s/%s-%s", var.environment_root, "hosts", var.cluster_name, each.key)) }
+    # extend write_files provided by cloud_config:
+        - path: /etc/hosts
+          content: |
+            ${indent(8, file(format("%s/%s/%s-%s", var.environment_root, "hosts", var.cluster_name, each.key)))}
+          owner: root:root
+          permissions: 0o644
+          encoding: text/plain
+   %{ endif }
   EOF
 
 }
