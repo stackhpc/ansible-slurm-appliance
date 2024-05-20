@@ -1,0 +1,29 @@
+# Combine the defaults with any slurm_appliance-specific collections
+azimuth_caas_stackhpc_slurm_appliance_init_collections_default: >-
+  {{ ansible_init_default_collections | default([]) }}
+azimuth_caas_stackhpc_slurm_appliance_init_collections_extra: []
+azimuth_caas_stackhpc_slurm_appliance_init_collections: >-
+  {{
+    azimuth_caas_stackhpc_slurm_appliance_init_collections_default +
+    azimuth_caas_stackhpc_slurm_appliance_init_collections_extra
+  }}
+
+# Same for playbooks
+azimuth_caas_stackhpc_slurm_appliance_init_playbooks_default: >-
+  {{ ansible_init_default_playbooks | default([]) }}
+azimuth_caas_stackhpc_slurm_appliance_init_playbooks_extra: []
+azimuth_caas_stackhpc_slurm_appliance_init_playbooks: >-
+  {{
+    azimuth_caas_stackhpc_slurm_appliance_init_playbooks_default +
+    azimuth_caas_stackhpc_slurm_appliance_init_playbooks_extra
+  }}
+
+# Add the resulting variables to the extra vars for the slurm_appliance type
+azimuth_caas_stackhpc_slurm_appliance_extra_vars_defaults:
+  cluster_image: >-
+    {{ azimuth_caas_stackhpc_slurm_appliance_image }}
+  ansible_init_collections: >-
+    {{ azimuth_caas_stackhpc_slurm_appliance_init_collections }}
+  ansible_init_playbooks: >-
+    {{ azimuth_caas_stackhpc_slurm_appliance_init_playbooks }}
+
