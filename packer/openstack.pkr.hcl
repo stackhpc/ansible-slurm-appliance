@@ -49,7 +49,7 @@ variable "fatimage_source_image_name" {
   type = map(string)
   default = {
     RL8: "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2"
-    RL9: "Rocky-9-GenericCloud-Base-9.4-20240509.0.x86_64.qcow2"
+    RL9: "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
   }
 }
 
