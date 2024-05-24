@@ -1,3 +1,11 @@
+- name: Ensure inventory hosts file does not exist
+  # This is a bit subtle; we're going to create this from the in-memory inventory to
+  # permit multiple ansible commands. Hosts cannot be deleted from inventory
+  # (even by a meta: refresh_inventory) so we must ensure inventory is empty
+  file:
+    path: "{{ cluster_infra_inventory_file }}"
+    state: absent
+
 - debug:
     msg: |
       terraform_backend_type: {{ terraform_backend_type }}
@@ -60,3 +68,9 @@
 - name: Provision infrastructure
   include_role:
     name: stackhpc.terraform.infra
+
+- name: Create inventory hosts file to permit ad-hoc uses
+  template:
+    src: cluster_hosts.yml.j2
+    dest: "{{ cluster_infra_inventory_file }}"
+  when: terraform_state != 'absent'

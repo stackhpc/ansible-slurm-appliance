@@ -3,6 +3,7 @@
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack
+  tags: infra
   roles:
     - cluster_infra
 
