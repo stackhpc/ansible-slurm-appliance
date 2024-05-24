@@ -1,0 +1,47 @@
+# Variables in this file are normally injected by Azimuth/CaaS. This file is moved into
+# the inventory by the CI workflow or the activate script
+
+# -- Environment lookups --
+# Set either by the workflow for CI or by the activate script for dev/debugging
+cluster_name: "{{ lookup('env', 'CI_CLUSTER_NAME') | default('dev') }}" # TODO: potentially want to override this for dev
+distro_version: "{{ lookup('env', 'DISTRO_VERSION') | default('RL9') }}"
+ci_cloud: "{{ lookup('env', 'CI_CLOUD') }}" # set by GH actions
+# --
+
+# Use tiny volumes for CI
+state_volume_size: 10
+home_volume_size: 10
+
+# Likely to have multiple (identical) images with same name in dev due to image build + community image deploys
+cluster_image_name:
+  RL8: openhpc-RL8-240423-1002-4b09ba85
+  RL9: openhpc-ofed-RL9-240423-1059-4b09ba85
+cluster_image: "{{ (lookup('pipe', 'openstack image list -f yaml') | from_yaml | selectattr('Name', 'eq', cluster_image_name[distro_version]) | first)['ID'] }}"
+
+compute_count: 2
+cluster_run_validation: true # enable hpctests
+cluster_id: "{{ cluster_name }}" # TODO not sure what this should be
+cluster_user_ssh_public_key: "{{ lookup('file', lookup('fileglob', '~/.ssh/*.pub') | split(',') | first) }}"
+
+ci_cloud_vars: # cloud-specific vars:
+  LEAFCLOUD:
+    control_flavor_name: ec1.medium # gets down to ~100Mi mem free on deployment
+    login_flavor_name: en1.xsmall
+    compute_flavor: en1.xsmall
+    cluster_external_network: external
+    use_home_volume_type_fast: true
+    home_volume_type_fast: unencrypted
+    # TODO: can't currently select state volume type as unencrypted
+  ARCUS:
+    control_flavor_name: vm.ska.cpu.general.eighth
+    login_flavor_name: vm.ska.cpu.general.small
+    compute_flavor: vm.ska.cpu.general.small
+    cluster_external_network: CUDN-Internet
+    use_home_volume_type_fast: false
+
+login_flavor_name: "{{ ci_cloud_vars[ci_cloud].login_flavor_name }}"
+control_flavor_name: "{{ ci_cloud_vars[ci_cloud].control_flavor_name }}"
+compute_flavor: "{{ ci_cloud_vars[ci_cloud].compute_flavor }}"
+cluster_external_network: "{{ ci_cloud_vars[ci_cloud].cluster_external_network }}"
+use_home_volume_type_fast: "{{ ci_cloud_vars[ci_cloud].use_home_volume_type_fast }}"
+home_volume_type_fast: "{{ ci_cloud_vars[ci_cloud].home_volume_type_fast }}"
