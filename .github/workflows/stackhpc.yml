@@ -129,7 +129,7 @@ jobs:
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
-          rm environments/.caas/inventory/cluster_hosts.yml
+          rm -f environments/.caas/inventory/cluster_hosts.yml
           ansible-playbook -v ansible/site.yml -e cluster_state=absent
         if: ${{ always() }} # success, failure or cancelled
 
