@@ -223,7 +223,6 @@ resource "openstack_networking_port_v2" "login_storage" {
   # not sure if needed here
   security_group_ids = [
     "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}",
-    "${openstack_networking_secgroup_v2.secgroup_slurm_login.id}"
   ]
 
   # for now, until we set up flavors
