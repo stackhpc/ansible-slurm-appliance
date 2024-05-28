@@ -1,10 +1,17 @@
-- name: Ensure inventory hosts file does not exist
-  # This is a bit subtle; we're going to create this from the in-memory inventory to
-  # permit multiple ansible commands. Hosts cannot be deleted from inventory
-  # (even by a meta: refresh_inventory) so we must ensure inventory is empty
+- name: Remove inventory hosts file
   file:
     path: "{{ cluster_infra_inventory_file }}"
     state: absent
+  register: _inventory_file
+
+- name: Error if inventory hosts file exists
+  # When creating infra this file must not exist to avoid inventory errors from mismatches
+  # between this hosts file and in-memory inventory. Note hosts cannot be deleted from
+  # inventory so ensuring the file does not exist before starting the infra role is the 
+  # only safe approach.
+  assert:
+    that: not _inventory_file.changed
+    fail_msg: "Inventory file has been deleted - rerun the ansible command now"
 
 - debug:
     msg: |
