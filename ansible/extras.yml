@@ -5,6 +5,9 @@
     - users
   gather_facts: yes
   tasks:
+    - debug:
+        var: basic_users_users.0
+    - meta: end_here
     - import_role:
         name: basic_users
 
