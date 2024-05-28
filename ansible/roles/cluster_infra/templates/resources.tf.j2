@@ -116,9 +116,9 @@ data "openstack_networking_network_v2" "cluster_external_network" {
   name = "{{ cluster_external_network }}"
 }
 
-# SRIOV storage network 
+# Storage network 
 {% if cluster_storage_network is defined %}
-data "openstack_networking_network_v2" "cluster_storage_direct" {
+data "openstack_networking_network_v2" "cluster_storage" {
   name = "{{ cluster_storage_network }}"
 }
 {% endif %}
@@ -217,15 +217,13 @@ resource "openstack_networking_port_v2" "login" {
 {% if cluster_storage_network is defined %}
 resource "openstack_networking_port_v2" "login_storage" {
   name           = "{{ cluster_name }}-login-storage-0"
-  network_id     = data.openstack_networking_network_v2.cluster_storage_direct.id
+  network_id     = data.openstack_networking_network_v2.cluster_storage.id
   admin_state_up = "true"
 
-  # not sure if needed here
   security_group_ids = [
     "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}",
   ]
 
-  # for now, until we set up flavors
   binding {
     vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
   }
@@ -260,19 +258,17 @@ resource "openstack_networking_port_v2" "control" {
   }
 }
 
-# Storage VLAN
+# Storage network
 {% if cluster_storage_network is defined %}
 resource "openstack_networking_port_v2" "control_storage" {
   name           = "{{ cluster_name }}-control-storage-0"
-  network_id     = data.openstack_networking_network_v2.cluster_storage_direct.id
+  network_id     = data.openstack_networking_network_v2.cluster_storage.id
   admin_state_up = "true"
 
-  # not sure if needed here
   security_group_ids = [
     "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
   ]
 
-  # for now, until we set up flavors
   binding {
     vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
   }
@@ -308,20 +304,18 @@ resource "openstack_networking_port_v2" "{{ partition.name }}" {
   }
 }
 
-# Storage VLAN
+# Storage network
 {% if cluster_storage_network is defined %}
 resource "openstack_networking_port_v2" "{{ partition.name }}_storage" {
   count          = {{ partition.count }}
   name           = "{{ cluster_name }}-compute-{{ partition.name }}-storage-${count.index}"
-  network_id     = data.openstack_networking_network_v2.cluster_storage_direct.id
+  network_id     = data.openstack_networking_network_v2.cluster_storage.id
   admin_state_up = "true"
 
-  # not sure if needed here
   security_group_ids = [
     "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
   ]
 
-  # for now, until we set up flavors
   binding {
     vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
   }
