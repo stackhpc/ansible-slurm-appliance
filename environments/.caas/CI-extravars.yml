@@ -21,7 +21,7 @@ cluster_image: "{{ (lookup('pipe', 'openstack image list -f yaml') | from_yaml |
 compute_count: 2
 cluster_run_validation: true # enable hpctests
 cluster_id: "{{ cluster_name }}" # TODO not sure what this should be
-cluster_user_ssh_public_key: "{{ lookup('file', lookup('fileglob', '~/.ssh/*.pub') | split(',') | first) }}"
+cluster_user_ssh_public_key: "{{ lookup('file', lookup('fileglob', '~/.ssh/*.pub', wantlist=True) | first) }}"
 
 ci_cloud_vars: # cloud-specific vars:
   LEAFCLOUD:
