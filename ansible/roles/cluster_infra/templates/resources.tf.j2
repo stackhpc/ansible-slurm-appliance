@@ -205,11 +205,6 @@ resource "openstack_networking_port_v2" "login" {
 
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
-    {% if cluster_vnic_profile is defined %}
-    profile = <<EOF
-    {{ cluster_vnic_profile | to_json }}
-    EOF
-    {% endif %}
   }
 }
 
@@ -250,11 +245,7 @@ resource "openstack_networking_port_v2" "control" {
 
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
-    {% if cluster_vnic_profile is defined %}
-    profile = <<EOF
-    {{ cluster_vnic_profile | to_json }}
-    EOF
-    {% endif %}
+
   }
 }
 
@@ -296,11 +287,6 @@ resource "openstack_networking_port_v2" "{{ partition.name }}" {
 
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
-    {% if cluster_vnic_profile is defined %}
-    profile = <<EOF
-    {{ cluster_vnic_profile | to_json }}
-    EOF
-    {% endif %}
   }
 }
 
