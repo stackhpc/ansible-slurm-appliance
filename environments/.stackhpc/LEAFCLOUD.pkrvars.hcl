@@ -1,4 +1,4 @@
-flavor = "ec1.medium"
+flavor = "ec1.large"
 use_blockstorage_volume = true
 volume_size = 12 # GB. Compatible with SMS-lab's general.v1.tiny
 volume_size_ofed = 15 # GB
