@@ -1,0 +1,12 @@
+export ANSIBLE_INVENTORY=environments/common/inventory,environments/.caas/inventory
+echo "Set ANSIBLE_INVENTORY=${ANSIBLE_INVENTORY}"
+export OS_CLOUD=openstack
+echo "Set OS_CLOUD=${OS_CLOUD} - override if using a non-default clouds.yaml"
+export CI_CLOUD=LEAFCLOUD
+echo "Set CI_CLOUD=${CI_CLOUD} - override if on another cloud"
+export DISTRO_VERSION=RL9
+echo "Set DISTRO_VERSION=${DISTRO_VERSION} - or override for RL8"
+cp environments/.caas/CI-extravars.yml environments/.caas/inventory/group_vars/all/CI-extravars.yml
+echo "Copied CI extravars into inventory"
+export CI_CLUSTER_NAME=dev
+echo "Set CI_CLUSTER_NAME=$CI_CLUSTER_NAME - override for multiple dev deployments"

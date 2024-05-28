@@ -1,0 +1,1 @@
+cluster_infra_inventory_file: "{{ appliances_environment_root }}/inventory/cluster_hosts.yml"

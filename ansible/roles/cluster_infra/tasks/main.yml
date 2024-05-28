@@ -1,3 +1,18 @@
+- name: Remove inventory hosts file
+  file:
+    path: "{{ cluster_infra_inventory_file }}"
+    state: absent
+  register: _inventory_file
+
+- name: Error if inventory hosts file exists
+  # When creating infra this file must not exist to avoid inventory errors from mismatches
+  # between this hosts file and in-memory inventory. Note hosts cannot be deleted from
+  # inventory so ensuring the file does not exist before starting the infra role is the 
+  # only safe approach.
+  assert:
+    that: not _inventory_file.changed
+    fail_msg: "Inventory file has been deleted - rerun the ansible command now"
+
 - debug:
     msg: |
       terraform_backend_type: {{ terraform_backend_type }}
@@ -60,3 +75,9 @@
 - name: Provision infrastructure
   include_role:
     name: stackhpc.terraform.infra
+
+- name: Create inventory hosts file to permit ad-hoc uses
+  template:
+    src: cluster_hosts.yml.j2
+    dest: "{{ cluster_infra_inventory_file }}"
+  when: terraform_state != 'absent'
