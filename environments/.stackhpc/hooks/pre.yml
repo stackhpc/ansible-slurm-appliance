@@ -1,3 +1,10 @@
+- hosts: builder
+  become: no
+  gather_facts: false
+  tasks:
+    - name: Output builder hostname
+      command: hostname
+      
 - hosts: control:!builder
   become: yes
   gather_facts: false
