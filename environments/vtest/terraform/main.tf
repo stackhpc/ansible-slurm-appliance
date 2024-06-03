@@ -340,22 +340,15 @@ resource "openstack_compute_instance_v2" "computes" {
 
 # --- floating ips ---
 
-resource "openstack_compute_floatingip_associate_v2" "logins" {
+resource "openstack_networking_floatingip_associate_v2" "logins" {
   for_each = var.login_names
-
   floating_ip = var.login_ips[each.key]
-  instance_id = openstack_compute_instance_v2.logins[each.key].id
-   # networks are zero-indexed
-  fixed_ip = openstack_compute_instance_v2.logins[each.key].network.2.fixed_ip_v4
-
+  port_id = openstack_networking_port_v2.login_control[each.key].id
 }
 
-resource "openstack_compute_floatingip_associate_v2" "control" {
-
+resource "openstack_networking_floatingip_associate_v2" "control" {
   floating_ip = var.control_ip
-  instance_id = openstack_compute_instance_v2.control.id
-   # networks are zero-indexed
-  fixed_ip = openstack_compute_instance_v2.control.network.2.fixed_ip_v4
+  port_id = openstack_networking_port_v2.control_control.id
 }
 
 # --- template ---
