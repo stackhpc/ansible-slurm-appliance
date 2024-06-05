@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v23.12.1 # Tolerate state nfs file handles
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.25.0 # https://github.com/stackhpc/ansible-role-openhpc/pull/167
+    version: v0.26.0 # https://github.com/stackhpc/ansible-role-openhpc/pull/168
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
