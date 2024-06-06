@@ -22,7 +22,7 @@ roles:
     version: v3.1.5
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: v24.2.0 # Support RockyLinux 9
+    version: fix/rocky-version # TODO: release Support Ceph Quincy for RL9
 
 collections:
   - name: containers.podman
