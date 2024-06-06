@@ -8,11 +8,13 @@ name: Build fat image
         description: Include RL8 image build
         type: boolean
         default: false
+concurrency:
+  group: ${{ github.ref }}-{{ matrix.os_version }} # to branch/PR + OS
+  cancel-in-progress: true
 jobs:
   openstack:
     name: openstack-imagebuild
     runs-on: ubuntu-20.04
-    concurrency: ${{ github.ref }}-{{ matrix.os_version }} # to branch/PR + OS
     strategy:
       matrix:
         os_version: [RL8, RL9]
