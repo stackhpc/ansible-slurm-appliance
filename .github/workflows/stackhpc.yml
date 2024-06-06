@@ -24,10 +24,13 @@ jobs:
           - ${{ inputs.use_RL8 == true }} # only potentially true for workflow_dispatch
         rl8_branch:
           - ${{ startsWith(github.head_ref, 'rl8') == true }} # only potentially for pull_request, always false on merge
+        rl8_label:
+          - ${{ contains(github.event.pull_request.labels.*.name, 'RL8') }} # NB: needs a new commit if added after PR created
         exclude:
           - os_version: RL8
             rl8_selected: false
             rl8_branch: false
+            rl8_label: false
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
