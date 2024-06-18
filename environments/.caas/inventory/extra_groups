@@ -9,8 +9,7 @@ grafana
 openondemand
 
 [manila:children]
-login
-compute
+cluster
 
 [podman:children]
 zenith
