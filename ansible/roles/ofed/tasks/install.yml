@@ -1,0 +1,73 @@
+- name: Get installed kernels
+  command: dnf list --installed kernel
+  register: _ofed_dnf_kernels
+  changed_when: false
+
+- name: Determine running kernel
+  command: uname -r # e.g. 4.18.0-513.18.1.el8_9.x86_64
+  register: _ofed_loaded_kernel
+  changed_when: false
+
+- name: Check current kernel is newest installed
+  assert:
+    that: _ofed_loaded_kernel.stdout == _ofed_dnf_kernels_newest
+    fail_msg: "Kernel {{ _ofed_loaded_kernel.stdout }} is loaded but newer {{ _ofed_dnf_kernels_newest }} is installed: consider rebooting?"
+  vars:
+    _ofed_dnf_kernels_newest: >-
+      {{ _ofed_dnf_kernels.stdout_lines[1:] | map('regex_replace', '^\w+\.(\w+)\s+(\S+)\s+\S+\s*$', '\2.\1') | community.general.version_sort | last }}
+    # dnf line format e.g. "kernel.x86_64  4.18.0-513.18.1.el8_9   @baseos  "
+
+- name: Enable epel
+  dnf:
+    name: epel-release
+
+- name: Check for existing OFED installation
+  command: ofed_info
+  changed_when: false
+  failed_when:
+    - _ofed_info.rc > 0
+    - "'No such file or directory' not in _ofed_info.msg"
+  register: _ofed_info
+
+- name: Install build prerequisites
+  dnf:
+    name: "{{ ofed_build_packages + (ofed_build_rl8_packages if ofed_distro_version == '8.9' else []) }}"
+  when: "'MLNX_OFED_LINUX-' + ofed_version not in _ofed_info.stdout"
+  # don't want to install a load of prereqs unnecessarily
+
+- name: Download and unpack Mellanox OFED tarball
+  ansible.builtin.unarchive:
+    src: "{{ ofed_download_url }}"
+    dest: "{{ ofed_tmp_dir }}"
+    remote_src: yes
+  become: no
+  when: "'MLNX_OFED_LINUX-' + ofed_version not in _ofed_info.stdout"
+
+# Below from https://docs.nvidia.com/networking/display/mlnxofedv24010331/user+manual
+- name: Run OFED install script
+  command:
+    cmd: >
+      ./mlnxofedinstall
+      --add-kernel-support
+      {% if not ofed_update_firmware %}--without-fw-update{% endif %}
+      --force
+      --skip-repo
+      {% for pkgsel in ofed_package_selection %}
+      --{{ pkgsel }}
+      {% endfor %}
+    chdir: "{{ ofed_tmp_dir }}/MLNX_OFED_LINUX-{{ ofed_version }}-{{ ofed_distro }}{{ ofed_distro_version }}-{{ ofed_arch }}/"
+  register: _ofed_install
+  when: "'MLNX_OFED_LINUX-' + ofed_version not in _ofed_info.stdout"
+  async: "{{ 45 * 60 }}" # wait for up to 45 minutes
+  poll: 15 # check every 15 seconds
+
+- name: Update initramfs
+  command:
+    cmd: dracut -f
+  when: '"update your initramfs" in _ofed_install.stdout | default("")'
+  failed_when: false # always shows errors due to deleted modules for inbox RDMA drivers
+
+- name: Load the new driver
+  command:
+    cmd: /etc/init.d/openibd restart
+  when: '"To load the new driver" in _ofed_install.stdout | default("")'

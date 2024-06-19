@@ -13,8 +13,6 @@
 # or include regex special characters.
 openondemand_host_regex: "{{ (groups['compute'] + groups['grafana']) | to_ood_regex }}"
 
-ondemand_package: ondemand-3.0.3
-
 # Add grafana to dashboard links to OOD only if grafana group is available
 openondemand_dashboard_links_grafana:
   - name: Grafana

@@ -22,15 +22,16 @@ variable "cluster_name" {
 variable "os_version" {
   type = string
   description = "RL8 or RL9"
+  default = "RL9"
 }
 
 variable "cluster_image" {
     description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
     type = map(string)
     default = {
-        # https://github.com/stackhpc/ansible-slurm-appliance/pull/382
-        RL8: "openhpc-RL8-240327-1050-4812f852"
-        RL9: "openhpc-RL9-240327-1026-4812f852"
+        # https://github.com/stackhpc/ansible-slurm-appliance/pull/399
+        RL8: "openhpc-RL8-240619-0949-66c0e540"
+        RL9: "openhpc-ofed-RL9-240619-0949-66c0e540"
     }
 }
 
@@ -58,6 +59,11 @@ variable "volume_backed_instances" {
     default = false
 }
 
+data "openstack_images_image_v2" "cluster" {
+    name = var.cluster_image[var.os_version]
+    most_recent = true
+}
+
 module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
 
@@ -66,33 +72,24 @@ module "cluster" {
     cluster_subnet = var.cluster_subnet
     vnic_type = var.vnic_type
     key_pair = "slurm-app-ci"
-    control_node = {
-        flavor: var.control_node_flavor
-        image: var.cluster_image[var.os_version]
-    }
+    cluster_image_id = data.openstack_images_image_v2.cluster.id
+    control_node_flavor = var.control_node_flavor
+
     login_nodes = {
-        login-0: {
-            flavor: var.other_node_flavor
-            image: var.cluster_image[var.os_version]
-        }
+        login-0: var.other_node_flavor
     }
-    compute_types = {
+    compute = {
         standard: { # NB: can't call this default!
+            nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
-            image: var.cluster_image[var.os_version]
         }
         # Example of how to add another partition:
         # extra: {
+        #     nodes: ["compute-2", "compute-3"]
         #     flavor: var.other_node_flavor
-        #     image: var.cluster_image[var.os_version]
         # }
     }
-    compute_nodes = {
-        compute-0: "standard"
-        compute-1: "standard"
-        # compute-2: "extra"
-        # compute-3: "extra"
-    }
+    
     volume_backed_instances = var.volume_backed_instances
     
     environment_root = var.environment_root

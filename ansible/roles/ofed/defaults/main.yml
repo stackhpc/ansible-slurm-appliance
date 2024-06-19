@@ -1,0 +1,28 @@
+ofed_version: '24.04-0.6.6.0'  # LTS version 23.10-2.1.3.1 does not support RL9.4
+ofed_download_url: https://content.mellanox.com/ofed/MLNX_OFED-{{ ofed_version }}/MLNX_OFED_LINUX-{{ ofed_version }}-{{ ofed_distro }}{{ ofed_distro_version }}-{{ ofed_arch }}.tgz
+ofed_distro: rhel # NB: not expected to work on other distros due to installation differences
+ofed_distro_version: "{{ ansible_distribution_version }}" # e.g. '8.9'
+ofed_arch: "{{ ansible_architecture }}"
+ofed_tmp_dir: /tmp
+ofed_update_firmware: false
+ofed_build_packages: # may require additional packages depending on ofed_package_selection
+  - autoconf
+  - automake
+  - gcc
+  - gcc-gfortran
+  - kernel-devel-{{ _ofed_loaded_kernel.stdout | trim }}
+  - kernel-rpm-macros
+  - libtool
+  - lsof
+  - patch
+  - pciutils
+  - perl
+  - rpm-build
+  - tcl
+  - tk
+ofed_build_rl8_packages:
+  - gdb-headless
+  - python36
+ofed_package_selection: # list of package selection flags for mlnxofedinstall script
+  - hpc
+  - with-nfsrdma
