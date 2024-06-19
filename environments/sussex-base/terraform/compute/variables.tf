@@ -1,6 +1,11 @@
 variable "nodes" {
     type = list(string)
     description = "list of node names for partition"
+    # TODO: a variable like "nodenames_as_hypervisor" which when set, for this group
+    # will add availability_zone = "nova::${each.key}" where 'each' is nodes loop,
+    # i.e. nodes map 1:1 to hypervisors
+    # more flexibily, we could just take a list of hypervisors as an optional indexed list?
+    # not sure we actually need that though
 }
 
 variable "flavor" {
