@@ -3,7 +3,7 @@
     path: "{{ squid_cache_dir }}"
     # based on what dnf package creates:
     owner: squid
-    mode: squid
+    group: squid
     mode: u=rwx,g=rw,o=
 
 - name: Template squid configuration
