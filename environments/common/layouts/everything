@@ -72,3 +72,6 @@ openhpc
 
 [persist_hostkeys]
 # Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
+
+[squid]
+# Hosts to run squid proxy

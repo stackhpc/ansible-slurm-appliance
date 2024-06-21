@@ -46,10 +46,6 @@
         path: /etc/profile
         search_string: HOSTNAME=$(/usr/bin/hostnamectl --transient 2>/dev/null) || \
         state: absent
-    - name: Remove RHEL cockpit
-      dnf:
-        name: cockpit-ws
-        state: "{{ appliances_cockpit_state }}"
     - name: Add system user groups
       ansible.builtin.group: "{{ item.group }}"
       loop: "{{ appliances_local_users }}"
@@ -91,6 +87,16 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
+# --- tasks after here require access to package repos ---
+- hosts: squid
+  tags: squid
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Configure squid proxy
+      import_role:
+        name: squid
+
 - hosts: freeipa_server
   # Done here as it might be providing DNS
   tags:
@@ -104,7 +110,15 @@
         name: freeipa
         tasks_from: server.yml
 
-# --- tasks after here require access to package repos ---
+- hosts: cluster
+  gather_facts: false
+  become: yes
+  tags: cockpit
+  tasks:
+    - name: Remove RHEL cockpit
+      dnf:
+        name: cockpit-ws
+        state: "{{ appliances_cockpit_state }}"
 
 - hosts: firewalld
   gather_facts: false
