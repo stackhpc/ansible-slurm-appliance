@@ -54,3 +54,5 @@ roles/*
 !roles/persist_hostkeys/**
 !roles/ofed/
 !roles/ofed/**
+!roles/squid/
+!roles/squid/**
