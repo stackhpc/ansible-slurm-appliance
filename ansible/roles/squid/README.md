@@ -8,7 +8,10 @@ by the OpenStack security groups applied to the cluster. The generated configura
 reviewed if this is not case.
 
 ## Role Variables
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91619bb (add squid role + config)
 Where noted these map to squid parameters of the same name without the `squid_` prefix - see [squid documentation](https://www.squid-cache.org/Doc/config) for details.
 
 - `squid_conf_template`: Optional str. Path (using Ansible search paths) to squid.conf template. Default is in-role template.
