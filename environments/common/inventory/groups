@@ -135,3 +135,6 @@ freeipa_client
 
 [ansible_init]
 # Hosts to run linux-anisble-init
+
+[lustre]
+# Hosts to run lustre client

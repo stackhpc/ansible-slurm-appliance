@@ -1,0 +1,9 @@
+# TODO: is this an ok way of doing it?
+- name: Mount lustre filesystem
+  mount:
+    fstype: lustre
+    src: "{{ lustre_mgs_nid }}:/{{ lustre_fs_name }}"
+    path: "{{ lustre_mount_point }}"
+    state: "{{ lustre_mount_state }}"
+    opts: "defaults,_netdev,noauto,x-systemd.automount,x-systemd.requires=lnet.service"
+    # opts are systemd defaults from http://wiki.lustre.org/Mounting_a_Lustre_File_System_on_Client_Nodes

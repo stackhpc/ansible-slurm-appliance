@@ -24,3 +24,12 @@
   tasks:
     - include_role:
         name: stackhpc.os-manila-mount
+
+- name: Setup Lustre clients
+  hosts: lustre
+  become: true
+  tags: lustre
+  tasks:
+    - include_role:
+        name: lustre
+        tasks_from: configure.yml

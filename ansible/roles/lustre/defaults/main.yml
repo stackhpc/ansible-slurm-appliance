@@ -1,0 +1,35 @@
+
+lustre_version: 'b2_15' # TODO: FIXME to 2.15.5 on release see http://lists.lustre.org/pipermail/lustre-discuss-lustre.org/2024-June/019163.html
+lustre_mounts: []
+lustre_mount_point: /mnt/lustre
+lustre_mount_state: mounted
+
+# below variables are for build and should not generally require changes
+lustre_build_packages:
+  - "kernel-devel-{{ ansible_kernel }}"
+  - git
+  - gcc
+  - libtool
+  - python3
+  - python3-devel
+  - openmpi
+  - elfutils-libelf-devel
+  - libmount-devel
+  - libnl3-devel
+  - libyaml-devel
+  - rpm-build
+  - kernel-abi-stablelists
+  - libaio
+  - libaio-devel
+lustre_build_dir: /tmp/lustre-release
+lustre_configure_opts:
+  - --disable-server
+  - --with-linux=/usr/src/kernels/*
+  - --with-o2ib=/usr/src/ofa_kernel/default
+  - --disable-maintainer-mode
+  - --disable-gss-keyring
+  - --enable-mpitests=no
+lustre_rpm_globs: # NB: order is important here, as not installing from a repo
+  - "kmod-lustre-client-{{ lustre_version }}-*"
+  - "lustre-client-{{ lustre_version }}-*"
+lustre_cleanup_build: true

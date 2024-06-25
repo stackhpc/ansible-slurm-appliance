@@ -44,6 +44,11 @@
         name: stackhpc.os-manila-mount
         tasks_from: install.yml
       when: "'manila' in group_names"
+    - name: Install Lustre packages
+      include_role:
+        name: lustre
+        tasks_from: install.yml
+      when: "'lustre' in group_names"
 
 - import_playbook: extras.yml
 
