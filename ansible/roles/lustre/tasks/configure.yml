@@ -1,9 +1,18 @@
+- name: Ensure mount points exist
+  ansible.builtin.file:
+    path: "{{ item.mount_point | default(lustre_mount_point) }}/{{ item.fs_name | default(lustre_fs_name) }}"
+    state: directory
+  loop: "{{ lustre_mounts }}"
+  when: "item.mount_state | default(lustre_mount_state) != 'absent'"
+# TODO: do we need to set owner/group/mode either pre- or post-mount?
+
 # TODO: is this an ok way of doing it?
 - name: Mount lustre filesystem
-  mount:
+  ansible.posix.mount:
     fstype: lustre
-    src: "{{ lustre_mgs_nid }}:/{{ lustre_fs_name }}"
-    path: "{{ lustre_mount_point }}"
+    src: "{{ item.mgs_nid | default(lustre_mgs_nid) }}:/{{ item.lustre_fs_name | default(lustre_fs_name) }}"
+    path: "{{ item.mount_point | default(lustre_mount_point) }}/{{ item.fs_name | default(lustre_fs_name) }}"
     state: "{{ lustre_mount_state }}"
     opts: "defaults,_netdev,noauto,x-systemd.automount,x-systemd.requires=lnet.service"
     # opts are systemd defaults from http://wiki.lustre.org/Mounting_a_Lustre_File_System_on_Client_Nodes
+  loop: "{{ lustre_mounts }}"

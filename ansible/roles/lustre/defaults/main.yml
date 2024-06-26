@@ -1,7 +1,9 @@
 
 lustre_version: 'b2_15' # TODO: FIXME to 2.15.5 on release see http://lists.lustre.org/pipermail/lustre-discuss-lustre.org/2024-June/019163.html
-lustre_mounts: []
-lustre_mount_point: /mnt/lustre
+lustre_mounts: [{}] # Ensures if all top-level vars are provided then this isn't required
+#lustre_mgs_nid:
+#lustre_fs_name:
+lustre_mount_point: "/mnt/lustre/{{ lustre_fs_name }}"
 lustre_mount_state: mounted
 
 # below variables are for build and should not generally require changes

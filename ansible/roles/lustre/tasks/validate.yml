@@ -15,12 +15,12 @@
 
 - name: Ensure lustre_mgs_nid is defined
   assert:
-    that: item.lustre_mgs_nid | default(lustre_mgs_nid) is defined
-    fail_msg: lustre_mgs_nid must be defined or specified in lustre_mounts elements
+    that: item.mgs_nid | default(lustre_mgs_nid) is defined
+    fail_msg: lustre_mounts entries must specify mgs_nid or lustre_mgs_nid must be defined
   loop: "{{ lustre_mounts }}"
 
 - name: Ensure lustre_fs_name is defined
   assert:
     that: item.lustre_fs_name | default(lustre_fs_name) is defined
-    fail_msg: lustre_fs_name must be defined or specified in lustre_mounts elements
+    fail_msg: lustre_mounts entries must specify fs_name or lustre_fs_name must be specified
   loop: "{{ lustre_mounts }}"

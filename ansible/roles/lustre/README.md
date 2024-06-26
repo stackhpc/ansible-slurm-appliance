@@ -9,11 +9,11 @@ Install and configure a Lustre client. This builds RPM packages from source.
 
 - `lustre_version`: Optional str. Version of lustre to build, default '2.15.64'. TODO: EXPLAIN. See https://wiki.whamcloud.com/display/PUB/Lustre+Support+Matrix
 - `lustre_mounts`: Optional list. Define Lustre filesystems and mountpoints as a list of dicts with possible keys:
-    - `lustre_mgs_nid`: The NID for the MGS, e.g. `192.168.227.11@tcp1`
-    - `lustre_fs_name`: The name of the filesystem to mount
-    - `lustre_mount_point`: Path to mount filesystem at. Default is `/mnt/lustre/{{ lustre_fs_name}}`
-    - `lustre_mount_state`: Mountpoint state, as for [ansible.posix.mount](https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html#parameter-state). Default `mounted`.
-  These parameters may alternatively be specified as role variables of the same name, which are lower-priority than entries in `lustre_mounts`. 
+    - `mgs_nid`: The NID for the MGS, e.g. `192.168.227.11@tcp1`
+    - `fs_name`: The name of the filesystem to mount
+    - `mount_point`: Path to mount filesystem at. Default is `/mnt/lustre/{{ lustre_fs_name}}`
+    - `mount_state`: Mountpoint state, as for [ansible.posix.mount](https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html#parameter-state). Default `mounted`.
+  These parameters may alternatively be specified as role variables prefixed `lustre_`, which are lower-priority than entries in `lustre_mounts`.
 
 The following variables control the package build and and install and should not generally be required:
 - `lustre_build_packages`: Optional list. Prerequisite packages required to build Lustre. See `defaults/main.yml`.
