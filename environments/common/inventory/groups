@@ -32,6 +32,7 @@ openhpc
 opensearch
 filebeat
 mysql
+squid
 
 [prometheus]
 # Single node to host monitoring server.
@@ -126,3 +127,6 @@ freeipa_client
 
 [persist_hostkeys]
 # Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
+
+[squid]
+# Hosts to run squid proxy
