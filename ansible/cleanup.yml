@@ -35,3 +35,6 @@
 
 - name: Run cloud-init cleanup
   command: cloud-init clean --logs --seed
+
+- name: Cleanup /tmp
+  command : rm -rf /tmp/*

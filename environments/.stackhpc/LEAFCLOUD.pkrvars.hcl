@@ -1,7 +1,6 @@
 flavor = "ec1.large"
 use_blockstorage_volume = true
 volume_size = 15 # GB
-volume_size_ofed = 15 # GB
 volume_type = "unencrypted"
 image_disk_format = "qcow2"
 networks = ["909e49e8-6911-473a-bf88-0495ca63853c"] # slurmapp-ci
