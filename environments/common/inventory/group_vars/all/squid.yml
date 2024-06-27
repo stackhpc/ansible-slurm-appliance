@@ -1,0 +1,1 @@
+squid_http_port: 3128 # defined here for proxy role
