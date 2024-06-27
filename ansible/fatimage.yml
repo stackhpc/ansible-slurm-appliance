@@ -25,7 +25,7 @@
 
 - hosts: builder
   become: yes
-  gather_facts: no
+  gather_facts: yes
   tasks:
     # - import_playbook: iam.yml
     - name: Install FreeIPA client
