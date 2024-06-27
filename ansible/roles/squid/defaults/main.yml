@@ -1,0 +1,24 @@
+squid_conf_template: squid.conf.j2
+squid_started: true
+squid_enabled: true
+
+squid_cache_mem: "{{ undef(hint='squid_cache_mem required, e.g. \"12 GB\"')  }}"
+squid_cache_dir: /var/spool/squid
+squid_cache_disk: "{{ undef(hint='squid_cache_disk (in MB) required, e.g. \"1024\"')  }}" # always in MB
+squid_maximum_object_size_in_memory: '64 MB'
+squid_maximum_object_size: '200 MB'
+squid_http_port: 3128
+squid_acls: acl anywhere src all # rely on openstack security groups
+squid_http_access: |
+  # Deny requests to certain unsafe ports
+  http_access deny !Safe_ports
+  # Deny CONNECT to other than secure SSL ports
+  http_access deny CONNECT !SSL_ports
+  # Only allow cachemgr access from localhost
+  http_access allow localhost manager
+  http_access deny manager
+  # Rules allowing http access
+  http_access allow anywhere
+  http_access allow localhost
+  # Finally deny all other access to this proxy
+  http_access deny all
