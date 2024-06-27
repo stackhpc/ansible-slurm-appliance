@@ -169,6 +169,7 @@ source "openstack" "openhpc" {
   networks = var.networks
   floating_ip_network = var.floating_ip_network
   security_groups = var.security_groups
+  volume_size = var.volume_size
   
   # Input image:
   source_image = "${var.source_image[var.os_version]}"
