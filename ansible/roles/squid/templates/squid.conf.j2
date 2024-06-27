@@ -43,7 +43,7 @@ coredump_dir /var/spool/squid
 # Configure refresh
 # cache repodata only few minutes and then query parent whether it is fresh:
 refresh_pattern /XMLRPC/GET-REQ/.*/repodata/.*$ 0 1% 1440 ignore-no-cache reload-into-ims refresh-ims
-# rpm will hardly ever change, force to chache it for very long time:
+# rpm will hardly ever change, force it to cache for very long time:
 refresh_pattern \.rpm$ 10080 100% 525960 override-expire override-lastmod ignore-reload reload-into-ims
 refresh_pattern ^ftp: 1440 20% 10080
 refresh_pattern ^gopher: 1440 0% 1440
