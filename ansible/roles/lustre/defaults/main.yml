@@ -1,5 +1,4 @@
-
-lustre_version: 'b2_15' # TODO: FIXME to 2.15.5 on release see http://lists.lustre.org/pipermail/lustre-discuss-lustre.org/2024-June/019163.html
+lustre_version: '2.15.5-RC3' # TODO: FIXME to 2.15.5 on release see http://lists.lustre.org/pipermail/lustre-discuss-lustre.org/2024-June/019163.html
 lustre_mounts: [{}] # Ensures if all top-level vars are provided then this isn't required
 #lustre_mgs_nid:
 #lustre_fs_name:
@@ -32,6 +31,6 @@ lustre_configure_opts:
   - --disable-gss-keyring
   - --enable-mpitests=no
 lustre_rpm_globs: # NB: order is important here, as not installing from a repo
-  - "kmod-lustre-client-{{ lustre_version }}-*"
-  - "lustre-client-{{ lustre_version }}-*"
+  - "kmod-lustre-client-{{ lustre_version | split('.') | first }}*" # only take part of the version as -RC versions produce _RC rpms
+  - "lustre-client-{{ lustre_version | split('.') | first }}*"
 lustre_cleanup_build: true
