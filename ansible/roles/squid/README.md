@@ -12,8 +12,8 @@ Where noted these map to squid parameters of the same name without the `squid_` 
 
 - `squid_conf_template`: Optional str. Path (using Ansible search paths) to squid.conf template. Default is in-role template.
 - `squid_started`: Optional bool. Whether to start squid service. Default `true`.
-- `squid_enabled`: Optional bool. Whether squid service is enabled boot. Default `true`.
-- `squid_cache_mem`: Required str. Size of memory cache, .g "1024 KB", "12 GB" etc. See squid parameter.
+- `squid_enabled`: Optional bool. Whether squid service is enabled on boot. Default `true`.
+- `squid_cache_mem`: Required str. Size of memory cache, e.g "1024 KB", "12 GB" etc. See squid parameter.
 - `squid_cache_dir`: Optional. Path to cache directory. Default `/var/spool/squid`.
 - `squid_cache_disk`: Required int. Size of disk cache in MB. See Mbytes under "ufs" store type for squid parameter [cache_dir](https://www.squid-cache.org/Doc/config/cache_dir/).
 - `squid_maximum_object_size_in_memory`: Optional str. Upper size limit for objects in memory cache, default '64 MB'. See squid parameter.
