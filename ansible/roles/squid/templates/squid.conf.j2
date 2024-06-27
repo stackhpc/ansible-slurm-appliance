@@ -1,0 +1,54 @@
+#
+# Based on combination of configs from
+# - https://github.com/stackhpc/docker-squid/blob/master/squid.conf
+# - https://github.com/drosskopp/squid-cache/blob/main/squid.conf
+#
+
+# Define ACLs:
+{{ squid_acls }}
+
+acl SSL_ports port 443
+acl Safe_ports port 80		# http
+acl Safe_ports port 21		# ftp
+acl Safe_ports port 443		# https
+acl Safe_ports port 70		# gopher
+acl Safe_ports port 210		# wais
+acl Safe_ports port 1025-65535	# unregistered ports
+acl Safe_ports port 280		# http-mgmt
+acl Safe_ports port 488		# gss-http
+acl Safe_ports port 591		# filemaker
+acl Safe_ports port 777		# multiling http
+acl CONNECT method CONNECT
+
+# Rules allowing http access
+{{ squid_http_access}}
+
+# Squid normally listens to port 3128
+http_port {{ squid_http_port }}
+
+# Define cache parameters:
+cache_dir ufs /var/spool/squid {{ squid_cache_disk | int }} 16 256
+cache_mem {{ squid_cache_mem }}
+maximum_object_size_in_memory {{ squid_maximum_object_size_in_memory }}
+maximum_object_size {{ squid_maximum_object_size }}
+
+# Keep largest objects around longer:
+cache_replacement_policy heap LFUDA
+
+memory_replacement_policy heap GDSF
+
+# Leave coredumps in the first cache dir
+coredump_dir /var/spool/squid
+
+# Configure refresh
+# cache repodata only few minutes and then query parent whether it is fresh:
+refresh_pattern /XMLRPC/GET-REQ/.*/repodata/.*$ 0 1% 1440 ignore-no-cache reload-into-ims refresh-ims
+# rpm will hardly ever change, force it to cache for very long time:
+refresh_pattern \.rpm$ 10080 100% 525960 override-expire override-lastmod ignore-reload reload-into-ims
+refresh_pattern ^ftp: 1440 20% 10080
+refresh_pattern ^gopher: 1440 0% 1440
+refresh_pattern -i (/cgi-bin/|\?) 0 0% 0
+refresh_pattern . 0 20% 4320
+
+# Disable squid doing logfile rotation as the RockyLinux dnf package configures logrotate
+logfile_rotate 0

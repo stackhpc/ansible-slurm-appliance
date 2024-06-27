@@ -27,3 +27,7 @@ cluster
 # Allows demo; also installs manila client in fat image
 login
 compute
+
+[squid:children]
+# Install squid into fat image
+builder
