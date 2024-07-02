@@ -1,0 +1,185 @@
+# An ansible playbook to configure the SSSD configuration to work with GLauth LDAP.
+
+- hosts: openhpc
+  become: true
+  vars:
+    ldap_server: "{{ groups['login'] | first }}"
+  tasks:
+    - name: Install ldapsearch and sssd-ldap
+      dnf:
+        name:
+          - openldap-clients
+          - sssd-ldap
+        state: present      
+
+    - name: Read LDAP configuration
+      ansible.builtin.slurp:
+        src: /etc/glauth/config.cfg
+      register: file_content
+      delegate_to: "{{ ldap_server }}"
+
+    - name: Decode the LDAP configuration content
+      ansible.builtin.set_fact:
+        ldap_config_decoded: "{{ file_content['content'] | b64decode }}"
+
+    - name: Extract LDAP URI
+      ansible.builtin.set_fact:
+        ldap_uri: "{{ ldap_config_decoded | regex_search('listen\\s*=\\s*\"([^\"]+)\"', '\\1') | first | regex_replace('0.0.0.0', ansible_default_ipv4.address) }}"
+
+    - name: Extract Base DN
+      ansible.builtin.set_fact:
+        ldap_search_base: "{{ ldap_config_decoded | regex_search('baseDN\\s*=\\s*\"([^\"]+)\"', '\\1') | first }}"
+
+    - name: Extract LDAP Group format
+      ansible.builtin.set_fact:
+        ldap_group_name: "{{ ldap_config_decoded | regex_search('groupformat\\s*=\\s*\"([^\"]+)\"', '\\1') | first }}"    
+
+    # LDAP Service Account Password to be used 
+    # for ldapsearch and sssd configuration.
+    - name: Read LDAP admin configuration
+      ansible.builtin.slurp:
+        src: /etc/glauth/refresher.env
+      register: admin_file_content
+      delegate_to: "{{ ldap_server }}"
+
+    - name: Decode the LDAP admin configuration content
+      ansible.builtin.set_fact:
+        ldap_admin_config_decoded: "{{ admin_file_content['content'] | b64decode }}"
+
+    - name: Extract LDAP admin password
+      ansible.builtin.set_fact:
+        ldap_admin_password: "{{ ldap_admin_config_decoded | regex_search('^LDAP_ADMIN_PASSWORD=([^\\n]+)', '\\1', multiline=True) | first }}"
+
+    # Gather 'groups' variables from LDAP 
+    # structure by probing with ldapsearch.
+    - name: Execute ldapsearch to get group information
+      ansible.builtin.command:
+        cmd: "ldapsearch -x -H ldap://{{ ldap_uri }} -D 'cn=admin,{{ ldap_search_base }}' -w {{ ldap_admin_password }} -b '{{ ldap_group_name }}=groups,{{ ldap_search_base }}'"
+        # Should result in a command like: ldapsearch -x -H ldap://0.0.0.0:3893 -D "cn=admin,dc=glauth,dc=com" -w Adm1n! -b "ou=groups,dc=glauth,dc=com"
+      register: ldapsearch_output
+      ignore_errors: yes
+
+    - name: Check if gidNumber is present and set ldap_group_gid_number
+      ansible.builtin.set_fact:
+        ldap_group_gid_number: "{{ 'ldap_group_gid_number = gidNumber' if ('gidNumber: ' in ldapsearch_output.stdout) else ' ' }}"    
+    
+    - name: Extract ldap_group_object_class for entries with gidNumber and not organizationalUnit
+      ansible.builtin.set_fact:
+        ldap_group_object_class: "{{ ('ldap_group_object_class = ' + result) if result != '' else '' }}"
+      vars:
+        result: "{{ ldapsearch_output.stdout | regex_findall('(?ms)^dn:.+?(?:objectClass: ((?!organizationalUnit)[\\w-]+)).+?gidNumber: \\d+', '\\1') | reject('search', '^(organizationalUnit|top)$') | first | default('', true) }}"
+    
+    - name: Template sssd.conf file
+      ansible.builtin.template:
+        src: sssd.conf.j2
+        dest: /etc/sssd/sssd.conf
+        owner: root
+        group: root
+        mode: '0600'
+      register: sssd_configured
+
+    - name: Restart SSSD service
+      ansible.builtin.systemd:
+        name: sssd
+        state: restarted
+      when: sssd_configured.changed
+    
+# # The login node requires some special previlages in order to 
+# # allow the login node to create the home directories for the users.
+# - hosts: login
+#   become: true
+#   tasks:
+#     - name: Create 'common-session' file for pam_mkhomedir.so
+#       ansible.builtin.copy:
+#         content: |
+#           # Ensure session management is handled through SSSD, which interfaces with LDAP
+#           session required pam_mkhomedir.so skel=/etc/skel/ umask=0022
+#           session required pam_sss.so
+          
+#           # This line is optional but recommended for logging
+#           #session optional pam_syslog.so
+
+#           # Include this for environment variable management
+#           #session required pam_env.so
+
+#           # This line is for setting user limits
+#           #session required pam_limits.so
+#         dest: /etc/pam.d/common-session
+#         owner: root
+#         group: root
+#         mode: '0644'
+#       register: common_session_created  
+
+#     - name: Ensure 'sss' is configured in nsswitch.conf for passwd and group
+#       ansible.builtin.lineinfile:
+#         path: /etc/nsswitch.conf
+#         regexp: '^({{ item }}:\s+)'
+#         line: '\1:files sss systemd'
+#         backrefs: yes
+#       register: sss_added
+
+#     - name: Ensure 'sss' is configured in nsswitch.conf for group
+#       ansible.builtin.lineinfile:
+#         path: /etc/nsswitch.conf
+#         regexp: '^(group):\s+files'
+#         line: '\1:      files sss systemd'
+#         backrefs: yes
+#       register: sss_added
+
+#     # May not need this, but just in case.  
+#     # - name: Ensure 'sss' is configured in nsswitch.conf for various services
+#     #   ansible.builtin.lineinfile:
+#     #     path: /etc/nsswitch.conf
+#     #     regexp: "^{{ item.service }}:\\s+files"
+#     #     line: "{{ item.service }}:   sss files"
+#     #   loop:
+#     #     - { service: "netgroup" }
+#     #     - { service: "automount" }
+#     #     - { service: "services" }
+#     #   register: sss_added_two
+
+#       # Restart Waldur site agents and Glauth services and make
+#       # sure that the Waldur config scripts have been exceuted.
+#       # This should only run if the LDAP configuration has been
+#       # changed.
+#     - name: Restart Services
+#       block:
+#       - name: Restart Waldur site agents
+#         ansible.builtin.systemd:
+#           name: waldur-agent-{{ item }}
+#           state: restarted
+#         loop:
+#           - membership-sync
+#           - order-process
+#           - report
+
+#       # Only way to refresh the GLauth config.cfg file is to first 
+#       # delete the tmp files and then restart the refresher service.
+#       - name: Delete offering-users-config.cfg and prev-offering-users-config.cfg tmp files
+#         ansible.builtin.file:
+#           path: /tmp/{{ item }}
+#           state: absent
+#         with_items:
+#           - offering-users-config.cfg
+#           - prev-offering-users-config.cfg
+
+#       - name: Restart GLauth service
+#         ansible.builtin.systemd:
+#           name: refresh-glauth-config
+#           state: restarted
+
+#       - name: Restart GLauth service
+#         ansible.builtin.systemd:
+#           name: glauth
+#           state: restarted
+#       when: common_session_created.changed or sss_added.changed #or sss_added_two.changed
+
+#     - name: Load the Slurm resources types to Waldur
+#       ansible.builtin.shell: /opt/waldur-env/bin/waldur_site_load_components
+#       args:
+#         chdir: /etc/waldur
+
+#     - name: Make sure that there isn't a blocked workflow to create home directories.
+#       ansible.builtin.shell: /opt/waldur-env/bin/waldur_slurm_create_homedirs
+#       args:
+#         chdir: /etc/waldur

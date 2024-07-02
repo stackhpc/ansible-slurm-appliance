@@ -1,0 +1,34 @@
+[sssd]
+config_file_version = 2
+services = nss, pam
+domains = GLauth
+
+[nss]
+
+[pam]
+
+[domain/GLauth]
+#cache_credentials = True
+debug_level = 9
+enumerate = True
+id_provider = ldap
+auth_provider = ldap
+access_provider = ldap
+ldap_uri = ldap://{{ ldap_uri }}
+ldap_search_base = {{ ldap_search_base }}
+ldap_default_bind_dn = cn=admin,{{ ldap_search_base }}
+ldap_default_authtok_type = password
+ldap_default_authtok = {{ ldap_admin_password }}
+ldap_use_tokengroups = False
+sudo_provider = none
+ldap_group_member = uniqueMember
+ldap_schema = rfc2307bis
+ldap_access_order = filter
+ldap_access_filter = (memberOf=ou=service,{{ ldap_search_base }})
+ldap_tls_reqcert = never
+
+# Group settings.
+ldap_group_search_base = {{ ldap_group_name }}=groups,{{ ldap_search_base }}
+{{ ldap_group_object_class }}
+ldap_group_name = {{ ldap_group_name }}
+{{ ldap_group_gid_number }}
