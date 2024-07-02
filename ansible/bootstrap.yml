@@ -157,6 +157,20 @@
   tags:
     - update
   tasks:
+    - name: Install SIG/security release repo
+      dnf:
+        name: rocky-release-security
+    - name: Update openssh
+      dnf:
+        name:
+          - openssh
+          - openssh-askpass
+          - openssh-clients
+          - openssh-server
+        state: latest
+        update_only: true
+        enablerepo:
+          - security-common
     - block:
       - name: Update selected packages
         yum:
@@ -167,14 +181,6 @@
         async: "{{ 30 * 60 }}" # wait for up to 30 minutes
         poll: 15 # check every 15 seconds
         register: updates
-      - name: Install SIG/security release repo
-        dnf:
-          name: rocky-release-security
-      - name: Upgrade openssh
-        dnf:
-          name: openssh*
-          enablerepo:
-            - security-common
       - name: Ensure update log directory on localhost exists
         file:
           path: "{{ update_log_path | dirname }}"
