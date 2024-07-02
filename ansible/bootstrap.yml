@@ -157,6 +157,20 @@
   tags:
     - update
   tasks:
+    - name: Install SIG/security release repo
+      dnf:
+        name: rocky-release-security
+    - name: Update openssh
+      dnf:
+        name:
+          - openssh
+          - openssh-askpass
+          - openssh-clients
+          - openssh-server
+        state: latest
+        update_only: true
+        enablerepo:
+          - security-common
     - block:
       - name: Update selected packages
         yum:
