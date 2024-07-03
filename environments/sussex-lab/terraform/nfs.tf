@@ -6,7 +6,7 @@ data "openstack_blockstorage_volume_v3" "home" {
 resource "openstack_compute_instance_v2" "nfs_server" {
 
   name = "${var.cluster_name}-nfs"
-  image_id = "5e353672-c03c-43fc-9fb7-71ccaaee4047" # openhpc-RL9-240327-1026-4812f852
+  image_id = "1c86fcfd-fe5d-4225-952c-5b9f05632a57" # openhpc-ofed-RL9-240621-1308-96959324 # https://github.com/stackhpc/ansible-slurm-appliance/pull/401
   flavor_name = "en1.xsmall"
   key_pair = "slurm-app-ci"
 
