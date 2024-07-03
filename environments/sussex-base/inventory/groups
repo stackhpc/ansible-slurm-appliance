@@ -1,5 +1,6 @@
 [nfs:children]
 openhpc
+nfs_server
 
 [mysql:children]
 control
@@ -39,6 +40,7 @@ login
 
 [basic_users]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
+cluster
 
 [openondemand:children]
 # Host to run Open Ondemand server on - subset of login
