@@ -1,6 +1,5 @@
 [nfs:children]
 openhpc
-nfs_server
 
 [mysql:children]
 control
@@ -38,7 +37,7 @@ login
 [block_devices:children]
 # Environment-specific so not defined here
 
-[basic_users]
+[basic_users:children]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
 cluster
 
