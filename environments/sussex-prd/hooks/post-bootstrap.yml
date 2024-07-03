@@ -1,0 +1,2 @@
+- name: Import parent hook
+  import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../sussex-base/hooks/post-bootstrap.yml"

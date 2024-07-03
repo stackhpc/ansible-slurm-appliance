@@ -40,7 +40,7 @@ module "cluster" {
     login_nodes = {
         "login-0" = {
             flavor = "general.v1.4cpu.8gb"
-            fip = "139.184.83.91"
+            fip = # TODO
         }
     }
 

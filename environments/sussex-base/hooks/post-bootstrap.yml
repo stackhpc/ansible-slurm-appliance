@@ -1,0 +1,37 @@
+- hosts: control:!builder
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Configure chrony as server
+      ansible.builtin.lineinfile:
+        path: /etc/chrony.conf
+        regexp: ^#?allow
+        line: allow 0/0 # rely on security groups for access control
+      register: _chrony_conf
+    
+    - name: Restart chronyd
+      systemd:
+        name: chronyd
+        state: restarted
+      when: _chrony_conf.changed
+
+- hosts: cluster:!control:!builder
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Configure chrony to use cluster server
+      ansible.builtin.replace:
+        path: /etc/chrony.conf
+        regexp: |
+          # Use public servers from the pool\.ntp\.org project\.\n# Please consider joining the pool \(https://www\.pool\.ntp\.org/join.html\)\.\npool 2\.rocky\.pool\.ntp.org iburst
+        replace: |
+          # Use in-cluster server
+          server {{ hostvars[groups['control'] | first].api_address }} iburst
+      register: _chrony_conf
+    
+    - name: Restart chronyd
+      systemd:
+        name: chronyd
+        state: restarted
+      when: _chrony_conf.changed
+
