@@ -1,0 +1,1 @@
+ansible_ssh_common_args: "-i {{ appliances_repository_root }}/slurm-app-ci -J {{ ansible_user}}@{{ login_fip }}" # TODO: add path to keyfile
