@@ -1,2 +1,0 @@
-squid_cache_mem: '1 GB'
-squid_cache_disk: "{{ 2 * 1024 }}" # MB
