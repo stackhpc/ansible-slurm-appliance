@@ -19,7 +19,7 @@ variable "cluster_name" {
 
 variable "cluster_image_id" {
     type = string
-    default = "df546967-3b01-4e44-86e9-ed2ef67efd91" # openhpc-ofed-RL9-240619-0949-66c0e540
+    default = "1c86fcfd-fe5d-4225-952c-5b9f05632a57" # openhpc-ofed-RL9-240621-1308-96959324 # https://github.com/stackhpc/ansible-slurm-appliance/pull/401
 }
 
 module "cluster" {
