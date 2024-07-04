@@ -1,0 +1,3 @@
+[proxy:children]
+# Additional hosts to configure http/s proxies - see ansible/roles/proxy/README.md
+nfs_server # lab environment replacement for lustre

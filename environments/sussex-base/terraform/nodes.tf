@@ -47,9 +47,30 @@ resource "openstack_networking_port_v2" "login_storage" {
   }
 }
 
-resource "openstack_networking_port_v2" "control" {
+resource "openstack_networking_port_v2" "control_tenant" {
 
-  name = "${var.cluster_name}-control"
+  name = "${var.cluster_name}-control-tenant"
+  network_id = data.openstack_networking_network_v2.tenant_net.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.tenant_subnet.id
+  }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.cluster.id,
+    openstack_networking_secgroup_v2.login.id
+  ]
+
+  binding {
+    vnic_type = var.vnic_type
+    profile = var.vnic_profile
+  }
+}
+
+resource "openstack_networking_port_v2" "control_storage" {
+
+  name = "${var.cluster_name}-control-storage"
   network_id = data.openstack_networking_network_v2.storage_net.id
   admin_state_up = "true"
 
@@ -97,8 +118,13 @@ resource "openstack_compute_instance_v2" "control" {
   }
 
   network {
-    port = openstack_networking_port_v2.control.id
-    access_network = true
+    port = openstack_networking_port_v2.control_storage.id
+    access_network = true # using FIP as proxyjump
+  }
+
+  network {
+    port = openstack_networking_port_v2.control_tenant.id
+    access_network = false
   }
 
   metadata = {

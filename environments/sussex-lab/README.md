@@ -37,13 +37,10 @@ persist if the cluster is deleted.
 ```
 
 - The `sussex-tenant` network models an OpenStack tenant network. The default gateway is
-the router interface connecting to the external network.
+  the router interface connecting to the external network.
 - The `sussex-storage` network models a provider network with routing to NFS/lustre.
-On the production system this may have outbound internet via the campus network or this
-may be provided via a squid proxy on the control node. For simplicity in the lab
-environment the router has an interface on this subnet (hence why the default gateway
-must be disabled on this subnet to avoid routing loops) and the gateway is added via
-Ansible.
+  This has no default gateway (to avoid routing loops with dual-interfaced nodes) and
+  outbound internet is provided via a squid proxy on the control node.
 - The login node has a FIP with SSH and HTTPS enabled and runs fail2ban. It also proxies
 Grafana via OOD.
 - All nodes use `/etc/hosts` for cluster name resolution.
