@@ -1,7 +1,6 @@
 flavor = "vm.ska.cpu.general.small"
 use_blockstorage_volume = true
 volume_size = 15 # GB
-volume_size_ofed = 15 # GB
 image_disk_format = "qcow2"
 networks = ["4b6b2722-ee5b-40ec-8e52-a6610e14cc51"] # portal-internal (DNS broken on ilab-60)
 ssh_keypair_name = "slurm-app-ci"
