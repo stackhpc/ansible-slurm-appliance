@@ -1,1 +1,1 @@
-prometheus_storage_retention_size: "8GB" # # TODO
+prometheus_storage_retention_size: "180GB" # 200GB state volume
