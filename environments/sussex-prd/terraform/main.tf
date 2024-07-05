@@ -35,11 +35,11 @@ module "cluster" {
     storage_net = "slurm-data"
     storage_subnet = "slurm-data"
 
-    control_node_flavor = "general.v1.4cpu.8gb"
+    control_node_flavor = "general.v1.16cpu.32gb"
 
     login_nodes = {
         "login-0" = {
-            flavor = "general.v1.4cpu.8gb"
+            flavor = "general.v1.16cpu.32gb"
             fip = # TODO
         }
     }
