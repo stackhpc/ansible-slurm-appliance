@@ -41,24 +41,27 @@ variable "networks" {
 
 variable "os_version" {
   type = string
-  description = "RL8 or RL9"
+  description = "'RL8' or 'RL9' with default source_image_* mappings"
+  default = "RL9"
 }
 
-# Must supply either fatimage_source_image_name or fatimage_source_image
-variable "fatimage_source_image_name" {
+# Must supply either source_image_name or source_image_id
+variable "source_image_name" {
   type = map(string)
+  description = "name of source image, keyed from var.os_version"
   default = {
     RL8: "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2"
     RL9: "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
   }
 }
 
-variable "fatimage_source_image" {
+variable "source_image" {
   type = map(string)
   default = {
     RL8: null
     RL9: null
   }
+  description = "UUID of source image, keyed from var.os_version"
 }
 
 variable "flavor" {
@@ -130,11 +133,6 @@ variable "volume_size" {
   default = null # When not specified use the size of the builder instance root disk
 }
 
-variable "volume_size_ofed" {
-  type = number
-  default = null # When not specified use the size of the builder instance root disk
-}
-
 variable "image_disk_format" {
   type = string
   default = null # When not specified use the image default
@@ -143,6 +141,16 @@ variable "image_disk_format" {
 variable "metadata" {
   type = map(string)
   default = {}
+}
+
+variable "groups" {
+  type = map(list(string))
+  description = "Additional inventory groups (other than 'builder') to add build VM to, keyed by source name"
+  default = {
+    # fat image builds:
+    openhpc = ["control", "compute", "login"]
+    openhpc-ofed = ["control", "compute", "login", "ofed"]
+  }
 }
 
 source "openstack" "openhpc" {
@@ -154,10 +162,11 @@ source "openstack" "openhpc" {
   networks = var.networks
   floating_ip_network = var.floating_ip_network
   security_groups = var.security_groups
+  volume_size = var.volume_size
   
   # Input image:
-  source_image = "${var.fatimage_source_image[var.os_version]}"
-  source_image_name = "${var.fatimage_source_image_name[var.os_version]}" # NB: must already exist in OpenStack
+  source_image = "${var.source_image[var.os_version]}"
+  source_image_name = "${var.source_image_name[var.os_version]}" # NB: must already exist in OpenStack
   
   # SSH:
   ssh_username = var.ssh_username
@@ -174,27 +183,34 @@ source "openstack" "openhpc" {
   image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
 }
 
-# "fat" image builds:
 build {
 
-  # non-OFED:
+  # non-OFED fat image:
   source "source.openstack.openhpc" {
     name = "openhpc"
-    volume_size = var.volume_size
   }
 
-  # OFED:
+  # OFED fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-ofed"
-    volume_size = var.volume_size_ofed
+  }
+
+  # Extended site-specific image, built on fat image:
+  source "source.openstack.openhpc" {
+    name = "openhpc-extra"
   }
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
-    groups = concat(["builder", "control", "compute", "login"], [for g in split("-", "${source.name}"): g if g != "openhpc"])
+    groups = concat(["builder"], var.groups[source.name])
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
-    extra_arguments = ["--limit", "builder", "-i", "${var.repo_root}/packer/ansible-inventory.sh", "-vv", "-e", "@${var.repo_root}/packer/openhpc_extravars.yml"]
+    extra_arguments = [
+      "--limit", "builder", # prevent running against real nodes, if in inventory!
+      "-i", "${var.repo_root}/packer/ansible-inventory.sh",
+      "-vv",
+      "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
+      ]
   }
 
   post-processor "manifest" {
