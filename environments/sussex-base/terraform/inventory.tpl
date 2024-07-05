@@ -3,7 +3,6 @@ all:
         openhpc_cluster_name: ${cluster_name}
         cluster_domain_suffix: ${cluster_domain_suffix}
         login_fip: ${login_fip}
-        ansible_ssh_common_args: -J {{ ansible_user}}@{{ login_fip }}
 
 control:
     hosts:

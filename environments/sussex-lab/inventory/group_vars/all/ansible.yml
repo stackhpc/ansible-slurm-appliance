@@ -1,0 +1,1 @@
+ansible_ssh_common_args: "-J {{ ansible_user }}@{{ login_fip }}" # no route to storage network from deploy host in different project
