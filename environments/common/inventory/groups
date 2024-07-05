@@ -32,7 +32,6 @@ openhpc
 opensearch
 filebeat
 mysql
-squid
 
 [prometheus]
 # Single node to host monitoring server.
