@@ -19,7 +19,7 @@ variable "cluster_name" {
 
 variable "cluster_image_id" {
     type = string
-    default = "063d2f2e-6c53-4f14-a7fd-e557df645794" # openhpc-ofed-RL9-240621-1308-96959324, v1.149
+    default = "fa21f5a7-184a-496b-8570-62db2314eb32" # openhpc-ofed-RL9-240621-1308-96959324, v1.149
 }
 
 module "cluster" {
