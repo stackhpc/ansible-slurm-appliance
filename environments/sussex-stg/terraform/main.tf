@@ -22,12 +22,12 @@ module "cluster" {
     environment_root = var.environment_root
 
     cluster_name = var.cluster_name
-    key_pair = "slurm-app-ci"
+    key_pair = "slurm-deploy"
 
     login_nodes = {
         "login-0" = {
             flavor = "general.v1.16cpu.32gb"
-            fip = # TODO
+            fip = "139.184.83.151"
         }
     }
 
