@@ -3,6 +3,7 @@ all:
         openhpc_cluster_name: ${cluster_name}
         cluster_domain_suffix: ${cluster_domain_suffix}
         login_fip: ${login_fip}
+        state_volume_size: ${state_volume.size}
 
 control:
     hosts:
