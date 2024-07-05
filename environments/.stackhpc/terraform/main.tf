@@ -89,9 +89,9 @@ module "cluster" {
         #     flavor: var.other_node_flavor
         # }
     }
-    
+
     volume_backed_instances = var.volume_backed_instances
-    
+
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10
@@ -100,4 +100,25 @@ module "cluster" {
     state_volume_type = var.state_volume_type
     home_volume_type = var.home_volume_type
 
+}
+
+resource "openstack_compute_instance_v2" "freeipa" {
+    name            = "${var.cluster_name}-freeipa"
+    image_id        = "3d20681e-38a6-4563-a80e-f1762f6cdce8" # == Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2
+    flavor_id       = "c8b72062-5d52-4590-9d7a-68a670b44442"
+    key_pair        = "slurm-app-ci"
+    security_groups = ["default", "SSH"]
+
+    network {
+    name = var.cluster_net
+    }
+
+    metadata = {
+    environment_root = var.environment_root
+    }
+
+    user_data = <<-EOF
+        #cloud-config
+        fqdn: ${var.cluster_name}-freeipa.${var.cluster_name}.invalid
+    EOF
 }

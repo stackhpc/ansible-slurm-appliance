@@ -1,0 +1,37 @@
+all:
+    vars:
+        openhpc_cluster_name: scott-slurm-dev
+        cluster_domain_suffix: invalid
+
+control:
+    hosts:
+        scott-slurm-dev-control:
+            ansible_host: 192.168.3.37
+            instance_id: dfe0f2bc-d874-433c-a91d-0fa73b51d581
+    vars:
+        appliances_state_dir: /var/lib/state # NB needs to be set on group not host otherwise it is ignored in packer build!
+
+login:
+    hosts:
+        scott-slurm-dev-login-0:
+            ansible_host: 192.168.3.4
+            instance_id: fd4e85fd-7fd3-4a4e-ae62-29003b8a1468
+
+scott-slurm-dev_standard:
+    hosts:
+        scott-slurm-dev-compute-0:
+            ansible_host: 192.168.3.89
+            instance_id: ec2683b4-4c9b-41d8-b645-e13d082a9286
+        scott-slurm-dev-compute-1:
+            ansible_host: 192.168.3.144
+            instance_id: 608844bd-ba76-4d99-9b12-925f7e682f8f
+
+compute:
+    children:
+        scott-slurm-dev_standard:
+
+freeipa_server:
+    hosts:
+        scott-slurm-dev-freeipa:
+            ansible_host: 192.168.3.199
+            instance_id: d53dc420-b0b5-492c-ad92-de4ca5da55b8

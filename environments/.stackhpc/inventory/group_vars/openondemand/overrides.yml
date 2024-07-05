@@ -1,6 +1,66 @@
-openondemand_auth: basic_pam
+openondemand_auth: oidc # or basic_pam
 openondemand_jupyter_partition: standard
 openondemand_desktop_partition: standard
-#openondemand_dashboard_support_url: 
+#openondemand_dashboard_support_url:
 #openondemand_dashboard_docs_url:
 #openondemand_filesapp_paths:
+
+openondemand_servername: 128.232.226.209
+openondemand_oidc_provider_url: https://identity.apps.hpc.cam.ac.uk/realms/az-rcp-cloud-portal-demo
+openondemand_oidc_crypto_passphrase: <redacted>
+openondemand_oidc_client_id: ondemand
+openondemand_oidc_client_secret: <redacted>
+openondemand_oidc_scope: "openid profile email"
+openondemand_oidc_remote_user_claim: preferred_username
+# openondemand_oidc_remote_user_claim: email
+
+# add openondemand_apps.shell.env.ood_ssh_wrapper:
+openondemand_apps:
+  files:
+    env:
+      ood_shell: ""
+  shell:
+    env:
+      ood_shell_origin_check: "https://{{ openondemand_servername }}"
+      ood_ssh_wrapper: /usr/bin/ood_shell_wrapper # TODO: changeme?
+      # this is bash --login -c "cd && exec bash"
+      # #!/usr/bin/bash
+  dashboard:
+    env:
+      motd_path: /etc/motd
+      motd_format: markdown
+      ood_dashboard_support_url: "{{ openondemand_dashboard_support_url }}"
+      ood_dashboard_docs_url: "{{ openondemand_dashboard_docs_url }}"
+      ood_brand_bg_color: "#0e6ec8"
+      ood_dashboard_title: "{{ openhpc_cluster_name }}"
+
+user_map_match: '.*' # map remote user to local user, as-is
+user_map_cmd: null # need to set this to override the default "openondemand" role behaviour of using file-based mapping
+
+# user_map_match: 'waldur_user_.*'
+
+# user_map_cmd:
+# user_map_cmd: "echo waldur_user_$1"
+# user_map_cmd: "echo -e waldur_user_$1 | tr -d '[:space:]'"
+
+# Script manually created on login node with contents:
+# ```
+# #!/bin/bash
+# echo waldur_user_$1
+# ```
+# user_map_cmd: /opt/user-mapper-test.sh
+
+# openondemand_mapping_users:
+#   - name: waldur_user_scott-test-user
+#     openondemand_username: scott-test-user
+
+# lua_log_level: debug
+
+# user_map_match: 'waldur_user_.*'
+# openondemand_oidc_remote_user_claim: email
+
+
+# oidc_session_inactivity_timeout: 28800
+# oidc_session_max_duration: 28800
+# oidc_state_max_number_of_cookies: "10 true"
+# oidc_cookie_same_site: On

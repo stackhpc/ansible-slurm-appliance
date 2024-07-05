@@ -10,3 +10,5 @@ freeipa_users:
 # freeipa_client hosts must use a FreeIPA server for name resolution - requires hosts to be in group `resolv_conf`.
 resolv_conf_nameservers:
   - "{{ hostvars[groups['freeipa_server'].0].ansible_host }}"
+
+node_fqdn: "{{ [inventory_hostname, openhpc_cluster_name, cluster_domain_suffix ] | join('.') }}"

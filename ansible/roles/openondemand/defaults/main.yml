@@ -56,7 +56,7 @@ openondemand_auth_defaults:
       - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
     user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
     user_map_match: none
-  
+
   # Defaults for basic/PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
   basic_pam:
     httpd_auth: # ood_portal.yml.j2
@@ -91,7 +91,7 @@ openondemand_osc_ood_defaults:
     - SSLHonorCipherOrder On
     - SSLCompression off
     - SSLSessionTickets Off
-  
+
   # User mapping:
   user_map_cmd: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_cmd }}"
   user_map_match: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_match }}"

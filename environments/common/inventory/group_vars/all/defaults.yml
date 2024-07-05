@@ -39,7 +39,7 @@ appliances_local_users_default:
         home: /var/lib/{{ appliances_local_users_ansible_user_name }}
         move_home: true
         local: true
-    
+
     - user: "{{ appliances_local_users_podman }}"
       enable: "{{ 'podman' in group_names }}"
 
@@ -50,7 +50,7 @@ appliances_local_users_default:
         shell: /sbin/nologin
         uid: 202
         system: true
-    
+
     - group:
         name: prometheus
         gid: 976
@@ -61,7 +61,7 @@ appliances_local_users_default:
         shell: /usr/sbin/nologin
         system: true
       enable: "{{ 'prometheus' in group_names }}"
-    
+
     - group:
         name: grafana
         gid: 979
