@@ -15,7 +15,7 @@ persist if the cluster is deleted.
 ```
  │    tenant_net*      storage_net*     
  │ ┌──┐ │                  │
- │ │  ├────────────────────┤ ┌─────────┐   
+ │ │  │ │                  │ ┌─────────┐   
  ├─┤X*├─┤  ┌ SSH/HTTPS     ├─┤nfs      │   
  │ └──┘ │ ┌┴──────┐        │ └┬────────┘   
  │      ├─┤login-0├────────┤  └─home-volume*
