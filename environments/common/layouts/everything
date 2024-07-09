@@ -75,3 +75,7 @@ openhpc
 
 [squid]
 # Hosts to run squid proxy
+
+[tuned:children]
+# Hosts to run TuneD configuration
+cluster

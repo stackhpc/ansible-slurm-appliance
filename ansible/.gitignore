@@ -56,3 +56,6 @@ roles/*
 !roles/ofed/**
 !roles/squid/
 !roles/squid/**
+!roles/tuned/
+!roles/tuned/**
+
