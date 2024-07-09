@@ -14,7 +14,7 @@ resource "openstack_compute_instance_v2" "nfs_server" {
   name = "${var.cluster_name}-nfs"
   image_id = var.nfs_image_id
   flavor_name = "general.v1.4cpu.8gb"
-  key_pair = "slurm-deploy"
+  key_pair = "slurm-deploy-v2"
 
   network {
     name = "slurm-data"

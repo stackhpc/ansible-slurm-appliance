@@ -22,7 +22,7 @@ module "cluster" {
     environment_root = var.environment_root
 
     cluster_name = var.cluster_name
-    key_pair = "slurm-deploy"
+    key_pair = "slurm-deploy-v2"
 
     login_nodes = {
         "login-0" = {
