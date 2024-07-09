@@ -63,8 +63,9 @@ cluster
 [eessi:children]
 openhpc
 
-[resolv_conf]
+[resolv_conf:children]
 # Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md
+cluster
 
 [proxy:children]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
