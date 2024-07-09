@@ -32,11 +32,11 @@ module "cluster" {
     }
 
     compute = {
-      standard = {
-          flavor = "general.v1.16cpu.32gb"
+      general = {
+          flavor = "general.v1.16cpu.32gb" # TODO: should be baremetal.gridpp.r6525.128cpu
           nodes = [
-            "general",
-            "general",
+            "general-0",
+            "general-1",
           ]
       }
     }
