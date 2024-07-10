@@ -19,6 +19,7 @@ While it is tested on OpenStack it should work on any cloud, except for node reb
 It is recommended to check the following before starting:
 - You have root access on the "ansible deploy host" which will be used to deploy the appliance.
 - You can create instances using a Rocky 9 GenericCloud image (or an image based on that).
+    - **NB**: In general it is recommended to use the [latest released image](https://github.com/stackhpc/ansible-slurm-appliance/releases) which already contains the required packages. This is built and tested in StackHPC's CI. However the appliance will install the necessary packages if a GenericCloud image is used.
 - SSH keys get correctly injected into instances.
 - Instances have access to internet (note proxies can be setup through the appliance if necessary).
 - DNS works (if not this can be partially worked around but additional configuration will be required).
