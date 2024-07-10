@@ -1,8 +1,8 @@
 ---
 
-- name: Install python3-venv
-  package:
-    name: python3-venv
+# - name: Install python3-venv
+#   package:
+#     name: python3-venv
 
 - name: Install dependencies into virtualenv
   pip:
