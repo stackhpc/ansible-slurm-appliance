@@ -104,3 +104,15 @@ variable "root_volume_size" {
     type = number
     default = 40
 }
+
+variable "squid_nodes_count" {
+    description = "Number of CVFMS squid proxies"
+    type = number
+    default = 2
+}
+
+variable "squid_flavor" {
+    description = "Flavor for CVFMS squid proxies"
+    type = string
+    default = "general.v1.4cpu.8gb"
+}

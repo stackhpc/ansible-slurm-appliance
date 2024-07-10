@@ -39,7 +39,7 @@ login
 
 [basic_users:children]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
-cluster
+openhpc
 
 [openondemand:children]
 # Host to run Open Ondemand server on - subset of login
@@ -69,7 +69,6 @@ cluster
 
 [proxy:children]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
-login
 compute
 
 [manila]
@@ -79,5 +78,4 @@ compute
 # Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
 login
 
-[squid:children]
-control
+# [squid:children] # defined directly in hosts.yml

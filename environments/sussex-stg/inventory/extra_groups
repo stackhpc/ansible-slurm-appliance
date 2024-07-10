@@ -4,3 +4,4 @@ nfs_server
 
 [cluster:children]
 nfs_server
+squid

@@ -21,6 +21,14 @@ login:
             instance_id: ${ login.id }
 %{ endfor ~}
 
+squid:
+    hosts:
+%{ for squid in squid_instances ~}
+        ${ squid.name }:
+            ansible_host: ${[for n in squid.network: n.fixed_ip_v4 if n.access_network][0]}
+            instance_id: ${ squid.id }
+%{ endfor ~}
+
 %{ for group_name in keys(compute_groups) ~}
 ${cluster_name}_${group_name}:
     hosts:
