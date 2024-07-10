@@ -1,0 +1,61 @@
+- hosts: eessi
+  become: yes
+  gather_facts: no
+  tags:
+    - eessi
+    - cvmfs
+  tasks:
+  # TODO: test this!
+    - name: Add CVMFS config
+      copy:
+        dest: /etc/cvmfs/default.local
+        content: |
+          CVMFS_NFILES=262144
+          CVMFS_REPOSITORIES=atlas.cern.ch,atlas-condb.cern.ch,grid.cern.ch
+          CVMFS_CACHE_BASE=/var/cache/cvmfs2
+          CVMFS_QUOTA_LIMIT=17000
+          CVMFS_HTTP_PROXY='{{ groups['squid'] | map('extract', hostvars, 'ansible_host') | product([squid_http_port]) | map('join', ':') | join(';') }}'
+          CVMFS_FORCE_SIGNING=True
+
+- hosts: control
+  become: yes
+  gather_facts: no
+  tags: openhpc
+  vars:
+    sussex_shared_slurm_path: /mnt/shared/apps/slurm/current/bin
+    slurm_user_cmds:
+      - sacct
+      - sacctmgr
+      - salloc
+      - sattach
+      - sbatch
+      - sbcast
+      - scancel
+      - scontrol
+      - scrontab
+      - scrun
+      - sdiag
+      - sinfo
+      - sprio
+      - squeue
+      - sreport
+      - srun
+      - sshare
+      - sstat
+      - strigger
+      - munge # not really a user command but lives in same place
+  tasks:
+    - name: Ensure shared slurm binary directory exists
+      file:
+        state: directory
+        path: "{{ sussex_shared_slurm_path }}"
+        owner: root
+        group: root
+        mode: ug=rwX,o=rX
+
+    - name: Copy slurm binaries into shared filesystem
+      copy:
+        remote_src: true
+        src: "/usr/bin/{{ item }}"
+        dest: "{{ sussex_shared_slurm_path }}/{{ item }}"
+      loop: "{{ slurm_user_cmds }}"
