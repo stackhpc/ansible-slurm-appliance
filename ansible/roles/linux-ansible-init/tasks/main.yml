@@ -1,0 +1,46 @@
+---
+
+- name: Install python3-venv
+  package:
+    name: python3-venv
+
+- name: Install dependencies into virtualenv
+  pip:
+    name:
+      - ansible
+      - jmespath
+      - requests
+    state: latest
+    virtualenv: /usr/lib/ansible-init
+    virtualenv_command: python3 -m venv --upgrade-deps
+
+- name: Ensure config directories exist
+  file:
+    state: directory
+    path: "/etc/ansible-init/{{ item }}"
+  loop:
+    - vars
+    - playbooks
+    - includes
+
+- name: Install Ansible config file
+  copy:
+    src: ansible.cfg
+    dest: /etc/ansible-init/ansible.cfg
+
+- name: Install ansible-init script
+  copy:
+    src: ansible-init.py
+    dest: /usr/bin/ansible-init
+    mode: +x
+
+- name: Install systemd unit file
+  copy:
+    src: ansible-init.service
+    dest: /etc/systemd/system/ansible-init.service
+
+- name: Ensure ansible-init service is enabled
+  systemd:
+    daemon_reload: yes
+    name: ansible-init.service
+    enabled: yes

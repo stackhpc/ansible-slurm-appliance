@@ -1,0 +1,18 @@
+[Unit]
+Description=
+Wants=network.target
+After=network-online.target
+ConditionPathExists=!/var/lib/ansible-init.done
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/ansible-init
+ExecStartPost=touch /var/lib/ansible-init.done
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target default.target
