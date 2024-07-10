@@ -1,8 +1,8 @@
 openondemand_servername: "{{ login_fip }}"
 openondemand_auth: basic_pam
 
-openondemand_jupyter_partition: standard
-openondemand_desktop_partition: standard
+openondemand_jupyter_partition: general
+openondemand_desktop_partition: general
 # TODO:
 #openondemand_dashboard_support_url: 
 #openondemand_dashboard_docs_url:

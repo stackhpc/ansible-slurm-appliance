@@ -47,11 +47,11 @@ login
 
 [openondemand_desktop:children]
 # Subset of compute to run a interactive desktops on via Open Ondemand
-compute
+compute # TODO: FIXME
 
 [openondemand_jupyter:children]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
-compute
+compute  # TODO: FIXME
 
 [etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
@@ -71,8 +71,9 @@ cluster
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
 compute
 
-[manila]
+[manila:children]
 # Hosts to configure for manila fileshares
+openhpc
 
 [persist_hostkeys:children]
 # Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
