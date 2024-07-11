@@ -22,7 +22,7 @@
   gather_facts: no
   tags: openhpc
   vars:
-    sussex_shared_slurm_path: /mnt/shared/apps/slurm/current/bin
+    sussex_shared_slurm_path: /exports/slurm-binaries
     slurm_user_cmds:
       - sacct
       - sacctmgr
@@ -45,15 +45,8 @@
       - strigger
       - munge # not really a user command but lives in same place
   tasks:
-    - name: Ensure shared slurm binary directory exists
-      file:
-        state: directory
-        path: "{{ sussex_shared_slurm_path }}"
-        owner: root
-        group: root
-        mode: ug=rwX,o=rX
-
-    - name: Copy slurm binaries into shared filesystem
+    # NB: NFS role ensures sussex_shared_slurm_path exists
+    - name: Copy slurm binaries into nfs exports filesystem
       copy:
         remote_src: true
         src: "/usr/bin/{{ item }}"
