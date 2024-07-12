@@ -45,9 +45,8 @@ openhpc
 # Host to run Open Ondemand server on - subset of login
 login
 
-[openondemand_desktop:children]
-# Subset of compute to run a interactive desktops on via Open Ondemand
-compute # TODO: FIXME
+#[openondemand_desktop:children]
+# defined in specific environment
 
 [openondemand_jupyter:children]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand

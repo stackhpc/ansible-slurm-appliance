@@ -1,7 +1,14 @@
 # can't put this in base due to inventory read order
+# z_ prefix forces it to be read after additional_hosts and hosts
 [nfs:children]
 nfs_server
 
 [cluster:children]
 nfs_server
 squid
+
+[openondemand_desktop:children]
+prd_general
+
+[openondemand_jupyter:children]
+prd_general
