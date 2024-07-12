@@ -41,6 +41,14 @@
   gather_facts: false
   become: yes
   tasks:
+    - name: Fix incorrect permissions on /etc in Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+      # breaks munge
+      file:
+        path: /etc
+        state: directory
+        owner: root
+        group: root
+        mode: u=rwx,go=rx # has g=rwx
     - name: Prevent ssh hanging if shared home is unavailable
       lineinfile:
         path: /etc/profile
