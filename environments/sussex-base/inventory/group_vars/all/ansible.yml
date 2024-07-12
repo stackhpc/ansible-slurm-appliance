@@ -1,4 +1,4 @@
 # Need to use the same private key file for the jumphost and the final host:
-ansible_ssh_private_key_file: "{{ appliances_environment_root }}/../sussex-base/slurm-deploy-v2"
+ansible_ssh_private_key_file: "~/.ssh/slurm-deploy-v2"
 ansible_ssh_common_args: |-
   -o ProxyCommand='ssh -i {{ ansible_ssh_private_key_file }} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -W %h:%p {{ ansible_user }}@{{ login_fip }}'
