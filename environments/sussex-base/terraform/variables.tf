@@ -61,7 +61,7 @@ variable "cluster_image_id" {
 # }
 
 variable "compute" {
-    type = map
+    type = any
     description = <<-EOF
         Mapping defining compute infrastructure. Keys are names of groups. Values are a
         mapping as follows:
