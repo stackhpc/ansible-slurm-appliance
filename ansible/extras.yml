@@ -36,3 +36,11 @@
   tasks:
     - import_role:
         name: persist_hostkeys
+
+- name: Inject ansible-init through demo role
+  hosts: demo
+  tags: demo
+  become: yes
+  tasks:
+    - import_role:
+        name: demo
