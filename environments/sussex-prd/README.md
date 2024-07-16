@@ -56,6 +56,7 @@ cluster is deleted.
 - The `/var/lib/state` directory on the control node (mounted on an Openstack volume) is
 exported to the login node to allow the `persist_hostkeys` role to be used.
 - The cluster uses an OFED image.
+- All hosts have `/mnt/shared` mounted from the `slurm-software` CephFS share.
 
 # Exports and Resources
 

@@ -71,7 +71,7 @@ cluster
 compute
 
 [manila:children]
-# Hosts to configure for manila fileshares
+# Hosts to mount shared software
 openhpc
 
 [persist_hostkeys:children]

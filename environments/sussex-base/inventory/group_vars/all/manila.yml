@@ -1,0 +1,9 @@
+os_manila_mount_shares:
+  - share_name: slurm-software
+    mount_path: /mnt/shared
+    mount_user: root
+    mount_group: root
+    mount_mode: ug=rwx,o=rx
+
+os_manila_mount_ceph_version: '18.2.2' # Reef, https://github.com/universityofsussex-its/artemis-kayobe-config/blob/artemis/2023.1/etc/kayobe/environments/artemis/cephadm.yml#L9
+# TODO: rebuild image for reef
