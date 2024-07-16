@@ -1,0 +1,14 @@
+---
+- name: Test ansible-init has worked
+  hosts: localhost
+  tasks:
+    - name: Echo test message and save to file
+      shell: echo "linux-ansible-init role has been executed" >> /var/log/ansible-init.log
+
+    - name: Display contents of the log file
+      command: cat /var/log/ansible-init.log
+      register: log_output
+
+    - name: Display log output
+      debug:
+        msg: "{{ log_output.stdout }}"

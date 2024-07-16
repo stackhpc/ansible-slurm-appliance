@@ -56,3 +56,5 @@ roles/*
 !roles/ofed/**
 !roles/squid/
 !roles/squid/**
+!/roles/demo/
+!/roles/demo/**

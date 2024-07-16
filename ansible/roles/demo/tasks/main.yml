@@ -1,0 +1,9 @@
+---
+- include_role:
+    name: linux-ansible-init
+
+- name: Install demo ansible-init playbook
+  copy:
+    src: demo-playbook.yml
+    dest: /etc/ansible-init/playbooks/demo.yml
+    
