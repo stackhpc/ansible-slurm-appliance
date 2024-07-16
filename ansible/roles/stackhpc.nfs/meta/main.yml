@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  role_name: nfs
+  author: Holly Silk
+  description: >
+    Role for simple NFS server and client intended for Cluster-as-a-Service cloud deployments
+  company: StackHPC Ltd
+  license: Apache2
+  min_ansible_version: 2.0
+  platforms:
+    - name: EL
+      versions:
+        - 7
+  galaxy_tags:
+    - cloud
+    - openstack
+    - nfs
+
+dependencies: []

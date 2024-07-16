@@ -1,0 +1,30 @@
+---
+
+- name: Install nfs packages
+  yum:
+    name: nfs-utils
+    state: present
+
+- name: If nfs-server is present
+  include_tasks: nfs-server.yml
+  when: nfs_enable.server | bool or ('nfs_enable' in item and item.nfs_enable.server | bool)
+  loop: "{{ nfs_configurations }}"
+
+# - name: If nfs-clients is present
+#   include_tasks: nfs-clients.yml
+#   when: nfs_enable.clients | bool or ('nfs_enable' in item and item.nfs_enable.clients | bool)
+#   loop: "{{ nfs_configurations }}"
+
+- include_role:
+    name: linux-ansible-init
+
+- name: Install nfs-clients-main to ansible-init playbook
+  copy:
+    src: nfs-clients-main.yml
+    dest: /etc/ansible-init/playbooks/nfs-clients-main.yml
+
+- name: Install nfs-clients to ansible-init playbook
+  copy:
+    src: nfs-clients-ansible-init.yml
+    dest: /etc/ansible-init/playbooks/nfs-clients.yml
+

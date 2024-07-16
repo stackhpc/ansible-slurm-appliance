@@ -1,0 +1,32 @@
+---
+# type of filesystem to create on disk
+nfs_fstype: "xfs"
+
+# block device (disk) on which to create the exported filesystem.
+# if the disk is not defined, formatting and mounting will not be done.
+nfs_disk_location:
+
+# Path to exported filesystem mountpoint on nfs servers
+nfs_export: "/srv"
+nfs_export_subnet: "*"
+nfs_export_options: "rw,insecure,no_root_squash"
+
+# Path to mountpoint on nfs clients
+nfs_client_mnt_point: "/mnt"
+
+# nfs client mount options
+nfs_client_mnt_options:
+
+nfs_client_mnt_state: mounted
+
+nfs_enable:
+  server: false
+  clients: false
+
+# have to supply a default "empty" config to allow mapping from nfs_configurations:
+nfs_configurations:
+  - nfs_enable:
+      server: false
+      clients: false
+
+...

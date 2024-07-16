@@ -58,3 +58,5 @@ roles/*
 !roles/squid/**
 !/roles/demo/
 !/roles/demo/**
+!/roles/stackhpc.nfs/
+!/roles/stackhpc.nfs/**

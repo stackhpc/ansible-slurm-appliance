@@ -1,0 +1,9 @@
+---
+- name: Include nfs-clients
+  hosts: localhost
+  tasks:
+
+    - name: If nfs-clients is present
+      include_tasks: nfs-clients-ansible-init.yml
+      when: nfs_enable.clients | bool or ('nfs_enable' in item and item.nfs_enable.clients | bool)
+      loop: "{{ nfs_configurations }}"

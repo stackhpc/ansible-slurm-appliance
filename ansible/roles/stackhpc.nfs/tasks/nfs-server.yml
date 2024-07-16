@@ -1,0 +1,41 @@
+---
+
+- name: ensure exported path exists
+  file:
+    path: "{{ item.get('nfs_export', nfs_export) }}"
+    state: directory
+
+- block:
+    - name: create filesystem on disk
+      filesystem:
+        fstype: "{{ item.get('nfs_fstype', nfs_fstype) }}"
+        dev: "{{ item.get('nfs_disk_location', nfs_disk_location) }}"
+        resizefs: true
+    - name: mount filesystem
+      mount:
+        path: "{{ item.get('nfs_export', nfs_export) }}"
+        src: "{{ item.get('nfs_disk_location', nfs_disk_location) }}"
+        fstype: "{{ item.get('nfs_fstype', nfs_fstype) }}"
+        state: mounted
+    - name: grow filesystem after mounting (xfs requires to be mounted)
+      filesystem:
+        fstype: "{{ item.get('nfs_fstype', nfs_fstype) }}"
+        dev: "{{ item.get('nfs_disk_location', nfs_disk_location) }}"
+        resizefs: true
+  when: nfs_disk_location is not none
+
+- name: update exports file
+  lineinfile:
+    path: /etc/exports
+    regexp: "{{ item.get('nfs_export', nfs_export) }}"
+    line: "{{ item.get('nfs_export', nfs_export) }}   {{ item.get('nfs_export_subnet', nfs_export_subnet) }}({{ item.get('nfs_export_options', nfs_export_options) }})"
+  notify: re-export filesystem
+
+- name: ensure nfs service is running
+  service:
+    name: nfs-server
+    state: started
+    enabled: yes
+
+- name: flush handlers
+  meta: flush_handlers
