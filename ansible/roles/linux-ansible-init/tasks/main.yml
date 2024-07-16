@@ -1,8 +1,9 @@
 ---
 
-# - name: Install python3-venv
+# - name: Install python3-venv on Ubuntu
 #   package:
 #     name: python3-venv
+#   when: ansible_facts['distribution'] == "Ubuntu"
 
 - name: Install dependencies into virtualenv
   pip:
@@ -22,6 +23,7 @@
     - vars
     - playbooks
     - includes
+    - inventory
 
 - name: Install Ansible config file
   copy:

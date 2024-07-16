@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import subprocess
+import yaml
 
 import requests
 
@@ -44,6 +45,13 @@ response = requests.get(METADATA_URL)
 response.raise_for_status()
 user_metadata = response.json().get("meta", {})
 
+# here: get user_metadata['ansible-init-metadata'] and write it as yaml? to etc/ansible-init/inventory/whatever.json/.yaml
+ansible_metadata_str = user_metadata.get('ansible-init-vars', {})
+ansible_metadata = json.loads(ansible_metadata_str)
+ansible_filepath = '/etc/ansible-init/inventory/group_vars/all/nfs-metadata.yml'
+os.makedirs(os.path.dirname(ansible_filepath), exist_ok=True)
+with open(ansible_filepath, 'w') as yaml_file:
+    yaml.dump(ansible_metadata, yaml_file, default_flow_style=False)
 
 logger.info("extracting collections and playbooks from metadata")
 collections = assemble_list(user_metadata, "ansible_init_coll_")
