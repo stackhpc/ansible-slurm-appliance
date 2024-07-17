@@ -37,20 +37,20 @@ login
 [block_devices:children]
 # Environment-specific so not defined here
 
-[basic_users]
+[basic_users:children]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
+openhpc
 
 [openondemand:children]
 # Host to run Open Ondemand server on - subset of login
 login
 
-[openondemand_desktop:children]
-# Subset of compute to run a interactive desktops on via Open Ondemand
-compute
+#[openondemand_desktop:children]
+# defined in specific environment
 
 [openondemand_jupyter:children]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
-compute
+compute  # TODO: FIXME
 
 [etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
@@ -62,20 +62,20 @@ cluster
 [eessi:children]
 openhpc
 
-[resolv_conf]
+[resolv_conf:children]
 # Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md
+cluster
 
 [proxy:children]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
-login
 compute
 
-[manila]
-# Hosts to configure for manila fileshares
+[manila:children]
+# Hosts to mount shared software
+openhpc
 
 [persist_hostkeys:children]
 # Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
 login
 
-[squid:children]
-control
+# [squid:children] # defined directly in hosts.yml

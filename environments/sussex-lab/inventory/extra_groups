@@ -1,8 +1,6 @@
+# can't put this in base due to inventory read order
 [nfs:children]
 nfs_server
 
 [cluster:children]
 nfs_server
-
-[basic_users:children]
-cluster

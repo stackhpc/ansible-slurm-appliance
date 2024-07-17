@@ -3,7 +3,7 @@ all:
         openhpc_cluster_name: ${cluster_name}
         cluster_domain_suffix: ${cluster_domain_suffix}
         login_fip: ${login_fip}
-        ansible_ssh_common_args: -J {{ ansible_user}}@{{ login_fip }}
+        state_volume_size: ${state_volume.size}
 
 control:
     hosts:
@@ -19,6 +19,14 @@ login:
         ${ login.name }:
             ansible_host: ${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]}
             instance_id: ${ login.id }
+%{ endfor ~}
+
+squid:
+    hosts:
+%{ for squid in squid_instances ~}
+        ${ squid.name }:
+            ansible_host: ${[for n in squid.network: n.fixed_ip_v4 if n.access_network][0]}
+            instance_id: ${ squid.id }
 %{ endfor ~}
 
 %{ for group_name in keys(compute_groups) ~}

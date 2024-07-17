@@ -70,7 +70,7 @@ resource "openstack_networking_port_v2" "control_tenant" {
 
 resource "openstack_networking_port_v2" "control_storage" {
 
-  name = "${var.cluster_name}-control-storage"
+  name = "${var.cluster_name}-control"
   network_id = data.openstack_networking_network_v2.storage_net.id
   admin_state_up = "true"
 
@@ -184,6 +184,92 @@ resource "openstack_compute_instance_v2" "login" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
+  EOF
+
+}
+
+resource "openstack_networking_port_v2" "squid_tenant" {
+
+  count = var.squid_nodes_count
+
+  name = "${var.cluster_name}-squid-${count.index}-tenant"
+  network_id = data.openstack_networking_network_v2.tenant_net.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.tenant_subnet.id
+  }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.cluster.id,
+  ]
+
+  binding {
+    vnic_type = var.vnic_type
+    profile = var.vnic_profile
+  }
+}
+
+resource "openstack_networking_port_v2" "squid_storage" {
+
+  count = var.squid_nodes_count
+
+  name = "${var.cluster_name}-squid-${count.index}"
+  network_id = data.openstack_networking_network_v2.storage_net.id
+  admin_state_up = "true"
+
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.storage_subnet.id
+  }
+
+  security_group_ids = [
+    openstack_networking_secgroup_v2.cluster.id
+  ]
+
+  binding {
+    vnic_type = var.vnic_type
+    profile = var.vnic_profile
+  }
+}
+
+resource "openstack_compute_instance_v2" "squid" {
+
+  count = var.squid_nodes_count
+
+  name = "${var.cluster_name}-squid-${count.index}"
+  image_id = var.cluster_image_id
+  flavor_name = var.squid_flavor
+  key_pair = var.key_pair
+
+  dynamic "block_device" {
+    for_each = var.volume_backed_instances ? [1]: []
+    content {
+      uuid = var.cluster_image_id
+      source_type  = "image"
+      destination_type = "volume"
+      volume_size = var.root_volume_size
+      boot_index = 0
+      delete_on_termination = true
+    }
+  }
+
+  network {
+    port = openstack_networking_port_v2.squid_storage[count.index].id
+    access_network = true # using FIP as proxyjump
+  }
+
+  network {
+    port = openstack_networking_port_v2.squid_tenant[count.index].id
+    access_network = false
+  }
+
+  metadata = {
+    environment_root = var.environment_root
+  }
+
+  user_data = <<-EOF
+    #cloud-config
+    fqdn: ${var.cluster_name}-squid-${count.index}.${var.cluster_name}.${var.cluster_domain_suffix}
   EOF
 
 }

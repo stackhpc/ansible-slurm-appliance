@@ -1,0 +1,2931 @@
+basic_users_users_staff:
+  - name: reese.wilkinson
+    password: "{{ vault_reese_wilkinson_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+    uid: 1005
+    public_key: >
+      ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2QS2GsvGLBhgKd2cQ0qCNZXn0aH6IXgv0sStox+s6ln
+      hWAvz7t31r0yVy7C9/SAvLYdfoaWtfKhqqiF6p9DkjVQ53YPu0MfBkXnZf6/8096M5ckghQUZo8qNlH1Zm
+      597Jl5o1Hn8vR0fa06b1WtOXqVG2pb9mHr3iJ5VC1cB2kmO30cCKKUAMF+kn9QGWN0GLdv12JSdhozchSp
+      0aZqBBAxhv/TIK8UDir2gL6u1A3wcD/59lFNelWkpEb1hM3jqfW/G4vJZQW0fvlYY2p1uZ2QkXa2ZxladV
+      tONhlYXbIq6qYWfsJh1auIDtG+k6j56ImhHjEAHnHu0VtjZI912I6Zb0PGR1iQKFdXxXQ/2p3aiVdeWtPz
+      KqM866/iGvejhfgoUc5cXmEc3DQGfmhDmxe5kAnQ7VBz4Tlk1UtKP94P1NhKS60fwmx3Vh0gpiB7ie94FW
+      uZkbTWU8Xy47ifG5t3PoPGNB+0c45HcJa8swG2aYHisXILY51MCyGmyoUtU= rw264@Khaladin
+    shell: /bin/bash # allows login to control node (non-default)
+    append: true
+    groups:
+      - adm # enables ssh to control nodes even without a job running
+      - systemd-journal
+    sudo: reese.wilkinson ALL=(ALL) NOPASSWD:ALL
+  - name: sussex_admin
+    password: "{{ vault_sussex_admin_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+    uid: 1006
+    public_key: >
+      ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2QS2GsvGLBhgKd2cQ0qCNZXn0aH6IXgv0sStox+s6ln
+      hWAvz7t31r0yVy7C9/SAvLYdfoaWtfKhqqiF6p9DkjVQ53YPu0MfBkXnZf6/8096M5ckghQUZo8qNlH1Zm
+      597Jl5o1Hn8vR0fa06b1WtOXqVG2pb9mHr3iJ5VC1cB2kmO30cCKKUAMF+kn9QGWN0GLdv12JSdhozchSp
+      0aZqBBAxhv/TIK8UDir2gL6u1A3wcD/59lFNelWkpEb1hM3jqfW/G4vJZQW0fvlYY2p1uZ2QkXa2ZxladV
+      tONhlYXbIq6qYWfsJh1auIDtG+k6j56ImhHjEAHnHu0VtjZI912I6Zb0PGR1iQKFdXxXQ/2p3aiVdeWtPz
+      KqM866/iGvejhfgoUc5cXmEc3DQGfmhDmxe5kAnQ7VBz4Tlk1UtKP94P1NhKS60fwmx3Vh0gpiB7ie94FW
+      uZkbTWU8Xy47ifG5t3PoPGNB+0c45HcJa8swG2aYHisXILY51MCyGmyoUtU= rw264@Khaladin
+    shell: /bin/bash # allows login to control node (non-default)
+    append: true
+    groups:
+      - adm # enables ssh to control nodes even without a job running
+      - systemd-journal
+    sudo: sussex_admin ALL=(ALL) NOPASSWD:ALL
+
+basic_users_groups_grid:
+  - gid: 72000
+    name: atlas
+  - gid: 72100
+    name: atlas_prd
+  - gid: 72200
+    name: atlas_pil
+  - gid: 70000
+    name: dteam
+  - gid: 70100
+    name: dteam_prd
+  - gid: 70200
+    name: dteam_pil
+  - gid: 71000
+    name: ops
+  - gid: 71100
+    name: ops_prd
+  - gid: 71200
+    name: ops_pil
+
+# override the basic_users logic for grid users
+# as home is not on a shared directory
+basic_users_users_grid_defaults:
+  create_home: true
+  generate_ssh_key: false
+
+basic_users_users_grid:
+  - group: atlas
+    home: /local/grid
+    name: atlas_sgm
+    shell: /bin/bash
+    uid: 72000
+  - group: atlas
+    home: /local/grid/atlas001
+    name: atlas001
+    shell: /bin/bash
+    uid: 72001
+  - group: atlas
+    home: /local/grid/atlas002
+    name: atlas002
+    shell: /bin/bash
+    uid: 72002
+  - group: atlas
+    home: /local/grid/atlas003
+    name: atlas003
+    shell: /bin/bash
+    uid: 72003
+  - group: atlas
+    home: /local/grid/atlas004
+    name: atlas004
+    shell: /bin/bash
+    uid: 72004
+  - group: atlas
+    home: /local/grid/atlas005
+    name: atlas005
+    shell: /bin/bash
+    uid: 72005
+  - group: atlas
+    home: /local/grid/atlas006
+    name: atlas006
+    shell: /bin/bash
+    uid: 72006
+  - group: atlas
+    home: /local/grid/atlas007
+    name: atlas007
+    shell: /bin/bash
+    uid: 72007
+  - group: atlas
+    home: /local/grid/atlas008
+    name: atlas008
+    shell: /bin/bash
+    uid: 72008
+  - group: atlas
+    home: /local/grid/atlas009
+    name: atlas009
+    shell: /bin/bash
+    uid: 72009
+  - group: atlas
+    home: /local/grid/atlas010
+    name: atlas010
+    shell: /bin/bash
+    uid: 72010
+  - group: atlas
+    home: /local/grid/atlas011
+    name: atlas011
+    shell: /bin/bash
+    uid: 72011
+  - group: atlas
+    home: /local/grid/atlas012
+    name: atlas012
+    shell: /bin/bash
+    uid: 72012
+  - group: atlas
+    home: /local/grid/atlas013
+    name: atlas013
+    shell: /bin/bash
+    uid: 72013
+  - group: atlas
+    home: /local/grid/atlas014
+    name: atlas014
+    shell: /bin/bash
+    uid: 72014
+  - group: atlas
+    home: /local/grid/atlas015
+    name: atlas015
+    shell: /bin/bash
+    uid: 72015
+  - group: atlas
+    home: /local/grid/atlas016
+    name: atlas016
+    shell: /bin/bash
+    uid: 72016
+  - group: atlas
+    home: /local/grid/atlas017
+    name: atlas017
+    shell: /bin/bash
+    uid: 72017
+  - group: atlas
+    home: /local/grid/atlas018
+    name: atlas018
+    shell: /bin/bash
+    uid: 72018
+  - group: atlas
+    home: /local/grid/atlas019
+    name: atlas019
+    shell: /bin/bash
+    uid: 72019
+  - group: atlas
+    home: /local/grid/atlas020
+    name: atlas020
+    shell: /bin/bash
+    uid: 72020
+  - group: atlas
+    home: /local/grid/atlas021
+    name: atlas021
+    shell: /bin/bash
+    uid: 72021
+  - group: atlas
+    home: /local/grid/atlas022
+    name: atlas022
+    shell: /bin/bash
+    uid: 72022
+  - group: atlas
+    home: /local/grid/atlas023
+    name: atlas023
+    shell: /bin/bash
+    uid: 72023
+  - group: atlas
+    home: /local/grid/atlas024
+    name: atlas024
+    shell: /bin/bash
+    uid: 72024
+  - group: atlas
+    home: /local/grid/atlas025
+    name: atlas025
+    shell: /bin/bash
+    uid: 72025
+  - group: atlas
+    home: /local/grid/atlas026
+    name: atlas026
+    shell: /bin/bash
+    uid: 72026
+  - group: atlas
+    home: /local/grid/atlas027
+    name: atlas027
+    shell: /bin/bash
+    uid: 72027
+  - group: atlas
+    home: /local/grid/atlas028
+    name: atlas028
+    shell: /bin/bash
+    uid: 72028
+  - group: atlas
+    home: /local/grid/atlas029
+    name: atlas029
+    shell: /bin/bash
+    uid: 72029
+  - group: atlas
+    home: /local/grid/atlas030
+    name: atlas030
+    shell: /bin/bash
+    uid: 72030
+  - group: atlas
+    home: /local/grid/atlas031
+    name: atlas031
+    shell: /bin/bash
+    uid: 72031
+  - group: atlas
+    home: /local/grid/atlas032
+    name: atlas032
+    shell: /bin/bash
+    uid: 72032
+  - group: atlas
+    home: /local/grid/atlas033
+    name: atlas033
+    shell: /bin/bash
+    uid: 72033
+  - group: atlas
+    home: /local/grid/atlas034
+    name: atlas034
+    shell: /bin/bash
+    uid: 72034
+  - group: atlas
+    home: /local/grid/atlas035
+    name: atlas035
+    shell: /bin/bash
+    uid: 72035
+  - group: atlas
+    home: /local/grid/atlas036
+    name: atlas036
+    shell: /bin/bash
+    uid: 72036
+  - group: atlas
+    home: /local/grid/atlas037
+    name: atlas037
+    shell: /bin/bash
+    uid: 72037
+  - group: atlas
+    home: /local/grid/atlas038
+    name: atlas038
+    shell: /bin/bash
+    uid: 72038
+  - group: atlas
+    home: /local/grid/atlas039
+    name: atlas039
+    shell: /bin/bash
+    uid: 72039
+  - group: atlas
+    home: /local/grid/atlas040
+    name: atlas040
+    shell: /bin/bash
+    uid: 72040
+  - group: atlas
+    home: /local/grid/atlas041
+    name: atlas041
+    shell: /bin/bash
+    uid: 72041
+  - group: atlas
+    home: /local/grid/atlas042
+    name: atlas042
+    shell: /bin/bash
+    uid: 72042
+  - group: atlas
+    home: /local/grid/atlas043
+    name: atlas043
+    shell: /bin/bash
+    uid: 72043
+  - group: atlas
+    home: /local/grid/atlas044
+    name: atlas044
+    shell: /bin/bash
+    uid: 72044
+  - group: atlas
+    home: /local/grid/atlas045
+    name: atlas045
+    shell: /bin/bash
+    uid: 72045
+  - group: atlas
+    home: /local/grid/atlas046
+    name: atlas046
+    shell: /bin/bash
+    uid: 72046
+  - group: atlas
+    home: /local/grid/atlas047
+    name: atlas047
+    shell: /bin/bash
+    uid: 72047
+  - group: atlas
+    home: /local/grid/atlas048
+    name: atlas048
+    shell: /bin/bash
+    uid: 72048
+  - group: atlas
+    home: /local/grid/atlas049
+    name: atlas049
+    shell: /bin/bash
+    uid: 72049
+  - group: atlas
+    home: /local/grid/atlas050
+    name: atlas050
+    shell: /bin/bash
+    uid: 72050
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd001
+    name: atlas_prd001
+    shell: /bin/bash
+    uid: 72101
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd002
+    name: atlas_prd002
+    shell: /bin/bash
+    uid: 72102
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd003
+    name: atlas_prd003
+    shell: /bin/bash
+    uid: 72103
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd004
+    name: atlas_prd004
+    shell: /bin/bash
+    uid: 72104
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd005
+    name: atlas_prd005
+    shell: /bin/bash
+    uid: 72105
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd006
+    name: atlas_prd006
+    shell: /bin/bash
+    uid: 72106
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd007
+    name: atlas_prd007
+    shell: /bin/bash
+    uid: 72107
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd008
+    name: atlas_prd008
+    shell: /bin/bash
+    uid: 72108
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd009
+    name: atlas_prd009
+    shell: /bin/bash
+    uid: 72109
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd010
+    name: atlas_prd010
+    shell: /bin/bash
+    uid: 72110
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd011
+    name: atlas_prd011
+    shell: /bin/bash
+    uid: 72111
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd012
+    name: atlas_prd012
+    shell: /bin/bash
+    uid: 72112
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd013
+    name: atlas_prd013
+    shell: /bin/bash
+    uid: 72113
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd014
+    name: atlas_prd014
+    shell: /bin/bash
+    uid: 72114
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd015
+    name: atlas_prd015
+    shell: /bin/bash
+    uid: 72115
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd016
+    name: atlas_prd016
+    shell: /bin/bash
+    uid: 72116
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd017
+    name: atlas_prd017
+    shell: /bin/bash
+    uid: 72117
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd018
+    name: atlas_prd018
+    shell: /bin/bash
+    uid: 72118
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd019
+    name: atlas_prd019
+    shell: /bin/bash
+    uid: 72119
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd020
+    name: atlas_prd020
+    shell: /bin/bash
+    uid: 72120
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd021
+    name: atlas_prd021
+    shell: /bin/bash
+    uid: 72121
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd022
+    name: atlas_prd022
+    shell: /bin/bash
+    uid: 72122
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd023
+    name: atlas_prd023
+    shell: /bin/bash
+    uid: 72123
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd024
+    name: atlas_prd024
+    shell: /bin/bash
+    uid: 72124
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd025
+    name: atlas_prd025
+    shell: /bin/bash
+    uid: 72125
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd026
+    name: atlas_prd026
+    shell: /bin/bash
+    uid: 72126
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd027
+    name: atlas_prd027
+    shell: /bin/bash
+    uid: 72127
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd028
+    name: atlas_prd028
+    shell: /bin/bash
+    uid: 72128
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd029
+    name: atlas_prd029
+    shell: /bin/bash
+    uid: 72129
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd030
+    name: atlas_prd030
+    shell: /bin/bash
+    uid: 72130
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd031
+    name: atlas_prd031
+    shell: /bin/bash
+    uid: 72131
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd032
+    name: atlas_prd032
+    shell: /bin/bash
+    uid: 72132
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd033
+    name: atlas_prd033
+    shell: /bin/bash
+    uid: 72133
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd034
+    name: atlas_prd034
+    shell: /bin/bash
+    uid: 72134
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd035
+    name: atlas_prd035
+    shell: /bin/bash
+    uid: 72135
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd036
+    name: atlas_prd036
+    shell: /bin/bash
+    uid: 72136
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd037
+    name: atlas_prd037
+    shell: /bin/bash
+    uid: 72137
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd038
+    name: atlas_prd038
+    shell: /bin/bash
+    uid: 72138
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd039
+    name: atlas_prd039
+    shell: /bin/bash
+    uid: 72139
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd040
+    name: atlas_prd040
+    shell: /bin/bash
+    uid: 72140
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd041
+    name: atlas_prd041
+    shell: /bin/bash
+    uid: 72141
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd042
+    name: atlas_prd042
+    shell: /bin/bash
+    uid: 72142
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd043
+    name: atlas_prd043
+    shell: /bin/bash
+    uid: 72143
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd044
+    name: atlas_prd044
+    shell: /bin/bash
+    uid: 72144
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd045
+    name: atlas_prd045
+    shell: /bin/bash
+    uid: 72145
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd046
+    name: atlas_prd046
+    shell: /bin/bash
+    uid: 72146
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd047
+    name: atlas_prd047
+    shell: /bin/bash
+    uid: 72147
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd048
+    name: atlas_prd048
+    shell: /bin/bash
+    uid: 72148
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd049
+    name: atlas_prd049
+    shell: /bin/bash
+    uid: 72149
+  - group: atlas_prd
+    groups:
+    - atlas
+    home: /local/grid/atlas_prd050
+    name: atlas_prd050
+    shell: /bin/bash
+    uid: 72150
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil001
+    name: atlas_pil001
+    shell: /bin/bash
+    uid: 72201
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil002
+    name: atlas_pil002
+    shell: /bin/bash
+    uid: 72202
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil003
+    name: atlas_pil003
+    shell: /bin/bash
+    uid: 72203
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil004
+    name: atlas_pil004
+    shell: /bin/bash
+    uid: 72204
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil005
+    name: atlas_pil005
+    shell: /bin/bash
+    uid: 72205
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil006
+    name: atlas_pil006
+    shell: /bin/bash
+    uid: 72206
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil007
+    name: atlas_pil007
+    shell: /bin/bash
+    uid: 72207
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil008
+    name: atlas_pil008
+    shell: /bin/bash
+    uid: 72208
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil009
+    name: atlas_pil009
+    shell: /bin/bash
+    uid: 72209
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil010
+    name: atlas_pil010
+    shell: /bin/bash
+    uid: 72210
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil011
+    name: atlas_pil011
+    shell: /bin/bash
+    uid: 72211
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil012
+    name: atlas_pil012
+    shell: /bin/bash
+    uid: 72212
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil013
+    name: atlas_pil013
+    shell: /bin/bash
+    uid: 72213
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil014
+    name: atlas_pil014
+    shell: /bin/bash
+    uid: 72214
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil015
+    name: atlas_pil015
+    shell: /bin/bash
+    uid: 72215
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil016
+    name: atlas_pil016
+    shell: /bin/bash
+    uid: 72216
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil017
+    name: atlas_pil017
+    shell: /bin/bash
+    uid: 72217
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil018
+    name: atlas_pil018
+    shell: /bin/bash
+    uid: 72218
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil019
+    name: atlas_pil019
+    shell: /bin/bash
+    uid: 72219
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil020
+    name: atlas_pil020
+    shell: /bin/bash
+    uid: 72220
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil021
+    name: atlas_pil021
+    shell: /bin/bash
+    uid: 72221
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil022
+    name: atlas_pil022
+    shell: /bin/bash
+    uid: 72222
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil023
+    name: atlas_pil023
+    shell: /bin/bash
+    uid: 72223
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil024
+    name: atlas_pil024
+    shell: /bin/bash
+    uid: 72224
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil025
+    name: atlas_pil025
+    shell: /bin/bash
+    uid: 72225
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil026
+    name: atlas_pil026
+    shell: /bin/bash
+    uid: 72226
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil027
+    name: atlas_pil027
+    shell: /bin/bash
+    uid: 72227
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil028
+    name: atlas_pil028
+    shell: /bin/bash
+    uid: 72228
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil029
+    name: atlas_pil029
+    shell: /bin/bash
+    uid: 72229
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil030
+    name: atlas_pil030
+    shell: /bin/bash
+    uid: 72230
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil031
+    name: atlas_pil031
+    shell: /bin/bash
+    uid: 72231
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil032
+    name: atlas_pil032
+    shell: /bin/bash
+    uid: 72232
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil033
+    name: atlas_pil033
+    shell: /bin/bash
+    uid: 72233
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil034
+    name: atlas_pil034
+    shell: /bin/bash
+    uid: 72234
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil035
+    name: atlas_pil035
+    shell: /bin/bash
+    uid: 72235
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil036
+    name: atlas_pil036
+    shell: /bin/bash
+    uid: 72236
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil037
+    name: atlas_pil037
+    shell: /bin/bash
+    uid: 72237
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil038
+    name: atlas_pil038
+    shell: /bin/bash
+    uid: 72238
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil039
+    name: atlas_pil039
+    shell: /bin/bash
+    uid: 72239
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil040
+    name: atlas_pil040
+    shell: /bin/bash
+    uid: 72240
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil041
+    name: atlas_pil041
+    shell: /bin/bash
+    uid: 72241
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil042
+    name: atlas_pil042
+    shell: /bin/bash
+    uid: 72242
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil043
+    name: atlas_pil043
+    shell: /bin/bash
+    uid: 72243
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil044
+    name: atlas_pil044
+    shell: /bin/bash
+    uid: 72244
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil045
+    name: atlas_pil045
+    shell: /bin/bash
+    uid: 72245
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil046
+    name: atlas_pil046
+    shell: /bin/bash
+    uid: 72246
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil047
+    name: atlas_pil047
+    shell: /bin/bash
+    uid: 72247
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil048
+    name: atlas_pil048
+    shell: /bin/bash
+    uid: 72248
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil049
+    name: atlas_pil049
+    shell: /bin/bash
+    uid: 72249
+  - group: atlas_pil
+    groups:
+    - atlas
+    home: /local/grid/atlas_pil050
+    name: atlas_pil050
+    shell: /bin/bash
+    uid: 72250
+  - group: dteam
+    home: /local/grid/dteam001
+    name: dteam001
+    shell: /bin/bash
+    uid: 70001
+  - group: dteam
+    home: /local/grid/dteam002
+    name: dteam002
+    shell: /bin/bash
+    uid: 70002
+  - group: dteam
+    home: /local/grid/dteam003
+    name: dteam003
+    shell: /bin/bash
+    uid: 70003
+  - group: dteam
+    home: /local/grid/dteam004
+    name: dteam004
+    shell: /bin/bash
+    uid: 70004
+  - group: dteam
+    home: /local/grid/dteam005
+    name: dteam005
+    shell: /bin/bash
+    uid: 70005
+  - group: dteam
+    home: /local/grid/dteam006
+    name: dteam006
+    shell: /bin/bash
+    uid: 70006
+  - group: dteam
+    home: /local/grid/dteam007
+    name: dteam007
+    shell: /bin/bash
+    uid: 70007
+  - group: dteam
+    home: /local/grid/dteam008
+    name: dteam008
+    shell: /bin/bash
+    uid: 70008
+  - group: dteam
+    home: /local/grid/dteam009
+    name: dteam009
+    shell: /bin/bash
+    uid: 70009
+  - group: dteam
+    home: /local/grid/dteam010
+    name: dteam010
+    shell: /bin/bash
+    uid: 70010
+  - group: dteam
+    home: /local/grid/dteam011
+    name: dteam011
+    shell: /bin/bash
+    uid: 70011
+  - group: dteam
+    home: /local/grid/dteam012
+    name: dteam012
+    shell: /bin/bash
+    uid: 70012
+  - group: dteam
+    home: /local/grid/dteam013
+    name: dteam013
+    shell: /bin/bash
+    uid: 70013
+  - group: dteam
+    home: /local/grid/dteam014
+    name: dteam014
+    shell: /bin/bash
+    uid: 70014
+  - group: dteam
+    home: /local/grid/dteam015
+    name: dteam015
+    shell: /bin/bash
+    uid: 70015
+  - group: dteam
+    home: /local/grid/dteam016
+    name: dteam016
+    shell: /bin/bash
+    uid: 70016
+  - group: dteam
+    home: /local/grid/dteam017
+    name: dteam017
+    shell: /bin/bash
+    uid: 70017
+  - group: dteam
+    home: /local/grid/dteam018
+    name: dteam018
+    shell: /bin/bash
+    uid: 70018
+  - group: dteam
+    home: /local/grid/dteam019
+    name: dteam019
+    shell: /bin/bash
+    uid: 70019
+  - group: dteam
+    home: /local/grid/dteam020
+    name: dteam020
+    shell: /bin/bash
+    uid: 70020
+  - group: dteam
+    home: /local/grid/dteam021
+    name: dteam021
+    shell: /bin/bash
+    uid: 70021
+  - group: dteam
+    home: /local/grid/dteam022
+    name: dteam022
+    shell: /bin/bash
+    uid: 70022
+  - group: dteam
+    home: /local/grid/dteam023
+    name: dteam023
+    shell: /bin/bash
+    uid: 70023
+  - group: dteam
+    home: /local/grid/dteam024
+    name: dteam024
+    shell: /bin/bash
+    uid: 70024
+  - group: dteam
+    home: /local/grid/dteam025
+    name: dteam025
+    shell: /bin/bash
+    uid: 70025
+  - group: dteam
+    home: /local/grid/dteam026
+    name: dteam026
+    shell: /bin/bash
+    uid: 70026
+  - group: dteam
+    home: /local/grid/dteam027
+    name: dteam027
+    shell: /bin/bash
+    uid: 70027
+  - group: dteam
+    home: /local/grid/dteam028
+    name: dteam028
+    shell: /bin/bash
+    uid: 70028
+  - group: dteam
+    home: /local/grid/dteam029
+    name: dteam029
+    shell: /bin/bash
+    uid: 70029
+  - group: dteam
+    home: /local/grid/dteam030
+    name: dteam030
+    shell: /bin/bash
+    uid: 70030
+  - group: dteam
+    home: /local/grid/dteam031
+    name: dteam031
+    shell: /bin/bash
+    uid: 70031
+  - group: dteam
+    home: /local/grid/dteam032
+    name: dteam032
+    shell: /bin/bash
+    uid: 70032
+  - group: dteam
+    home: /local/grid/dteam033
+    name: dteam033
+    shell: /bin/bash
+    uid: 70033
+  - group: dteam
+    home: /local/grid/dteam034
+    name: dteam034
+    shell: /bin/bash
+    uid: 70034
+  - group: dteam
+    home: /local/grid/dteam035
+    name: dteam035
+    shell: /bin/bash
+    uid: 70035
+  - group: dteam
+    home: /local/grid/dteam036
+    name: dteam036
+    shell: /bin/bash
+    uid: 70036
+  - group: dteam
+    home: /local/grid/dteam037
+    name: dteam037
+    shell: /bin/bash
+    uid: 70037
+  - group: dteam
+    home: /local/grid/dteam038
+    name: dteam038
+    shell: /bin/bash
+    uid: 70038
+  - group: dteam
+    home: /local/grid/dteam039
+    name: dteam039
+    shell: /bin/bash
+    uid: 70039
+  - group: dteam
+    home: /local/grid/dteam040
+    name: dteam040
+    shell: /bin/bash
+    uid: 70040
+  - group: dteam
+    home: /local/grid/dteam041
+    name: dteam041
+    shell: /bin/bash
+    uid: 70041
+  - group: dteam
+    home: /local/grid/dteam042
+    name: dteam042
+    shell: /bin/bash
+    uid: 70042
+  - group: dteam
+    home: /local/grid/dteam043
+    name: dteam043
+    shell: /bin/bash
+    uid: 70043
+  - group: dteam
+    home: /local/grid/dteam044
+    name: dteam044
+    shell: /bin/bash
+    uid: 70044
+  - group: dteam
+    home: /local/grid/dteam045
+    name: dteam045
+    shell: /bin/bash
+    uid: 70045
+  - group: dteam
+    home: /local/grid/dteam046
+    name: dteam046
+    shell: /bin/bash
+    uid: 70046
+  - group: dteam
+    home: /local/grid/dteam047
+    name: dteam047
+    shell: /bin/bash
+    uid: 70047
+  - group: dteam
+    home: /local/grid/dteam048
+    name: dteam048
+    shell: /bin/bash
+    uid: 70048
+  - group: dteam
+    home: /local/grid/dteam049
+    name: dteam049
+    shell: /bin/bash
+    uid: 70049
+  - group: dteam
+    home: /local/grid/dteam050
+    name: dteam050
+    shell: /bin/bash
+    uid: 70050
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd001
+    name: dteam_prd001
+    shell: /bin/bash
+    uid: 70101
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd002
+    name: dteam_prd002
+    shell: /bin/bash
+    uid: 70102
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd003
+    name: dteam_prd003
+    shell: /bin/bash
+    uid: 70103
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd004
+    name: dteam_prd004
+    shell: /bin/bash
+    uid: 70104
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd005
+    name: dteam_prd005
+    shell: /bin/bash
+    uid: 70105
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd006
+    name: dteam_prd006
+    shell: /bin/bash
+    uid: 70106
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd007
+    name: dteam_prd007
+    shell: /bin/bash
+    uid: 70107
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd008
+    name: dteam_prd008
+    shell: /bin/bash
+    uid: 70108
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd009
+    name: dteam_prd009
+    shell: /bin/bash
+    uid: 70109
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd010
+    name: dteam_prd010
+    shell: /bin/bash
+    uid: 70110
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd011
+    name: dteam_prd011
+    shell: /bin/bash
+    uid: 70111
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd012
+    name: dteam_prd012
+    shell: /bin/bash
+    uid: 70112
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd013
+    name: dteam_prd013
+    shell: /bin/bash
+    uid: 70113
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd014
+    name: dteam_prd014
+    shell: /bin/bash
+    uid: 70114
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd015
+    name: dteam_prd015
+    shell: /bin/bash
+    uid: 70115
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd016
+    name: dteam_prd016
+    shell: /bin/bash
+    uid: 70116
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd017
+    name: dteam_prd017
+    shell: /bin/bash
+    uid: 70117
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd018
+    name: dteam_prd018
+    shell: /bin/bash
+    uid: 70118
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd019
+    name: dteam_prd019
+    shell: /bin/bash
+    uid: 70119
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd020
+    name: dteam_prd020
+    shell: /bin/bash
+    uid: 70120
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd021
+    name: dteam_prd021
+    shell: /bin/bash
+    uid: 70121
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd022
+    name: dteam_prd022
+    shell: /bin/bash
+    uid: 70122
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd023
+    name: dteam_prd023
+    shell: /bin/bash
+    uid: 70123
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd024
+    name: dteam_prd024
+    shell: /bin/bash
+    uid: 70124
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd025
+    name: dteam_prd025
+    shell: /bin/bash
+    uid: 70125
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd026
+    name: dteam_prd026
+    shell: /bin/bash
+    uid: 70126
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd027
+    name: dteam_prd027
+    shell: /bin/bash
+    uid: 70127
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd028
+    name: dteam_prd028
+    shell: /bin/bash
+    uid: 70128
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd029
+    name: dteam_prd029
+    shell: /bin/bash
+    uid: 70129
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd030
+    name: dteam_prd030
+    shell: /bin/bash
+    uid: 70130
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd031
+    name: dteam_prd031
+    shell: /bin/bash
+    uid: 70131
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd032
+    name: dteam_prd032
+    shell: /bin/bash
+    uid: 70132
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd033
+    name: dteam_prd033
+    shell: /bin/bash
+    uid: 70133
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd034
+    name: dteam_prd034
+    shell: /bin/bash
+    uid: 70134
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd035
+    name: dteam_prd035
+    shell: /bin/bash
+    uid: 70135
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd036
+    name: dteam_prd036
+    shell: /bin/bash
+    uid: 70136
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd037
+    name: dteam_prd037
+    shell: /bin/bash
+    uid: 70137
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd038
+    name: dteam_prd038
+    shell: /bin/bash
+    uid: 70138
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd039
+    name: dteam_prd039
+    shell: /bin/bash
+    uid: 70139
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd040
+    name: dteam_prd040
+    shell: /bin/bash
+    uid: 70140
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd041
+    name: dteam_prd041
+    shell: /bin/bash
+    uid: 70141
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd042
+    name: dteam_prd042
+    shell: /bin/bash
+    uid: 70142
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd043
+    name: dteam_prd043
+    shell: /bin/bash
+    uid: 70143
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd044
+    name: dteam_prd044
+    shell: /bin/bash
+    uid: 70144
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd045
+    name: dteam_prd045
+    shell: /bin/bash
+    uid: 70145
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd046
+    name: dteam_prd046
+    shell: /bin/bash
+    uid: 70146
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd047
+    name: dteam_prd047
+    shell: /bin/bash
+    uid: 70147
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd048
+    name: dteam_prd048
+    shell: /bin/bash
+    uid: 70148
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd049
+    name: dteam_prd049
+    shell: /bin/bash
+    uid: 70149
+  - group: dteam_prd
+    groups:
+    - dteam
+    home: /local/grid/dteam_prd050
+    name: dteam_prd050
+    shell: /bin/bash
+    uid: 70150
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil001
+    name: dteam_pil001
+    shell: /bin/bash
+    uid: 70201
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil002
+    name: dteam_pil002
+    shell: /bin/bash
+    uid: 70202
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil003
+    name: dteam_pil003
+    shell: /bin/bash
+    uid: 70203
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil004
+    name: dteam_pil004
+    shell: /bin/bash
+    uid: 70204
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil005
+    name: dteam_pil005
+    shell: /bin/bash
+    uid: 70205
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil006
+    name: dteam_pil006
+    shell: /bin/bash
+    uid: 70206
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil007
+    name: dteam_pil007
+    shell: /bin/bash
+    uid: 70207
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil008
+    name: dteam_pil008
+    shell: /bin/bash
+    uid: 70208
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil009
+    name: dteam_pil009
+    shell: /bin/bash
+    uid: 70209
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil010
+    name: dteam_pil010
+    shell: /bin/bash
+    uid: 70210
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil011
+    name: dteam_pil011
+    shell: /bin/bash
+    uid: 70211
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil012
+    name: dteam_pil012
+    shell: /bin/bash
+    uid: 70212
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil013
+    name: dteam_pil013
+    shell: /bin/bash
+    uid: 70213
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil014
+    name: dteam_pil014
+    shell: /bin/bash
+    uid: 70214
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil015
+    name: dteam_pil015
+    shell: /bin/bash
+    uid: 70215
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil016
+    name: dteam_pil016
+    shell: /bin/bash
+    uid: 70216
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil017
+    name: dteam_pil017
+    shell: /bin/bash
+    uid: 70217
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil018
+    name: dteam_pil018
+    shell: /bin/bash
+    uid: 70218
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil019
+    name: dteam_pil019
+    shell: /bin/bash
+    uid: 70219
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil020
+    name: dteam_pil020
+    shell: /bin/bash
+    uid: 70220
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil021
+    name: dteam_pil021
+    shell: /bin/bash
+    uid: 70221
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil022
+    name: dteam_pil022
+    shell: /bin/bash
+    uid: 70222
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil023
+    name: dteam_pil023
+    shell: /bin/bash
+    uid: 70223
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil024
+    name: dteam_pil024
+    shell: /bin/bash
+    uid: 70224
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil025
+    name: dteam_pil025
+    shell: /bin/bash
+    uid: 70225
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil026
+    name: dteam_pil026
+    shell: /bin/bash
+    uid: 70226
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil027
+    name: dteam_pil027
+    shell: /bin/bash
+    uid: 70227
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil028
+    name: dteam_pil028
+    shell: /bin/bash
+    uid: 70228
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil029
+    name: dteam_pil029
+    shell: /bin/bash
+    uid: 70229
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil030
+    name: dteam_pil030
+    shell: /bin/bash
+    uid: 70230
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil031
+    name: dteam_pil031
+    shell: /bin/bash
+    uid: 70231
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil032
+    name: dteam_pil032
+    shell: /bin/bash
+    uid: 70232
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil033
+    name: dteam_pil033
+    shell: /bin/bash
+    uid: 70233
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil034
+    name: dteam_pil034
+    shell: /bin/bash
+    uid: 70234
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil035
+    name: dteam_pil035
+    shell: /bin/bash
+    uid: 70235
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil036
+    name: dteam_pil036
+    shell: /bin/bash
+    uid: 70236
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil037
+    name: dteam_pil037
+    shell: /bin/bash
+    uid: 70237
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil038
+    name: dteam_pil038
+    shell: /bin/bash
+    uid: 70238
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil039
+    name: dteam_pil039
+    shell: /bin/bash
+    uid: 70239
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil040
+    name: dteam_pil040
+    shell: /bin/bash
+    uid: 70240
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil041
+    name: dteam_pil041
+    shell: /bin/bash
+    uid: 70241
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil042
+    name: dteam_pil042
+    shell: /bin/bash
+    uid: 70242
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil043
+    name: dteam_pil043
+    shell: /bin/bash
+    uid: 70243
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil044
+    name: dteam_pil044
+    shell: /bin/bash
+    uid: 70244
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil045
+    name: dteam_pil045
+    shell: /bin/bash
+    uid: 70245
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil046
+    name: dteam_pil046
+    shell: /bin/bash
+    uid: 70246
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil047
+    name: dteam_pil047
+    shell: /bin/bash
+    uid: 70247
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil048
+    name: dteam_pil048
+    shell: /bin/bash
+    uid: 70248
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil049
+    name: dteam_pil049
+    shell: /bin/bash
+    uid: 70249
+  - group: dteam_pil
+    groups:
+    - dteam
+    home: /local/grid/dteam_pil050
+    name: dteam_pil050
+    shell: /bin/bash
+    uid: 70250
+  - group: dteam
+    home: /local/grid
+    name: dteam_sgm
+    shell: /bin/bash
+    uid: 70000
+  - group: ops
+    home: /local/grid/ops001
+    name: ops001
+    shell: /bin/bash
+    uid: 71001
+  - group: ops
+    home: /local/grid/ops002
+    name: ops002
+    shell: /bin/bash
+    uid: 71002
+  - group: ops
+    home: /local/grid/ops003
+    name: ops003
+    shell: /bin/bash
+    uid: 71003
+  - group: ops
+    home: /local/grid/ops004
+    name: ops004
+    shell: /bin/bash
+    uid: 71004
+  - group: ops
+    home: /local/grid/ops005
+    name: ops005
+    shell: /bin/bash
+    uid: 71005
+  - group: ops
+    home: /local/grid/ops006
+    name: ops006
+    shell: /bin/bash
+    uid: 71006
+  - group: ops
+    home: /local/grid/ops007
+    name: ops007
+    shell: /bin/bash
+    uid: 71007
+  - group: ops
+    home: /local/grid/ops008
+    name: ops008
+    shell: /bin/bash
+    uid: 71008
+  - group: ops
+    home: /local/grid/ops009
+    name: ops009
+    shell: /bin/bash
+    uid: 71009
+  - group: ops
+    home: /local/grid/ops010
+    name: ops010
+    shell: /bin/bash
+    uid: 71010
+  - group: ops
+    home: /local/grid/ops011
+    name: ops011
+    shell: /bin/bash
+    uid: 71011
+  - group: ops
+    home: /local/grid/ops012
+    name: ops012
+    shell: /bin/bash
+    uid: 71012
+  - group: ops
+    home: /local/grid/ops013
+    name: ops013
+    shell: /bin/bash
+    uid: 71013
+  - group: ops
+    home: /local/grid/ops014
+    name: ops014
+    shell: /bin/bash
+    uid: 71014
+  - group: ops
+    home: /local/grid/ops015
+    name: ops015
+    shell: /bin/bash
+    uid: 71015
+  - group: ops
+    home: /local/grid/ops016
+    name: ops016
+    shell: /bin/bash
+    uid: 71016
+  - group: ops
+    home: /local/grid/ops017
+    name: ops017
+    shell: /bin/bash
+    uid: 71017
+  - group: ops
+    home: /local/grid/ops018
+    name: ops018
+    shell: /bin/bash
+    uid: 71018
+  - group: ops
+    home: /local/grid/ops019
+    name: ops019
+    shell: /bin/bash
+    uid: 71019
+  - group: ops
+    home: /local/grid/ops020
+    name: ops020
+    shell: /bin/bash
+    uid: 71020
+  - group: ops
+    home: /local/grid/ops021
+    name: ops021
+    shell: /bin/bash
+    uid: 71021
+  - group: ops
+    home: /local/grid/ops022
+    name: ops022
+    shell: /bin/bash
+    uid: 71022
+  - group: ops
+    home: /local/grid/ops023
+    name: ops023
+    shell: /bin/bash
+    uid: 71023
+  - group: ops
+    home: /local/grid/ops024
+    name: ops024
+    shell: /bin/bash
+    uid: 71024
+  - group: ops
+    home: /local/grid/ops025
+    name: ops025
+    shell: /bin/bash
+    uid: 71025
+  - group: ops
+    home: /local/grid/ops026
+    name: ops026
+    shell: /bin/bash
+    uid: 71026
+  - group: ops
+    home: /local/grid/ops027
+    name: ops027
+    shell: /bin/bash
+    uid: 71027
+  - group: ops
+    home: /local/grid/ops028
+    name: ops028
+    shell: /bin/bash
+    uid: 71028
+  - group: ops
+    home: /local/grid/ops029
+    name: ops029
+    shell: /bin/bash
+    uid: 71029
+  - group: ops
+    home: /local/grid/ops030
+    name: ops030
+    shell: /bin/bash
+    uid: 71030
+  - group: ops
+    home: /local/grid/ops031
+    name: ops031
+    shell: /bin/bash
+    uid: 71031
+  - group: ops
+    home: /local/grid/ops032
+    name: ops032
+    shell: /bin/bash
+    uid: 71032
+  - group: ops
+    home: /local/grid/ops033
+    name: ops033
+    shell: /bin/bash
+    uid: 71033
+  - group: ops
+    home: /local/grid/ops034
+    name: ops034
+    shell: /bin/bash
+    uid: 71034
+  - group: ops
+    home: /local/grid/ops035
+    name: ops035
+    shell: /bin/bash
+    uid: 71035
+  - group: ops
+    home: /local/grid/ops036
+    name: ops036
+    shell: /bin/bash
+    uid: 71036
+  - group: ops
+    home: /local/grid/ops037
+    name: ops037
+    shell: /bin/bash
+    uid: 71037
+  - group: ops
+    home: /local/grid/ops038
+    name: ops038
+    shell: /bin/bash
+    uid: 71038
+  - group: ops
+    home: /local/grid/ops039
+    name: ops039
+    shell: /bin/bash
+    uid: 71039
+  - group: ops
+    home: /local/grid/ops040
+    name: ops040
+    shell: /bin/bash
+    uid: 71040
+  - group: ops
+    home: /local/grid/ops041
+    name: ops041
+    shell: /bin/bash
+    uid: 71041
+  - group: ops
+    home: /local/grid/ops042
+    name: ops042
+    shell: /bin/bash
+    uid: 71042
+  - group: ops
+    home: /local/grid/ops043
+    name: ops043
+    shell: /bin/bash
+    uid: 71043
+  - group: ops
+    home: /local/grid/ops044
+    name: ops044
+    shell: /bin/bash
+    uid: 71044
+  - group: ops
+    home: /local/grid/ops045
+    name: ops045
+    shell: /bin/bash
+    uid: 71045
+  - group: ops
+    home: /local/grid/ops046
+    name: ops046
+    shell: /bin/bash
+    uid: 71046
+  - group: ops
+    home: /local/grid/ops047
+    name: ops047
+    shell: /bin/bash
+    uid: 71047
+  - group: ops
+    home: /local/grid/ops048
+    name: ops048
+    shell: /bin/bash
+    uid: 71048
+  - group: ops
+    home: /local/grid/ops049
+    name: ops049
+    shell: /bin/bash
+    uid: 71049
+  - group: ops
+    home: /local/grid/ops050
+    name: ops050
+    shell: /bin/bash
+    uid: 71050
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd001
+    name: ops_prd001
+    shell: /bin/bash
+    uid: 71101
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd002
+    name: ops_prd002
+    shell: /bin/bash
+    uid: 71102
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd003
+    name: ops_prd003
+    shell: /bin/bash
+    uid: 71103
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd004
+    name: ops_prd004
+    shell: /bin/bash
+    uid: 71104
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd005
+    name: ops_prd005
+    shell: /bin/bash
+    uid: 71105
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd006
+    name: ops_prd006
+    shell: /bin/bash
+    uid: 71106
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd007
+    name: ops_prd007
+    shell: /bin/bash
+    uid: 71107
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd008
+    name: ops_prd008
+    shell: /bin/bash
+    uid: 71108
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd009
+    name: ops_prd009
+    shell: /bin/bash
+    uid: 71109
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd010
+    name: ops_prd010
+    shell: /bin/bash
+    uid: 71110
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd011
+    name: ops_prd011
+    shell: /bin/bash
+    uid: 71111
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd012
+    name: ops_prd012
+    shell: /bin/bash
+    uid: 71112
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd013
+    name: ops_prd013
+    shell: /bin/bash
+    uid: 71113
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd014
+    name: ops_prd014
+    shell: /bin/bash
+    uid: 71114
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd015
+    name: ops_prd015
+    shell: /bin/bash
+    uid: 71115
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd016
+    name: ops_prd016
+    shell: /bin/bash
+    uid: 71116
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd017
+    name: ops_prd017
+    shell: /bin/bash
+    uid: 71117
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd018
+    name: ops_prd018
+    shell: /bin/bash
+    uid: 71118
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd019
+    name: ops_prd019
+    shell: /bin/bash
+    uid: 71119
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd020
+    name: ops_prd020
+    shell: /bin/bash
+    uid: 71120
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd021
+    name: ops_prd021
+    shell: /bin/bash
+    uid: 71121
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd022
+    name: ops_prd022
+    shell: /bin/bash
+    uid: 71122
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd023
+    name: ops_prd023
+    shell: /bin/bash
+    uid: 71123
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd024
+    name: ops_prd024
+    shell: /bin/bash
+    uid: 71124
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd025
+    name: ops_prd025
+    shell: /bin/bash
+    uid: 71125
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd026
+    name: ops_prd026
+    shell: /bin/bash
+    uid: 71126
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd027
+    name: ops_prd027
+    shell: /bin/bash
+    uid: 71127
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd028
+    name: ops_prd028
+    shell: /bin/bash
+    uid: 71128
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd029
+    name: ops_prd029
+    shell: /bin/bash
+    uid: 71129
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd030
+    name: ops_prd030
+    shell: /bin/bash
+    uid: 71130
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd031
+    name: ops_prd031
+    shell: /bin/bash
+    uid: 71131
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd032
+    name: ops_prd032
+    shell: /bin/bash
+    uid: 71132
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd033
+    name: ops_prd033
+    shell: /bin/bash
+    uid: 71133
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd034
+    name: ops_prd034
+    shell: /bin/bash
+    uid: 71134
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd035
+    name: ops_prd035
+    shell: /bin/bash
+    uid: 71135
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd036
+    name: ops_prd036
+    shell: /bin/bash
+    uid: 71136
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd037
+    name: ops_prd037
+    shell: /bin/bash
+    uid: 71137
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd038
+    name: ops_prd038
+    shell: /bin/bash
+    uid: 71138
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd039
+    name: ops_prd039
+    shell: /bin/bash
+    uid: 71139
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd040
+    name: ops_prd040
+    shell: /bin/bash
+    uid: 71140
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd041
+    name: ops_prd041
+    shell: /bin/bash
+    uid: 71141
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd042
+    name: ops_prd042
+    shell: /bin/bash
+    uid: 71142
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd043
+    name: ops_prd043
+    shell: /bin/bash
+    uid: 71143
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd044
+    name: ops_prd044
+    shell: /bin/bash
+    uid: 71144
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd045
+    name: ops_prd045
+    shell: /bin/bash
+    uid: 71145
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd046
+    name: ops_prd046
+    shell: /bin/bash
+    uid: 71146
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd047
+    name: ops_prd047
+    shell: /bin/bash
+    uid: 71147
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd048
+    name: ops_prd048
+    shell: /bin/bash
+    uid: 71148
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd049
+    name: ops_prd049
+    shell: /bin/bash
+    uid: 71149
+  - group: ops_prd
+    groups:
+    - ops
+    home: /local/grid/ops_prd050
+    name: ops_prd050
+    shell: /bin/bash
+    uid: 71150
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil001
+    name: ops_pil001
+    shell: /bin/bash
+    uid: 71201
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil002
+    name: ops_pil002
+    shell: /bin/bash
+    uid: 71202
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil003
+    name: ops_pil003
+    shell: /bin/bash
+    uid: 71203
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil004
+    name: ops_pil004
+    shell: /bin/bash
+    uid: 71204
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil005
+    name: ops_pil005
+    shell: /bin/bash
+    uid: 71205
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil006
+    name: ops_pil006
+    shell: /bin/bash
+    uid: 71206
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil007
+    name: ops_pil007
+    shell: /bin/bash
+    uid: 71207
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil008
+    name: ops_pil008
+    shell: /bin/bash
+    uid: 71208
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil009
+    name: ops_pil009
+    shell: /bin/bash
+    uid: 71209
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil010
+    name: ops_pil010
+    shell: /bin/bash
+    uid: 71210
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil011
+    name: ops_pil011
+    shell: /bin/bash
+    uid: 71211
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil012
+    name: ops_pil012
+    shell: /bin/bash
+    uid: 71212
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil013
+    name: ops_pil013
+    shell: /bin/bash
+    uid: 71213
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil014
+    name: ops_pil014
+    shell: /bin/bash
+    uid: 71214
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil015
+    name: ops_pil015
+    shell: /bin/bash
+    uid: 71215
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil016
+    name: ops_pil016
+    shell: /bin/bash
+    uid: 71216
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil017
+    name: ops_pil017
+    shell: /bin/bash
+    uid: 71217
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil018
+    name: ops_pil018
+    shell: /bin/bash
+    uid: 71218
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil019
+    name: ops_pil019
+    shell: /bin/bash
+    uid: 71219
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil020
+    name: ops_pil020
+    shell: /bin/bash
+    uid: 71220
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil021
+    name: ops_pil021
+    shell: /bin/bash
+    uid: 71221
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil022
+    name: ops_pil022
+    shell: /bin/bash
+    uid: 71222
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil023
+    name: ops_pil023
+    shell: /bin/bash
+    uid: 71223
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil024
+    name: ops_pil024
+    shell: /bin/bash
+    uid: 71224
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil025
+    name: ops_pil025
+    shell: /bin/bash
+    uid: 71225
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil026
+    name: ops_pil026
+    shell: /bin/bash
+    uid: 71226
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil027
+    name: ops_pil027
+    shell: /bin/bash
+    uid: 71227
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil028
+    name: ops_pil028
+    shell: /bin/bash
+    uid: 71228
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil029
+    name: ops_pil029
+    shell: /bin/bash
+    uid: 71229
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil030
+    name: ops_pil030
+    shell: /bin/bash
+    uid: 71230
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil031
+    name: ops_pil031
+    shell: /bin/bash
+    uid: 71231
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil032
+    name: ops_pil032
+    shell: /bin/bash
+    uid: 71232
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil033
+    name: ops_pil033
+    shell: /bin/bash
+    uid: 71233
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil034
+    name: ops_pil034
+    shell: /bin/bash
+    uid: 71234
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil035
+    name: ops_pil035
+    shell: /bin/bash
+    uid: 71235
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil036
+    name: ops_pil036
+    shell: /bin/bash
+    uid: 71236
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil037
+    name: ops_pil037
+    shell: /bin/bash
+    uid: 71237
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil038
+    name: ops_pil038
+    shell: /bin/bash
+    uid: 71238
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil039
+    name: ops_pil039
+    shell: /bin/bash
+    uid: 71239
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil040
+    name: ops_pil040
+    shell: /bin/bash
+    uid: 71240
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil041
+    name: ops_pil041
+    shell: /bin/bash
+    uid: 71241
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil042
+    name: ops_pil042
+    shell: /bin/bash
+    uid: 71242
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil043
+    name: ops_pil043
+    shell: /bin/bash
+    uid: 71243
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil044
+    name: ops_pil044
+    shell: /bin/bash
+    uid: 71244
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil045
+    name: ops_pil045
+    shell: /bin/bash
+    uid: 71245
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil046
+    name: ops_pil046
+    shell: /bin/bash
+    uid: 71246
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil047
+    name: ops_pil047
+    shell: /bin/bash
+    uid: 71247
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil048
+    name: ops_pil048
+    shell: /bin/bash
+    uid: 71248
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil049
+    name: ops_pil049
+    shell: /bin/bash
+    uid: 71249
+  - group: ops_pil
+    groups:
+    - ops
+    home: /local/grid/ops_pil050
+    name: ops_pil050
+    shell: /bin/bash
+    uid: 71250
+  - group: ops
+    home: /local/grid
+    name: ops_sgm
+    shell: /bin/bash
+    uid: 71000
+
+basic_users_groups: "{{ basic_users_groups_grid }}"
+basic_users_users: "{{ basic_users_users_staff + (basic_users_users_grid | map('combine', basic_users_users_grid_defaults)) }}"

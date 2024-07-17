@@ -1,0 +1,2 @@
+squid_cache_mem: '2 GB' # squid-0 shows 0.6/7.5Gi used at idle
+squid_cache_disk: "{{ 4 * 1024 }}" # squid-0 shows 11/19G used after creation

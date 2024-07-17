@@ -12,21 +12,25 @@ variable "cluster_domain_suffix" {
 variable "tenant_net" {
     type = string
     description = "Name of existing tenant network"
+    default = "slurm"
 }
 
 variable "tenant_subnet" {
     type = string
     description = "Name of existing tenant subnet"
+    default = "slurm"
 }
 
 variable "storage_net" {
     type = string
     description = "Name of existing storage network"
+    default = "slurm-data"
 }
 
 variable "storage_subnet" {
     type = string
     description = "Name of existing storage subnet"
+    default = "slurm-data"
 }
 
 variable "key_pair" {
@@ -37,6 +41,7 @@ variable "key_pair" {
 variable "control_node_flavor" {
     type = string
     description = "Flavor name for control name"
+    default = "general.v1.16cpu.32gb" # defined in OpenStack Kayobe Reference Architecture v1.6
 }
 
 variable "login_nodes" {
@@ -47,6 +52,7 @@ variable "login_nodes" {
 variable "cluster_image_id" {
     type = string
     description = "ID of default image for the cluster"
+    default = "fa21f5a7-184a-496b-8570-62db2314eb32" # openhpc-ofed-RL9-240621-1308-96959324, v1.149
 }
 
 # variable "compute_nodes" {
@@ -55,7 +61,7 @@ variable "cluster_image_id" {
 # }
 
 variable "compute" {
-    type = map
+    type = any
     description = <<-EOF
         Mapping defining compute infrastructure. Keys are names of groups. Values are a
         mapping as follows:
@@ -97,4 +103,16 @@ variable "root_volume_size" {
     description = "Size of volume for root volumes if using volume backed instances, in Gb"
     type = number
     default = 40
+}
+
+variable "squid_nodes_count" {
+    description = "Number of CVFMS squid proxies"
+    type = number
+    default = 2
+}
+
+variable "squid_flavor" {
+    description = "Flavor for CVFMS squid proxies"
+    type = string
+    default = "general.v1.4cpu.8gb"
 }

@@ -1,0 +1,1 @@
+prometheus_storage_retention_size: "{{ state_volume_size - 20 }}GB" # Reserve 20GB for slurm etc state, not sure if this is appropriate TBH

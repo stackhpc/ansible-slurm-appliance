@@ -6,7 +6,9 @@ resource "local_file" "hosts" {
                             "control_instances": openstack_compute_instance_v2.control
                             "login_instances": openstack_compute_instance_v2.login
                             "login_fip": [for v in var.login_nodes: v.fip][0]
+                            "squid_instances": openstack_compute_instance_v2.squid
                             "compute_groups": module.compute
+                            "state_volume": data.openstack_blockstorage_volume_v3.state
                           },
                           )
   filename = "../inventory/hosts.yml"
