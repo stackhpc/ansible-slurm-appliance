@@ -1,38 +1,36 @@
 Role Name
 =========
 
-A brief description of the role goes here.
-
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role configures the TuneD tool for system tuning, ensuring optimal performance based on the profile settings defined.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+The profiles provided with tuned are divided into two categories: power-saving profiles, and performance-boosting profiles. The performance-boosting profiles include profiles focus on the following aspects:
+ - low latency for storage and network
+ - high throughput for storage and network
+ - virtual machine performance
+ - virtualization host performance
 
-Dependencies
-------------
+See [tuned documentation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-performance_monitoring_tools-tuned_and_tuned_adm#sect-Red_Hat_Enterprise_Linux-Performance_Tuning_Guide-Performance_Monitoring_Tools-tuned_and_tuned_adm) for detailed overview on sensible profile settings.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+**Default profiles**
 
-Example Playbook
-----------------
+- `tuned_profile_baremetal: hpc-compute` 
+- `tuned_profile_vm: virtual-guest`
+- `tuned_profile: "{{ tuned_profile_baremetal if ansible_virtualization_role != 'guest' else tuned_profile_vm }}"`
+- `tuned_enabled: true`
+- `tuned_started: true`
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+To list all available profiles and identify the current active profile, run on-node:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+`tuned-adm list`
 
-License
--------
+To only display the currently active profile, run:
 
-BSD
+`tuned-adm active`
 
-Author Information
-------------------
+To switch to one of the available profiles, run:
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+`tuned-adm profile {profile_name}`
+
