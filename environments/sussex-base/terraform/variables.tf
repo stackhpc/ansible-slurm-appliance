@@ -52,7 +52,7 @@ variable "login_nodes" {
 variable "cluster_image_id" {
     type = string
     description = "ID of default image for the cluster"
-    default = "fa21f5a7-184a-496b-8570-62db2314eb32" # openhpc-ofed-RL9-240621-1308-96959324, v1.149
+    default = "8b4482a0-208f-4889-abac-46656fd5fb62" # openhpc-ofed-RL9-240712-1425-6830f97b-raid-v1: v1.150+RAID
 }
 
 # variable "compute_nodes" {

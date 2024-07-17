@@ -42,7 +42,6 @@ module "cluster" {
       grid = {
           flavor = "baremetal.gridpp.r6525.128cpu"
           vnic_type = "baremetal"
-          image_id = "1f00f845-a588-41d6-9a04-813b925ce402" # openhpc-ofed-RL9-240621-1308-96959324-raid-v1
           nodes = [
             "grid-0",
             "grid-1",
