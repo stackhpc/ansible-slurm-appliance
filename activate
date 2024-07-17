@@ -1,4 +1,3 @@
 . venv/bin/activate
 . environments/$1/activate
-export ANSIBLE_VAULT_PASSWORD_FILE=/home/slurm-deploy/artemis-slurm-PRODUCTION/environments/sussex-base/vault-password
-
+export ANSIBLE_VAULT_PASSWORD_FILE=$APPLIANCES_REPO_ROOT/environments/sussex-base/vault-password
