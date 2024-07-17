@@ -1,5 +1,14 @@
 ---
 
+- hosts: ansibleinit
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Wait for ansible-init sentinel to be present on nodes
+      wait_for:
+        path: /var/lib/ansible-init.done
+        timeout: 1200 # seconds
+
 - hosts: localhost
   gather_facts: false
   become: false
