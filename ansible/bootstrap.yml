@@ -226,3 +226,11 @@
   tasks:
     - include_role:
         name: ofed
+
+- hosts: ansibleinit
+  gather_facts: yes
+  become: yes
+  tags: linux-ansible-init
+  tasks:
+    - include_role:
+        name: stackhpc.linux-ansible-init

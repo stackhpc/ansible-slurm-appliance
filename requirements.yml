@@ -24,7 +24,7 @@ roles:
     version: v24.5.1 # Support ceph quincy for RL9
   - src: https://github.com/stackhpc/ansible-role-linux-ansible-init.git
     name: stackhpc.linux-ansible-init
-    version: 55d42c8 # update when released
+    version: main # update when released
 
 collections:
   - name: containers.podman
