@@ -370,6 +370,23 @@ resource "openstack_compute_instance_v2" "login" {
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
   EOF
+
+  metadata = {
+    {% for playbook in ansible_init_playbooks %}
+      ansible_init_pb_{{ loop.index0 }}_name = "{{ playbook.name }}"
+      {% if playbook.stage is defined %}
+        ansible_init_pb_{{ loop.index0 }}_stage = "{{ playbook.stage }}"
+      {% endif %}
+    {% endfor %}
+    {% for collection in ansible_init_collections %}
+      ansible_init_coll_{{ loop.index0 }}_name = "{{ collection.name }}"
+      ansible_init_coll_{{ loop.index0 }}_type = "{{ collection.type }}"
+      ansible_init_coll_{{ loop.index0 }}_version = "{{ collection.version }}"
+      {% if collection.source is defined %}
+        ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
+      {% endif %}
+    {% endfor %} 
+  }
 }
 
 resource "openstack_compute_instance_v2" "control" {
@@ -446,6 +463,23 @@ resource "openstack_compute_instance_v2" "control" {
         - [LABEL=home, /exports/home, auto]
         {% endif %}
   EOF
+
+  metadata = {
+    {% for playbook in ansible_init_playbooks %}
+      ansible_init_pb_{{ loop.index0 }}_name = "{{ playbook.name }}"
+      {% if playbook.stage is defined %}
+        ansible_init_pb_{{ loop.index0 }}_stage = "{{ playbook.stage }}"
+      {% endif %}
+    {% endfor %}
+    {% for collection in ansible_init_collections %}
+      ansible_init_coll_{{ loop.index0 }}_name = "{{ collection.name }}"
+      ansible_init_coll_{{ loop.index0 }}_type = "{{ collection.type }}"
+      ansible_init_coll_{{ loop.index0 }}_version = "{{ collection.version }}"
+      {% if collection.source is defined %}
+        ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
+      {% endif %}
+    {% endfor %} 
+  }
 }
 
 {% for partition in openhpc_slurm_partitions %}
@@ -498,6 +532,23 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
   EOF
+
+  metadata = {
+    {% for playbook in ansible_init_playbooks %}
+      ansible_init_pb_{{ loop.index0 }}_name = "{{ playbook.name }}"
+      {% if playbook.stage is defined %}
+        ansible_init_pb_{{ loop.index0 }}_stage = "{{ playbook.stage }}"
+      {% endif %}
+    {% endfor %}
+    {% for collection in ansible_init_collections %}
+      ansible_init_coll_{{ loop.index0 }}_name = "{{ collection.name }}"
+      ansible_init_coll_{{ loop.index0 }}_type = "{{ collection.type }}"
+      ansible_init_coll_{{ loop.index0 }}_version = "{{ collection.version }}"
+      {% if collection.source is defined %}
+        ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
+      {% endif %}
+    {% endfor %} 
+  }
 }
 
 {% endfor %}
