@@ -12,7 +12,7 @@ The profiles provided with tuned are divided into two categories: power-saving p
  - virtual machine performance
  - virtualization host performance
 
-See [tuned documentation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-performance_monitoring_tools-tuned_and_tuned_adm#sect-Red_Hat_Enterprise_Linux-Performance_Tuning_Guide-Performance_Monitoring_Tools-tuned_and_tuned_adm) for detailed overview on sensible profile settings.
+See the [TuneD documentation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/monitoring_and_managing_system_status_and_performance/getting-started-with-tuned_monitoring-and-managing-system-status-and-performance) for profile details.
 
 **Default profiles**
 
