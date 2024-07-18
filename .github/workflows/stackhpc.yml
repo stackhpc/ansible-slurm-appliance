@@ -34,8 +34,10 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_id }}
+      CI_CLUSTER_NAME: slurmci-${{ matrix.os_version }}-${{ github.run_id }}
       CI_CLOUD: ${{ vars.CI_CLOUD }}
+      ANSIBLE_INVENTORY: environments/common/inventory,environments/.caas/inventory
+      DISTRO_VERSION: ${{ matrix.os_version }}
     steps:
       - uses: actions/checkout@v2
 
@@ -43,115 +45,55 @@ jobs:
         run: |
           echo CI_CLOUD: ${{ vars.CI_CLOUD }}
 
-      - name: Setup ssh
-        run: |
-          set -x
-          mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', vars.CI_CLOUD)] }}" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-        shell: bash
-        
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
-        shell: bash
-      
+      - name: Setup ssh for azimuth user
+        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+
       - name: Install ansible etc
         run: dev/setup-env.sh
 
-      - name: Install OpenTofu
-        uses: opentofu/setup-opentofu@v1
-        with:
-          tofu_version: 1.6.2
-      
-      - name: Initialise terraform
-        run: terraform init
-        working-directory: ${{ github.workspace }}/environments/.stackhpc/terraform
-        
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
           echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
-      - name: Setup environment-specific inventory/terraform inputs
+      - name: Setup CI-specific extravars (including per-cloud vars)
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook ansible/adhoc/generate-passwords.yml
-          echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
-        env:
-          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          cp environments/.caas/CI-extravars.yml environments/.caas/inventory/group_vars/all/CI-extravars.yml
 
-      - name: Provision nodes using fat image
-        id: provision_servers
+      - name: Provision and configure cluster, run mpi-based tests and check slurm partitions
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate
-          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform apply -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
-        env:
-          TF_VAR_os_version: ${{ matrix.os_version }}
-
-      - name: Delete infrastructure if provisioning failed
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform destroy -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
-        if: failure() && steps.provision_servers.outcome == 'failure'
-        env:
-          TF_VAR_os_version: ${{ matrix.os_version }}
-
-      - name: Configure cluster
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible all -m wait_for_connection
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
-
-      - name: Run MPI-based tests
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml
 
       # - name: Run EESSI tests
       #   run: |
       #     . venv/bin/activate
-      #     . environments/.stackhpc/activate
       #     ansible-playbook -vv ansible/ci/check_eessi.yml
 
-      - name: Confirm Open Ondemand is up (via SOCKS proxy)
+      - name: Confirm Open Ondemand is up (via FIP)
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate
           
           # load ansible variables into shell:
           ansible-playbook ansible/ci/output_vars.yml \
-            -e output_vars_hosts=openondemand \
+            -e output_vars_hosts=control \
             -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
-            -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
+            -e output_vars_items=cluster_gateway_ip,vault_azimuth_user_password
           source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
           
-          # setup ssh proxying:
-          sudo apt-get --yes install proxychains
-          echo proxychains installed
-          ssh -v -fN -D 9050 ${bastion_user}@${bastion_ip}
-          echo port 9050 forwarded
-
           # check OOD server returns 200:
-          statuscode=$(proxychains wget \
+          statuscode=$(wget \
             --quiet \
             --spider \
             --server-response \
             --no-check-certificate \
-            --http-user=testuser \
-            --http-password=${TESTUSER_PASSWORD} https://${openondemand_servername} \
+            --http-user=azimuth \
+            --http-password=${vault_azimuth_user_password} https://${cluster_gateway_ip} \
             2>&1)
           (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
-        env:
-          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       # - name: Build environment-specific compute image
       #   id: packer_build
@@ -174,33 +116,28 @@ jobs:
       - name: Test reimage of login and control nodes (via rebuild adhoc)
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate
           ansible-playbook -v --limit control,login ansible/adhoc/rebuild.yml
           ansible all -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
+          rm environments/.caas/inventory/cluster_hosts.yml
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
       
       - name: Check sacct state survived reimage
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate
           ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
 
       - name: Check MPI-based tests are shown in Grafana
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate
           ansible-playbook -vv ansible/ci/check_grafana.yml
 
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate
-          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform destroy -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
-        if: ${{ success() || cancelled() }}
-        env:
-          TF_VAR_os_version: ${{ matrix.os_version }}
+          rm -f environments/.caas/inventory/cluster_hosts.yml
+          ansible-playbook -v ansible/site.yml -e cluster_state=absent
+        if: ${{ always() }} # success, failure or cancelled
 
       # - name: Delete images
       #   run: |

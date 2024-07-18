@@ -2,8 +2,8 @@
 # Can't actually check the dashboard programatically so this queries the datasource used by the dashboard instead.
 
 - hosts: control # so proxying etc is irrelevant
-  gather_facts: no
-  become: no
+  gather_facts: yes
+  become: yes
   tasks:
     - name: Wait for slurm-stats file to exist (run by cron)
       ansible.builtin.wait_for:
