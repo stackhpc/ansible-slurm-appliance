@@ -76,6 +76,12 @@ openhpc
 [squid]
 # Hosts to run squid proxy
 
+[tuned:children]
+# Hosts to run TuneD configuration
+
+[tuned:children]
+# Hosts to run TuneD configuration
+
 [ansible_init:children]
 # Hosts to run ansible-init
 cluster

@@ -130,5 +130,8 @@ freeipa_client
 [squid]
 # Hosts to run squid proxy
 
-[ansibleinit]
+[tuned]
+# Hosts to run TuneD configuration
+
+[ansible_init]
 # Hosts to run linux-anisble-init

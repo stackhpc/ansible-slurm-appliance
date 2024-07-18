@@ -1,0 +1,7 @@
+---
+# defaults file for tuned
+tuned_profile_baremetal: hpc-compute
+tuned_profile_vm: virtual-guest
+tuned_profile: "{{ tuned_profile_baremetal if ansible_virtualization_role != 'guest' else tuned_profile_vm }}"
+tuned_enabled: true
+tuned_started: true 
