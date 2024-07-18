@@ -14,7 +14,6 @@ The profiles provided with tuned are divided into two categories: power-saving p
 
 See the [TuneD documentation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/monitoring_and_managing_system_status_and_performance/getting-started-with-tuned_monitoring-and-managing-system-status-and-performance) for profile details.
 
-**Default profiles**
 
 - `tuned_profile_baremetal: hpc-compute` 
 - `tuned_profile_vm: virtual-guest`
