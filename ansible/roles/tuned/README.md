@@ -1,4 +1,4 @@
-Role Name
+tuned
 =========
 
 This role configures the TuneD tool for system tuning, ensuring optimal performance based on the profile settings defined.
