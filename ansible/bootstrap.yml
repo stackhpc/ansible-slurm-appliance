@@ -105,6 +105,15 @@
       import_role:
         name: squid
 
+- hosts: tuned
+  tags: tuned
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Install and configure tuneD
+      import_role:
+        name: tuned
+
 - hosts: freeipa_server
   # Done here as it might be providing DNS
   tags:
