@@ -78,4 +78,3 @@ openhpc
 
 [tuned:children]
 # Hosts to run TuneD configuration
-cluster
