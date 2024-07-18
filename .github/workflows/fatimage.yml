@@ -2,14 +2,8 @@
 name: Build fat image
 'on':
   workflow_dispatch:
-    inputs:
-      use_RL8:
-        required: true
-        description: Include RL8 image build
-        type: boolean
-        default: false
 concurrency:
-  group: ${{ github.ref }}-{{ matrix.os_version }} # to branch/PR + OS
+  group: ${{ github.ref }}-{{ matrix.os_version }}-{{ matrix.build }} # to branch/PR + OS + build
   cancel-in-progress: true
 jobs:
   openstack:
@@ -17,12 +11,17 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        os_version: [RL8, RL9]
-        rl8_selected:
-          - ${{ inputs.use_RL8 == true }} # only potentially true for workflow_dispatch
+        os_version:
+          - RL8
+          - RL9
+        build:
+          - openstack.openhpc
+          - openstack.openhpc-ofed
         exclude:
           - os_version: RL8
-            rl8_selected: false
+            build: openstack.openhpc-ofed
+          - os_version: RL9
+            build: openstack.openhpc
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -63,7 +62,7 @@ jobs:
           . environments/.stackhpc/activate
           cd packer/
           packer init .
-          PACKER_LOG=1 packer build -on-error=${{ vars.PACKER_ON_ERROR }} -except=openstack.openhpc-extra -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
+          PACKER_LOG=1 packer build -on-error=${{ vars.PACKER_ON_ERROR }} -only={{ matrix.build }} -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
 
@@ -71,15 +70,16 @@ jobs:
         id: manifest
         run: |
           . venv/bin/activate
-          for IMAGE_ID in $(jq --raw-output '.builds[].artifact_id' packer/packer-manifest.json)
-          do
-            while ! openstack image show -f value -c name $IMAGE_ID; do
-              sleep 5
-            done
-            IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
-            echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
-            echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
+          while ! openstack image show -f value -c name $IMAGE_ID; do
+            sleep 5
           done
+          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download image
+        run: openstack image save --file ${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -95,7 +95,6 @@ jobs:
       - name: mount qcow2 file
         run: sudo guestmount -a ${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
 
-
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.17.0
         with:
@@ -110,7 +109,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
-          category: "${{ matrix.os_version }}"
+          category: "${{ matrix.os_version }}-${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
         uses: aquasecurity/trivy-action@0.16.1
