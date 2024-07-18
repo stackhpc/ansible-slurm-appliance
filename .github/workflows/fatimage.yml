@@ -14,7 +14,7 @@ concurrency:
 jobs:
   openstack:
     name: openstack-imagebuild
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         os_version: [RL8, RL9]
