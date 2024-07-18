@@ -129,3 +129,6 @@ freeipa_client
 
 [squid]
 # Hosts to run squid proxy
+
+[tuned]
+# Hosts to run TuneD configuration

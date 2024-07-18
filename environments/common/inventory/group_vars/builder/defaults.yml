@@ -20,3 +20,5 @@ squid_started: false
 squid_enabled: false
 squid_cache_disk: 0 # just needs to be defined
 squid_cache_mem: 0
+tuned_started: false
+tuned_enabled: false
