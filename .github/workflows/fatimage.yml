@@ -85,7 +85,9 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: install libguestfs
-        run: sudo apt-get -y install libguestfs-tools
+        run: |
+          sudo apt -y update
+          sudo apt -y install libguestfs-tools
 
       - name: mkdir for mount
         run: sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
