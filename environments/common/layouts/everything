@@ -76,6 +76,6 @@ openhpc
 [squid]
 # Hosts to run squid proxy
 
-[ansibleinit:children]
+[ansible_init:children]
 # Hosts to run ansible-init
 cluster

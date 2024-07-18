@@ -1,13 +1,19 @@
 ---
 
-- hosts: ansibleinit
+- hosts: ansible_init
   gather_facts: false
   become: yes
   tasks:
-    - name: Wait for ansible-init sentinel to be present on nodes
+    - name: Check if ansible-init is installed
+      stat:
+        path: /etc/systemd/system/ansible-init.service
+      register: _stat_ansible_init_unitfile
+    
+    - name: Wait for ansible-init to finish
       wait_for:
         path: /var/lib/ansible-init.done
-        timeout: 1200 # seconds
+        timeout: "{{ ansible_init_wait }}" # seconds
+      when: _stat_ansible_init_unitfile.stat.exists
 
 - hosts: localhost
   gather_facts: false
@@ -236,7 +242,7 @@
     - include_role:
         name: ofed
 
-- hosts: ansibleinit
+- hosts: ansible_init
   gather_facts: yes
   become: yes
   tags: linux-ansible-init
