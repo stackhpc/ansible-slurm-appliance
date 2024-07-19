@@ -79,7 +79,9 @@ jobs:
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
 
       - name: Download image
-        run: openstack image save --file ${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
+        run: |
+          . venv/bin/activate
+          openstack image save --file ${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
