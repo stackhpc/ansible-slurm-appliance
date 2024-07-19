@@ -372,15 +372,12 @@ resource "openstack_compute_instance_v2" "login" {
   EOF
 
   metadata = {
-    {% if ansible_init_playbooks is defined %}
     {% for playbook in ansible_init_playbooks %}
       ansible_init_pb_{{ loop.index0 }}_name = "{{ playbook.name }}"
       {% if playbook.stage is defined %}
         ansible_init_pb_{{ loop.index0 }}_stage = "{{ playbook.stage }}"
       {% endif %}
     {% endfor %}
-    {% endif %}
-    {% if ansible_init_collections is defined %}
     {% for collection in ansible_init_collections %}
       ansible_init_coll_{{ loop.index0 }}_name = "{{ collection.name }}"
       ansible_init_coll_{{ loop.index0 }}_type = "{{ collection.type }}"
@@ -388,8 +385,7 @@ resource "openstack_compute_instance_v2" "login" {
       {% if collection.source is defined %}
         ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
       {% endif %}
-    {% endfor %}
-    {% endif %}
+    {% endfor %} 
   }
 }
 
