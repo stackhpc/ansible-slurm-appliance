@@ -342,11 +342,13 @@ resource "openstack_compute_instance_v2" "computes" {
 
 resource "openstack_networking_floatingip_associate_v2" "logins" {
   for_each = var.login_names
+
   floating_ip = var.login_ips[each.key]
   port_id = openstack_networking_port_v2.login_control[each.key].id
 }
 
 resource "openstack_networking_floatingip_associate_v2" "control" {
+
   floating_ip = var.control_ip
   port_id = openstack_networking_port_v2.control_control.id
 }
