@@ -1,6 +1,8 @@
 # Flavor has root size 30GB = resulting virtual image size
-# All flavors >= 30GB disk so don't need volume-backed build VM
 flavor = "general.v1.4cpu.8gb"
+image_disk_format = "qcow2" # default comes out as raw for some reason
+use_blockstorage_volume = true # required to set image image_disk_format
+volume_size = 25 # GB. df in image showed ~18GB used
 
 # Specify image by id to match environment/sussex-base/variables.tf:
 source_image = {
