@@ -33,11 +33,19 @@ module "cluster" {
 
     compute = {
       general = {
-          flavor = "general.v1.16cpu.32gb" # TODO: should be baremetal.gridpp.r6525.128cpu
+          flavor = "general.v1.16cpu.32gb"
           nodes = [
             "general-0",
             "general-1",
           ]
+      }
+      a40 = {
+        flavor = "baremetal.r7525.256cpu.a40"
+        image_id = "bbffdb18-5dbb-4271-ba8f-950c2cbdd616" # openhpc-extra-RL9-240719-1402-bc56229b
+        vnic_type = "baremetal"
+        nodes = [
+          "a40-0",
+        ]
       }
     }
 }
