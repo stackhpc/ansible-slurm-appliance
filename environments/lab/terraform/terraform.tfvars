@@ -8,7 +8,7 @@ compute_types = {
     image: "vs_rocky86_20221231"
   }
   small: {
-    flavor: "vm.ska.cpu.general.small"
+    flavor: "en1.xsmall"
     image: "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
   }
   tiny: {
@@ -43,11 +43,11 @@ login_ips = {} # Don't use FIPs for lab but need to define for symlinked variabl
 #
 
 login_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
-login_flavor = "vm.ska.cpu.general.small"
+login_flavor = "en1.xsmall"
 
 
 control_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
-control_flavor = "vm.ska.cpu.general.small"
+control_flavor = "ec1.medium"
 
 control_ip = "" # Don't use FIPs for lab but need to define for symlinked variables.tf
 
@@ -57,19 +57,19 @@ proxy_name = "login-1"
 
 cluster_name  = "vslab"
 cluster_slurm_name = "vermilion"
-cluster_availability_zone = "nova"
+cluster_availability_zone = "europe-nl-ams1"
 
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 
 key_pair = "slurm-app-ci"
 
-external_network = "CUDN-Internet"
-cluster_network = "lab-compute" # tf-deployed
-cluster_subnet = "lab-compute"
+external_network = "external"
+cluster_network = "nrel-lab-compute"
+cluster_subnet = "nrel-lab-compute" # 10.90.0.0/24
 
-storage_network = "lab-storage"  # tf-deployed
-storage_subnet = "lab-storage"
+storage_network = "nrel-lab-storage"
+storage_subnet = "nrel-lab-storage" # 10.91.0.0/24
 
-control_network = "portal-internal"
-control_subnet = "portal-internal"
+control_network = "stackhpc-dev"
+control_subnet = "stackhpc-dev"
 compute_images = {} # allows overrides for specific nodes, by name
