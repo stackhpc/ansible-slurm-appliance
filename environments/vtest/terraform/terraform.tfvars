@@ -70,7 +70,7 @@ cluster_availability_zone = "esif"
 #key_pair = "slurmdeploy"
 key_pair = "vsdeployer"
 
-external_network = "external"
+external_network = "external2"
 cluster_network = "compute"
 cluster_subnet = "compute-subnet"
 
