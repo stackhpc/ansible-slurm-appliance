@@ -31,7 +31,7 @@ variable "cluster_image" {
     default = {
         # https://github.com/stackhpc/ansible-slurm-appliance/pull/411
         RL8: "openhpc-RL8-240719-0943-1c8626e8"
-        RL9: "openhpc-ofed-RL9-240719-0943-1c8626e8"
+        RL9: "openhpc-ofed-RL9-240722-0930-bb9609ac"
     }
 }
 
