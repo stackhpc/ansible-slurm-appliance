@@ -77,6 +77,10 @@
       import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+    - name: Open Ondemand jupyter node
+      import_role:
+        name: openondemand
+        tasks_from: jupyter_compute.yml
 
     # - import_playbook: monitoring.yml:
     - import_role:
