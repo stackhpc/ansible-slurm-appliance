@@ -62,25 +62,17 @@
         tasks_from: install.yml
 
     # - import_playbook: portal.yml
-    - name: Open Ondemand server (packages)
+    - name: Open Ondemand server
       include_role:
         name: osc.ood
         tasks_from: install-package.yml
         vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
     # # FUTURE: install-apps.yml - this is git clones
-    - name: Open Ondemand server (apps)
-      include_role:
-        name: osc.ood
-        tasks_from: install-apps.yml
-        vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
+
     - name: Open Ondemand remote desktop
       import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
-    - name: Open Ondemand jupyter node
-      import_role:
-        name: openondemand
-        tasks_from: jupyter_compute.yml
 
     # - import_playbook: monitoring.yml:
     - import_role:
