@@ -34,7 +34,7 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      TF_VAR_cluster_name: slurmci_${{ matrix.os_version }}_${{ github.run_number }}
+      TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v2
