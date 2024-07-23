@@ -1,4 +1,4 @@
-- hosts: eessi
+- hosts: eessi:!builder
   become: yes
   gather_facts: no
   tags:
@@ -17,7 +17,7 @@
           CVMFS_HTTP_PROXY='{{ groups['squid'] | map('extract', hostvars, 'ansible_host') | product([squid_http_port]) | map('join', ':') | join(';') }}'
           CVMFS_FORCE_SIGNING=True
 
-- hosts: control
+- hosts: control:!builder
   become: yes
   gather_facts: no
   tags: openhpc
