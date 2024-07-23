@@ -41,10 +41,12 @@ module "cluster" {
       }
       a40 = {
         flavor = "baremetal.r7525.256cpu.a40"
-        image_id = "bbffdb18-5dbb-4271-ba8f-950c2cbdd616" # openhpc-extra-RL9-240719-1402-bc56229b
+        image_id = "9fa9cc54-7447-4204-8d88-aaf0f314c648" # openhpc-extra-RL9-240723-1238-b5de8392
         vnic_type = "baremetal"
+        availability_zone_prefix = "nova::artemis-node-" # last portion of node name = hypervisor hostname
         nodes = [
-          "a40-0",
+          "a40-300",
+          "a40-301",
         ]
       }
     }
