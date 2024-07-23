@@ -1,5 +1,7 @@
 openhpc_slurm_partitions:
-  - name: "general"
+  - name: general
     default: YES
-  - name: "grid"
+  - name: grid
+    default: NO
+  - name: a40
     default: NO
