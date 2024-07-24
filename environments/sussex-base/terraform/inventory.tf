@@ -9,6 +9,8 @@ resource "local_file" "hosts" {
                             "squid_instances": openstack_compute_instance_v2.squid
                             "compute_groups": module.compute
                             "state_volume": data.openstack_blockstorage_volume_v3.state
+                            "var_compute": var.compute
+                            "compute_inventory_groups": distinct(flatten([for c in var.compute: lookup(c, "inventory_groups", [])]))
                           },
                           )
   filename = "../inventory/hosts.yml"

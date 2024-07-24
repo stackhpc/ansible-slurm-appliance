@@ -78,3 +78,9 @@ variable "availability_zone_prefix" {
     type = string
     default = ""
 }
+
+variable "inventory_groups" {
+    description = "Inventory groups to add the nodes into, in addition to 'compute' and the partition group"
+    type = list(string)
+    default = []
+}
