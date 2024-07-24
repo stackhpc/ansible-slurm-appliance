@@ -21,7 +21,7 @@
 - name: Setup CUDA
   hosts: cuda
   become: yes
-  gather_facts: no
+  gather_facts: yes
   tags: cuda
   tasks:
     - import_role:
