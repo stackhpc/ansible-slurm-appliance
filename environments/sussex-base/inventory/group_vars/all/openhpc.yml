@@ -16,7 +16,12 @@ openhpc_slurm_partitions:
     default: NO
   - name: gpu # all GPU nodes
     groups:
-      - name: a40 # TODO: gres
+      - name: a40
+        gres:
+          - conf: gpu:A40:2
+            file: /dev/nvidia[0-1]
     default: NO
 
-openhpc_config_extra: {} # parameters for slurm.conf
+openhpc_config_extra: # parameters for slurm.conf
+   GresTypes:
+    - gpu
