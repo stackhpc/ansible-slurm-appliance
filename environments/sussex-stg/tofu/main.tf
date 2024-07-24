@@ -38,7 +38,6 @@ module "cluster" {
             "general-0",
             "general-1",
           ]
-          inventory_groups = ["cuda"]
       }
       a40 = {
         flavor = "baremetal.r7525.256cpu.a40"
@@ -49,7 +48,6 @@ module "cluster" {
           "a40-300",
           "a40-301",
         ]
-        inventory_groups = ["cuda"]
       }
     }
 }

@@ -44,15 +44,3 @@ compute:
 %{ for group_name in keys(compute_groups) ~}
         ${cluster_name}_${group_name}:
 %{ endfor ~}
-
-%{ for inventory_group in distinct(
-    flatten([for c in var_compute: lookup(c, "inventory_groups", [])])
-    ) ~}
-${inventory_group}:
-    children:
-%{ for k, v in var_compute ~}
-%{ if contains(lookup(v, "inventory_groups", []), inventory_group) ~}
-        ${cluster_name}_${k}:
-%{ endif ~}
-%{ endfor ~}
-%{ endfor ~}
