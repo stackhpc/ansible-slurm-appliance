@@ -33,6 +33,9 @@ basic_users_users_staff:
       - adm # enables ssh to control nodes even without a job running
       - systemd-journal
     sudo: sussex_admin ALL=(ALL) NOPASSWD:ALL
+  - name: ood.basic.user
+    password: "{{ vault_ood_basic_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+    uid: 1007
 
 basic_users_groups_grid:
   - gid: 72000
