@@ -22,9 +22,6 @@ roles:
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
     version: v24.5.1 # Support ceph quincy for RL9
-  - src: https://github.com/stackhpc/ansible-role-linux-ansible-init.git
-    name: stackhpc.linux-ansible-init
-    version: main # update when released
 
 collections:
   - name: containers.podman
@@ -51,5 +48,5 @@ collections:
     version: 0.2.0
   - name: https://github.com/azimuth-cloud/ansible-collection-image-utils
     type: git
-    version: 0.1.0
+    version: main # update on release
 ...

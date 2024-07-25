@@ -254,7 +254,7 @@
 - hosts: ansible_init
   gather_facts: yes
   become: yes
-  tags: linux-ansible-init
+  tags: linux_ansible_init
   tasks:
     - include_role:
-        name: azimuth_cloud.image_utils.linux-ansible-init
+        name: azimuth_cloud.image_utils.linux_ansible_init
