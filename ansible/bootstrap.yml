@@ -1,6 +1,6 @@
 ---
 
-- hosts: ansible_init
+- hosts: cluster
   gather_facts: false
   become: yes
   tasks:
@@ -257,4 +257,4 @@
   tags: linux-ansible-init
   tasks:
     - include_role:
-        name: stackhpc.linux-ansible-init
+        name: azimuth_cloud.image_utils.linux-ansible-init
