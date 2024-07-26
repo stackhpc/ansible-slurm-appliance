@@ -43,23 +43,22 @@ module "cluster" {
         flavor = "baremetal.r7525.128cpu.1tbram.a40"
         image_id = "9fa9cc54-7447-4204-8d88-aaf0f314c648" # openhpc-extra-RL9-240723-1238-b5de8392
         vnic_type = "baremetal"
-        availability_zone_prefix = "nova::artemis-node-" # last portion of node name = hypervisor hostname
-        nodes = [
-          "a40-300",
-          "a40-301",
-          "a40-307",
-          "a40-308",
+        nodes = [ # use -10 for 1TB nodes
+          "a40-10",
+          "a40-11",
+          "a40-12",
+          "a40-13",
+          "a40-14",
          ]
       }
       a40_512 = {
         flavor = "baremetal.r7525.128cpu.512gbram.a40"
         image_id = "9fa9cc54-7447-4204-8d88-aaf0f314c648" # openhpc-extra-RL9-240723-1238-b5de8392
         vnic_type = "baremetal"
-        availability_zone_prefix = "nova::artemis-node-" # last portion of node name = hypervisor hostname
-        nodes = [
-          "a40-303",
-          "a40-304",
-          "a40-306",
+        nodes = [ # use -00 for 500GB nodes
+          "a40-00",
+          "a40-01",
+          "a40-02",
         ]
       }
     }
