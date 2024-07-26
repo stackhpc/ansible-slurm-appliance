@@ -62,3 +62,12 @@
           +:adm:ALL
           -:ALL:ALL
       # vagrant uses (deprecated) ansible_ssh_user
+
+- name: activate log rotation
+  hosts: openhpc
+  tags:
+    - logrotate
+    - openhpc
+  tasks:
+    - import_role:
+        name: logrotate

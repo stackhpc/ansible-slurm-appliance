@@ -58,4 +58,5 @@ roles/*
 !roles/squid/**
 !roles/tuned/
 !roles/tuned/**
-
+!roles/logrotate/
+!roles/logrotate/**

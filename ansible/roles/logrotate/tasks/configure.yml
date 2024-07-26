@@ -1,0 +1,24 @@
+---
+- name: Deploy slurmctld logrotate configuration
+  template:
+    src: slurmctld-logrotate.conf.j2
+    dest: /etc/logrotate.d/slurmctld
+  when:
+    - openhpc_enable.control
+    - "'SlurmctldLogFile' in openhpc_config_extra"
+
+- name: Deploy slurmd logrotate configuration
+  template:
+    src: slurmd-logrotate.conf.j2
+    dest: /etc/logrotate.d/slurmd
+  when:
+    - openhpc_enable.batch
+    - "'SlurmdLogFile' in openhpc_config_extra"
+
+- name: Deploy slurmdbd logrotate configuration
+  template:
+    src: slurmdbd-logrotate.conf.j2
+    dest: /etc/logrotate.d/slurmdbd
+  when:
+    - openhpc_enable.database
+    - "'SlurmdbdLogFile' in openhpc_config_extra"
