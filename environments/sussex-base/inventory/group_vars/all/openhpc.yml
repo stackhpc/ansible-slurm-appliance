@@ -8,13 +8,15 @@
 #   evaluated inside the role. NB: this filter returns a list.
 _general_nodes:
   - "{{ groups[openhpc_cluster_name + '_general'] | hostlist_expression | join(',') }}"
-  - "{{ groups[openhpc_cluster_name + '_a40'] | hostlist_expression | join(',') }}"
+  - "{{ groups[openhpc_cluster_name + '_a40_1024'] | hostlist_expression | join(',') }}"
+  - "{{ groups[openhpc_cluster_name + '_a40_512'] | hostlist_expression | join(',') }}"
 
 openhpc_slurm_partitions:
   - name: general # all nodes except grid
     groups:
       - name: general
-      - name: general_a40 # needs to not match an inventory group
+      - name: general_a40_1024 # needs to not match an inventory group
+      - name: general_a40_512
     partition_params:
       Nodes: "{{ _general_nodes | join(',') }}"
     default: YES
