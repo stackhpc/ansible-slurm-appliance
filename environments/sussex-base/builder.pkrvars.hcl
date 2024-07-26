@@ -1,4 +1,3 @@
-# Flavor has root size 30GB = resulting virtual image size
 flavor = "general.v1.4cpu.8gb"
 image_disk_format = "qcow2" # default comes out as raw for some reason
 use_blockstorage_volume = true # required to set image image_disk_format
