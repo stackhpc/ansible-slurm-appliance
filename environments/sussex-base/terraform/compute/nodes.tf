@@ -26,7 +26,6 @@ resource "openstack_compute_instance_v2" "compute" {
   image_id = var.image_id
   flavor_name = var.flavor
   key_pair = var.key_pair
-  availability_zone = var.availability_zone_prefix == "" ? null : "${var.availability_zone_prefix}${regex(".*-(.*)$", each.key)[0]}"
 
   dynamic "block_device" {
     for_each = var.volume_backed_instances ? [1]: []

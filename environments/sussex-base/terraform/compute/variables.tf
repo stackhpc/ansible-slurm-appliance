@@ -72,9 +72,3 @@ variable "root_volume_size" {
 variable "security_group_ids" {
     type = list
 }
-
-variable "availability_zone_prefix" {
-    description = "If non-empty, then the availability_zone is set to this + the last portion of the nodename when split on '-'"
-    type = string
-    default = ""
-}

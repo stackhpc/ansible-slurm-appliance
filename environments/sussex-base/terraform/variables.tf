@@ -73,7 +73,6 @@ variable "compute" {
             image_id: Overrides variable cluster_image_id
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
-            availability_zone_prefix: If set, use this + last portion of nodename when split on '-' to set availability_zone.
     EOF
 }
 
