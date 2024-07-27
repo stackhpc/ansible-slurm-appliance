@@ -1,0 +1,25 @@
+# - name: Import parent hook
+#   vars:
+#     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+#   import_playbook: "{{ appliances_environment_root }}/../nrel/hooks/pre.yml"
+
+- name: "Do the preliminary node setups"
+  hosts: all
+  # tags: pre_tasks_all
+  become: true
+  tasks:
+    - include_role:
+        name: vshpc.prov.pre-tasks
+
+# TODO: KBENDL - check compatibility with new playbook
+- name: "NREL pre - Mount cephfs volumes"
+  hosts: all
+  tags:
+    - vs_pre
+    - aco.core.cephfs
+  become: true
+  tasks:
+    - include_role:
+        name: aco.core.cephfs
+      tags:
+        - aco.core.cephfs

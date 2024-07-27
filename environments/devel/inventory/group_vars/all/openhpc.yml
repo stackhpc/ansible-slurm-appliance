@@ -1,0 +1,20 @@
+#
+#openhpc_config_files:
+#  # gres.conf from role defaults:
+#  - template:
+#      dest: "{{ slurm_build_dir }}/etc/gres.conf"
+#      src: "{{ openhpc_gres_template }}"
+#      mode: "0600"
+#      owner: slurm
+#      group: slurm
+#    enable: control
+#
+#  # cgroups.conf - appears to be required even with NO cgroup plugins:
+#  - template:
+#      dest: "{{ slurm_build_dir }}/etc/cgroup.conf"
+#      src: "{{ appliances_environment_root }}/cgroup.conf.j2"
+#      mode: "0644" # perms/ownership based off src from ohpc package
+#      owner: root
+#      group: root
+#    enable: control
+#

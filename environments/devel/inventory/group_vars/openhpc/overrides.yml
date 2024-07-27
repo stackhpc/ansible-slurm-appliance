@@ -1,0 +1,34 @@
+# define paths to slurm on nodes:
+slurm_build_version: '23.11.1' # quote to avoid ansible autoconversion weirdness
+slurm_build_path: /nopt/devel/slurm
+slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
+
+openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
+openhpc_lib_dir: "{{ slurm_build_dir }}/slurm"
+openhpc_bin_dir: "{{ slurm_build_dir }}/bin"
+openhpc_slurm_conf_path: "{{ slurm_build_dir }}/etc/slurm.conf"
+
+openhpc_packages_extra: "{{ openhpc_packages_extra_nrel}}"
+
+openhpc_slurm_partitions:
+  - name: "sm"
+    default: YES
+    maxtime: "4-0" # 1 days 0 hours
+  - name: "gpu"
+    default: NO
+    maxtime: "4-0" # 1 days 0 hours
+  - name: "lg"
+    default: NO
+    maxtime: "4-0" # 1 days 0 hours
+  # - name: "gpu8a100"
+  #   default: NO
+  #   maxtime: "4-0" # 1 days 0 hours
+  # - name: "gpu4a100"
+  #   default: NO
+  #   maxtime: "4-0" # 1 days 0 hours
+  # - name: "std"
+  #   default: YES
+  #   maxtime: "1-0" # 1 days 0 hours
+  # - name: "t"
+  #   default: NO
+  #   maxtime: "4:0:0" # 4 hour 0m 0s

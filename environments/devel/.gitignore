@@ -1,0 +1,3 @@
+inventory/group_vars/all/secrets.yml
+terraform/.terraform.lock.hcl
+*.bak

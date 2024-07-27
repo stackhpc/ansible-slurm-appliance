@@ -1,0 +1,12 @@
+spack_root: /nopt/devel/spack
+spack_version: develop
+spack_packages:
+  - "openmpi@4.0.5 %gcc@9.3.0 fabrics=ucx schedulers=auto"
+  # Need gromacs 2016 for HECBioSim benchmarks, this is latest (have to specify version to avoid "no hash" complaint)
+  # Have to specify openmpi variant to use the above one again
+  # Have to specify ucx flags to avoid spec clash
+  #- "gromacs@2016.6 %gcc@9.3.0 ^openmpi fabrics=ucx schedulers=auto ^ucx +thread_multiple"
+  - "intel-mpi-benchmarks ^openmpi@4.0.5 fabrics=ucx schedulers=auto"
+  - "cp2k ^openmpi@4.0.5 fabrics=ucx schedulers=auto ^fftw+openmp ^openblas threads=openmp"
+  - "miniconda3"
+  - "reframe"

@@ -1,0 +1,4 @@
+- name: Import parent hook
+  vars:
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+  import_playbook: "{{ appliances_environment_root }}/../nrel/hooks/post.yml"

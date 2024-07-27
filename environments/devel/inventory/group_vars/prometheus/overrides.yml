@@ -1,0 +1,61 @@
+---
+
+# See: https://github.com/cloudalchemy/ansible-prometheus
+# for variable definitions
+
+prometheus_web_external_url: "http://{{ prometheus_address }}:9090"
+prometheus_storage_retention: "2y"
+prometheus_storage_retention_size: "500GB"
+
+prometheus_alertmanager_config: []
+
+prometheus_alert_rules_files:
+- "{{ appliances_repository_root }}/environments/common/files/prometheus/rules/*.rules"
+
+prometheus_alert_rules: []
+
+# Can set a hostvar 'env' to an arbitrary string to group prometheus targets, e.g. rack.
+# env: location-1
+prometheus_targets:
+  node: "{{ groups.get('node_exporter', []) | reject('equalto', 'localhost') | prometheus_node_exporter_targets(env | default('ungrouped')) }}"
+
+prometheus_scrape_configs_default:
+- job_name: "prometheus"
+  metrics_path: "/metrics"
+  static_configs:
+  - targets:
+    - "{{ prometheus_address }}:9090"
+- job_name: "grafana"
+  static_configs:
+  - targets:
+    - "{{ grafana_api_address }}:{{ grafana_port }}"
+- job_name: "node"
+  file_sd_configs:
+  - files:
+    - "/etc/prometheus/file_sd/node.yml"
+  relabel_configs:
+  # strip off port
+  - source_labels: ['__address__']
+    separator:     ':'
+    regex:         '(.*):.*'
+    target_label:  'instance'
+    replacement:   '${1}'
+  params:
+    collect[]:
+      - netdev
+      - cpu
+      - meminfo
+      - bonding
+      - infiniband
+      - cpufreq
+  scrape_interval: 30s
+  scrape_timeout: 20s
+
+- job_name: "slurm_exporter"
+  scrape_interval: 30s
+  scrape_timeout: 30s
+  static_configs:
+    - targets:
+      - "{{ openhpc_slurm_control_host }}:{{ slurm_exporter_port }}"
+
+prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"

@@ -1,0 +1,103 @@
+---
+roles:
+
+  - name: vshpc.prov.pre-tasks
+    src: git+git@github.nrel.gov:acoinf/vshpc.prov.pre-tasks.git
+    type: git
+    version: main
+
+  # - name: aco.prov.yum
+  #   src: git+git@github.nrel.gov:acoinf/aco.prov.yum.git
+  #   version: main
+
+  # - name: root_pass
+  #   src: git+git@github.nrel.gov:hpc/ansible_root_pass.git
+  #   version: master
+
+  # - name: root_pass_cli
+  #   src: git+git@github.nrel.gov:hpc/root_pass_cli.git
+  #   type: git
+
+  - name: openstack_stackmgr_user
+    src: git+git@github.nrel.gov:hpc/openstack_stackmgr_user.git
+    type: git
+    version: main
+
+  # - name: vs.core.vastmount
+  #   src: git+git@github.nrel.gov:acoinf/vs.core.vastmount.git
+  #   type: git
+  #  version: main
+
+  - name: aco.core.motd
+    src: git+git@github.nrel.gov:acoinf/aco.core.motd.git
+    type: git
+    version: main
+
+  - name: aco.core.logging
+    src: git+git@github.nrel.gov:acoinf/aco.core.logging.git
+    type: git
+    version: main
+
+  - name: aco.core.cephfs
+    src: git+git@github.nrel.gov:acoinf/aco.core.cephfs
+    type: git
+    version: main
+
+  - name: ansible_ipa_ldap_fix
+    src: git+git@github.nrel.gov:hpc/ansible_ipa_ldap_fix.git
+    type: git
+    version: main
+
+  - name: vermilion_ldap_client
+    src: git+git@github.nrel.gov:hpc/vermilion_ldap_client.git
+    type: git
+    version: main
+
+  - name: aco.core.ntp
+    src: git+git@github.nrel.gov:acoinf/aco.core.ntp
+    type: git
+    version: main
+
+  - name: vs-set-ephemeral-mounts
+    src: git+git@github.nrel.gov:hpc/vs-set-ephemeral-mounts.git
+    type: git
+    version: main
+
+  - name: vshpc.prov.pam_mkhomedir_plus
+    src: git+git@github.nrel.gov:acoinf/vshpc.prov.pam_mkhomedir_plus.git
+    type: git
+    version: main
+    #version: feature/ansible-galaxy
+
+  - name: ipaclient
+    src: git+git@github.nrel.gov:hpc/ipaclient.git
+    type: git
+    version: main
+
+  - name: vs_nvidia_a100_driver_install
+    src: git+git@github.nrel.gov:hpc/vs_nvidia_a100_driver_install.git
+    type: git
+    version: main
+
+######
+# TODO: All the "lex" integration stuff has diverged and need to be re-addressed.
+######
+  # - name: cluster_config_manager
+  #   src: git+git@github.nrel.gov:hpc/cluster_config_manager.git
+  #   type: git
+  #   version: feature/galaxy-role-install
+#
+  # - name: cluster_dataset_manager
+  #   src: git+git@github.nrel.gov:hpc/cluster_dataset_manager.git
+  #   type: git
+  #   version: feature/generic_for_vermilion
+#
+  # - name: sync_slurm_allocations
+  #   src: git+git@github.nrel.gov:hpc/sync_slurm_allocations.git
+  #   type: git
+  #   version: feature/port_from_eagle_to_generic
+#
+  # - name: slurm_lex_accounting
+  #   src: git+git@github.nrel.gov:hpc/slurm_lex_accounting.git
+  #   type: git
+  #   version: master

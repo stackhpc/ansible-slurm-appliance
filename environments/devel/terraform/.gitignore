@@ -1,0 +1,4 @@
+cloud-config.tftpl
+vtest_plan
+devel_plan
+.terraform.tfstate.lock.info

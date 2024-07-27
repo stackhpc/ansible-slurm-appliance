@@ -1,0 +1,20 @@
+---
+# sync_slurm_allocations vars
+sync_slurm_allocations_clustername: "vdevel"
+slurm_sync_allocations_log_file: "sync_slurm_accounting_vdevel.log"
+
+#slurm_sync_allocations_log_path: "/var/log"
+# slurm_sync_allocations_vault_file: "vault"
+# slurm_sync_allocations_vault_secret_file: "sync_slurm_allocations_secret.yml"
+
+#slurm_sync_allocations_log_path: "/var/log"
+#slurm_sync_allocations_slurm_path: "/usr/sbin"
+
+#slurm_sync_allocations_install_path: "/nopt/{{sync_slurm_allocations_clustername}}/lex/slurm_sync_allocations"
+
+# sync_slurm_allocations vars
+slurm_lex_accounting_dev: False
+#slurm_lex_accounting_clustername: "{{ vermilion_cluster_name_prefix }}"
+
+#sync_slurm_allocations_clustername: "{{ vermilion_cluster_name_prefix }}"
+#slurm_sync_allocations_log_file: "sync_slurm_accounting_{{ vermilion_cluster_name_prefix }}.log"
