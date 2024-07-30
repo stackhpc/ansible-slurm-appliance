@@ -5,7 +5,3 @@ nfs_server
 [cluster:children]
 nfs_server
 squid
-
-[cuda:children]
-stg_a40_1024
-stg_a40_512
