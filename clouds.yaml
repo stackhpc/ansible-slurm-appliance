@@ -1,0 +1,18 @@
+# This is a clouds.yaml file, which can be used by OpenStack tools as a source
+# of configuration on how to connect to a cloud. If this is your only cloud,
+# just put this file in ~/.config/openstack/clouds.yaml and tools like
+# python-openstackclient will just work with no further config. (You will need
+# to add your password to the auth section)
+# If you have more than one cloud account, add the cloud entry to the clouds
+# section of your existing file and you can refer to them by name with
+# OS_CLOUD=openstack or --os-cloud=openstack
+clouds:
+  openstack:
+    auth:
+      auth_url: https://api.sms-lab.cloud:5000
+      application_credential_id: "fd66a6a6675d44859d8f562f1ba5d758"
+      application_credential_secret: "FumD5djjLH1Xxg7zyldr-dzBLsMF3g0TGXnAroDAggBiV6_DotlqNIARbsWi9EvVzkC3sHNDElKBED8eaeguYA"
+    region_name: "RegionOne"
+    interface: "public"
+    identity_api_version: 3
+    auth_type: "v3applicationcredential"
