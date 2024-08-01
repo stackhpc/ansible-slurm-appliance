@@ -7,9 +7,9 @@ ipaclient_force: yes
 ipaclient_mkhomedir: yes
 ipaclient_allow_repair: yes
 ipaclient_ntp_servers:
-  - ds1.hpc.nrel.gov
-  - ds2.hpc.nrel.gov
-  - ds3.hpc.nrel.gov
+  - time.hpc.nrel.gov
+  - time2.nrel.gov
+  - time.nrel.gov
 
 ipaserver_domain: hpc.nrel.gov
 ipaserver_realm: HPC.NREL.GOV
