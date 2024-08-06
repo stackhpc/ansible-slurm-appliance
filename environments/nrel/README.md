@@ -3,7 +3,8 @@
 This README covers the NREL-specific environments:
    - `nrel`: Shared base environment for other NREL environments - do not activate this.
    - `prod`: Production environment using VMs on AMD Epyc hypervisors with RoCE.
-   - `vtest`: Test & development environment at NREL.
+   - `vtest`: Test & development environment at NREL. Suitable for users.
+   - `devel`: Development - bleeding-edge NREL development environment. No users here.
    - `lab`: Development environment for StackHPC on `sms-labs`, using VMs without RoCE.
 
 This README is supplimentary to the main readme at ../../README.md so only differences/additinoal information is noted here. Paths are relative to the environment unless otherwise noted.
