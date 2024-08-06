@@ -1,11 +1,11 @@
-cuda_distro: rhel8
+cuda_distro: "rhel{{ ansible_distribution_major_version }}"
 cuda_repo: "https://developer.download.nvidia.com/compute/cuda/repos/{{ cuda_distro }}/x86_64/cuda-{{ cuda_distro }}.repo"
 cuda_driver_stream: default
 cuda_packages:
   - cuda
   - nvidia-gds
 # _cuda_version_tuple: # discovered from installed package e.g. ('12', '1', '0')
-cuda_version_short: "{{ _cuda_version_tuple[0] }}.{{ cuda_version_tuple[1] }}"
+cuda_version_short: "{{ _cuda_version_tuple[0] }}.{{ _cuda_version_tuple[1] }}"
 cuda_samples_release_url: "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v{{ cuda_version_short }}.tar.gz"
 cuda_samples_path: "/home/{{ ansible_user }}/cuda_samples"
 cuda_samples_programs:

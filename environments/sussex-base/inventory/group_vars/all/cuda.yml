@@ -1,0 +1,1 @@
+cuda_version_short: 12.4.1 # used for cuda samples (only). Installed cuda is 12.5.1 which isn't available for cuda samples

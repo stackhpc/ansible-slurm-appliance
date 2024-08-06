@@ -12,3 +12,7 @@ prd_general
 
 [openondemand_jupyter:children]
 prd_general
+
+[cuda:children]
+prd_a40_1024
+prd_a40_512

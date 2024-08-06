@@ -13,12 +13,3 @@ resource "local_file" "hosts" {
                           )
   filename = "../inventory/hosts.yml"
 }
-
-# resource "local_file" "partitions" {
-#     content  = templatefile("${path.module}/partitions.tpl",
-#                             {
-#                               "compute_types": var.compute_types,
-#                             },
-#     )
-#     filename = "../inventory/group_vars/all/partitions.yml" # as all/ is created by skeleton
-# }
