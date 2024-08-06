@@ -1,5 +1,17 @@
-openhpc_install_type: generic # i.e. don't want OpenHPC
+#openhpc_install_type: generic # i.e. don't want OpenHPC
+#slurm_build_version: '23.11.1' # quote to avoid ansible autoconversion weirdness
+slurm_build_path: /nopt/vtest/slurm
+slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
+
+openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
+openhpc_lib_dir: "{{ slurm_build_dir }}/slurm"
+openhpc_bin_dir: "{{ slurm_build_dir }}/bin"
+openhpc_slurm_conf_path: "{{ slurm_build_dir }}/etc/slurm.conf"
+
+openhpc_packages_extra: "{{ openhpc_packages_extra_nrel }}"
+
 openhpc_packages_extra_nrel: # extra indirection to allow lab environment to filter this
+  - vim
   # - bzip2
   # - curl
   # - fio
@@ -15,7 +27,6 @@ openhpc_packages_extra_nrel: # extra indirection to allow lab environment to fil
   # - xz
   # - zstd
   # - tmux
-  # - vim
   # - nano
   # - python39-devel
 
