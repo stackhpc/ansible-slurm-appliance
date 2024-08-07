@@ -46,4 +46,7 @@ collections:
   - name: https://github.com/stackhpc/ansible-collection-terraform
     type: git
     version: 0.2.0
+  - name: https://github.com/azimuth-cloud/ansible-collection-image-utils
+    type: git
+    version: main # update on release
 ...
