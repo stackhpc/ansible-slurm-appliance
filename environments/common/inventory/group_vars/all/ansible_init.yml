@@ -1,0 +1,1 @@
+ansible_init_wait: 1200 # seconds

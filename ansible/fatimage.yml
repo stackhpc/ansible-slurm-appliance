@@ -68,11 +68,13 @@
         tasks_from: install-package.yml
         vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
     # # FUTURE: install-apps.yml - this is git clones
+
     - name: Open Ondemand server (apps)
       include_role:
         name: osc.ood
         tasks_from: install-apps.yml
         vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
+
     - name: Open Ondemand remote desktop
       import_role:
         name: openondemand
