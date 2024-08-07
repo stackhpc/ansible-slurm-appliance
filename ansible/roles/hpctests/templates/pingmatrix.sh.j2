@@ -16,4 +16,8 @@ echo UCX_NET_DEVICES: $UCX_NET_DEVICES
 module load {{ hpctests_pingmatrix_modules | join(' ' ) }}
 
 mpicc -o nxnlatbw mpi_nxnlatbw.c
+
+{# mpirun flags force using UCX TCP transports, overriding higher #}
+{# priority of OpenMPI btl/openib component, which is also using RDMA #}
+{# https://wiki.stackhpc.com/s/985dae84-7bd8-4924-94b7-9629a7827100 #}
 mpirun -mca pml_ucx_tls any -mca pml_ucx_devices any nxnlatbw
