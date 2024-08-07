@@ -16,4 +16,4 @@ echo UCX_NET_DEVICES: $UCX_NET_DEVICES
 module load {{ hpctests_pingpong_modules | join(' ' ) }}
 
 #srun --mpi=pmi2 IMB-MPI1 pingpong # doesn't work in ohpc v2.1
-mpirun IMB-MPI1 pingpong
+mpirun -mca pml_ucx_tls any -mca pml_ucx_devices any IMB-MPI1 pingpong
