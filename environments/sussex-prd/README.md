@@ -60,12 +60,10 @@ exported to the login node to allow the `persist_hostkeys` role to be used.
 
 # Exports and Resources
 
-- From the NFS server (`prd-nfs`): `/exports/grid-sessions` for GridPP user session data.
-- From the control node (`prd-control`): `/exports/slurm-binaries` for Slurm user binaries.
+- From the NFS server (`prd-nfs`): `/exports/grid-sessions/` for GridPP user session data.
+- From the control node (`prd-control`): `/exports/slurm/` for Slurm user binaries (in `bin/`) and `slurm.conf` configuration (in `etc/`).
 
 Mounting both of these on the `arc-ce` VM will require that VM to be added to the cluster's security group.
-
-The cluster will copy slurm command and `munge` executables into the Manila/CephFS share `slurm-software` at `apps/slurm/current/bin`.
 
 # Images
 

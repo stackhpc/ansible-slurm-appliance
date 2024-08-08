@@ -6,10 +6,11 @@
 # - To avoid having to explicitly list the nodes, we can use the hostlist_expression
 #   filter provided by the stackhpc.openhpc role. This works as this expression is
 #   evaluated inside the role. NB: this filter returns a list.
+# - Have to handle the GPU nodes not existing in staging.
 _general_nodes:
   - "{{ groups[openhpc_cluster_name + '_general'] | hostlist_expression | join(',') }}"
-  - "{{ groups[openhpc_cluster_name + '_a40_1024'] | hostlist_expression | join(',') }}"
-  - "{{ groups[openhpc_cluster_name + '_a40_512'] | hostlist_expression | join(',') }}"
+  - "{{ groups.get(openhpc_cluster_name + '_a40_1024', []) | hostlist_expression | join(',') }}"
+  - "{{ groups.get(openhpc_cluster_name + '_a40_512', []) | hostlist_expression | join(',') }}"
 
 openhpc_slurm_partitions:
   - name: general # all nodes except grid - this templates the actual ${cluster_name}-general nodes ...
