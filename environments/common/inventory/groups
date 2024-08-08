@@ -132,3 +132,6 @@ freeipa_client
 
 [tuned]
 # Hosts to run TuneD configuration
+
+[ansible_init]
+# Hosts to run linux-anisble-init

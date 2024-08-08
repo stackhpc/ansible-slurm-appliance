@@ -1,5 +1,20 @@
 ---
 
+- hosts: cluster
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Check if ansible-init is installed
+      stat:
+        path: /etc/systemd/system/ansible-init.service
+      register: _stat_ansible_init_unitfile
+    
+    - name: Wait for ansible-init to finish
+      wait_for:
+        path: /var/lib/ansible-init.done
+        timeout: "{{ ansible_init_wait }}" # seconds
+      when: _stat_ansible_init_unitfile.stat.exists
+
 - hosts: localhost
   gather_facts: false
   become: false
@@ -235,3 +250,11 @@
   tasks:
     - include_role:
         name: ofed
+
+- hosts: ansible_init
+  gather_facts: yes
+  become: yes
+  tags: linux_ansible_init
+  tasks:
+    - include_role:
+        name: azimuth_cloud.image_utils.linux_ansible_init
