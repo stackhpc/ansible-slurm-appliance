@@ -16,7 +16,7 @@ jobs:
   openstack:
     name: openstack-ci
     concurrency: ${{ github.ref }}-{{ matrix.os_version }} # to branch/PR + OS
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         os_version: [RL8, RL9]
