@@ -23,6 +23,3 @@ groups = {
 networks = ["2127b46a-9cca-4f40-b030-e54cc73cf354"] # slurm - want direct outbound internet
 ssh_keypair_name = "slurm-deploy-v2"
 ssh_private_key_file = "~/.ssh/slurm-deploy-v2"
-ssh_bastion_host = "139.184.83.151" # STAGING login fip
-ssh_bastion_private_key_file = "~/.ssh/slurm-deploy-v2"
-ssh_bastion_username = "rocky"
