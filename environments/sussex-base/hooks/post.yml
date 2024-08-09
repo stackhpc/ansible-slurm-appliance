@@ -22,53 +22,25 @@
   gather_facts: no
   tags: openhpc
   vars:
-    slurm_user_cmds:
-      - sacct
-      - sacctmgr
-      - salloc
-      - sattach
-      - sbatch
-      - sbcast
-      - scancel
-      - scontrol
-      - scrontab
-      - scrun
-      - sdiag
-      - sinfo
-      - sprio
-      - squeue
-      - sreport
-      - srun
-      - sshare
-      - sstat
-      - strigger
-      - munge # not really a user command but lives in same place
+    slurm_files:
+      - /etc/slurm/slurm.conf
+      - /etc/hosts
   tasks:
     # NB: NFS role ensures sussex_shared_slurm_path exists
     - name: Ensure {{ sussex_shared_slurm_path }} subdirectories exist
       file:
-        path: "{{ sussex_shared_slurm_path }}/{{ item }}"
+        path: "{{ sussex_shared_slurm_path }}/{{ item | dirname }}"
         state: directory
         owner: root
         group: root
         mode: ug=rwX,o=rX
-      loop:
-        - bin
-        - etc
-    - name: Copy slurm binaries into shared directory
+      loop: "{{ slurm_files }}"
+    - name: Copy slurm cluster files into shared directory
       copy:
         remote_src: true
-        src: "/usr/bin/{{ item }}"
-        dest: "{{ sussex_shared_slurm_path }}/bin/{{ item }}"
+        src: "{{ item }}"
+        dest: "{{ sussex_shared_slurm_path }}{{ item }}"
         owner: root
         group: root
-        mode: ug=rwx,o=rx
-      loop: "{{ slurm_user_cmds }}"
-    - name: Copy slurm.conf into shared directory
-      copy:
-        remote_src: true
-        src: /etc/slurm/slurm.conf
-        dest: "{{ sussex_shared_slurm_path }}/etc/slurm.conf"
-        owner: root
-        group: root
-        mode: ug=rw,o=r
+        mode: preserve
+      loop: "{{ slurm_files }}"
