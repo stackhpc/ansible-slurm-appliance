@@ -41,8 +41,8 @@ The steps for building site-specific fat images or extending an existing fat ima
 
   Note that the `-only` flag here restricts the build to the non-OFED fat image "source" (in Packer terminology). Other
   source options are:
-    - `-only=openhpc-ofed`: Build a fat image including Mellanox OFED
-    - `-only=openhpc-extra`: Build an image which extends an existing fat image - in this case the variable `source_image` or `source_image_name}` must also be set in the Packer variables file.
+    - `-only=openstack.openhpc-ofed`: Build a fat image including Mellanox OFED
+    - `-only=openstack.openhpc-extra`: Build an image which extends an existing fat image - in this case the variable `source_image` or `source_image_name}` must also be set in the Packer variables file.
     
 5. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc-` and including a timestamp and a shortened git hash.
 
