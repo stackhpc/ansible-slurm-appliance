@@ -27,12 +27,6 @@ It is recommended to check the following before starting:
 
 ## Installation on deployment host
 
-Current Operating Systems supported to be deploy hosts:
-
-- Rocky Linux 9
-- Rocky Linux 8
-- Ubuntu 22.04
-
 These instructions assume the deployment host is running Rocky Linux 8:
 
     sudo yum install -y git python38
