@@ -2,7 +2,9 @@
   become: yes
   gather_facts: false
   tasks:
-    - name: Delete trivy vulnerable files
+    - name: Delete ondemand files causing Trivy scan false-positives
+      # Raised at https://github.com/OSC/ondemand/security/advisories/GHSA-f7j8-ppqm-m5vw
+      # All declared not to be an issue by Open Ondemand as relevant packages not installed
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
