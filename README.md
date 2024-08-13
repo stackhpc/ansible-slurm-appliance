@@ -34,6 +34,8 @@ These instructions assume the deployment host is running Rocky Linux 8:
     cd ansible-slurm-appliance
     ./dev/setup-env.sh
 
+You will also need to install [OpenTofu](https://opentofu.org/docs/intro/install/rpm/).
+
 ## Overview of directory structure
 
 - `environments/`: Contains configurations for both a "common" environment and one or more environments derived from this for your site. These define ansible inventory and may also contain provisioning automation such as Terraform or OpenStack HEAT templates.
