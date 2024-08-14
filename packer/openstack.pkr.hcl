@@ -150,6 +150,7 @@ variable "groups" {
     # fat image builds:
     openhpc = ["control", "compute", "login"]
     openhpc-ofed = ["control", "compute", "login", "ofed"]
+    openhpc-cuda = ["control", "compute", "login", "ofed", "cuda"]
   }
 }
 
@@ -193,6 +194,11 @@ build {
   # OFED fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-ofed"
+  }
+
+  # CUDA fat image:
+  source "source.openstack.openhpc" {
+    name = "openhpc-cuda"
   }
 
   # Extended site-specific image, built on fat image:
