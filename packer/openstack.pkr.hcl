@@ -118,24 +118,24 @@ variable "manifest_output_path" {
   default = "packer-manifest.json"
 }
 
-variable "use_blockstorage_volume" {
-  type = bool
-  default = false
-}
-
 variable "volume_type" {
   type = string
   default = null
 }
 
 variable "volume_size" {
-  type = number
-  default = null # When not specified use the size of the builder instance root disk
+  type = map(number)
+  default = {
+    # fat image builds, GB:
+    openhpc = 15
+    openhpc-ofed = 15
+    openhpc-cuda = 25
+  }
 }
 
 variable "image_disk_format" {
   type = string
-  default = null # When not specified use the image default
+  default = "qcow2"
 }
 
 variable "metadata" {
@@ -157,13 +157,13 @@ variable "groups" {
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
-  use_blockstorage_volume = var.use_blockstorage_volume
+  use_blockstorage_volume = true
   volume_type = var.volume_type
+  volume_size = var.volume_size
   metadata = var.metadata
   networks = var.networks
   floating_ip_network = var.floating_ip_network
   security_groups = var.security_groups
-  volume_size = var.volume_size
   
   # Input image:
   source_image = "${var.source_image[var.os_version]}"
@@ -179,7 +179,7 @@ source "openstack" "openhpc" {
   ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
   
   # Output image:
-  image_disk_format = var.image_disk_format
+  image_disk_format = "qcow2"
   image_visibility = var.image_visibility
   image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
 }
