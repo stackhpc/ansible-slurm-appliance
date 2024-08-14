@@ -5,7 +5,7 @@ set -euo pipefail
 if [[ -f /etc/os-release ]]; then
     . /etc/os-release
     OS=$ID
-    VERSION_ID=$VERSION_ID
+    OS_VERSION=$VERSION_ID
 else
     exit 1
 fi
