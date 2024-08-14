@@ -31,7 +31,7 @@
 
 - name: Install build prerequisites
   dnf:
-    name: "{{ ofed_build_packages + (ofed_build_rl8_packages if ofed_distro_version == '8.9' else []) }}"
+    name: "{{ ofed_build_packages + (ofed_build_rl8_packages if ofed_distro_major_version == '8' else []) }}"
   when: "'MLNX_OFED_LINUX-' + ofed_version not in _ofed_info.stdout"
   # don't want to install a load of prereqs unnecessarily
 
