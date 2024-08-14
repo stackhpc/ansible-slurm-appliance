@@ -10,11 +10,13 @@
 
 - name: Check current kernel is newest installed
   assert:
-    that: _ofed_loaded_kernel.stdout == _ofed_dnf_kernels_newest
+    that: _ofed_kernel_current == _ofed_dnf_kernels_newest
     fail_msg: "Kernel {{ _ofed_loaded_kernel.stdout }} is loaded but newer {{ _ofed_dnf_kernels_newest }} is installed: consider rebooting?"
   vars:
+    _ofed_kernel_current: >-
+      {{ _ofed_loaded_kernel.stdout | regex_replace('\.(?:.(?!\.))+$', '') | regex_replace('\.(?:.(?!\.))+$', '') }}
     _ofed_dnf_kernels_newest: >-
-      {{ _ofed_dnf_kernels.stdout_lines[1:] | map('regex_replace', '^\w+\.(\w+)\s+(\S+)\s+\S+\s*$', '\2.\1') | community.general.version_sort | last }}
+      {{ _ofed_dnf_kernels.stdout_lines[1:] | map('split') | map(attribute=1) | map('regex_replace', '\.(?:.(?!\.))+$', '') | community.general.version_sort | last }}
     # dnf line format e.g. "kernel.x86_64  4.18.0-513.18.1.el8_9   @baseos  "
 
 - name: Enable epel
