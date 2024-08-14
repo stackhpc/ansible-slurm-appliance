@@ -10,7 +10,7 @@ else
     exit 1
 fi
 
-MAJOR_VERSION=$(echo $VERSION_ID | cut -d. -f1)
+MAJOR_VERSION=$(echo $OS_VERSION | cut -d. -f1)
 
 PYTHON_VERSION=""
 
