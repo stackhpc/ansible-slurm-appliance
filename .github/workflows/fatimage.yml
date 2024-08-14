@@ -17,7 +17,7 @@ jobs:
         build:
           - openstack.openhpc
           - openstack.openhpc-ofed
-          - openstack.opemhpc-cuda
+          - openstack.openhpc-cuda
         exclude:
           - os_version: RL8
             build: openstack.openhpc-ofed
