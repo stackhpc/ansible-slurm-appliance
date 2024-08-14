@@ -159,7 +159,7 @@ source "openstack" "openhpc" {
   flavor = var.flavor
   use_blockstorage_volume = true
   volume_type = var.volume_type
-  volume_size = var.volume_size
+  volume_size = var.volume_size[source.name]
   metadata = var.metadata
   networks = var.networks
   floating_ip_network = var.floating_ip_network
