@@ -29,6 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+
       - name: Setup ssh
         run: |
           set -x
