@@ -1,0 +1,21 @@
+#### NOTE:
+# If your path has dashes in it, systemctl needs you to escape it:
+#
+# example:
+#     systemd-escape -p "/mnt/shared-projects"
+
+ACO_NFS_MOUNT_DATA:
+  - NAME: datasets
+    DESCRIPTION: ""
+    SERVER_URI: 10.60.2.120:/datasets
+    MOUNTPOINT: /datasets
+    MOUNTPOINT_FILE: datasets
+    OPTS: rw,proto=tcp,port=20048,vers=3,nconnect=8,nofail
+
+  - NAME: shared-projects
+    DESCRIPTION: ""
+    SERVER_URI: 10.60.2.120:/shared-projects
+    MOUNTPOINT: /shared-projects
+    MOUNTPOINT_FILE: shared\x2dprojects
+    OPTS: rw,proto=tcp,port=20048,vers=3,nconnect=8,nofail
+
