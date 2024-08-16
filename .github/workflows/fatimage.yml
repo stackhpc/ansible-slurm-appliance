@@ -10,6 +10,7 @@ jobs:
     name: openstack-imagebuild
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9+OFED, RL9+CUDA versions
         os_version:
           - RL8
