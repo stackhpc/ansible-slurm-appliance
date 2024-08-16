@@ -12,10 +12,10 @@ ACO_NFS_MOUNT_DATA:
     MOUNTPOINT_FILE: datasets
     OPTS: rw,proto=tcp,port=20048,vers=3,nconnect=8,nofail
 
-  - NAME: shared-projects
-    DESCRIPTION: ""
-    SERVER_URI: 10.60.2.120:/shared-projects
-    MOUNTPOINT: /shared-projects
-    MOUNTPOINT_FILE: shared\x2dprojects
-    OPTS: rw,proto=tcp,port=20048,vers=3,nconnect=8,nofail
+  # - NAME: shared-projects
+  #   DESCRIPTION: ""
+  #   SERVER_URI: 10.60.2.120:/shared-projects
+  #   MOUNTPOINT: /shared-projects
+  #   MOUNTPOINT_FILE: shared\x2dprojects
+  #   OPTS: rw,proto=tcp,port=20048,vers=3,nconnect=8,nofail
 
