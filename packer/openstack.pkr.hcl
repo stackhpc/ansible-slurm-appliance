@@ -129,7 +129,7 @@ variable "volume_size" {
     # fat image builds, GB:
     openhpc = 15
     openhpc-ofed = 15
-    openhpc-cuda = 25
+    openhpc-cuda = 30
   }
 }
 
