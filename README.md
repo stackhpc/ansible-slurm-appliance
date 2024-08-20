@@ -144,3 +144,20 @@ Please contact us for specific advice, but in outline this generally involves:
 ## Monitoring and logging
 
 Please see the [monitoring-and-logging.README.md](docs/monitoring-and-logging.README.md) for details.
+
+## CI/CD automation
+
+A GitHub Actions workflow which checks for new upstream version release tags and updates the downstream repo, can be found at:
+
+        .github/workflows/upgrade-check.yml.sample
+
+If activated, the workflow is scheduled by default to run every day at 9 AM UTC and can be triggered manually via the `workflow_dispatch` event. How to activate the workflow is detailed at the top of the file.
+
+In order for GitHub actions to fetch workflow changes in `.github/workflows`, a PAT for each deployment must be provided.
+
+The following repository permissions must be set for the PAT:
+ - `Workflows : Read and write`
+ - `Actions : Read and write`
+ - `Pull requests: Read and write`
+
+The PAT should then be copied into a downstream repo secret with the title `WORKFLOW_TOKEN`.
