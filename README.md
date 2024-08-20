@@ -156,8 +156,8 @@ If activated, the workflow is scheduled by default to run every day at 9 AM UTC 
 In order for GitHub actions to fetch workflow changes in `.github/workflows`, a PAT for each deployment must be provided.
 
 The following repository permissions must be set for the PAT:
- - `Workflows : Read and write`
- - `Actions : Read and write`
+ - `Workflows: Read and write`
+ - `Actions: Read and write`
  - `Pull requests: Read and write`
 
-The PAT should then be copied into a downstream repo secret with the title `WORKFLOW_TOKEN`.
+The PAT should then be copied into an Actions repository secret in the downstream repo with the title `WORKFLOW_TOKEN`.
