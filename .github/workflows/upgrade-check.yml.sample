@@ -2,10 +2,26 @@
 # stackhpc/ansible-slurm-appliance repository to check whether there is a new upstream version available. If a
 # newer tag is found in the upstream repository then a pull request is created to the downstream repo
 # in order to merge in the changes from the new upstream release.
-
+#
 # To use this workflow in a downstream ansible-slurm-appliance repository simply copy it into .github/workflows
 # and give it an appropriate name, e.g.
 # cp .github/workflows/upgrade-check.yml.sample .github/workflows/upgrade-check.yml
+#
+# Workflow uses https://github.com/peter-evans/create-pull-request to handle the pull request action. 
+# See the docs for action inputs.
+#
+# In order for GitHub actions to create pull requests that make changes to workflows in `.github/workflows`, 
+# a token for each deployment must be provided. Both user PAT and fine-grained tokens should work, but it was tested
+# with a PAT. Fine-grained repo-scoped token is preferred if possible but requires organisation admin privileges.
+#
+# See https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+# for security considerations around tokens. TREAT YOUR ACCESS TOKENS LIKE PASSWORDS.
+#
+# The following repository permissions must be set for the PAT:
+#  - `Workflows: Read and write`
+#  - `Actions: Read and write`
+#  - `Pull requests: Read and write`
+# The PAT should then be copied into an Actions repository secret in the downstream repo with the title `WORKFLOW_TOKEN`.
 
 name: Check for upstream updates
 on:
@@ -15,10 +31,6 @@ on:
 jobs:
   check_for_update:
     runs-on: ubuntu-22.04
-    # permissions:
-    #   contents: write
-    #   pull-requests: write
-    #   actions: write
 
     steps:
       - name: Checkout the config repo
@@ -27,7 +39,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      # Based on equivalent GitLab CI job
+      # Based on equivalent azimuth-config job
       - name: Check for new release
         shell: bash
         run: |
