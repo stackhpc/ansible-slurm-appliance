@@ -12,105 +12,7 @@ openhpc_packages_extra: "{{ openhpc_packages_extra_nrel }}"
 
 openhpc_packages_extra_nrel: # extra indirection to allow lab environment to filter this
   - vim
-  # - bzip2
-  # - curl
-  # - fio
-  # - libaio
-  # - libaio-devel
-  # - git
-  # - gzip
-  # - make
-  # - patch
-  # - tar
-  # - unzip
-  # - wget
-  # - xz
-  # - zstd
-  # - tmux
-  # - nano
-  # - python39-devel
-
-  # - slurm-libpmi-ohpc
-  # - slurm-sview-ohpc
-  # - slurm-libpmi-ohpc
-  # - docs-ohpc
-  # - EasyBuild-ohpc
-  # - ohpc-autotools
-  # - cmake-ohpc
-  # - hwloc-ohpc
-  # - singularity-ohpc
-  # - slurm-libpmi-ohpc
-  # - slurm-sview-ohpc
-  # - slurm-libpmi-ohpc
-  # - ohpc-base
-  # - ohpc-base-compute
-  # - ohpc-slurm-client
-  # - lmod-ohpc
-  # - nhc-ohpc
-  # - valgrind-ohpc
-  # - clustershell
-  # - conman-ohpc
-  # - magpie-ohpc
-  # - charliecloud-ohpc
-
-
-
-  # - gnu9-compilers-ohpc
-  # - openmpi4-gnu9-ohpc
-  # - intel-compilers-devel-ohpc
-  # - intel-oneapi-toolkit-release-ohpc
-
-  # impi-devel
-  # - intel-mpi-devel-ohpc
-  # - mpich-ofi-intel-ohpc
-  # - mpich-ucx-intel-ohpc
-  # - mvapich2-intel-ohpc
-  # - openmpi4-intel-ohpc
-  # - openmpi4-gnu9-ohpc
-
-  # #openmpi-*-ohpc mvapich2-*-ohpc intel-mpi-ohpc
-
-
-
-  #- mpich-ofi-gnu9-ohpc
-  #- mpich-ucx-gnu9-ohpc
-
-  # - mvapich2-gnu9-ohpc
-  # - hpc-gnu9-openmpi4-io-libs
-  # - ohpc-gnu9-openmpi4-perf-tools
-  # - ohpc-gnu9-openmpi4-parallel-libs
-
-  # - ucx-ohpc
-  # - ohpc-gnu9-mpich-perf-tools
-  # - ohpc-gnu9-mpich-io-libs
-  # - ohpc-gnu9-mpich-parallel-libs
-  # - ohpc-gnu9-mpich-perf-tools
-
-
-  # - hdf5-gnu9-ohpc
-  # - netcdf-gnu9-impi-ohpc
-  # - netcdf-gnu9-mpich-ohpc
-  # - netcdf-gnu9-mvapich2-ohpc
-  # - netcdf-gnu9-openmpi4-ohpc
-
-  #- phdf5-gnu9-impi-ohpc
-  #- phdf5-gnu9-mpich-ohpc
-  #- phdf5-gnu9-mvapich2-ohpc
-  #- phdf5-gnu9-openmpi4-ohpc
-
-  #- pnetcdf-gnu9-impi-ohpc
-  #- pnetcdf-gnu9-mpich-ohpc
-  #- pnetcdf-gnu9-mvapich2-ohpc
-  #- pnetcdf-gnu9-openmpi4-ohpc
-  #- openblas-gnu9-ohpc
-  #- boost-gnu9-impi-ohpc
-  #- boost-gnu9-mpich-ohpc
-  #- boost-gnu9-mvapich2-ohpc
-  #- boost-gnu9-openmpi4-ohpc
-
-# - python3
-# - make
-
+ 
 # system package installs - generic slurm
 openhpc_generic_packages:
   # below are default in the role, required to get slurm to work:
@@ -143,10 +45,11 @@ openhpc_config_extra:
   # PROLOGUE & EPILOGUE
   # JobSubmitPlugins: 'require_timelimit,lua'
   # PrologSlurmctld: '/nopt/slurm/etc/prologslurmctld.sh'
-  # Prolog: '/nopt/slurm/etc/prolog.d/*'
+  Prolog: '/nopt/slurm/scripts/prolog.d/*'
   # PrologFlags: 'X11'
   # X11Parameters: 'local_xauthority'
-  Epilog: '<absent>' # /nopt/slurm/etc/epilog.d/*'
+  #Epilog: '<absent>' # /nopt/slurm/etc/epilog.d/*'
+  Epilog: '/nopt/slurm/scripts/epilog.d/*'
   # PrologEpilogTimeout: 180
   # UnkillableStepTimeout: 180
 
@@ -237,7 +140,7 @@ openhpc_config_extra:
   # - HealthCheckNodeState: 'CYCLE,ANY'
 
 # kbendl - the ephemeral mount for SSD?
-  TmpFS: '/var/scratch'
+  TmpFS: '/tmp/scratch'
   GresTypes: 'gpu'
   ### - MpiDefault: "pmi2"    ### get the launcher to work! pmi1, pmi2, or pmix
   # # spack mpi drivers were a mis-match... is this working now????
