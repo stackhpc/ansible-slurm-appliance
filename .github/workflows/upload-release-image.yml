@@ -1,0 +1,41 @@
+
+name: Upload release images to client sites from s3
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+      - feat/fatimage-auto-upload
+
+jobs:
+  image_upload:
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.ref }}
+    env: 
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
+      IMAGE_LIST: "RL8 RL9"
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record which cloud CI is running on
+        run: |
+          echo CI_CLOUD: ${{ vars.CI_CLOUD }}
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Upload latest image if missing
+        run: |
+          /usr/bin/python3.10 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install -r requirements.txt
+          ansible --version
+          . environments/.stackhpc/activate
+          ansible-galaxy collection install openstack.cloud
+          . .github/bin/get-s3-image.sh -o
