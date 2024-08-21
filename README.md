@@ -147,19 +147,6 @@ Please see the [monitoring-and-logging.README.md](docs/monitoring-and-logging.RE
 
 ## CI/CD automation
 
-A GitHub Actions workflow which checks for new upstream version release tags and creates a PR to update the downstream repo, can be found at:
+The `.github` directory contains a set of sample workflows which can be used by downstream site-specific configuration repositories to simplify ongoing maintainence tasks. These include:
 
-        .github/workflows/upgrade-check.yml.sample
-
-If activated, the workflow is scheduled by default to run every day at 9 AM UTC and can be triggered manually via the `workflow_dispatch` event. How to activate the workflow is detailed at the top of the file.
-
-Workflow uses [create-pull-request](https://github.com/peter-evans/create-pull-request) to handle the pull request action. See for action inputs.
-
-In order for GitHub actions to fetch workflow changes in `.github/workflows`, a PAT for each deployment must be provided.
-
-The following repository permissions must be set for the PAT:
- - `Workflows: Read and write`
- - `Actions: Read and write`
- - `Pull requests: Read and write`
-
-The PAT should then be copied into an Actions repository secret in the downstream repo with the title `WORKFLOW_TOKEN`.
+- An [upgrade check](.github/workflows/upgrade-check.yml.sample) workflow which automatically checks this upstream stackhpc/ansible-slurm-appliance repo for new releases and proposes a pull request to the downstream site-specific repo when a new release is published.
