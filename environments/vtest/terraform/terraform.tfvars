@@ -1,14 +1,14 @@
 compute_types = {
   tiny: {
-    flavor: "test.compute.c4m16s8e60"
+    flavor: "slurm_test_compute_t"
     image: "openhpc-ofed-RL9-240712-1425"
   }
   small: {
-    flavor: "test.compute.c8m32s8e60"
+    flavor: "slurm_test_compute_sm"
     image: "openhpc-ofed-RL9-240712-1425"
   }
   standard: {
-    flavor: "test.compute.c30m120s60e5000"
+    flavor: "slurm_test_compute_std"
     image: "openhpc-ofed-RL9-240712-1425"
   }
   gpu: {
