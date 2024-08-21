@@ -232,13 +232,10 @@
     - name: Wait for hosts to be reachable
       wait_for_connection:
         sleep: 15
-
-- hosts: ofed
-  gather_facts: false
-  tags: ofed
-  tasks:
-    - name: refresh facts
+    - name: Clear facts
       meta: clear_facts
+    - name: Update facts
+      setup:
 
 - hosts: ofed
   gather_facts: yes
