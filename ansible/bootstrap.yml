@@ -232,9 +232,13 @@
     - name: Wait for hosts to be reachable
       wait_for_connection:
         sleep: 15
-    - name: update facts
-      setup:
-      when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
+
+- hosts: ofed
+  gather_facts: false
+  tags: ofed
+  tasks:
+    - name: refresh facts
+      meta: clear_facts
 
 - hosts: ofed
   gather_facts: yes
