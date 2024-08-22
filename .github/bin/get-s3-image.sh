@@ -14,7 +14,7 @@ else
     wget https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/openhpc-images/$image_name --progress=dot:giga
 
     echo "Uploading image $image_name to OpenStack..."
-    openstack image create --file "$image_name.qcow2" --disk-format qcow2 "$image_name"
+    openstack image create --file "$image_name" --disk-format qcow2 "$image_name" --progress
 
     echo "Image $image_name has been uploaded to OpenStack."
 fi
