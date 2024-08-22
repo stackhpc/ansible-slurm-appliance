@@ -66,7 +66,7 @@ module "cluster" {
         nodes = [ # use -00 for 500GB nodes
           "a40-00",
           "a40-01",
-          "a40-02",
+          # "a40-02", # Moved to staging for new CUDA image tests
         ]
       }
     }

@@ -32,5 +32,5 @@ openhpc_slurm_partitions:
     default: NO
 
 openhpc_config_extra: # parameters for slurm.conf
-   GresTypes:
+  GresTypes:
     - gpu
