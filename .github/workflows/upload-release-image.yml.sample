@@ -1,3 +1,14 @@
+# This workflow dispatch is to be used on a downstream ansible-slurm-appliance repository. The workflow takes two inputs:
+# image name, and s3 bucket name. The image is searched for in the environment set openstack, and if not found there, 
+# downloads it from the ARCUS S3 bucket specified. The workflow then uploads the image to the openstack.
+#
+# To use this workflow in a downstream ansible-slurm-appliance repository simply copy it into .github/workflows
+# and give it an appropriate name, e.g.
+# cp .github/workflows/upload-s3-image.yml.sample .github/workflows/upload-s3-image.yml
+#
+# In order for the workflow to access the openstack, credentials in the form of a clouds.yaml file must be provided by a
+# secret. This secret should have the name OS_CLOUD_YAML to be found by the workflow.
+# Details on the contents of the clouds.yaml file can be found at https://docs.openstack.org/keystone/latest/user/application_credentials.html
 
 name: Upload release images to client sites from s3
 on:

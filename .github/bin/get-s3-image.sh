@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#####
+# This script looks for an image in OpenStack and if not found, downloads from
+# S3 bucket, and then uploads to OpenStack
+#####
+
 set -ex
 
 image_name=$1
