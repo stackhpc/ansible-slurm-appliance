@@ -120,7 +120,7 @@ variable "manifest_output_path" {
 
 variable "use_blockstorage_volume" {
   type = bool
-  default = false
+  default = true
 }
 
 variable "volume_type" {
@@ -130,12 +130,12 @@ variable "volume_type" {
 
 variable "volume_size" {
   type = number
-  default = null # When not specified use the size of the builder instance root disk
+  default = 15
 }
 
 variable "image_disk_format" {
   type = string
-  default = null # When not specified use the image default
+  default = qcow2
 }
 
 variable "metadata" {
