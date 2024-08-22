@@ -27,7 +27,7 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "${{ secrets.OS_CLOUD_YAML }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
       - name: Upload latest image if missing
@@ -36,5 +36,4 @@ jobs:
           . venv/bin/activate
           pip install -U pip
           pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
-          . environments/.stackhpc/activate
           bash .github/bin/get-s3-image.sh ${{ inputs.image_name }}
