@@ -19,11 +19,7 @@ on:
     inputs:
       image_name:
         type: string
-        description: |
-          Image name from:
-          [openhpc-images](https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/{openhpc-images})
-          or [openhpc-images-prerelease](https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/{openhpc-images-prerelease})
-
+        description: Image name from: (https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/{BUCKET_NAME})
         required: true
       bucket_name:
         type: choice
