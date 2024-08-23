@@ -57,7 +57,7 @@ jobs:
         run: |
           . venv/bin/activate
           image_hanging=$(openstack image list --name ${{ inputs.image_name }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
-          if [ -n $image_hanging ]; then
+          if [ -n "$image_hanging" ]; then
             echo "Cleaning up OpenStack image with ID: $image_hanging"
             openstack image delete $image_hanging
           else
