@@ -144,3 +144,9 @@ Please contact us for specific advice, but in outline this generally involves:
 ## Monitoring and logging
 
 Please see the [monitoring-and-logging.README.md](docs/monitoring-and-logging.README.md) for details.
+
+## CI/CD automation
+
+The `.github` directory contains a set of sample workflows which can be used by downstream site-specific configuration repositories to simplify ongoing maintainence tasks. These include:
+
+- An [upgrade check](.github/workflows/upgrade-check.yml.sample) workflow which automatically checks this upstream stackhpc/ansible-slurm-appliance repo for new releases and proposes a pull request to the downstream site-specific repo when a new release is published.
