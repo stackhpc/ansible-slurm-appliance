@@ -1,13 +1,16 @@
-# This workflow dispatch is to be used on a downstream ansible-slurm-appliance repository. The workflow takes two inputs:
-# image name, and s3 bucket name. The image is searched for in the environment set openstack, and if not found there, 
-# downloads it from the ARCUS S3 bucket specified. The workflow then uploads the image to the openstack.
+# This workflow can be used to fetch images published by StackHPC and upload them to a client's OpenStack. 
+# The workflow takes two inputs:
+# - image name
+# - s3 bucket name
+# and first checks to see if the image exists in the target OpenStack. If the image doesn't exist, it is downloaded 
+# from StackHPC's public S3 bucket and then uploaded to the target OpenStack.
 #
 # To use this workflow in a downstream ansible-slurm-appliance repository simply copy it into .github/workflows
 # and give it an appropriate name, e.g.
 # cp .github/workflows/upload-s3-image.yml.sample .github/workflows/upload-s3-image.yml
 #
-# In order for the workflow to access the openstack, credentials in the form of a clouds.yaml file must be provided by a
-# secret. This secret should have the name OS_CLOUD_YAML to be found by the workflow.
+# In order for the workflow to access the target OpenStack, an application credential clouds.yaml file must be 
+# added as a repository secret named OS_CLOUD_YAML.
 # Details on the contents of the clouds.yaml file can be found at https://docs.openstack.org/keystone/latest/user/application_credentials.html
 
 name: Upload release images to client sites from s3
@@ -53,15 +56,11 @@ jobs:
         if: cancelled()
         run: |
           . venv/bin/activate
-          image_hanging=$(openstack image list --name ${{ inputs.image_name }} -f value -c ID)
-          if [ -n "$image_hanging" ]; then
+          image_hanging=$(openstack image list --name ${{ inputs.image_name }} -f value -c ID -c Status | grep -v ' queued$' | awk '{print $1}'
+          if [ -n $image_hanging ]; then
             echo "Cleaning up OpenStack image with ID: $image_hanging"
             openstack image delete $image_hanging
           else
             echo "No image ID found, skipping cleanup."
           fi
         shell: bash
-
-      - name: Confirm Success
-        if: success()
-        run: echo "Deployment succeeded, no cleanup needed."
