@@ -12,7 +12,7 @@ bucket_name=$2
 echo "Checking if image $image_name exists in OpenStack"
 image_exists=$(openstack image list --name "$image_name" -f value -c Name)
 
-if [ ! -n $image_exists ]; then
+if [ -n $image_exists ]; then
     echo "Image $image_name already exists in OpenStack."
 else
     echo "Image $image_name not found in OpenStack. Getting it from S3."
