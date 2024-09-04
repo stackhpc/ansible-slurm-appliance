@@ -5,13 +5,12 @@ name: Build fat image
     inputs:
       ci_cloud:
         description: 'Select the CI_CLOUD'
-        required: false
+        required: true
         type: choice
-        default: ${{ vars.CI_CLOUD }}
         options:
-          - ARCUS
-          - SMS
           - LEAFCLOUD
+          - SMS
+          - ARCUS
 concurrency:
   group: ${{ github.ref }}-{{ matrix.os_version }}-{{ matrix.build }} # to branch/PR + OS + build
   cancel-in-progress: true
