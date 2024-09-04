@@ -135,7 +135,7 @@ variable "volume_size" {
 
 variable "image_disk_format" {
   type = string
-  default = qcow2
+  default = "qcow2"
 }
 
 variable "metadata" {
