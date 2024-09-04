@@ -5,8 +5,9 @@ name: Build fat image
     inputs:
       ci_cloud:
         description: 'Select the CI_CLOUD'
-        required: true
+        required: false
         type: choice
+        default: ${{ vars.CI_CLOUD }}
         options:
           - LEAFCLOUD
           - ARCUS
