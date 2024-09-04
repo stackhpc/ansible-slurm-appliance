@@ -85,7 +85,7 @@ jobs:
       - name: Download image
         run: |
           . venv/bin/activate
-          openstack image save --file /mnt/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
+          sudo openstack image save --file /mnt/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
