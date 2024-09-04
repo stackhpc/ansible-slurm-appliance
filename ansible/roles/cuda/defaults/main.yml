@@ -1,7 +1,7 @@
 cuda_distro: "rhel{{ ansible_distribution_major_version }}"
 cuda_repo: "https://developer.download.nvidia.com/compute/cuda/repos/{{ cuda_distro }}/x86_64/cuda-{{ cuda_distro }}.repo"
 cuda_driver_stream: default
-cuda_package_version: '12.5.1-1' # or 'latest'. Workaround https://forums.developer.nvidia.com/t/issues-with-cuda-12-6-0-1-x86-64-from-rhel8-repo/
+cuda_package_version: 'latest'
 cuda_packages:
   - "cuda{{ ('-' + cuda_package_version) if cuda_package_version != 'latest' else '' }}"
   - nvidia-gds
