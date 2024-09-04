@@ -85,7 +85,9 @@ jobs:
       - name: Download image
         run: |
           . venv/bin/activate
-          sudo openstack image save --file /mnt/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
+          sudo mkdir /mnt/images
+          sudo chmod 777 /mnt/images
+          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -96,32 +98,32 @@ jobs:
           sudo apt -y install libguestfs-tools
 
       - name: mkdir for mount
-        run: sudo mkdir -p '/mnt/${{ steps.manifest.outputs.image-name }}'
+        run: sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
 
       - name: mount qcow2 file
-        run: sudo guestmount -a ${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other '/mnt/${{ steps.manifest.outputs.image-name }}'
+        run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.17.0
         with:
           scan-type: fs
-          scan-ref: "/mnt/${{ steps.manifest.outputs.image-name }}"
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
           scanners: "vuln"
           format: sarif
-          output: "/mnt/${{ steps.manifest.outputs.image-name }}.sarif"
+          output: "${{ steps.manifest.outputs.image-name }}.sarif"
           # turn off secret scanning to speed things up
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: "/mnt/${{ steps.manifest.outputs.image-name }}.sarif"
+          sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
           category: "${{ matrix.os_version }}-${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
         uses: aquasecurity/trivy-action@0.16.1
         with:
           scan-type: fs
-          scan-ref: "/mnt/${{ steps.manifest.outputs.image-name }}"
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
           scanners: "vuln"
           format: table
           exit-code: '1'
