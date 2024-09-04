@@ -1,0 +1,25 @@
+---
+
+- hosts: login
+  vars:
+    keytab_dest_path: "{{ appliances_environment_root }}/files/{{ inventory_hostname }}/krb5.keytab"
+  tasks:
+    - name: Ensure output directory exists
+      file:
+        state: directory
+        path: "{{ keytab_dest_path | dirname }}"
+      run_once: true
+      delegate_to: localhost
+
+    - name: Slurp keytab
+      ansible.builtin.fetch:
+        src: /etc/krb5.keytab
+        dest: "{{ keytab_dest_path }}"
+        flat: yes
+      become: true
+      when: keytab_dest_path is not exists
+      notify: Remind to encrypt keytab
+  handlers:
+    - name: Remind to encrypt keytab
+      debug:
+        msg: "Please remember to encrypt {{ keytab_dest_path }}"

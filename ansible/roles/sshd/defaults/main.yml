@@ -1,0 +1,2 @@
+# Whether or not to enable password login
+sshd_password_authentication: false

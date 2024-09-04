@@ -1,0 +1,31 @@
+---
+
+- name: Assert that kerberos keytab exists
+  assert:
+    that: kerberos_key_tab_path is exists
+    # FIXME: make this non client specific
+    fail_msg: >-
+      Please enroll the node with:
+      sudo realm join --computer-ou OU=<Operating Unit>
+      --computer-name {{ inventory_hostname }} -v
+      -U swinst
+      --automatic-id-mapping=no << AD realm >>
+
+- name: Copy keytab into place
+  ansible.builtin.copy:
+    src: "{{ kerberos_key_tab_path }}"
+    dest: /etc/krb5.keytab
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Template configuration file
+  ansible.builtin.template:
+    src: "{{ appliances_environment_root }}/templates/krb5.conf.j2"
+    dest: /etc/krb5.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  register: kerberos_config

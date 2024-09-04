@@ -1,0 +1,2 @@
+---
+kerberos_key_tab_path: "{{ appliances_environment_root }}/files/{{ inventory_hostname }}/krb5.keytab"

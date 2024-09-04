@@ -34,6 +34,21 @@
         tasks_from: client-install.yml
       when: "'freeipa_client' in group_names"
 
+    - name: Configure kerberos
+      import_role:
+        tasks_from: install.yml
+        name: kerberos
+
+    - name: Configure ldap
+      import_role:
+        tasks_from: install.yml
+        name: ldap
+
+    - name: Configure SSSD
+      import_role:
+        tasks_from: install.yml
+        name: sssd
+
     # - import_playbook: filesystems.yml:
     - name: Install nfs packages
       dnf:

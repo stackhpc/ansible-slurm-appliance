@@ -40,3 +40,39 @@
       import_role:
         name: freeipa
         tasks_from: users.yml
+
+- hosts: kerberos_client
+  tags:
+    - users
+    - kerberos
+    - kerberos_client
+  tasks:
+    - name: Configure kerberos
+      import_role:
+        # Fix me: Split install/configure
+        #tasks_from: ...
+        name: kerberos
+
+- hosts: ldap_client
+  tags:
+    - users
+    - ldap
+    - ldap_client
+  tasks:
+    - name: Configure ldap
+      import_role:
+        # Fix me: Split install/configure
+        #tasks_from: ...
+        name: ldap
+
+- hosts: sssd
+  tags:
+    - users
+    - sssd
+  become: yes
+  tasks:
+    - name: Configure SSSD
+      import_role:
+        # Fix me: Split install/configure
+        #tasks_from: ...
+        name: sssd

@@ -1,0 +1,6 @@
+---
+- name: "Manage sssd service"
+  service:
+    name: "{{ sssd_service }}"
+    state: "{{ sssd_state }}"
+    enabled: "{{ sssd_enabled }}"

@@ -58,4 +58,13 @@ roles/*
 !roles/squid/**
 !roles/tuned/
 !roles/tuned/**
-
+!roles/sssd/
+!roles/sssd/**
+!roles/kerberos/
+!roles/kerberos/**
+!roles/ldap/
+!roles/ldap/**
+!roles/cacerts/
+!roles/cacerts/**
+!roles/sshd/
+!roles/sshd/**

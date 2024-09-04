@@ -135,3 +135,26 @@ freeipa_client
 
 [ansible_init]
 # Hosts to run linux-anisble-init
+
+[kerberos_client]
+# When using Kerberos for authentication. For example:
+#[kerberos_client:children]
+#login
+
+[ldap_client]
+# When using LDAP instead of kerberos for authentication E.g
+#[ldap_client:children]
+#compute
+#control
+
+[sssd:children]
+kerberos_client
+ldap_client
+
+[cacerts:children]
+# Adds certificates under APPLIANCES_ENVIORNMENT_ROOT/cacerts to system trust store.
+openhpc
+
+[sshd:children]
+# Hosts where the OpenSSH server daemon should be configured
+openhpc
