@@ -118,6 +118,11 @@ variable "manifest_output_path" {
   default = "packer-manifest.json"
 }
 
+variable "use_blockstorage_volume" {
+  type = bool
+  default = true
+}
+
 variable "volume_type" {
   type = string
   default = null
@@ -157,7 +162,7 @@ variable "groups" {
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
-  use_blockstorage_volume = true
+  use_blockstorage_volume = var.use_blockstorage_volume
   volume_type = var.volume_type
   volume_size = var.volume_size[source.name]
   metadata = var.metadata
