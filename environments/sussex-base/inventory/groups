@@ -68,6 +68,7 @@ openhpc
 [proxy:children]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
 compute
+login
 
 [manila:children]
 # Hosts to mount shared software

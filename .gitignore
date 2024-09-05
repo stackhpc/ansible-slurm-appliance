@@ -5,3 +5,8 @@ venv
 *.pyc
 packer/openhpc2
 .vscode
+
+**/__pycache__
+*openrc.sh
+**/vault-password
+*clouds.y[a]ml
