@@ -1,0 +1,17 @@
+- hosts: localhost
+  gather_facts: no
+  become: no
+  tasks:
+    - name: Confirm continuing if using production environment
+      ansible.builtin.pause:
+        prompt: |
+          **********************************
+          * WARNING PRODUCTION ENVIRONMENT *
+          **********************************
+
+          Do you really want to continue (yes/no)?
+      register: prd_confirm
+      when:
+        - "'prd' in appliances_environment_name"
+        - not (prd_continue | default(false) | bool)
+      failed_when: not (prd_confirm.user_input | bool)
