@@ -226,9 +226,14 @@
     - selinux
     - update
   tasks:
+    - name: Check for pending reboot from package updates
+      command:
+        cmd: dnf needs-restarting
+      register: update_reboot_required
     - name: Reboot to cover SELinux state change or package upgrades
       reboot:
         post_reboot_delay: 30
+      when: (sestatus['reboot_required'] | default(false)) or (update_reboot_required.stdout != '')
     - name: Wait for hosts to be reachable
       wait_for_connection:
         sleep: 15
