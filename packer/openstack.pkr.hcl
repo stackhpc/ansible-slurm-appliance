@@ -129,8 +129,13 @@ variable "volume_type" {
 }
 
 variable "volume_size" {
-  type = number
-  default = 15
+  type = map(number)
+  default = {
+    # fat image builds, GB:
+    openhpc = 15
+    openhpc-ofed = 15
+    openhpc-cuda = 30
+  }
 }
 
 variable "image_disk_format" {
@@ -150,6 +155,7 @@ variable "groups" {
     # fat image builds:
     openhpc = ["control", "compute", "login"]
     openhpc-ofed = ["control", "compute", "login", "ofed"]
+    openhpc-cuda = ["control", "compute", "login", "ofed", "cuda"]
   }
 }
 
@@ -158,11 +164,11 @@ source "openstack" "openhpc" {
   flavor = var.flavor
   use_blockstorage_volume = var.use_blockstorage_volume
   volume_type = var.volume_type
+  volume_size = var.volume_size[source.name]
   metadata = var.metadata
   networks = var.networks
   floating_ip_network = var.floating_ip_network
   security_groups = var.security_groups
-  volume_size = var.volume_size
   
   # Input image:
   source_image = "${var.source_image[var.os_version]}"
@@ -178,7 +184,7 @@ source "openstack" "openhpc" {
   ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
   
   # Output image:
-  image_disk_format = var.image_disk_format
+  image_disk_format = "qcow2"
   image_visibility = var.image_visibility
   image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
 }
@@ -193,6 +199,11 @@ build {
   # OFED fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-ofed"
+  }
+
+  # CUDA fat image:
+  source "source.openstack.openhpc" {
+    name = "openhpc-cuda"
   }
 
   # Extended site-specific image, built on fat image:
