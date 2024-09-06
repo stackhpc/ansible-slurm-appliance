@@ -11,21 +11,16 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
-      matrix: # build RL8, RL9+OFED, RL9+CUDA versions
+      matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
         os_version:
           - RL8
           - RL9
         build:
-          - openstack.openhpc
           - openstack.openhpc-ofed
           - openstack.openhpc-cuda
         exclude:
           - os_version: RL8
-            build: openstack.openhpc-ofed
-          - os_version: RL8
             build: openstack.openhpc-cuda
-          - os_version: RL9
-            build: openstack.openhpc
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
