@@ -2,12 +2,6 @@
 name: Test deployment and reimage on OpenStack
 on:
   workflow_dispatch:
-    inputs:
-      use_RL8:
-        required: true
-        description: Include RL8 tests
-        type: boolean
-        default: false
   push:
     branches:
       - main
@@ -20,22 +14,12 @@ jobs:
     strategy:
       matrix:
         os_version: [RL8, RL9]
-        rl8_selected:
-          - ${{ inputs.use_RL8 == true }} # only potentially true for workflow_dispatch
-        rl8_branch:
-          - ${{ startsWith(github.head_ref, 'rl8') == true }} # only potentially for pull_request, always false on merge
-        rl8_label:
-          - ${{ contains(github.event.pull_request.labels.*.name, 'RL8') }} # NB: needs a new commit if added after PR created
-        exclude:
-          - os_version: RL8
-            rl8_selected: false
-            rl8_branch: false
-            rl8_label: false
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }}
+      TF_VAR_os_version: ${{ matrix.os_version }}
     steps:
       - uses: actions/checkout@v2
 
@@ -89,8 +73,6 @@ jobs:
           . environments/.stackhpc/activate
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform apply -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
-        env:
-          TF_VAR_os_version: ${{ matrix.os_version }}
 
       - name: Delete infrastructure if provisioning failed
         run: |
@@ -99,8 +81,6 @@ jobs:
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
-        env:
-          TF_VAR_os_version: ${{ matrix.os_version }}
 
       - name: Configure cluster
         run: |
@@ -199,8 +179,6 @@ jobs:
           cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
           terraform destroy -auto-approve -var-file="${{ vars.CI_CLOUD }}.tfvars"
         if: ${{ success() || cancelled() }}
-        env:
-          TF_VAR_os_version: ${{ matrix.os_version }}
 
       # - name: Delete images
       #   run: |
