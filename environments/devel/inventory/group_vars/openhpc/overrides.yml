@@ -1,6 +1,6 @@
 # define paths to slurm on nodes:
 slurm_build_version: '23.11.1' # quote to avoid ansible autoconversion weirdness
-slurm_build_path: /nopt/devel/slurm
+slurm_build_path: /nopt/{{ vermilion_cluster_name }}/slurm
 slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
 
 openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
