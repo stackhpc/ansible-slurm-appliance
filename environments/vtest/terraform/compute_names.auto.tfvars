@@ -1,6 +1,7 @@
 compute_names = {
-vtlg-001: "large"
-vtgpu-001: "gpu"
+vtlg-901: "large"
+vtlg-902: "large"
+vtgpu-901: "gpu"
 }
 
 # compute_names = {

@@ -9,13 +9,13 @@ login
 control
 
 [prometheus:children]
-control
+admin
 
 [grafana:children]
-control
+admin
 
 [alertmanager:children]
-control
+admin
 
 [node_exporter:children]
 cluster
@@ -41,11 +41,11 @@ cluster
 
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH
-login
+# login
 
 [firewalld:children]
 # Hosts to install firewalld on
-fail2ban
+# fail2ban
 
 # [block_devices:children]
 # # Environment-specific so not defined here
