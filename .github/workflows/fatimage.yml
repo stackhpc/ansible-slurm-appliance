@@ -3,7 +3,7 @@ name: Build fat image
 'on':
   workflow_dispatch:
 concurrency:
-  group: ${{ github.ref }}-{{ matrix.os_version }}-{{ matrix.build }} # to branch/PR + OS + build
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
   cancel-in-progress: true
 jobs:
   openstack:
