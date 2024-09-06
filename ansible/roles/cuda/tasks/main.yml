@@ -24,22 +24,13 @@
   failed_when: false
   register: _cuda_driver_module_enabled
 
-- name: List nvidia driver dnf module stream versions
-  shell:
-    cmd: dnf module list nvidia-driver | grep -oP "\d+-dkms" | sort -V
-  # Output of interest from command is something like (some whitespace removed):
-  # "nvidia-driver 418-dkms   default [d], fm, ks    Nvidia driver for 418-dkms branch "
-  changed_when: false
-  register: _cuda_driver_module_streams
-  when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
-
 - name: Enable nvidia driver module
-  ansible.builtin.command: "dnf module enable -y nvidia-driver:{{ _cuda_driver_module_streams.stdout_lines | last }}"
+  ansible.builtin.command: "dnf module enable -y nvidia-driver:open-dkms"
   register: _cuda_driver_module_enable
   when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
 
-- name: Install nvidia drivers # TODO: make removal possible?
+- name: Install nvidia drivers
   ansible.builtin.command: dnf module install -y nvidia-driver
   register: _cuda_driver_install
   when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
