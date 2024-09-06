@@ -230,6 +230,7 @@
       command:
         cmd: dnf needs-restarting
       register: update_reboot_required
+      changed_when: false
     - name: Reboot to cover SELinux state change or package upgrades
       reboot:
         post_reboot_delay: 30
