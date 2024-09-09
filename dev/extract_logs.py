@@ -37,36 +37,29 @@ def extract_log_info_and_generate_csv(log_file_path, output_csv_path, target_dir
 
                 previous_task = [task_name, partial_task_path, None]  # Placeholder for the next time_to_complete
 
-        # Ensure the last task is also included
         if previous_task:
             previous_task[2] = time_to_complete if time_to_complete else 'N/A'
             data.append(previous_task)
 
-    # Convert time strings to seconds for sorting
     for row in data:
         if row[2] != 'N/A':
             row[2] = convert_time_to_seconds(row[2])
 
-    # Sort the data by time (now in seconds)
     data.sort(key=lambda x: x[2], reverse=True)
 
-    # Convert times back to original string format
     for row in data:
         if isinstance(row[2], float):
             row[2] = f'{int(row[2] // 3600):02}:{int((row[2] % 3600) // 60):02}:{row[2] % 60:.3f}'
 
-    # Write the sorted data to a CSV file
     with open(output_csv_path, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(['Task Name', 'Task Path', 'Time to Complete'])
         csvwriter.writerows(data)
 
     print(f"Data extracted, sorted, and saved to {output_csv_path}")
+    
+log_file_path = './RL9-ofed-fatimage-177.txt' # Input workflow log name
+output_csv_path = 'RL9-ofed-fatimage-177.csv' # Output CSV name
+target_directory = '/ansible/' # Shared directory for task path
 
-# File paths
-log_file_path = './RL9-ofed-fatimage-177.txt'
-output_csv_path = 'RL9-ofed-fatimage-177.csv'
-target_directory = '/ansible/'
-
-# Run the function
 extract_log_info_and_generate_csv(log_file_path, output_csv_path, target_directory)
