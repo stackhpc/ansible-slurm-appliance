@@ -3,6 +3,7 @@ resource "openstack_networking_port_v2" "compute" {
   for_each = toset(var.nodes)
 
   name = "${var.cluster_name}-${each.key}"
+  dns_name = var.dns == "neutron" ? "${var.cluster_name}-${each.key}" : null
   network_id = var.cluster_net_id
   admin_state_up = "true"
 
@@ -48,12 +49,18 @@ resource "openstack_compute_instance_v2" "compute" {
     environment_root = var.environment_root
   }
 
-  user_data = <<-EOF
-    #cloud-config
-    fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
-  EOF
-
 }
+
+resource "openstack_dns_recordset_v2" "compute" {
+
+  for_each = var.dns == "designate" ? toset(var.nodes) : []
+  
+  zone_id = var.cluster_dns_zone["cluster"].id
+  name = "${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}."
+  type = "A"
+  records = [for n in openstack_compute_instance_v2.compute[each.key].network: n.fixed_ip_v4 if n.access_network]
+}
+
 
 output "compute_instances" {
     value = openstack_compute_instance_v2.compute

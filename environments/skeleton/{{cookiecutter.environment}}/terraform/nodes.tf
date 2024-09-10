@@ -7,6 +7,8 @@ resource "openstack_networking_port_v2" "login" {
   for_each = var.login_nodes
 
   name = "${var.cluster_name}-${each.key}"
+  dns_name = var.dns == "neutron" ? "${var.cluster_name}-${each.key}" : null
+
   network_id = data.openstack_networking_network_v2.cluster_net.id
   admin_state_up = "true"
 
@@ -25,6 +27,8 @@ resource "openstack_networking_port_v2" "login" {
 resource "openstack_networking_port_v2" "control" {
 
   name = "${var.cluster_name}-control"
+  dns_name = var.dns == "neutron" ? "${var.cluster_name}-control" : null
+
   network_id = data.openstack_networking_network_v2.cluster_net.id
   admin_state_up = "true"
 
@@ -80,7 +84,6 @@ resource "openstack_compute_instance_v2" "control" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
     
     bootcmd:
       %{for volume in local.control_volumes}
@@ -125,10 +128,5 @@ resource "openstack_compute_instance_v2" "login" {
   metadata = {
     environment_root = var.environment_root
   }
-
-  user_data = <<-EOF
-    #cloud-config
-    fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
-  EOF
 
 }

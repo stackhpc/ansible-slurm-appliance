@@ -6,6 +6,9 @@ module "compute" {
   nodes = each.value.nodes
   cluster_name = var.cluster_name
   cluster_domain_suffix = var.cluster_domain_suffix
+  cluster_dns_zone = openstack_dns_zone_v2.cluster
+  dns = var.dns
+
   cluster_net_id = data.openstack_networking_network_v2.cluster_net.id
   cluster_subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
 

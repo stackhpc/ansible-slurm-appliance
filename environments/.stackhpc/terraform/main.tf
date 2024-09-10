@@ -59,6 +59,10 @@ variable "volume_backed_instances" {
     default = false
 }
 
+variable "dns" {
+    default = "none"
+}
+
 data "openstack_images_image_v2" "cluster" {
     name = var.cluster_image[var.os_version]
     most_recent = true
@@ -91,6 +95,7 @@ module "cluster" {
     }
     
     volume_backed_instances = var.volume_backed_instances
+    dns = var.dns
     
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:

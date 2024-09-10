@@ -17,6 +17,10 @@ variable "cluster_domain_suffix" {
     default = "invalid"
 }
 
+variable cluster_dns_zone {
+    type = map
+}
+
 variable "cluster_net_id" {
     type = string
 }
@@ -66,4 +70,8 @@ variable "root_volume_size" {
 
 variable "security_group_ids" {
     type = list
+}
+
+variable "dns" {
+    type = string
 }

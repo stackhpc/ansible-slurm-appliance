@@ -5,8 +5,18 @@ variable "cluster_name" {
 
 variable "cluster_domain_suffix" {
     type = string
-    description = "Domain suffix for cluster"
-    default = "invalid"
+    description = "Domain suffix for cluster. Only relevant if var.dns == \"designate\", else domain is controlled by Neutron."
+    default = "invalid" # IETF reserved TLD
+}
+
+variable "dns" {
+    description = "Select DNS method"
+    type = string
+    default = "none"
+    validation {
+        condition = contains(["none", "neutron", "designate"], var.dns)
+        error_message = "Valid values for var.dns are 'none', 'neutron' (requires Neutron DNS extension) or 'designate' (requires Designate)"
+    }
 }
 
 variable "cluster_net" {
