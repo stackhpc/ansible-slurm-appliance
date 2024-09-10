@@ -67,3 +67,8 @@ variable "root_volume_size" {
 variable "security_group_ids" {
     type = list
 }
+
+variable "k3s_token" {
+    description = "Random cryptographically secure string for K3s token"
+    type = string
+}
