@@ -1,0 +1,18 @@
+---
+
+- name: Create ansible-init playbook install directory
+  file: 
+    path: "/etc/ansible-init/playbooks"
+    state: directory
+
+- name: Install k3s server ansible-init playbook
+  copy:
+    src: start_k3s_server.yml
+    dest: /etc/ansible-init/playbooks/0-start-k3s.yml
+  when: inventory_hostname in groups["k3s_server"]
+
+- name: Install k3s agent ansible-init playbook
+  copy:
+    src: start_k3s_agent.yml
+    dest: /etc/ansible-init/playbooks/0-start-k3s.yml
+  when: inventory_hostname in groups["k3s_agent"]

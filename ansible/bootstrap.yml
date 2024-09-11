@@ -21,7 +21,8 @@
       environment:
         INSTALL_K3S_VERSION: "v1.31.0+k3s1"
         INSTALL_K3S_EXEC: "server"
-        INSTALL_K3S_SKIP_START: true
+        INSTALL_K3S_SKIP_START: "true"
+        INSTALL_K3S_SKIP_ENABLE: "true"
       changed_when: true
 
 - hosts: k3s_agent
@@ -33,7 +34,8 @@
       environment:
         INSTALL_K3S_VERSION: "v1.31.0+k3s1"
         INSTALL_K3S_EXEC: "agent"
-        INSTALL_K3S_SKIP_START: true
+        INSTALL_K3S_SKIP_START: "true"
+        INSTALL_K3S_SKIP_ENABLE: "true"
       changed_when: true
 
 - hosts: k3s
@@ -54,6 +56,11 @@
         - k3s
         - kubectl
 
+- hosts: k3s
+  become: yes
+  tasks:
+    - include_role:
+        name: k3s
 
 - hosts: cluster
   gather_facts: false

@@ -1,0 +1,19 @@
+- hosts: localhost
+  become: true
+  vars:
+    os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
+    k3s_token: "{{ os_metadata.meta.k3s_token }}"
+  tasks:
+    - name: Add the token for joining the cluster to the environment
+      no_log: true # avoid logging the server token
+      ansible.builtin.lineinfile:
+        path: "/etc/systemd/system/k3s.service.env"
+        line: "{{ item }}"
+      with_items:
+        - "K3S_TOKEN={{ k3s_token }}"
+    - name: Start k3s service
+      ansible.builtin.systemd:
+        name: k3s
+        daemon_reload: true
+        state: started
+        enabled: true
