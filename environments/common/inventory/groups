@@ -129,3 +129,6 @@ freeipa_client
 
 [squid]
 # Hosts to run squid proxy
+
+[sssd]
+# Hosts to configure sssd on

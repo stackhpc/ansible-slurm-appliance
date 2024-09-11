@@ -1,0 +1,5 @@
+- name: Restart sssd
+  service:
+    name: sssd
+    state: restarted
+  when: sssd_started | bool
