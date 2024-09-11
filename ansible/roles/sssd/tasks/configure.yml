@@ -1,0 +1,16 @@
+- name: Write sssd.conf
+  template:
+    src: "{{ sssd_conf_src }}"
+    dest: "{{ sssd_conf_dest }}"
+    owner: root
+    group: root
+    mode: u=rw,go=
+  notify: "Restart sssd"
+
+- meta: flush_handlers
+
+- name: Ensure sssd service state
+  systemd:
+    name: sssd
+    state: "{{ 'started' if sssd_started | bool else 'stopped' }}"
+    enabled: "{{ true if sssd_enabled else false }}"

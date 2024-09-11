@@ -82,3 +82,6 @@ openhpc
 [ansible_init:children]
 # Hosts to run ansible-init
 cluster
+
+[sssd]
+# Hosts to configure sssd on
