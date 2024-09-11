@@ -1,0 +1,52 @@
+[sssd]
+config_file_version = 2
+services = nss, pam, sudo
+reconnection_retries = 5
+domains = AD
+disable_netlink = False
+certificate_verification = no_verification
+
+[nss]
+enum_cache_timeout = 3600
+entry_cache_nowait_percentage = 99
+entry_negative_timeout = 15
+local_negative_timeout = 15
+enum_cache_timeout = 64800
+entry_cache_nowait_percentage = 50
+
+[pam]
+pam_verbosity = 1
+
+[domain/AD]
+enumeration = True
+cache_credentials = True
+debug_level = 7
+id_provider = ldap
+# auth_provider = krb5
+auth_provider = ldap
+# chpass_provider = krb5
+pwd_expiration_warning = 7
+krb5_realm = AD.SUSX.AC.UK
+krb5_renew_interval = 600
+krb5_renewable_lifetime = 7d
+ldap_uri = ldaps://ad.susx.ac.uk
+ldap_id_use_start_tls = False
+ldap_search_base = OU=US,DC=ad,DC=susx,DC=ac,DC=uk
+ldap_default_bind_dn = CN=ldapbind,OU=Service Accounts,OU=US,DC=ad,DC=susx,DC=ac,DC=uk
+ldap_default_authtok = {{ ldap_password }}
+ldap_default_authtok_type = password
+# ldap_tls_cacertdir = /etc/openldap/cacerts
+ldap_schema = rfc2307bis
+ldap_pwd_policy = none
+ldap_user_search_base = OU=Users,OU=US,DC=ad,DC=susx,DC=ac,DC=uk
+ldap_user_object_class = user
+ldap_user_name = cn
+ldap_user_home_directory = unixHomeDirectory
+ldap_user_gecos = displayName
+ldap_group_search_base = OU=Groups,OU=US,DC=ad,DC=susx,DC=ac,DC=uk
+ldap_group_object_class = group
+ldap_netgroup_search_base = OU=Netgroup,OU=US,DC=ad,DC=susx,DC=ac,DC=uk
+ldap_netgroup_object_class = nisNetgroup
+ldap_sudo_search_base = OU=US,DC=ad,DC=susx,DC=ac,DC=uk
+ldap_netgroup_name = cn
+ldap_tls_reqcert = allow

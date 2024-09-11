@@ -79,3 +79,7 @@ openhpc
 login
 
 # [squid:children] # defined directly in hosts.yml
+
+[sssd:children]
+# Hosts to configure sssd on
+cluster
