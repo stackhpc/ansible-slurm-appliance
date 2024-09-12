@@ -13,4 +13,4 @@
   systemd:
     name: sssd
     state: "{{ 'started' if sssd_started | bool else 'stopped' }}"
-    enabled: "{{ true if sssd_enabled else false }}"
+    enabled: "{{ sssd_enabled | bool }}"
