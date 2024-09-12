@@ -1,3 +1,3 @@
-- name: Install packages
+- name: Install sssd packages
   dnf:
-    name: "{{ sssd_packages }}"
+    name: "{{ sssd_packages + sssd_ldap_packages if (sssd_install_ldap | bool) else [] }}"

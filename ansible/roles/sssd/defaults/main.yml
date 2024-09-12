@@ -1,6 +1,8 @@
 sssd_packages:
   - sssd-common
-  - sssd-ldap # TODO: maybe should be in ldap role ??
+sssd_install_ldap: false
+sssd_ldap_packages:
+  - sssd-ldap
 sssd_conf_src: "{{ appliances_environment_root }}/files/sssd.conf.j2"
 sssd_conf_dest: /etc/sssd/sssd.conf
 sssd_started: true
