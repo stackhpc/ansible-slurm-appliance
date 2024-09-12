@@ -1,18 +1,49 @@
 ---
 
-- name: Create ansible-init playbook install directory
+- name: Download k3s install script
+  ansible.builtin.get_url:
+    url: https://get.k3s.io/
+    timeout: 120
+    dest: /usr/local/bin/k3s-install.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install k3s server
+  ansible.builtin.shell:
+    cmd: /usr/local/bin/k3s-install.sh
+  environment:
+    INSTALL_K3S_VERSION: "v1.31.0+k3s1"
+    INSTALL_K3S_EXEC: "{{ item }}"
+    INSTALL_K3S_SKIP_START: "true"
+    INSTALL_K3S_SKIP_ENABLE: "true"
+  changed_when: true
+  with_items:
+    - server
+    - agent
+
+- name: Creating directory on root path
+  ansible.builtin.file:
+    path: /root/bin
+    state: directory
+    owner: root
+    
+- name: Adding symlinks to k3s binaries for root
+  ansible.builtin.file:
+    src: /usr/local/bin/k3s
+    dest: "/root/bin/{{ item }}"
+    state: link
+    owner: root
+  with_items:
+    - k3s
+    - kubectl
+  
+- name: Create ansible-init playbook install directory #TODO: move into ansible-init
   file: 
     path: "/etc/ansible-init/playbooks"
     state: directory
 
 - name: Install k3s server ansible-init playbook
   copy:
-    src: start_k3s_server.yml
+    src: start_k3s.yml
     dest: /etc/ansible-init/playbooks/0-start-k3s.yml
-  when: inventory_hostname in groups["k3s_server"]
-
-- name: Install k3s agent ansible-init playbook
-  copy:
-    src: start_k3s_agent.yml
-    dest: /etc/ansible-init/playbooks/0-start-k3s.yml
-  when: inventory_hostname in groups["k3s_agent"]

@@ -77,6 +77,8 @@ resource "openstack_compute_instance_v2" "control" {
   metadata = {
     environment_root = var.environment_root
     k3s_token = var.k3s_token
+    k3s_server = "${var.cluster_name}-control"
+    k3s_node_type = "server"
   }
 
   user_data = <<-EOF
@@ -127,6 +129,7 @@ resource "openstack_compute_instance_v2" "login" {
     environment_root = var.environment_root
     k3s_token = var.k3s_token
     k3s_server = "${var.cluster_name}-control"
+    k3s_node_type = "agent"
   }
 
   user_data = <<-EOF

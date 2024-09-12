@@ -1,65 +1,9 @@
 ---
 
-- hosts: k3s
+- hosts: cluster
   become: yes
   tasks:
-    - name: Download k3s install script
-      ansible.builtin.get_url:
-        url: https://get.k3s.io/
-        timeout: 120
-        dest: /usr/local/bin/k3s-install.sh
-        owner: root
-        group: root
-        mode: "0755"
-
-- hosts: k3s_server
-  become: yes
-  tasks:
-    - name: Install k3s server
-      ansible.builtin.shell:
-        cmd: /usr/local/bin/k3s-install.sh
-      environment:
-        INSTALL_K3S_VERSION: "v1.31.0+k3s1"
-        INSTALL_K3S_EXEC: "server"
-        INSTALL_K3S_SKIP_START: "true"
-        INSTALL_K3S_SKIP_ENABLE: "true"
-      changed_when: true
-
-- hosts: k3s_agent
-  become: yes
-  tasks:
-    - name: Install k3s agent
-      ansible.builtin.shell:
-        cmd: /usr/local/bin/k3s-install.sh
-      environment:
-        INSTALL_K3S_VERSION: "v1.31.0+k3s1"
-        INSTALL_K3S_EXEC: "agent"
-        INSTALL_K3S_SKIP_START: "true"
-        INSTALL_K3S_SKIP_ENABLE: "true"
-      changed_when: true
-
-- hosts: k3s
-  become: yes
-  tasks:
-    - name: Creating directory on root path
-      ansible.builtin.file:
-        path: /root/bin
-        state: directory
-        owner: root
-    - name: Adding symlinks to k3s binaries for root
-      ansible.builtin.file:
-        src: /usr/local/bin/k3s
-        dest: "/root/bin/{{ item }}"
-        state: link
-        owner: root
-      with_items:
-        - k3s
-        - kubectl
-
-- hosts: k3s
-  become: yes
-  tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: k3s
 
 - hosts: cluster
