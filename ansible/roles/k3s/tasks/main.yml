@@ -9,7 +9,7 @@
     group: root
     mode: "0755"
 
-- name: Install k3s server
+- name: Install k3s
   ansible.builtin.shell:
     cmd: /usr/local/bin/k3s-install.sh
   environment:

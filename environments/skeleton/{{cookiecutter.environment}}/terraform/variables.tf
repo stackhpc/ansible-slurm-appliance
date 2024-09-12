@@ -135,4 +135,5 @@ variable "root_volume_size" {
 variable "k3s_token" {
     description = "Random cryptographically secure string for K3s token"
     type = string
+    default = "k3s_token_replace_me"
 }
