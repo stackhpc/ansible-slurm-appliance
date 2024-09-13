@@ -32,4 +32,5 @@
   tasks:
     - include_role:
         name: lustre
+        # NB install is ONLY run in builder
         tasks_from: configure.yml

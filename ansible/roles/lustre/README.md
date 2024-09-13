@@ -5,16 +5,18 @@ Install and configure a Lustre client. This builds RPM packages from source.
 **NB:** The `install.yml` playbook in this role should only be run during image build, with the default `update_enable=true`. This ensures that the latest kernel and matching
 `kernel-devel` packages will be installed. This playbook is not idempotent.
 
+**NB:** Currently this only supports RockyLinux 9.
+
 ## Role Variables
 
-- `lustre_version`: Optional str. Version of lustre to build, default '2.15.64'. TODO: EXPLAIN. See https://wiki.whamcloud.com/display/PUB/Lustre+Support+Matrix
+- `lustre_version`: Optional str. Version of lustre to build, default '2.15.5' which is the first version with EL9 support
 - `lustre_mounts`: Required list. Define Lustre filesystems and mountpoints as a list of dicts with possible keys:
     - `mgs_nid`: The NID for the MGS, e.g. `192.168.227.11@tcp1`
     - `fs_name`: The name of the filesystem to mount
     - `mount_point`: Path to mount filesystem at. Default is `/mnt/lustre/{{ lustre_fs_name}}`
     - `mount_state`: Mountpoint state, as for [ansible.posix.mount](https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html#parameter-state). Default `mounted`.
   Any of these parameters may alternatively be specified as role variables prefixed `lustre_`. If both are given entries in `lustre_mounts` take priority.
-
+- `lustre_subnet_cidr`: Required str. CIDR of subnet for interface to be used for Lustre.
 The following variables control the package build and and install and should not generally be required:
 - `lustre_build_packages`: Optional list. Prerequisite packages required to build Lustre. See `defaults/main.yml`.
 - `lustre_build_dir`: Optional str. Path to build lustre at, default `/tmp/lustre-release`.
