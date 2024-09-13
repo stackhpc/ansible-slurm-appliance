@@ -1,1 +1,2 @@
 #update_enable: false # Can uncomment for speed debugging non-update related build issues
+sssd_install_ldap: true # include sssd-ldap package in fatimage
