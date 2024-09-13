@@ -18,7 +18,7 @@
         path: "/etc/systemd/system/{{ service_name }}.service.env"
         line: "K3S_URL=https://{{ k3s_server_name }}:6443"
       when: k3s_node_type == "agent"
-      
+
     - name: Start k3s service
       ansible.builtin.systemd:
         name: "{{ service_name }}"

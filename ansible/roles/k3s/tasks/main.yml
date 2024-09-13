@@ -37,6 +37,11 @@
   with_items:
     - k3s
     - kubectl
+
+- name: k9s install
+  ansible.builtin.include_role:
+    name: k9s
+  
   
 - name: Create ansible-init playbook install directory #TODO: move into ansible-init
   file: 

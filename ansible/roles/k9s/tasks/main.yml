@@ -1,0 +1,33 @@
+---
+  - name: Create install directory
+    ansible.builtin.file:
+      path: /root/k9s-temp
+      state: directory
+
+  - name: Download k9s
+    ansible.builtin.get_url:
+      url: https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_amd64.tar.gz
+      dest: /root/k9s-temp/k9s_Linux_amd64.tar.gz
+
+  - name: Unpack k9s binary
+    ansible.builtin.unarchive:
+      src: /root/k9s-temp/k9s_Linux_amd64.tar.gz
+      dest: /root/k9s-temp
+      remote_src: yes
+
+  - name: Add k9s to root path
+    ansible.builtin.copy:
+      src: /root/k9s-temp/k9s
+      dest: /root/bin/k9s
+      mode: u+rwx
+      remote_src: yes
+
+  - name: Add k3s kubeconfig as environment variable
+    ansible.builtin.lineinfile:
+      path: /etc/environment
+      line: "KUBECONFIG=/etc/rancher/k3s/k3s.yaml"
+
+  - name: Cleanup k9s install directory
+    ansible.builtin.file:
+      path: /root/k9s-temp
+      state: absent
