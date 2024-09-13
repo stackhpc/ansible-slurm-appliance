@@ -1,12 +1,6 @@
 ---
 
 - hosts: cluster
-  become: yes
-  tasks:
-    - ansible.builtin.include_role:
-        name: k3s
-
-- hosts: cluster
   gather_facts: false
   become: yes
   tasks:
@@ -264,3 +258,9 @@
   tasks:
     - include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
+
+- hosts: cluster
+  become: yes
+  tasks:
+    - ansible.builtin.include_role:
+        name: k3s
