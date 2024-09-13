@@ -159,6 +159,12 @@ variable "groups" {
   }
 }
 
+variable "extra_image_name" {
+  type = string
+  description = "Infix for 'extra' build image name"
+  default = "extra"
+}
+
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
@@ -187,7 +193,6 @@ source "openstack" "openhpc" {
   # Output image:
   image_disk_format = "qcow2"
   image_visibility = var.image_visibility
-  image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
 }
 
 build {
@@ -195,11 +200,13 @@ build {
   # non-OFED fat image:
   source "source.openstack.openhpc" {
     name = "openhpc"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   # OFED fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-ofed"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   # CUDA fat image:
@@ -210,6 +217,7 @@ build {
   # Extended site-specific image, built on fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-extra"
+    image_name = "openhpc-${var.extra_image_name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   provisioner "ansible" {
