@@ -1,4 +1,4 @@
-lustre_version: '2.15.5-RC3' # TODO: FIXME to 2.15.5 on release see http://lists.lustre.org/pipermail/lustre-discuss-lustre.org/2024-June/019163.html
+lustre_version: '2.15.5' # https://www.lustre.org/lustre-2-15-5-released/
 lustre_mounts: []
 #lustre_mgs_nid:
 #lustre_fs_name:
