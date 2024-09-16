@@ -41,12 +41,6 @@
 - name: k9s install
   ansible.builtin.include_role:
     name: k9s
-  
-  
-- name: Create ansible-init playbook install directory #TODO: move into ansible-init
-  file: 
-    path: "/etc/ansible-init/playbooks"
-    state: directory
 
 - name: Install k3s server ansible-init playbook
   copy:

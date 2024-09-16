@@ -259,7 +259,7 @@
     - include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
 
-- hosts: cluster
+- hosts: k3s
   become: yes
   tasks:
     - ansible.builtin.include_role:

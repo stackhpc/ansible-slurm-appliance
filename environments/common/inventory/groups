@@ -135,3 +135,6 @@ freeipa_client
 
 [ansible_init]
 # Hosts to run linux-anisble-init
+
+[k3s]
+# Hosts to run k3s server/agent
