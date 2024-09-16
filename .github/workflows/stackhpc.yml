@@ -7,12 +7,14 @@ on:
       - main
     paths-ignore:
       - dev/**
+      - !dev/setup-env.sh
       - docs/**
       - README.md
       - .gitignore
   pull_request:
     paths-ignore:
       - dev/**
+      - !dev/setup-env.sh
       - docs/**
       - README.md
       - .gitignore
