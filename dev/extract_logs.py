@@ -1,6 +1,10 @@
+
+
+
 import csv
 import re
 import os
+import sys
 
 def convert_time_to_seconds(time_str):
     h, m, s = time_str.split(':')
@@ -58,8 +62,11 @@ def extract_log_info_and_generate_csv(log_file_path, output_csv_path, target_dir
 
     print(f"Data extracted, sorted, and saved to {output_csv_path}")
     
-log_file_path = './RL9-ofed-fatimage-177.txt' # Input workflow log name
-output_csv_path = 'RL9-ofed-fatimage-177.csv' # Output CSV name
+if len(sys.argv) != 2:
+    print("Path to workflow log plain text file should be provided as the only arg to this script")
+    sys.exit(1)
+log_file_path = sys.argv[1] # Input workflow log name
+output_csv_path = log_file_path.replace('.txt.', '.csv') # Output CSV name
 target_directory = '/ansible/' # Shared directory for task path
 
 extract_log_info_and_generate_csv(log_file_path, output_csv_path, target_directory)
