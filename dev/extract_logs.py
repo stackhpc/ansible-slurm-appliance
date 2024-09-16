@@ -1,5 +1,15 @@
+#!/usr/bin/env python
 
+"""
+Process packer build workflow logs into CSV. Useful for timing 
+dissemination.
 
+Usage:
+    extract_logs.py <logs.txt>
+
+Where logs.txt is the name of the workflow log downloaded.
+It will list task name, against task directory path, against time to complete.
+"""
 
 import csv
 import re
