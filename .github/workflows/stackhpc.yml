@@ -6,20 +6,20 @@ on:
     branches:
       - main
     paths:
-      - **
-      - !dev/**
-      - dev/setup-env.sh
-      - !docs/**
-      - !README.md
-      - !.gitignore
+      - '**'
+      - '!dev/**'
+      - 'dev/setup-env.sh'
+      - '!docs/**'
+      - '!README.md'
+      - '!.gitignore'
   pull_request:
     paths:
-      - **
-      - !dev/**
-      - dev/setup-env.sh
-      - !docs/**
-      - !README.md
-      - !.gitignore
+      - '**'
+      - '!dev/**'
+      - 'dev/setup-env.sh'
+      - '!docs/**'
+      - '!README.md'
+      - '!.gitignore'
 jobs:
   openstack:
     name: openstack-ci
