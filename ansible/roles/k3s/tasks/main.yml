@@ -38,6 +38,16 @@
     - k3s
     - kubectl
 
+- name: Installing helm
+  unarchive:
+    src: https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
+    dest: /root/bin
+    extra_opts: "--strip-components=1"
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: true
+
 - name: k9s install
   ansible.builtin.include_role:
     name: k9s
