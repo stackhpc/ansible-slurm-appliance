@@ -16,20 +16,20 @@
     that: _lustre_interface is defined
     fail_msg: "No interface was found for lustre_subnet_cidr={{ lustre_subnet_cidr }}"
 
-# - name: Write LNet configuration file
-#   template:
-#     src: lnet.conf.j2
-#     dest:  /etc/lnet.conf # exists from package install, expected by lnet service
-#     owner: root
-#     group: root
-#     mode: u=rw,go=r # from package install
-#   register: _lnet_conf
+- name: Write LNet configuration file
+  template:
+    src: lnet.conf.j2
+    dest:  /etc/lnet.conf # exists from package install, expected by lnet service
+    owner: root
+    group: root
+    mode: u=rw,go=r # from package install
+  register: _lnet_conf
 
-# - name: Ensure lnet service state
-#   systemd_service:
-#     name: lnet
-#     state: "'restarted' if _lnet_conf.changed else 'started'"
-#   when: _lnet_conf.changed
+- name: Ensure lnet service state
+  systemd:
+    name: lnet
+    state: "{{ 'restarted' if _lnet_conf.changed else 'started' }}"
+  when: _lnet_conf.changed
 
 - name: Ensure mount points exist
   ansible.builtin.file:
