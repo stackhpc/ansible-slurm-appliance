@@ -4,56 +4,34 @@
   ansible.builtin.get_url:
     url: https://get.k3s.io/
     timeout: 120
-    dest: /usr/local/bin/k3s-install.sh
+    dest: /usr/bin/k3s-install.sh
     owner: root
     group: root
     mode: "0755"
 
 - name: Install k3s
   ansible.builtin.shell:
-    cmd: /usr/local/bin/k3s-install.sh
+    cmd: /usr/bin/k3s-install.sh
   environment:
     INSTALL_K3S_VERSION: "v1.31.0+k3s1"
     INSTALL_K3S_EXEC: "{{ item }}"
     INSTALL_K3S_SKIP_START: "true"
     INSTALL_K3S_SKIP_ENABLE: "true"
+    INSTALL_K3S_BIN_DIR: "/usr/bin"
   changed_when: true
   with_items:
     - server
     - agent
 
-- name: Creating directory on root path
-  ansible.builtin.file:
-    path: /root/bin
-    state: directory
-    owner: root
-    
-- name: Adding symlinks to k3s binaries for root
-  ansible.builtin.file:
-    src: /usr/local/bin/k3s
-    dest: "/root/bin/{{ item }}"
-    state: link
-    owner: root
-  with_items:
-    - k3s
-    - kubectl
-
 - name: Installing helm
   unarchive:
     src: https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
-    dest: /usr/local/bin
+    dest: /usr/bin
     extra_opts: "--strip-components=1"
     owner: root
     group: root
     mode: 0755
     remote_src: true
-
-- name: Add helm symlink in root path
-  ansible.builtin.file:
-      src: /usr/local/bin/helm
-      dest: "/root/bin/helm"
-      state: link
-      owner: root
 
 - name: k9s install
   ansible.builtin.include_role:

@@ -18,7 +18,7 @@
   - name: Add k9s to root path
     ansible.builtin.copy:
       src: /root/k9s-temp/k9s
-      dest: /root/bin/k9s
+      dest: /usr/bin/k9s
       mode: u+rwx
       remote_src: yes
 
