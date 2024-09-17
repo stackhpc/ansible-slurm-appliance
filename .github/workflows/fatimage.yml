@@ -1,5 +1,5 @@
 
-name: Build nightly fat image
+name: Build fat image
 on:
   workflow_dispatch:
   schedule:
@@ -65,8 +65,9 @@ jobs:
           cd packer/
           packer init .
 
-          SOURCE_IMAGE_NAME="${{ matrix.build }}-${{ matrix.os_version }}-latest"
-          IMAGE_NAME="${{ matrix.build }}-${{ matrix.os_version }}-latest"
+          MATRIX_BUILD="${{ matrix.build }}"
+          SOURCE_IMAGE_NAME="${MATRIX_BUILD#openstack.}-${{ matrix.os_version }}-latest"
+          IMAGE_NAME="${MATRIX_BUILD#openstack.}-${{ matrix.os_version }}-latest"
           
           PACKER_CMD="PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
