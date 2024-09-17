@@ -5,7 +5,21 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**'
+      - '!dev/**'
+      - 'dev/setup-env.sh'
+      - '!docs/**'
+      - '!README.md'
+      - '!.gitignore'
   pull_request:
+    paths:
+      - '**'
+      - '!dev/**'
+      - 'dev/setup-env.sh'
+      - '!docs/**'
+      - '!README.md'
+      - '!.gitignore'
 jobs:
   openstack:
     name: openstack-ci
@@ -53,11 +67,11 @@ jobs:
           echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         shell: bash
-        
+
       - name: Add bastion's ssh key to known_hosts
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
-      
+
       - name: Install ansible etc
         run: dev/setup-env.sh
 
@@ -65,11 +79,11 @@ jobs:
         uses: opentofu/setup-opentofu@v1
         with:
           tofu_version: 1.6.2
-      
+
       - name: Initialise terraform
         run: terraform init
         working-directory: ${{ github.workspace }}/environments/.stackhpc/terraform
-        
+
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
@@ -125,14 +139,14 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          
+
           # load ansible variables into shell:
           ansible-playbook ansible/ci/output_vars.yml \
             -e output_vars_hosts=openondemand \
             -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
             -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
           source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
-          
+
           # setup ssh proxying:
           sudo apt-get --yes install proxychains
           echo proxychains installed
@@ -169,7 +183,7 @@ jobs:
       #     ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' ${TF_VAR_cluster_name}-compute-[0-3]"
       #     ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
       #     ansible-playbook -v ansible/ci/check_slurm.yml
-      
+
       - name: Test reimage of login and control nodes (via rebuild adhoc)
         run: |
           . venv/bin/activate
@@ -178,7 +192,7 @@ jobs:
           ansible all -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
-      
+
       - name: Check sacct state survived reimage
         run: |
           . venv/bin/activate
