@@ -41,12 +41,19 @@
 - name: Installing helm
   unarchive:
     src: https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
-    dest: /root/bin
+    dest: /usr/local/bin
     extra_opts: "--strip-components=1"
     owner: root
     group: root
     mode: 0755
     remote_src: true
+
+- name: Add helm symlink in root path
+  ansible.builtin.file:
+      src: /usr/local/bin/helm
+      dest: "/root/bin/helm"
+      state: link
+      owner: root
 
 - name: k9s install
   ansible.builtin.include_role:
