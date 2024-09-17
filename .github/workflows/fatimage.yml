@@ -68,7 +68,11 @@ jobs:
 
           MATRIX_BUILD="${{ matrix.build }}"
           CLEAN_BUILD="${MATRIX_BUILD#openstack.}"
-          SOURCE_IMAGE_NAME="${CLEAN_BUILD}-${{ matrix.os_version }}-latest"
+          # SOURCE_IMAGE_NAME="${CLEAN_BUILD}-${{ matrix.os_version }}-latest"
+          SOURCE_IMAGE_NAME="{
+            RL8: "${CLEAN_BUILD}-${{ matrix.os_version }}-latest"
+            RL9: "${CLEAN_BUILD}-${{ matrix.os_version }}-latest"
+          }"
           IMAGE_NAME="${CLEAN_BUILD}-${{ matrix.os_version }}-latest"
           
           PACKER_CMD="PACKER_LOG=1 packer build \
@@ -76,13 +80,14 @@ jobs:
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl \
+          -var "source_image_name=${SOURCE_IMAGE_NAME}" \
           openstack.pkr.hcl"
 
-          if [ "${{ github.event_name }}" != "schedule" ]; then
-            PACKER_CMD="$PACKER_CMD -var 'source_image_name=$SOURCE_IMAGE_NAME'"
-          else
-            PACKER_CMD="$PACKER_CMD -var 'image_name=$IMAGE_NAME'"
-          fi
+          # if [ "${{ github.event_name }}" != "schedule" ]; then
+          #   PACKER_CMD="$PACKER_CMD -var 'source_image_name[${{ matrix.os_version }}]=${SOURCE_IMAGE_NAME}'"
+          # else
+          #   PACKER_CMD="$PACKER_CMD -var 'image_name=$IMAGE_NAME'"
+          # fi
 
           eval $PACKER_CMD
         env:
