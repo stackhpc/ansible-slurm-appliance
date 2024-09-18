@@ -1,6 +1,15 @@
 name: Nightly fat image build
 on:
   workflow_dispatch:
+      inputs:
+        ci_cloud:
+          description: 'Select the CI_CLOUD'
+          required: true
+          type: choice
+          options:
+            - LEAFCLOUD
+            - SMS
+            - ARCUS
   schedule:
     - cron: '0 0 * * *'  # Run at midnight
 

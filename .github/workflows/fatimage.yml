@@ -11,8 +11,6 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
-  schedule:
-    - cron: '0 0 * * *'  # Run at midnight
 
 jobs:
   openstack:
