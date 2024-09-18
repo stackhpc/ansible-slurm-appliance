@@ -2,6 +2,15 @@
 name: Build fat image
 on:
   workflow_dispatch:
+      inputs:
+        ci_cloud:
+          description: 'Select the CI_CLOUD'
+          required: true
+          type: choice
+          options:
+            - LEAFCLOUD
+            - SMS
+            - ARCUS
   schedule:
     - cron: '0 0 * * *'  # Run at midnight
 
@@ -27,15 +36,19 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ vars.CI_CLOUD }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
       - name: Setup ssh
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', vars.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         shell: bash
 
@@ -49,7 +62,7 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
       - name: Setup environment
