@@ -1,0 +1,11 @@
+---
+
+
+- name: Install dependencies
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - sssd-ldap
+    - openldap-clients

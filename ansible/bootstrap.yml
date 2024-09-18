@@ -111,6 +111,22 @@
       register: sestatus
 
 # --- tasks after here require access to package repos ---
+- hosts: cacerts
+  tags: cacerts
+  gather_facts: false
+  tasks:
+    - name: Install custom cacerts
+      import_role:
+        name: cacerts
+
+- hosts: sshd
+  tags: sshd
+  gather_facts: false
+  tasks:
+    - name: Configure sshd
+      import_role:
+        name: sshd
+
 - hosts: squid
   tags: squid
   gather_facts: yes

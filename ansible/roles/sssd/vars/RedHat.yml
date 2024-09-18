@@ -1,0 +1,14 @@
+---
+sssd_packages:
+  - 'sssd'
+  - 'sssd-tools'
+  - 'authconfig'
+
+sssd_mkhomedir_packages:
+  - 'oddjob-mkhomedir'
+
+sssd_conf_path: '/etc/sssd/sssd.conf'
+
+sssd_service: 'sssd'
+sssd_state: 'started'
+sssd_enabled: true
