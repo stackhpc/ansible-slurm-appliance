@@ -1,5 +1,4 @@
-
-name: Build fat image
+name: Nightly fat image build
 on:
   workflow_dispatch:
       inputs:
@@ -11,6 +10,8 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
+  schedule:
+    - cron: '0 0 * * *'  # Run at midnight
 
 jobs:
   openstack:
@@ -21,16 +22,13 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
-      matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
+      matrix: # build RL8+OFED, RL9+OFED new base images
         os_version:
           - RL8
           - RL9
         build:
-          - openstack.openhpc-ofed
-          - openstack.openhpc-cuda
-        exclude:
-          - os_version: RL8
-            build: openstack.openhpc-cuda
+          - openstack.openhpc-latest
+
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -53,10 +51,10 @@ jobs:
       - name: Add bastion's ssh key to known_hosts
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
-      
+
       - name: Install ansible etc
         run: dev/setup-env.sh
-      
+
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
@@ -67,7 +65,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-        
+
       - name: Build fat image with packer
         id: packer_build
         run: |
@@ -81,6 +79,7 @@ jobs:
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl \
+          -var 'source_image_name={"RL8": "openhpc-latest-RL8", "RL9": "openhpc-latest-RL9"}' \
           openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
