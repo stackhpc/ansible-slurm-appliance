@@ -1,4 +1,4 @@
-- name: Install sssd packages
+- name: Ensure sssd packages are installed
   dnf:
     name: "{{ sssd_packages + sssd_ldap_packages if (sssd_install_ldap | bool) else [] }}"
 
@@ -7,3 +7,7 @@
   systemd:
     name: sssd
     enabled: "{{ sssd_enabled | bool }}"
+
+- name: Ensure mkhomedir packages are installed if required
+  dnf:
+    name: "{{ sssd_mkhomedir_packages }}"
