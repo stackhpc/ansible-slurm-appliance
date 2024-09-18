@@ -24,3 +24,4 @@ tuned_started: false
 tuned_enabled: false
 sssd_started: false
 sssd_enabled: false
+sssd_install_ldap: true # include sssd-ldap package in fatimage
