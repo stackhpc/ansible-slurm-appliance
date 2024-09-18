@@ -85,3 +85,6 @@ cluster
 
 [sssd]
 # Hosts to configure sssd on
+
+[sshd]
+# Hosts where the OpenSSH server daemon should be configured

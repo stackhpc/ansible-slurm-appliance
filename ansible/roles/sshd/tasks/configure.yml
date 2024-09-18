@@ -1,0 +1,16 @@
+- name: Configure SSH password authentication
+  # NB: If parameters are defined multiple times the first value wins;
+  # The default /etc/ssh/sshd_config has
+  #   Include /etc/ssh/sshd_config.d/*.conf
+  # early on, which is generally held to be the correct approach, so adding
+  # values to the end of that file won't work
+  lineinfile:
+    dest: /etc/ssh/sshd_config.d/10-ansible.conf # will beat 50-cloud-init and 50-redhat
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication {{ 'yes' if sshd_password_authentication | bool else 'no' }}"
+    state: present
+    create: true
+    validate: sshd -t -f %s
+  notify:
+    - Restart sshd
+  
