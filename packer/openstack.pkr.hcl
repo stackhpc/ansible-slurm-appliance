@@ -186,7 +186,8 @@ source "openstack" "openhpc" {
   # Output image:
   image_disk_format = "qcow2"
   image_visibility = var.image_visibility
-  image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
+  image_name = "${source.name}-${var.os_version}"
+  # -${local.timestamp}-${substr(local.git_commit, 0, 8)}"
 }
 
 build {

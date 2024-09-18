@@ -1,4 +1,4 @@
-name: Nightly fat image build
+name: Build fat image
 on:
   workflow_dispatch:
       inputs:
@@ -10,8 +10,6 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
-  schedule:
-    - cron: '0 0 * * *'  # Run at midnight
 
 jobs:
   openstack:
@@ -22,7 +20,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
-      matrix: # build RL8+OFED, RL9+OFED new base images
+      matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
         os_version:
           - RL8
           - RL9
@@ -79,7 +77,6 @@ jobs:
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl \
-          -var 'source_image_name={"RL8": "openhpc-latest-RL8", "RL9": "openhpc-latest-RL9"}' \
           openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
