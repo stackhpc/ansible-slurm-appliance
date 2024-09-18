@@ -110,6 +110,15 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
+- hosts: sshd
+  tags: sshd
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Configure sshd
+      import_role:
+        name: sshd
+
 # --- tasks after here require access to package repos ---
 - hosts: squid
   tags: squid

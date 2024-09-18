@@ -60,3 +60,5 @@ roles/*
 !roles/tuned/**
 !roles/sssd/
 !roles/sssd/**
+!roles/sshd/
+!roles/sshd/**
