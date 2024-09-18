@@ -22,38 +22,43 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
-      matrix: # build RL8+OFED, RL9+OFED base images
+      matrix: # build RL8+OFED, RL9+OFED new base images
         os_version:
           - RL8
           - RL9
         build:
-          - openstack.openhpc-latest
+          - openstack.openhpc-ofed
+
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ vars.CI_CLOUD }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
       - name: Setup ssh
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', vars.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         shell: bash
 
       - name: Add bastion's ssh key to known_hosts
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
-      
+
       - name: Install ansible etc
         run: dev/setup-env.sh
-      
+
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
       - name: Setup environment
