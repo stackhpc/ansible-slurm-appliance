@@ -9,16 +9,6 @@
   when: sssd_config is defined
   notify: "Restart sssd"
 
-- name: "Check if authconfig needs to be run to configure pam/nsswitch"
-  # FIXME(wszumski) --test is no longer supported. This probably isn't doing what we think it is doing
-  # Error: option --test is no longer supported and we cannot continue if it is set.
-  # authconfig is also deprecated. We should switch to authselect.
-  shell: "/usr/bin/test \"$(authconfig {% if sssd_enable_mkhomedir | bool %}--enablemkhomedir {% endif %}--enablesssd --enablesssdauth --test)\" = \"$(authconfig --test)\""
-  register: authconfig_result
-  changed_when: "authconfig_result.rc != 0"
-  check_mode: no
-  failed_when: "authconfig_result.rc >= 2"
-
+# TODO: Make idempotent
 - name: "Configure nsswitch and pam for SSSD via authconfig"
-  command: "authconfig {% if sssd_enable_mkhomedir | bool %}--enablemkhomedir {% endif %} --enablesssd --enablesssdauth --update"
-  when: "authconfig_result.rc != 0"
+  command: "authselect select sssd{% if sssd_enable_mkhomedir | bool %} with-mkhomedir{% endif %}"

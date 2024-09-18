@@ -16,3 +16,4 @@
   service:
     name: "{{ sssd_service }}"
     state: "restarted"
+

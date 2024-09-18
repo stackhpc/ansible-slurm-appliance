@@ -4,3 +4,9 @@
     name: "{{ sssd_service }}"
     state: "{{ sssd_state }}"
     enabled: "{{ sssd_enabled }}"
+
+- name: "Ensure oddjob is started"
+  service:
+    name: oddjobd
+    state: started
+    enabled: "{{ sssd_enable_mkhomedir }}"
