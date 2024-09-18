@@ -132,7 +132,7 @@ variable "volume_size" {
   type = map(number)
   default = {
     # fat image builds, GB:
-    openhpc = 15
+    openhpc-latest = 15
     openhpc-ofed = 15
     openhpc-cuda = 30
   }
@@ -153,9 +153,9 @@ variable "groups" {
   description = "Additional inventory groups (other than 'builder') to add build VM to, keyed by source name"
   default = {
     # fat image builds:
-    openhpc = ["control", "compute", "login"]
-    openhpc-ofed = ["control", "compute", "login", "ofed"]
-    openhpc-cuda = ["control", "compute", "login", "ofed", "cuda"]
+    openhpc-latest = ["ofed"]
+    openhpc-ofed = ["control", "compute", "login"]
+    openhpc-cuda = ["control", "compute", "login", "cuda"]
   }
 }
 
@@ -191,9 +191,9 @@ source "openstack" "openhpc" {
 
 build {
 
-  # non-OFED fat image:
+  # latest fat image:
   source "source.openstack.openhpc" {
-    name = "openhpc"
+    name = "openhpc-latest"
   }
 
   # OFED fat image:
