@@ -12,4 +12,7 @@ slurm_appliance_secrets:
 secrets_openhpc_mungekey_default:
   content: "{{ lookup('pipe', 'dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64') }}"
 
+k3s_secrets:
+  k3s_token: "{{ lookup('ansible.builtin.password', '/dev/null', length=64) }}"
+
 openhpc_passwords_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') | default(undefined, true) | mandatory('You must define the APPLIANCES_ENVIRONMENT_ROOT environment variable') }}/inventory/group_vars/all/secrets.yml"

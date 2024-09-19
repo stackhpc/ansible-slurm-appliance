@@ -69,6 +69,5 @@ variable "security_group_ids" {
 }
 
 variable "k3s_token" {
-    description = "Random cryptographically secure string for K3s token (must be set by ../compute.tf)"
     type = string
 }

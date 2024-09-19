@@ -7,17 +7,12 @@
   delegate_to: localhost
   run_once: true
 
-- name: Generate k3s token
-  ansible.builtin.set_fact:
-    k3s_token_secret: ""
-
 - name:  Generate k3s token and add to terraform
-  vars:
-    token: "{{ lookup('ansible.builtin.password', '/dev/null', length=64) }}"
-  replace:
-    path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/terraform/variables.tf"
-    regexp: "k3s_token_replace_me"
-    replace: "{{ token }}"
+  template:
+    src: k3s-token.auto.tfvars.json
+    dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/terraform/k3s-token.auto.tfvars.json"
+  delegate_to: localhost
+  run_once: true
 
 
 # - name: Ensure munge key directory exists
