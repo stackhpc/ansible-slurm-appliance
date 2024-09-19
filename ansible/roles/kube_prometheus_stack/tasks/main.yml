@@ -1,0 +1,72 @@
+---
+
+# Because of the way Helm handles CRDs, we upgrade them first
+- name: Get kube-prometheus-stack CRDs
+  command: >-
+    helm show crds
+      {{ kube_prometheus_stack_chart_name }}
+      --repo {{ kube_prometheus_stack_chart_repo }}
+      --version {{ kube_prometheus_stack_chart_version }}
+  register: kube_prometheus_stack_crds
+
+- name: Install kube-prometheus-stack CRDs
+  # Use server-side apply because some of the CRDs are too big to fit in the annotation
+  command: kubectl apply --server-side=true --force-conflicts=true -f -
+  args:
+    stdin: "{{ kube_prometheus_stack_crds.stdout }}"
+
+- name: Create hostPath volume in /var/lib/state
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: appliances-state-dir
+        labels:
+          app.kubernetes.io/name: appliances-state-dir
+      spec:
+        capacity:
+          storage: 4Gi
+        accessModes:
+        - ReadWriteOnce
+        hostPath:
+          path: "{{ appliances_state_dir }}/prometheus"
+          type: DirectoryOrCreate
+
+- name: Disable rancher default storage class
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    state: patched
+    definition:
+      kind: StorageClass
+      metadata:
+        name: local-path
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "false"
+
+- name: Install kube-prometheus-stack on target Kubernetes cluster
+  kubernetes.core.helm:
+    chart_ref: "{{ kube_prometheus_stack_chart_name }}"
+    chart_repo_url: "{{ kube_prometheus_stack_chart_repo }}"
+    chart_version: "{{ kube_prometheus_stack_chart_version }}"
+    release_namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    release_name: "{{ kube_prometheus_stack_release_name }}"
+    release_values: "{{ kube_prometheus_stack_release_values }}"
+    atomic: yes
+    create_namespace: yes
+    wait: yes
+    wait_timeout: "{{ kube_prometheus_stack_wait_timeout }}"
+
+- name: Expose prometheus dashboard
+  kubernetes.core.k8s_service:
+    state: present
+    name: prometheus-external
+    type: NodePort
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    ports:
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+    selector:
+      app.kubernetes.io/instance: kube-prometheus-stack-prometheus

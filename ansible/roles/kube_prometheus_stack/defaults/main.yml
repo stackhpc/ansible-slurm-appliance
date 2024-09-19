@@ -1,0 +1,122 @@
+---
+
+# The chart to use
+kube_prometheus_stack_chart_repo: https://prometheus-community.github.io/helm-charts
+kube_prometheus_stack_chart_name: kube-prometheus-stack
+kube_prometheus_stack_chart_version: 59.1.0
+
+# Release information
+kube_prometheus_stack_release_namespace: monitoring-system
+kube_prometheus_stack_release_name: kube-prometheus-stack
+
+# The timeout to wait for the release to become ready
+kube_prometheus_stack_wait_timeout: 10m
+
+# The external URLs for Prometheus and Alertmanager
+_kube_prometheus_stack_external_url_tls_enabled: >-
+  {{-
+    admin_dashboard_ingress_tls_enabled |
+      default(ingress_tls_enabled | default(True))
+  }}
+_kube_prometheus_stack_external_url_scheme: >-
+  {{- "https" if _kube_prometheus_stack_external_url_tls_enabled else "http" }}
+_kube_prometheus_stack_alertmanager_host: >-
+  {{-
+    admin_dashboard_ingress_alertmanager_host |
+      default(
+        "{}.{}".format(ingress_alertmanager_subdomain, ingress_base_domain)
+        if ingress_alertmanager_subdomain is defined and ingress_base_domain is defined
+        else ""
+      )
+  }}
+kube_prometheus_stack_alertmanager_external_url: >-
+  {{-
+    "{}://{}".format(
+      _kube_prometheus_stack_external_url_scheme,
+      _kube_prometheus_stack_alertmanager_host
+    )
+    if _kube_prometheus_stack_alertmanager_host
+    else ""
+  }}
+_kube_prometheus_stack_prometheus_host: >-
+  {{-
+    admin_dashboard_ingress_prometheus_host |
+      default(
+        "{}.{}".format(ingress_prometheus_subdomain, ingress_base_domain)
+        if ingress_prometheus_subdomain is defined and ingress_base_domain is defined
+        else ""
+      )
+  }}
+kube_prometheus_stack_prometheus_external_url: >-
+  {{-
+    "{}://{}".format(
+      _kube_prometheus_stack_external_url_scheme,
+      _kube_prometheus_stack_prometheus_host
+    )
+    if _kube_prometheus_stack_prometheus_host
+    else ""
+  }}
+
+# The values for the kube-prometheus-stack release
+kube_prometheus_stack_release_defaults:
+  defaultRules:
+    disabled:
+      # None of these are relevant in k3s context
+      KubeSchedulerDown: true
+      KubeProxyDown: true
+      KubeControllerManagerDown: true
+  prometheus:
+    prometheusSpec:
+      externalUrl: "{{ kube_prometheus_stack_prometheus_external_url }}"
+      podMonitorSelectorNilUsesHelmValues: false
+      serviceMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            volumeName: appliances-state-dir
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 4Gi
+      # may need to change these
+      securityContext:
+        runAsUser: 0
+        runAsNonRoot: false
+        runAsGroup: 0
+        fsGroup: 0
+      nodeSelector:
+        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+
+                
+  grafana:
+    sidecar:
+      dashboards:
+        searchNamespace: ALL
+    grafana.ini:
+      auth.anonymous:
+        enabled: true
+  alertmanager:
+    # Don't apply the namespace grouping by default
+    config:
+      route:
+        group_by: ['...']
+    alertmanagerSpec:
+      externalUrl: "{{ kube_prometheus_stack_alertmanager_external_url }}"
+      # Make sure that alertmanager finds configurations with the alertmanager name as a label
+      alertmanagerConfigSelector:
+        matchLabels:
+          alertmanager: "{{ kube_prometheus_stack_release_name }}-alertmanager"
+      # Do NOT add the namespace matcher to routes from AlertmanagerConfig resources
+      alertmanagerConfigMatcherStrategy:
+        type: None
+
+kube_prometheus_stack_release_overrides: {}
+
+kube_prometheus_stack_release_values: >-
+  {{-
+    kube_prometheus_stack_release_defaults |
+      combine(kube_prometheus_stack_release_overrides, recursive = True)
+  }}

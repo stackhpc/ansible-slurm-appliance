@@ -49,4 +49,6 @@ collections:
   - name: https://github.com/azimuth-cloud/ansible-collection-image-utils
     type: git
     version: main # update on release
+  - name: kubernetes.core
+    version: 2.4.2
 ...
