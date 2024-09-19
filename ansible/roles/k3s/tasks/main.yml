@@ -33,9 +33,10 @@
     mode: 0755
     remote_src: true
 
-- name: k9s install
-  ansible.builtin.include_role:
-    name: k9s
+- name: Add k3s kubeconfig as environment variable
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    line: "KUBECONFIG=/etc/rancher/k3s/k3s.yaml"
 
 - name: Install ansible-init playbook for k3s agent or server activation
   copy:
