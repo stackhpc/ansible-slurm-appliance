@@ -4,8 +4,7 @@
     os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
     k3s_token: "{{ os_metadata.meta.k3s_token }}"
     k3s_server_name: "{{ os_metadata.meta.k3s_server }}"
-    k3s_node_type: "{{ os_metadata.meta.k3s_node_type }}"
-    service_name: "{{ 'k3s-agent' if k3s_node_type == 'agent' else 'k3s' }}"
+    service_name: "{{ 'k3s' if k3s_server_name == 'none' else 'k3s-agent' }}"
   tasks:
     - name: Add the token for joining the cluster to the environment
       no_log: false # avoid logging the server token
@@ -17,7 +16,7 @@
       ansible.builtin.lineinfile:
         path: "/etc/systemd/system/{{ service_name }}.service.env"
         line: "K3S_URL=https://{{ k3s_server_name }}:6443"
-      when: k3s_node_type == "agent"
+      when: k3s_server_name != "none"
 
     - name: Start k3s service
       ansible.builtin.systemd:
@@ -25,4 +24,3 @@
         daemon_reload: true
         state: started
         enabled: true
-      when: k3s_node_type != "none"
