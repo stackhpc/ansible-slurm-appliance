@@ -72,3 +72,8 @@ variable "k3s_token" {
     description = "Random cryptographically secure string for K3s token (must be set by ../compute.tf)"
     type = string
 }
+
+variable "k3s_server" {
+    description = "Name/address of k3s server"
+    type = string
+}
