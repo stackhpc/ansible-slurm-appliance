@@ -25,7 +25,7 @@ jobs:
           - RL8
           - RL9
         build:
-          - openstack.openhpc-latest
+          - openstack.rocky-latest
 
     env:
       ANSIBLE_FORCE_COLOR: True
