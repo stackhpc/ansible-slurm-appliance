@@ -1,0 +1,6 @@
+net:
+    - net type: tcp1
+      local NI(s):
+        - nid: {{ _lustre_ip }}@tcp1
+          interfaces:
+              0: {{ _lustre_interface }}
