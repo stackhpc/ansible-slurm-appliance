@@ -1,20 +1,19 @@
-- name: Gather interface info
+- name: Gather Lustre interface info
   shell:
     cmd: |
-      ip -o -f inet addr show | awk '{print $2, $4}' | awk -F/ '{print $1}'
+      ip r get {{ _lustre_mgs_ip }}
   changed_when: false
-  register: _inet_interfaces
+  register: _lustre_ip_r_mgs
+  vars:
+    _lustre_mgs_ip: "{{ lustre_mgs_nid | split('@') | first }}"
 
-- name: Set fact for Lustre interface
+- name: Set facts for Lustre interface
   set_fact:
-    _lustre_interface: "{{ item.0 }}"
-  when: lustre_subnet_cidr | ansible.utils.network_in_usable(item.1)
-  loop: "{{ _inet_interfaces.stdout_lines | map('split') }}"
-
-- name: Ensure Lustre interface found
-  assert:
-    that: _lustre_interface is defined
-    fail_msg: "No interface was found for lustre_subnet_cidr={{ lustre_subnet_cidr }}"
+    _lustre_interface: "{{ _lustre_ip_r_mgs_info[4] }}"
+    _lustre_ip: "{{ _lustre_ip_r_mgs_info[6] }}"
+  vars:
+    _lustre_ip_r_mgs_info: "{{ _lustre_ip_r_mgs.stdout_lines.0 | split }}"
+    # first line e.g. "10.167.128.1 via 10.179.0.2 dev eth0 src 10.179.3.149 uid 1000"
 
 - name: Write LNet configuration file
   template:
@@ -29,7 +28,6 @@
   systemd:
     name: lnet
     state: "{{ 'restarted' if _lnet_conf.changed else 'started' }}"
-  when: _lnet_conf.changed
 
 - name: Ensure mount points exist
   ansible.builtin.file:

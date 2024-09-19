@@ -1,5 +1,4 @@
 lustre_version: '2.15.5' # https://www.lustre.org/lustre-2-15-5-released/
-#lustre_subnet_cidr:
 #lustre_mgs_nid:
 lustre_fs_name: lustre
 lustre_mount_point: "/mnt/lustre/{{ lustre_fs_name }}"

@@ -15,8 +15,7 @@ Install and configure a Lustre client. This builds RPM packages from source.
     - `fs_name`: The name of the filesystem to mount
     - `mount_point`: Path to mount filesystem at. Default is `/mnt/lustre/{{ lustre_fs_name}}`
     - `mount_state`: Mountpoint state, as for [ansible.posix.mount](https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html#parameter-state). Default `mounted`.
-  Any of these parameters may alternatively be specified as role variables prefixed `lustre_`. If both are given entries in `lustre_mounts` take priority.
-- `lustre_subnet_cidr`: Required str. CIDR of subnet for interface to be used for Lustre.
+  TODO: FIXME: Any of these parameters may alternatively be specified as role variables prefixed `lustre_`. If both are given entries in `lustre_mounts` take priority.
 The following variables control the package build and and install and should not generally be required:
 - `lustre_build_packages`: Optional list. Prerequisite packages required to build Lustre. See `defaults/main.yml`.
 - `lustre_build_dir`: Optional str. Path to build lustre at, default `/tmp/lustre-release`.
