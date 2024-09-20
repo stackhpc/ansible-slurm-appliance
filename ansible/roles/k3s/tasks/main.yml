@@ -23,7 +23,7 @@
     - server
     - agent
 
-- name: Installing helm
+- name: Install helm
   unarchive:
     src: https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
     dest: /usr/bin
