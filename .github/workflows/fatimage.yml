@@ -93,6 +93,17 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
 
+      - name: Delete old latest image
+        run: |
+          . venv/bin/activate
+          IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
+          if [ "$IMAGE_COUNT" -gt 1 ]; then
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ steps.manifest.outputs.image-name }}"  -f value -c ID | head -n 1)
+            openstack image delete "$OLD_IMAGE_ID"
+          else
+            echo "Only one image exists, skipping deletion."
+          fi
+
       - name: Download image
         run: |
           . venv/bin/activate
