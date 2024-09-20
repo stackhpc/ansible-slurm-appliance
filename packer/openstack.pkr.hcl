@@ -186,8 +186,7 @@ source "openstack" "openhpc" {
   # Output image:
   image_disk_format = "qcow2"
   image_visibility = var.image_visibility
-  image_name = "${source.name}-${var.os_version}"
-  # -${local.timestamp}-${substr(local.git_commit, 0, 8)}"
+  
 }
 
 build {
@@ -195,16 +194,19 @@ build {
   # latest fat image:
   source "source.openstack.openhpc" {
     name = "rocky-latest"
+    image_name = "${source.name}-${var.os_version}"
   }
 
   # OFED fat image:
   source "source.openstack.openhpc" {
     name = "openhpc"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   # CUDA fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-cuda"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   # Extended site-specific image, built on fat image:
