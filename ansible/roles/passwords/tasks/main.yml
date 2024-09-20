@@ -7,7 +7,7 @@
   delegate_to: localhost
   run_once: true
 
-- name:  Generate k3s token and add to terraform
+- name:  Template k3s token to terraform
   template:
     src: k3s-token.auto.tfvars.json
     dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/terraform/k3s-token.auto.tfvars.json"
