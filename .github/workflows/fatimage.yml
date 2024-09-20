@@ -1,39 +1,51 @@
 
 name: Build fat image
-'on':
+on:
   workflow_dispatch:
-concurrency:
-  group: ${{ github.ref }}-{{ matrix.os_version }}-{{ matrix.build }} # to branch/PR + OS + build
-  cancel-in-progress: true
+    inputs:
+      ci_cloud:
+        description: 'Select the CI_CLOUD'
+        required: true
+        type: choice
+        options:
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
 jobs:
   openstack:
     name: openstack-imagebuild
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
+      cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
-      matrix:
+      fail-fast: false # allow other matrix jobs to continue even if one fails
+      matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
         os_version:
           - RL8
           - RL9
         build:
-          - openstack.openhpc
           - openstack.openhpc-ofed
+          - openstack.openhpc-cuda
         exclude:
           - os_version: RL8
-            build: openstack.openhpc-ofed
-          - os_version: RL9
-            build: openstack.openhpc
+            build: openstack.openhpc-cuda
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ vars.CI_CLOUD }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
       - name: Setup ssh
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', vars.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         shell: bash
 
@@ -47,7 +59,7 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
       - name: Setup environment
@@ -62,7 +74,7 @@ jobs:
           . environments/.stackhpc/activate
           cd packer/
           packer init .
-          PACKER_LOG=1 packer build -on-error=${{ vars.PACKER_ON_ERROR }} -only=${{ matrix.build }} -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
+          PACKER_LOG=1 packer build -on-error=${{ vars.PACKER_ON_ERROR }} -only=${{ matrix.build }} -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
 
@@ -81,7 +93,9 @@ jobs:
       - name: Download image
         run: |
           . venv/bin/activate
-          openstack image save --file ${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
+          sudo mkdir /mnt/images
+          sudo chmod 777 /mnt/images
+          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -95,13 +109,13 @@ jobs:
         run: sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
 
       - name: mount qcow2 file
-        run: sudo guestmount -a ${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
+        run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.17.0
         with:
           scan-type: fs
-          scan-ref: "./${{ steps.manifest.outputs.image-name }}"
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
           scanners: "vuln"
           format: sarif
           output: "${{ steps.manifest.outputs.image-name }}.sarif"
@@ -117,7 +131,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.16.1
         with:
           scan-type: fs
-          scan-ref: "./${{ steps.manifest.outputs.image-name }}"
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
           scanners: "vuln"
           format: table
           exit-code: '1'
