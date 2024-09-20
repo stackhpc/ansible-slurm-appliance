@@ -98,6 +98,9 @@ kube_prometheus_stack_release_defaults:
     grafana.ini:
       auth.anonymous:
         enabled: true
+    nodeSelector:
+        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+  
   alertmanager:
     # Don't apply the namespace grouping by default
     config:
@@ -112,6 +115,16 @@ kube_prometheus_stack_release_defaults:
       # Do NOT add the namespace matcher to routes from AlertmanagerConfig resources
       alertmanagerConfigMatcherStrategy:
         type: None
+      nodeSelector:
+        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+  
+  prometheusOperator:
+    nodeSelector:
+        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+  
+  kube-state-metrics:
+    nodeSelector:
+        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
 
 kube_prometheus_stack_release_overrides: {}
 

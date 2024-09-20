@@ -43,6 +43,10 @@
     src: start_k3s.yml
     dest: /etc/ansible-init/playbooks/0-start-k3s.yml
 
+- name: Install pip
+  dnf:
+    name: python3-pip
+
 - name: Install pip dependencies for k8s ansible module
   ansible.builtin.pip:
     name:
