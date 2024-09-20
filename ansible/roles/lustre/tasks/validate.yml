@@ -13,15 +13,15 @@
     that: selinux_state in ['permissive', 'disabled']
     fail_msg: "SELinux must be permissive for Lustre not '{{ selinux_state }}'; see variable selinux_state"
 
-# TODO: fixme lustre_mounts
-# - name: Ensure lustre_mgs_nid is defined
-#   assert:
-#     that: item.mgs_nid | default(lustre_mgs_nid) is defined
-#     fail_msg: lustre_mounts entries must specify mgs_nid or lustre_mgs_nid must be defined
-#   loop: "{{ lustre_mounts }}"
+- name: Ensure lustre_mgs_nid is defined
+  assert:
+    that: lustre_mgs_nid is defined
+    fail_msg: Variable lustre_mgs_nid must be defined
 
-# - name: Ensure lustre_fs_name is defined
-#   assert:
-#     that: item.lustre_fs_name | default(lustre_fs_name) is defined
-#     fail_msg: lustre_mounts entries must specify fs_name or lustre_fs_name must be specified
-#   loop: "{{ lustre_mounts }}"
+- name: Ensure lustre_mounts entries define filesystem name and mount point
+  assert:
+    that:
+      - item.fs_name is defined
+      - item.mount_point is defined
+    fail_msg: All lustre_mounts entries must specify fs_name and mount_point
+  loop: "{{ lustre_mounts }}"

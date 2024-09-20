@@ -67,4 +67,4 @@
     file:
       path: "{{ lustre_build_dir }}"
       state: absent
-  when: lustre_cleanup_build | bool
+  when: lustre_build_cleanup | bool

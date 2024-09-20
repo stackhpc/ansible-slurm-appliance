@@ -1,8 +1,9 @@
 lustre_version: '2.15.5' # https://www.lustre.org/lustre-2-15-5-released/
+lustre_lnet_label: tcp
 #lustre_mgs_nid:
-lustre_fs_name: lustre
-lustre_mount_point: "/mnt/lustre/{{ lustre_fs_name }}"
+lustre_mounts: []
 lustre_mount_state: mounted
+lustre_mount_options: 'defaults,_netdev,noauto,x-systemd.automount,x-systemd.requires=lnet.service'
 
 # below variables are for build and should not generally require changes
 lustre_build_packages:
@@ -32,4 +33,4 @@ lustre_configure_opts:
 lustre_rpm_globs: # NB: order is important here, as not installing from a repo
   - "kmod-lustre-client-{{ lustre_version | split('.') | first }}*" # only take part of the version as -RC versions produce _RC rpms
   - "lustre-client-{{ lustre_version | split('.') | first }}*"
-lustre_cleanup_build: true
+lustre_build_cleanup: true
