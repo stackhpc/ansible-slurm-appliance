@@ -58,15 +58,43 @@
     wait: yes
     wait_timeout: "{{ kube_prometheus_stack_wait_timeout }}"
 
-- name: Expose prometheus dashboard
+# Not looping through this because ports get templated as strings for some reason
+
+- name: Expose prometheus
   kubernetes.core.k8s_service:
     state: present
-    name: prometheus-external
-    type: NodePort
+    name: "prometheus-external"
+    type: LoadBalancer
     namespace: "{{ kube_prometheus_stack_release_namespace }}"
     ports:
     - port: 9090
       targetPort: 9090
       protocol: TCP
     selector:
-      app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+      app.kubernetes.io/name: "prometheus"
+
+- name: Expose grafana
+  kubernetes.core.k8s_service:
+    state: present
+    name: "grafana-external"
+    type: LoadBalancer
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+    selector:
+      app.kubernetes.io/name: "grafana"
+
+- name: Expose alertmanager
+  kubernetes.core.k8s_service:
+    state: present
+    name: "alertmanager-external"
+    type: LoadBalancer
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    ports:
+    - port: 9093
+      targetPort: 9093
+      protocol: TCP
+    selector:
+      app.kubernetes.io/name: "alertmanager"
