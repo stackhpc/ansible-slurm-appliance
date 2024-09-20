@@ -13,17 +13,17 @@
   ansible.builtin.shell:
     cmd: /usr/bin/k3s-install.sh
   environment:
-    INSTALL_K3S_VERSION: "v1.31.0+k3s1"
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
     INSTALL_K3S_EXEC: "{{ item }}"
     INSTALL_K3S_SKIP_START: "true"
     INSTALL_K3S_SKIP_ENABLE: "true"
     INSTALL_K3S_BIN_DIR: "/usr/bin"
   changed_when: true
-  with_items:
+  loop:
     - server
     - agent
 
-- name: Installing helm
+- name: Install helm
   unarchive:
     src: https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
     dest: /usr/bin
@@ -33,11 +33,12 @@
     mode: 0755
     remote_src: true
 
-- name: k9s install
-  ansible.builtin.include_role:
-    name: k9s
+- name: Add k3s kubeconfig as environment variable
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    line: "KUBECONFIG=/etc/rancher/k3s/k3s.yaml"
 
-- name: Install k3s server ansible-init playbook
+- name: Install ansible-init playbook for k3s agent or server activation
   copy:
     src: start_k3s.yml
     dest: /etc/ansible-init/playbooks/0-start-k3s.yml

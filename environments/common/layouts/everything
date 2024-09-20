@@ -85,4 +85,7 @@ cluster
 
 [k3s:children]
 # Hosts to run k3s server/agent
-cluster
+openhpc
+
+[k9s:children]
+control

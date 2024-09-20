@@ -261,6 +261,7 @@
 
 - hosts: k3s
   become: yes
+  tags: k3s
   tasks:
     - ansible.builtin.include_role:
         name: k3s

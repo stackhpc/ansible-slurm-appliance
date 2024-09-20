@@ -77,8 +77,6 @@ resource "openstack_compute_instance_v2" "control" {
   metadata = {
     environment_root = var.environment_root
     k3s_token = var.k3s_token
-    k3s_server = "${var.cluster_name}-control"
-    k3s_node_type = "server"
   }
 
   user_data = <<-EOF
@@ -128,8 +126,7 @@ resource "openstack_compute_instance_v2" "login" {
   metadata = {
     environment_root = var.environment_root
     k3s_token = var.k3s_token
-    k3s_server = "${var.cluster_name}-control"
-    k3s_node_type = "agent"
+    k3s_server = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
   }
 
   user_data = <<-EOF
