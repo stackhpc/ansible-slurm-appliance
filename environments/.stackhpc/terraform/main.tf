@@ -29,9 +29,9 @@ variable "cluster_image" {
     description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
     type = map(string)
     default = {
-        # https://github.com/stackhpc/ansible-slurm-appliance/pull/427
-        RL8: "openhpc-ofed-RL8-240906-1042-32568dbb"
-        RL9: "openhpc-ofed-RL9-240906-1041-32568dbb"
+        # https://github.com/stackhpc/ansible-slurm-appliance/pull/441
+        RL8: "openhpc-ofed-RL8-240920-1001-22a4e6de"
+        RL9: "openhpc-ofed-RL9-240920-1001-22a4e6de"
     }
 }
 
