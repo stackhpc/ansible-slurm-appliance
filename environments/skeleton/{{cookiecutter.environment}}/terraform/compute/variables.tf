@@ -71,3 +71,8 @@ variable "security_group_ids" {
 variable "k3s_token" {
     type = string
 }
+
+variable "k3s_server" {
+    description = "Name/address of k3s server"
+    type = string
+}
