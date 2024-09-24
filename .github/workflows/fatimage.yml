@@ -26,6 +26,10 @@ jobs:
           - RL9
         build:
           - openstack.openhpc
+          - openstack.openhpc-cuda
+        exclude:
+          - os_version: RL8
+            build: openstack.openhpc-cuda
 
     env:
       ANSIBLE_FORCE_COLOR: True
