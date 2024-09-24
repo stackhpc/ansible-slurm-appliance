@@ -147,14 +147,10 @@
   become: yes
   tags: cockpit
   tasks:
-    - name: Remove RHEL cockpit using dnf command
-      command: dnf -y -vvvv remove cockpit-ws
+    - name: Remove RHEL cockpit
+      command: dnf -y remove cockpit-ws
       register: dnf_remove_output
       ignore_errors: true  # Avoid failing if a lock or other error happens
-
-    - name: Debug dnf output
-      debug:
-        msg: "{{ dnf_remove_output.stdout }}"
 
 - hosts: firewalld
   gather_facts: false
