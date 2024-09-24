@@ -27,11 +27,11 @@
           app.kubernetes.io/name: appliances-state-dir
       spec:
         capacity:
-          storage: 4Gi
+          storage: "{{ kube_prometheus_stack_volume_size }}"
         accessModes:
         - ReadWriteOnce
         hostPath:
-          path: "{{ appliances_state_dir }}/prometheus"
+          path: "{{ prometheus_db_dir }}"
           type: DirectoryOrCreate
 
 - name: Disable rancher default storage class
