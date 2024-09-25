@@ -12,7 +12,7 @@ kube_prometheus_stack_release_name: kube-prometheus-stack
 # The timeout to wait for the release to become ready
 kube_prometheus_stack_wait_timeout: 10m
 
-control_sslip: "{{ ansible_all_ipv4_addresses[0] | regex_replace('\\.', '-') }}.sslip.io" 
+control_sslip: "{{ ansible_default_ipv4.address| default(ansible_all_ipv4_addresses[0]) | regex_replace('\\.', '-') }}.sslip.io" 
 
 ### PREVIOUS ROLE VALUES
 

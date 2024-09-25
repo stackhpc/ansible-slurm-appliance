@@ -57,21 +57,3 @@
     create_namespace: yes
     wait: yes
     wait_timeout: "{{ kube_prometheus_stack_wait_timeout }}"
-
-# kind: Ingress
-# metadata:
-#   name: test-ingress
-#   annotations:
-#     traefik.ingress.kubernetes.io/router.entrypoints: web
-# spec:
-#   rules:
-#     - host: 172-16-0-125.sslip.io
-#       http:
-#         paths:
-#           - path: /grafana
-#             pathType: Prefix
-#             backend:
-#               service:
-#                 name: kube-prometheus-stack-grafana
-#                 port:
-#                   name: http-web
