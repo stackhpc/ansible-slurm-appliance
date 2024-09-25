@@ -45,6 +45,35 @@
         annotations:
           storageclass.kubernetes.io/is-default-class: "false"
 
+- name: Creating headless service for slurm exporter
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      kind: Service
+      metadata:
+        name: slurm-exporter
+      spec:
+        clusterIP: None
+        ports:
+        - name: slurm-exporter
+          port: 9341
+          protocol: TCP
+
+- name: Binding slurm exporter service to host
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      kind: Endpoints
+      metadata:
+        name: slurm-exporter
+      subsets:
+        - addresses:
+            - ip: "{{ control_ip }}"
+          ports:
+            - port: 9341
+              name: slurm-exporter
+              protocol: TCP
+
 - name: Install kube-prometheus-stack on target Kubernetes cluster
   kubernetes.core.helm:
     chart_ref: "{{ kube_prometheus_stack_chart_name }}"

@@ -86,7 +86,7 @@ kube_prometheus_stack_release_defaults:
       remoteRead: "{{ prometheus_remote_read }}"
       remoteWrite: "{{ prometheus_remote_write }}"
       externalLabels: "{{ prometheus_external_labels }}"
-      # additionalScrapeConfigs: "{{ prometheus_scrape_configs }}" TODO: readd
+      additionalScrapeConfigs: "{{ prometheus_scrape_configs }}"
       # may need to change these
       securityContext:
         runAsUser: 0
