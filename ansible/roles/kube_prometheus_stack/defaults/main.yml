@@ -285,6 +285,8 @@ prometheus_alert_rules:
 
 # ------------------------------------------------------------------------------------------
 
+control_sslip: "{{ ansible_all_ipv4_addresses[0] | regex_replace('\\.', '-') }}.sslip.io" 
+
 # The values for the kube-prometheus-stack release
 kube_prometheus_stack_release_defaults:
   defaultRules:
@@ -294,7 +296,15 @@ kube_prometheus_stack_release_defaults:
       KubeProxyDown: true
       KubeControllerManagerDown: true
   prometheus:
+    ingress:
+      enabled: true
+      hosts:
+        - "{{ control_sslip }}"
+      ingressClassName: traefik
+      paths:
+        - /prometheus
     prometheusSpec:
+      routePrefix: /prometheus
       externalUrl: "{{ kube_prometheus_stack_prometheus_external_url }}"
       podMonitorSelectorNilUsesHelmValues: false
       serviceMonitorSelectorNilUsesHelmValues: false
@@ -333,16 +343,33 @@ kube_prometheus_stack_release_defaults:
   additionalPrometheusRulesMap: "{{ prometheus_alert_rules }}"
                 
   grafana:
+    ingress:
+      enabled: true
+      hosts:
+        - "{{ control_sslip }}"
+      ingressClassName: traefik
+      path: /
     sidecar:
       dashboards:
         searchNamespace: ALL
     grafana.ini:
+      server:
+        domain: "{{ control_sslip }}"
+        root_url: "http://{{ control_sslip }}/grafana"
+        serve_from_sub_path: true
       auth.anonymous:
         enabled: true
     nodeSelector:
         kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
   
   alertmanager:
+    ingress:
+      enabled: true
+      hosts:
+        - "{{ control_sslip }}"
+      ingressClassName: traefik
+      paths: 
+        - /alertmanager
     # Don't apply the namespace grouping by default
     config:
       route:
@@ -350,6 +377,7 @@ kube_prometheus_stack_release_defaults:
       global:
         resolve_timeout: "{{ prometheus_config_flags_extra.alertmanager.timeout | default( '5m' ) }}"
     alertmanagerSpec:
+      routePrefix: /alertmanager
       externalUrl: "{{ kube_prometheus_stack_alertmanager_external_url }}"
       # Make sure that alertmanager finds configurations with the alertmanager name as a label
       alertmanagerConfigSelector:
