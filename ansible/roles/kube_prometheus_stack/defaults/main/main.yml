@@ -12,6 +12,7 @@ kube_prometheus_stack_release_name: kube-prometheus-stack
 # The timeout to wait for the release to become ready
 kube_prometheus_stack_wait_timeout: 10m
 
+login_ip: "{{ hostvars[groups['openondemand'][0]]['ansible_host'] }}" # probably needs to be more robust
 control_ip: "{{ ansible_default_ipv4.address| default(ansible_all_ipv4_addresses[0]) }}"
 control_sslip: "{{ control_ip | regex_replace('\\.', '-') }}.sslip.io" 
 
@@ -91,13 +92,12 @@ prometheus_targets: {}
 #      labels:
 #        env: test
 
-# TODO: readd
-# prometheus_scrape_configs:
-#   - job_name: "prometheus"
-#     metrics_path: "{{ prometheus_metrics_path }}"
-#     static_configs:
-#       - targets:
-#           - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+prometheus_scrape_configs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+          - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
 #   - job_name: "node"
 #     file_sd_configs:
 #       - files:
