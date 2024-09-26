@@ -77,11 +77,17 @@ jobs:
           cd packer/
           packer init .
 
+          if [[ "${{ matrix.build }}" == *"cuda"* ]]; then
+            SOURCE_IMAGE_NAME="rocky-latest-cuda"
+          else
+            SOURCE_IMAGE_NAME="rocky-latest"
+          fi
+
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl \
-          -var 'source_image_name={"${{ matrix.os_version }}":"rocky-latest-${{ matrix.os_version }}"}' \
+          -var "source_image_name={\"${{ matrix.os_version }}\":\"${SOURCE_IMAGE_NAME}-${{ matrix.os_version }}\"}" \
           openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}

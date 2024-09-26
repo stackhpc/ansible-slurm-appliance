@@ -133,6 +133,7 @@ variable "volume_size" {
   default = {
     # fat image builds, GB:
     rocky-latest = 15
+    rocky-latest-cuda = 30
     openhpc = 15
     openhpc-cuda = 30
   }
@@ -154,8 +155,9 @@ variable "groups" {
   default = {
     # fat image builds:
     rocky-latest = ["update", "ofed"]
+    rocky-latest-cuda = ["update", "ofed", "cuda"]
     openhpc = ["control", "compute", "login"]
-    openhpc-cuda = ["control", "compute", "login", "cuda"]
+    openhpc-cuda = ["control", "compute", "login"]
   }
 }
 
@@ -191,9 +193,15 @@ source "openstack" "openhpc" {
 
 build {
 
-  # latest fat image:
+  # latest nightly image:
   source "source.openstack.openhpc" {
     name = "rocky-latest"
+    image_name = "${source.name}-${var.os_version}"
+  }
+
+  # latest nightly cuda image:
+  source "source.openstack.openhpc" {
+    name = "rocky-latest-cuda"
     image_name = "${source.name}-${var.os_version}"
   }
 
@@ -212,6 +220,7 @@ build {
   # Extended site-specific image, built on fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-extra"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   provisioner "ansible" {
