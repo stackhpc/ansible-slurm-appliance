@@ -10,6 +10,8 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
+  schedule:
+    - cron: '0 0 * * *'  # Run at midnight
 
 jobs:
   openstack:
@@ -25,16 +27,16 @@ jobs:
           - RL8
           - RL9
         build:
-          - openstack.openhpc
-          - openstack.openhpc-cuda
+          - openstack.rocky-latest
+          - openstack.rocky-latest-cuda
         exclude:
           - os_version: RL8
-            build: openstack.openhpc-cuda
+            build: openstack.rocky-latest-cuda
 
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v2
 
@@ -77,18 +79,12 @@ jobs:
           cd packer/
           packer init .
 
-          if [[ "${{ matrix.build }}" == *"cuda"* ]]; then
-            SOURCE_IMAGE_NAME="rocky-latest-cuda"
-          else
-            SOURCE_IMAGE_NAME="rocky-latest"
-          fi
-
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
-          -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name={\"${{ matrix.os_version }}\":\"${SOURCE_IMAGE_NAME}-${{ matrix.os_version }}\"}" \
+          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           openstack.pkr.hcl
+
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
 
@@ -104,11 +100,23 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
 
+      - name: Delete old latest image
+        run: |
+          . venv/bin/activate
+          IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
+          if [ "$IMAGE_COUNT" -gt 1 ]; then
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ steps.manifest.outputs.image-name }}"  -f value -c ID | head -n 1)
+            openstack image delete "$OLD_IMAGE_ID"
+          else
+            echo "Only one image exists, skipping deletion."
+          fi
+
       - name: Download image
         run: |
           . venv/bin/activate
           sudo mkdir /mnt/images
           sudo chmod 777 /mnt/images
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-name }}"
           openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
 
       - name: Set up QEMU
