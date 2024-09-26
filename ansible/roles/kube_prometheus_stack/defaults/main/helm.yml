@@ -133,6 +133,7 @@ kube_prometheus_stack_release_defaults:
       global:
         resolve_timeout: "{{ prometheus_config_flags_extra.alertmanager.timeout | default( '5m' ) }}"
     alertmanagerSpec:
+      forceEnableClusterMode: true
       routePrefix: /alertmanager
       externalUrl: "{{ kube_prometheus_stack_alertmanager_external_url }}"
       # Make sure that alertmanager finds configurations with the alertmanager name as a label
