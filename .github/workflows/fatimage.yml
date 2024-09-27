@@ -1,4 +1,4 @@
-name: Build fat image
+name: Build nightly image
 on:
   workflow_dispatch:
       inputs:
@@ -10,6 +10,8 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
+  schedule:
+    - cron: '0 0 * * *'  # Run at midnight
 
 jobs:
   openstack:
@@ -25,16 +27,16 @@ jobs:
           - RL8
           - RL9
         build:
-          - openstack.openhpc
-          - openstack.openhpc-cuda
+          - openstack.rocky-latest
+          - openstack.rocky-latest-cuda
         exclude:
           - os_version: RL8
-            build: openstack.openhpc-cuda
+            build: openstack.rocky-latest-cuda
 
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v2
 
@@ -77,18 +79,12 @@ jobs:
           cd packer/
           packer init .
 
-          if [[ "${{ matrix.build }}" == *"cuda"* ]]; then
-            SOURCE_IMAGE_NAME="rocky-latest-cuda"
-          else
-            SOURCE_IMAGE_NAME="rocky-latest"
-          fi
-
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name={\"${{ matrix.os_version }}\":\"${SOURCE_IMAGE_NAME}-${{ matrix.os_version }}\"}" \
           openstack.pkr.hcl
+
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
 
@@ -104,11 +100,23 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
 
+      - name: Delete old latest image
+        run: |
+          . venv/bin/activate
+          IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
+          if [ "$IMAGE_COUNT" -gt 1 ]; then
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ steps.manifest.outputs.image-name }}"  -f value -c ID | head -n 1)
+            openstack image delete "$OLD_IMAGE_ID"
+          else
+            echo "Only one image exists, skipping deletion."
+          fi
+
       - name: Download image
         run: |
           . venv/bin/activate
           sudo mkdir /mnt/images
           sudo chmod 777 /mnt/images
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-name }}"
           openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
 
       - name: Set up QEMU
@@ -151,3 +159,88 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL'
           ignore-unfixed: true
+
+  upload:
+    name: upload-nightly-targets
+    needs: openstack
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.image }}-${{ matrix.target_cloud }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target_cloud:
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+        os_version:
+          - RL8
+          - RL9
+        image:
+          - rocky-latest
+          - rocky-latest-cuda
+        exclude:
+          - os_version: RL8
+            image: rocky-latest-cuda
+          - target_cloud: LEAFCLOUD
+    env:
+      OS_CLOUD: openstack
+      SOURCE_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
+      TARGET_CLOUD: ${{ matrix.target_cloud }}
+      IMAGE_NAME: "${{ matrix.image }}-${{ matrix.os_version }}"
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record settings for CI cloud
+        run: |
+          echo SOURCE_CLOUD: ${{ env.SOURCE_CLOUD }}
+          echo TARGET_CLOUD: ${{ env.TARGET_CLOUD }}
+
+      - name: Install openstackclient
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.SOURCE_CLOUD)] }}" > ~/.config/openstack/source_clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.TARGET_CLOUD)] }}" > ~/.config/openstack/target_clouds.yaml
+        shell: bash
+
+      - name: Download source image
+        run: |
+          . venv/bin/activate
+          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/source_clouds.yaml
+          openstack image save --file ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}
+        shell: bash
+
+      - name: Upload to target cloud
+        run: |
+          . venv/bin/activate
+          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
+
+          openstack image create "${{ env.IMAGE_NAME }}" \
+            --file "${{ env.IMAGE_NAME }}" \
+            --disk-format qcow2 \
+            --container-format bare \
+            --public
+        shell: bash
+
+      - name: Delete old latest image from target cloud
+        run: |
+          . venv/bin/activate
+          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
+
+          IMAGE_COUNT=$(openstack image list --name ${{ env.IMAGE_NAME }} -f value -c ID | wc -l)
+          if [ "$IMAGE_COUNT" -gt 1 ]; then
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ env.IMAGE_NAME }}"  -f value -c ID | head -n 1)
+            openstack image delete "$OLD_IMAGE_ID"
+          else
+            echo "Only one image exists, skipping deletion."
+          fi
+        shell: bash
