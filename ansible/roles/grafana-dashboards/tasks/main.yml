@@ -25,7 +25,8 @@
 - become: false
   block:
     - name: Create local grafana dashboard directory
-      tempfile:
+      file:
+        path: /tmp/dashboards
         state: directory
       register: _tmp_dashboards
       changed_when: false
@@ -107,59 +108,93 @@
       when:
         - grafana_dashboards | length > 0
 
-- name: Create/Update dashboards file (provisioning)
-  become: true
-  copy:
-    dest: "/etc/grafana/provisioning/dashboards/ansible.yml"
-    content: |
-      apiVersion: 1
-      providers:
-        - name: 'default'
-          orgId: 1
-          folder: ''
-          type: file
-          options:
-            path: "{{ grafana_data_dir }}/dashboards"
-    backup: false
-    owner: root
-    group: grafana
-    mode: 0640
-  notify: restart grafana
+# Templating partial manifests and then adding the dashboard's data server-side because the k8s module doesn't like Jinja2
+- name: Create partial configmaps for server-side templating
+  ansible.builtin.template:
+    src: configmap-template.yml.j2
+    dest: "{{ _tmp_dashboards.path }}/{{ item_filename }}.yml"
+  loop: "{{ grafana_dashboards }}"
+  vars:
+    item_filename: "{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"
 
-- name: Register preexisting dashboards
-  become: true
-  find:
-    paths: "{{ grafana_data_dir }}/dashboards"
-    hidden: true
-    patterns:
-      - "*.json"
-  register: _dashboards_pre
+- name: Setting data keys
+  ansible.builtin.replace:
+    path: "{{ _tmp_dashboards.path }}/{{ item_filename }}.yml"
+    regexp: 'PLACEHOLDER'
+    replace: "{{ item_filename }}"
+  loop: "{{ grafana_dashboards }}"
+  vars:
+    item_filename: "{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"
 
-- name: Import grafana dashboards
-  become: true
-  copy:
-    remote_src: yes
-    src: "{{ _tmp_dashboards.path }}/" # Note trailing / to only copy contents, not directory itself
-    dest: "{{ grafana_data_dir }}/dashboards/"
-  notify: "provisioned dashboards changed"
+- name: Appending json data to configmaps
+  ansible.builtin.shell:
+    cmd: "sed 's/^/    /' {{ item_path }} >> {{ item_path }}.yml"
+  loop: "{{ grafana_dashboards }}"
+  vars:
+    item_filename: "{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"
+    item_path: "{{ _tmp_dashboards.path }}/{{ item_filename }}"
 
-- name: Register all installed dashboards
-  become: true
-  find:
-    paths: "{{ grafana_data_dir }}/dashboards"
-    hidden: true
-    patterns:
-      - "*.json"
-  register: _dashboards_post
+- name: Applying dashboard configmaps
+  ansible.builtin.k8s:
+    src: "{{ item_path }}.yml"
+  loop: "{{ grafana_dashboards }}"
+  vars:
+    item_filename: "{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"
+    item_path: "{{ _tmp_dashboards.path }}/{{ item_filename }}"
 
-- name: Get dashboard lists
-  set_fact:
-    _dashboards_pre_list:  "{{ _dashboards_pre  | json_query('files[*].path') | default([]) }}"
-    _dashboards_post_list: "{{ _dashboards_post | json_query('files[*].path') | default([]) }}"
+# - name: Create/Update dashboards file (provisioning)
+#   become: true
+#   copy:
+#     dest: "/etc/grafana/provisioning/dashboards/ansible.yml"
+#     content: |
+#       apiVersion: 1
+#       providers:
+#         - name: 'default'
+#           orgId: 1
+#           folder: ''
+#           type: file
+#           options:
+#             path: "{{ grafana_data_dir }}/dashboards"
+#     backup: false
+#     owner: root
+#     group: grafana
+#     mode: 0640
+#   notify: restart grafana
 
-- name: Remove installed dashboards not defined through this role
-  become: true
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items: "{{ _dashboards_pre_list | difference( _dashboards_post_list ) }}"
+# - name: Register preexisting dashboards
+#   become: true
+#   find:
+#     paths: "{{ grafana_data_dir }}/dashboards"
+#     hidden: true
+#     patterns:
+#       - "*.json"
+#   register: _dashboards_pre
+
+# - name: Import grafana dashboards
+#   become: true
+#   copy:
+#     remote_src: yes
+#     src: "{{ _tmp_dashboards.path }}/" # Note trailing / to only copy contents, not directory itself
+#     dest: "{{ grafana_data_dir }}/dashboards/"
+#   notify: "provisioned dashboards changed"
+
+# - name: Register all installed dashboards
+#   become: true
+#   find:
+#     paths: "{{ grafana_data_dir }}/dashboards"
+#     hidden: true
+#     patterns:
+#       - "*.json"
+#   register: _dashboards_post
+
+# - name: Get dashboard lists
+#   set_fact:
+#     _dashboards_pre_list:  "{{ _dashboards_pre  | json_query('files[*].path') | default([]) }}"
+#     _dashboards_post_list: "{{ _dashboards_post | json_query('files[*].path') | default([]) }}"
+
+# - name: Remove installed dashboards not defined through this role
+#   become: true
+#   file:
+#     path: "{{ item }}"
+#     state: absent
+#   with_items: "{{ _dashboards_pre_list | difference( _dashboards_post_list ) }}"

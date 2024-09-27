@@ -33,4 +33,6 @@ prometheus_scrape_configs_default:
   - targets:
     - "kube-prometheus-stack-grafana:80"
 
+kube_prometheus_stack_release_namespace: monitoring-system
+
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"

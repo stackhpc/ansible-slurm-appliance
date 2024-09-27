@@ -104,6 +104,10 @@
               name: slurm-exporter
               protocol: TCP
 
+- name: Import grafana dashboards
+  ansible.builtin.import_role:
+    name: grafana-dashboards
+
 - name: Install kube-prometheus-stack on target Kubernetes cluster
   kubernetes.core.helm:
     chart_ref: "{{ kube_prometheus_stack_chart_name }}"
