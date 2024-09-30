@@ -100,24 +100,13 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
 
-      - name: Delete old latest image
-        run: |
-          . venv/bin/activate
-          IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
-          if [ "$IMAGE_COUNT" -gt 1 ]; then
-            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ steps.manifest.outputs.image-name }}"  -f value -c ID | head -n 1)
-            openstack image delete "$OLD_IMAGE_ID"
-          else
-            echo "Only one image exists, skipping deletion."
-          fi
-
       - name: Download image
         run: |
           . venv/bin/activate
           sudo mkdir /mnt/images
           sudo chmod 777 /mnt/images
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-name }}"
-          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-id }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -161,6 +150,26 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL'
           ignore-unfixed: true
+      
+      - name: Delete new image if Trivy scan fails
+        if: failure() && steps.packer_build.outcome == 'success' # Runs if the Trivy scan found crit vulnerabilities or failed
+        run: |
+          . venv/bin/activate
+          echo "Deleting new image due to critical vulnerabilities..."
+          openstack image delete "${{ steps.manifest.outputs.image-id }}"
+
+      - name: Delete old latest image
+        if: success() # Runs only if Trivy scan passed
+        run: |
+          . venv/bin/activate
+          IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
+          if [ "$IMAGE_COUNT" -gt 1 ]; then
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ steps.manifest.outputs.image-name }}"  -f value -c ID | head -n 1)
+            echo "Deleting old image ID: $OLD_IMAGE_ID"
+            openstack image delete "$OLD_IMAGE_ID"
+          else
+            echo "Only one image exists, skipping deletion."
+          fi
 
   upload:
     name: upload-nightly-targets
