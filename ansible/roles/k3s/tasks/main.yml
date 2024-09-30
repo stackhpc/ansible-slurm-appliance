@@ -42,3 +42,54 @@
   copy:
     src: start_k3s.yml
     dest: /etc/ansible-init/playbooks/0-start-k3s.yml
+
+- name: Get service status 
+  ansible.builtin.service_facts:
+
+- name: Create k3s ingress endpoint for OOD if running
+  when: (groups['openondemand'] | length) > 0 and ansible_facts.services['k3s.service'] is defined and ansible_facts.services['k3s.service'].state == "running"
+  block:
+    - name: Creating headless service for slurm exporter
+      kubernetes.core.k8s:
+        namespace: "default"
+        definition:
+          kind: Service
+          metadata:
+            name: ood
+          spec:
+            clusterIP: None
+            ports:
+            - name: http-web
+              port: 80
+              protocol: TCP
+
+    - name: Binding slurm exporter service to host
+      kubernetes.core.k8s:
+        namespace: "default"
+        definition:
+          kind: Endpoints
+          metadata:
+            name: ood
+          subsets:
+            - addresses:
+                - ip: "{{ hostvars[ groups['openondemand'] | first].ansible_host }}"
+              ports:
+                - name: http-web
+                  port: 80
+                  protocol: TCP
+    
+    - name: Creating ingress
+      kubernetes.core.k8s:
+        namespace: "default"
+        definition:
+          ingressClassName: traefik
+          rules:
+          - http:
+              paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: ood
+                    port:
+                      number: 80
