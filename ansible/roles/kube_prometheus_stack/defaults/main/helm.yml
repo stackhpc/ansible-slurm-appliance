@@ -56,6 +56,7 @@ kube_prometheus_stack_release_defaults:
       enabled: true
       hosts:
         - "{{ control_sslip }}"
+        - "localhost"
       ingressClassName: traefik
       paths:
         - /prometheus
@@ -99,10 +100,13 @@ kube_prometheus_stack_release_defaults:
   additionalPrometheusRulesMap: "{{ prometheus_alert_rules }}"
                 
   grafana:
+    # service:
+    #   port: 3000 # seems to cause issues with prometheus targets
     ingress:
       enabled: true
-      hosts:
-        - "{{ control_sslip }}"
+      # hosts:
+      #   - "{{ control_sslip }}"
+      #   - "localhost"
       ingressClassName: traefik
       path: /grafana
     sidecar:
@@ -123,8 +127,9 @@ kube_prometheus_stack_release_defaults:
   alertmanager:
     ingress:
       enabled: true
-      hosts:
-        - "{{ control_sslip }}"
+      # hosts:
+      #   - "{{ control_sslip }}"
+      #   - "localhost"
       ingressClassName: traefik
       paths: 
         - /alertmanager

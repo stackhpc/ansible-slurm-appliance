@@ -82,8 +82,8 @@ prometheus_remote_read: []
 #       password: FOO
 
 prometheus_external_labels:
-  environment: "{{ control_sslip }}"
-#  environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
+  environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
+  # environment: "{{ control_sslip }}"
 
 prometheus_targets: {}
 #  node:
