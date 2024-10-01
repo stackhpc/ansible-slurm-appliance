@@ -1,5 +1,5 @@
 net:
-    - net type: tcp1
+    - net type: {{ lustre_lnet_label }}
       local NI(s):
         - nid: {{ _lustre_ip }}@{{ lustre_lnet_label }}
           interfaces:
