@@ -5,6 +5,10 @@ terraform {
   required_providers {
     openstack = {
       source = "terraform-provider-openstack/openstack"
+      # TODO we must upgrade to 3.0.0
+      # but only after we stop using the deprecated
+      # openstack_compute_floatingip_associate_v2
+      version = "~>2.1.0"
     }
   }
 }
