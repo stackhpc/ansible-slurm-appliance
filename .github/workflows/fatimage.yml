@@ -132,7 +132,7 @@ jobs:
           output: "${{ steps.manifest.outputs.image-name }}.sarif"
           # turn off secret scanning to speed things up
         env:
-          TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -151,8 +151,8 @@ jobs:
           severity: 'CRITICAL'
           ignore-unfixed: true
         env:
-          TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
-      
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Delete new image if Trivy scan fails
         if: failure() && steps.packer_build.outcome == 'success' # Runs if the Trivy scan found crit vulnerabilities or failed
         run: |
