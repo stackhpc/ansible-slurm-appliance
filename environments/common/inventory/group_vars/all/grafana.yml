@@ -58,14 +58,14 @@ grafana_security:
     allow_embedding: true
 
 grafana_datasources:
-  - name: prometheus
-    type: prometheus
-    url: "http://{{ prometheus_address }}:9090" # default prometheus port
-    editable: true
+  # - name: prometheus
+  #   type: prometheus
+  #   url: "http://{{ prometheus_address }}:9090" # default prometheus port
+  #   editable: true
   - name: slurmstats
     # see https://github.com/grafana/opensearch-datasource#configure-the-data-source-with-provisioning
     type: grafana-opensearch-datasource
-    url: "https://{{ opensearch_address }}:9200"
+    url: "https://{{ control_ip }}:9200"
     basicAuth: true
     basicAuthUser: admin
     secureJsonData:

@@ -115,6 +115,8 @@ kube_prometheus_stack_release_defaults:
         serve_from_sub_path: true
       auth.anonymous:
         enabled: true
+    additionalDataSources: "{{ grafana_datasources }}"
+    plugins: "{{ grafana_plugins }}"
     nodeSelector:
         kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
   

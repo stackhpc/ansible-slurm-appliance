@@ -1,5 +1,12 @@
 ---
 
+- name: Creating namespace
+  kubernetes.core.k8s:
+    name: "{{ kube_prometheus_stack_release_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
 # Because of the way Helm handles CRDs, we upgrade them first
 - name: Get kube-prometheus-stack CRDs
   command: >-
@@ -104,6 +111,35 @@
               name: slurm-exporter
               protocol: TCP
 
+- name: Creating headless service for opensearch datasource
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      kind: Service
+      metadata:
+        name: opensearch
+      spec:
+        clusterIP: None
+        ports:
+        - name: opensearch
+          port: 9200
+          protocol: TCP
+
+- name: Binding opensearch service to host
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      kind: Endpoints
+      metadata:
+        name: opensearch
+      subsets:
+        - addresses:
+            - ip: "{{ control_ip }}"
+          ports:
+            - port: 9200
+              name: opensearch
+              protocol: TCP
+
 - name: Import grafana dashboards
   ansible.builtin.import_role:
     name: grafana-dashboards
@@ -117,6 +153,6 @@
     release_name: "{{ kube_prometheus_stack_release_name }}"
     release_values: "{{ kube_prometheus_stack_release_values }}"
     atomic: yes
-    create_namespace: yes
+    create_namespace: no
     wait: yes
     wait_timeout: "{{ kube_prometheus_stack_wait_timeout }}"
