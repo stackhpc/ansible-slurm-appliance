@@ -29,16 +29,12 @@
     name: lnet
     state: "{{ 'restarted' if _lnet_conf.changed else 'started' }}"
 
-# TODO: on some nodes we've got additional nodes!
-# An systemd lnet restart fixed it
-
 - name: Ensure mount points exist
   ansible.builtin.file:
     path: "{{ item.mount_point }}"
     state: directory
   loop: "{{ lustre_mounts }}"
   when: "(item.mount_state | default(lustre_mount_state)) != 'absent'"
-# TODO: do we need to set owner/group/mode either pre- or post-mount?
 
 - name: Mount lustre filesystem
   ansible.posix.mount:
