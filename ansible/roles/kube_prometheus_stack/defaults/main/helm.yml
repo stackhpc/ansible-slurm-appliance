@@ -72,7 +72,7 @@ kube_prometheus_stack_release_defaults:
       storageSpec:
         volumeClaimTemplate:
           spec:
-            volumeName: appliances-state-dir
+            volumeName: prometheus-dir
             accessModes:
               - ReadWriteOnce
             resources:
@@ -100,8 +100,8 @@ kube_prometheus_stack_release_defaults:
   additionalPrometheusRulesMap: "{{ prometheus_alert_rules }}"
                 
   grafana:
-    # service:
-    #   port: 3000 # seems to cause issues with prometheus targets
+    service:
+      port: "{{ grafana_port }}"
     ingress:
       enabled: true
       # hosts:
@@ -123,6 +123,10 @@ kube_prometheus_stack_release_defaults:
     plugins: "{{ grafana_plugins }}"
     nodeSelector:
         kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+    persistence:
+      type: pvc
+      enabled: true
+      existingClaim: grafana-pvc
   
   alertmanager:
     ingress:

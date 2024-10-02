@@ -16,6 +16,8 @@ login_ip: "{{ hostvars[groups['openondemand'][0]]['ansible_host'] }}" # probably
 control_ip: "{{ ansible_default_ipv4.address| default(ansible_all_ipv4_addresses[0]) }}"
 control_sslip: "{{ control_ip | regex_replace('\\.', '-') }}.sslip.io" 
 
+grafana_claim_size: 10Gi
+
 ### PREVIOUS ROLE VALUES
 
 prometheus_image_tag: "v2.27.0"
@@ -102,7 +104,7 @@ prometheus_scrape_configs:
   - job_name: "grafana"
     static_configs:
     - targets:
-      - "kube-prometheus-stack-grafana:80"
+      - "kube-prometheus-stack-grafana:{{ grafana_port }}"
 
 # Alternative config file name, searched in ansible templates path.
 # prometheus_config_file: 'prometheus.yml.j2'
