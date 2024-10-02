@@ -45,6 +45,7 @@
 - name: Ensure image summary directory exists
   file:
     path: /var/lib/image/
+    state: directory
     owner: root
     group: root
     mode: u=rwX,go=rX
