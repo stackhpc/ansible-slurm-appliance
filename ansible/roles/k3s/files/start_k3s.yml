@@ -18,7 +18,8 @@
         line: "K3S_URL=https://{{ k3s_server_name }}:6443"
       when: k3s_server_name is defined
 
-    - name: Add loadbalancer label to server
+    - name: Only run loadbalancer on k3s server
+    # avoids problems with Ondemand https server
       when: k3s_server_name is undefined
       block:
         - name: Create override directory
@@ -26,7 +27,7 @@
             state: directory
             path: "/etc/systemd/system/{{ service_name }}.service.d"
         
-        - name: Add label override
+        - name: Set loadbalancer label on k3s server
           ansible.builtin.copy:
             dest: "/etc/systemd/system/{{ service_name }}.service.d/override.conf"
             content: |
