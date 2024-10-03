@@ -1,7 +1,7 @@
 ---
 
 grafana_address: "0.0.0.0"
-grafana_port: 3000
+grafana_port: 80
 
 # External Grafana address. Variable maps to "root_url" in grafana server section
 grafana_url: "http://{{ grafana_address }}:{{ grafana_port }}"

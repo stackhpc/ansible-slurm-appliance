@@ -10,7 +10,7 @@ kube_prometheus_stack_release_namespace: monitoring-system
 kube_prometheus_stack_release_name: kube-prometheus-stack
 
 # The timeout to wait for the release to become ready
-kube_prometheus_stack_wait_timeout: 10m
+kube_prometheus_stack_wait_timeout: 5m
 
 login_ip: "{{ hostvars[groups['openondemand'][0]]['ansible_host'] }}" # probably needs to be more robust
 control_ip: "{{ ansible_default_ipv4.address| default(ansible_all_ipv4_addresses[0]) }}"

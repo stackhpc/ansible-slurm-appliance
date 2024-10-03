@@ -108,15 +108,14 @@ kube_prometheus_stack_release_defaults:
       #   - "{{ control_sslip }}"
       #   - "localhost"
       ingressClassName: traefik
-      path: /grafana
+      path: /
     sidecar:
       dashboards:
         searchNamespace: ALL
     grafana.ini:
       server:
-        domain: "{{ control_sslip }}"
-        root_url: "http://{{ control_sslip }}/grafana"
-        serve_from_sub_path: true
+        domain: "{{ openondemand_servername }}"
+        root_url: "{{ grafana_url_openondemand_proxy }}"
       auth.anonymous:
         enabled: true
     additionalDataSources: "{{ grafana_datasources }}"

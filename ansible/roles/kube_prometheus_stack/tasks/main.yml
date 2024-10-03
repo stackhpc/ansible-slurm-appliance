@@ -22,6 +22,17 @@
   args:
     stdin: "{{ kube_prometheus_stack_crds.stdout }}"
 
+- name: Disable rancher default storage class
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    state: patched
+    definition:
+      kind: StorageClass
+      metadata:
+        name: local-path
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "false"
+
 # variables would need refactoring to let us loop through the data directories nicely
 - name: Create Prometheus hostPath volume in /var/lib/state
   kubernetes.core.k8s:
@@ -77,17 +88,6 @@
             storage: "{{ grafana_claim_size }}"
         volumeMode: Filesystem
         volumeName: grafana-dir
-
-- name: Disable rancher default storage class
-  kubernetes.core.k8s:
-    namespace: "{{ kube_prometheus_stack_release_namespace }}"
-    state: patched
-    definition:
-      kind: StorageClass
-      metadata:
-        name: local-path
-        annotations:
-          storageclass.kubernetes.io/is-default-class: "false"
 
 # not looping through these because templating doesn't set ports as integer
 - name: Creating headless service for OOD exporter
