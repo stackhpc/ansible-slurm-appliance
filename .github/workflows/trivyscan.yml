@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - ci/nightly-builds
+    paths:
+      - 'environments/.stackhpc/terraform/cluster_image.json'
 
 jobs:
   scan:

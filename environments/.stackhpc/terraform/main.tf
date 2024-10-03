@@ -28,7 +28,6 @@ variable "os_version" {
 variable "cluster_image" {
     description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
     type = map(string)
-    default = jsondecode(file("./cluster_image.json"))
 }
 
 variable "cluster_net" {}
