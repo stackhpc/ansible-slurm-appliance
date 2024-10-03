@@ -1,0 +1,92 @@
+name: Trivy scan image for vulnerabilities
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - ci/nightly-builds
+
+jobs:
+  scan:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os_version:
+          - RL8
+          - RL9
+        build:
+          - openstack.openhpc
+          - openstack.openhpc-cuda
+        exclude:
+          - os_version: RL8
+            build: openstack.openhpc-cuda
+    env:
+      BUILD: ${{ matrix.build }}-${{ matrix.os_version }}
+
+    steps:
+      - name: Download image details artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image-details
+
+      - name: Use the downloaded artifact
+        id: manifest
+        run: |
+          IMAGE_ID=$(cat image-id-${{ env.BUILD }}.txt)
+          IMAGE_NAME=$(cat image-name-${{ env.BUILD }}.txt)
+          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "image-id=${IMAGE_ID}" >> "$GITHUB_OUTPUT"
+
+      - name: Download image
+        run: |
+          . venv/bin/activate
+          sudo mkdir /mnt/images
+          sudo chmod 777 /mnt/images
+          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: install libguestfs
+        run: |
+          sudo apt -y update
+          sudo apt -y install libguestfs-tools
+
+      - name: mkdir for mount
+        run: sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
+
+      - name: mount qcow2 file
+        run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
+          scanners: "vuln"
+          format: sarif
+          output: "${{ steps.manifest.outputs.image-name }}.sarif"
+          # turn off secret scanning to speed things up
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
+          category: "${{ matrix.os_version }}-${{ matrix.build }}"
+
+      - name: Fail if scan has CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
+          scanners: "vuln"
+          format: table
+          exit-code: '1'
+          severity: 'CRITICAL'
+          ignore-unfixed: true
