@@ -30,11 +30,12 @@ jobs:
         exclude:
           - os_version: RL8
             build: openstack.openhpc-cuda
-
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      BUILD: "${{ matrix.build }}-${{ matrix.os_version }}"
+
     steps:
       - uses: actions/checkout@v2
 
@@ -101,53 +102,14 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
-          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
-          echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo $IMAGE_ID > image-id-${{ env.BUILD }}.txt
+          echo $IMAGE_NAME > image-name-${{ env.BUILD }}.txt
 
-      - name: Download image
-        run: |
-          . venv/bin/activate
-          sudo mkdir /mnt/images
-          sudo chmod 777 /mnt/images
-          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: install libguestfs
-        run: |
-          sudo apt -y update
-          sudo apt -y install libguestfs-tools
-
-      - name: mkdir for mount
-        run: sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
-
-      - name: mount qcow2 file
-        run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.17.0
+      - name: Upload manifest artifact
+        uses: actions/upload-artifact@v4
         with:
-          scan-type: fs
-          scan-ref: "${{ steps.manifest.outputs.image-name }}"
-          scanners: "vuln"
-          format: sarif
-          output: "${{ steps.manifest.outputs.image-name }}.sarif"
-          # turn off secret scanning to speed things up
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
-          category: "${{ matrix.os_version }}-${{ matrix.build }}"
-
-      - name: Fail if scan has CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@0.16.1
-        with:
-          scan-type: fs
-          scan-ref: "${{ steps.manifest.outputs.image-name }}"
-          scanners: "vuln"
-          format: table
-          exit-code: '1'
-          severity: 'CRITICAL'
-          ignore-unfixed: true
+          name: image-details
+          path: |
+            ./image-id-${{ env.BUILD }}.txt
+            ./image-name-${{ env.BUILD }}.txt
+          overwrite: true
