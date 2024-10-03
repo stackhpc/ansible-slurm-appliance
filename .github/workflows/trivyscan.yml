@@ -1,9 +1,6 @@
 name: Trivy scan image for vulnerabilities
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - ci/nightly-builds
@@ -33,13 +30,13 @@ jobs:
       - name: Download image details artifact
         uses: actions/download-artifact@v4
         with:
-          name: image-details
+          name: image-details-${{ env.BUILD }}
 
       - name: Use the downloaded artifact
         id: manifest
         run: |
-          IMAGE_ID=$(cat image-id-${{ env.BUILD }}.txt)
-          IMAGE_NAME=$(cat image-name-${{ env.BUILD }}.txt)
+          IMAGE_ID=$(cat image-id.txt)
+          IMAGE_NAME=$(cat image-name.txt)
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=${IMAGE_ID}" >> "$GITHUB_OUTPUT"
 

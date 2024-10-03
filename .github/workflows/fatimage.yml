@@ -102,14 +102,14 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
-          echo $IMAGE_ID > image-id-${{ env.BUILD }}.txt
-          echo $IMAGE_NAME > image-name-${{ env.BUILD }}.txt
+          echo $IMAGE_ID > image-id.txt
+          echo $IMAGE_NAME > image-name.txt
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: image-details
+          name: image-details-${{ env.BUILD }}
           path: |
-            ./image-id-${{ env.BUILD }}.txt
-            ./image-name-${{ env.BUILD }}.txt
+            ./image-id.txt
+            ./image-name.txt
           overwrite: true
