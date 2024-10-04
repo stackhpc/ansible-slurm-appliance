@@ -1,27 +1,35 @@
 ---
 
-- name: Download k3s install script
-  ansible.builtin.get_url:
-    url: https://get.k3s.io/
-    timeout: 120
-    dest: /usr/bin/k3s-install.sh
-    owner: root
-    group: root
-    mode: "0755"
+- name: Check for existing k3s binaries
+  stat:
+    path: /usr/bin/k3s
+  register: stat_result
 
-- name: Install k3s
-  ansible.builtin.shell:
-    cmd: /usr/bin/k3s-install.sh
-  environment:
-    INSTALL_K3S_VERSION: "{{ k3s_version }}"
-    INSTALL_K3S_EXEC: "{{ item }}"
-    INSTALL_K3S_SKIP_START: "true"
-    INSTALL_K3S_SKIP_ENABLE: "true"
-    INSTALL_K3S_BIN_DIR: "/usr/bin"
-  changed_when: true
-  loop:
-    - server
-    - agent
+- name: Download and install k3s
+  when: not stat_result.stat.exists
+  block:
+  - name: Download k3s install script
+    ansible.builtin.get_url:
+      url: https://get.k3s.io/
+      timeout: 120
+      dest: /usr/bin/k3s-install.sh
+      owner: root
+      group: root
+      mode: "0755"
+
+  - name: Install k3s
+    ansible.builtin.shell:
+      cmd: /usr/bin/k3s-install.sh
+    environment:
+      INSTALL_K3S_VERSION: "{{ k3s_version }}"
+      INSTALL_K3S_EXEC: "{{ item }}"
+      INSTALL_K3S_SKIP_START: "true"
+      INSTALL_K3S_SKIP_ENABLE: "true"
+      INSTALL_K3S_BIN_DIR: "/usr/bin"
+    changed_when: true
+    loop:
+      - server
+      - agent
 
 - name: Install helm
   unarchive:
