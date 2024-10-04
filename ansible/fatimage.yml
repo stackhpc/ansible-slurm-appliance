@@ -33,6 +33,11 @@
         name: freeipa
         tasks_from: client-install.yml
       when: "'freeipa_client' in group_names"
+    - name: Install sssd
+      import_role:
+        name: sssd
+        tasks_from: install.yml
+      when: "'sssd' in group_names"
 
     # - import_playbook: filesystems.yml:
     - name: Install nfs packages
