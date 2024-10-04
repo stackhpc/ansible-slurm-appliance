@@ -95,3 +95,11 @@
     - import_role:
         name: freeipa
         tasks_from: validate.yml
+
+- name: Validate lustre configuration
+  hosts: lustre
+  tags: lustre
+  tasks:
+    - import_role:
+        name: lustre
+        tasks_from: validate.yml
