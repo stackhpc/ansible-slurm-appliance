@@ -5,7 +5,7 @@ on:
     branches:
       - ci/nightly-builds
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json/cluster_image'
 
 jobs:
   scan:
@@ -18,7 +18,7 @@ jobs:
       matrix:
         build: ["RL8", "RL9", "RL9-cuda"]
     env:
-      JSON_PATH: environments/.stackhpc/terraform/cluster_image.json
+      JSON_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json/cluster_image
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
 
