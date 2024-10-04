@@ -1,6 +1,6 @@
 output "cluster_gateway_ip" {
   description = "The IP address of the gateway used to contact the cluster nodes"
-  value       =  openstack_compute_floatingip_associate_v2.login_floatingip_assoc.floating_ip
+  value       =  openstack_networking_floatingip_associate_v2.login_floatingip_assoc.floating_ip
 }
 
 {% if cluster_ssh_private_key_file is not defined %}
