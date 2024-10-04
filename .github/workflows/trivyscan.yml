@@ -5,7 +5,7 @@ on:
     branches:
       - ci/nightly-builds
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.json'
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
 
 jobs:
   scan:
