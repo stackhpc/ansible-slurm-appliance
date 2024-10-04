@@ -100,6 +100,7 @@
     - import_role:
         name: opensearch
         tasks_from: install.yml
+      become: true
       when: "'opensearch' in group_names"
     # slurm_stats - nothing to do
     - import_role:
