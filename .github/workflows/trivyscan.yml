@@ -91,6 +91,7 @@ jobs:
           format: sarif
           output: "${{ steps.manifest.outputs.image-name }}.sarif"
           # turn off secret scanning to speed things up
+          timeout: 15m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -110,5 +111,6 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL'
           ignore-unfixed: true
+          timeout: 15m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
