@@ -211,6 +211,7 @@ build {
   # CUDA fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-cuda"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   # Extended site-specific image, built on fat image:
