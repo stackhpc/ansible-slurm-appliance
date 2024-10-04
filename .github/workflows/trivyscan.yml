@@ -5,7 +5,7 @@ on:
     branches:
       - ci/nightly-builds
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json/cluster_image'
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
 
 jobs:
   scan:
@@ -18,7 +18,7 @@ jobs:
       matrix:
         build: ["RL8", "RL9", "RL9-cuda"]
     env:
-      JSON_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json/cluster_image
+      JSON_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
 
@@ -58,7 +58,7 @@ jobs:
       - name: Parse image name json
         id: manifest
         run: |
-          IMAGE_NAME=$(jq --arg version "${{ matrix.build }}" -r '.[$version]' "${{ env.JSON_PATH }}")
+          IMAGE_NAME=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.JSON_PATH }}")
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Download image
