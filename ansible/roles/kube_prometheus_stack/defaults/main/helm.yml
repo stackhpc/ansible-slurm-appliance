@@ -149,11 +149,7 @@ kube_prometheus_stack_release_defaults:
       paths: 
         - /alertmanager
     # Don't apply the namespace grouping by default
-    config:
-      route:
-        group_by: ['...']
-      global:
-        resolve_timeout: "{{ prometheus_config_flags_extra.alertmanager.timeout | default( '5m' ) }}"
+    config: "{{ alertmanager_config }}"
     alertmanagerSpec:
       forceEnableClusterMode: true
       routePrefix: /alertmanager

@@ -20,6 +20,28 @@ grafana_claim_size: 10Gi
 
 grafana_anonymous_auth: true
 
+slack_integration:
+  channel: "#alerts"
+  app_creds: # TODO: need to find best way to build this into secrets store as must be manually retrieved from app
+
+alertmanager_config:
+  route:
+    group_by: ['...']
+    receiver: slack-receiver
+  global:
+    resolve_timeout: "{{ prometheus_config_flags_extra.alertmanager.timeout | default( '5m' ) }}"
+  receivers:
+    - name: 'null'
+    - name: slack-receiver
+      slack_configs:
+        - channel: "{{ slack_integration.channel }}"
+          api_url: https://slack.com/api/chat.postMessage
+          http_config:
+            authorization:
+              credentials: "{{ slack_integration.app_creds }}"
+          text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
+          title_link: "http://{{ control_ip }}/alertmanager/#/alerts?receiver=slack-receiver"
+
 ### PREVIOUS ROLE VALUES
 
 prometheus_image_tag: "v2.27.0"
