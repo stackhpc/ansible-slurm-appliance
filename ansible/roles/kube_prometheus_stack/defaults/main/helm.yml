@@ -116,8 +116,14 @@ kube_prometheus_stack_release_defaults:
       server:
         domain: "{{ openondemand_servername }}"
         root_url: "{{ grafana_url_openondemand_proxy }}"
+      auth: "{{ grafana_auth }}"
       auth.anonymous:
-        enabled: true
+        enabled: "{{ grafana_anonymous_auth }}"
+      analytics: "{{ grafana_analytics }}"
+      smtp: "{{ grafana_smtp }}"
+      log: "{{ grafana_log }}"
+      tracing: "{{ grafana_tracing }}"
+      panels: "{{ grafana_panels }}"
     additionalDataSources: "{{ grafana_datasources }}"
     plugins: "{{ grafana_plugins }}"
     nodeSelector:
@@ -126,6 +132,12 @@ kube_prometheus_stack_release_defaults:
       type: pvc
       enabled: true
       existingClaim: grafana-pvc
+    ldap:
+      enabled: "{{ false if grafana_ldap == {} else true }}"
+      config: "{{ grafana_ldap | to_yaml }}"
+    image:
+      tag: "{{ grafana_image_tag }}"
+    env: "{{ grafana_environment }}"
   
   alertmanager:
     ingress:

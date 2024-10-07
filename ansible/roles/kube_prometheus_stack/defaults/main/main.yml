@@ -18,6 +18,8 @@ control_sslip: "{{ control_ip | regex_replace('\\.', '-') }}.sslip.io"
 
 grafana_claim_size: 10Gi
 
+grafana_anonymous_auth: true
+
 ### PREVIOUS ROLE VALUES
 
 prometheus_image_tag: "v2.27.0"
@@ -245,4 +247,190 @@ prometheus_alert_rules:
       severity: warning
 
 # ------------------------------------------------------------------------------------------
+
+### PREVIOUS GRAFANA VARS
+grafana_image_tag: 11.2.2
+
+grafana_instance: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
+
+grafana_data_dir: "/var/lib/grafana"
+
+grafana_port: 80
+
+# Additional options for grafana "server" section
+# This section WILL omit options for: http_addr, http_port, domain, and root_url, as those settings are set by variables listed before
+# grafana_server:
+#   protocol: http
+#   enforce_domain: false
+#   socket: ""
+#   cert_key: ""
+#   cert_file: ""
+#   enable_gzip: false
+#   static_root_path: public
+#   router_logging: false
+#   serve_from_sub_path: false
+
+# # Variables correspond to ones in grafana.ini configuration file
+# # Security
+# grafana_security:
+#   admin_user: admin
+#   admin_password: ""
+# #  secret_key: ""
+# #  login_remember_days: 7
+# #  cookie_username: grafana_user
+# #  cookie_remember_name: grafana_remember
+# #  disable_gravatar: true
+# #  data_source_proxy_whitelist:
+
+# User management and registration
+# grafana_welcome_email_on_sign_up: false
+# grafana_users:
+#   allow_sign_up: false
+#   # allow_org_create: true
+#   # auto_assign_org: true
+#   auto_assign_org_role: Viewer
+#   # login_hint: "email or username"
+#   default_theme: dark
+#   # external_manage_link_url: ""
+#   # external_manage_link_name: ""
+#   # external_manage_info: ""
+
+# grafana authentication mechanisms
+grafana_auth: {}
+#  disable_login_form: false
+#  oauth_auto_login: false
+#  disable_signout_menu: false
+#  signout_redirect_url: ""
+#  ldap:
+#    config_file: "/etc/grafana/ldap.toml"
+#    allow_sign_up: false
+#  basic:
+#    enabled: true
+
+grafana_ldap: {}
+#  verbose_logging: false
+#  servers:
+#    host: 127.0.0.1
+#    port: 389 # 636 for SSL
+#    use_ssl: false
+#    start_tls: false
+#    ssl_skip_verify: false
+#    root_ca_cert: /path/to/certificate.crt
+#    bind_dn: "cn=admin,dc=grafana,dc=org"
+#    bind_password: grafana
+#    search_filter: "(cn=%s)" # "(sAMAccountName=%s)" on AD
+#    search_base_dns:
+#      - "dc=grafana,dc=org"
+#    group_search_filter: "(&(objectClass=posixGroup)(memberUid=%s))"
+#    group_search_base_dns:
+#      - "ou=groups,dc=grafana,dc=org"
+#    attributes:
+#      name: givenName
+#      surname: sn
+#      username: sAMAccountName
+#      member_of: memberOf
+#      email: mail
+#  group_mappings:
+#    - name: Main Org.
+#      id: 1
+#      groups:
+#        - group_dn: "cn=admins,ou=groups,dc=grafana,dc=org"
+#          org_role: Admin
+#        - group_dn: "cn=editors,ou=groups,dc=grafana,dc=org"
+#          org_role: Editor
+#        - group_dn: "*"
+#          org_role: Viewer
+#    - name: Alternative Org
+#      id: 2
+#      groups:
+#        - group_dn: "cn=alternative_admins,ou=groups,dc=grafana,dc=org"
+#          org_role: Admin
+
+grafana_analytics: {}
+#  reporting_enabled: true
+#  google_analytics_ua_id: ""
+
+# Set this for mail notifications
+grafana_smtp: {}
+#  host:
+#  user:
+#  password:
+#  from_address:
+
+# Grafana logging configuration
+grafana_log:
+# mode: 'console file'
+# level: info
+
+# Distributed tracing options
+grafana_tracing: {}
+#  address: "localhost:6831"
+#  always_included_tag: "tag1:value1,tag2:value2"
+#  sampler_type: const
+#  sampler_param: 1
+
+grafana_snapshots: {}
+#  external_enabled: true
+#  external_snapshot_url: "https://snapshots-origin.raintank.io"
+#  external_snapshot_name: "Publish to snapshot.raintank.io"
+#  snapshot_remove_expired: true
+#  snapshot_TTL_days: 90
+
+# # External image store
+# grafana_image_storage: {}
+# #  provider: gcs
+# #  key_file:
+# #  bucket:
+# #  path:
+
+
+#######
+# Plugins from https://grafana.com/plugins
+grafana_plugins: []
+#  - raintank-worldping-app
+
+# # Dashboards from https://grafana.com/dashboards
+# grafana_dashboards: []
+# #  - dashboard_id: '4271'
+# #    revision_id: '3'
+# #    datasource: 'Prometheus'
+# #  - dashboard_id: '1860'
+# #    revision_id: '4'
+# #    datasource: 'Prometheus'
+# #  - dashboard_id: '358'
+# #    revision_id: '1'
+# #    datasource: 'Prometheus'
+
+# grafana_dashboards_dir: "dashboards"
+
+# # Alert notification channels to configure
+# grafana_alert_notifications: []
+# #  - name: "Email Alert"
+# #    type: "email"
+# #    uid: channel1
+# #    is_default: true
+# #    settings:
+# #      addresses: "example@example.com"
+
+# Datasources to configure
+grafana_datasources: []
+#  - name: "Prometheus"
+#    type: "prometheus"
+#    access: "proxy"
+#    url: "http://prometheus.mydomain"
+#    basicAuth: true
+#    basicAuthUser: "admin"
+#    basicAuthPassword: "password"
+#    isDefault: true
+#    jsonData:
+#      tlsAuth: false
+#      tlsAuthWithCACert: false
+#      tlsSkipVerify: true
+
+grafana_environment: {}
+
+# Panels configurations
+grafana_panels: {}
+#  disable_sanitize_html: false
+#  enable_alpha: false
 
