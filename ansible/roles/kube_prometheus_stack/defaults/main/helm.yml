@@ -151,6 +151,8 @@ kube_prometheus_stack_release_defaults:
     # Don't apply the namespace grouping by default
     config: "{{ alertmanager_config }}"
     alertmanagerSpec:
+      image:
+        tag: "{{ alertmanager_image_tag }}"
       forceEnableClusterMode: true
       routePrefix: /alertmanager
       externalUrl: "{{ kube_prometheus_stack_alertmanager_external_url }}"
@@ -167,6 +169,7 @@ kube_prometheus_stack_release_defaults:
     serviceMonitor:
       scheme: "{{ prometheus_alertmanager_config.scheme | default( '' ) }}"
       proxyUrl: "{{ prometheus_alertmanager_config.proxy_url | default( '' ) }}"
+    templateFiles: "{{ alertmanager_template_files }}"
       
   
   prometheusOperator:

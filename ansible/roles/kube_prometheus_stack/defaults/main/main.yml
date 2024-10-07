@@ -41,6 +41,9 @@ alertmanager_config:
               credentials: "{{ slack_integration.app_creds }}"
           text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
           title_link: "http://{{ control_ip }}/alertmanager/#/alerts?receiver=slack-receiver"
+          send_resolved: true
+
+alertmanager_replicas: 1
 
 ### PREVIOUS ROLE VALUES
 
@@ -110,13 +113,6 @@ prometheus_remote_read: []
 prometheus_external_labels:
   environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
   # environment: "{{ control_sslip }}"
-
-prometheus_targets: {}
-#  node:
-#    - targets:
-#        - localhost:9100
-#      labels:
-#        env: test
 
 prometheus_scrape_configs:
   - job_name: "slurm_exporter"
@@ -456,3 +452,12 @@ grafana_panels: {}
 #  disable_sanitize_html: false
 #  enable_alpha: false
 
+### PREVIOUS ALERTMANAGER ROLEVARS
+
+alertmanager_image_tag: v0.27.0
+
+# alertmanager_config_file: 'alertmanager.yml.j2'
+
+alertmanager_template_files: {}
+
+# alertmanager_http_config: {}
