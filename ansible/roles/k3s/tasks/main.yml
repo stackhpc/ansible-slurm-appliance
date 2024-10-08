@@ -28,7 +28,7 @@
       INSTALL_K3S_BIN_DIR: "/usr/bin"
     changed_when: true
     loop:
-      - server
+      - server --disable=traefik
       - agent
 
 - name: Install helm
