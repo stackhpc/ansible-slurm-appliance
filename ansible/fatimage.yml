@@ -177,9 +177,9 @@
 
 - hosts: builder
   become: yes
-  gather_facts: no
+  gather_facts: yes
+  tags: finalise
   tasks:
-    # - meta: end_here
     - name: Cleanup image
       import_tasks: cleanup.yml
 
