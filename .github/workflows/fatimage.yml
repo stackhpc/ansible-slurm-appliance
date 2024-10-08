@@ -34,7 +34,6 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
-      BUILD: "${{ matrix.build }}-${{ matrix.os_version }}"
 
     steps:
       - uses: actions/checkout@v2
@@ -108,7 +107,7 @@ jobs:
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: image-details-${{ env.BUILD }}
+          name: image-details-"${{ matrix.build }}-${{ matrix.os_version }}"
           path: |
             ./image-id.txt
             ./image-name.txt

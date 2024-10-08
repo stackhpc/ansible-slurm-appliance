@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - master
     paths:
       - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
 

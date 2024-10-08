@@ -148,7 +148,7 @@
   tags: cockpit
   tasks:
     - name: Remove RHEL cockpit
-      command: dnf -y remove cockpit-ws
+      command: dnf -y remove cockpit-ws # N.B. using ansible dnf module is very slow
       register: dnf_remove_output
       ignore_errors: true  # Avoid failing if a lock or other error happens
 
