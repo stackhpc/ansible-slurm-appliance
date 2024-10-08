@@ -1,1 +1,1 @@
-k3s_version: "v1.31.0+k3s1"
+k3s_version: "v1.31.0+k3s1" # Warning: changes to this variable won't be reflected in the cluster/image if k3s is already installed

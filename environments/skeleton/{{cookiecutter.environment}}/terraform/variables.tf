@@ -133,5 +133,6 @@ variable "root_volume_size" {
 }
 
 variable "k3s_token" {
+    description = "K3s cluster authentication token, set automatically by Ansible"
     type = string
 }

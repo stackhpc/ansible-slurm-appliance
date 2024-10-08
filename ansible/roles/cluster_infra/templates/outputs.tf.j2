@@ -1,6 +1,6 @@
 output "cluster_gateway_ip" {
   description = "The IP address of the gateway used to contact the cluster nodes"
-  value       =  openstack_compute_floatingip_associate_v2.login_floatingip_assoc.floating_ip
+  value       =  openstack_networking_floatingip_associate_v2.login_floatingip_assoc.floating_ip
 }
 
 {% if cluster_ssh_private_key_file is not defined %}
@@ -24,8 +24,8 @@ output "cluster_nodes" {
         }
       },
       {
-        name          = openstack_compute_instance_v2.control.name
-        ip            = openstack_compute_instance_v2.control.network[0].fixed_ip_v4
+        name          = openstack_compute_instance_v2.control["control"].name
+        ip            = openstack_compute_instance_v2.control["control"].network[0].fixed_ip_v4
         groups        = ["control", "{{ cluster_name }}_control"],
         facts  = {
           openstack_project_id = data.openstack_identity_auth_scope_v3.scope.project_id

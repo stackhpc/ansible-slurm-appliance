@@ -1,5 +1,12 @@
 ---
 
+# Generate k3s token
+- name: Generate k3s token
+  hosts: openstack
+  tasks:
+    - ansible.builtin.set_fact:
+        k3s_token: "{{ lookup('ansible.builtin.password', '/dev/null', length=64) }}"
+
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack

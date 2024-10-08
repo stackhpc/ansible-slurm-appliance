@@ -7,7 +7,7 @@
     service_name: "{{ 'k3s-agent' if k3s_server_name is defined else 'k3s' }}"
   tasks:
     - name: Add the token for joining the cluster to the environment
-      no_log: false # avoid logging the server token
+      no_log: true # avoid logging the server token
       ansible.builtin.lineinfile:
         path: "/etc/systemd/system/{{ service_name }}.service.env"
         line: "K3S_TOKEN={{ k3s_token }}"
@@ -18,7 +18,8 @@
         line: "K3S_URL=https://{{ k3s_server_name }}:6443"
       when: k3s_server_name is defined
 
-    - name: Add loadbalancer label to server
+    - name: Only run loadbalancer on k3s server
+    # avoids problems with Ondemand https server
       when: k3s_server_name is undefined
       block:
         - name: Create override directory
@@ -26,7 +27,7 @@
             state: directory
             path: "/etc/systemd/system/{{ service_name }}.service.d"
         
-        - name: Add label override
+        - name: Set loadbalancer label on k3s server
           ansible.builtin.copy:
             dest: "/etc/systemd/system/{{ service_name }}.service.d/override.conf"
             content: |
