@@ -52,16 +52,7 @@ kube_prometheus_stack_release_defaults:
       KubeProxyDown: true
       KubeControllerManagerDown: true
   prometheus:
-    ingress:
-      enabled: true
-      hosts:
-        - "{{ control_sslip }}"
-        - "localhost"
-      ingressClassName: traefik
-      paths:
-        - /prometheus
     prometheusSpec:
-      routePrefix: /prometheus
       externalUrl: "{{ kube_prometheus_stack_prometheus_external_url }}"
       podMonitorSelectorNilUsesHelmValues: false
       serviceMonitorSelectorNilUsesHelmValues: false
@@ -103,12 +94,7 @@ kube_prometheus_stack_release_defaults:
     service:
       port: "{{ grafana_port }}"
     ingress:
-      enabled: true
-      # hosts:
-      #   - "{{ control_sslip }}"
-      #   - "localhost"
-      ingressClassName: traefik
-      path: /
+      path: /node/{{ groups['grafana'].0 }}/30001
     sidecar:
       dashboards:
         searchNamespace: ALL
@@ -116,6 +102,7 @@ kube_prometheus_stack_release_defaults:
       server:
         domain: "{{ openondemand_servername }}"
         root_url: "{{ grafana_url_openondemand_proxy }}"
+        serve_from_sub_path: true
       auth: "{{ grafana_auth }}"
       auth.anonymous:
         enabled: "{{ grafana_anonymous_auth }}"
@@ -140,21 +127,12 @@ kube_prometheus_stack_release_defaults:
     env: "{{ grafana_environment }}"
   
   alertmanager:
-    ingress:
-      enabled: true
-      # hosts:
-      #   - "{{ control_sslip }}"
-      #   - "localhost"
-      ingressClassName: traefik
-      paths: 
-        - /alertmanager
     # Don't apply the namespace grouping by default
     config: "{{ alertmanager_config }}"
     alertmanagerSpec:
       image:
         tag: "{{ alertmanager_image_tag }}"
       forceEnableClusterMode: true
-      routePrefix: /alertmanager
       externalUrl: "{{ kube_prometheus_stack_alertmanager_external_url }}"
       # Make sure that alertmanager finds configurations with the alertmanager name as a label
       alertmanagerConfigSelector:
