@@ -13,7 +13,7 @@ All subsequent sections assume that:
 - A string `some/path/to/file.yml:myvar` defines a path relative to the repository root and an Ansible variable in that file.
 - Configuration is generally common to all environments at a site, i.e. is made in `environments/$SITE_ENV` not `environments/$ENV`.
 
-Review any [site-specific documentation](docs/site.md) for more details on the above.
+Review any [site-specific documentation](site/README.md) for more details on the above.
 
 # Deploying a Cluster
 
@@ -117,7 +117,7 @@ is skipped using:
 
         ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo.
 
-Review any [site-specific documentation](docs/site.md) for more details.
+Review any [site-specific documentation](site/README.md) for more details.
 
 # Running CUDA Tests
 This uses the [cuda-samples](https://github.com/NVIDIA/cuda-samples/) utilities "deviceQuery" and "bandwidthTest" to test GPU functionality. It automatically runs on any
