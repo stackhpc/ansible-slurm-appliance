@@ -19,7 +19,7 @@ The ansible inventory for the environment is in `environments/<environment>/inve
 
 Although most of the inventory uses the group convention described above there are a few special cases:
 - The `control`, `login` and `compute` groups are special as they need to contain actual hosts rather than child groups, and so should generally be defined in the templated-out `hosts` file.
-- The cluster name must be set on all hosts using `openhpc_cluster_name`. Using an  `[all:vars]` section in the `hosts` file is usually convenient.
+- The cluster name must be set on all hosts using `openhpc_cluster_name`. Using an `[all:vars]` section in the `hosts` file is usually convenient.
 - `environments/common/inventory/group_vars/all/defaults.yml` contains some variables which are not associated with a specific role/feature. These are unlikely to need changing, but if necessary that could be done using a `environments/<environment>/inventory/group_vars/all/overrides.yml` file.
 - The `ansible/adhoc/generate-passwords.yml` playbook sets secrets for all hosts in `environments/<environent>/inventory/group_vars/all/secrets.yml`.
 - The Packer-based pipeline for building compute images creates a VM in groups `builder` and `compute`, allowing build-specific properties to be set in `environments/common/inventory/group_vars/builder/defaults.yml` or the equivalent inventory-specific path.

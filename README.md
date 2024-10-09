@@ -10,12 +10,14 @@ This repository contains playbooks and configuration to define a Slurm-based HPC
 - Slurm accounting using a MySQL database.
 - Monitoring integrated with Slurm jobs using Prometheus, ElasticSearch and Grafana.
 - A web-based portal from [OpenOndemand](https://openondemand.org/).
-- Production-ready default Slurm configurations for access and memory.
+- Production-ready default Slurm configurations for access and memory limits.
 - [Packer](https://developer.hashicorp.com/packer)-based image build configurations for node images.
 
-The repository is expected to be forked for a specific HPC site but can contain multiple environments for e.g. development, staging and production clusters based off a single configuration. It has been designed to be modular and extensible, so if you add features for your HPC site please feel free to submit PRs back upstream to us!
+The repository is expected to be forked for a specific HPC site but can contain multiple environments for e.g. development, staging and production clusters
+sharing a common configuration. It has been designed to be modular and extensible, so if you add features for your HPC site please feel free to submit PRs
+back upstream to us!
 
-While it is tested on OpenStack it would work on any cloud with appropriate OpenTofu configuration files.
+While it is tested on OpenStack it should work on any cloud with appropriate OpenTofu configuration files.
 
 ## Demonstration Deployment
 
@@ -72,7 +74,7 @@ Now generate secrets for this environment:
 
 Create an OpenTofu variables file to define the required infrastructure, e.g.:
 
-    # environments/$ENV/terraform/terrraform.tfvars:
+    # environments/$ENV/terraform/terraform.tfvars:
 
     cluster_name = "mycluster"
     cluster_net = "some_network" # *
@@ -106,7 +108,7 @@ where the IP of the login node is given in `environments/$ENV/inventory/hosts.ym
 
 ## Overview of directory structure
 
-- `environments/`: Contains configurations for both a "common" environment and one or more environments derived from this for your site. These define ansible inventory and may also contain provisioning automation such as Terraform or OpenStack HEAT templates.
+- `environments/`: See [docs/environments.md](docs/environments.md).
 - `ansible/`: Contains the ansible playbooks to configure the infrastruture.
 - `packer/`: Contains automation to use Packer to build compute nodes for an enviromment - see the README in this directory for further information.
 - `dev/`: Contains development tools.
