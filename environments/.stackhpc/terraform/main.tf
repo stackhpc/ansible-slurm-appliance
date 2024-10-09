@@ -29,10 +29,9 @@ variable "cluster_image" {
     description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
     type = map(string)
     default = {
-        # https://github.com/stackhpc/ansible-slurm-appliance/pull/444
-        RL8: "openhpc-ofed-RL8-241002-1612-1ce702b1"
-        RL9: "openhpc-ofed-RL9-241003-1052-1ce702b1"
-        RL9-cuda: "openhpc-cuda-RL9-241002-1612-1ce702b1"
+        # https://github.com/stackhpc/ansible-slurm-appliance/pull/441
+        RL8: "openhpc-ofed-RL8-241008-1531-2861edba"
+        RL9: "openhpc-ofed-RL9-241008-1531-2861edba"
     }
 }
 
@@ -60,6 +59,10 @@ variable "volume_backed_instances" {
     default = false
 }
 
+variable "k3s_token" {
+    type = string
+}
+
 data "openstack_images_image_v2" "cluster" {
     name = var.cluster_image[var.os_version]
     most_recent = true
@@ -75,6 +78,7 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     cluster_image_id = data.openstack_images_image_v2.cluster.id
     control_node_flavor = var.control_node_flavor
+    k3s_token = var.k3s_token
 
     login_nodes = {
         login-0: var.other_node_flavor
