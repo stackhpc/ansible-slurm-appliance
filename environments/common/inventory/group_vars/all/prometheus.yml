@@ -28,10 +28,6 @@ prometheus_scrape_configs_default:
   static_configs:
     - targets:
       - "{{ control_ip }}:{{ slurm_exporter_port }}"
-- job_name: "grafana"
-  static_configs:
-  - targets:
-    - "kube-prometheus-stack-grafana:80"
 
 kube_prometheus_stack_release_namespace: monitoring-system
 

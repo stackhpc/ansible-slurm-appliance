@@ -45,6 +45,11 @@ alertmanager_config:
 
 alertmanager_replicas: 1
 
+# Must be within K3s' reserved port range (default 30000-32767)
+prometheus_port: 30000
+grafana_port: 30001
+alertmanager_port: 30002
+
 ### PREVIOUS ROLE VALUES
 
 prometheus_image_tag: "v2.27.0"
@@ -94,7 +99,7 @@ prometheus_alert_relabel_configs: []
 #     regex: replica
 
 prometheus_global:
-  scrape_interval: 15s
+  scrape_interval: 30s
   scrape_timeout: 10s
   evaluation_interval: 15s
 
@@ -121,10 +126,6 @@ prometheus_scrape_configs:
     static_configs:
       - targets:
         - "{{ control_ip }}:{{ slurm_exporter_port }}"
-  - job_name: "grafana"
-    static_configs:
-    - targets:
-      - "kube-prometheus-stack-grafana:{{ grafana_port }}"
 
 # Alternative config file name, searched in ansible templates path.
 # prometheus_config_file: 'prometheus.yml.j2'
@@ -272,8 +273,6 @@ grafana_image_tag: 11.2.2
 grafana_instance: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
 
 grafana_data_dir: "/var/lib/grafana"
-
-grafana_port: 80
 
 # Additional options for grafana "server" section
 # This section WILL omit options for: http_addr, http_port, domain, and root_url, as those settings are set by variables listed before

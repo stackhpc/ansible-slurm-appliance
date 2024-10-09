@@ -52,6 +52,9 @@ kube_prometheus_stack_release_defaults:
       KubeProxyDown: true
       KubeControllerManagerDown: true
   prometheus:
+    service:
+      type: NodePort
+      nodePort: "{{ prometheus_port }}"
     prometheusSpec:
       externalUrl: "{{ kube_prometheus_stack_prometheus_external_url }}"
       podMonitorSelectorNilUsesHelmValues: false
@@ -92,9 +95,12 @@ kube_prometheus_stack_release_defaults:
                 
   grafana:
     service:
-      port: "{{ grafana_port }}"
+      type: NodePort
+      nodePort: "{{ grafana_port }}"
+    serviceMonitor:
+      enabled: false
     ingress:
-      path: /node/{{ groups['grafana'].0 }}/30001
+      path: "/node/{{ groups['grafana'].0 }}/{{ grafana_port }}"
     sidecar:
       dashboards:
         searchNamespace: ALL
@@ -127,6 +133,9 @@ kube_prometheus_stack_release_defaults:
     env: "{{ grafana_environment }}"
   
   alertmanager:
+    service:
+      type: NodePort
+      nodePort: "{{ alertmanager_port }}"
     # Don't apply the namespace grouping by default
     config: "{{ alertmanager_config }}"
     alertmanagerSpec:
