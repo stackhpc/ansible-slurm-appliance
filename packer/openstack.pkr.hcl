@@ -52,12 +52,9 @@ variable "source_image_name" {
 }
 
 variable "source_image" {
-  type = map(string)
-  default = {
-    RL8: null
-    RL9: null
-  }
-  description = "UUID of source image, keyed from var.os_version"
+  type = string
+  default = null
+  description = "UUID of source image"
 }
 
 variable "flavor" {
@@ -169,7 +166,7 @@ source "openstack" "openhpc" {
   security_groups = var.security_groups
   
   # Input image:
-  source_image = "${var.source_image[var.os_version]}"
+  source_image = "${var.source_image}"
   source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
   
   # SSH:

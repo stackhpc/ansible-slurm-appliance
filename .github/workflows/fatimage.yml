@@ -88,16 +88,15 @@ jobs:
           cd packer/
           packer init .
 
-          SOURCE_IMAGE=${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][matrix.build] }}
-
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${SOURCE_IMAGE}" \
+          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
           openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
+          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][matrix.build] }}
 
       - name: Get created image names from manifest
         id: manifest
