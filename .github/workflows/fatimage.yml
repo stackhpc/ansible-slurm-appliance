@@ -34,6 +34,17 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      SOURCE_IMAGES_MAP: |
+        {
+          "RL8": {
+            "openstack.openhpc": "rocky-latest-RL8",
+            "openstack.openhpc-cuda": "rocky-latest-cuda-RL8"
+          },
+          "RL9": {
+            "openstack.openhpc": "rocky-latest-RL9",
+            "openstack.openhpc-cuda": "rocky-latest-cuda-RL9"
+          }
+        }
 
     steps:
       - uses: actions/checkout@v2
@@ -77,17 +88,13 @@ jobs:
           cd packer/
           packer init .
 
-          if [[ "${{ matrix.build }}" == *"cuda"* ]]; then
-            SOURCE_IMAGE_NAME="rocky-latest-cuda"
-          else
-            SOURCE_IMAGE_NAME="rocky-latest"
-          fi
+          SOURCE_IMAGE=${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][matrix.build] }}
 
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name={\"${{ matrix.os_version }}\":\"${SOURCE_IMAGE_NAME}-${{ matrix.os_version }}\"}" \
+          -var "source_image_name=${SOURCE_IMAGE}" \
           openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
@@ -107,7 +114,7 @@ jobs:
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: image-details-"${{ matrix.build }}-${{ matrix.os_version }}"
+          name: image-details-${{ matrix.build }}-${{ matrix.os_version }}
           path: |
             ./image-id.txt
             ./image-name.txt

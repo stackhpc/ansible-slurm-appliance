@@ -47,12 +47,8 @@ variable "os_version" {
 
 # Must supply either source_image_name or source_image_id
 variable "source_image_name" {
-  type = map(string)
-  description = "name of source image, keyed from var.os_version"
-  default = {
-    RL8: "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2"
-    RL9: "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
-  }
+  type = string
+  description = "name of source image"
 }
 
 variable "source_image" {
@@ -174,7 +170,7 @@ source "openstack" "openhpc" {
   
   # Input image:
   source_image = "${var.source_image[var.os_version]}"
-  source_image_name = "${var.source_image_name[var.os_version]}" # NB: must already exist in OpenStack
+  source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
   
   # SSH:
   ssh_username = var.ssh_username
