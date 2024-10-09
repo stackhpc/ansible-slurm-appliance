@@ -131,6 +131,8 @@ kube_prometheus_stack_release_defaults:
     image:
       tag: "{{ grafana_image_tag }}"
     env: "{{ grafana_environment }}"
+    adminUser: "{{ grafana_security.admin_user }}"
+    adminPassword: "{{ grafana_security.admin_password }}"
   
   alertmanager:
     service:

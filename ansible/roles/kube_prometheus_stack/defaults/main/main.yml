@@ -289,15 +289,15 @@ grafana_data_dir: "/var/lib/grafana"
 
 # # Variables correspond to ones in grafana.ini configuration file
 # # Security
-# grafana_security:
-#   admin_user: admin
-#   admin_password: ""
-# #  secret_key: ""
-# #  login_remember_days: 7
-# #  cookie_username: grafana_user
-# #  cookie_remember_name: grafana_remember
-# #  disable_gravatar: true
-# #  data_source_proxy_whitelist:
+grafana_security:
+  admin_user: grafana
+  admin_password: "{{ vault_grafana_admin_password }}"
+#  secret_key: ""    # would we want to template the rest of this into the ini? its not currently
+#  login_remember_days: 7
+#  cookie_username: grafana_user
+#  cookie_remember_name: grafana_remember
+#  disable_gravatar: true
+#  data_source_proxy_whitelist:
 
 # User management and registration
 # grafana_welcome_email_on_sign_up: false
