@@ -44,42 +44,9 @@ jobs:
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
-      - name: Create EC2 credentials if not present
-        id: check_creds
-        run: |
-          . venv/bin/activate
-          # List existing EC2 credentials
-          existing_creds=$(openstack ec2 credentials list --format json)
-
-          # Check if the list is empty
-          if [ "$(echo "$existing_creds" | jq 'length')" -eq 0 ]; then
-            echo "No existing EC2 credentials found."
-            new_creds=$(openstack ec2 credentials create --format json)
-            access_key=$(echo "$new_creds" | jq -r '.Access')
-            secret_key=$(echo "$new_creds" | jq -r '.Secret')
-            echo "Created new EC2 credentials."
-          else
-            echo "Existing EC2 credentials found."
-            access_key=$(echo "$existing_creds" | jq -r '.[0].Access')
-            secret_key=$(echo "$existing_creds" | jq -r '.[0].Secret')
-          fi
-
-          # Save access and secret keys for the next step
-          echo "access_key=${access_key}" >> $GITHUB_ENV
-          echo "secret_key=${secret_key}" >> $GITHUB_ENV
-        shell: bash
-
       - name: Write s3cmd configuration
         run: |
-          cat <<EOF > ~/.s3cfg
-          [default]
-          host_base = https://object.arcus.openstack.hpc.cam.ac.uk
-          host_bucket = https://object.arcus.openstack.hpc.cam.ac.uk
-          access_key = ${{ env.access_key }}
-          secret_key = ${{ env.secret_key }}
-          use_https = True
-          signurl_use_https = True
-          EOF
+          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
         shell: bash
 
       - name: Install s3cmd
@@ -94,8 +61,8 @@ jobs:
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
           echo "target-image-${{ matrix.build }}=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
 
-          S3_IMAGES=$(s3cmd ls s3://openhpc-images)
-          
+          S3_IMAGES=$(s3cmd ls s3://openhpc-images-prerelease)
+
           if echo "$S3_IMAGES" | grep -q "$TARGET_IMAGE"; then
             echo "Image ${TARGET_IMAGE} is already present in S3."
             echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
@@ -116,7 +83,7 @@ jobs:
         if: env.IMAGE_EXISTS == 'false'
         run: |
           echo "Uploading Image: ${{ env.TARGET_IMAGE }} to S3..."
-          s3cmd put ${{ env.TARGET_IMAGE }}.qcow2 s3://openhpc-images
+          s3cmd put ${{ env.TARGET_IMAGE }}.qcow2 s3://openhpc-images-prerelease
         shell: bash
 
   image_sync:
@@ -168,10 +135,10 @@ jobs:
           TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
 
-      - name: Upload latest image if missing
+      - name: Download latest image if missing
         run: |
           . venv/bin/activate
-          bash .github/bin/get-s3-image.sh ${{ env.TARGET_IMAGE }} openhpc-images
+          bash .github/bin/get-s3-image.sh ${{ env.TARGET_IMAGE }} openhpc-images-prerelease
 
       - name: Cleanup OpenStack Image (on error or cancellation)
         if: cancelled()
