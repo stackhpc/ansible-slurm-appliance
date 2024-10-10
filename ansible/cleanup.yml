@@ -39,6 +39,11 @@
 - name: Cleanup /tmp
   command : rm -rf /tmp/*
 
+- name: Delete ansible-init sentintel file created during build
+  ansible.builtin.file:
+    path: /var/lib/ansible-init.done
+    state: absent
+
 - name: Get package facts
   package_facts:
 
