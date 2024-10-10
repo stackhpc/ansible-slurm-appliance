@@ -1,72 +1,42 @@
-name: Build fat image
+name: Upload CI-tested images to Arcus S3 and sync clouds
 on:
   workflow_dispatch:
-      inputs:
-        ci_cloud:
-          description: 'Select the CI_CLOUD'
-          required: true
-          type: choice
-          options:
-            - LEAFCLOUD
-            - SMS
-            - ARCUS
+  push:
+    branches:
+      - main
+    paths:
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
 
 jobs:
-  openstack:
-    name: openstack-imagebuild
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
-      cancel-in-progress: true
+  image_upload:
     runs-on: ubuntu-22.04
+    concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }}
     strategy:
-      fail-fast: false # allow other matrix jobs to continue even if one fails
-      matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
-        os_version:
+      fail-fast: false
+      matrix:
+        build:
           - RL8
           - RL9
-        build:
-          - openstack.openhpc
-          - openstack.openhpc-cuda
-        exclude:
-          - os_version: RL8
-            build: openstack.openhpc-cuda
+          - RL9-cuda
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
-      SOURCE_IMAGES_MAP: |
-        {
-          "RL8": {
-            "openstack.openhpc": "rocky-latest-RL8",
-            "openstack.openhpc-cuda": "rocky-latest-cuda-RL8"
-          },
-          "RL9": {
-            "openstack.openhpc": "rocky-latest-RL9",
-            "openstack.openhpc-cuda": "rocky-latest-cuda-RL9"
-          }
-        }
-
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
+      IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
     steps:
       - uses: actions/checkout@v2
 
-      - name: Record settings for CI cloud
+      - name: Record which cloud CI is running on
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
-      - name: Setup ssh
+      - name: setup environment
         run: |
-          set -x
-          mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
         shell: bash
-
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
-        shell: bash
-
-      - name: Install ansible etc
-        run: dev/setup-env.sh
 
       - name: Write clouds.yaml
         run: |
@@ -74,47 +44,111 @@ jobs:
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
-      - name: Setup environment
+      - name: Write s3cmd configuration
+        run: |
+          echo "${{ secrets['ARCUS_S3CFG'] }}" > ~/.s3cfg
+        shell: bash
+
+      - name: Install s3cmd
+        run: |
+          sudo apt-get --yes install s3cmd
+
+      - name: Check for image in Arcus S3 bucket
+        id: s3_ls
+        run: |
+
+          TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
+          echo "target-image-${{ matrix.build }}=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
+
+          S3_IMAGES=$(s3cmd ls s3://openhpc-images)
+          
+          if echo "$S3_IMAGES" | grep -q "$TARGET_IMAGE"; then
+            echo "Image ${TARGET_IMAGE} is already present in S3."
+            echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "Image ${TARGET_IMAGE} is not present in S3."
+            echo "IMAGE_EXISTS=false" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      - name: Download image to runner
+        if: env.IMAGE_EXISTS == 'false'
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate
+          openstack image save --file ${{ env.TARGET_IMAGE }} ${{ env.TARGET_IMAGE }}
+        shell: bash
 
-      - name: Build fat image with packer
-        id: packer_build
+      - name: Conditionally Upload Image to S3
+        if: env.IMAGE_EXISTS == 'false'
         run: |
-          set -x
+          echo "Uploading Image: ${{ env.TARGET_IMAGE }} to S3..."
+          s3cmd put ${{ env.TARGET_IMAGE }}.qcow2 s3://openhpc-images
+        shell: bash
+
+  image_sync:
+    needs: image_upload
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.cloud }}-${{ matrix.build }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cloud:
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+        build:
+          - RL8
+          - RL9
+          - RL9-cuda
+        exclude: 
+          - cloud: LEAFCLOUD
+
+    env:
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ matrix.cloud }}
+      IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record which cloud CI is running on
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+
+      - name: setup environment
+        run: |
+          python3 -m venv venv
           . venv/bin/activate
-          . environments/.stackhpc/activate
-          cd packer/
-          packer init .
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+        shell: bash
 
-          PACKER_LOG=1 packer build \
-          -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -only=${{ matrix.build }} \
-          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
-          openstack.pkr.hcl
-        env:
-          PKR_VAR_os_version: ${{ matrix.os_version }}
-          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][matrix.build] }}
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
 
-      - name: Get created image names from manifest
-        id: manifest
+      - name: Retrieve image name
+        run: |
+          TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
+
+      - name: Upload latest image if missing
         run: |
           . venv/bin/activate
-          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
-          while ! openstack image show -f value -c name $IMAGE_ID; do
-            sleep 5
-          done
-          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
-          echo $IMAGE_ID > image-id.txt
-          echo $IMAGE_NAME > image-name.txt
+          bash .github/bin/get-s3-image.sh ${{ env.TARGET_IMAGE }} openhpc-images
 
-      - name: Upload manifest artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: image-details-${{ matrix.build }}-${{ matrix.os_version }}
-          path: |
-            ./image-id.txt
-            ./image-name.txt
-          overwrite: true
+      - name: Cleanup OpenStack Image (on error or cancellation)
+        if: cancelled()
+        run: |
+          . venv/bin/activate
+          image_hanging=$(openstack image list --name ${{ env.TARGET_IMAGE }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
+          if [ -n "$image_hanging" ]; then
+            echo "Cleaning up OpenStack image with ID: $image_hanging"
+            openstack image delete $image_hanging
+          else
+            echo "No image ID found, skipping cleanup."
+          fi
+        shell: bash
