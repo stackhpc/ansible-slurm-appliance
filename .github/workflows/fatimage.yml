@@ -83,7 +83,7 @@ jobs:
         if: env.IMAGE_EXISTS == 'false'
         run: |
           echo "Uploading Image: ${{ env.TARGET_IMAGE }} to S3..."
-          s3cmd put ${{ env.TARGET_IMAGE }}.qcow2 s3://openhpc-images-prerelease
+          s3cmd --multipart-chunk-size-mb=300 put ${{ env.TARGET_IMAGE }} s3://openhpc-images-prerelease
         shell: bash
 
   image_sync:
