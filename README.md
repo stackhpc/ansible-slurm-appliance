@@ -113,4 +113,4 @@ where the IP of the login node is given in `environments/$ENV/inventory/hosts.ym
 - `packer/`: Contains automation to use Packer to build compute nodes for an enviromment - see the README in this directory for further information.
 - `dev/`: Contains development tools.
 
-For further information see the [docs/](docs/) directory.
+For further information see the [docs](docs/) directory.
