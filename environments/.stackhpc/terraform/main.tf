@@ -28,12 +28,6 @@ variable "os_version" {
 variable "cluster_image" {
     description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
     type = map(string)
-    default = {
-        # https://github.com/stackhpc/ansible-slurm-appliance/pull/444
-        RL8: "openhpc-ofed-RL8-241002-1612-1ce702b1"
-        RL9: "openhpc-ofed-RL9-241003-1052-1ce702b1"
-        RL9-cuda: "openhpc-cuda-RL9-241002-1612-1ce702b1"
-    }
 }
 
 variable "cluster_net" {}
