@@ -44,11 +44,42 @@ jobs:
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
-      - name: Write s3cmd configuration
+      - name: Create EC2 credentials if not present
+        id: check_creds
         run: |
           . venv/bin/activate
-          S3_CREDS=$(openstack ec2 credentials create)
-          echo "$S3_CREDS" > ~/.s3cfg
+          # List existing EC2 credentials
+          existing_creds=$(openstack ec2 credentials list --format json)
+
+          # Check if the list is empty
+          if [ "$(echo "$existing_creds" | jq 'length')" -eq 0 ]; then
+            echo "No existing EC2 credentials found."
+            new_creds=$(openstack ec2 credentials create --format json)
+            access_key=$(echo "$new_creds" | jq -r '.Access')
+            secret_key=$(echo "$new_creds" | jq -r '.Secret')
+            echo "Created new EC2 credentials."
+          else
+            echo "Existing EC2 credentials found."
+            access_key=$(echo "$existing_creds" | jq -r '.[0].Access')
+            secret_key=$(echo "$existing_creds" | jq -r '.[0].Secret')
+          fi
+
+          # Save access and secret keys for the next step
+          echo "access_key=${access_key}" >> $GITHUB_ENV
+          echo "secret_key=${secret_key}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Write s3cmd configuration
+        run: |
+          cat <<EOF > ~/.s3cfg
+          [default]
+          host_base = https://object.arcus.openstack.hpc.cam.ac.uk
+          host_bucket = https://object.arcus.openstack.hpc.cam.ac.uk
+          access_key = ${{ env.access_key }}
+          secret_key = ${{ env.secret_key }}
+          use_https = True
+          signurl_use_https = True
+          EOF
         shell: bash
 
       - name: Install s3cmd
