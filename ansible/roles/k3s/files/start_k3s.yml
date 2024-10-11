@@ -8,7 +8,7 @@
   tasks:
     - name: Ensure password directory exists
       ansible.builtin.file: 
-        path: /etc/rancher/node"
+        path: "/etc/rancher/node"
         state: directory
         
     - name: Set agent node password as token # uses token to keep password consistent between reimages
