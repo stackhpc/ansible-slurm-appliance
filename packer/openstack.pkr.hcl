@@ -154,6 +154,12 @@ variable "groups" {
   }
 }
 
+variable "extra_image_name" {
+  type = string
+  description = "Infix for 'extra' build image name"
+  default = "extra"
+}
+
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
@@ -213,7 +219,7 @@ build {
   # Extended site-specific image, built on fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-extra"
-    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
+    image_name = "openhpc-${var.extra_image_name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   provisioner "ansible" {
