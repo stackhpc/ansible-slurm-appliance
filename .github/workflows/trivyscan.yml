@@ -1,0 +1,116 @@
+name: Trivy scan image for vulnerabilities
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+
+jobs:
+  scan:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + OS + build
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build: ["RL8", "RL9", "RL9-cuda"]
+    env:
+      JSON_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        shell: bash
+
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
+        shell: bash
+
+      - name: setup environment
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Parse image name json
+        id: manifest
+        run: |
+          IMAGE_NAME=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.JSON_PATH }}")
+          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Download image
+        run: |
+          . venv/bin/activate
+          sudo mkdir /mnt/images
+          sudo chmod 777 /mnt/images
+          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-name }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: install libguestfs
+        run: |
+          sudo apt -y update
+          sudo apt -y install libguestfs-tools
+
+      - name: mkdir for mount
+        run: sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
+
+      - name: mount qcow2 file
+        run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
+          scanners: "vuln"
+          format: sarif
+          output: "${{ steps.manifest.outputs.image-name }}.sarif"
+          # turn off secret scanning to speed things up
+          timeout: 15m
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
+          category: "${{ matrix.os_version }}-${{ matrix.build }}"
+
+      - name: Fail if scan has CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
+          scanners: "vuln"
+          format: table
+          exit-code: '1'
+          severity: 'CRITICAL'
+          ignore-unfixed: true
+          timeout: 15m
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
