@@ -56,26 +56,23 @@ To configure an "extra" image build, prepare a Packer variable definition file a
 
 - `extra_image_name`: A string to add into the final image name
 - `source_image` (or `source_image_name`): A map of strings keyed by RockyLinux variant, defining the base image.
-- `groups`: A mapping keyed by the build name defining the Ansible inventory groups which the build VM should be added to - which defines the roles/functionality which are
-added to the image.
+- `groups`: A mapping with a key "openhpc-extra" (i.e. the name of this Packer build) with a list of Ansible inventory groups to put the build VM into.
+  This defines the roles/functionality which are added to the image.
 
 E.g. to add the lustre client to an RockyLinux 9 image:
 
     # environments/site/lustre.pkvars.hcl
 
     extra_image_name = "lustre" # output image name will be like "openhpc-lustre-RL9-$timestamp-$commit"
-    source_image = {
-      # current StackHPC RL9 image:
-      RL9 = "openhpc-ofed-RL9-240906-1041-32568dbb"
-    }
+    source_image_name = "openhpc-ofed-RL9-240906-1041-32568dbb" # e.g. current StackHPC RL9 image
     groups = {
       openhpc-extra = ["lustre"] # only run lustre role during this extra build
     }
 
-    ... # define flavor, network, etc as normal
+    # ... define flavor, network, etc as normal
 
 
-Then, reference this file in the Packer build command:
+Then, reference this build and variables file in the Packer build command:
 
     PACKER_LOG=1 /usr/bin/packer build -only=openstack.openhpc-extra --on-error=ask -var-file=environments/site/lustre.pkvars.hcl openstack.pkr.hcl
 
