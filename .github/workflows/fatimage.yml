@@ -6,10 +6,35 @@ on:
       - main
     paths:
       - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+env:
+  S3_BUCKET: openhpc-images-prerelease
+  IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
 
 jobs:
+  s3_cleanup:
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.workflow }}-${{ github.ref }}
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Write s3cmd configuration
+        run: |
+          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
+        shell: bash
+
+      - name: Install s3cmd
+        run: |
+          sudo apt-get --yes install s3cmd
+      
+      - name: Cleanup S3 bucket
+        run: |
+          s3cmd rm s3://${{ env.S3_BUCKET }} --recursive --force
+
   image_upload:
     runs-on: ubuntu-22.04
+    needs: s3_cleanup
     concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }}
     strategy:
       fail-fast: false
@@ -22,7 +47,6 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
-      IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
     steps:
       - uses: actions/checkout@v2
 
@@ -53,37 +77,22 @@ jobs:
         run: |
           sudo apt-get --yes install s3cmd
 
-      - name: Check for image in Arcus S3 bucket
-        id: s3_ls
+      - name: Retrieve image name
         run: |
-          . venv/bin/activate
           TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
-          echo "target-image-${{ matrix.build }}=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
-
-          S3_IMAGES=$(s3cmd ls s3://openhpc-images-prerelease)
-
-          if echo "$S3_IMAGES" | grep -q "$TARGET_IMAGE"; then
-            echo "Image ${TARGET_IMAGE} is already present in S3."
-            echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "Image ${TARGET_IMAGE} is not present in S3."
-            echo "IMAGE_EXISTS=false" >> $GITHUB_ENV
-          fi
         shell: bash
 
       - name: Download image to runner
-        if: env.IMAGE_EXISTS == 'false'
         run: |
           . venv/bin/activate
           openstack image save --file ${{ env.TARGET_IMAGE }} ${{ env.TARGET_IMAGE }}
         shell: bash
 
-      - name: Conditionally Upload Image to S3
-        if: env.IMAGE_EXISTS == 'false'
+      - name: Upload Image to S3
         run: |
           echo "Uploading Image: ${{ env.TARGET_IMAGE }} to S3..."
-          s3cmd --multipart-chunk-size-mb=300 put ${{ env.TARGET_IMAGE }} s3://openhpc-images-prerelease
+          s3cmd --multipart-chunk-size-mb=150 put ${{ env.TARGET_IMAGE }} s3://${{ env.S3_BUCKET }}
         shell: bash
 
   image_sync:
@@ -108,7 +117,6 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ matrix.cloud }}
-      IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
     steps:
       - uses: actions/checkout@v2
 
@@ -138,7 +146,7 @@ jobs:
       - name: Download latest image if missing
         run: |
           . venv/bin/activate
-          bash .github/bin/get-s3-image.sh ${{ env.TARGET_IMAGE }} openhpc-images-prerelease
+          bash .github/bin/get-s3-image.sh ${{ env.TARGET_IMAGE }} ${{ env.S3_BUCKET }}
 
       - name: Cleanup OpenStack Image (on error or cancellation)
         if: cancelled()
