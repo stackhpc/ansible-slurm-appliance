@@ -47,21 +47,14 @@ variable "os_version" {
 
 # Must supply either source_image_name or source_image_id
 variable "source_image_name" {
-  type = map(string)
-  description = "name of source image, keyed from var.os_version"
-  default = {
-    RL8: "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2"
-    RL9: "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
-  }
+  type = string
+  description = "name of source image"
 }
 
 variable "source_image" {
-  type = map(string)
-  default = {
-    RL8: null
-    RL9: null
-  }
-  description = "UUID of source image, keyed from var.os_version"
+  type = string
+  default = null
+  description = "UUID of source image"
 }
 
 variable "flavor" {
@@ -132,8 +125,9 @@ variable "volume_size" {
   type = map(number)
   default = {
     # fat image builds, GB:
+    rocky-latest = 15
+    rocky-latest-cuda = 30
     openhpc = 15
-    openhpc-ofed = 15
     openhpc-cuda = 30
   }
 }
@@ -153,9 +147,10 @@ variable "groups" {
   description = "Additional inventory groups (other than 'builder') to add build VM to, keyed by source name"
   default = {
     # fat image builds:
+    rocky-latest = ["update", "ofed"]
+    rocky-latest-cuda = ["update", "ofed", "cuda"]
     openhpc = ["control", "compute", "login"]
-    openhpc-ofed = ["control", "compute", "login", "ofed"]
-    openhpc-cuda = ["control", "compute", "login", "ofed", "cuda"]
+    openhpc-cuda = ["control", "compute", "login"]
   }
 }
 
@@ -171,8 +166,8 @@ source "openstack" "openhpc" {
   security_groups = var.security_groups
   
   # Input image:
-  source_image = "${var.source_image[var.os_version]}"
-  source_image_name = "${var.source_image_name[var.os_version]}" # NB: must already exist in OpenStack
+  source_image = "${var.source_image}"
+  source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
   
   # SSH:
   ssh_username = var.ssh_username
@@ -186,29 +181,39 @@ source "openstack" "openhpc" {
   # Output image:
   image_disk_format = "qcow2"
   image_visibility = var.image_visibility
-  image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
+  
 }
 
 build {
 
-  # non-OFED fat image:
+  # latest nightly image:
   source "source.openstack.openhpc" {
-    name = "openhpc"
+    name = "rocky-latest"
+    image_name = "${source.name}-${var.os_version}"
+  }
+
+  # latest nightly cuda image:
+  source "source.openstack.openhpc" {
+    name = "rocky-latest-cuda"
+    image_name = "${source.name}-${var.os_version}"
   }
 
   # OFED fat image:
   source "source.openstack.openhpc" {
-    name = "openhpc-ofed"
+    name = "openhpc"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   # CUDA fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-cuda"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   # Extended site-specific image, built on fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-extra"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 
   provisioner "ansible" {
