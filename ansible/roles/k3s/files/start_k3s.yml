@@ -6,6 +6,11 @@
     k3s_server_name: "{{ os_metadata.meta.k3s_server }}"
     service_name: "{{ 'k3s-agent' if k3s_server_name is defined else 'k3s' }}"
   tasks:
+    - name: Ensure password directory exists
+      ansible.builtin.file: 
+        path: "/etc/rancher/node"
+        state: directory
+        
     - name: Set agent node password as token # uses token to keep password consistent between reimages
       ansible.builtin.copy:
         dest: /etc/rancher/node/password
