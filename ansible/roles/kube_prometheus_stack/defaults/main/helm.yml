@@ -43,7 +43,7 @@ kube_prometheus_stack_prometheus_external_url: >-
     else ""
   }}
 
-control_hostname: "{{ openhpc_cluster_name + '-control.'+ openhpc_cluster_name + '.' + cluster_domain_suffix | lower }}"
+control_hostname: "{{ ( openhpc_cluster_name + '-control.'+ openhpc_cluster_name + '.' + cluster_domain_suffix ) | lower }}"
 
 # The values for the kube-prometheus-stack release
 kube_prometheus_stack_release_defaults:
