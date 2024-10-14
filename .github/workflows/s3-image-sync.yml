@@ -54,7 +54,7 @@ jobs:
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
-      - name: setup environment
+      - name: Setup environment
         run: |
           python3 -m venv venv
           . venv/bin/activate
@@ -124,7 +124,7 @@ jobs:
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
-      - name: setup environment
+      - name: Setup environment
         run: |
           python3 -m venv venv
           . venv/bin/activate
@@ -149,7 +149,7 @@ jobs:
           bash .github/bin/get-s3-image.sh ${{ env.TARGET_IMAGE }} ${{ env.S3_BUCKET }}
 
       - name: Cleanup OpenStack Image (on error or cancellation)
-        if: cancelled()
+        if: cancelled() || failure()
         run: |
           . venv/bin/activate
           image_hanging=$(openstack image list --name ${{ env.TARGET_IMAGE }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
