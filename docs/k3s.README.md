@@ -5,4 +5,4 @@ access to the Kubernetes API. The `k3s` role installs Helm for package managemen
 
 # Idempotency
 K3s is intended to only be installed during image build as it is configured by the appliance on first boot with `azimuth_cloud.image_utils.linux_ansible_init`. Therefore, the `k3s` role isn't
-idempotent and changes to variables will not be reflected in the image when running `site.yml`. An additional consequence of this is that for changes to role variables to be correctly applied during build, a base image which has `ansible-init` installed but not existing K3s instances must be used.
+idempotent and changes to variables will not be reflected in the image when running `site.yml`. An additional consequence of this is that for changes to role variables to be correctly applied when extending a base image with a Packer `openhpc-extra` build, the base image must have `ansible-init` installed but not existing K3s instances.
