@@ -1,0 +1,25 @@
+name: Upload CI-tested images to Arcus S3 and sync clouds
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+env:
+  S3_BUCKET: openhpc-images-prerelease
+  IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+
+jobs:
+  s3_cleanup:
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.workflow }}-${{ github.ref }}
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Write s3cmd configuration
+        run: |
+          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
+        shell: bash
