@@ -47,12 +47,15 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
+    outputs:
+      ci_cloud: ${{ steps.ci.outputs.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Record which cloud CI is running on
+        id: ci
         run: |
-          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo "CI_CLOUD=${{ env.CI_CLOUD }}" >> "$GITHUB_OUTPUT"
 
       - name: Setup environment
         run: |
@@ -111,7 +114,7 @@ jobs:
           - RL9
           - RL9-cuda
         exclude: 
-          - cloud: LEAFCLOUD
+          - cloud: ${{ needs.image_upload.outputs.ci_cloud }}
 
     env:
       ANSIBLE_FORCE_COLOR: True
