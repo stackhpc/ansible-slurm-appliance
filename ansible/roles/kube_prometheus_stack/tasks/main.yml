@@ -189,7 +189,7 @@
     release_namespace: "{{ kube_prometheus_stack_release_namespace }}"
     release_name: "{{ kube_prometheus_stack_release_name }}"
     release_values: "{{ kube_prometheus_stack_release_values }}"
-    atomic: yes
+    atomic: no
     create_namespace: no
     wait: yes
     wait_timeout: "{{ kube_prometheus_stack_wait_timeout }}"
