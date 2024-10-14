@@ -53,7 +53,7 @@ jobs:
           bash .github/bin/get-s3-image.sh ${{ inputs.image_name }} ${{ inputs.bucket_name }}
 
       - name: Cleanup OpenStack Image (on error or cancellation)
-        if: cancelled()
+        if: cancelled() || failure()
         run: |
           . venv/bin/activate
           image_hanging=$(openstack image list --name ${{ inputs.image_name }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
