@@ -465,3 +465,14 @@ alertmanager_image_tag: v0.27.0
 alertmanager_template_files: {}
 
 # alertmanager_http_config: {}
+
+### Previous node exporter vars
+
+node_exporter_image_tag: v1.8.2
+
+# node_exporter_tls_server_config: {}
+
+# node_exporter_http_server_config: {}
+
+# node_exporter_basic_auth_users: {}
+

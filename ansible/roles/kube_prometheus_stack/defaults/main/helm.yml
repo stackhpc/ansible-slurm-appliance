@@ -169,6 +169,10 @@ kube_prometheus_stack_release_defaults:
     nodeSelector:
         kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
 
+  prometheus-node-exporter:
+    image:
+      tag: "{{ node_exporter_image_tag }}"
+
 kube_prometheus_stack_release_overrides: {}
 
 kube_prometheus_stack_release_values: >-
