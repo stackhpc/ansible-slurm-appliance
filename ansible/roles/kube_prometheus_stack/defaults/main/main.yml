@@ -27,21 +27,10 @@ slack_integration:
 alertmanager_config:
   route:
     group_by: ['...']
-    receiver: slack-receiver
   global:
     resolve_timeout: "{{ prometheus_config_flags_extra.alertmanager.timeout | default( '5m' ) }}"
   receivers:
     - name: 'null'
-    - name: slack-receiver
-      slack_configs:
-        - channel: "{{ slack_integration.channel }}"
-          api_url: https://slack.com/api/chat.postMessage
-          http_config:
-            authorization:
-              credentials: "{{ slack_integration.app_creds }}"
-          text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
-          title_link: "http://{{ control_ip }}/alertmanager/#/alerts?receiver=slack-receiver"
-          send_resolved: true
 
 alertmanager_replicas: 1
 

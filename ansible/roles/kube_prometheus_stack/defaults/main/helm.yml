@@ -43,6 +43,8 @@ kube_prometheus_stack_prometheus_external_url: >-
     else ""
   }}
 
+control_hostname: "{{ openhpc_cluster_name + '-control.'+ openhpc_cluster_name + '.' + cluster_domain_suffix | lower }}"
+
 # The values for the kube-prometheus-stack release
 kube_prometheus_stack_release_defaults:
   defaultRules:
@@ -89,7 +91,7 @@ kube_prometheus_stack_release_defaults:
         runAsGroup: 0
         fsGroup: 0
       nodeSelector:
-        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+        kubernetes.io/hostname: "{{ control_hostname }}"
 
   additionalPrometheusRulesMap: "{{ prometheus_alert_rules }}"
                 
@@ -120,7 +122,7 @@ kube_prometheus_stack_release_defaults:
     additionalDataSources: "{{ grafana_datasources }}"
     plugins: "{{ grafana_plugins }}"
     nodeSelector:
-        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+        kubernetes.io/hostname: "{{ control_hostname }}"
     persistence:
       type: pvc
       enabled: true
@@ -153,7 +155,7 @@ kube_prometheus_stack_release_defaults:
       alertmanagerConfigMatcherStrategy:
         type: None
       nodeSelector:
-        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+        kubernetes.io/hostname: "{{ control_hostname }}"
       scheme: "{{ prometheus_alertmanager_config.scheme | default( '' ) }}"
     serviceMonitor:
       scheme: "{{ prometheus_alertmanager_config.scheme | default( '' ) }}"
@@ -163,11 +165,11 @@ kube_prometheus_stack_release_defaults:
   
   prometheusOperator:
     nodeSelector:
-        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+        kubernetes.io/hostname: "{{ control_hostname }}"
   
   kube-state-metrics:
     nodeSelector:
-        kubernetes.io/hostname: "{{ openhpc_cluster_name }}-control.{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"
+        kubernetes.io/hostname: "{{ control_hostname }}"
 
   prometheus-node-exporter:
     image:
