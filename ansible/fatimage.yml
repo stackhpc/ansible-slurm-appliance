@@ -101,12 +101,6 @@
         tasks_from: install.yml
       when: "'filebeat' in group_names"
 
-    - import_role:
-      # can't only run cloudalchemy.node_exporter/tasks/install.yml as needs vars from preflight.yml and triggers service start
-      # however starting node exporter is ok
-        name: cloudalchemy.node_exporter
-      when: "'node_exporter' in group_names"
-
     - name: openondemand exporter
       dnf:
         name: ondemand_exporter
@@ -119,72 +113,6 @@
       vars:
         slurm_exporter_state: stopped
       when: "'slurm_exporter' in group_names"
-
-- hosts: prometheus
-  become: yes
-  gather_facts: yes
-  tasks:
-    - import_role:
-        name: cloudalchemy.prometheus
-        tasks_from: preflight.yml
-
-    # can't run cloudalchemy.prometheus/tasks/install.yml as it triggers a unit start
-    # so below is a partial extraction of this:
-    - name: create prometheus system group
-      group:
-        name: prometheus
-        system: true
-        state: present
-
-    - name: create prometheus system user
-      user:
-        name: prometheus
-        system: true
-        shell: "/usr/sbin/nologin"
-        group: prometheus
-        createhome: false
-        home: "{{ prometheus_db_dir }}"
-
-    - name: download prometheus binary to local folder
-      become: false
-      get_url:
-        url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
-        dest: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
-        checksum: "sha256:{{ __prometheus_checksum }}"
-      register: _download_archive
-      until: _download_archive is succeeded
-      retries: 5
-      delay: 2
-
-    - name: unpack prometheus binaries
-      become: false
-      unarchive:
-        remote_src: yes
-        src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
-        dest: "/tmp"
-        creates: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/prometheus"
-
-    - name: propagate official prometheus and promtool binaries
-      copy:
-        remote_src: yes
-        src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}"
-        dest: "{{ _prometheus_binary_install_dir }}/{{ item }}"
-        mode: 0755
-        owner: root
-        group: root
-      with_items:
-        - prometheus
-        - promtool
-
-- hosts: grafana
-  become: yes
-  gather_facts: yes
-  tasks:
-    - name: Include distribution variables for cloudalchemy.grafana
-      include_vars: "{{ appliances_repository_root }}/ansible/roles/cloudalchemy.grafana/vars/redhat.yml"
-    - import_role:
-        name: cloudalchemy.grafana
-        tasks_from: install.yml
 
 - name: Run post.yml hook
   vars:
