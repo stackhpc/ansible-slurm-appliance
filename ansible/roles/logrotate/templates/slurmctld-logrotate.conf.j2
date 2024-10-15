@@ -1,0 +1,16 @@
+{{ openhpc_config_extra.SlurmctldLogFile }} {
+    compress
+    missingok
+    nocopytruncate
+    nodelaycompress
+    nomail
+    notifempty
+    noolddir
+    rotate 5
+    sharedscripts
+    size 5M
+    create 600 slurm root
+    postrotate
+        pkill -x --signal SIGUSR2 slurmctld
+    endscript
+}
