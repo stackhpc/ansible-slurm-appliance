@@ -46,7 +46,7 @@
           app.kubernetes.io/name: prometheus-dir
       spec:
         capacity:
-          storage: "{{ kube_prometheus_stack_volume_size }}"
+          storage: "{{ prometheus_volume_size }}"
         accessModes:
         - ReadWriteOnce
         hostPath:
@@ -65,7 +65,7 @@
           app.kubernetes.io/name: grafana-dir
       spec:
         capacity:
-          storage: "{{ grafana_claim_size }}"
+          storage: "{{ grafana_volume_size }}"
         accessModes:
         - ReadWriteOnce
         hostPath:
@@ -85,7 +85,7 @@
         - ReadWriteOnce
         resources:
           requests:
-            storage: "{{ grafana_claim_size }}"
+            storage: "{{ grafana_volume_size }}"
         volumeMode: Filesystem
         volumeName: grafana-dir
 

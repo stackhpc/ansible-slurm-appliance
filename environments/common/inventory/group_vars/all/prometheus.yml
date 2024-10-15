@@ -1,26 +1,12 @@
----
+# Must be within K3s' reserved port range (default 30000-32767)
+prometheus_port: 30000
 
-# See: https://github.com/cloudalchemy/ansible-prometheus
-# for variable definitions
+prometheus_image_tag: "v2.27.0"
 
-prometheus_version: 2.27.0 # default from ansible/roles/cloudalchemy.prometheus/defaults/main.yml
-prometheus_web_external_url: "http://{{ prometheus_address }}:9090"
-prometheus_storage_retention: "31d"
-prometheus_storage_retention_size: "100GB"
-prometheus_db_dir: "{{ appliances_state_dir | default('/var/lib') }}/prometheus"
-
-prometheus_alertmanager_config: []
-
-prometheus_alert_rules_files:
-- "{{ appliances_repository_root }}/environments/common/files/prometheus/rules/*.rules"
-
-prometheus_alert_rules: []
-
-# Can set a hostvar 'env' to an arbitrary string to group prometheus targets, e.g. rack.
-# env: location-1
-prometheus_targets:
-  node: "{{ groups.get('node_exporter', []) | reject('equalto', 'localhost') | prometheus_node_exporter_targets(env | default('ungrouped')) }}"
-
+prometheus_db_dir: "{{ appliances_state_dir }}/prometheus"
+prometheus_storage_retention: "30d"
+prometheus_volume_size: 40Gi
+prometheus_storage_retention_size: "40GB"
 prometheus_scrape_configs_default:
 - job_name: "slurm_exporter"
   scrape_interval: 30s
@@ -28,7 +14,20 @@ prometheus_scrape_configs_default:
   static_configs:
     - targets:
       - "{{ control_ip }}:{{ slurm_exporter_port }}"
-
-kube_prometheus_stack_release_namespace: monitoring-system
+  relabel_configs:
+  # strip off port
+  - source_labels: ['__address__']
+    separator:     ':'
+    regex:         '(.*):.*'
+    target_label:  'instance'
+    replacement:   '${1}'
 
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"
+prometheus_extra_alert_rules:
+  - alert: SlurmNodeDown
+    annotations:
+      message: '{% raw %}{{ $value }} Slurm nodes are in down status.{% endraw %}'
+      summary: 'At least one Slurm node is down.'
+    expr: "slurm_nodes_down > 0\n"
+    labels:
+      severity: critical

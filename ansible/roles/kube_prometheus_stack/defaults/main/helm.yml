@@ -73,7 +73,7 @@ kube_prometheus_stack_release_defaults:
               - ReadWriteOnce
             resources:
               requests:
-                storage: "{{ kube_prometheus_stack_volume_size }}"
+                storage: "{{ prometheus_volume_size }}"
       retention: "{{ prometheus_storage_retention }}"
       retentionSize: "{{ prometheus_storage_retention_size }}"
       additionalAlertRelabelConfigs: "{{ prometheus_alert_relabel_configs }}"
@@ -102,7 +102,7 @@ kube_prometheus_stack_release_defaults:
     serviceMonitor:
       enabled: false
     ingress:
-      path: "/node/{{ groups['grafana'].0 }}/{{ grafana_port }}"
+      path: "/node/{{ groups['prometheus'].0 }}/{{ grafana_port }}"
     sidecar:
       dashboards:
         searchNamespace: ALL
@@ -113,7 +113,7 @@ kube_prometheus_stack_release_defaults:
         serve_from_sub_path: true
       auth: "{{ grafana_auth }}"
       auth.anonymous:
-        enabled: "{{ grafana_anonymous_auth }}"
+        enabled: "{{ grafana_auth_anonymous }}"
       analytics: "{{ grafana_analytics }}"
       smtp: "{{ grafana_smtp }}"
       log: "{{ grafana_log }}"
