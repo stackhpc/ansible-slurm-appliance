@@ -1,0 +1,27 @@
+# An ansible playbook to configure the SSHD configuration to enable CA cert auth for SSH.
+# Remember to export CI_CLOUD if it isn't part of your environment's variables.
+
+# NOTE: Change the src for the `ssh_signing_key.pub` to be your corresponding directory.
+
+- hosts: login
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Copy ssh public key
+      ansible.builtin.copy:
+        src: /var/lib/rocky/conch/ssh_signing_key.pub
+        dest: /etc/ssh/ca_user_key.pub
+        owner: root
+        group: root
+        mode: '0644'
+        remote_src: true
+        
+    - name: Ensure CA Certs are accepted
+      ansible.builtin.lineinfile:
+        line: 'TrustedUserCAKeys /etc/ssh/ca_user_key.pub'
+        dest: /etc/ssh/sshd_config
+
+    - name: Restart SSH service
+      ansible.builtin.systemd:
+        name: sshd
+        state: restarted
