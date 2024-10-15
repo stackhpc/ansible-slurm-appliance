@@ -1,15 +1,12 @@
 ---
-
-grafana_address: "0.0.0.0"
-grafana_port: 80
+grafana_port: 30001
 
 # External Grafana address. Variable maps to "root_url" in grafana server section
 grafana_url: "http://{{ grafana_address }}:{{ grafana_port }}"
 grafana_api_url: "{{ grafana_url }}"
 
 grafana_security:
-  admin_user: admin
-  admin_password: ""
+  admin_user: grafana
+  admin_password: "{{ vault_grafana_admin_password }}"
 
-grafana_data_dir: "/var/lib/grafana"
-grafana_dashboards_dir: "dashboards"
+grafana_data_dir: "{{ appliances_state_dir | default('/var/lib') }}/grafana"
