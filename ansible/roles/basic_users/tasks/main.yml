@@ -7,7 +7,16 @@
     label: "{{ item.name }}"
   when:
     - "item.state | default('present') == 'absent'"
-  
+
+- name: Stop sssd if required
+  systemd:
+    name: sssd
+    state: stopped
+  register: _stop_sssd
+  when:
+    - "'sssd' in group_names"
+    - basic_users_override_sssd | bool
+
 - name: Create groups
   ansible.builtin.group: "{{ item }}"
   loop:  "{{ basic_users_groups }}"
@@ -18,6 +27,12 @@
   loop_control:
     label: "{{ item.name }} [{{ item.state | default('present') }}]"
   register: basic_users_info
+
+- name: Restart sssd if required
+  systemd:
+    name: sssd
+    state: started
+  when: _stop_sssd.changed | default(false)
 
 - name: Write supplied public key as authorized for SSH access
   authorized_key:

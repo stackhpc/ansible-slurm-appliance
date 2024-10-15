@@ -58,4 +58,7 @@ roles/*
 !roles/squid/**
 !roles/tuned/
 !roles/tuned/**
-
+!roles/sssd/
+!roles/sssd/**
+!roles/sshd/
+!roles/sshd/**

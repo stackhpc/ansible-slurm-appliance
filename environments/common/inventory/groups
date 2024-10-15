@@ -135,3 +135,6 @@ freeipa_client
 
 [ansible_init]
 # Hosts to run linux-anisble-init
+
+[sssd]
+# Hosts to configure sssd on
