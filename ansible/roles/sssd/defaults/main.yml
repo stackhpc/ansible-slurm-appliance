@@ -1,0 +1,11 @@
+---
+# Package state; use `present` to make sure it's installed, or `latest`
+# if you want to upgrade or switch versions using a new repo.
+sssd_packages_state: present
+
+# Choose if you want to enable the pam_mkhomedir module to auto-create
+# user home directories on successful login
+sssd_enable_mkhomedir: false
+
+# Default sssd configuration template
+sssd_conf_template: "sssd.conf.j2"

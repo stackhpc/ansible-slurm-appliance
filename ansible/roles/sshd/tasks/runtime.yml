@@ -1,0 +1,12 @@
+---
+
+- name: Disallow SSH password authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication {{ 'yes' if sshd_password_authentication | bool else 'no' }}"
+    state: present
+    validate: sshd -t -f %s
+  notify:
+    - Restart sshd
+  become: true

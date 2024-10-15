@@ -1,0 +1,11 @@
+---
+- name: "Ensure sssd packages are installed"
+  package:
+    name: "{{ sssd_packages }}"
+    state: "{{ sssd_packages_state }}"
+
+- name: "Ensure mkhomedir packages are installed if requested"
+  package:
+    name: "{{ sssd_mkhomedir_packages }}"
+    state: "{{ sssd_packages_state }}"
+  when: sssd_enable_mkhomedir | bool

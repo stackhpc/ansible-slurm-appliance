@@ -1,0 +1,12 @@
+---
+
+
+- name: Install dependencies
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - krb5-workstation
+    - krb5-libs
+    - realmd
