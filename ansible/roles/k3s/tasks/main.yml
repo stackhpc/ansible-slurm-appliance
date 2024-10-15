@@ -28,8 +28,8 @@
       INSTALL_K3S_BIN_DIR: "/usr/bin"
     changed_when: true
     loop:
-      - server --disable=traefik
-      - agent
+      - server --disable=traefik --node-label clusterrole=server
+      - agent --node-label clusterrole=agent
 
 - name: Install helm
   unarchive:
