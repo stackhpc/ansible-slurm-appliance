@@ -14,6 +14,8 @@ module "compute" {
   vnic_type = lookup(each.value, "vnic_type", var.vnic_type)
   vnic_profile = lookup(each.value, "vnic_profile", var.vnic_profile)
   key_pair = var.key_pair
+  volumes = lookup(each.value, "volumes", {})
+
   environment_root = var.environment_root
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
 }

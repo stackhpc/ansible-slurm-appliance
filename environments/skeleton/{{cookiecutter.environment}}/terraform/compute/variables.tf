@@ -64,6 +64,17 @@ variable "root_volume_size" {
     default = 40
 }
 
+variable "volumes" {
+    description = <<-EOF
+        Mapping defining volumes to create and attach.
+        Keys are unique volume name.
+        Values are a mapping with:
+            size: Size of volume in GB
+        EOF
+    type = any
+    default = {}
+}
+
 variable "security_group_ids" {
     type = list
 }
