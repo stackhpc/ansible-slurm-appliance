@@ -130,7 +130,7 @@ host in the `cuda` inventory group:
 
 # Ad-hoc Commands and Playbooks
 
-"Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
+A set of utility playbooks for managing a running appliance are provided in `ansible/adhoc` - run these by activating the environment and using:
 
         ansible-playbook ansible/adhoc/$PLAYBOOK
 
