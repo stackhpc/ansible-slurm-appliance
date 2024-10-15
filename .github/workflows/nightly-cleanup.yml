@@ -11,7 +11,7 @@ on:
             - SMS
             - ARCUS
   schedule:
-    - cron: '0 4 * * *'  # Run at 4AM - image sync runs at midnight
+    - cron: '0 20 * * *'  # Run at 8PM - image sync runs at midnight
 
 jobs:
   ci_cleanup:
