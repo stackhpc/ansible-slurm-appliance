@@ -43,7 +43,6 @@ The following operating systems are supported for the deploy host:
 
 - Rocky Linux 9
 - Rocky Linux 8
-- Ubuntu 22.04
 
 These instructions assume the deployment host is running Rocky Linux 8:
 
@@ -93,7 +92,7 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
     }
 
 Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables
-and descriptions see `environments/$ENV/terraform/terrraform.tfvars`.
+and descriptions see `environments/$ENV/terraform/terraform.tfvars`.
 
 ### Deploy appliance
 
@@ -110,7 +109,7 @@ where the IP of the login node is given in `environments/$ENV/inventory/hosts.ym
 
 - `environments/`: See [docs/environments.md](docs/environments.md).
 - `ansible/`: Contains the ansible playbooks to configure the infrastruture.
-- `packer/`: Contains automation to use Packer to build compute nodes for an enviromment - see the README in this directory for further information.
+- `packer/`: Contains automation to use Packer to build machine images for an enviromment - see the README in this directory for further information.
 - `dev/`: Contains development tools.
 
 For further information see the [docs](docs/) directory.

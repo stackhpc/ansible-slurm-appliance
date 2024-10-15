@@ -128,14 +128,21 @@ host in the `cuda` inventory group:
 
 **NB:** This test is not launched through Slurm, so confirm nodes are free/out of service or use `--limit` appropriately.
 
-# Ad-hoc Commands
+# Ad-hoc Commands and Playbooks
 
-5. "Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
+"Utility" playbooks for managing a running appliance are contained in `ansible/adhoc` - run these by activating the environment and using:
 
         ansible-playbook ansible/adhoc/$PLAYBOOK
 
-   Currently they include the following (see each playbook for links to documentation):
-    - `hpctests.yml`: MPI-based cluster tests for latency, bandwidth and floating point performance.
-    - `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for reimaging nodes on an in-production cluster).
-    - `restart-slurm.yml`: Restart all Slurm daemons in the correct order.
-    - `update-packages.yml`: Update specified packages on cluster nodes (NB: not recommended for routine use).
+Currently they include the following (see each playbook for links to documentation):
+
+- `hpctests.yml`: MPI-based cluster tests for latency, bandwidth and floating point performance.
+- `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for reimaging nodes on an in-production cluster).
+- `restart-slurm.yml`: Restart all Slurm daemons in the correct order.
+- `update-packages.yml`: Update specified packages on cluster nodes (NB: not recommended for routine use).
+
+The `ansible` binary [can be used](https://docs.ansible.com/ansible/latest/command_guide/intro_adhoc.html) to run arbitrary shell commands against inventory groups or hosts, for example:
+
+    ansible [--become] <group/host> -m shell -a "<shell command>"
+
+This can be useful for debugging and development but any modifications made this way will be lost if nodes are rebuilt/reimaged.
