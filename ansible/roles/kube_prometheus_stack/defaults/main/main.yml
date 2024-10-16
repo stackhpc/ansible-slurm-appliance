@@ -126,13 +126,13 @@ prometheus_scrape_configs:
 #   - prometheus/targets/*.yml
 #   - prometheus/targets/*.json
 
-prometheus_extra_alert_rules: []
+prometheus_extra_rules: []
 
-prometheus_alert_rules:
+prometheus_rules:
   appliance-rules:
     groups:
     - name: all
-      rules: "{{ prometheus_extra_alert_rules }}" 
+      rules: "{{ prometheus_extra_rules }}" 
 
 # ------------------------------------------------------------------------------------------
 

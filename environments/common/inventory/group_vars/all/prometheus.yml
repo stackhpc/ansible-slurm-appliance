@@ -23,7 +23,7 @@ prometheus_scrape_configs_default:
     replacement:   '${1}'
 
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"
-prometheus_extra_alert_rules:
+prometheus_extra_rules:
   - alert: SlurmNodeDown
     annotations:
       message: '{% raw %}{{ $value }} Slurm nodes are in down status.{% endraw %}'
@@ -31,3 +31,17 @@ prometheus_extra_alert_rules:
     expr: "slurm_nodes_down > 0\n"
     labels:
       severity: critical
+  - record: node_cpu_system_seconds:record
+    expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="system",job="node-exporter"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node-exporter"}[60s])))
+  - record: node_cpu_user_seconds:record
+    expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="user",job="node-exporter"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node-exporter"}[60s])))
+  - record: node_cpu_iowait_seconds:record
+    expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="iowait",job="node-exporter"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node-exporter"}[60s])))
+  - record: node_cpu_other_seconds:record
+    expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode!="idle",mode!="user",mode!="system",mode!="iowait",job="node-exporter"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node-exporter"}[60s])))
+  - record: node_cpu_scaling_frequency_hertz_avg:record # frequency rules aren't working
+    expr: avg by (instance) (node_cpu_scaling_frequency_hertz)
+  - record: node_cpu_scaling_frequency_hertz_min:record
+    expr: min by (instance) (node_cpu_scaling_frequency_hertz)
+  - record: node_cpu_scaling_frequency_hertz_max:record
+    expr: max by (instance) (node_cpu_scaling_frequency_hertz)

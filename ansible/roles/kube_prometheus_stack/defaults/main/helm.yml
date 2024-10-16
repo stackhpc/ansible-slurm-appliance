@@ -91,7 +91,7 @@ kube_prometheus_stack_release_defaults:
       nodeSelector:
         clusterrole: "server"
 
-  additionalPrometheusRulesMap: "{{ prometheus_alert_rules }}"
+  additionalPrometheusRulesMap: "{{ prometheus_rules }}"
                 
   grafana:
     service:
