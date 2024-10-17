@@ -16,7 +16,7 @@ on:
 jobs:
   ci_cleanup:
     name: ci-cleanup
-    concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.cloud }}-${{ matrix.build }}
+    concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.cloud }}
     strategy:
       fail-fast: false
       matrix:
@@ -62,7 +62,7 @@ jobs:
           for cluster_prefix in ${CI_CLUSTERS}
           do
             TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
-            if [[ TAGS =~ "keep" ]]; then
+            if [[ $TAGS =~ "keep" ]]; then
               echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
             else
               yes | ./dev/delete-cluster.py ${cluster_prefix}
