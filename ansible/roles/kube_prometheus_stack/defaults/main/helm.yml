@@ -172,6 +172,19 @@ kube_prometheus_stack_release_defaults:
   prometheus-node-exporter:
     image:
       tag: "{{ node_exporter_image_tag }}"
+    prometheus:
+      monitor:
+        relabelings:
+          # relabels instances to hostnames with suffixes stripped
+          - sourceLabels: [__meta_kubernetes_pod_node_name]
+            separator: ;
+            regex: ([^.]+).*
+            targetLabel: instance
+            replacement: $1
+            action: replace
+        metricRelabelings:
+          - targetLabel: cluster_env
+            replacement: ungrouped
 
 kube_prometheus_stack_release_overrides: {}
 
