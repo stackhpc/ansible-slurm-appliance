@@ -161,6 +161,7 @@ source "openstack" "openhpc" {
   volume_type = var.volume_type
   volume_size = var.volume_size[source.name]
   metadata = var.metadata
+  instance_metadata = {ansible_init_disable = "true"}
   networks = var.networks
   floating_ip_network = var.floating_ip_network
   security_groups = var.security_groups
