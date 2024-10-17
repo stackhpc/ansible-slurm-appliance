@@ -12,6 +12,8 @@ on:
       - '!docs/**'
       - '!README.md'
       - '!.gitignore'
+      - '!.github/workflows/'
+      - '.github/workflows/stackhpc'
   pull_request:
     paths:
       - '**'
@@ -20,6 +22,8 @@ on:
       - '!docs/**'
       - '!README.md'
       - '!.gitignore'
+      - '!.github/workflows/'
+      - '.github/workflows/stackhpc'
 jobs:
   openstack:
     name: openstack-ci
