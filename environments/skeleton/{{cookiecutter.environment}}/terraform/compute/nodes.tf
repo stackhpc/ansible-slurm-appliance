@@ -46,6 +46,8 @@ resource "openstack_compute_instance_v2" "compute" {
 
   metadata = {
     environment_root = var.environment_root
+    k3s_token = var.k3s_token
+    k3s_server = var.k3s_server
   }
 
   user_data = <<-EOF

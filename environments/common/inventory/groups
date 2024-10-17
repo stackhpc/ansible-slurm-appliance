@@ -36,12 +36,6 @@ mysql
 [prometheus]
 # Single node to host monitoring server.
 
-[grafana]
-# Single node to host monitoring dashboards.
-
-[alertmanager]
-# TODO:
-
 [opensearch]
 # Single node to host ElasticSearch search engine for Slurm monitoring.
 
@@ -57,9 +51,6 @@ mysql
 
 [mysql]
 # Single node to run database used for Slurm accounting.
-
-[node_exporter]
-# All hosts to monitor for hardware and OS metrics.
 
 [selinux:children]
 # All hosts requiring control of SELinux status.
@@ -100,7 +91,6 @@ fail2ban
 [systemd:children]
 # Hosts to make systemd unit adjustments on
 opensearch
-grafana
 control
 prometheus
 
@@ -135,3 +125,9 @@ freeipa_client
 
 [ansible_init]
 # Hosts to run linux-anisble-init
+
+[k3s]
+# Hosts to run k3s server/agent
+
+[k9s]
+# Hosts to install k9s on

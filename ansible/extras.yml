@@ -36,3 +36,10 @@
   tasks:
     - import_role:
         name: persist_hostkeys
+
+- name: Install k9s
+  become: yes
+  hosts: k9s
+  tasks:
+  - import_role:
+      name: k9s

@@ -24,8 +24,8 @@ output "cluster_nodes" {
         }
       },
       {
-        name          = openstack_compute_instance_v2.control.name
-        ip            = openstack_compute_instance_v2.control.network[0].fixed_ip_v4
+        name          = openstack_compute_instance_v2.control["control"].name
+        ip            = openstack_compute_instance_v2.control["control"].network[0].fixed_ip_v4
         groups        = ["control", "{{ cluster_name }}_control"],
         facts  = {
           openstack_project_id = data.openstack_identity_auth_scope_v3.scope.project_id

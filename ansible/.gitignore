@@ -58,4 +58,9 @@ roles/*
 !roles/squid/**
 !roles/tuned/
 !roles/tuned/**
-
+!roles/k3s/
+!roles/k3s/**
+!roles/k9s/
+!roles/k9s/**
+!roles/kube_prometheus_stack
+!roles/kube_prometheus_stack/**

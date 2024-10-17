@@ -7,15 +7,6 @@ control
 [prometheus:children]
 control
 
-[grafana:children]
-control
-
-[alertmanager:children]
-control
-
-[node_exporter:children]
-cluster
-
 [opensearch:children]
 control
 
@@ -81,3 +72,11 @@ openhpc
 [ansible_init:children]
 # Hosts to run ansible-init
 cluster
+
+[k3s:children]
+# Hosts to run k3s server/agent
+openhpc
+
+[k9s:children]
+control
+

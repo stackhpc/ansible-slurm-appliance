@@ -18,7 +18,7 @@ api_address: "{{ inventory_hostname }}"
 opensearch_address: "127.0.0.1"
 prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
-grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
+grafana_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 
 ############################# bootstrap: local user configuration #########################
 
@@ -50,29 +50,6 @@ appliances_local_users_default:
         shell: /sbin/nologin
         uid: 202
         system: true
-    
-    - group:
-        name: prometheus
-        gid: 976
-      user:
-        name: prometheus
-        uid: 981
-        home: "{{ prometheus_db_dir }}"
-        shell: /usr/sbin/nologin
-        system: true
-      enable: "{{ 'prometheus' in group_names }}"
-    
-    - group:
-        name: grafana
-        gid: 979
-      user:
-        name: grafana
-        comment: grafana user
-        uid: 984
-        home: /usr/share/grafana
-        shell: /sbin/nologin
-        system: true
-      enable: "{{ 'grafana' in group_names }}"
 
 # Overide this to add extra users whilst keeping the defaults.
 appliances_local_users_extra: [] # see format of appliances_local_users_default above
