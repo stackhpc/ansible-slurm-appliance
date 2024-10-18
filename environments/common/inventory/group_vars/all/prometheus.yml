@@ -26,7 +26,7 @@ prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand
 prometheus_extra_rules:
   - alert: SlurmNodeDown
     annotations:
-      message: '{% raw %}{{ $value }} Slurm nodes are in down status.{% endraw %}'
+      description: '{% raw %}{{ $value }} Slurm nodes are in down status.{% endraw %}'
       summary: 'At least one Slurm node is down.'
     expr: "slurm_nodes_down > 0\n"
     labels:
@@ -39,7 +39,7 @@ prometheus_extra_rules:
     expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="iowait",job="node-exporter"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node-exporter"}[60s])))
   - record: node_cpu_other_seconds:record
     expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode!="idle",mode!="user",mode!="system",mode!="iowait",job="node-exporter"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node-exporter"}[60s])))
-  - record: node_cpu_scaling_frequency_hertz_avg:record # frequency rules aren't working
+  - record: node_cpu_scaling_frequency_hertz_avg:record # Warning: frequency rules will not work when deploying appliance on VMs
     expr: avg by (instance) (node_cpu_scaling_frequency_hertz)
   - record: node_cpu_scaling_frequency_hertz_min:record
     expr: min by (instance) (node_cpu_scaling_frequency_hertz)
