@@ -18,7 +18,7 @@ control_sslip: "{{ control_ip | regex_replace('\\.', '-') }}.sslip.io"
 
 grafana_volume_size: 10Gi
 
-grafana_auth_anonymous: true
+grafana_auth_anonymous: false
 
 slack_integration:
   channel: "#alerts"
@@ -57,16 +57,9 @@ prometheus_global:
   evaluation_interval: 15s
 
 prometheus_external_labels:
-  environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
-  # environment: "{{ control_sslip }}"
+  environment: "{{ ansible_fqdn | default(inventory_hostname) | default(ansible_host) }}"
 
-prometheus_scrape_configs:
-  - job_name: "slurm_exporter"
-    scrape_interval: 30s
-    scrape_timeout: 30s
-    static_configs:
-      - targets:
-        - "{{ control_ip }}:{{ slurm_exporter_port }}"
+prometheus_scrape_configs: []
 
 prometheus_extra_rules: []
 
