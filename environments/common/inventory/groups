@@ -34,7 +34,7 @@ filebeat
 mysql
 
 [prometheus]
-# Single node to host monitoring server.
+# Single node to host monitoring stack.
 
 [opensearch]
 # Single node to host ElasticSearch search engine for Slurm monitoring.
