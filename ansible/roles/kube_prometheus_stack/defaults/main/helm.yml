@@ -78,8 +78,6 @@ kube_prometheus_stack_release_defaults:
       scrapeInterval: "{{ prometheus_global.scrape_interval }}"
       scrapeTimeout: "{{ prometheus_global.scrape_timeout }}"
       evaluationInterval: "{{ prometheus_global.evaluation_interval }}"
-      remoteRead: "{{ prometheus_remote_read }}"
-      remoteWrite: "{{ prometheus_remote_write }}"
       externalLabels: "{{ prometheus_external_labels }}"
       additionalScrapeConfigs: "{{ prometheus_scrape_configs }}"
       # may need to change these
@@ -112,11 +110,6 @@ kube_prometheus_stack_release_defaults:
       auth: "{{ grafana_auth }}"
       auth.anonymous:
         enabled: "{{ grafana_auth_anonymous }}"
-      analytics: "{{ grafana_analytics }}"
-      smtp: "{{ grafana_smtp }}"
-      log: "{{ grafana_log }}"
-      tracing: "{{ grafana_tracing }}"
-      panels: "{{ grafana_panels }}"
     additionalDataSources: "{{ grafana_datasources }}"
     plugins: "{{ grafana_plugins }}"
     nodeSelector:
@@ -130,7 +123,6 @@ kube_prometheus_stack_release_defaults:
       config: "{{ grafana_ldap | to_yaml }}"
     image:
       tag: "{{ grafana_image_tag }}"
-    env: "{{ grafana_environment }}"
     adminUser: "{{ grafana_security.admin_user }}"
     adminPassword: "{{ grafana_security.admin_password }}"
   
@@ -154,11 +146,6 @@ kube_prometheus_stack_release_defaults:
         type: None
       nodeSelector:
         clusterrole: "server"
-      scheme: "{{ prometheus_alertmanager_config.scheme | default( '' ) }}"
-    serviceMonitor:
-      scheme: "{{ prometheus_alertmanager_config.scheme | default( '' ) }}"
-      proxyUrl: "{{ prometheus_alertmanager_config.proxy_url | default( '' ) }}"
-    templateFiles: "{{ alertmanager_template_files }}"
       
   
   prometheusOperator:

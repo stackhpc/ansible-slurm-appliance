@@ -27,8 +27,6 @@ slack_integration:
 alertmanager_config:
   route:
     group_by: ['...']
-  global:
-    resolve_timeout: "{{ prometheus_config_flags_extra.alertmanager.timeout | default( '5m' ) }}"
   receivers:
     - name: 'null'
 
@@ -39,24 +37,9 @@ prometheus_port: 30000
 grafana_port: 30001
 alertmanager_port: 30002
 
-### PREVIOUS ROLE VALUES
-
 prometheus_image_tag: "v2.27.0"
 
-# prometheus_config_dir: /etc/prometheus
-prometheus_db_dir: "{{ appliances_state_dir }}/prometheus"
-# prometheus_read_only_dirs: []
-
-# prometheus_binary_local_dir: ''
-# prometheus_skip_install: false
-
-# prometheus_web_listen_address: "0.0.0.0:9090"
-# prometheus_web_external_url: ''
-# See https://github.com/prometheus/exporter-toolkit/blob/master/docs/web-configuration.md
-# prometheus_web_config:
-#   tls_server_config: {}
-#   http_server_config: {}
-#   basic_auth_users: {}
+prometheus_db_dir: "/var/lib/prometheus"
 
 prometheus_storage_retention: "30d"
 # Available since Prometheus 2.7.0
@@ -66,43 +49,12 @@ prometheus_storage_retention_size: "40GB"
 
 prometheus_volume_size: 40Gi
 
-prometheus_config_flags_extra: {}
-# prometheus_config_flags_extra:
-#   storage.tsdb.retention: 15d
-#   alertmanager.timeout: 10s
-
-prometheus_alertmanager_config: []
-# prometheus_alertmanager_config:
-#   - scheme: https
-#     path_prefix: alertmanager/
-#     basic_auth:
-#       username: user
-#       password: pass
-#     static_configs:
-#       - targets: ["127.0.0.1:9093"]
-#     proxy_url: "127.0.0.2"
-
 prometheus_alert_relabel_configs: []
-# prometheus_alert_relabel_configs:
-#   - action: labeldrop
-#     regex: replica
 
 prometheus_global:
   scrape_interval: 30s
   scrape_timeout: 10s
   evaluation_interval: 15s
-
-prometheus_remote_write: []
-# prometheus_remote_write:
-#   - url: https://dev.kausal.co/prom/push
-#     basic_auth:
-#       password: FOO
-
-prometheus_remote_read: []
-# prometheus_remote_read:
-#   - url: https://demo.cloudalchemy.org:9201/read
-#     basic_auth:
-#       password: FOO
 
 prometheus_external_labels:
   environment: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
@@ -116,16 +68,6 @@ prometheus_scrape_configs:
       - targets:
         - "{{ control_ip }}:{{ slurm_exporter_port }}"
 
-# Alternative config file name, searched in ansible templates path.
-# prometheus_config_file: 'prometheus.yml.j2'
-
-# prometheus_alert_rules_files:
-#   - prometheus/rules/*.rules
-
-# prometheus_static_targets_files:
-#   - prometheus/targets/*.yml
-#   - prometheus/targets/*.json
-
 prometheus_extra_rules: []
 
 prometheus_rules:
@@ -135,208 +77,26 @@ prometheus_rules:
       rules: "{{ prometheus_extra_rules }}" 
 
 # ------------------------------------------------------------------------------------------
-
-### PREVIOUS GRAFANA VARS
 grafana_image_tag: 11.2.2
-
-grafana_instance: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
 
 grafana_data_dir: "/var/lib/grafana"
 
-# Additional options for grafana "server" section
-# This section WILL omit options for: http_addr, http_port, domain, and root_url, as those settings are set by variables listed before
-# grafana_server:
-#   protocol: http
-#   enforce_domain: false
-#   socket: ""
-#   cert_key: ""
-#   cert_file: ""
-#   enable_gzip: false
-#   static_root_path: public
-#   router_logging: false
-#   serve_from_sub_path: false
-
-# # Variables correspond to ones in grafana.ini configuration file
-# # Security
 grafana_security:
   admin_user: grafana
   admin_password: "{{ vault_grafana_admin_password }}"
-#  secret_key: ""    # would we want to template the rest of this into the ini? its not currently
-#  login_remember_days: 7
-#  cookie_username: grafana_user
-#  cookie_remember_name: grafana_remember
-#  disable_gravatar: true
-#  data_source_proxy_whitelist:
 
-# User management and registration
-# grafana_welcome_email_on_sign_up: false
-# grafana_users:
-#   allow_sign_up: false
-#   # allow_org_create: true
-#   # auto_assign_org: true
-#   auto_assign_org_role: Viewer
-#   # login_hint: "email or username"
-#   default_theme: dark
-#   # external_manage_link_url: ""
-#   # external_manage_link_name: ""
-#   # external_manage_info: ""
-
-# grafana authentication mechanisms
+# see https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml for configuration options
 grafana_auth: {}
-#  disable_login_form: false
-#  oauth_auto_login: false
-#  disable_signout_menu: false
-#  signout_redirect_url: ""
-#  ldap:
-#    config_file: "/etc/grafana/ldap.toml"
-#    allow_sign_up: false
-#  basic:
-#    enabled: true
-
 grafana_ldap: {}
-#  verbose_logging: false
-#  servers:
-#    host: 127.0.0.1
-#    port: 389 # 636 for SSL
-#    use_ssl: false
-#    start_tls: false
-#    ssl_skip_verify: false
-#    root_ca_cert: /path/to/certificate.crt
-#    bind_dn: "cn=admin,dc=grafana,dc=org"
-#    bind_password: grafana
-#    search_filter: "(cn=%s)" # "(sAMAccountName=%s)" on AD
-#    search_base_dns:
-#      - "dc=grafana,dc=org"
-#    group_search_filter: "(&(objectClass=posixGroup)(memberUid=%s))"
-#    group_search_base_dns:
-#      - "ou=groups,dc=grafana,dc=org"
-#    attributes:
-#      name: givenName
-#      surname: sn
-#      username: sAMAccountName
-#      member_of: memberOf
-#      email: mail
-#  group_mappings:
-#    - name: Main Org.
-#      id: 1
-#      groups:
-#        - group_dn: "cn=admins,ou=groups,dc=grafana,dc=org"
-#          org_role: Admin
-#        - group_dn: "cn=editors,ou=groups,dc=grafana,dc=org"
-#          org_role: Editor
-#        - group_dn: "*"
-#          org_role: Viewer
-#    - name: Alternative Org
-#      id: 2
-#      groups:
-#        - group_dn: "cn=alternative_admins,ou=groups,dc=grafana,dc=org"
-#          org_role: Admin
-
-grafana_analytics: {}
-#  reporting_enabled: true
-#  google_analytics_ua_id: ""
-
-# Set this for mail notifications
-grafana_smtp: {}
-#  host:
-#  user:
-#  password:
-#  from_address:
-
-# Grafana logging configuration
-grafana_log:
-# mode: 'console file'
-# level: info
-
-# Distributed tracing options
-grafana_tracing: {}
-#  address: "localhost:6831"
-#  always_included_tag: "tag1:value1,tag2:value2"
-#  sampler_type: const
-#  sampler_param: 1
-
-grafana_snapshots: {}
-#  external_enabled: true
-#  external_snapshot_url: "https://snapshots-origin.raintank.io"
-#  external_snapshot_name: "Publish to snapshot.raintank.io"
-#  snapshot_remove_expired: true
-#  snapshot_TTL_days: 90
-
-# # External image store
-# grafana_image_storage: {}
-# #  provider: gcs
-# #  key_file:
-# #  bucket:
-# #  path:
-
 
 #######
 # Plugins from https://grafana.com/plugins
 grafana_plugins: []
-#  - raintank-worldping-app
 
-# # Dashboards from https://grafana.com/dashboards
-# grafana_dashboards: []
-# #  - dashboard_id: '4271'
-# #    revision_id: '3'
-# #    datasource: 'Prometheus'
-# #  - dashboard_id: '1860'
-# #    revision_id: '4'
-# #    datasource: 'Prometheus'
-# #  - dashboard_id: '358'
-# #    revision_id: '1'
-# #    datasource: 'Prometheus'
-
-# grafana_dashboards_dir: "dashboards"
-
-# # Alert notification channels to configure
-# grafana_alert_notifications: []
-# #  - name: "Email Alert"
-# #    type: "email"
-# #    uid: channel1
-# #    is_default: true
-# #    settings:
-# #      addresses: "example@example.com"
-
-# Datasources to configure
+# Additional datasources to configure alongside kube-prometheus-stack defaults
 grafana_datasources: []
-#  - name: "Prometheus"
-#    type: "prometheus"
-#    access: "proxy"
-#    url: "http://prometheus.mydomain"
-#    basicAuth: true
-#    basicAuthUser: "admin"
-#    basicAuthPassword: "password"
-#    isDefault: true
-#    jsonData:
-#      tlsAuth: false
-#      tlsAuthWithCACert: false
-#      tlsSkipVerify: true
-
-grafana_environment: {}
-
-# Panels configurations
-grafana_panels: {}
-#  disable_sanitize_html: false
-#  enable_alpha: false
-
-### PREVIOUS ALERTMANAGER ROLEVARS
 
 alertmanager_image_tag: v0.27.0
 
-# alertmanager_config_file: 'alertmanager.yml.j2'
-
-alertmanager_template_files: {}
-
-# alertmanager_http_config: {}
-
-### Previous node exporter vars
-
 node_exporter_image_tag: v1.8.2
-
-# node_exporter_tls_server_config: {}
-
-# node_exporter_http_server_config: {}
-
-# node_exporter_basic_auth_users: {}
 
