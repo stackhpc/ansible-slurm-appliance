@@ -16,8 +16,6 @@ login_ip: "{{ hostvars[groups['openondemand'][0]]['ansible_host'] }}" # probably
 control_ip: "{{ ansible_default_ipv4.address| default(ansible_all_ipv4_addresses[0]) }}"
 control_sslip: "{{ control_ip | regex_replace('\\.', '-') }}.sslip.io" 
 
-grafana_volume_size: 10Gi
-
 grafana_auth_anonymous: false
 
 slack_integration:
@@ -71,8 +69,6 @@ prometheus_rules:
 
 # ------------------------------------------------------------------------------------------
 grafana_image_tag: 11.2.2
-
-grafana_data_dir: "/var/lib/grafana"
 
 grafana_security:
   admin_user: grafana

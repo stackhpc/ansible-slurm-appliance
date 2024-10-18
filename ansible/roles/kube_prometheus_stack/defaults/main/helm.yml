@@ -114,10 +114,6 @@ kube_prometheus_stack_release_defaults:
     plugins: "{{ grafana_plugins }}"
     nodeSelector:
         clusterrole: "server"
-    persistence:
-      type: pvc
-      enabled: true
-      existingClaim: grafana-pvc
     ldap:
       enabled: "{{ false if grafana_ldap == {} else true }}"
       config: "{{ grafana_ldap | to_yaml }}"

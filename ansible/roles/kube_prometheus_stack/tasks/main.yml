@@ -53,42 +53,6 @@
           path: "{{ prometheus_db_dir }}"
           type: DirectoryOrCreate
 
-- name: Create Grafana hostPath volume in /var/lib/state
-  kubernetes.core.k8s:
-    namespace: "{{ kube_prometheus_stack_release_namespace }}"
-    definition:
-      apiVersion: v1
-      kind: PersistentVolume
-      metadata:
-        name: grafana-dir
-        labels:
-          app.kubernetes.io/name: grafana-dir
-      spec:
-        capacity:
-          storage: "{{ grafana_volume_size }}"
-        accessModes:
-        - ReadWriteOnce
-        hostPath:
-          path: "{{ grafana_data_dir }}"
-          type: DirectoryOrCreate
-
-- name: Create PVC for Grafana
-  kubernetes.core.k8s:
-    namespace: "{{ kube_prometheus_stack_release_namespace }}"
-    definition:
-      apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: grafana-pvc
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: "{{ grafana_volume_size }}"
-        volumeMode: Filesystem
-        volumeName: grafana-dir
-
 # not looping through these because templating doesn't set ports as integer
 - name: Creating headless service for OOD exporter
   kubernetes.core.k8s:

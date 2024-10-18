@@ -1,9 +1,3 @@
-grafana_image_tag: '11.2.2'
-grafana_port: 30001 # Must be within K3s' reserved port range (default 30000-32767)
-
-# Define where state is stored
-grafana_data_dir: "{{ appliances_state_dir | default('/var/lib') }}/grafana"
-
 # Configure external address, with external URL depending on whether we are using Open Ondemand as a proxy
 grafana_api_address: "{{ hostvars[groups['prometheus'].0].internal_address }}"
 grafana_api_url: "http://{{ grafana_api_address }}:{{ grafana_port }}"
