@@ -110,6 +110,8 @@ kube_prometheus_stack_release_defaults:
       auth: "{{ grafana_auth }}"
       auth.anonymous:
         enabled: "{{ grafana_auth_anonymous }}"
+      dashboards:
+        default_home_dashboard_path: "/tmp/dashboards/{{ grafana_home_dashboard }}"
     additionalDataSources: "{{ grafana_datasources }}"
     plugins: "{{ grafana_plugins }}"
     nodeSelector:

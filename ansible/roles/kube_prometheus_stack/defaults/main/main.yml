@@ -85,6 +85,8 @@ grafana_plugins: []
 # Additional datasources to configure alongside kube-prometheus-stack defaults
 grafana_datasources: []
 
+grafana_home_dashboard: 13427.json # node exporter slurm
+
 alertmanager_image_tag: v0.27.0
 
 node_exporter_image_tag: v1.8.2
