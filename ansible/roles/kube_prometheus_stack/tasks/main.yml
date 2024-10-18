@@ -157,3 +157,18 @@
     create_namespace: no
     wait: yes
     wait_timeout: "{{ kube_prometheus_stack_wait_timeout }}"
+
+- name: Delete unwanted default dashboards # currently no way to selectively enabled in helm chart
+  kubernetes.core.k8s:
+    state: absent
+    kind: ConfigMap
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      metadata:
+        name: "{{ item }}"
+  loop:
+    - kube-prometheus-stack-nodes-darwin
+    - kube-prometheus-stack-grafana-overview
+    - kube-prometheus-stack-proxy
+    - kube-prometheus-stack-etcd
+    - kube-prometheus-stack-alertmanager-overview
