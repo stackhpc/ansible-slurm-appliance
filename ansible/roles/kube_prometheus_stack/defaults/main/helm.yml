@@ -155,6 +155,7 @@ kube_prometheus_stack_release_defaults:
         clusterrole: "server"
 
   prometheus-node-exporter:
+    extraArgs: "{{ node_exporter_args }}"
     image:
       tag: "{{ node_exporter_image_tag }}"
     prometheus:

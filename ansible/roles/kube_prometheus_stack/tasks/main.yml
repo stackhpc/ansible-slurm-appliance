@@ -158,7 +158,7 @@
     wait: yes
     wait_timeout: "{{ kube_prometheus_stack_wait_timeout }}"
 
-- name: Delete unwanted default dashboards # currently no way to selectively enabled in helm chart
+- name: Delete unwanted default dashboards # currently no way to selectively enable in helm chart
   kubernetes.core.k8s:
     state: absent
     kind: ConfigMap

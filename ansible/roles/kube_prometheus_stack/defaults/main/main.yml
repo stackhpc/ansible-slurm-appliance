@@ -90,4 +90,6 @@ grafana_home_dashboard: 13427.json # node exporter slurm
 alertmanager_image_tag: v0.27.0
 
 node_exporter_image_tag: v1.8.2
-
+node_exporter_args: 
+  - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+  - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$

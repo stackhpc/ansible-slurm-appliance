@@ -1,0 +1,4 @@
+# To disable unwanted metrics or enable non-default metrics, add --no-collector or --collector flags to list below (see https://github.com/prometheus/node_exporter?tab=readme-ov-file#collectors)
+node_exporter_args:
+  - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+  - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
