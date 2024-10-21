@@ -48,5 +48,5 @@ collections:
     version: 0.2.0
   - name: https://github.com/azimuth-cloud/ansible-collection-image-utils
     type: git
-    version: fix/packer-sentinel-file # update on release
+    version: main # update on release
 ...
