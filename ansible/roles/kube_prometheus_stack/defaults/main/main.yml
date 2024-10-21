@@ -45,8 +45,6 @@ prometheus_storage_retention: "30d"
 # supported: KB, MB, GB, TB, PB.
 prometheus_storage_retention_size: "40GB"
 
-prometheus_volume_size: 40Gi
-
 prometheus_alert_relabel_configs: []
 
 prometheus_global:

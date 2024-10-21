@@ -1,11 +1,8 @@
 # Must be within K3s' reserved port range (default 30000-32767)
 prometheus_port: 30000
 
-prometheus_image_tag: "v2.27.0"
-
 prometheus_db_dir: "{{ appliances_state_dir }}/prometheus"
 prometheus_storage_retention: "30d"
-prometheus_volume_size: 40Gi
 prometheus_storage_retention_size: "40GB"
 prometheus_scrape_configs_default:
 - job_name: "slurm_exporter"

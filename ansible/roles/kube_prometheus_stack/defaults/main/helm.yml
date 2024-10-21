@@ -71,7 +71,7 @@ kube_prometheus_stack_release_defaults:
               - ReadWriteOnce
             resources:
               requests:
-                storage: "{{ prometheus_volume_size }}"
+                storage: 1Gi # not enforced but requires value > 0
       retention: "{{ prometheus_storage_retention }}"
       retentionSize: "{{ prometheus_storage_retention_size }}"
       additionalAlertRelabelConfigs: "{{ prometheus_alert_relabel_configs }}"

@@ -46,7 +46,7 @@
           app.kubernetes.io/name: prometheus-dir
       spec:
         capacity:
-          storage: "{{ prometheus_volume_size }}"
+          storage: 1Gi # not enforced for hostpath volumes but requires value >0 to work
         accessModes:
         - ReadWriteOnce
         hostPath:
