@@ -12,7 +12,7 @@ kube_prometheus_stack_release_name: kube-prometheus-stack
 # The timeout to wait for the release to become ready
 kube_prometheus_stack_wait_timeout: 5m
 
-control_ip: "{{ ansible_default_ipv4.address| default(ansible_all_ipv4_addresses[0]) }}"
+control_ip: "{{ hostvars[groups['control'].0].ansible_host }}"
 
 grafana_auth_anonymous: false
 
