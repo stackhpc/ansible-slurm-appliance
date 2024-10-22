@@ -1,13 +1,37 @@
 ---
 
-- name: Check for existing k3s binaries
+- name: Check for existing k3s installation
   stat:
-    path: /usr/bin/k3s
+    path: /var/lib/rancher/k3s
   register: stat_result
 
-- name: Download and install k3s
+- name: Download and air-gapped installation of k3s
   when: not stat_result.stat.exists
   block:
+
+  - name: Download k3s binary
+    ansible.builtin.get_url:
+      url: "https://github.com/k3s-io/k3s/releases/download/{{ k3s_version | urlencode }}/k3s"
+      dest: /usr/bin/k3s
+      owner: root
+      group: root
+      mode: "0755"
+
+  - name: Install k3s SELinux policy package
+    yum:
+      name: "https://github.com/k3s-io/k3s-selinux/releases/download/{{ k3s_selinux_release }}/k3s-selinux-{{ k3s_selinux_rpm_version }}.el{{ rocky_version }}.noarch.rpm"
+      disable_gpg_check: true
+
+  - name: Create image directory
+    ansible.builtin.file: 
+      path: "/var/lib/rancher/k3s/agent/images"
+      state: directory
+
+  - name: Install k3s' internal images
+    ansible.builtin.get_url:
+      url: "https://github.com/k3s-io/k3s/releases/download/{{ k3s_version | urlencode }}/k3s-airgap-images-amd64.tar.zst"
+      dest: /var/lib/rancher/k3s/agent/images/k3s-airgap-images-amd64.tar.zst
+
   - name: Download k3s install script
     ansible.builtin.get_url:
       url: https://get.k3s.io/
@@ -26,6 +50,7 @@
       INSTALL_K3S_SKIP_START: "true"
       INSTALL_K3S_SKIP_ENABLE: "true"
       INSTALL_K3S_BIN_DIR: "/usr/bin"
+      INSTALL_K3S_SKIP_DOWNLOAD: "true"
     changed_when: true
     loop:
       - server --disable=traefik

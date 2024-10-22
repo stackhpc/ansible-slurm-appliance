@@ -1,1 +1,5 @@
-k3s_version: "v1.31.0+k3s1" # Warning: changes to this variable won't be reflected in the cluster/image if k3s is already installed
+# Warning: changes to these variables won't be reflected in the cluster/image if k3s is already installed
+k3s_version: "v1.31.0+k3s1"
+k3s_selinux_release: v1.6.latest.1
+k3s_selinux_rpm_version: 1.6-1
+rocky_version: "{{ ansible_distribution_major_version }}"
