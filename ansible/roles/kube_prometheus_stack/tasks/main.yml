@@ -173,3 +173,4 @@
     - kube-prometheus-stack-proxy
     - kube-prometheus-stack-etcd
     - kube-prometheus-stack-alertmanager-overview
+    - kube-prometheus-stack-scheduler
