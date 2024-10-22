@@ -178,7 +178,7 @@ openondemand_scrape_configs:
     scrape_interval: 2m
     static_configs:
     - targets:
-      - "{{ login_ip }}:9301"
+      - "{{ openondemand_address }}:9301"
       labels:
         environment: "{{ appliances_environment_name }}"
         service: "openondemand"

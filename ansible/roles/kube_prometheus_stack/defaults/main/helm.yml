@@ -104,9 +104,9 @@ kube_prometheus_stack_release_defaults:
         searchNamespace: ALL
     grafana.ini:
       server:
-        domain: "{{ openondemand_servername }}"
-        root_url: "{{ grafana_url_openondemand_proxy }}"
-        serve_from_sub_path: true
+        domain: "{{ grafana_domain }}"
+        root_url: "{{ grafana_url }}"
+        serve_from_sub_path: "{{ grafana_serve_from_sub_path }}"
       auth: "{{ grafana_auth }}"
       auth.anonymous:
         enabled: "{{ grafana_auth_anonymous }}"

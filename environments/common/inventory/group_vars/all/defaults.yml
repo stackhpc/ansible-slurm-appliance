@@ -20,6 +20,9 @@ prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}:{{ prome
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
 grafana_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 
+# Service IP addresses
+openondemand_ip: "{{ hostvars[groups['openondemand'].0].ansible_host if groups['openondemand'] else '' }}"
+
 ############################# bootstrap: local user configuration #########################
 
 # Note RockyLinux 8.5 defines system user/groups in range 201-999

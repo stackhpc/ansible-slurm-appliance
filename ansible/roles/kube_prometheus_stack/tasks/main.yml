@@ -33,7 +33,6 @@
         annotations:
           storageclass.kubernetes.io/is-default-class: "false"
 
-# variables would need refactoring to let us loop through the data directories nicely
 - name: Create Prometheus hostPath volume in /var/lib/state
   kubernetes.core.k8s:
     namespace: "{{ kube_prometheus_stack_release_namespace }}"
@@ -53,35 +52,37 @@
           path: "{{ prometheus_db_dir }}"
           type: DirectoryOrCreate
 
-# not looping through these because templating doesn't set ports as integer
-- name: Creating headless service for OOD exporter
-  kubernetes.core.k8s:
-    namespace: "{{ kube_prometheus_stack_release_namespace }}"
-    definition:
-      kind: Service
-      metadata:
-        name: ood-exporter
-      spec:
-        clusterIP: None
-        ports:
-        - name: ood-exporter
-          port: 9301
-          protocol: TCP
-
-- name: Binding OOD exporter service to host
-  kubernetes.core.k8s:
-    namespace: "{{ kube_prometheus_stack_release_namespace }}"
-    definition:
-      kind: Endpoints
-      metadata:
-        name: ood-exporter
-      subsets:
-        - addresses:
-            - ip: "{{ login_ip }}"
-          ports:
-            - port: 9301
-              name: ood-exporter
+- name: Setting up k3s services for OnDemand Exporter
+  when: groups['openondemand'] | count > 0
+  block:
+    - name: Creating headless service for OOD exporter
+      kubernetes.core.k8s:
+        namespace: "{{ kube_prometheus_stack_release_namespace }}"
+        definition:
+          kind: Service
+          metadata:
+            name: ood-exporter
+          spec:
+            clusterIP: None
+            ports:
+            - name: ood-exporter
+              port: 9301
               protocol: TCP
+
+    - name: Binding OOD exporter service to host
+      kubernetes.core.k8s:
+        namespace: "{{ kube_prometheus_stack_release_namespace }}"
+        definition:
+          kind: Endpoints
+          metadata:
+            name: ood-exporter
+          subsets:
+            - addresses:
+                - ip: "{{ openondemand_ip }}"
+              ports:
+                - port: 9301
+                  name: ood-exporter
+                  protocol: TCP
 
 - name: Creating headless service for slurm exporter
   kubernetes.core.k8s:

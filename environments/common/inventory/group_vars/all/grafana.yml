@@ -6,6 +6,8 @@ grafana_api_url: "http://{{ grafana_api_address }}:{{ grafana_port }}"
 grafana_url_direct: "http://{{ grafana_address }}:{{ grafana_port }}"
 grafana_url_openondemand_proxy: "https://{{ openondemand_servername | default('') }}/node/{{ groups['prometheus'].0 }}/{{ grafana_port }}"
 grafana_url: "{{ grafana_url_openondemand_proxy if groups['openondemand'] | count > 0 else grafana_url_direct }}"
+grafana_serve_from_sub_path: "{{ groups['openondemand'] | count > 0 }}"
+grafana_domain: "{{ ( openondemand_servername | default('') ) if groups['openondemand'] | count > 0 else grafana_api_address }}"
 
 grafana_dashboards_default:
   # node exporter slurm:
