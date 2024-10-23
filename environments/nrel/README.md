@@ -51,7 +51,7 @@ TODO: update this section
 
 This environment defines:
 
-- 2x login nodes `nrel-login-{0,1}` - see `inventory/hosts` for IP addresses.
+- 2x login nodes `<vs|vtest>-login-{0,1}` - see `inventory/hosts` for IP addresses.
 - 4x node "hpc" partition with 3-day timelimit. Intended to represent a partition for production MPI application runs.
 - 2x node "express" partition with a 1-hour timelimit. Intended to represent a partition for development of (multi-node) MPI-based Python data science programs.
 - Monitoring dashboards available via Grafana on `nrel-login-0` - use a SOCKS proxy as above to access this. Grafana can be used without login in read-only mode, or use username: `grafana` and password given in `inventory/group_vars/all/secrets.yml` to login in admin mode.
