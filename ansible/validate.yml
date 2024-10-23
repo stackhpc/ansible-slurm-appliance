@@ -29,16 +29,6 @@
           'enable_configless' not found in openhpc_config.SlurmctldParameters - is variable openhpc_config overridden?
           Additional slurm.conf parameters should be provided using variable openhpc_config_extra.
         success_msg: Checked Slurm will be configured for configless operation
-    
-- name: Validate podman configuration
-  hosts: podman
-  gather_facts: false
-  tags: podman
-  tasks:
-    - import_role:
-        name: podman
-        tasks_from: validate.yml
-      tags: validate
 
 - name: Validate filebeat configuration
   hosts: filebeat
