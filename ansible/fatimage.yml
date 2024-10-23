@@ -113,39 +113,12 @@
       vars:
         slurm_exporter_state: stopped
       when: "'slurm_exporter' in group_names"
-
-- hosts: builder
-  name: Pre-pull kube-prometheus-stack images and import to k3s
-  vars:
-    image_list:
-      - { name: "docker.io/grafana/grafana", tag: "{{ grafana_image_tag }}" }
-      - { name: "quay.io/prometheus/prometheus", tag: "{{ prometheus_image_tag }}" }
-      - { name: "quay.io/prometheus/alertmanager", tag: "{{ alertmanager_image_tag }}" }
-      - { name: "quay.io/prometheus-operator/node-exporter", tag: "{{ node_exporter_image_tag }}" }
-      - { name: "quay.io/prometheus-operator/prometheus-config-reloader", tag: "{{ kube_prometheus_stack_app_version }}" }
-      - { name: "quay.io/prometheus-operator/prometheus-operator", tag: "{{ kube_prometheus_stack_app_version }}" }
-      - { name: "quay.io/kiwigrid/k8s-sidecar", tag: "{{ grafana_sidecar_image_tag }}" }
-      - { name: "registry.k8s.io/kube-state-metrics/kube-state-metrics", tag: "{{ kube_prometheus_stack_metrics_image_tag }}" }
-      - { name: "registry.k8s.io/ingress-nginx/kube-webhook-certgen", tag: "{{ kube_prometheus_stack_patch_image_tag }}" }
-  tasks:
-    - name: Pull with images with podman
-      containers.podman.podman_image:
-        name: "{{ item.name }}"
-        tag: "{{ item.tag }}"
-      loop: "{{ image_list }}"
-
-    - name: Export images to k3s
-      containers.podman.podman_save:
-        image: "{{ item.name }}:{{ item.tag }}"
-        dest: "/var/lib/rancher/k3s/agent/images/{{ item.name | regex_replace('\\/|\\.','-')}}.tar"
-      loop: "{{ image_list }}"
-
-    - name: Clean up podman images
-      containers.podman.podman_image:
-        state: absent
-        name: "{{ item.name }}"
-        tag: "{{ item.tag }}"
-      loop: "{{ image_list }}"
+    
+    - name: kube prometheus stack
+      import_role:
+        name: kube_prometheus_stack
+        tasks_from: install.yml
+      when: "'prometheus' in group_names"
 
 - name: Run post.yml hook
   vars:
