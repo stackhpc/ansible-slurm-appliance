@@ -1,7 +1,7 @@
 [all:vars]
 ansible_user=rocky
 openhpc_cluster_name=${cluster_name}
-#ansible_ssh_common_args='-o ProxyCommand="ssh rocky@${proxy_fip} -W %h:%p"'
+ansible_ssh_common_args='-o ProxyCommand="ssh rocky@${proxy_fip} -W %h:%p"'
 
 [control]
 ${control.name} ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}'
@@ -19,42 +19,13 @@ ${login.name} ansible_host=${[for n in login.network: n.fixed_ip_v4 if n.access_
 ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in compute.network: net.name => [ net.fixed_ip_v4 ] })}'
 %{ endfor ~}
 
-################################################################# 
-#
-# TODO: kbendl - work out how to 
-#       Define groups for running ansible against specific VM types. 
-#         - Do you even need to do this? Can gres handle it? Something else?
+## Define groups for slurm partitions:
 #################################################################
 
-## Define groups for slurm parititions:
-[${cluster_slurm_name}_lg]
-vtest-vtlg-[901:902]
-
-#${cluster_name}-lg-[0001:0039]
-
-[${cluster_slurm_name}_std]
-#${cluster_name}-std-[0001:0060]
-
-[${cluster_slurm_name}_sm]
-#${cluster_name}-sm-[0001:0028]
-
-[${cluster_slurm_name}_t]
-#${cluster_name}-t-[0001:0015]
-
-[${cluster_slurm_name}_gpu]
-${cluster_name}-gpu-901
-
-##${cluster_name}-gpu-[0001:0020]
-
-[${cluster_name}_lg_intel]
-
-
-[a100:children]
-${cluster_name}_gpu
-${cluster_name}_gpu3
+[${cluster_name}_lg]
+${cluster_name}-vtlg-[001:002]
+${cluster_name}-vtlg-901
 
 [${cluster_name}_gpu]
-
-
-[${cluster_name}_gpu3]
-
+${cluster_name}-vtgpu-[001:002]
+${cluster_name}-vtgpu-901

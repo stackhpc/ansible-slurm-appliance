@@ -7,10 +7,6 @@ compute_types = {
     flavor: "slurm_test_compute_sm"
     image: "openhpc-ofed-RL9-240712-1425"
   }
-  standard: {
-    flavor: "slurm_test_compute_std"
-    image: "openhpc-ofed-RL9-240712-1425"
-  }
   gpu: {
     flavor: "slurm_test_gpu0"
     image: "openhpc-ofed-RL9-240712-1425"
@@ -27,6 +23,10 @@ compute_types = {
     flavor: "slurm_test_compute_lg_intel"
     image: "openhpc-ofed-RL9-240712-1425"
   }
+  #  standard: {
+  #    flavor: "slurm_test_compute_std"
+  #    image: "openhpc-ofed-RL9-240712-1425"
+  #  }
 }
 
 # #############################################
@@ -36,7 +36,7 @@ compute_types = {
 
 #---- login node info ----
 login_image = "openhpc-ofed-RL9-240712-1425"
-login_flavor = "vermilion_util_c8m15"
+login_flavor = "vermilion_slurm_login_c8m15"
 
 proxy_name = "vtlogin-1"
 
@@ -44,8 +44,8 @@ proxy_name = "vtlogin-1"
 # but access is limited for admin-type worlflows
 
 login_names = {
-  vtlogin-1: "vermilion_util_c8m15"
-  vtadmin: "vermilion_util_c8m15"
+  vtlogin-1: "vermilion_slurm_login_c8m15"
+  vtadmin: "vermilion_slurm_login_c8m15"
 }
 # name: IPaddr
 login_ips = {
@@ -70,7 +70,7 @@ cluster_availability_zone = "esif"
 #key_pair = "slurmdeploy"
 key_pair = "vsdeployer"
 
-external_network = "external2"
+external_network = "external"
 cluster_network = "compute"
 cluster_subnet = "compute-subnet"
 
