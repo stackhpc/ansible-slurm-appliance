@@ -1,3 +1,5 @@
+alertmanager_image_tag: v0.27.0
+
 alertmanager_config:
   route:
     group_by: ['...']

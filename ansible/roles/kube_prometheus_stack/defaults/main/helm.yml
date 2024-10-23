@@ -100,6 +100,8 @@ kube_prometheus_stack_release_defaults:
     ingress:
       path: "/node/{{ groups['prometheus'].0 }}/{{ grafana_port }}"
     sidecar:
+      image:
+        tag: "{{ grafana_sidecar_image_tag }}"
       dashboards:
         searchNamespace: ALL
     grafana.ini:
@@ -147,10 +149,21 @@ kube_prometheus_stack_release_defaults:
       
   
   prometheusOperator:
+    image:
+      tag: "{{ kube_prometheus_stack_app_version }}"
+    prometheusConfigReloader:
+      image:
+        tag: "{{ kube_prometheus_stack_app_version }}"
+    admissionWebhooks:
+      patch:
+        image:
+          tag: "{{ kube_prometheus_stack_patch_image_tag }}"
     nodeSelector:
         clusterrole: "server"
   
   kube-state-metrics:
+    image:
+      tag: "{{ kube_prometheus_stack_metrics_image_tag }}"
     nodeSelector:
         clusterrole: "server"
 
