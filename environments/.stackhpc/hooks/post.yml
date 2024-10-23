@@ -10,5 +10,7 @@
         state: absent
       with_items:
         - /opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/3.1.7-1/gems/bootstrap_form-2.7.0/test/dummy/Gemfile.lock
+        - /opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/3.1.9-1/gems/bootstrap_form-2.7.0/test/dummy/Gemfile.lock
         - /opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/3.1.7-1/gems/bootstrap_form-4.5.0/demo/yarn.lock
+        - /opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/3.1.9-1/gems/bootstrap_form-4.5.0/demo/yarn.lock
         - /var/www/ood/apps/sys/dashboard/node_modules/data-confirm-modal/Gemfile.lock
