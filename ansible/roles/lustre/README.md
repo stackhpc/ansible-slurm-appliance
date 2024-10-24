@@ -9,7 +9,7 @@ Install and configure a Lustre client. This builds RPM packages from source.
 ## Role Variables
 
 - `lustre_version`: Optional str. Version of lustre to build, default `2.15.5` which is the first version with EL9 support
-- `lustre_lnet_label`: Optional str. The "lnet label" part of the host's NID, e.g. `tcp0` or `o2ib1`. Default `tcp`.
+- `lustre_lnet_label`: Optional str. The "lnet label" part of the host's NID, e.g. `tcp0`. Only the `tcp` protocol type is currently supported. Default `tcp`.
 - `lustre_mgs_nid`: Required str. The NID(s) for the MGS, e.g. `192.168.227.11@tcp1` (separate mutiple MGS NIDs using `:`).
 - `lustre_mounts`: Required list. Define Lustre filesystems and mountpoints as a list of dicts with keys:
     - `fs_name`: Required str. The name of the filesystem to mount
