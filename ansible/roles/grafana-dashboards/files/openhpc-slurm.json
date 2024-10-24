@@ -1728,7 +1728,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(node_network_receive_bytes_total{job=~\"$job\",instance=~\"$instance\"}[60s])*8",
+          "expr": "irate(node_network_receive_bytes_total{job=~\"$job\",instance=~\"$instance\",device=~\"^(([^v].{3}|.[^e].{2}|.{2}[^t].|.{3}[^h]).*|.{0,3})$\",device=~\"^(([^c].{2}|.[^n].{1}|.{2}[^i]).*|.{0,2})$\"}[60s])*8",
           "hide": true,
           "interval": "",
           "intervalFactor": 1,
@@ -1739,7 +1739,7 @@
           "target": ""
         },
         {
-          "expr": "irate(node_network_transmit_bytes_total{job=~\"$job\",instance=~\"$instance\"}[60s])*8",
+          "expr": "irate(node_network_transmit_bytes_total{job=~\"$job\",instance=~\"$instance\",device=~\"^(([^v].{3}|.[^e].{2}|.{2}[^t].|.{3}[^h]).*|.{0,3})$\",device=~\"^(([^c].{2}|.[^n].{1}|.{2}[^i]).*|.{0,2})$\"}[60s])*8",
           "hide": false,
           "interval": "",
           "intervalFactor": 1,
@@ -1853,7 +1853,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(node_network_receive_bytes_total{job=~\"$job\",instance=~\"$instance\"}[60s])*8",
+          "expr": "irate(node_network_receive_bytes_total{job=~\"$job\",instance=~\"$instance\",device=~\"^(([^v].{3}|.[^e].{2}|.{2}[^t].|.{3}[^h]).*|.{0,3})$\",device=~\"^(([^c].{2}|.[^n].{1}|.{2}[^i]).*|.{0,2})$\"}[60s])*8",
           "hide": false,
           "interval": "",
           "intervalFactor": 1,
@@ -1864,7 +1864,7 @@
           "target": ""
         },
         {
-          "expr": "irate(node_network_transmit_bytes_total{job=~\"$job\",instance=~\"$instance\"}[60s])*8",
+          "expr": "irate(node_network_transmit_bytes_total{job=~\"$job\",instance=~\"$instance\",device=~\"^(([^v].{3}|.[^e].{2}|.{2}[^t].|.{3}[^h]).*|.{0,3})$\",device=~\"^(([^c].{2}|.[^n].{1}|.{2}[^i]).*|.{0,2})$\"}[60s])*8",
           "hide": true,
           "interval": "",
           "intervalFactor": 1,
