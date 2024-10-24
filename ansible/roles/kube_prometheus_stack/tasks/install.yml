@@ -6,7 +6,7 @@
       - { name: "docker.io/grafana/grafana", tag: "{{ grafana_image_tag }}" }
       - { name: "quay.io/prometheus/prometheus", tag: "{{ prometheus_image_tag }}" }
       - { name: "quay.io/prometheus/alertmanager", tag: "{{ alertmanager_image_tag }}" }
-      - { name: "quay.io/prometheus-operator/node-exporter", tag: "{{ node_exporter_image_tag }}" }
+      - { name: "quay.io/prometheus/node-exporter", tag: "{{ node_exporter_image_tag }}" }
       - { name: "quay.io/prometheus-operator/prometheus-config-reloader", tag: "{{ kube_prometheus_stack_app_version }}" }
       - { name: "quay.io/prometheus-operator/prometheus-operator", tag: "{{ kube_prometheus_stack_app_version }}" }
       - { name: "quay.io/kiwigrid/k8s-sidecar", tag: "{{ grafana_sidecar_image_tag }}" }
