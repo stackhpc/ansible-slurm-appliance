@@ -23,8 +23,7 @@ ${compute.name} ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.acc
 #################################################################
 
 [${cluster_name}_lg]
-${cluster_name}-vtlg-[001:002]
-${cluster_name}-vtlg-901
+${cluster_name}-vtlg-[001:004]
 
 [${cluster_name}_gpu]
 ${cluster_name}-vtgpu-[001:002]
