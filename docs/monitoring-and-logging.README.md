@@ -256,6 +256,7 @@ This appliance customises the default set of collectors to a minimal set, these 
 - cpufreq
 - diskstats
 - filesystem
+- uname
 
 The list can be customised by adding or removing `--collector` flags to Node Exporter's command line arguments. The defaults can be found in:
 
@@ -265,7 +266,7 @@ The list can be customised by adding or removing `--collector` flags to Node Exp
 
 #### prometheus_node_exporter_targets
 
-Groups prometheus targets into per environment groups. The ansible variable, `cluster_env` is used to determine the grouping. The metrics for each target in the group are given the prometheus label, `cluster_env: $cluster_env`, where `$cluster_env` is the value of the `cluster_env` variable for that host.
+Groups prometheus targets into per environment groups. The ansible variable, `env` is used to determine the grouping. The metrics for each target in the group are given the prometheus label, `env: $env`, where `$env` is the value of the `env` variable for that host.
 
 ## slurm-stats
 

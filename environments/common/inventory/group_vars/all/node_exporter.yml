@@ -10,3 +10,4 @@ node_exporter_args:
   - --collector.cpufreq
   - --collector.diskstats
   - --collector.filesystem
+  - --collector.uname

@@ -181,8 +181,9 @@ kube_prometheus_stack_release_defaults:
             targetLabel: instance
             replacement: $1
             action: replace
-        metricRelabelings:
-          - targetLabel: cluster_env
+          - targetLabel: env
+            sourceLabels: [env]
+            regex: ^$
             replacement: ungrouped
 
 kube_prometheus_stack_release_overrides: {}
