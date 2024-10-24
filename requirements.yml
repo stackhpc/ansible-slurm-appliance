@@ -5,17 +5,6 @@ roles:
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
     version: v0.26.0 # https://github.com/stackhpc/ansible-role-openhpc/pull/168
     name: stackhpc.openhpc
-  - src: https://github.com/stackhpc/ansible-node-exporter.git
-    version: stackhpc
-    name: cloudalchemy.node_exporter
-  - src: https://github.com/cloudalchemy/ansible-prometheus.git
-    version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
-    name: cloudalchemy.prometheus
-  - src: cloudalchemy.alertmanager
-    version: 0.19.1
-  - src: https://github.com/stackhpc/ansible-grafana.git
-    name: cloudalchemy.grafana
-    version: stackhpc-0.19.0 # fix grafana install
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
     version: v3.1.5
