@@ -51,20 +51,21 @@ Ansible in the appliance. This allows adding additional functionality into site-
 
 To configure an "extra" image build, prepare a Packer variable definition file as described above but also including:
 
-- `extra_image_name`: A string to add into the final image name.
-- `source_image` (or `source_image_name`): The UUID or name of the fat image to start from (which must already be present in OpenStack).
-- `groups`: A mapping with a key "openhpc-extra" (i.e. the name of this Packer build) with a list of Ansible inventory groups to put the build VM into.
-  This defines the roles/functionality which are added to the image.
+- `extra_build_image_name`: A string to add into the final image name.
+- `source_image` or `source_image_name`: The UUID or name of the fat image to start from (which must already be present in OpenStack).
+- `extra_build_groups`: A list of Ansible inventory groups to put the build VM into, in addition to the `builder` group. This defines the roles/functionality
+  which are added to the image.
+- `extra_build_volume_size`: A number giving the size in GB of the volume for the build VM's root disk and therefore the resulting image size.
+  Note this assumes the default of `use_blockstorage_volume = true`.
 
 E.g. to add the lustre client to an RockyLinux 9 image:
 
     # environments/site/lustre.pkvars.hcl
 
-    extra_image_name = "lustre" # output image name will be like "openhpc-lustre-RL9-$timestamp-$commit"
+    extra_build_image_name = "lustre" # output image name will be like "openhpc-lustre-RL9-$timestamp-$commit"
     source_image_name = "openhpc-ofed-RL9-240906-1041-32568dbb" # e.g. current StackHPC RL9 image
-    groups = {
-      openhpc-extra = ["lustre"] # only run lustre role during this extra build
-    }
+    extra_build_groups = ["lustre"] # only run lustre role during this extra build
+    extra_build_volume_size = 15 # default non-CUDA build image size has enough free space
 
     # ... define flavor, network, etc as normal
 
