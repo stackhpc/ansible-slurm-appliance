@@ -135,7 +135,7 @@ variable "volume_size" {
 
 variable "extra_build_volume_size" {
   type = number
-  default = null
+  default = 15 # same as default non-CUDA build
 }
 
 variable "image_disk_format" {
