@@ -74,6 +74,11 @@
       set_fact:
         prometheus_skip_install: "{{ false if prometheus_version is defined else true }}" 
       when: "{{ (prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined] }}"
+    - name: Set fact to override included vars for RL
+      set_fact:
+        prometheus_selinux_packages:
+        - python3-libselinux
+        - python3-policycoreutils
     - import_role:
         name: cloudalchemy.prometheus
 

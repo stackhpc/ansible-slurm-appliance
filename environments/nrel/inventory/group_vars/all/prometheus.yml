@@ -1,4 +1,0 @@
-# override the old packages for RL9
-prometheus_selinux_packages:
-  - python3-libselinux
-  - python3-policycoreutils
