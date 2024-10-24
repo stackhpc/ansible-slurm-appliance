@@ -62,3 +62,5 @@ roles/*
 !roles/k3s/**
 !roles/k9s/
 !roles/k9s/**
+!roles/kube_prometheus_stack
+!roles/kube_prometheus_stack/**
