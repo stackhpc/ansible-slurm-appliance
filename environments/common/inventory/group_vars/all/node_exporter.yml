@@ -10,5 +10,3 @@ node_exporter_args:
   - --collector.cpufreq
   - --collector.diskstats
   - --collector.filesystem
-
-node_exporter_image_tag: v1.8.2

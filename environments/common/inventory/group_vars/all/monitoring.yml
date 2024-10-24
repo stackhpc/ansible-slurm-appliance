@@ -4,13 +4,3 @@ kube_prometheus_stack_release_name: kube-prometheus-stack
 kube_prometheus_stack_wait_timeout: 5m
 
 # See prometheus.yml, grafana.yml and alertmanager.yml for config of individual monitoring services
-
-
-# used as tag prometheus-operator image and helpers, 
-# should be kept in sync with the appVersion provided in the Chart.yaml of whichever
-# kube_prometheus_stack_chart_version is used
-kube_prometheus_stack_app_version: v0.74.0
-
-# helper images
-kube_prometheus_stack_metrics_image_tag: v2.12.0
-kube_prometheus_stack_patch_image_tag: v20221220-controller-v1.5.1-58-g787ea74b6

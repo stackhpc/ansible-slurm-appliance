@@ -4,6 +4,10 @@
 kube_prometheus_stack_chart_repo: https://prometheus-community.github.io/helm-charts
 kube_prometheus_stack_chart_name: kube-prometheus-stack
 kube_prometheus_stack_chart_version: 59.1.0
+
+# used as tag prometheus-operator image and helpers, 
+# should be kept in sync with the appVersion provided in the Chart.yaml of whichever
+# kube_prometheus_stack_chart_version is used
 kube_prometheus_stack_app_version: v0.74.0
 
 # Release information
