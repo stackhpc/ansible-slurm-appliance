@@ -25,11 +25,9 @@ The steps for building site-specific fat images or extending an existing fat ima
     flavor = "general.v1.small"                           # VM flavor to use for builder VMs
     networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
     ```
-    
-    - The network used for the Packer VM must provide outbound internet access but does not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.).
-    
+    Note that:
+    - The network used for the Packer VM must provide outbound internet access but does not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.).  
     - For additional options such as non-default private key locations or jumphost configuration see the variable descriptions in `./openstack.pkr.hcl`.
-
     - For an example of configuration for extending an existing fat image see below.
 
 3. Activate the venv and the relevant environment.
@@ -51,10 +49,10 @@ The steps for building site-specific fat images or extending an existing fat ima
 An "extra" image build starts with an existing fat image (e.g. one provided by StackHPC) rather than a RockyLinux GenericCloud image, and only runs a specific subset of the
 Ansible in the appliance. This allows adding additional functionality into site-specific images, without modifying the existing functionality in the base fat image. This is the recommended way to build site-specific images.
 
-To configure an "extra" image build, prepare a Packer variable definition file as described above. However this must additionally include:
+To configure an "extra" image build, prepare a Packer variable definition file as described above but also including:
 
-- `extra_image_name`: A string to add into the final image name
-- `source_image` (or `source_image_name`): A map of strings keyed by RockyLinux variant, defining the base image.
+- `extra_image_name`: A string to add into the final image name.
+- `source_image` (or `source_image_name`): The UUID or name of the fat image to start from (which must already be present in OpenStack).
 - `groups`: A mapping with a key "openhpc-extra" (i.e. the name of this Packer build) with a list of Ansible inventory groups to put the build VM into.
   This defines the roles/functionality which are added to the image.
 
