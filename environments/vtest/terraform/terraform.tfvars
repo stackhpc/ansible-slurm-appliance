@@ -1,27 +1,27 @@
 compute_types = {
   tiny: {
     flavor: "slurm_test_compute_t"
-    image: "openhpc-ofed-RL9-240712-1425"
+    image: "aco-rocky9.4-final"
   }
   small: {
     flavor: "slurm_test_compute_sm"
-    image: "openhpc-ofed-RL9-240712-1425"
+    image: "aco-rocky9.4-final"
   }
   gpu: {
     flavor: "slurm_test_gpu0"
-    image: "openhpc-ofed-RL9-240712-1425"
+    image: "aco-rocky9.4-final"
   }
   gpu3: {
     flavor: "slurm_test_gpu3"
-    image: "openhpc-ofed-RL9-240712-1425"
+    image: "aco-rocky9.4-final"
   }
   large: {
-    flavor: "slurm_test_compute_lg_amd"
-    image: "openhpc-ofed-RL9-240712-1425"
+    flavor: "slurm_test_compute_lg"
+    image: "aco-rocky9.4-final"
   }
   large_intel: {
     flavor: "slurm_test_compute_lg_intel"
-    image: "openhpc-ofed-RL9-240712-1425"
+    image: "aco-rocky9.4-final"
   }
   #  standard: {
   #    flavor: "slurm_test_compute_std"
@@ -35,7 +35,7 @@ compute_types = {
 # #############################################
 
 #---- login node info ----
-login_image = "openhpc-ofed-RL9-240712-1425"
+login_image =  "aco-rocky9.4-final"
 login_flavor = "vermilion_slurm_login_c8m15"
 
 proxy_name = "vtlogin-1"
@@ -55,7 +55,8 @@ login_ips = {
 
 #---- CONTROL node info ----
 
-control_image = "openhpc-ofed-RL9-240712-1425"
+#control_image = "openhpc-ofed-RL9-240712-1425"
+control_image = "aco-rocky9.4-final"
 control_ip = "10.60.105.70"
 control_flavor = "vermilion_util_c8m15"
 
