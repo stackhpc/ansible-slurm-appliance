@@ -135,6 +135,7 @@ variable "volume_size" {
 
 variable "extra_build_volume_size" {
   type = number
+  default = null
 }
 
 variable "image_disk_format" {
