@@ -1,0 +1,27 @@
+- name: Assert using RockyLinux 9
+  assert:
+    that: ansible_distribution_major_version | int == 9
+    fail_msg: The 'lustre' role requires RockyLinux 9
+
+- name: Check kernel-devel package is installed
+  command: "dnf list --installed kernel-devel-{{ ansible_kernel }}"
+  changed_when: false
+  # NB: we don't check here the kernel will remain the same after reboot etc, see ofed/install.yml
+
+- name: Ensure SELinux in permissive mode
+  assert:
+    that: selinux_state in ['permissive', 'disabled']
+    fail_msg: "SELinux must be permissive for Lustre not '{{ selinux_state }}'; see variable selinux_state"
+
+- name: Ensure lustre_mgs_nid is defined
+  assert:
+    that: lustre_mgs_nid is defined
+    fail_msg: Variable lustre_mgs_nid must be defined
+
+- name: Ensure lustre_mounts entries define filesystem name and mount point
+  assert:
+    that:
+      - item.fs_name is defined
+      - item.mount_point is defined
+    fail_msg: All lustre_mounts entries must specify fs_name and mount_point
+  loop: "{{ lustre_mounts }}"

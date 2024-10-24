@@ -81,3 +81,6 @@ openhpc
 [ansible_init:children]
 # Hosts to run ansible-init
 cluster
+
+[lustre]
+# Hosts to run lustre client
