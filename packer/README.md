@@ -7,9 +7,9 @@ The Packer configuration defined here builds "fat images" which contain binaries
 - Ensures re-deployment of the cluster or deployment of additional nodes can be completed even if packages are changed in upstream repositories (e.g. due to RockyLinux or OpenHPC updates).
 - Improves deployment speed by reducing the number of package downloads to improve deployment speed.
 
-By default, a fat image build starts from a RockyLinux GenericCloud image and updates all DNF packages already present.
+By default, a fat image build starts from a nightly image build containing Mellanox OFED, and updates all DNF packages already present. The 'latest' nightly build itself is from a RockyLinux GenericCloud image.
 
-The fat images StackHPC builds and test in CI are  available from [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases). However with some additional configuration it is also possible to:
+The fat images StackHPC builds and test in CI are available from [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases). However with some additional configuration it is also possible to:
 1. Build site-specific fat images from scratch.
 2. Extend an existing fat image with additional software.
 
@@ -39,9 +39,9 @@ The steps for building site-specific fat images or extending an existing fat ima
         cd packer/
         PACKER_LOG=1 /usr/bin/packer build -only=openstack.openhpc --on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
-  Note that the `-only` flag here restricts the build to the non-OFED fat image "source" (in Packer terminology). Other
+  Note that the `-only` flag here restricts the build to the non-CUDA fat image "source" (in Packer terminology). Other
   source options are:
-    - `-only=openstack.openhpc-ofed`: Build a fat image including Mellanox OFED
+    - `-only=openstack.openhpc-cuda`: Build a fat image including CUDA packages.
     - `-only=openstack.openhpc-extra`: Build an image which extends an existing fat image - in this case the variable `source_image` or `source_image_name}` must also be set in the Packer variables file.
     
 5. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc-` and including a timestamp and a shortened git hash.
@@ -70,7 +70,7 @@ What is Slurm Appliance-specific are the details of how Ansible is run:
           openhpc-extra = ["foo"]
       }
 
-    the build VM uses an existing "fat image" (rather than a RockyLinyux GenericCloud one) and is added to the `builder` and `foo` groups. This means only code targeting `builder` and `foo` groups runs. In this way an existing image can be extended with site-specific code, without modifying the part of the image which has already been tested in the StackHPC CI.
+    the build VM uses an existing "fat image" (rather than a 'latest' nightly one) and is added to the `builder` and `foo` groups. This means only code targeting `builder` and `foo` groups runs. In this way an existing image can be extended with site-specific code, without modifying the part of the image which has already been tested in the StackHPC CI.
 
  - The playbook `ansible/fatimage.yml` is run which is only a subset of `ansible/site.yml`. This allows restricting the code
    which runs during build for cases where setting `builder` groupvars is not sufficient (e.g. a role always attempts to configure or start services). This may eventually be removed.
@@ -82,5 +82,5 @@ There are some things to be aware of when developing Ansible to run in a Packer 
   - Build VM hostnames are not the same as for equivalent "real" hosts and do not contain `login`, `control` etc. Therefore variables used by the build VM must be defined as groupvars not hostvars.
   - Ansible may need to proxy to real compute nodes. If Packer should not use the same proxy to connect to the
     build VMs (e.g. build happens on a different network), proxy configuration should not be added to the `all` group.
-  - Currently two fat image "sources" are defined, with and without OFED. This simplifies CI configuration by allowing the
+  - Currently two fat image "sources" are defined, with and without CUDA. This simplifies CI configuration by allowing the
     default source images to be defined in the `openstack.pkr.hcl` definition.

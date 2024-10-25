@@ -89,7 +89,7 @@ jobs:
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ env.SOURCE_IMAGE }}"
+          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
           openstack.pkr.hcl
 
         env:
