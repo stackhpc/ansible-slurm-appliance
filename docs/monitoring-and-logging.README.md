@@ -228,6 +228,10 @@ The port can customised by overriding the `prometheus_port` variable.
 
 Note that this service is not password protected, allowing anyone with access to the URL to make queries.
 
+### Upgrades
+
+The appliance previously used [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role to configure Prometheus, but our monitoring stack has since been moved into the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart running on a k3s cluster. The some of the default Grafana dashboards deployed by kube-prometheus-stack are hardcoded to rely on the `job` label of metrics scraped from Node Exporter to have the value `node-exporter`. By default, the cloudalchemy role scraped these metrics with the `job` label set to `node`. Therefore, if upgrading from previous versions of the appliance which used the cloudalchemy role, pre-upgrade data will not show up by default in Grafana dashboards. The old data can still be viewed in the OpenHPC and Node Exporter Slurm dashboards by selecting the previous `job` value from the Job dropdown.
+
 ### Alerting and recording rules
 
 See the upstream documentation for [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) and [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) rules.
