@@ -1,5 +1,35 @@
 ---
 
+- name: Checking for existing Prometheus data directory
+  ansible.builtin.stat:
+    path: "{{ prometheus_db_dir }}"
+  register: prom_exists_result
+
+- name: Check if data is in kube-prometheus-stack
+  ansible.builtin.stat:
+    path: "{{ prometheus_db_dir }}/prometheus-db"
+  register: prom_already_migrated
+  when: prom_exists_result.stat.exists
+
+- name: Migrate existing Prometheus data from cloudalchemy roles to kube-prometheus-stack
+  when: prom_exists_result.stat.exists and not prom_already_migrated.stat.exists
+  block:
+    - name: Get existing files to copy
+      ansible.builtin.find:
+        paths: "{{ prometheus_db_dir }}"
+        file_type: any
+      register: prometheus_files
+
+    - name: Create KPS subdirectory
+      ansible.builtin.file:
+        path: "{{ prometheus_db_dir }}/prometheus-db"
+        state: directory
+
+    - name: Move data to KPS subdirectory
+      ansible.builtin.shell:
+        cmd: "mv {{ item.path }} {{ prometheus_db_dir }}/prometheus-db/{{ item.path | regex_search('([^/]+$)') }}"
+      loop: "{{ prometheus_files.files }}"
+
 - name: Creating namespace
   kubernetes.core.k8s:
     name: "{{ kube_prometheus_stack_release_namespace }}"
