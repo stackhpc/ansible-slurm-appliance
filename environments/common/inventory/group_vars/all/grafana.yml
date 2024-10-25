@@ -11,7 +11,7 @@ grafana_domain: "{{ ( openondemand_servername | default('') ) if groups['openond
 
 grafana_dashboards_default:
   # node exporter slurm:
-  - dashboard_id: 13427
+  - dashboard_file: node-exporter-slurm.json
     replacements:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
