@@ -3,7 +3,7 @@
 ## Components overview
 
 ### [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
-An umbrella Helm chart which the appliance uses to deploy and manages containerised versions of Grafana and Prometheus.
+An umbrella Helm chart which the appliance uses to deploy and manages containerised versions of Prometheus, Grafana, Alertmanager and Node Exporter.
 
 ### [filebeat](https://www.elastic.co/beats/filebeat)
 

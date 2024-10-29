@@ -166,7 +166,7 @@
         name: opensearch
       subsets:
         - addresses:
-            - ip: "{{ control_ip }}"
+            - ip: "{{ opensearch_ip }}"
           ports:
             - port: 9200
               name: opensearch

@@ -49,7 +49,7 @@ grafana_datasources:
   - name: slurmstats
     # see https://github.com/grafana/opensearch-datasource#configure-the-data-source-with-provisioning
     type: grafana-opensearch-datasource
-    url: "https://{{ control_ip }}:9200"
+    url: "https://{{ opensearch_ip }}:9200"
     basicAuth: true
     basicAuthUser: admin
     secureJsonData:

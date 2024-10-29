@@ -22,6 +22,7 @@ grafana_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 
 # Service IP addresses
 openondemand_ip: "{{ hostvars[groups['openondemand'].0].ansible_host if groups['openondemand'] else '' }}"
+opensearch_ip: "{{ hostvars[groups['opensearch'].0].ansible_host if groups['opensearch'] else '' }}"
 
 ############################# bootstrap: local user configuration #########################
 
