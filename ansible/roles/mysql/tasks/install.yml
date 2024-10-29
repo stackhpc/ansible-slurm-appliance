@@ -9,14 +9,62 @@
       - cryptography
     state: present
 
-- name: Create systemd mysql container unit file
-  template:
-    dest: /etc/systemd/system/mysql.service
-    src: mysql.service.j2
-  register: _mysql_unitfile
+- name: Create mysql hostPath volume in /var/lib/state
+  kubernetes.core.k8s:
+    namespace: default
+    definition:
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: mysql-test
+        labels:
+          app.kubernetes.io/name: mysql-test
+      spec:
+        capacity:
+          storage: 1Gi # not enforced for hostpath volumes but requires value >0 to work
+        accessModes:
+        - ReadWriteOnce
+        hostPath:
+          path: /var/lib/state/mysql-test
+          type: DirectoryOrCreate
 
-- name: Pull container image
-  containers.podman.podman_image:
-    name: docker.io/library/mysql
-    tag: "{{ mysql_tag }}"
-  become_user: "{{ mysql_podman_user }}"
+- name: Create pvc
+  kubernetes.core.k8s:
+    namespace: default
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: sql-pvc
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        volumeMode: Filesystem
+        volumeName: mysql-test
+
+- name: Install mysql helm chart
+  kubernetes.core.helm:
+    chart_ref: mysql
+    chart_repo_url: https://charts.bitnami.com/bitnami
+    chart_version: 11.1.19
+    release_namespace: default
+    release_name: sqlrelease
+    release_values:
+      image:
+        debug: true
+      volumePermissions:
+        enabled: true
+      auth:
+        rootPassword: "{{ mysql_root_password }}"
+      primary:
+        persistence:
+          existingClaim: sql-pvc
+        nodeSelector:
+          clusterrole: server
+      networkPolicy:
+        enabled: false
+    atomic: no
+    create_namespace: no
