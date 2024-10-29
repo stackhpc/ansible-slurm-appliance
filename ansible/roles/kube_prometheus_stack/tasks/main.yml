@@ -197,10 +197,4 @@
     definition:
       metadata:
         name: "{{ item }}"
-  loop:
-    - kube-prometheus-stack-nodes-darwin
-    - kube-prometheus-stack-grafana-overview
-    - kube-prometheus-stack-proxy
-    - kube-prometheus-stack-etcd
-    - kube-prometheus-stack-alertmanager-overview
-    - kube-prometheus-stack-scheduler
+  loop: "{{ grafana_exclude_default_dashboards }}"

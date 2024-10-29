@@ -109,7 +109,7 @@ Note that if Open OnDemand is enabled, Grafana is only accessible through OOD's 
 
 ### grafana dashboards
 
-In addition to the default set of dashboards that are deployed by kube-prometheus-stack, the appliance ships with a default set of dashboards (listed below). The set of appliance-specific dashboards can be configured via the `grafana_dashboards` variable. The dashboards are either internal to the [grafana-dashboards role](../ansible/roles/grafana-dashboards/files/) or downloaded from grafana.com.
+In addition to the default set of dashboards that are deployed by kube-prometheus-stack, the appliance ships with a default set of dashboards (listed below). The set of appliance-specific dashboards can be configured via the `grafana_dashboards` variable. The dashboards are either internal to the [grafana-dashboards role](../ansible/roles/grafana-dashboards/files/) or downloaded from grafana.com. If you wish to selectively remove the default dashboards deployed by kube-prometheus-stack, this can be done by overriding the `grafana_exclude_default_dashboards` variable in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml).
 
 #### node exporter slurm
 

@@ -73,6 +73,9 @@ prometheus_rules:
 
 # ------------------------------------------------------------------------------------------
 grafana_image_tag: 11.2.2
+grafana_sidecar_image_tag: 1.26.1
+
+grafana_exclude_default_dashboards: []
 
 grafana_security:
   admin_user: grafana
@@ -92,7 +95,6 @@ grafana_datasources: []
 grafana_home_dashboard: slurm-jobs.json
 
 alertmanager_image_tag: v0.27.0
-grafana_sidecar_image_tag: 1.26.1
 
 node_exporter_image_tag: v1.8.2
 node_exporter_args: 

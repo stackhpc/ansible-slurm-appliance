@@ -40,6 +40,15 @@ grafana_dashboards_default:
     revision_id: 3
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 
+# Configmap names of kube prometheus stack's default dashboards to exclude
+grafana_exclude_default_dashboards:
+- kube-prometheus-stack-nodes-darwin
+- kube-prometheus-stack-grafana-overview
+- kube-prometheus-stack-proxy
+- kube-prometheus-stack-etcd
+- kube-prometheus-stack-alertmanager-overview
+- kube-prometheus-stack-scheduler
+
 grafana_security:
     admin_user: grafana
     admin_password: "{{ vault_grafana_admin_password }}"
