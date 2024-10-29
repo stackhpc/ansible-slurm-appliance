@@ -1,0 +1,165 @@
+name: Upload CI-tested images to Arcus S3 and sync clouds
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+env:
+  S3_BUCKET: openhpc-images-prerelease
+  IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+
+jobs:
+  s3_cleanup:
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.workflow }}-${{ github.ref }}
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Write s3cmd configuration
+        run: |
+          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
+        shell: bash
+
+      - name: Install s3cmd
+        run: |
+          sudo apt-get --yes install s3cmd
+      
+      - name: Cleanup S3 bucket
+        run: |
+          s3cmd rm s3://${{ env.S3_BUCKET }} --recursive --force
+
+  image_upload:
+    runs-on: ubuntu-22.04
+    needs: s3_cleanup
+    concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - RL8
+          - RL9
+          - RL9-cuda
+    env:
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
+    outputs:
+      ci_cloud: ${{ steps.ci.outputs.CI_CLOUD }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record which cloud CI is running on
+        id: ci
+        run: |
+          echo "CI_CLOUD=${{ env.CI_CLOUD }}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup environment
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Write s3cmd configuration
+        run: |
+          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
+        shell: bash
+
+      - name: Install s3cmd
+        run: |
+          sudo apt-get --yes install s3cmd
+
+      - name: Retrieve image name
+        run: |
+          TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
+        shell: bash
+
+      - name: Download image to runner
+        run: |
+          . venv/bin/activate
+          openstack image save --file ${{ env.TARGET_IMAGE }} ${{ env.TARGET_IMAGE }}
+        shell: bash
+
+      - name: Upload Image to S3
+        run: |
+          echo "Uploading Image: ${{ env.TARGET_IMAGE }} to S3..."
+          s3cmd --multipart-chunk-size-mb=150 put ${{ env.TARGET_IMAGE }} s3://${{ env.S3_BUCKET }}
+        shell: bash
+
+  image_sync:
+    needs: image_upload
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.cloud }}-${{ matrix.build }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cloud:
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+        build:
+          - RL8
+          - RL9
+          - RL9-cuda
+        exclude: 
+          - cloud: ${{ needs.image_upload.outputs.ci_cloud }}
+
+    env:
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ matrix.cloud }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record which cloud CI is running on
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+
+      - name: Setup environment
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Retrieve image name
+        run: |
+          TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
+
+      - name: Download latest image if missing
+        run: |
+          . venv/bin/activate
+          bash .github/bin/get-s3-image.sh ${{ env.TARGET_IMAGE }} ${{ env.S3_BUCKET }}
+
+      - name: Cleanup OpenStack Image (on error or cancellation)
+        if: cancelled() || failure()
+        run: |
+          . venv/bin/activate
+          image_hanging=$(openstack image list --name ${{ env.TARGET_IMAGE }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
+          if [ -n "$image_hanging" ]; then
+            echo "Cleaning up OpenStack image with ID: $image_hanging"
+            openstack image delete $image_hanging
+          else
+            echo "No image ID found, skipping cleanup."
+          fi
+        shell: bash
