@@ -23,6 +23,7 @@
 # SOFTWARE.
 
 - become: false
+  delegate_to: localhost
   block:
     - name: Create local grafana dashboard directory
       file:
@@ -108,35 +109,10 @@
       when:
         - grafana_dashboards | length > 0
 
-# Templating partial manifests and then adding the dashboard's data server-side because the k8s module doesn't like Jinja2
-- name: Create partial configmaps for server-side templating
-  ansible.builtin.template:
-    src: configmap-template.yml.j2
-    dest: "{{ _tmp_dashboards.path }}/{{ item_filename }}.yml"
-  loop: "{{ grafana_dashboards }}"
-  vars:
-    item_filename: "{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"
-
-- name: Setting data keys
-  ansible.builtin.replace:
-    path: "{{ _tmp_dashboards.path }}/{{ item_filename }}.yml"
-    regexp: 'PLACEHOLDER'
-    replace: "{{ item_filename }}"
-  loop: "{{ grafana_dashboards }}"
-  vars:
-    item_filename: "{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"
-
-- name: Appending json data to configmaps
-  ansible.builtin.shell:
-    cmd: "sed 's/^/    /' {{ item_path }} >> {{ item_path }}.yml"
-  loop: "{{ grafana_dashboards }}"
-  vars:
-    item_filename: "{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"
-    item_path: "{{ _tmp_dashboards.path }}/{{ item_filename }}"
-
-- name: Applying dashboard configmaps
+- name: Template configmaps from dashboards
   ansible.builtin.k8s:
-    src: "{{ item_path }}.yml"
+    definition:
+      "{{ lookup('ansible.builtin.template', 'configmap-template.yml.j2') | from_yaml }}"
   loop: "{{ grafana_dashboards }}"
   vars:
     item_filename: "{{ ((item.dashboard_id | string) + '.json') if 'dashboard_id' in item else item.dashboard_file }}"

@@ -6,4 +6,5 @@ metadata:
   labels:
     grafana_dashboard: "1"
 data:
-  PLACEHOLDER: |
+  {{ item_filename }}: |
+{{ lookup('ansible.builtin.file', _tmp_dashboards.path+'/'+item_filename) | indent(4, first=True) }}
