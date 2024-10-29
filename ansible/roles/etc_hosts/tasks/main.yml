@@ -6,3 +6,26 @@
     group: root
     mode: 0644
   become: yes
+
+- name: Ensure /exports/hosts directory exists and copy /etc/hosts
+  block:
+    - name: Ensure the /exports/hosts directory exists
+      file:
+        path: /exports/hosts
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      become: yes
+      delegate_to: "{{ groups['control'] | first }}"
+
+    - name: Copy /etc/hosts to NFS exported directory
+      copy:
+        src: /etc/hosts
+        dest: /exports/hosts/hosts
+        owner: root
+        group: root
+        mode: 0644
+        remote_src: true
+      become: yes
+      delegate_to: "{{ groups['control'] | first }}"
