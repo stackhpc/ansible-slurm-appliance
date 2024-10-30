@@ -58,7 +58,7 @@ m appliance release](https://github.com/stackhpc/ansible-slurm-appliance/release
 
     Note that some releases may not include new images. In this case use the image from the latest previous release with new images.
 
-1. If required, build an "extra" image with local modifications. See site-specific instructions in [docs/site/README.md](site/README.md).
+1. If required, build an "extra" image with local modifications. See [docs/image-build.md](./image-build.md) and site-specific instructions in [docs/site/README.md](site/README.md).
 
 1. Modify your environments to use this image, test it in your staging cluster, and push commits to the PR created above. See site-specific instructions in [docs/site/README.md](site/README.md).
 
