@@ -43,10 +43,10 @@ collections:
     version: 3.7.2
   - name: openstack.cloud
     version: 2.1.0
-  - name: https://github.com/stackhpc/ansible-collection-terraform
+  - name: https://github.com/azimuth-cloud/ansible-collection-terraform
     type: git
-    version: 0.2.0
+    version: 0.4.0
   - name: https://github.com/azimuth-cloud/ansible-collection-image-utils
     type: git
-    version: main # update on release
+    version: 0.4.0
 ...

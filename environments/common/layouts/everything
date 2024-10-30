@@ -87,3 +87,6 @@ cluster
 
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
+
+[lustre]
+# Hosts to run lustre client

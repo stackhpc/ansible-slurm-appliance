@@ -138,3 +138,6 @@ freeipa_client
 
 [sssd]
 # Hosts to configure sssd on
+
+[lustre]
+# Hosts to run lustre client

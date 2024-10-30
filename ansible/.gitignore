@@ -62,3 +62,5 @@ roles/*
 !roles/sssd/**
 !roles/sshd/
 !roles/sshd/**
+!roles/lustre/
+!roles/lustre/**
