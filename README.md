@@ -65,9 +65,15 @@ and follow the prompts to complete the environment name and description.
 
 **NB:** In subsequent sections this new environment is refered to as `$ENV`.
 
-Now generate secrets for this environment:
+Activate this environment:
+
+    . environments/$ENV/activate
+
+and generate secrets for it:
 
     ansible-playbook ansible/adhoc/generate-passwords.yml
+
+Note that all subsequent steps require the venv and the environment to be activated as above.
 
 ### Define infrastructure configuration
 
@@ -91,10 +97,19 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
         }
     }
 
-Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables
-and descriptions see `environments/$ENV/terraform/terraform.tfvars`.
+Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables and descriptions see `environments/$ENV/terraform/terraform.tfvars`.
+
+Now deploy the infrastructure - the below assumes that OpenStack credentials are defined using a [clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml) file in a default location with the default cloud name of `openstack`:
+
+    export OS_CLOUD=openstack
+    cd environments/$ENV/terraform/
+    tofu apply
+
+and follow the prompts.
 
 ### Deploy appliance
+
+Once infrastructure has been created, run Ansible to configure the appliance on it:
 
     ansible-playbook ansible/site.yml
 
