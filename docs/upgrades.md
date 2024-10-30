@@ -35,7 +35,7 @@ All other commands should be run on the Ansible deploy host.
 
 1. Merge the upstream code into your release branch:
 
-        git merge stackhpc/vX.Y
+        git merge vX.Y
 
    It is possible this will introduce merge conflicts; fix these following the usual git 
    prompts. Generally merge conflicts should only exist where functionality which was added
