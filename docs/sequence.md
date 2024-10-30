@@ -38,7 +38,7 @@ sequenceDiagram
     participant ansible as Ansible Deploy Host
     participant cloud as Cloud
     note over ansible: $ ansible-playbook ansible/adhoc/generate-passwords.yml
-    ansible->>ansible: Template secrets to inventory group_vars
+    ansible->>ansible: Template secrets to inventory group_vars and tofu metadata
     note over ansible: $ tofu apply ....
     ansible->>cloud: Create infra
     create participant nodes as Cluster Instances
