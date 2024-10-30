@@ -19,6 +19,9 @@ sequenceDiagram
     create participant packer as Build VM
     cloud->>packer: Create VM
     note over packer: Boot
+    packer->>cloud: Query metadata
+    cloud->>packer: Metadata sent
+    packer->>packer: Skip ansible-init
     ansible->>packer: Wait for ssh connection
     ansible->>packer: Run ansible/fatimage.yml playbook
     ansible->>packer: Shutdown
