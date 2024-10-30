@@ -48,7 +48,7 @@ sequenceDiagram
     note over nodes: ansible-init
     nodes->>cloud: Query metadata
     cloud->>nodes: Metadata sent
-    nodes->>nodes: Start k3s
+    nodes->>nodes: Start k3s and connect to its peers
     end
     note over ansible: $ ansible-playbook ansible/site.yml
     ansible->>nodes: Wait for ansible-init completion
