@@ -12,8 +12,10 @@ This document assumes the deployment repository has:
 2. Branches:
     - `main` - following `main/origin`, the current site-specific code deployed to production.
     - `upstream` - following `main/stackhpc`, i.e. the upstream `main` branch from `stackhpc`.
-
-It also assumes the site has `staging` and `production` environments.
+3. The following environments:
+    - `$PRODUCTION`: a production environment, as defined by e.g. `environments/production/`.
+    - `$STAGING`: a production environment, as defined by e.g. `environments/staging/`.
+    - `$SITE_ENV`: a base site-specific environment, as defined by e.g. `environments/mysite/`.
 
 **NB:** Commands which should be run on the Slurm login node are shown below prefixed `[LOGIN]$`.
 All other commands should be run on the Ansible deploy host.
@@ -51,26 +53,35 @@ All other commands should be run on the Ansible deploy host.
 
    Make changes as necessary.
 
-1. Download the relevant release image(s) using the link from the relevant [Slur
-m appliance release](https://github.com/stackhpc/ansible-slurm-appliance/releases), e.g.:
+1. Identify image(s) from the relevant [Slurm appliance release](https://github.com/stackhpc/ansible-slurm-appliance/releases), and download
+   using the link on the release plus the image name, e.g. for an image `openhpc-ofed-RL8-240906-1042-32568dbb`:
 
         wget https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/openhpc-images/openhpc-ofed-RL8-240906-1042-32568dbb
 
     Note that some releases may not include new images. In this case use the image from the latest previous release with new images.
 
-1. If required, build an "extra" image with local modifications. See [docs/image-build.md](./image-build.md) and site-specific instructions in [docs/site/README.md](site/README.md).
+1. If required, build an "extra" image with local modifications, see [docs/image-build.md](./image-build.md).
 
-1. Modify your environments to use this image, test it in your staging cluster, and push commits to the PR created above. See site-specific instructions in [docs/site/README.md](site/README.md).
+1. Modify your site-specific environment to use this image, e.g. via `cluster_image_id` in `environments/$SITE_ENV/terraform/variables.tf`.
 
-1. Declare a future outage window to cluster users and create a [Slurm reservation](https://slurm.schedmd.com/scontrol.html#lbAQ) to prevent jobs running during that window, e.g.:
+1. Test this in your staging cluster.
+
+1. Commit changes and push to the PR created above.
+
+1. Declare a future outage window to cluster users. A [Slurm reservation](https://slurm.schedmd.com/scontrol.html#lbAQ) can be
+   used to prevent jobs running during that window, e.g.:
 
         [LOGIN]$  sudo scontrol create reservation Flags=MAINT ReservationName="upgrade-vX.Y" StartTime=2024-10-16T08:00:00 EndTime=2024-10-16T10:00:00 Nodes=ALL Users=root
+
+   Note a reservation cannot be created if it may overlap with currently running jobs (defined by job or partition time limits).
 
 1. At the outage window, check there are no jobs running:
 
         [LOGIN]$ squeue
 
-1. Deploy the branch created above to production. See site-specific instructions in [docs/site/README.md](site/README.md).
+1. Deploy the branch created above to production, i.e. activate the production environment, run OpenTofu to reimage or
+delete/recreate instances with the new images (depending on how the root disk is defined), and run Ansible's `site.yml`
+playbook to reconfigure the cluster, e.g. as described in the main [README.md](../README.md).
 
 1. Check slurm is up:
 
