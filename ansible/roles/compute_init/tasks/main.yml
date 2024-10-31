@@ -1,0 +1,45 @@
+---
+
+- name: Ensure templates directory exists
+  file: 
+    path: /etc/ansible-init/templates
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Inject templates
+  copy:
+    src: '{{ item }}'
+    dest: '/etc/ansible-init/templates/{{ item | basename }}'
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - ../../resolv_conf/templates/resolv.conf.j2
+
+- name: Ensure files directory exists
+  file: 
+    path: /etc/ansible-init/files
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Inject files
+  copy:
+    src: '{{ item }}'
+    dest: '/etc/ansible-init/files/{{ item | basename }}'
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - ../../resolv_conf/files/NetworkManager-dns-none.conf
+
+- name: Inject compute initialisation playbook
+  copy:
+    src: compute-init.yml
+    dest: /etc/ansible-init/playbooks/compute-init.yml
+    owner: root
+    group: root
+    mode: 0644

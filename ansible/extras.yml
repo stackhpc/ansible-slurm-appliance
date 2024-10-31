@@ -36,3 +36,11 @@
   tasks:
     - import_role:
         name: persist_hostkeys
+
+- name: Inject ansible-init compute script
+  hosts: compute_init
+  tags: compute_init
+  become: yes
+  tasks:
+    - import_role:
+        name: compute_init

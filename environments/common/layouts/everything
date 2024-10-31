@@ -81,3 +81,7 @@ openhpc
 [ansible_init:children]
 # Hosts to run ansible-init
 cluster
+
+[compute_init:children]
+# Hosts to deploy compute initialisation ansible-init script to.
+compute

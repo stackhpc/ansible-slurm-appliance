@@ -135,3 +135,6 @@ freeipa_client
 
 [ansible_init]
 # Hosts to run linux-anisble-init
+
+[compute_init]
+# Hosts to deploy compute initialisation ansible-init script to.

@@ -1,0 +1,59 @@
+---
+
+- name: Compute node initialisation
+  hosts: localhost
+  become: yes
+  vars:
+    control_node_ip: "172.16.1.228"
+    nfs_export: "/exports/hosts"
+    resolv_conf_nameservers: []
+
+  tasks:
+    - name: Configure resolve.conf
+      block:
+        - name: Set nameservers in /etc/resolv.conf
+          ansible.builtin.template:
+            src: /etc/ansible-init/templates/resolv.conf.j2
+            dest: /etc/resolv.conf
+            owner: root
+            group: root
+            mode: u=rw,og=r
+
+        - name: Disable NetworkManager control of resolv.conf
+          ansible.builtin.copy:
+            src: /etc/ansible-init/files/NetworkManager-dns-none.conf
+            dest: /etc/NetworkManager/conf.d/90-dns-none.conf
+            owner: root
+            group: root
+            mode: u=rw,og=r
+          register: _copy_nm_config
+
+        - name: Reload NetworkManager
+          ansible.builtin.systemd:
+            name: NetworkManager
+            state: reloaded
+          when: _copy_nm_config.changed | default(false)
+
+    - name: Mount /etc/hosts on compute nodes
+      block:
+        - name: Ensure the mount directory exists
+          file:
+            path: /mnt/hosts
+            state: directory
+            mode: 0755
+        
+        - name: Mount NFS export
+          mount:
+            path: /mnt/hosts
+            src: "{{ vars.control_node_ip }}:{{ nfs_export }}"
+            fstype: nfs
+            opts: rw,sync
+            state: mounted
+
+        - name: Copy /exports/hosts contents to /etc/hosts
+          copy:
+            src: /mnt/hosts/hosts
+            dest: /etc/hosts
+            owner: root
+            group: root
+            mode: 0644
