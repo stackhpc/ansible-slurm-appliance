@@ -1,0 +1,265 @@
+name: Build nightly image
+on:
+  workflow_dispatch:
+      inputs:
+        ci_cloud:
+          description: 'Select the CI_CLOUD'
+          required: true
+          type: choice
+          options:
+            - LEAFCLOUD
+            - SMS
+            - ARCUS
+  schedule:
+    - cron: '0 0 * * *'  # Run at midnight
+
+jobs:
+  openstack:
+    name: openstack-imagebuild
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false # allow other matrix jobs to continue even if one fails
+      matrix: # build RL8, RL9, RL9+CUDA versions
+        os_version:
+          - RL8
+          - RL9
+        build:
+          - openstack.rocky-latest
+          - openstack.rocky-latest-cuda
+        exclude:
+          - os_version: RL8
+            build: openstack.rocky-latest-cuda
+
+    env:
+      ANSIBLE_FORCE_COLOR: True
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
+      SOURCE_IMAGES_MAP: |
+        {
+          "RL8": "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2",
+          "RL9": "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
+        }
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir ~/.ssh
+          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+        shell: bash
+
+      - name: Add bastion's ssh key to known_hosts
+        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Setup environment
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+
+      - name: Build fat image with packer
+        id: packer_build
+        run: |
+          set -x
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          cd packer/
+          packer init .
+
+          PACKER_LOG=1 packer build \
+          -on-error=${{ vars.PACKER_ON_ERROR }} \
+          -only=${{ matrix.build }} \
+          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
+          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
+          openstack.pkr.hcl
+
+        env:
+          PKR_VAR_os_version: ${{ matrix.os_version }}
+          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version] }}
+
+      - name: Get created image names from manifest
+        id: manifest
+        run: |
+          . venv/bin/activate
+          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
+          while ! openstack image show -f value -c name $IMAGE_ID; do
+            sleep 5
+          done
+          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download image
+        run: |
+          . venv/bin/activate
+          sudo mkdir /mnt/images
+          sudo chmod 777 /mnt/images
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-id }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: install libguestfs
+        run: |
+          sudo apt -y update
+          sudo apt -y install libguestfs-tools
+
+      - name: mkdir for mount
+        run: sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
+
+      - name: mount qcow2 file
+        run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.17.0
+        with:
+          scan-type: fs
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
+          scanners: "vuln"
+          format: sarif
+          output: "${{ steps.manifest.outputs.image-name }}.sarif"
+          # turn off secret scanning to speed things up
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
+          category: "${{ matrix.os_version }}-${{ matrix.build }}"
+
+      - name: Fail if scan has CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@0.16.1
+        with:
+          scan-type: fs
+          scan-ref: "${{ steps.manifest.outputs.image-name }}"
+          scanners: "vuln"
+          format: table
+          exit-code: '1'
+          severity: 'CRITICAL'
+          ignore-unfixed: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete new image if Trivy scan fails
+        if: failure() && steps.packer_build.outcome == 'success' # Runs if the Trivy scan found crit vulnerabilities or failed
+        run: |
+          . venv/bin/activate
+          echo "Deleting new image due to critical vulnerabilities or scan failure ..."
+          openstack image delete "${{ steps.manifest.outputs.image-id }}"
+
+      - name: Delete old latest image
+        if: success() # Runs only if Trivy scan passed
+        run: |
+          . venv/bin/activate
+          IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
+          if [ "$IMAGE_COUNT" -gt 1 ]; then
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ steps.manifest.outputs.image-name }}"  -f value -c ID | head -n 1)
+            echo "Deleting old image ID: $OLD_IMAGE_ID"
+            openstack image delete "$OLD_IMAGE_ID"
+          else
+            echo "Only one image exists, skipping deletion."
+          fi
+
+  upload:
+    name: upload-nightly-targets
+    needs: openstack
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.image }}-${{ matrix.target_cloud }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target_cloud:
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+        os_version:
+          - RL8
+          - RL9
+        image:
+          - rocky-latest
+          - rocky-latest-cuda
+        exclude:
+          - os_version: RL8
+            image: rocky-latest-cuda
+          - target_cloud: LEAFCLOUD
+    env:
+      OS_CLOUD: openstack
+      SOURCE_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
+      TARGET_CLOUD: ${{ matrix.target_cloud }}
+      IMAGE_NAME: "${{ matrix.image }}-${{ matrix.os_version }}"
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record settings for CI cloud
+        run: |
+          echo SOURCE_CLOUD: ${{ env.SOURCE_CLOUD }}
+          echo TARGET_CLOUD: ${{ env.TARGET_CLOUD }}
+
+      - name: Install openstackclient
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.SOURCE_CLOUD)] }}" > ~/.config/openstack/source_clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.TARGET_CLOUD)] }}" > ~/.config/openstack/target_clouds.yaml
+        shell: bash
+
+      - name: Download source image
+        run: |
+          . venv/bin/activate
+          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/source_clouds.yaml
+          openstack image save --file ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}
+        shell: bash
+
+      - name: Upload to target cloud
+        run: |
+          . venv/bin/activate
+          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
+
+          openstack image create "${{ env.IMAGE_NAME }}" \
+            --file "${{ env.IMAGE_NAME }}" \
+            --disk-format qcow2 \
+        shell: bash
+
+      - name: Delete old latest image from target cloud
+        run: |
+          . venv/bin/activate
+          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
+
+          IMAGE_COUNT=$(openstack image list --name ${{ env.IMAGE_NAME }} -f value -c ID | wc -l)
+          if [ "$IMAGE_COUNT" -gt 1 ]; then
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ env.IMAGE_NAME }}"  -f value -c ID | head -n 1)
+            openstack image delete "$OLD_IMAGE_ID"
+          else
+            echo "Only one image exists, skipping deletion."
+          fi
+        shell: bash

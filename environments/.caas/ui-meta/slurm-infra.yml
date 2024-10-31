@@ -29,7 +29,7 @@ parameters:
     kind: cloud.size
     immutable: true
     options:
-      min_ram: 2048
+      min_ram: 4096
       min_disk: 20
 
   - name: compute_count
@@ -112,7 +112,7 @@ usage_template: |-
   compute*     up 60-00:00:0    {{ "%3s" | format(cluster.parameter_values.compute_count) }}   idle {{ cluster.name }}-compute-[0-{{ cluster.parameter_values.compute_count - 1 }}]
   ```
 
-  The `rocky` user can be accessed the same way and has passwordless `sudo` enabled.
+  The `azimuth` user can ssh between nodes and has passwordless sudo.
 
   SSH access can be granted to additional users by placing their SSH public key in `~azimuth/.ssh/authorized_keys`.
 

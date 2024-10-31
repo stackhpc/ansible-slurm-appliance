@@ -116,6 +116,13 @@ data "openstack_networking_network_v2" "cluster_external_network" {
   name = "{{ cluster_external_network }}"
 }
 
+# Storage network 
+{% if cluster_storage_network is defined %}
+data "openstack_networking_network_v2" "cluster_storage" {
+  name = "{{ cluster_storage_network }}"
+}
+{% endif %}
+
 data "openstack_networking_subnet_ids_v2" "cluster_external_subnets" {
   network_id = "${data.openstack_networking_network_v2.cluster_external_network.id}"
 }
@@ -177,6 +184,11 @@ data "openstack_networking_subnet_v2" "cluster_subnet" {
 ##### Cluster ports
 #####
 
+###
+# Login node
+###
+
+# Primary network
 resource "openstack_networking_port_v2" "login" {
   name = "{{ cluster_name }}-login-0"
   network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
@@ -193,14 +205,31 @@ resource "openstack_networking_port_v2" "login" {
 
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
-    {% if cluster_vnic_profile is defined %}
-    profile = <<EOF
-    {{ cluster_vnic_profile | to_json }}
-    EOF
-    {% endif %}
   }
 }
 
+# Storage network
+{% if cluster_storage_network is defined %}
+resource "openstack_networking_port_v2" "login_storage" {
+  name           = "{{ cluster_name }}-login-storage-0"
+  network_id     = data.openstack_networking_network_v2.cluster_storage.id
+  admin_state_up = "true"
+
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}",
+  ]
+
+  binding {
+    vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
+  }
+}
+{% endif %}
+
+###
+# Control node
+###
+
+# Primary network
 resource "openstack_networking_port_v2" "control" {
   name = "{{ cluster_name }}-control-0"
   network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
@@ -216,15 +245,32 @@ resource "openstack_networking_port_v2" "control" {
 
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
-    {% if cluster_vnic_profile is defined %}
-    profile = <<EOF
-    {{ cluster_vnic_profile | to_json }}
-    EOF
-    {% endif %}
+
   }
 }
 
+# Storage network
+{% if cluster_storage_network is defined %}
+resource "openstack_networking_port_v2" "control_storage" {
+  name           = "{{ cluster_name }}-control-storage-0"
+  network_id     = data.openstack_networking_network_v2.cluster_storage.id
+  admin_state_up = "true"
+
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+  ]
+
+  binding {
+    vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
+  }
+}
+{% endif %}
+
+###
+# Workers
+###
 {% for partition in openhpc_slurm_partitions %}
+# Primary network
 resource "openstack_networking_port_v2" "{{ partition.name }}" {
   count = {{ partition.count }}
   name = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
@@ -241,13 +287,26 @@ resource "openstack_networking_port_v2" "{{ partition.name }}" {
 
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
-    {% if cluster_vnic_profile is defined %}
-    profile = <<EOF
-    {{ cluster_vnic_profile | to_json }}
-    EOF
-    {% endif %}
   }
 }
+
+# Storage network
+{% if cluster_storage_network is defined %}
+resource "openstack_networking_port_v2" "{{ partition.name }}_storage" {
+  count          = {{ partition.count }}
+  name           = "{{ cluster_name }}-compute-{{ partition.name }}-storage-${count.index}"
+  network_id     = data.openstack_networking_network_v2.cluster_storage.id
+  admin_state_up = "true"
+
+  security_group_ids = [
+    "${openstack_networking_secgroup_v2.secgroup_slurm_cluster.id}"
+  ]
+
+  binding {
+    vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
+  }
+}
+{% endif %}
 
 {% endfor %}
 
@@ -274,8 +333,14 @@ resource "openstack_compute_instance_v2" "login" {
   {% endif %}
 
   network {
-    port = "${openstack_networking_port_v2.login.id}"
+    port = openstack_networking_port_v2.login.id
   }
+
+  {% if cluster_storage_network is defined %}
+  network {
+    port = openstack_networking_port_v2.login_storage.id
+  }
+  {% endif %}
 
   # root device:
   block_device {
@@ -298,19 +363,30 @@ resource "openstack_compute_instance_v2" "login" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {%- if cluster_user_ssh_public_key is defined %}
-      - {{ cluster_user_ssh_public_key }}
-    {%- endif %}
     {%- if cluster_deploy_ssh_public_key is defined %}
       - {{ cluster_deploy_ssh_public_key }}
     {%- endif %}
     {%- if cluster_ssh_private_key_file is not defined %}
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
-    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
-      - {{ ssh_key }}
-    {%- endfor %}
   EOF
+
+  metadata = {
+    {% for playbook in ansible_init_playbooks %}
+      ansible_init_pb_{{ loop.index0 }}_name = "{{ playbook.name }}"
+      {% if playbook.stage is defined %}
+        ansible_init_pb_{{ loop.index0 }}_stage = "{{ playbook.stage }}"
+      {% endif %}
+    {% endfor %}
+    {% for collection in ansible_init_collections %}
+      ansible_init_coll_{{ loop.index0 }}_name = "{{ collection.name }}"
+      ansible_init_coll_{{ loop.index0 }}_type = "{{ collection.type }}"
+      ansible_init_coll_{{ loop.index0 }}_version = "{{ collection.version }}"
+      {% if collection.source is defined %}
+        ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
+      {% endif %}
+    {% endfor %} 
+  }
 }
 
 resource "openstack_compute_instance_v2" "control" {
@@ -323,8 +399,14 @@ resource "openstack_compute_instance_v2" "control" {
   {% endif %}
 
   network {
-    port = "${openstack_networking_port_v2.control.id}"
+    port = openstack_networking_port_v2.control.id
   }
+
+  {% if cluster_storage_network is defined %}
+  network {
+    port = openstack_networking_port_v2.control_storage.id
+  }
+  {% endif %}
 
   # root device:
   block_device {
@@ -365,18 +447,12 @@ resource "openstack_compute_instance_v2" "control" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {%- if cluster_user_ssh_public_key is defined %}
-      - {{ cluster_user_ssh_public_key }}
-    {%- endif %}
     {%- if cluster_deploy_ssh_public_key is defined %}
       - {{ cluster_deploy_ssh_public_key }}
     {%- endif %}
     {%- if cluster_ssh_private_key_file is not defined %}
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
-    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
-      - {{ ssh_key }}
-    {%- endfor %}
     bootcmd:
     %{for volume in [openstack_blockstorage_volume_v3.state, {% if not cluster_home_manila_share | bool %} openstack_blockstorage_volume_v3.home {% endif %}]}
     - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
@@ -387,6 +463,23 @@ resource "openstack_compute_instance_v2" "control" {
         - [LABEL=home, /exports/home, auto]
         {% endif %}
   EOF
+
+  metadata = {
+    {% for playbook in ansible_init_playbooks %}
+      ansible_init_pb_{{ loop.index0 }}_name = "{{ playbook.name }}"
+      {% if playbook.stage is defined %}
+        ansible_init_pb_{{ loop.index0 }}_stage = "{{ playbook.stage }}"
+      {% endif %}
+    {% endfor %}
+    {% for collection in ansible_init_collections %}
+      ansible_init_coll_{{ loop.index0 }}_name = "{{ collection.name }}"
+      ansible_init_coll_{{ loop.index0 }}_type = "{{ collection.type }}"
+      ansible_init_coll_{{ loop.index0 }}_version = "{{ collection.version }}"
+      {% if collection.source is defined %}
+        ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
+      {% endif %}
+    {% endfor %} 
+  }
 }
 
 {% for partition in openhpc_slurm_partitions %}
@@ -404,6 +497,12 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
   network {
     port = openstack_networking_port_v2.{{ partition.name }}[count.index].id
   }
+
+  {% if cluster_storage_network is defined %}
+  network {
+    port = openstack_networking_port_v2.{{ partition.name }}_storage[count.index].id
+  }
+  {% endif %}
 
   # root device:
   block_device {
@@ -426,19 +525,30 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
   user_data = <<-EOF
     #cloud-config
     ssh_authorized_keys:
-    {%- if cluster_user_ssh_public_key is defined %}
-      - {{ cluster_user_ssh_public_key }}
-    {%- endif %}
     {%- if cluster_deploy_ssh_public_key is defined %}
       - {{ cluster_deploy_ssh_public_key }}
     {%- endif %}
     {%- if cluster_ssh_private_key_file is not defined %}
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
-    {%- for ssh_key in cluster_deploy_ssh_keys_extra %}
-      - {{ ssh_key }}
-    {%- endfor %}
   EOF
+
+  metadata = {
+    {% for playbook in ansible_init_playbooks %}
+      ansible_init_pb_{{ loop.index0 }}_name = "{{ playbook.name }}"
+      {% if playbook.stage is defined %}
+        ansible_init_pb_{{ loop.index0 }}_stage = "{{ playbook.stage }}"
+      {% endif %}
+    {% endfor %}
+    {% for collection in ansible_init_collections %}
+      ansible_init_coll_{{ loop.index0 }}_name = "{{ collection.name }}"
+      ansible_init_coll_{{ loop.index0 }}_type = "{{ collection.type }}"
+      ansible_init_coll_{{ loop.index0 }}_version = "{{ collection.version }}"
+      {% if collection.source is defined %}
+        ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
+      {% endif %}
+    {% endfor %} 
+  }
 }
 
 {% endfor %}
@@ -462,7 +572,7 @@ data "openstack_networking_floatingip_v2" "cluster_floating_ip" {
   {% endif %}
 }
 
-resource "openstack_compute_floatingip_associate_v2" "login_floatingip_assoc" {
+resource "openstack_networking_floatingip_associate_v2" "login_floatingip_assoc" {
   floating_ip = "${data.openstack_networking_floatingip_v2.cluster_floating_ip.address}"
-  instance_id = "${openstack_compute_instance_v2.login.id}"
+  port_id = "${openstack_networking_port_v2.login.id}"
 }

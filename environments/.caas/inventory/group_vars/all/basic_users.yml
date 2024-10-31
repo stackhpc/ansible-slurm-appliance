@@ -4,3 +4,9 @@ basic_users_users:
     password: "{{ vault_azimuth_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
     uid: 1005
     public_key: "{{ cluster_user_ssh_public_key }}"
+    shell: /bin/bash
+    append: true
+    groups:
+      - adm
+      - systemd-journal
+    sudo: azimuth ALL=(ALL) NOPASSWD:ALL

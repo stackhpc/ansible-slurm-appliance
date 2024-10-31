@@ -1,32 +1,38 @@
-[all:vars]
-openhpc_cluster_name=${cluster_name}
-cluster_domain_suffix=${cluster_domain_suffix}
+all:
+    vars:
+        openhpc_cluster_name: ${cluster_name}
+        cluster_domain_suffix: ${cluster_domain_suffix}
 
-[control]
+control:
+    hosts:
 %{ for control in control_instances ~}
-${ control.name } ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} node_fqdn=${ control.name }.${cluster_name}.${cluster_domain_suffix}
+        ${ control.name }:
+            ansible_host: ${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]}
+            instance_id: ${ control.id }
 %{ endfor ~}
+    vars:
+        appliances_state_dir: ${state_dir} # NB needs to be set on group not host otherwise it is ignored in packer build!
 
-[control:vars]
-# NB needs to be set on group not host otherwise it is ignored in packer build!
-appliances_state_dir=${state_dir}
-
-[login]
+login:
+    hosts:
 %{ for login in login_instances ~}
-${ login.name } ansible_host=${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]} node_fqdn=${ login.name }.${cluster_name}.${cluster_domain_suffix}
+        ${ login.name }:
+            ansible_host: ${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]}
+            instance_id: ${ login.id }
 %{ endfor ~}
 
-[compute]
-%{ for compute in compute_instances ~}
-${ compute.name } ansible_host=${[for n in compute.network: n.fixed_ip_v4 if n.access_network][0]} node_fqdn=${ compute.name }.${cluster_name}.${cluster_domain_suffix}
+%{ for group_name in keys(compute_groups) ~}
+${cluster_name}_${group_name}:
+    hosts:
+%{ for node in compute_groups[group_name]["compute_instances"] ~}
+        ${ node.name }:
+            ansible_host: ${node.access_ip_v4}
+            instance_id: ${ node.id }
+%{ endfor ~}
 %{ endfor ~}
 
-# Define groups for slurm parititions:
-%{~ for type_name, type_descr in compute_types}
-[${cluster_name}_${type_name}]
-    %{~ for node_name, node_type in compute_nodes ~}
-        %{~ if node_type == type_name ~}
-${ compute_instances[node_name].name }
-        %{~ endif ~}
-%{~ endfor ~}
+compute:
+    children:
+%{ for group_name in keys(compute_groups) ~}
+        ${cluster_name}_${group_name}:
 %{ endfor ~}

@@ -33,6 +33,7 @@ Role Variables
 - `hpctests_hpl_arch`: Optional, default 'linux64'. Arbitrary architecture name for HPL build. HPL is compiled on the first compute node of those selected (see `hpctests_nodes`), so this can be used to create different builds for different types of compute node.
 
 The following variables should not generally be changed:
+- `hpctests_pre_cmd`: Optional. Command(s) to include in sbatch templates before module load commands.
 - `hpctests_pingmatrix_modules`: Optional. List of modules to load for pingmatrix test. Defaults are suitable for OpenHPC 2.x cluster using the required packages.
 - `hpctests_pingpong_modules`: As above but for pingpong test.
 - `hpctests_pingpong_plot`: Whether to plot pingpong results. Default `yes`.

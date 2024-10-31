@@ -43,8 +43,10 @@
     path: /etc/systemd/system.conf.d/90-proxy.conf
     section: Manager
     option: DefaultEnvironment
-    value: >
-        "http_proxy={{ proxy_http_proxy }}" "https_proxy={{ proxy_http_proxy }}" "no_proxy={{ proxy_no_proxy }}"
+    value: >-
+        "http_proxy={{ proxy_http_proxy }}"
+        "https_proxy={{ proxy_http_proxy }}"
+        "no_proxy={{ proxy_no_proxy }}"
     no_extra_spaces: true
     owner: root
     group: root

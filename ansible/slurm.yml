@@ -65,7 +65,6 @@
       blockinfile:
         path: /etc/security/access.conf
         block: |
-          +:wheel:ALL
-          +:{{ ansible_user }}:ALL
+          +:adm:ALL
           -:ALL:ALL
       # vagrant uses (deprecated) ansible_ssh_user

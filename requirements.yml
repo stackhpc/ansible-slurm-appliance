@@ -3,8 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v23.12.1 # Tolerate state nfs file handles
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: a34dace
-    #version: 23ddc82 # https://github.com/stackhpc/ansible-role-openhpc/pull/163 # TODO: bump on release
+    version: a34dace # https://github.com/stackhpc/ansible-role-openhpc/pull/163 # TODO: bump on release
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
@@ -16,14 +15,13 @@ roles:
     version: 0.19.1
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
-    version: service-state
-    # No versions available
+    version: stackhpc-0.19.0 # fix grafana install
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
-    version: v3.0.6
+    version: v3.1.5
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: v24.1.0
+    version: v24.5.1 # Support ceph quincy for RL9
 
 collections:
   - name: containers.podman
@@ -45,7 +43,10 @@ collections:
     version: 3.7.2
   - name: openstack.cloud
     version: 2.1.0
-  - name: https://github.com/stackhpc/ansible-collection-terraform
+  - name: https://github.com/azimuth-cloud/ansible-collection-terraform
     type: git
-    version: 0.1.0
+    version: 0.4.0
+  - name: https://github.com/azimuth-cloud/ansible-collection-image-utils
+    type: git
+    version: 0.4.0
 ...

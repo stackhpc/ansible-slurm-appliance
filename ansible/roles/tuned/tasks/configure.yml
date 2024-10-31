@@ -1,0 +1,20 @@
+---
+- name: Enable and start TuneD
+  ansible.builtin.systemd:
+    name: tuned
+    enabled: "{{ tuned_enabled | bool }}"
+    state: "{{ 'started' if tuned_started | bool else 'stopped' }}"
+
+- name: Check TuneD profile
+  ansible.builtin.command:
+    cmd: tuned-adm active
+  when: tuned_started
+  register: _tuned_profile_current
+  changed_when: false
+
+- name: Set tuned-adm profile
+  ansible.builtin.command:
+    cmd: "tuned-adm profile {{ tuned_profile }}"
+  when: 
+    - tuned_started | bool
+    - tuned_profile not in _tuned_profile_current.stdout

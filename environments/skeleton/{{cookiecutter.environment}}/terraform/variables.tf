@@ -24,30 +24,35 @@ variable "key_pair" {
     description = "Name of an existing keypair in OpenStack"
 }
 
-variable "control_node" {
-    type = map
-    description = "Mapping {flavor: flavor_name, image: image_name_or_id }"
+variable "control_node_flavor" {
+    type = string
+    description = "Flavor name for control name"
 }
 
 variable "login_nodes" {
   type = map
-  description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> mapping  {flavor: flavor_name, image: image_name_or_id }"
+  description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> (str) flavor name"
 }
 
-variable "compute_types" {
-    type = map
-    description = "Mapping defining types of compute nodes: key -> (str) name of type, value -> mapping {flavor: flavor_name, image: image_name_or_id }"
+variable "cluster_image_id" {
+    type = string
+    description = "ID of default image for the cluster"
 }
 
-variable "compute_nodes" {
-    type = map(string)
-    description = "Mapping of compute nodename suffix -> key in compute_types"
-}
+variable "compute" {
+    type = any
+    description = <<-EOF
+        Mapping defining compute infrastructure. Keys are names of groups. Values are a
+        mapping as follows:
 
-variable "compute_images" {
-    type = map(string)
-    default = {}
-    description = "Mapping to override compute images from compute_types: key ->(str) node name, value -> (str) image name"
+        Required:
+            nodes: List of node names
+            flavor: String flavor name
+        Optional:
+            image_id: Overrides variable cluster_image_id
+            vnic_type: Overrides variable vnic_type
+            vnic_profile: Overrides variable vnic_profile
+    EOF
 }
 
 variable "environment_root" {
@@ -67,21 +72,33 @@ variable "state_volume_size" {
     default = 150 # GB
 }
 
+variable "state_volume_type" {
+    type = string
+    description = "Type of state volume, if not default type"
+    default = null
+}
+
 variable "home_volume_size" {
     type = number
     description = "Size of state volume on control node, in GB"
     default = 100 # GB, 0 means no home volume
 }
 
+variable "home_volume_type" {
+    type = string
+    default = null
+    description = "Type of home volume, if not default type"
+}
+
 variable "vnic_type" {
     type = string
-    description = "VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
+    description = "Default VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
     default = "normal"
 }
 
 variable "vnic_profile" {
     type = string
-    description = "VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
+    description = "Default VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
     default = "{}"
 }
 

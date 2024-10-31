@@ -10,20 +10,20 @@
 # outputs.cluster_gateway_ip.
 - block:
     - name: Look up floating IP
-      include_role:
-        name: stackhpc.terraform.infra
-        tasks_from: lookup_floating_ip
-      vars:
-        os_floating_ip_id: "{{ cluster_floating_ip }}"
+      azimuth_cloud.terraform.os_floating_ip_info:
+         floating_ip: "{{ cluster_floating_ip }}"
+      register: cluster_floating_ip_info
 
     - name: Set floating IP address fact
       set_fact:
-        cluster_floating_ip_address: "{{ os_floating_ip_info.floating_ip_address }}"
-  when: cluster_floating_ip is defined
+        cluster_floating_ip_address: "{{ cluster_floating_ip_info.floating_ip.floating_ip_address }}"
+  when:
+    - cluster_floating_ip is defined
+    - cluster_floating_ip
 
 - name: Install Terraform binary
   include_role:
-    name: stackhpc.terraform.install
+    name: azimuth_cloud.terraform.install
 
 - name: Make Terraform project directory
   file:
@@ -59,4 +59,4 @@
 
 - name: Provision infrastructure
   include_role:
-    name: stackhpc.terraform.infra
+    name: azimuth_cloud.terraform.infra

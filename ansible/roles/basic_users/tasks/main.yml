@@ -8,6 +8,10 @@
   when:
     - "item.state | default('present') == 'absent'"
   
+- name: Create groups
+  ansible.builtin.group: "{{ item }}"
+  loop:  "{{ basic_users_groups }}"
+
 - name: Create users and generate public keys
   user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() }}"
   loop: "{{ basic_users_users }}"
@@ -42,3 +46,13 @@
   - item.ssh_public_key is defined
   - basic_users_manage_homedir
   run_once: true
+
+- name: Write sudo rules
+  blockinfile:
+    path: /etc/sudoers.d/80-{{ item.name}}-user
+    block: "{{ item.sudo }}"
+    create: true
+  loop: "{{ basic_users_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: "'sudo' in item"

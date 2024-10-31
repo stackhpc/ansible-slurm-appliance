@@ -21,8 +21,18 @@
 - name: Setup CUDA
   hosts: cuda
   become: yes
-  gather_facts: no
+  gather_facts: yes
   tags: cuda
   tasks:
     - import_role:
         name: cuda
+
+- name: Persist hostkeys across rebuilds
+  # Must be after filesystems.yml (for storage)
+  # and before portal.yml (where OOD login node hostkeys are scanned)
+  hosts: persist_hostkeys:!builder
+  become: yes
+  gather_facts: no
+  tasks:
+    - import_role:
+        name: persist_hostkeys

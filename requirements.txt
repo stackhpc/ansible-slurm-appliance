@@ -1,7 +1,8 @@
 ansible==6.0.0
 openstacksdk
-python-openstackclient
+python-openstackclient==6.6.1 # v7.0.0 has a bug re. rebuild
 python-manilaclient
+python-ironicclient
 jmespath
 passlib[bcrypt]==1.7.4
 cookiecutter

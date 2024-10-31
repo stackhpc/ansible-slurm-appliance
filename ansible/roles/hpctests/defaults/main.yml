@@ -1,9 +1,13 @@
 ---
 hpctests_rootdir:
 hpctests_extra_paths: []
+hpctests_pre_cmd: ''
 hpctests_pingmatrix_modules: [gnu12 openmpi4]
 hpctests_pingpong_modules: [gnu12 openmpi4 imb]
-hpctests_pingpong_command: 'mpirun IMB-MPI1 pingpong' # NB 'srun --mpi=pmi2 IMB-MPI1 pingpong'  doesn't work in ohpc v2.1
+# mpirun flags force using UCX TCP transports, overriding higher
+# priority of OpenMPI btl/openib component, which is also using RDMA
+# https://wiki.stackhpc.com/s/985dae84-7bd8-4924-94b7-9629a7827100
+hpctests_pingpong_command: 'mpirun -mca pml_ucx_tls any -mca pml_ucx_devices any IMB-MPI1 pingpong' # NB 'srun --mpi=pmi2 IMB-MPI1 pingpong'  doesn't work in ohpc v2.1
 hpctests_pingpong_plot: yes
 hpctests_hpl_modules: [gnu12 openmpi4 openblas]
 hpctests_outdir: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/hpctests"

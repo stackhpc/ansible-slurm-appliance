@@ -1,5 +1,20 @@
 ---
 
+- hosts: cluster
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Check if ansible-init is installed
+      stat:
+        path: /etc/systemd/system/ansible-init.service
+      register: _stat_ansible_init_unitfile
+    
+    - name: Wait for ansible-init to finish
+      wait_for:
+        path: /var/lib/ansible-init.done
+        timeout: "{{ ansible_init_wait }}" # seconds
+      when: _stat_ansible_init_unitfile.stat.exists
+
 - hosts: localhost
   gather_facts: false
   become: false
@@ -39,8 +54,22 @@
 
 - hosts: cluster
   gather_facts: false
+  become: yes
   tasks:
-    - name: Add groups
+    - name: Fix incorrect permissions on /etc in Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+      # breaks munge
+      file:
+        path: /etc
+        state: directory
+        owner: root
+        group: root
+        mode: u=rwx,go=rx # has g=rwx
+    - name: Prevent ssh hanging if shared home is unavailable
+      lineinfile:
+        path: /etc/profile
+        search_string: HOSTNAME=$(/usr/bin/hostnamectl --transient 2>/dev/null) || \
+        state: absent
+    - name: Add system user groups
       ansible.builtin.group: "{{ item.group }}"
       loop: "{{ appliances_local_users }}"
       when:
@@ -49,17 +78,16 @@
       become_method: "sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: '-i'
-      become: true
-    - name: Add users
+    - name: Add system users
       ansible.builtin.user: "{{ item.user }}"
       loop: "{{ appliances_local_users }}"
       when: item.enable | default(true) | bool
       become_method: "sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: '-i'
-      become: true
     - name: Reset ssh connection to allow user changes to affect ansible_user
       meta: reset_connection
+      become: no
 
 - hosts: systemd
   become: yes
@@ -82,6 +110,25 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
+# --- tasks after here require access to package repos ---
+- hosts: squid
+  tags: squid
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Configure squid proxy
+      import_role:
+        name: squid
+
+- hosts: tuned
+  tags: tuned
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Install and configure tuneD
+      import_role:
+        name: tuned
+
 - hosts: freeipa_server
   # Done here as it might be providing DNS
   tags:
@@ -95,7 +142,15 @@
         name: freeipa
         tasks_from: server.yml
 
-# --- tasks after here require access to package repos ---
+- hosts: cluster
+  gather_facts: false
+  become: yes
+  tags: cockpit
+  tasks:
+    - name: Remove RHEL cockpit
+      command: dnf -y remove cockpit-ws # N.B. using ansible dnf module is very slow
+      register: dnf_remove_output
+      ignore_errors: true  # Avoid failing if a lock or other error happens
 
 - hosts: firewalld
   gather_facts: false
@@ -172,18 +227,35 @@
     - update
   tasks:
     - name: Check for pending reboot from package updates
-      stat: 
-        path: /var/run/reboot-required
+      command:
+        cmd: dnf needs-restarting -r
       register: update_reboot_required
-    - debug:
-        msg: "setstatus:{{ (sestatus.reboot_required | default(false)) }} packages: {{ (update_reboot_required.stat.exists | bool) }}"
-    - name: Reboot if required from SELinux state change or package upgrades
+      failed_when: "update_reboot_required.rc not in [0, 1]"
+      changed_when: false
+    - name: Reboot to cover SELinux state change or package upgrades
       reboot:
         post_reboot_delay: 30
-      when: (sestatus['reboot_required'] | default(false)) or (update_reboot_required.stat.exists | bool)
+      when: (sestatus['reboot_required'] | default(false)) or (update_reboot_required.rc == 1)
     - name: Wait for hosts to be reachable
       wait_for_connection:
         sleep: 15
-    - name: update facts
+    - name: Clear facts
+      meta: clear_facts
+    - name: Update facts
       setup:
-      when: (sestatus.changed | default(false)) or (sestatus.reboot_required | default(false))
+
+- hosts: ofed
+  gather_facts: yes
+  become: yes
+  tags: ofed
+  tasks:
+    - include_role:
+        name: ofed
+
+- hosts: ansible_init
+  gather_facts: yes
+  become: yes
+  tags: linux_ansible_init
+  tasks:
+    - include_role:
+        name: azimuth_cloud.image_utils.linux_ansible_init
