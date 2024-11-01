@@ -58,6 +58,7 @@ compute
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
 [eessi:children]
+# Hosts on which EESSI stack should be configured
 openhpc
 
 [resolv_conf]
@@ -79,7 +80,7 @@ openhpc
 # Hosts to run TuneD configuration
 
 [ansible_init:children]
-# Hosts to run ansible-init
+# Hosts to run linux-anisble-init
 cluster
 
 [sssd]
