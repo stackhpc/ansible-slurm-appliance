@@ -5,3 +5,4 @@ ssh_keypair_name = "slurm-app-ci"
 ssh_private_key_file = "~/.ssh/id_rsa"
 security_groups = ["default", "SSH"]
 floating_ip_network = "external"
+image_name_suffx = "-ofed24"
