@@ -55,9 +55,12 @@ You will also need to install [OpenTofu](https://opentofu.org/docs/intro/install
 
 ### Create a new environment
 
-Use the `cookiecutter` template to create a new environment to hold your configuration. In the repository root run:
+Run the following from the repository root to activate the venv:
 
     . venv/bin/activate
+
+Use the `cookiecutter` template to create a new environment to hold your configuration:
+
     cd environments
     cookiecutter skeleton
 
@@ -65,17 +68,15 @@ and follow the prompts to complete the environment name and description.
 
 **NB:** In subsequent sections this new environment is refered to as `$ENV`.
 
-Activate this environment:
+Activate the new environment:
 
     . environments/$ENV/activate
 
-and generate secrets for it:
+And generate secrets for it:
 
     ansible-playbook ansible/adhoc/generate-passwords.yml
 
-Note that all subsequent steps require the venv and the environment to be activated as above.
-
-### Define infrastructure configuration
+### Define and deploy infrastructure
 
 Create an OpenTofu variables file to define the required infrastructure, e.g.:
 
@@ -99,26 +100,25 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
 
 Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables and descriptions see `environments/$ENV/terraform/terraform.tfvars`.
 
-Now deploy the infrastructure - the below assumes that OpenStack credentials are defined using a [clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml) file in a default location with the default cloud name of `openstack`:
+To deploy this infrastructure, ensure the venv and the environment are [activated](#create-a-new-environment) and run:
 
     export OS_CLOUD=openstack
     cd environments/$ENV/terraform/
     tofu apply
 
-and follow the prompts.
+and follow the prompts. Note the OS_CLOUD environment variable assumes that OpenStack credentials are defined using a [clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml) file in a default location with the default cloud name of `openstack`.
 
-### Deploy appliance
+### Configure appliance
 
-Once infrastructure has been created, run Ansible to configure the appliance on it:
+To configure the appliance, ensure the venv and the environment are [activated](#create-a-new-environment) and run:
 
     ansible-playbook ansible/site.yml
 
-You can now log in to the cluster using:
+Once it completes you can log in to the cluster using:
 
     ssh rocky@$login_ip
 
 where the IP of the login node is given in `environments/$ENV/inventory/hosts.yml`
-
 
 ## Overview of directory structure
 
