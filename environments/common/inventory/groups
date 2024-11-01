@@ -139,5 +139,8 @@ freeipa_client
 [sssd]
 # Hosts to configure sssd on
 
+[sshd]
+# Hosts where the OpenSSH server daemon should be configured
+
 [lustre]
 # Hosts to run lustre client
