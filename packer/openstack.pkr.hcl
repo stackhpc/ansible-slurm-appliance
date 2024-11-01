@@ -171,7 +171,7 @@ variable "extra_build_image_name" {
   default = "extra"
 }
 
-variable "image_name_suffx" {
+variable "image_name_suffix" {
   type = string
   description = "Suffix for all build image names"
   default = ""
@@ -213,31 +213,31 @@ build {
   # latest nightly image:
   source "source.openstack.openhpc" {
     name = "rocky-latest"
-    image_name = "${source.name}-${var.os_version}${var.image_name_suffx}"
+    image_name = "${source.name}-${var.os_version}${var.image_name_suffix}"
   }
 
   # latest nightly cuda image:
   source "source.openstack.openhpc" {
     name = "rocky-latest-cuda"
-    image_name = "${source.name}-${var.os_version}${var.image_name_suffx}"
+    image_name = "${source.name}-${var.os_version}${var.image_name_suffix}"
   }
 
   # OFED fat image:
   source "source.openstack.openhpc" {
     name = "openhpc"
-    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}${var.image_name_suffx}"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}${var.image_name_suffix}"
   }
 
   # CUDA fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-cuda"
-    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}${var.image_name_suffx}"
+    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}${var.image_name_suffix}"
   }
 
   # Extended site-specific image, built on fat image:
   source "source.openstack.openhpc" {
     name = "openhpc-extra"
-    image_name = "openhpc-${var.extra_build_image_name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}${var.image_name_suffx}"
+    image_name = "openhpc-${var.extra_build_image_name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}${var.image_name_suffix}"
   }
 
   provisioner "ansible" {
