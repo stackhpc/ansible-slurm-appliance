@@ -43,7 +43,7 @@
         accessModes:
         - ReadWriteOnce
         hostPath:
-          path: /var/lib/state/mysql-test
+          path: "{{ mysql_datadir }}"
           type: DirectoryOrCreate
 
 - name: Create pvc
