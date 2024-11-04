@@ -6,6 +6,7 @@
   register: stat_result
 
 - name: Download and air-gapped installation of k3s
+  # Using air-gapped install so containers are pre-installed to avoid rate-limiting from registries on cluster startup
   when: not stat_result.stat.exists
   block:
 

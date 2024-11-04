@@ -87,5 +87,6 @@ cluster
 openhpc
 
 [k9s:children]
+# Hosts to install k9s on
 control
 

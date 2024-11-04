@@ -15,7 +15,7 @@ resource "terraform_data" "k3s_token" {
     input = "{{ k3s_token }}"
     lifecycle {
         ignore_changes = [
-            input,
+            input, # makes it a write-once value (set via Ansible)
         ]
     }   
 }
