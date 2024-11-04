@@ -19,7 +19,7 @@
 
   - name: Install k3s SELinux policy package
     yum:
-      name: "https://github.com/k3s-io/k3s-selinux/releases/download/{{ k3s_selinux_release }}/k3s-selinux-{{ k3s_selinux_rpm_version }}.el{{ rocky_version }}.noarch.rpm"
+      name: "https://github.com/k3s-io/k3s-selinux/releases/download/{{ k3s_selinux_release }}/k3s-selinux-{{ k3s_selinux_rpm_version }}.el{{ ansible_distribution_major_version }}.noarch.rpm"
       disable_gpg_check: true
 
   - name: Create image directory
@@ -58,7 +58,7 @@
 
 - name: Install helm
   unarchive:
-    src: https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
+    src: "https://get.helm.sh/helm-{{ k3s_helm_version }}-linux-amd64.tar.gz"
     dest: /usr/bin
     extra_opts: "--strip-components=1"
     owner: root
