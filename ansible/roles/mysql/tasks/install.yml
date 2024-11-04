@@ -9,9 +9,27 @@
       - cryptography
     state: present
 
+- name: Creating namespace
+  kubernetes.core.k8s:
+    name: "{{ mysql_kube_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Disable rancher default storage class
+  kubernetes.core.k8s:
+    namespace: "{{ mysql_kube_namespace }}"
+    state: patched
+    definition:
+      kind: StorageClass
+      metadata:
+        name: local-path
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "false"
+
 - name: Create mysql hostPath volume in /var/lib/state
   kubernetes.core.k8s:
-    namespace: default
+    namespace: "{{ mysql_kube_namespace }}"
     definition:
       apiVersion: v1
       kind: PersistentVolume
@@ -30,7 +48,7 @@
 
 - name: Create pvc
   kubernetes.core.k8s:
-    namespace: default
+    namespace: "{{ mysql_kube_namespace }}"
     definition:
       apiVersion: v1
       kind: PersistentVolumeClaim
@@ -50,11 +68,11 @@
     chart_ref: mysql
     chart_repo_url: https://charts.bitnami.com/bitnami
     chart_version: 11.1.19
-    release_namespace: default
+    release_namespace: "{{ mysql_kube_namespace }}"
     release_name: sqlrelease
     release_values:
       image:
-        debug: true
+        tag: "{{ mysql_tag }}"
       volumePermissions:
         enabled: true
       auth:
@@ -64,7 +82,12 @@
           existingClaim: sql-pvc
         nodeSelector:
           clusterrole: server
+        service:
+          type: NodePort
+          nodePorts:
+            mysql: "{{ mysql_port }}"
       networkPolicy:
         enabled: false
     atomic: no
     create_namespace: no
+    wait: yes

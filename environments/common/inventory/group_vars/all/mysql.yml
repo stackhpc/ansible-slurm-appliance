@@ -2,7 +2,9 @@
 
 # See ansible/roles/mysql for variable definitions.
 
-mysql_host: "{{ hostvars[groups['mysql'] | first].api_address }}"
+# mysql_host: "{{ hostvars[groups['mysql'] | first].api_address }}"
+mysql_host: localhost
+mysql_port: 30004
 
 # The user which runs the mysql container
 mysql_podman_user: podman
@@ -21,6 +23,7 @@ mysql_databases:
     login_user: root
     login_password: "{{ mysql_root_password }}"
     login_host: "{{ mysql_host }}"
+    login_port: "{{ mysql_port }}"
 
 mysql_users:
   - name: slurm
@@ -30,3 +33,4 @@ mysql_users:
     login_user: root
     login_password: "{{ mysql_root_password }}"
     login_host: "{{ mysql_host }}"
+    login_port: "{{ mysql_port }}"

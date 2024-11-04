@@ -4,8 +4,9 @@
     community.mysql.mysql_info:
       login_user: root
       login_password: "{{ mysql_root_password }}"
-      login_port: 30004
-    #no_log: "{{ no_log | default(true) }}"
+      login_port: "{{ mysql_port }}"
+      login_host: localhost
+    no_log: "{{ no_log | default(true) }}"
     register: _mysql_info
     until: "'version' in _mysql_info"
     retries: 90
