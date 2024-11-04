@@ -7,6 +7,11 @@
   delegate_to: localhost
   run_once: true
 
+- name: Get templated passwords from target environment
+  ansible.builtin.include_vars:
+    file: "{{ openhpc_passwords_output_path }}"
+    name: templated_secrets
+
 - name:  Template k3s token to terraform
   template:
     src: k3s-token.auto.tfvars.json.j2
