@@ -24,7 +24,7 @@ All other commands should be run on the Ansible deploy host.
 
         git fetch stackhpc main --tags
 
-1. Identify the latest release from the [Slurm appliance release page](https://github.com/stackhpc/ansible-slurm-appliance/releases). Below this is shown as `vX.Y`, which is the 
+1. Identify the latest release from the [Slurm appliance release page](https://github.com/stackhpc/ansible-slurm-appliance/releases). Below this release is shown as `vX.Y`.
 
 1. Ensure your local site branch is up to date and create a new branch from it for the
    site-specfic release code:
