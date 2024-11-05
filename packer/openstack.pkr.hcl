@@ -23,7 +23,7 @@ data "git-commit" "cwd-head" { }
 locals {
     git_commit = data.git-commit.cwd-head.hash
     timestamp = formatdate("YYMMDD-hhmm", timestamp())
-    image_name_suffix = var.image_name_suffix == "" ? "${local.timestamp}-${substr(local.git_commit, 0, 8)}" : var.image_name_suffix
+    image_version = var.image_version == "" ? "${local.timestamp}-${substr(local.git_commit, 0, 8)}" : var.image_version
 }
 
 # Path pointing to root of repository - automatically set by environment variable PKR_VAR_repo_root
@@ -140,7 +140,7 @@ variable "metadata" {
 variable "inventory_groups" {
   type = string
   description = "comma-separated list of inventory groups, in addition to 'builder'"
-  default = ''
+  default = ""
 }
 
 # variable "groups" {
@@ -161,7 +161,7 @@ variable "image_name" {
   default = "openhpc"
 }
 
-variable "image_name_suffix" {
+variable "image_version" {
   type = string
   description = "Suffix for built image names. If not supplied a timestamp+git commit is used"
   default = ""
@@ -202,7 +202,7 @@ build {
 
   source "source.openstack.openhpc" {
     name = "rocky-latest"
-    image_name = "${var.image_name}-${local.image_name_suffix}"
+    image_name = "${var.image_name}-${local.image_version}"
   }
 
   provisioner "ansible" {
