@@ -17,28 +17,31 @@ jobs:
   openstack:
     name: openstack-imagebuild
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.source_image.name }}-${{ matrix.inventory_groups.label }} # to branch/PR + OS + build
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix:
-        source_image_name:
-          - Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2
-          - Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+        source_image:
+          - label: RL8
+            name: Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2
+          - label: RL9
+            name: Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
         inventory_groups:
-          - ["update", "ofed"]
-          - ["update", "ofed", "cuda"]
+          - label: ofed
+            list: 'update,ofed'
+          - label: cuda
+            list: 'update,ofed,cuda'
         exclude:
-          - source_image_name: Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2
-            inventory_groups: 'update,ofed,cuda'
+          - source_image: {label: RL8}
+            inventory_groups: {label: cuda}
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       # set the image suffix to -latest for cron jobs or a branch name if manually-triggered
       IMAGE_NAME_SUFFIX: ${{ github.event_name == 'schedule' && 'latest' || github.ref_name	}}
-  
 
     steps:
       - uses: actions/checkout@v2
@@ -46,7 +49,6 @@ jobs:
       - name: Record settings for CI cloud
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
-          echo IMAGE_NAME_SUFFIX: ${{ env.IMAGE_NAME_SUFFIX }}
 
       - name: Setup ssh
         run: |
@@ -86,10 +88,10 @@ jobs:
           packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var source_image_name=${{ matrix.source_image_name }} \
-          -var image_name_prefix=rocky-${{ matrix.os_version }} \
+          -var source_image_name=${{ matrix.source_image.name }} \
+          -var image_name=rocky-${{ matrix.source_image.label }}-${{ matrix.inventory_groups.label }} \
           -var image_name_suffix=${{ env.IMAGE_NAME_SUFFIX }} \
-          -var inventory_groups=${{ matrix.inventory_groups }} \
+          -var inventory_groups=${{ matrix.inventory_groups.list }} \
           openstack.pkr.hcl
         env:
           PACKER_LOG: '1'

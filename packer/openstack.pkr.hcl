@@ -155,10 +155,9 @@ variable "inventory_groups" {
 #   }
 # }
 
-variable "image_name_prefix" {
+variable "image_name" {
   type = string
-  description = "Prefix for built image names"
-  # TODO: maybe we can just make this default to the first two parts of the source image name?
+  description = "Built image name"
   default = "openhpc"
 }
 
@@ -203,7 +202,7 @@ build {
 
   source "source.openstack.openhpc" {
     name = "rocky-latest"
-    image_name = "${var.image_name_prefix}-${local.image_name_suffix}"
+    image_name = "${var.image_name}-${local.image_name_suffix}"
   }
 
   provisioner "ansible" {
