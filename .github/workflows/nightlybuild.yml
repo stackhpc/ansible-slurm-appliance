@@ -22,26 +22,23 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
-      matrix: # build RL8, RL9, RL9+CUDA versions
-        os_version:
-          - RL8
-          - RL9
-        build:
-          - openstack.rocky-latest
-          # - openstack.rocky-latest-cuda
+      matrix:
+        source_image_name:
+          - Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2
+          - Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+        inventory_groups:
+          - ["update", "ofed"]
+          - ["update", "ofed", "cuda"]
         exclude:
-          - os_version: RL8
-            build: openstack.rocky-latest-cuda
-
+          - source_image_name: Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2
+            inventory_groups: ["update", "ofed", "cuda"]
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
-      SOURCE_IMAGES_MAP: |
-        {
-          "RL8": "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2",
-          "RL9": "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
-        }
+      # set the image suffix to -latest for cron jobs or a branch name if manually-triggered
+      IMAGE_NAME_SUFFIX: ${{ github.event_name == 'schedule' && 'latest' || github.ref_name	}}
+  
 
     steps:
       - uses: actions/checkout@v2
@@ -49,6 +46,7 @@ jobs:
       - name: Record settings for CI cloud
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo IMAGE_NAME_SUFFIX: ${{ env.IMAGE_NAME_SUFFIX }}
 
       - name: Setup ssh
         run: |
@@ -85,16 +83,17 @@ jobs:
           cd packer/
           packer init .
 
-          PACKER_LOG=1 packer build \
+          packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
+          -var source_image_name=${{ matrix.source_image_name }} \
+          -var image_name_prefix=rocky-${{ matrix.os_version }} \
+          -var image_name_suffix=${{ env.IMAGE_NAME_SUFFIX }} \
+          -var 'inventory_groups=${{ toJSON(matrix.inventory_groups) }}' \
           openstack.pkr.hcl
-
         env:
-          PKR_VAR_os_version: ${{ matrix.os_version }}
-          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version] }}
+          PACKER_LOG: '1'
+          
 
       - name: Get created image names from manifest
         id: manifest
