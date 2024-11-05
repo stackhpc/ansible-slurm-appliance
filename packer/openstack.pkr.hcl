@@ -138,8 +138,9 @@ variable "metadata" {
 }
 
 variable "inventory_groups" {
-  type = list(string)
-  default = []
+  type = string
+  description = "comma-separated list of inventory groups, in addition to 'builder'"
+  default = ''
 }
 
 # variable "groups" {
@@ -157,6 +158,7 @@ variable "inventory_groups" {
 variable "image_name_prefix" {
   type = string
   description = "Prefix for built image names"
+  # TODO: maybe we can just make this default to the first two parts of the source image name?
   default = "openhpc"
 }
 
@@ -171,7 +173,7 @@ source "openstack" "openhpc" {
   flavor = var.flavor
   use_blockstorage_volume = var.use_blockstorage_volume
   volume_type = var.volume_type
-  volume_size = contains(var.inventory_groups, "cuda") ? var.volume_size_cuda : var.volume_size
+  volume_size = contains(split(",", var.inventory_groups), "cuda") ? var.volume_size_cuda : var.volume_size
   metadata = var.metadata
   instance_metadata = {ansible_init_disable = "true"}
   networks = var.networks
@@ -206,7 +208,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
-    groups = concat(["builder"], var.inventory_groups)
+    groups = concat(["builder"], split(",", var.inventory_groups))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     extra_arguments = [

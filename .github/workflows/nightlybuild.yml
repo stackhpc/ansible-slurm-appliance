@@ -31,7 +31,7 @@ jobs:
           - ["update", "ofed", "cuda"]
         exclude:
           - source_image_name: Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2
-            inventory_groups: ["update", "ofed", "cuda"]
+            inventory_groups: 'update,ofed,cuda'
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -89,7 +89,7 @@ jobs:
           -var source_image_name=${{ matrix.source_image_name }} \
           -var image_name_prefix=rocky-${{ matrix.os_version }} \
           -var image_name_suffix=${{ env.IMAGE_NAME_SUFFIX }} \
-          -var 'inventory_groups=${{ toJSON(matrix.inventory_groups) }}' \
+          -var inventory_groups=${{ matrix.inventory_groups }} \
           openstack.pkr.hcl
         env:
           PACKER_LOG: '1'
