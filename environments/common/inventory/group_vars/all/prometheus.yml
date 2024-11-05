@@ -20,7 +20,8 @@ prometheus_scrape_configs_default:
     replacement:   '${1}'
 
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"
-prometheus_extra_rules:
+prometheus_extra_rules: "{{ prometheus_extra_rules_default + (openondemand_extra_rules if groups['openondemand'] | count > 0 else []) }}"
+prometheus_extra_rules_default:
   - alert: SlurmNodeDown
     annotations:
       description: '{% raw %}{{ $value }} Slurm nodes are in down status.{% endraw %}'
