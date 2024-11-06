@@ -1,3 +1,5 @@
+# NB: When run via workflow_dispatch, image scanning and distribution to other clouds does not happen
+# on the basis that in this case a fatimage must be built and will be scanned.
 name: Build nightly image
 on:
   workflow_dispatch:
@@ -14,8 +16,8 @@ on:
     - cron: '0 0 * * *'  # Run at midnight
 
 jobs:
-  openstack:
-    name: openstack-imagebuild
+  build:
+    name: nightly-imagebuild
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.builds.label }}
       cancel-in-progress: true
@@ -37,8 +39,7 @@ jobs:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
-      # set the image suffix to -latest for cron jobs or a branch name if manually-triggered
-      IMAGE_SUFFIX: ${{ github.event_name == 'schedule' && 'latest' || github.ref_name	}}
+      IMAGE_VERSION: ${{ github.event_name == 'schedule' && 'latest' || github.ref_name	}}
 
     steps:
       - uses: actions/checkout@v2
@@ -87,7 +88,7 @@ jobs:
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var source_image_name=${{ matrix.builds.source_image_name }} \
           -var image_name=${{ matrix.builds.label }} \
-          -var image_version=${{ env.IMAGE_SUFFIX }} \
+          -var image_version=${{ env.IMAGE_VERSION }} \
           -var inventory_groups=${{ matrix.builds.inventory_groups }} \
           openstack.pkr.hcl
         env:
@@ -102,10 +103,12 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          echo image: ${IMAGE_NAME} ${IMAGE_ID}
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
 
       - name: Download image
+        if: github.event_name == 'schedule'
         run: |
           . venv/bin/activate
           sudo mkdir /mnt/images
@@ -114,20 +117,23 @@ jobs:
           openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-id }}
 
       - name: Set up QEMU
+        if: github.event_name == 'schedule'
         uses: docker/setup-qemu-action@v3
 
-      - name: install libguestfs
+      - name: Install libguestfs
         run: |
           sudo apt -y update
           sudo apt -y install libguestfs-tools
+        if: github.event_name == 'schedule'
 
-      - name: mkdir for mount
-        run: sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
-
-      - name: mount qcow2 file
-        run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
-
+      - name: Mount image
+        if: github.event_name == 'schedule'
+        run: |
+          sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
+          sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
+        
       - name: Run Trivy vulnerability scanner
+        if: github.event_name == 'schedule'
         uses: aquasecurity/trivy-action@0.17.0
         with:
           scan-type: fs
@@ -140,12 +146,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Trivy scan results to GitHub Security tab
+        if: github.event_name == 'schedule'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
-          category: "${{ matrix.os_version }}-${{ matrix.build }}"
+          category: "${{ matrix.build.label }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
+        if: github.event_name == 'schedule'
         uses: aquasecurity/trivy-action@0.16.1
         with:
           scan-type: fs
@@ -157,16 +165,17 @@ jobs:
           ignore-unfixed: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
 
       - name: Delete new image if Trivy scan fails
-        if: failure() && steps.packer_build.outcome == 'success' # Runs if the Trivy scan found crit vulnerabilities or failed
+        if: github.event_name == 'schedule' && failure() && steps.packer_build.outcome == 'success' # Runs if the Trivy scan found crit vulnerabilities or failed
         run: |
           . venv/bin/activate
           echo "Deleting new image due to critical vulnerabilities or scan failure ..."
           openstack image delete "${{ steps.manifest.outputs.image-id }}"
 
-      - name: Delete old latest image
-        if: success() # Runs only if Trivy scan passed
+      - name: Delete old image
+        if: github.event_name == 'schedule'
         run: |
           . venv/bin/activate
           IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
@@ -180,9 +189,10 @@ jobs:
 
   upload:
     name: upload-nightly-targets
-    needs: openstack
+    needs: build
+    if: github.event_name == 'schedule'
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.image }}-${{ matrix.target_cloud }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.builds.label }}-${{ matrix.target_cloud }}
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
@@ -192,21 +202,16 @@ jobs:
           - LEAFCLOUD
           - SMS
           - ARCUS
-        os_version:
-          - RL8
-          - RL9
-        image:
-          - rocky-latest
-          - rocky-latest-cuda
+        builds:
+          - image: RL8-ofed-latest
+          - image: RL9-ofed-latest
+          - image: RL9-cuda-latest
         exclude:
-          - os_version: RL8
-            image: rocky-latest-cuda
-          - target_cloud: LEAFCLOUD
+          - target_cloud: LEAFCLOUD # why?? Should this not be source_cloud/vars.CI_CLOUD
     env:
       OS_CLOUD: openstack
       SOURCE_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       TARGET_CLOUD: ${{ matrix.target_cloud }}
-      IMAGE_NAME: "${{ matrix.image }}-${{ matrix.os_version }}"
     steps:
       - uses: actions/checkout@v2
 
@@ -234,7 +239,7 @@ jobs:
         run: |
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/source_clouds.yaml
-          openstack image save --file ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}
+          openstack image save --file ${{ matrix.builds.image }} ${{ matrix.builds.image }}
         shell: bash
 
       - name: Upload to target cloud
@@ -242,8 +247,8 @@ jobs:
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
 
-          openstack image create "${{ env.IMAGE_NAME }}" \
-            --file "${{ env.IMAGE_NAME }}" \
+          openstack image create "${{ matrix.builds.image }}" \
+            --file "${{ matrix.builds.image }}" \
             --disk-format qcow2 \
         shell: bash
 
@@ -252,9 +257,9 @@ jobs:
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
 
-          IMAGE_COUNT=$(openstack image list --name ${{ env.IMAGE_NAME }} -f value -c ID | wc -l)
+          IMAGE_COUNT=$(openstack image list --name ${{ matrix.builds.image }} -f value -c ID | wc -l)
           if [ "$IMAGE_COUNT" -gt 1 ]; then
-            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ env.IMAGE_NAME }}"  -f value -c ID | head -n 1)
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ matrix.builds.image }}"  -f value -c ID | head -n 1)
             openstack image delete "$OLD_IMAGE_ID"
           else
             echo "Only one image exists, skipping deletion."
