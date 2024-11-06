@@ -11,3 +11,4 @@ image_list:
 - { name: "registry.k8s.io/ingress-nginx/kube-webhook-certgen", tag: "{{ kube_prometheus_stack_patch_image_tag }}" }
 - { name: "docker.io/grafana/loki", tag: "{{ kube_prometheus_stack_loki_image_tag }}" }
 - { name: "docker.io/grafana/promtail", tag: "{{ kube_prometheus_stack_loki_image_tag }}" }
+- { name: "docker.io/bats/bats", tag: "{{ kube_prometheus_stack_loki_test_pod_tag }}" }

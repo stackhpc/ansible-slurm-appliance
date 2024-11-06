@@ -195,6 +195,8 @@ kube_prometheus_stack_release_values: >-
   }}
 
 kube_prometheus_stack_loki_release_values:
+  test_pod:
+    image: "bats/bats:{{ kube_prometheus_stack_loki_test_pod_tag }}"
   loki:
     nodeSelector:
       clusterrole: server
