@@ -188,7 +188,7 @@ openondemand_scrape_configs:
       module: [http_2xx]
     static_configs:
       - targets:
-        - "https://{{ openondemand_address }}"
+        - ondemand.monitoring-system
     relabel_configs:
     - source_labels: [__address__]
       target_label: __param_target
@@ -201,7 +201,7 @@ openondemand_extra_rules:
   annotations:
     description: '{% raw %}Could not establish secure connection to OOD server at {{ $labels.target }}{% endraw %}'
     summary: 'Could not establish a secure connection to an Open OnDemand server'
-  expr: "probe_success{target='https://{{ openondemand_address }}'} < 1\n"
+  expr: "probe_success{target='ondemand.monitoring-system'} < 1\n"
   labels:
     severity: warning
 
