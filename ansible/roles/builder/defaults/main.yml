@@ -1,1 +1,1 @@
-builder_delete_syslog: true
+builder_delete_syslog: false
