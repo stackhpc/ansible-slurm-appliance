@@ -16,7 +16,7 @@
       ]
     },
     "description": "Search systemd logs stored in Loki",
-    "editable": false,
+    "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
     "id": 33,
