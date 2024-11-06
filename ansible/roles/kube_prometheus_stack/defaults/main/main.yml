@@ -24,6 +24,8 @@ kube_prometheus_stack_blackbox_exporter_release_version: 9.0.1
 kube_prometheus_stack_blackbox_exporter_image_tag: v0.25.0
 kube_prometheus_stack_blackbox_exporter_release_name: blackbox-exporter
 
+kube_prometheus_stack_blackbox_modules: {}
+
 control_ip: "{{ hostvars[groups['control'].0].ansible_host }}"
 
 grafana_auth_anonymous: false

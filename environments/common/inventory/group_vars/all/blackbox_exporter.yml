@@ -1,0 +1,7 @@
+# Note: underlying helm chart is configured with a default module 'http_2xx', defining modules with this name here will merge the module's values with the existing module,
+# see https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-blackbox-exporter/values.yaml#L163
+kube_prometheus_stack_blackbox_modules_defaults: {}
+
+kube_prometheus_stack_blackbox_modules: "{{ kube_prometheus_stack_blackbox_modules_defaults if ( groups['openondemand'] | count == 0 ) else ( kube_prometheus_stack_blackbox_modules_defaults | combine(openondemand_blackbox_modules) ) }}"
+
+# See prometheus_scrape_configs in prometheus.yml to add additional scrape jobs to probe services
