@@ -196,14 +196,6 @@ openondemand_scrape_configs:
       target_label: target
     - target_label: __address__ 
       replacement: "{{ kube_prometheus_stack_blackbox_exporter_release_name }}-prometheus-blackbox-exporter:9115"
-openondemand_extra_rules:
-- alert: OnDemandProbeFailed
-  annotations:
-    description: '{% raw %}Could not establish secure connection to OOD server at {{ $labels.target }}{% endraw %}'
-    summary: 'Could not establish a secure connection to an Open OnDemand server'
-  expr: "probe_success{target='ondemand.monitoring-system'} < 1\n"
-  labels:
-    severity: warning
 
 openondemand_dashboard:
   - dashboard_id: 13465

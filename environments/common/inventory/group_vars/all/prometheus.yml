@@ -20,8 +20,7 @@ prometheus_scrape_configs_default:
     replacement:   '${1}'
 
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"
-prometheus_extra_rules: "{{ prometheus_extra_rules_default + (openondemand_extra_rules if groups['openondemand'] | count > 0 else []) }}"
-prometheus_extra_rules_default:
+prometheus_extra_rules:
   - alert: SlurmNodeDown
     annotations:
       description: '{% raw %}{{ $value }} Slurm nodes are in down status.{% endraw %}'
@@ -29,6 +28,54 @@ prometheus_extra_rules_default:
     expr: "slurm_nodes_down > 0\n"
     labels:
       severity: critical
+  - alert: BlackboxProbeFailed
+    expr: probe_success == 0
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: '{% raw %}Blackbox probe failed (target {{ $labels.target }}){% endraw %}'
+      description: "{% raw %}Blackbox probe '{{ $labels.target }}' failed{% endraw %}"
+  - alert: BlackboxSlowProbe
+    expr: avg_over_time(probe_duration_seconds[1m]) > 1.2 #around 1.14 expected due to indirection in cluster
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{% raw %}Blackbox slow probe (target {{ $labels.target }}){% endraw %}'
+      description: "{% raw %}Blackbox probe '{{ $labels.target }}' took more than 1s to complete - {{ $value }}{% endraw %}"
+  - alert: BlackboxProbeHttpFailure
+    expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: '{% raw %}Blackbox probe HTTP failure (target {{ $labels.target }}){% endraw %}'
+      description: "{% raw %}Blackbox probe '{{ $labels.target }}' returned an HTTP error status - {{ $value }}{% endraw %}"
+  - alert: BlackboxSslCertificateWillExpireSoon
+    expr: (7 * 24 * 3600) <= (last_over_time(probe_ssl_earliest_cert_expiry[10m]) - time()) < (30 * 24 * 3600)
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{% raw %}Blackbox SSL certificate will expire soon (target {{ $labels.target }}){% endraw %}'
+      description: "{% raw %}SSL certificate for blackbox probe '{{ $labels.target }}' expires in {{ $value | humanizeDuration }}{% endraw %}"
+  - alert: BlackboxSslCertificateWillExpireVerySoon
+    expr: 0 <= (last_over_time(probe_ssl_earliest_cert_expiry[10m]) - time()) < (7 * 24 * 3600)
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: '{% raw %}Blackbox SSL certificate will expire very soon (target {{ $labels.target }}){% endraw %}'
+      description: "{% raw %}SSL certificate for blackbox probe '{{ $labels.target }}' expires in {{ $value | humanizeDuration }}{% endraw %}"
+  - alert: BlackboxSslCertificateExpired
+    expr: (last_over_time(probe_ssl_earliest_cert_expiry[10m]) - time()) < 0
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: '{% raw %}Blackbox SSL certificate expired (target {{ $labels.target }}){% endraw %}'
+      description: "{% raw %}SSL certificate for blackbox probe '{{ $labels.target }}' has expired{% endraw %}"
   - record: node_cpu_system_seconds:record
     expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="system",job="node-exporter"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node-exporter"}[60s])))
   - record: node_cpu_user_seconds:record

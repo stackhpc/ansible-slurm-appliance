@@ -67,7 +67,6 @@ prometheus_external_labels:
 prometheus_scrape_configs: []
 
 prometheus_extra_rules: []
-prometheus_extra_rules_default: []
 
 prometheus_rules:
   appliance-rules:
