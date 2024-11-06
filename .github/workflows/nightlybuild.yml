@@ -94,7 +94,7 @@ jobs:
         env:
           PACKER_LOG: '1'
 
-      - name: Get created image names from manifest
+      - name: Get image info and ensure it can be used for subsequent builds
         id: manifest
         run: |
           . venv/bin/activate
@@ -106,6 +106,7 @@ jobs:
           echo image: ${IMAGE_NAME} ${IMAGE_ID}
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          openstack image unset --property signature_verified $IMAGE_ID
 
       - name: Download image
         if: github.ref_name == 'main'
@@ -113,7 +114,6 @@ jobs:
           . venv/bin/activate
           sudo mkdir /mnt/images
           sudo chmod 777 /mnt/images
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
           openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-id }}
 
       - name: Set up QEMU
