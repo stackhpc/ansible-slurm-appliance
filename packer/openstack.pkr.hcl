@@ -24,7 +24,6 @@ locals {
     git_commit = data.git-commit.cwd-head.hash
     timestamp = formatdate("YYMMDD-hhmm", timestamp())
     image_version = var.image_version == "auto" ? "${local.timestamp}-${substr(local.git_commit, 0, 8)}" : var.image_version
-    image_name = replace(var.image_name, '/', '-')
 }
 
 # Path pointing to root of repository - automatically set by environment variable PKR_VAR_repo_root
@@ -158,7 +157,7 @@ variable "inventory_groups" {
 
 variable "image_name" {
   type = string
-  description = "Built image name. Any '/' are replaced with '-'."
+  description = "Built image name."
   default = "openhpc"
 }
 
@@ -203,7 +202,7 @@ build {
 
   source "source.openstack.openhpc" {
     name = "rocky-latest"
-    image_name = join("-", [local.image_name, local.image_version])
+    image_name = replace(join("-", [var.image_name, local.image_version]), "/", "-")
   }
 
   provisioner "ansible" {
