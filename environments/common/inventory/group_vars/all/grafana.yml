@@ -73,7 +73,13 @@ grafana_datasources:
       version: '7.10.2'
       flavor: elasticsearch
     editable: true
-    # readOnly: false
+    readOnly: false
+  - name: Loki
+    url: http://loki:3100
+    type: loki
+    access: proxy
+    version: 1
+    isDefault: false
 grafana_plugins:
   - grafana-opensearch-datasource 2.8.1
 

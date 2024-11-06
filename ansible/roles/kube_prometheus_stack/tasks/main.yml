@@ -176,6 +176,25 @@
   ansible.builtin.import_role:
     name: grafana-dashboards
 
+- name: Install loki stack helm chart
+  kubernetes.core.helm:
+    chart_ref: loki-stack
+    chart_repo_url: https://grafana.github.io/helm-charts
+    chart_version: 2.10.2
+    release_name: loki
+    release_namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    release_values:
+      loki:
+        nodeSelector:
+          clusterrole: server
+        image:
+          tag: 2.9.3
+      grafana:
+        sidecar:
+          grafana_datasources:
+            enabled: false
+    wait: yes
+
 - name: Install kube-prometheus-stack on target Kubernetes cluster
   kubernetes.core.helm:
     chart_ref: "{{ kube_prometheus_stack_chart_name }}"
