@@ -1,0 +1,75 @@
+# Finalise a Packer build VM
+
+- meta: flush_handlers
+
+- name: Remove dnf caches
+  command: dnf clean all
+
+# If image build happens on a Neutron subnet with property dns_namservers defined, then cloud-init
+# disables NetworkManager's control of /etc/resolv.conf and appends nameservers itself.
+# We don't want network configuration during instance boot to depend on the configuration
+# of the network the builder was on, so we reset these aspects.
+- name: Delete /etc/resolv.conf
+  file:
+    path: /etc/resolv.conf
+    state: absent
+  when: "'resolv_conf' not in group_names" # if its been overriden, deleting it is the wrong thing to do
+
+- name: Reenable NetworkManager control of resolv.conf
+  # NB: This *doesn't* delete the 90-dns-none.conf file created by the resolv_conf role
+  # as if nameservers are explicitly being set by that role we don't want to allow NM
+  # to override it again.
+  file:
+    path: /etc/NetworkManager/conf.d/99-cloud-init.conf
+    state: absent
+
+- name: Get remote environment for ansible_user
+  setup:
+    gather_subset: env
+  become: no
+
+- name: Delete any injected ssh config for ansible_user
+  file:
+    path: "{{ ansible_env.HOME }}/.ssh/"
+    state: absent
+
+- name: Run cloud-init cleanup
+  command: cloud-init clean --logs --seed
+
+- name: Cleanup /tmp
+  command : rm -rf /tmp/*
+
+- name: Get package facts
+  package_facts:
+
+- name: Ensure image summary directory exists
+  file:
+    path: /var/lib/image/
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwX,go=rX
+
+- name: Write image summary
+  copy:
+    content: "{{ image_info | to_nice_json }}"
+    dest: /var/lib/image/image.json
+  vars:
+    image_info:
+      branch: "{{ lookup('pipe', 'git rev-parse --abbrev-ref HEAD') }}"
+      build: "{{  ansible_nodename | split('.') | first }}" # hostname is image name, which contains build info
+      os: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+      kernel: "{{ ansible_kernel }}"
+      ofed: "{{ ansible_facts.packages['mlnx-ofa_kernel'].0.version | default('-') }}"
+      cuda:  "{{ ansible_facts.packages['cuda'].0.version | default('-') }}"
+      slurm-ohpc: "{{ ansible_facts.packages['slurm-ohpc'].0.version | default('-') }}"
+      ondemand: "{{ ansible_facts.packages['ondemand'].0.version | default('-') }}"
+
+- name: Clear system logs
+  file:
+    path: /var/log/messages
+    state: absent
+  when: "{{ builder_delete_syslog | bool }}"
+
+- name: Shutdown Packer VM
+  community.general.shutdown:
