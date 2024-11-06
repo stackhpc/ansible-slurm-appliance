@@ -1,0 +1,29 @@
+- name: Check whether OFED is installed
+  command: ofed_info
+  changed_when: false
+  failed_when:
+    - _ofed_info.rc > 0
+    - "'No such file or directory' not in _ofed_info.msg"
+  register: _ofed_info
+
+- name: Get package facts
+  package_facts:
+
+- name: Check e.g. libfabric package hasn't downgraded OFED-installed packages
+  assert:
+    that: "'mlnx' in ansible_facts.packages[item].0.version"
+    fail_msg: "OFED is installed but package {{ item }} has a non-OFED version: {{ ansible_facts.packages[item].0.version }}"
+  when: "'MLNX_OFED_LINUX-' in _ofed_info.stdout"
+  loop: "{{ builder_ofed_check_packages }}"
+  vars:
+    builder_ofed_check_packages:
+      - ibacm
+      - infiniband-diags
+      - libibumad
+      - libibverbs
+      - libibverbs-utils
+      - librdmacm
+      - librdmacm-utils
+      - rdma-core-devel
+      - rdma-core # didn't actually see this one get downgraded
+  

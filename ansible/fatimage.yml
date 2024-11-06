@@ -207,6 +207,10 @@
   gather_facts: yes
   tags: finalise
   tasks:
+    - name: Carry out checks on image
+      import_role:
+        name: builder
+        tasks_from: checks.yml
     - name: Finalise image
       import_role:
         name: builder
