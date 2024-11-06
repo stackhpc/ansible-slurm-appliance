@@ -38,6 +38,8 @@ grafana_dashboards_default:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
     revision_id: 3
+  - dashboard_file: loki-pod-logs-dashboard.json
+    replacements: []
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 
 # Configmap names of kube prometheus stack's default dashboards to exclude

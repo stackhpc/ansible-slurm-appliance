@@ -191,7 +191,7 @@
           tag: 2.9.3
       grafana:
         sidecar:
-          grafana_datasources:
+          datasources:
             enabled: false
     wait: yes
 
