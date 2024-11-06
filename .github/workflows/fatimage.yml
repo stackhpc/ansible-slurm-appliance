@@ -74,7 +74,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           BRANCH=${{ github.ref_name }}
-          BRANCH_VERSION=${BRANCH//\/-}
+          BRANCH_VERSION=${BRANCH//\//-} # replace '/' with '-' using bash parameter expansion
           NIGHTLY_IMAGE_ID=$( \
             openstack image show -c id -f value ${{ matrix.builds.source_image_name }}-${BRANCH_VERSION} || \
             openstack image show -c id -f value ${{ matrix.builds.source_image_name }}-latest \
