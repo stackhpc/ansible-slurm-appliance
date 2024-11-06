@@ -3,6 +3,17 @@
 #     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
 #   import_playbook: "{{ appliances_environment_root }}/../nrel/hooks/pre.yml"
 
+- name: "add a stack admin user"
+  hosts: all
+  # tags: pre_tasks_all
+  become: true
+  gather_facts: False
+  tasks:
+    - include_role:
+        name: vs.core.stack_user
+  tags:
+    - add_stack_user
+
 - name: "Do the preliminary node setups"
   hosts: all
   # tags: pre_tasks_all
