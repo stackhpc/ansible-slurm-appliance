@@ -113,35 +113,6 @@
                 - port: 9301
                   name: ood-exporter
                   protocol: TCP
-    
-    - name: Creating headless service for OOD server 
-      kubernetes.core.k8s:
-        namespace: "{{ kube_prometheus_stack_release_namespace }}"
-        definition:
-          kind: Service
-          metadata:
-            name: ondemand
-          spec:
-            clusterIP: None
-            ports:
-            - name: https
-              port: 443
-              protocol: TCP
-
-    - name: Binding OOD server service to host
-      kubernetes.core.k8s:
-        namespace: "{{ kube_prometheus_stack_release_namespace }}"
-        definition:
-          kind: Endpoints
-          metadata:
-            name: ondemand
-          subsets:
-            - addresses:
-                - ip: "{{ openondemand_ip }}"
-              ports:
-                - port: 443
-                  name: https
-                  protocol: TCP
 
 - name: Creating headless service for slurm exporter
   kubernetes.core.k8s:

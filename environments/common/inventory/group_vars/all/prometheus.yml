@@ -37,7 +37,7 @@ prometheus_extra_rules:
       summary: '{% raw %}Blackbox probe failed (target {{ $labels.target }}){% endraw %}'
       description: "{% raw %}Blackbox probe '{{ $labels.target }}' failed{% endraw %}"
   - alert: BlackboxSlowProbe
-    expr: avg_over_time(probe_duration_seconds[1m]) > 1.2 #around 1.14 expected due to indirection in cluster
+    expr: avg_over_time(probe_duration_seconds[1m]) > 1.25 #around 1.14 expected due to indirection in cluster
     for: 1m
     labels:
       severity: warning
