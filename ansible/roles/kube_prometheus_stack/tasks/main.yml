@@ -225,6 +225,11 @@
               basic_auth:
                 username: "testuser"
                 password: "{{ vault_testuser_password }}"
+      configReloader:
+        image:
+          tag: "{{ kube_prometheus_stack_app_version }}" # keeps consistent with pre-pulled image for kube-prometheus-stack
+      image:
+        tag: "{{ kube_prometheus_stack_blackbox_exporter_image_tag }}"
     wait: yes
 
 - name: Install kube-prometheus-stack on target Kubernetes cluster
