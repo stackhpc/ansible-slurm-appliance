@@ -21,31 +21,20 @@ jobs:
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
-        os_version:
-          - RL8
-          - RL9
-        build:
-          - openstack.openhpc
-          - openstack.openhpc-cuda
-        exclude:
-          - os_version: RL8
-            build: openstack.openhpc-cuda
+        builds:
+          - label: openhpc-RL8-ofed
+            source_image_name: RL8-ofed
+            inventory_groups: 'control,login,compute'
+          - label: openhpc-RL9-ofed
+            source_image_name: RL9-ofed
+            inventory_groups: 'control,login,compute'
+          - label: openhpc-RL9-cuda
+            source_image_name: RL9-cuda
+            inventory_groups: 'control,login,compute'
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
-      SOURCE_IMAGES_MAP: |
-        {
-          "RL8": {
-            "openstack.openhpc": "rocky-latest-RL8",
-            "openstack.openhpc-cuda": "rocky-latest-cuda-RL8"
-          },
-          "RL9": {
-            "openstack.openhpc": "rocky-latest-RL9",
-            "openstack.openhpc-cuda": "rocky-latest-cuda-RL9"
-          }
-        }
-
     steps:
       - uses: actions/checkout@v2
 
@@ -79,6 +68,20 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
 
+      - name: Select branch-specific or latest nightly image
+        id: select_source_image
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          BRANCH=${{ github.ref_name }}
+          BRANCH_VERSION=${BRANCH//\/-}
+          NIGHTLY_IMAGE_ID=$( \
+            openstack image show -c id -f value ${{ matrix.builds.source_image_name }}-${BRANCH_VERSION} || \
+            openstack image show -c id -f value ${{ matrix.builds.source_image_name }}-latest \
+          )
+          echo selected source_image $NIGHTLY_IMAGE_ID: $(openstack image show -c name -f value $NIGHTLY_IMAGE_ID)
+          echo "source_image_id=$NIGHTLY_IMAGE_ID" >> "$GITHUB_OUTPUT"
+      
       - name: Build fat image with packer
         id: packer_build
         run: |
@@ -88,15 +91,15 @@ jobs:
           cd packer/
           packer init .
 
-          PACKER_LOG=1 packer build \
+          packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
+          -var source_image=${{ steps.select_source_image.outputs.source_image_id }}
+          -var image_name=${{ matrix.builds.label }} \
+          -var inventory_groups=${{ matrix.builds.inventory_groups }} \
           openstack.pkr.hcl
         env:
-          PKR_VAR_os_version: ${{ matrix.os_version }}
-          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][matrix.build] }}
+          PACKER_LOG: '1'
 
       - name: Get created image names from manifest
         id: manifest
@@ -113,7 +116,7 @@ jobs:
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: image-details-${{ matrix.build }}-${{ matrix.os_version }}
+          name: image-details-${{ matrix.builds.label }}
           path: |
             ./image-id.txt
             ./image-name.txt
