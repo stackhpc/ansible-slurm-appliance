@@ -1,0 +1,5 @@
+---
+- name: Install tuneD
+  ansible.builtin.dnf:
+    name: tuned
+    state: present

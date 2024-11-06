@@ -1,15 +1,3 @@
 ---
 - import_tasks: install.yml
-
-- name: Apply filewalld configs
-  ansible.posix.firewalld: "{{ item }}"
-  notify: Restart filewalld
-  loop: "{{ firewalld_configs }}"
-
-- meta: flush_handlers
-
-- name: Ensure filewalld state
-  ansible.builtin.systemd:
-    name: firewalld
-    state: "{{ firewalld_state }}"
-    enabled: "{{ firewalld_enabled | default('yes' ) }}"
+- import_tasks: runtime.yml

@@ -7,7 +7,8 @@ caas_manila_home:
 
 cluster_project_manila_share_name: azimuth-project-share
 caas_manila_project:
-  share_name: "{{ cluster_project_manila_share_name }}"
+  share_name: "{{ cluster_project_manila_share_name | default('azimuth-project-share') }}"
+  share_user: "{{ cluster_project_manila_share_user | default(omit) }}"
   mount_path: /project
   mount_user: root
   mount_group: root

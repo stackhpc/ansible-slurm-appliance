@@ -2,6 +2,8 @@
   become: yes
   gather_facts: false
   tasks:
+    - name: Output OS version
+      command: cat /etc/redhat-release
     - name: Write CI-generated inventory and secrets for debugging
       ansible.builtin.copy:
         dest: /etc/ci-config/
@@ -12,6 +14,6 @@
         group: root
       no_log: "{{ no_log | default(true) }}"
       loop:
-        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts"
+        - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts.yml"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/secrets.yml"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/test_user.yml"

@@ -12,6 +12,7 @@ export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
 echo SLURM_JOB_ID: $SLURM_JOB_ID
 echo UCX_NET_DEVICES: $UCX_NET_DEVICES
+{{ hpctests_pre_cmd }}
 {% if hpctests_pingpong_modules %}module load {{ hpctests_pingpong_modules | join(' ' ) }}{% endif %}
 {% if hpctests_extra_paths %}export PATH={{ hpctests_extra_paths | join(':') }}:$PATH{% endif %}
 

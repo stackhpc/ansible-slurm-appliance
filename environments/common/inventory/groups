@@ -124,4 +124,14 @@ freeipa_client
 [proxy]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
 
+[persist_hostkeys]
+# Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
 
+[squid]
+# Hosts to run squid proxy
+
+[tuned]
+# Hosts to run TuneD configuration
+
+[ansible_init]
+# Hosts to run linux-anisble-init

@@ -27,13 +27,6 @@
   become: yes
   gather_facts: no
   tasks:
-    - name: Disable firewalld
-      # This is enabled on installation, which isn't what we want
-      systemd:
-        name: firewalld
-        state: stopped
-        enabled: false
-
     # - import_playbook: iam.yml
     - name: Install FreeIPA client
       import_role:
@@ -56,50 +49,68 @@
 
 - hosts: builder
   become: yes
-  gather_facts: no
+  gather_facts: yes
   tasks:
     # - import_playbook: slurm.yml:
     - name: Setup DB
       include_role:
         name: mysql
         tasks_from: install.yml
+      when: "'mysql' in group_names"
     - name: OpenHPC
       include_role:
         name: stackhpc.openhpc
         tasks_from: "install-{{ openhpc_install_type }}.yml"
-
-    - name: Include distribution variables for osc.ood
-      include_vars: "{{ appliances_repository_root }}/ansible/roles/osc.ood/vars/Rocky/8.yml"
-    # FUTURE: install-apps.yml - this is git clones
+      when: "'openhpc' in group_names"
 
     # - import_playbook: portal.yml
-    - name: Open Ondemand server
-      import_role:
+    - name: Open Ondemand server (packages)
+      include_role:
         name: osc.ood
         tasks_from: install-package.yml
+        vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
+      when: "'openondemand' in group_names"
+    # # FUTURE: install-apps.yml - this is git clones
+
+    - name: Open Ondemand server (apps)
+      include_role:
+        name: osc.ood
+        tasks_from: install-apps.yml
+        vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
+      when: "'openondemand' in group_names"
+
     - name: Open Ondemand remote desktop
       import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+      when: "'openondemand_desktop' in group_names"
+    - name: Open Ondemand jupyter node
+      import_role:
+        name: openondemand
+        tasks_from: jupyter_compute.yml
+      when: "'openondemand' in group_names"
 
     # - import_playbook: monitoring.yml:
     - import_role:
         name: opensearch
         tasks_from: install.yml
-      become: true
+      when: "'opensearch' in group_names"
     # slurm_stats - nothing to do
     - import_role:
         name: filebeat
         tasks_from: install.yml
+      when: "'filebeat' in group_names"
 
     - import_role:
       # can't only run cloudalchemy.node_exporter/tasks/install.yml as needs vars from preflight.yml and triggers service start
       # however starting node exporter is ok
         name: cloudalchemy.node_exporter
+      when: "'node_exporter' in group_names"
 
     - name: openondemand exporter
       dnf:
-        name: ondemand_exporter 
+        name: ondemand_exporter
+      when: "'openondemand' in group_names"
 
     - name: slurm exporter
       import_role:
@@ -107,7 +118,12 @@
         tasks_from: install
       vars:
         slurm_exporter_state: stopped
+      when: "'slurm_exporter' in group_names"
 
+- hosts: prometheus
+  become: yes
+  gather_facts: yes
+  tasks:
     - import_role:
         name: cloudalchemy.prometheus
         tasks_from: preflight.yml
@@ -160,6 +176,10 @@
         - prometheus
         - promtool
 
+- hosts: grafana
+  become: yes
+  gather_facts: yes
+  tasks:
     - name: Include distribution variables for cloudalchemy.grafana
       include_vars: "{{ appliances_repository_root }}/ansible/roles/cloudalchemy.grafana/vars/redhat.yml"
     - import_role:
@@ -175,9 +195,9 @@
 
 - hosts: builder
   become: yes
-  gather_facts: no
+  gather_facts: yes
+  tags: finalise
   tasks:
-    # - meta: end_here
     - name: Cleanup image
       import_tasks: cleanup.yml
 

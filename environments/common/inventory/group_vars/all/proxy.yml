@@ -1,0 +1,2 @@
+# default proxy address to first squid api address port 3128 if squid group non-empty, else empty string to avoid breaking hostvars
+proxy_http_proxy: "{{ 'http://' + hostvars[groups['squid'].0].api_address + ':' + (squid_http_port | string) if groups['squid'] else '' }}"

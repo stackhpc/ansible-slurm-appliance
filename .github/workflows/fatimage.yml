@@ -1,64 +1,120 @@
-
 name: Build fat image
 on:
   workflow_dispatch:
+      inputs:
+        ci_cloud:
+          description: 'Select the CI_CLOUD'
+          required: true
+          type: choice
+          options:
+            - LEAFCLOUD
+            - SMS
+            - ARCUS
+
 jobs:
   openstack:
     name: openstack-imagebuild
-    concurrency: ${{ github.ref }} # to branch/PR
-    runs-on: ubuntu-20.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false # allow other matrix jobs to continue even if one fails
+      matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
+        os_version:
+          - RL8
+          - RL9
+        build:
+          - openstack.openhpc
+          - openstack.openhpc-cuda
+        exclude:
+          - os_version: RL8
+            build: openstack.openhpc-cuda
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ vars.CI_CLOUD }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      SOURCE_IMAGES_MAP: |
+        {
+          "RL8": {
+            "openstack.openhpc": "rocky-latest-RL8",
+            "openstack.openhpc-cuda": "rocky-latest-cuda-RL8"
+          },
+          "RL9": {
+            "openstack.openhpc": "rocky-latest-RL9",
+            "openstack.openhpc-cuda": "rocky-latest-cuda-RL9"
+          }
+        }
+
     steps:
       - uses: actions/checkout@v2
+
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
       - name: Setup ssh
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', vars.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         shell: bash
 
       - name: Add bastion's ssh key to known_hosts
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
-      
+
       - name: Install ansible etc
         run: dev/setup-env.sh
-      
+
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', vars.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
       - name: Setup environment
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-        
+
       - name: Build fat image with packer
         id: packer_build
         run: |
+          set -x
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd packer/
           packer init .
-          PACKER_LOG=1 packer build -only openstack.openhpc -on-error=${{ vars.PACKER_ON_ERROR }} -var-file=$PKR_VAR_environment_root/${{ vars.CI_CLOUD }}.pkrvars.hcl openstack.pkr.hcl
-        env:
-          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      - name: Get created image name from manifest
+          PACKER_LOG=1 packer build \
+          -on-error=${{ vars.PACKER_ON_ERROR }} \
+          -only=${{ matrix.build }} \
+          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
+          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
+          openstack.pkr.hcl
+        env:
+          PKR_VAR_os_version: ${{ matrix.os_version }}
+          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][matrix.build] }}
+
+      - name: Get created image names from manifest
         id: manifest
         run: |
           . venv/bin/activate
           IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
           while ! openstack image show -f value -c name $IMAGE_ID; do
-            sleep 30
+            sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
-          echo "::set-output name=IMAGE_ID::$IMAGE_ID"
-          echo "::set-output name=IMAGE_NAME::$IMAGE_NAME"
+          echo $IMAGE_ID > image-id.txt
+          echo $IMAGE_NAME > image-name.txt
+
+      - name: Upload manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-details-${{ matrix.build }}-${{ matrix.os_version }}
+          path: |
+            ./image-id.txt
+            ./image-name.txt
+          overwrite: true

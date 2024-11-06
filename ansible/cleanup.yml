@@ -23,10 +23,43 @@
     path: /etc/NetworkManager/conf.d/99-cloud-init.conf
     state: absent
 
+- name: Get remote environment for ansible_user
+  setup:
+    gather_subset: env
+  become: no
+
 - name: Delete any injected ssh config for ansible_user
   file:
-    path: "/home/{{ ansible_user }}/.ssh/"
+    path: "{{ ansible_env.HOME }}/.ssh/"
     state: absent
 
 - name: Run cloud-init cleanup
   command: cloud-init clean --logs --seed
+
+- name: Cleanup /tmp
+  command : rm -rf /tmp/*
+
+- name: Get package facts
+  package_facts:
+
+- name: Ensure image summary directory exists
+  file:
+    path: /var/lib/image/
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwX,go=rX
+
+- name: Write image summary
+  copy:
+    content: "{{ image_info | to_nice_json }}"
+    dest: /var/lib/image/image.json
+  vars:
+    image_info:
+      branch: "{{ lookup('pipe', 'git rev-parse --abbrev-ref HEAD') }}"
+      build: "{{  ansible_nodename | split('.') | first }}" # hostname is image name, which contains build info
+      os: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+      kernel: "{{ ansible_kernel }}"
+      ofed: "{{ ansible_facts.packages['mlnx-ofa_kernel'].0.version | default('-') }}"
+      cuda:  "{{ ansible_facts.packages['cuda'].0.version | default('-') }}"
+      slurm-ohpc: "{{ ansible_facts.packages['slurm-ohpc'].0.version | default('-') }}"

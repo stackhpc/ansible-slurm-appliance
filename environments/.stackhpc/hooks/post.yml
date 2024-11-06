@@ -1,0 +1,16 @@
+- hosts: openondemand
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Delete ondemand files causing Trivy scan false-positives
+      # Raised at https://github.com/OSC/ondemand/security/advisories/GHSA-f7j8-ppqm-m5vw
+      # All declared not to be an issue by Open Ondemand as relevant packages not installed
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/3.1.7-1/gems/bootstrap_form-2.7.0/test/dummy/Gemfile.lock
+        - /opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/3.1.9-1/gems/bootstrap_form-2.7.0/test/dummy/Gemfile.lock
+        - /opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/3.1.7-1/gems/bootstrap_form-4.5.0/demo/yarn.lock
+        - /opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/3.1.9-1/gems/bootstrap_form-4.5.0/demo/yarn.lock
+        - /var/www/ood/apps/sys/dashboard/node_modules/data-confirm-modal/Gemfile.lock

@@ -3,8 +3,11 @@ bastion_config:
   ARCUS:
     user: slurm-app-ci
     ip: 128.232.222.183
+  LEAFCLOUD:
+    user: slurm-app-ci
+    ip: 195.114.30.222
   SMS:
-    user: steveb
+    user: slurm-app-ci
     ip: 185.45.78.150
 # NB: The bastion_{user,ip} variables are used directly in the CI workflow too
 bastion_user: "{{ bastion_config[ci_cloud].user }}"

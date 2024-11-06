@@ -1,0 +1,66 @@
+# This workflow can be used to fetch images published by StackHPC and upload them to a client's OpenStack. 
+# The workflow takes two inputs:
+# - image name
+# - s3 bucket name
+# and first checks to see if the image exists in the target OpenStack. If the image doesn't exist, it is downloaded 
+# from StackHPC's public S3 bucket and then uploaded to the target OpenStack.
+#
+# To use this workflow in a downstream ansible-slurm-appliance repository simply copy it into .github/workflows
+# and give it an appropriate name, e.g.
+# cp .github/workflows/upload-s3-image.yml.sample .github/workflows/upload-s3-image.yml
+#
+# In order for the workflow to access the target OpenStack, an application credential clouds.yaml file must be 
+# added as a repository secret named OS_CLOUD_YAML.
+# Details on the contents of the clouds.yaml file can be found at https://docs.openstack.org/keystone/latest/user/application_credentials.html
+
+name: Upload release images to client sites from s3
+on:
+  workflow_dispatch:
+    inputs:
+      image_name:
+        type: string
+        description: Image name from: (https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/{BUCKET_NAME})
+        required: true
+      bucket_name:
+        type: choice
+        required: true
+        description: Bucket name
+        options:
+          - openhpc-images
+          # - openhpc-images-prerelease
+
+jobs:
+  image_upload:
+    runs-on: ubuntu-22.04
+    concurrency: ${{ github.ref }}
+    env: 
+      OS_CLOUD: openstack
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets.OS_CLOUD_YAML }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Upload latest image if missing
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          bash .github/bin/get-s3-image.sh ${{ inputs.image_name }} ${{ inputs.bucket_name }}
+
+      - name: Cleanup OpenStack Image (on error or cancellation)
+        if: cancelled() || failure()
+        run: |
+          . venv/bin/activate
+          image_hanging=$(openstack image list --name ${{ inputs.image_name }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
+          if [ -n "$image_hanging" ]; then
+            echo "Cleaning up OpenStack image with ID: $image_hanging"
+            openstack image delete $image_hanging
+          else
+            echo "No image ID found, skipping cleanup."
+          fi
+        shell: bash

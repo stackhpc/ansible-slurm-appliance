@@ -52,4 +52,10 @@ roles/*
 !roles/image_build/**
 !roles/persist_hostkeys/
 !roles/persist_hostkeys/**
-!roles/requirements.yml
+!roles/ofed/
+!roles/ofed/**
+!roles/squid/
+!roles/squid/**
+!roles/tuned/
+!roles/tuned/**
+

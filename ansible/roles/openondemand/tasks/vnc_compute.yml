@@ -10,6 +10,22 @@
   yum:
     name: epel-release
 
+- name: Check /etc/init.d
+  ansible.builtin.stat:
+    path: /etc/init.d
+  register: init_d
+
+- name: Move OFED-installed init scripts
+  # turbovnc installs chkconfig which symlinks /etc/init.d from /etc/rc.d/init.d
+  # but OFED has already created that and installed files in it.
+  # See https://access.redhat.com/solutions/6969215
+  ansible.builtin.command:
+    cmd: mv /etc/init.d /etc/init.d.orig
+    creates: /etc/init.d.orig
+  when:
+    - init_d.stat.exists
+    - not init_d.stat.islnk
+
 - name: Install VNC-related packages
   tags: install
   dnf:
@@ -18,6 +34,15 @@
       - nmap-ncat
       - python3.9
       - dbus-x11
+
+- name: Replace OFED-installed init scripts
+  ansible.builtin.copy:
+    src: /etc/init.d.orig/ # trailing / to get contents
+    dest: /etc/init.d
+    remote_src: true
+  when:
+    - init_d.stat.exists
+    - not init_d.stat.islnk
 
 - name: Install Xfce desktop
   tags: install

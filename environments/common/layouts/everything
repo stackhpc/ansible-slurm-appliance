@@ -28,7 +28,6 @@ slurm_stats
 # NB: [rebuild] not defined here as this template is used in CI
 
 [update:children]
-cluster
 
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH
@@ -69,3 +68,16 @@ openhpc
 
 [manila]
 # Hosts to configure for manila fileshares
+
+[persist_hostkeys]
+# Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
+
+[squid]
+# Hosts to run squid proxy
+
+[tuned:children]
+# Hosts to run TuneD configuration
+
+[ansible_init:children]
+# Hosts to run ansible-init
+cluster
