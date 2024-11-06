@@ -17,6 +17,8 @@
     mode: 0644
   loop:
     - ../../resolv_conf/templates/resolv.conf.j2
+    - ../../stackhpc.os-manila-mount/templates/ceph.conf.j2
+    - ../../stackhpc.os-manila-mount/templates/ceph.keyring.j2
 
 - name: Ensure files directory exists
   file: 
@@ -35,6 +37,52 @@
     mode: 0644
   loop:
     - ../../resolv_conf/files/NetworkManager-dns-none.conf
+
+- name: Ensure library directory exists
+  file: 
+    path: /etc/ansible-init/library
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Inject files
+  copy:
+    src: '{{ item }}'
+    dest: '/etc/ansible-init/library/{{ item | basename }}'
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - ../../basic_users/library/terminate_user_sessions.py
+    - ../../stackhpc.os-manila-mount/library/os_manila_share.py
+
+- name: Ensure filter_plugins directory exists
+  file: 
+    path: /etc/ansible-init/filter_plugins
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Inject filter_plugins
+  copy:
+    src: '{{ item }}'
+    dest: '/etc/ansible-init/filter_plugins/{{ item | basename }}'
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - ../../basic_users/filter_plugins/filter_keys.py
+
+- name: Add filter_plugins ansible.cfg
+  lineinfile:
+    path: /etc/ansible-init/ansible.cfg
+    line: "filter_plugins = /etc/ansible-init/filter_plugins"
+    state: present
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Inject compute initialisation playbook
   copy:

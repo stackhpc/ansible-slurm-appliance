@@ -5,8 +5,55 @@
   become: yes
   vars:
     control_node_ip: "172.16.1.228"
-    nfs_export: "/exports/hosts"
-    resolv_conf_nameservers: []
+    nfs_export_hosts: "/exports/hosts"
+    resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
+
+    # block device (disk) on which to create the exported filesystem.
+    # if the disk is not defined, formatting and mounting will not be done.
+    nfs_disk_location:
+
+    # Path to exported filesystem mountpoint on nfs servers
+    nfs_export: "/exports/home"
+
+    # nfs client mount options
+    nfs_client_mnt_options:
+
+    # Path to mountpoint on nfs clients
+    nfs_client_mnt_point: "/home"
+    nfs_client_mnt_state: mounted
+
+    nfs_server: "{{ control_node_ip }}"
+
+
+    os_manila_mount_shares: []
+    os_manila_mount_state: mounted
+    os_manila_mount_opts:
+      - x-systemd.device-timeout=30
+      - x-systemd.mount-timeout=30
+      - noatime
+      - _netdev # prevents mount blocking early boot before networking available
+      - rw
+    os_manila_mount_share_info: [] # populated by lookup mode
+    os_manila_mount_ceph_conf_path: /etc/ceph
+
+
+    basic_users_manage_homedir: false
+
+    basic_users_userdefaults:
+      state: present
+      create_home: "{{ basic_users_manage_homedir }}"
+      generate_ssh_key: "{{ basic_users_manage_homedir }}"
+      ssh_key_comment: "{{ item.name }}"
+
+    test_user_password: "zXpcWyGQL7jtZnqylQra4g=="
+
+    basic_users_users:
+      - name: testuser # can't use rocky as $HOME isn't shared!
+        password: "{{ test_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+        uid: 1005
+        state: present
+
+    basic_users_groups: []
 
   tasks:
     - name: Configure resolve.conf
@@ -34,6 +81,7 @@
             state: reloaded
           when: _copy_nm_config.changed | default(false)
 
+
     - name: Mount /etc/hosts on compute nodes
       block:
         - name: Ensure the mount directory exists
@@ -42,18 +90,131 @@
             state: directory
             mode: 0755
         
-        - name: Mount NFS export
+        - name: Mount /mnt/hosts
           mount:
             path: /mnt/hosts
-            src: "{{ vars.control_node_ip }}:{{ nfs_export }}"
+            src: "{{ vars.control_node_ip }}:{{ nfs_export_hosts }}"
             fstype: nfs
             opts: rw,sync
             state: mounted
 
-        - name: Copy /exports/hosts contents to /etc/hosts
+        - name: Copy /mnt/hosts/hosts contents to /etc/hosts
           copy:
             src: /mnt/hosts/hosts
             dest: /etc/hosts
             owner: root
             group: root
             mode: 0644
+
+
+    - name: NFS client mount
+      block:
+        - name: ensure mount directory exists
+          file:
+            path: "{{ nfs_client_mnt_point }}"
+            state: directory
+
+        - name: mount the filesystem
+          mount:
+            path: "{{ nfs_client_mnt_point }}"
+            src: "{{ nfs_server }}:{{ nfs_export }}"
+            fstype: nfs
+            state: "{{ nfs_client_mnt_state }}"
+
+
+    - name: Manila mount
+      block:
+        - name: Read manila share from nfs file
+          slurp:
+            src: "/mnt/cluster/manila_share_info.yml"
+          register: manila_share_info_file
+
+        - name: Parse and set fact for manila share info
+          set_fact:
+            os_manila_mount_share_info: "{{ manila_share_info_file.content | b64decode | from_yaml }}"
+
+        - name: Ensure Ceph configuration directory exists
+          ansible.builtin.file:
+            path: "{{ os_manila_mount_ceph_conf_path }}"
+            state: directory
+            mode: "0755"
+            owner: root
+            group: root
+
+        - name: Configure ceph.conf using os_manila_mount_host
+          ansible.builtin.template:
+            src: /etc/ansible-init/templates/ceph.conf.j2
+            dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.conf"
+            owner: root
+            group: root
+            mode: "0600"
+
+        - name: Ensure mount directory exists
+          ansible.builtin.file:
+            path: "{{ item.mount_path }}"
+            state: directory
+            owner: "{{ item.mount_user | default(omit) }}"
+            group: "{{ item.mount_group | default(omit) }}"
+            mode: "{{ item.mount_mode | default(omit) }}"
+          loop: "{{ os_manila_mount_shares }}"
+          loop_control:
+            label: "{{ item.share_name }}"
+
+        - name: Write Ceph client keyring
+          ansible.builtin.template:
+            src: /etc/ansible-init/templates/ceph.keyring.j2
+            dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ item.share_user }}.keyring"
+            mode: "0600"
+            owner: root
+            group: root
+          loop: "{{ os_manila_mount_share_info }}"
+          loop_control:
+            label: "{{ item.share_name }}"
+
+        - name: Mount the Ceph share
+          ansible.posix.mount:
+            path: "{{ item[0].mount_path }}"
+            src: "{{ item[1].host }}:{{ item[1].export }}"
+            fstype: ceph
+            opts: "name={{ item[1].share_user }},{{ (item[0].mount_opts | default(os_manila_mount_opts)) | join(',') }}"
+            # NB share_user is looked up here in case of autodetection
+            state: "{{ item[0].mount_state | default(os_manila_mount_state) }}"
+          loop: "{{ os_manila_mount_shares | zip(os_manila_mount_share_info) }}"
+          loop_control:
+            label: "{{ item[0].share_name }}"
+
+        - name: Ensure mounted directory has correct permissions
+          ansible.builtin.file:
+            path: "{{ item.mount_path }}"
+            state: directory
+            owner: "{{ item.mount_user | default(omit) }}"
+            group: "{{ item.mount_group | default(omit) }}"
+            mode: "{{ item.mount_mode | default(omit) }}"
+          loop: "{{ os_manila_mount_shares }}"
+          loop_control:
+            label: "{{ item.share_name }}"
+          when: item.mount_state | default(os_manila_mount_state) in ['mounted' or 'ephemeral']
+
+
+    - name: Basic users setup
+      block:
+        - name: Create groups
+          ansible.builtin.group: "{{ item }}"
+          loop:  "{{ basic_users_groups }}"
+
+        - name: Create users
+          user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() }}"
+          loop: "{{ basic_users_users }}"
+          loop_control:
+            label: "{{ item.name }} [{{ item.state | default('present') }}]"
+          register: basic_users_info
+
+        - name: Write sudo rules
+          blockinfile:
+            path: /etc/sudoers.d/80-{{ item.name}}-user
+            block: "{{ item.sudo }}"
+            create: true
+          loop: "{{ basic_users_users }}"
+          loop_control:
+            label: "{{ item.name }}"
+          when: "'sudo' in item"
