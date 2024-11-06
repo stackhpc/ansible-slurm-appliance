@@ -210,7 +210,7 @@
   kubernetes.core.helm:
     chart_ref: prometheus-blackbox-exporter
     chart_repo_url: https://prometheus-community.github.io/helm-charts
-    chart_version: 9.0.1
+    chart_version: "{{ kube_prometheus_stack_blackbox_exporter_release_version }}"
     release_name: "{{ kube_prometheus_stack_blackbox_exporter_release_name }}"
     release_namespace: "{{ kube_prometheus_stack_release_namespace }}"
     release_values:
