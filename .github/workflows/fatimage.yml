@@ -94,7 +94,7 @@ jobs:
           packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var source_image=${{ steps.select_source_image.outputs.source_image_id }}
+          -var source_image=${{ steps.select_source_image.outputs.source_image_id }} \
           -var image_name=${{ matrix.builds.label }} \
           -var inventory_groups=${{ matrix.builds.inventory_groups }} \
           openstack.pkr.hcl
