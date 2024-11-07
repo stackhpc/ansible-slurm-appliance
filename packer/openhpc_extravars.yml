@@ -1,1 +1,2 @@
 workaround_ansible_issue_61497: yes # extravars files can't be empty
+cuda_driver_stream: 560-open # pinned to fix incompatibility cuda latest (12.6.2) being out of date for nvidia-driver latest (565.57.01), remove when fixed
