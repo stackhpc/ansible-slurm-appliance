@@ -56,6 +56,7 @@
   loop:
     - ../../basic_users/library/terminate_user_sessions.py
     - ../../stackhpc.os-manila-mount/library/os_manila_share.py
+    - ../../stackhpc.openhpc/library/sacct_cluster.py
 
 - name: Ensure filter_plugins directory exists
   file: 
@@ -74,6 +75,7 @@
     mode: 0644
   loop:
     - ../../basic_users/filter_plugins/filter_keys.py
+    - ../../stackhpc.openhpc/filter_plugins/slurm_conf.py
 
 - name: Add filter_plugins ansible.cfg
   lineinfile:
