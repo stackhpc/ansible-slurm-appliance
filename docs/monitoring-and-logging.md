@@ -28,6 +28,10 @@ Metrics are scraped from exporters. Exporters are services which expose HTTP end
 
 Tool which parses slurm accounting data and produces a log file that is suitable for ingest by filebeat.
 
+### [blackbox-exporter](https://github.com/prometheus/blackbox_exporter)
+
+Tool which allows blackbox probing of endpoints over HTTP, HTTPS, DNS, TCP, ICMP and gRPC.
+
 ## Definition of terms
 
 In this section we define any terms that may not be widely understood.
@@ -290,6 +294,21 @@ slurm-stats is configured `slurm-stats` role in the [slurm_openstack_tools colle
 The `slurm_stats` group controls the placement of the `slurm_stats` service.
 This should be configured to be a group with a single host. That host must be co-located on the same host as the `filebeat` service that scrapes its output.
 
+## blackbox-exporter
 
+### Defaults and adding jobs
 
+Blackbox exporter is configured using rolevars in the [kube_prometheus_stack role](../ansible/roles/kube_prometheus_stack/defaults/main). Blackbox uses modules to
+probe service endpoints. Modules can be configured by overriding the maps in [environments/common/inventory/group_vars/all/blackbox_exporter.yml](../environments/common/inventory/group_vars/all/blackbox_exporter.yml), see [upstream docs](https://github.com/prometheus/blackbox_exporter/blob/master/CONFIGURATION.md)
+and [underlying Helm chart values](https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-blackbox-exporter/values.yaml#L162) for module configuration options. Probes are defined through Prometheus scrape jobs, which can be added in [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml). See upstream docs for configuring blackbox-exporter scrape jobs.
 
+By default a HTTPS probe for OpenOndemand is added if there are hosts in the `openondemand` group, the module and scrape job for this is defined in
+[environments/common/inventory/group_vars/all/openondemand.yml](../environments/common/inventory/group_vars/all/openondemand.yml) (these are merged into the config in [blackbox_exporter.yml]([prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml)) and [prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml) respectively).
+
+### Placement
+
+Installed as part of the kube_prometheus_stack role thats placement is controlled by the `prometheus` group. As above, there is currently no load balancing support so should only be placed on a single node, configured to be the Slurm control node by default.
+
+### Access
+
+Probes can be viewed through the `Prometheus Blackbox Exporter` Grafana dashboard.
