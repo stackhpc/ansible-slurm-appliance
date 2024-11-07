@@ -2,5 +2,6 @@ kube_prometheus_stack_chart_version: 59.1.0
 kube_prometheus_stack_release_namespace: monitoring-system
 kube_prometheus_stack_release_name: kube-prometheus-stack
 kube_prometheus_stack_wait_timeout: 5m
+kube_prometheus_stack_blackbox_exporter_release_name: blackbox-exporter
 
 # See prometheus.yml, grafana.yml and alertmanager.yml for config of individual monitoring services

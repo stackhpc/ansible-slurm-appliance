@@ -182,6 +182,34 @@ openondemand_scrape_configs:
       labels:
         environment: "{{ appliances_environment_name }}"
         service: "openondemand"
+  - job_name: "ood-blackbox-probe"
+    metrics_path: /probe
+    params:
+      module: [ood_http_2xx]
+    static_configs:
+      - targets:
+        - "{{ openondemand_address }}"
+    relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [__param_target]
+      target_label: target
+    - target_label: __address__ 
+      replacement: "{{ kube_prometheus_stack_blackbox_exporter_release_name }}-prometheus-blackbox-exporter:9115"
+
+openondemand_blackbox_modules:
+  ood_http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      follow_redirects: true
+      preferred_ip_protocol: "ip4"
+      tls_config:
+        insecure_skip_verify: true
+      basic_auth:
+        username: "testuser"
+        password: "{{ vault_testuser_password }}"
 
 openondemand_dashboard:
   - dashboard_id: 13465
