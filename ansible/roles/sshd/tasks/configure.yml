@@ -1,0 +1,15 @@
+- name: Template sshd configuration
+  # NB: If parameters are defined multiple times the first value wins;
+  # The default /etc/ssh/sshd_config has
+  #   Include /etc/ssh/sshd_config.d/*.conf
+  # early on, which is generally held to be the correct approach, so adding
+  # values to the end of that file won't work
+  template:
+    src: "{{ sshd_conf_src }}"
+    dest: "{{ sshd_conf_dest }}"
+    owner: root
+    group: root
+    mode: u=rw,go=
+    validate: sshd -t -f %s
+  notify:
+    - Restart sshd

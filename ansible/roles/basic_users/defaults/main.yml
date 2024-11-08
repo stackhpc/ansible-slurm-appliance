@@ -7,3 +7,4 @@ basic_users_userdefaults:
   shell: "{{'/sbin/nologin' if 'control' in group_names else omit }}"
 basic_users_users: []
 basic_users_groups: []
+basic_users_override_sssd: false
