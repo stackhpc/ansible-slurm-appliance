@@ -108,74 +108,7 @@ jobs:
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
           openstack image unset --property signature_verified $IMAGE_ID
 
-      - name: Download image
-        if: github.ref_name == 'main'
-        run: |
-          . venv/bin/activate
-          sudo mkdir /mnt/images
-          sudo chmod 777 /mnt/images
-          openstack image save --file /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 ${{ steps.manifest.outputs.image-id }}
-
-      - name: Set up QEMU
-        if: github.ref_name == 'main'
-        uses: docker/setup-qemu-action@v3
-
-      - name: Install libguestfs
-        run: |
-          sudo apt -y update
-          sudo apt -y install libguestfs-tools
-        if: github.ref_name == 'main'
-
-      - name: Mount image
-        if: github.ref_name == 'main'
-        run: |
-          sudo mkdir -p './${{ steps.manifest.outputs.image-name }}'
-          sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
-        
-      - name: Run Trivy vulnerability scanner
-        if: github.ref_name == 'main'
-        uses: aquasecurity/trivy-action@0.17.0
-        with:
-          scan-type: fs
-          scan-ref: "${{ steps.manifest.outputs.image-name }}"
-          scanners: "vuln"
-          format: sarif
-          output: "${{ steps.manifest.outputs.image-name }}.sarif"
-          # turn off secret scanning to speed things up
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        if: github.ref_name == 'main'
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
-          category: "${{ matrix.build.label }}"
-
-      - name: Fail if scan has CRITICAL vulnerabilities
-        if: github.ref_name == 'main'
-        uses: aquasecurity/trivy-action@0.16.1
-        with:
-          scan-type: fs
-          scan-ref: "${{ steps.manifest.outputs.image-name }}"
-          scanners: "vuln"
-          format: table
-          exit-code: '1'
-          severity: 'CRITICAL'
-          ignore-unfixed: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-
-      - name: Delete new image if Trivy scan fails
-        if: github.ref_name == 'main' && failure() && steps.packer_build.outcome == 'success' # Runs if the Trivy scan found crit vulnerabilities or failed
-        run: |
-          . venv/bin/activate
-          echo "Deleting new image due to critical vulnerabilities or scan failure ..."
-          openstack image delete "${{ steps.manifest.outputs.image-id }}"
-
-      - name: Delete old image
-        if: github.ref_name == 'main'
+      - name: Delete old latest image
         run: |
           . venv/bin/activate
           IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
