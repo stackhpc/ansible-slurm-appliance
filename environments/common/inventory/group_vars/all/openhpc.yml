@@ -21,9 +21,9 @@ openhpc_packages_default:
   # system packages
   - podman
   # OpenHPC packages
-  - slurm-libpmi-ohpc # to allow intel mpi to work properly
-  - ohpc-gnu12-openmpi4-perf-tools # for hpctests
-  - openblas-gnu12-ohpc # for hpctests (HPL)
+  #- slurm-libpmi-ohpc # to allow intel mpi to work properly
+  #- ohpc-gnu12-openmpi4-perf-tools # for hpctests
+  #- openblas-gnu12-ohpc # for hpctests (HPL)
   # EPEL packages:
   - apptainer
   - podman-compose
