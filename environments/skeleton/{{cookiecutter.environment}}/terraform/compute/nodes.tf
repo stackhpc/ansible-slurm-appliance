@@ -20,6 +20,14 @@ resource "openstack_blockstorage_volume_v3" "compute" {
     size = var.volumes[each.value.volume].size
 }
 
+resource "openstack_compute_volume_attach_v2" "compute" {
+  
+  for_each = local.all_compute_volumes
+
+  instance_id = openstack_compute_instance_v2.compute["${each.value.node}"].id
+  volume_id  = openstack_blockstorage_volume_v3.compute["${each.key}"].id
+}
+
 resource "openstack_networking_port_v2" "compute" {
 
   for_each = toset(var.nodes)
@@ -48,27 +56,6 @@ resource "openstack_compute_instance_v2" "compute" {
   image_id = var.image_id
   flavor_name = var.flavor
   key_pair = var.key_pair
-
-  # root device:
-  block_device {
-    uuid = var.image_id
-    source_type  = "image"
-    destination_type = var.volume_backed_instances ? "volume" : "local"
-    volume_size = var.volume_backed_instances ? var.root_volume_size : null
-    boot_index = 0
-    delete_on_termination = true
-  }
-  
-  # additional volumes:
-  dynamic "block_device" {
-    for_each = var.volumes
-    content {
-      destination_type = "volume"
-      source_type  = "volume"
-      boot_index = -1
-      uuid = openstack_blockstorage_volume_v3.compute["${each.key}-${block_device.key}"].id
-    }
-  }
   
   network {
     port = openstack_networking_port_v2.compute[each.key].id
