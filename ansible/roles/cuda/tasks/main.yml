@@ -25,7 +25,7 @@
   register: _cuda_driver_module_enabled
 
 - name: Enable nvidia driver module
-  ansible.builtin.command: "dnf module enable -y nvidia-driver:{{ 'open-dkms' if cuda_driver_stream == 'default' else cuda_driver_stream }}"
+  ansible.builtin.command: "dnf module enable -y nvidia-driver:{{ cuda_driver_stream }}"
   register: _cuda_driver_module_enable
   when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
