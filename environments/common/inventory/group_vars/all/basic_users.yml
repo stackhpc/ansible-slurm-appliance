@@ -3,5 +3,10 @@
 # See: ansible/roles/basic_users/README.md 
 # for variable definitions.
 
+ondemand_user_password: "{{ vault_openondemand_default_user_password }}"
+
 basic_users_homedir: /home
-basic_users_users: []
+basic_users_users:
+  - name: ood_user
+    password: "{{ ondemand_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+    uid: 1006

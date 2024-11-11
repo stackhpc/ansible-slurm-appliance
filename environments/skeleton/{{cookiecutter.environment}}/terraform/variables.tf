@@ -6,7 +6,7 @@ variable "cluster_name" {
 variable "cluster_domain_suffix" {
     type = string
     description = "Domain suffix for cluster"
-    default = "invalid"
+    default = "internal"
 }
 
 variable "cluster_net" {
