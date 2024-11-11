@@ -8,6 +8,7 @@ slurm_appliance_secrets:
   vault_openhpc_mungekey: "{{ secrets_openhpc_mungekey | default(vault_openhpc_mungekey | default(secrets_openhpc_mungekey_default)) }}"
   vault_freeipa_ds_password: "{{ vault_freeipa_ds_password | default(lookup('password', '/dev/null')) }}"
   vault_freeipa_admin_password: "{{ vault_freeipa_admin_password | default(lookup('password', '/dev/null')) }}"
+  vault_openondemand_default_user_password: "{{ vault_openondemand_default_user_password | default(lookup('password', '/dev/null')) }}"
   k3s_token: "{{ lookup('ansible.builtin.password', '/dev/null', length=64) }}"
 
 secrets_openhpc_mungekey_default:
