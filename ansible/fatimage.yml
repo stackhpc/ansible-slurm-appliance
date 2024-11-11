@@ -25,7 +25,7 @@
 
 - hosts: builder
   become: yes
-  gather_facts: no
+  gather_facts: yes
   tasks:
     # - import_playbook: iam.yml
     - name: Install FreeIPA client
@@ -44,6 +44,11 @@
         name: stackhpc.os-manila-mount
         tasks_from: install.yml
       when: "'manila' in group_names"
+    - name: Install Lustre packages
+      include_role:
+        name: lustre
+        tasks_from: install.yml
+      when: "'lustre' in group_names"
 
 - import_playbook: extras.yml
 
@@ -57,6 +62,7 @@
         name: mysql
         tasks_from: install.yml
       when: "'mysql' in group_names"
+
     - name: OpenHPC
       import_role:
         name: stackhpc.openhpc
@@ -83,18 +89,21 @@
       import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+
       when: "'openondemand_desktop' in group_names"
+
     - name: Open Ondemand jupyter node
       import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
-      when: "'openondemand' in group_names"
+      when: "'openondemand_jupyter' in group_names"
 
     # - import_playbook: monitoring.yml:
     - import_role:
         name: opensearch
         tasks_from: install.yml
       when: "'opensearch' in group_names"
+
     # slurm_stats - nothing to do
     - import_role:
         name: filebeat

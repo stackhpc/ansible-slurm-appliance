@@ -78,5 +78,8 @@ cluster
 openhpc
 
 [k9s:children]
+# Hosts to install k9s on
 control
 
+[lustre]
+# Hosts to run lustre client
