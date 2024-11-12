@@ -96,6 +96,19 @@
     mode: 0644
   delegate_to: "{{ groups['control'] | first }}"
 
+- name: Ensure /exports/cluster exists on control node
+  ansible.builtin.file:
+    path: /exports/cluster
+    state: directory
+    mode: '0755'
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Copy manila share info to /exports/cluster
+  copy:
+    content: "{{ os_manila_mount_share_info | to_nice_yaml }}"
+    dest: "/exports/cluster/manila_share_info.yml"
+  delegate_to: "{{ groups['control'] | first }}"
+
 - name: Write openhpc munge key
   copy:
     content: "{{ vault_openhpc_mungekey | b64decode }}"
@@ -103,7 +116,6 @@
     owner: munge
     group: munge
     mode: 0400
-  become: true
   delegate_to: "{{ groups['control'] | first }}"
 
 

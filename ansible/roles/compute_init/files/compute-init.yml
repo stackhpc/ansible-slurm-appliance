@@ -3,19 +3,16 @@
 - name: Compute node initialisation
   hosts: localhost
   become: yes
+  # VARS TO BE SUPPLIED VIA CLOUD INIT METADATA
   vars:
     control_node_ip: "172.16.1.228"
     nfs_export_hosts: "/exports/hosts"
     resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
 
-    # block device (disk) on which to create the exported filesystem.
-    # if the disk is not defined, formatting and mounting will not be done.
+
     nfs_disk_location:
-    # Path to exported filesystem mountpoint on nfs servers
     nfs_export: "/exports/home"
-    # nfs client mount options
     nfs_client_mnt_options:
-    # Path to mountpoint on nfs clients
     nfs_client_mnt_point: "/home"
     nfs_client_mnt_state: mounted
     nfs_server: "{{ control_node_ip }}"
@@ -48,7 +45,6 @@
     basic_users_groups: []
 
 
-    # Default to 10GB
     cvmfs_quota_limit_mb: 10000
     cvmfs_config_default:
       CVMFS_CLIENT_PROFILE: single
@@ -137,7 +133,7 @@
       block:
         - name: Read manila share from nfs file
           slurp:
-            src: "/mnt/cluster/manila_share_info.yml"
+            src: "/mnt/manila_share_info.yml"
           register: manila_share_info_file
 
         - name: Parse and set fact for manila share info
