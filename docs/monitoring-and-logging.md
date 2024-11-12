@@ -3,7 +3,7 @@
 ## Components overview
 
 ### [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
-An umbrella Helm chart which the appliance uses to deploy and manages containerised versions of Prometheus, Grafana, Alertmanager and Node Exporter.
+An umbrella Helm chart which the appliance uses to deploy and manage containerised versions of Prometheus, Grafana, Alertmanager and Node Exporter.
 
 ### [filebeat](https://www.elastic.co/beats/filebeat)
 
@@ -109,7 +109,7 @@ Note that if Open OnDemand is enabled, Grafana is only accessible through OOD's 
 
 ### grafana dashboards
 
-In addition to the default set of dashboards that are deployed by kube-prometheus-stack, the appliance ships with a default set of dashboards (listed below). The set of appliance-specific dashboards can be configured via the `grafana_dashboards` variable. The dashboards are either internal to the [grafana-dashboards role](../ansible/roles/grafana-dashboards/files/) or downloaded from grafana.com. If you wish to selectively remove the default dashboards deployed by kube-prometheus-stack, this can be done by overriding the `grafana_exclude_default_dashboards` variable in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml).
+In addition to the default set of dashboards that are deployed by kube-prometheus-stack, the appliance ships with additional dashboards listed below. The set of appliance-specific dashboards can be configured via the `grafana_dashboards` variable. The dashboards are either internal to the [grafana-dashboards role](../ansible/roles/grafana-dashboards/files/) or downloaded from grafana.com. If you wish to selectively remove the default dashboards deployed by kube-prometheus-stack, this can be done by overriding the `grafana_exclude_default_dashboards` variable in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml).
 
 #### node exporter slurm
 
@@ -230,7 +230,7 @@ Note that this service is not password protected, allowing anyone with access to
 
 ### Upgrades
 
-The appliance previously used [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role to configure Prometheus, but our monitoring stack has since been moved into the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart running on a k3s cluster. The some of the default Grafana dashboards deployed by kube-prometheus-stack are hardcoded to rely on the `job` label of metrics scraped from Node Exporter to have the value `node-exporter`. By default, the cloudalchemy role scraped these metrics with the `job` label set to `node`. Therefore, if upgrading from previous versions of the appliance which used the cloudalchemy role, pre-upgrade data will not show up by default in Grafana dashboards. The old data can still be viewed in the OpenHPC and Node Exporter Slurm dashboards by selecting the previous `job` value from the Job dropdown.
+The appliance previously used [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role to configure Prometheus, but our monitoring stack has since been moved into the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart running on a k3s cluster. Some of the default Grafana dashboards deployed by kube-prometheus-stack are hardcoded to rely on the `job` label of metrics scraped from Node Exporter to have the value `node-exporter`. By default, the cloudalchemy role scraped these metrics with the `job` label set to `node`. Therefore, if upgrading from previous versions of the appliance which used the cloudalchemy role, pre-upgrade data will not show up by default in Grafana dashboards. The old data can still be viewed in the OpenHPC and Node Exporter Slurm dashboards by selecting the previous `job` value from the Job dropdown.
 
 ### Alerting and recording rules
 
