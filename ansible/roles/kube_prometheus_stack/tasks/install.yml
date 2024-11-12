@@ -1,5 +1,5 @@
 ---
 
 - name: Pre-pull kube-prometheus-stack images and import to k3s
-  ansible.builtin.include_tasks: roles/kube_prometheus_stack/files/podman_to_k3s.yml
+  ansible.builtin.include_tasks: podman_to_k3s.yml
   loop: "{{ image_list }}"
