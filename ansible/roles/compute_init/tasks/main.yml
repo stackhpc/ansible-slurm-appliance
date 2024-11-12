@@ -19,6 +19,7 @@
     - ../../resolv_conf/templates/resolv.conf.j2
     - ../../stackhpc.os-manila-mount/templates/ceph.conf.j2
     - ../../stackhpc.os-manila-mount/templates/ceph.keyring.j2
+    - ../../stackhpc.openhpc/templates/gres.conf.j2
 
 - name: Ensure files directory exists
   file: 
@@ -85,6 +86,26 @@
     owner: root
     group: root
     mode: 0644
+
+- name: Ensure /exports/cluster directory exists
+  file: 
+    path: /exports/cluster
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Write openhpc munge key
+  copy:
+    content: "{{ vault_openhpc_mungekey | b64decode }}"
+    dest: "/exports/cluster/openhpc_munge.key"
+    owner: munge
+    group: munge
+    mode: 0400
+  become: true
+  delegate_to: "{{ groups['control'] | first }}"
+
 
 - name: Inject compute initialisation playbook
   copy:

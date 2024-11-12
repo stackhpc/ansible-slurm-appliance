@@ -56,6 +56,15 @@
     cvmfs_config_overrides: {}
     cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
 
+    openhpc_conf_server: control_node_ip
+    openhpc_gres_template: /etc/ansible-init/templates/gres.conf.j2
+    openhpc_slurm_service_enabled: true
+    openhpc_slurm_service_started: "{{ openhpc_slurm_service_enabled }}"
+    openhpc_enable:
+      control: false
+      batch: true
+      database: false
+      runtime: true
 
   tasks:
     - name: Configure resolve.conf
@@ -223,7 +232,6 @@
 
 
     - name: Configure EESSI
-      gather_facts: false
       block:
         - name: Download Cern GPG key
           ansible.builtin.get_url:
@@ -247,15 +255,6 @@
             # NOTE: Can't find any docs on obtaining gpg key - maybe downloading directly from github is ok?
             disable_gpg_check: true
 
-        # Alternative version using official repo - still no GPG key :(
-        # - name: Add EESSI repo
-        #   dnf: 
-        #     name: http://repo.eessi-infra.org/eessi/rhel/8/noarch/eessi-release-0-1.noarch.rpm
-
-        # - name: Install EESSI CVMFS config
-        #   dnf:
-        #     name: cvmfs-config-eessi
-
         - name: Add base CVMFS config
           community.general.ini_file:
             dest: /etc/cvmfs/default.local
@@ -273,45 +272,6 @@
 
     - name: Configure openhpc
       block:
-        - name: Check openhpc_slurm_control_host, openhpc_cluster_name or openhpc_slurm_partitions exist
-          assert:
-            that:
-              - openhpc_slurm_control_host is defined
-              - openhpc_cluster_name is defined
-              - openhpc_cluster_name != ''
-              - openhpc_slurm_partitions is defined
-            fail_msg: "Undefined openhpc_slurm_control_host, openhpc_cluster_name or openhpc_slurm_partitions."
-
-        - name: Fail if control host not in play and munge key not specified
-          fail:
-            msg: "Either the slurm control node must be in the play or `openhpc_munge_key` must be set"
-          when:
-            - openhpc_slurm_control_host not in ansible_play_hosts
-            - not openhpc_munge_key
-
-        # - name: Ensure Slurm directories exists
-        #   file:
-        #     path: "{{ openhpc_state_save_location }}"
-        #     owner: slurm
-        #     group: slurm
-        #     mode: 0755
-        #     state: directory
-        #   when: inventory_hostname == openhpc_slurm_control_host
-
-        # - name: Generate a Munge key on control host
-        #   # NB this is usually a no-op as the package install actually generates a (node-unique) one, so won't usually trigger handler
-        #   command: "dd if=/dev/urandom of=/etc/munge/munge.key bs=1 count=1024"
-        #   args:
-        #     creates: "/etc/munge/munge.key"
-        #   when: inventory_hostname == openhpc_slurm_control_host
-
-        # - name: Retrieve Munge key from control host
-        #   slurp:
-        #     src: "/etc/munge/munge.key"
-        #   register: openhpc_control_munge_key
-        #   delegate_to: "{{ openhpc_slurm_control_host }}"
-        #   when: openhpc_slurm_control_host in ansible_play_hosts
-
         - name: Fix permissions on /etc to pass Munge startup checks
           # Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2 makes /etc g=rwx rather than g=rx (where group=root)
           # which fails munged startup checks
@@ -320,83 +280,13 @@
             state: directory
             mode: g-w
 
-        - name: Write Munge key
+        - name: Copy Munge key from NFS-mounted directory to /etc/munge
           copy:
-            content: "{{ openhpc_munge_key or (openhpc_control_munge_key.content | b64decode) }}"
+            src: "/mnt/openhpc_munge.key"
             dest: "/etc/munge/munge.key"
             owner: munge
             group: munge
             mode: 0400
-          notify:
-            - Restart Munge service
-
-        - name: Ensure JobComp logfile exists
-          file:
-            path: "{{ openhpc_slurm_job_comp_loc }}"
-            state: touch
-            owner: slurm
-            group: slurm
-            mode: 0644
-            access_time: preserve
-            modification_time: preserve
-          when: openhpc_slurm_job_comp_type == 'jobcomp/filetxt'
-
-        - name: Template slurmdbd.conf
-          template:
-            src: slurmdbd.conf.j2
-            dest: /etc/slurm/slurmdbd.conf
-            mode: "0600"
-            owner: slurm
-            group: slurm
-          notify: Restart slurmdbd service
-          when: openhpc_enable.database | default(false) | bool
-
-        - name: Make local tempfile for slurm.conf templating # ensures simultaneous runs don't clobber each other
-          ansible.builtin.tempfile:
-          register: _slurm_conf_tmpfile
-          delegate_to: localhost
-          when: openhpc_enable.control | default(false) or not openhpc_slurm_configless
-          changed_when: false # so molecule doesn't fail
-          become: no
-
-        - name: Template basic slurm.conf
-          template:
-            src: slurm.conf.j2
-            dest: "{{ _slurm_conf_tmpfile.path }}"
-            lstrip_blocks: true
-            mode: 0644
-          delegate_to: localhost
-          when: openhpc_enable.control | default(false) or not openhpc_slurm_configless
-          changed_when: false # so molecule doesn't fail
-          become: no
-
-        - name: Customise slurm.conf
-          community.general.ini_file:
-            path: "{{ _slurm_conf_tmpfile.path }}"
-            option: "{{ item.key }}"
-            section: ''
-            value: "{{ (item.value | join(',')) if (item.value is sequence and item.value is not string) else item.value }}"
-            no_extra_spaces: true
-            create: no
-            mode: 0644
-          loop: "{{ openhpc_config | dict2items }}"
-          delegate_to: localhost
-          when: openhpc_enable.control | default(false) or not openhpc_slurm_configless
-          changed_when: false # so molecule doesn't fail
-          become: no
-
-        - name: Create slurm.conf
-          copy:
-            src: "{{ _slurm_conf_tmpfile.path }}"
-            dest: /etc/slurm/slurm.conf
-            owner: root
-            group: root
-            mode: 0644
-          when: openhpc_enable.control | default(false) or not openhpc_slurm_configless
-          notify:
-            - Restart slurmctld service
-          register: ohpc_slurm_conf
-          # NB uses restart rather than reload as number of nodes might have changed
 
         - name: Create gres.conf
           template:
@@ -405,81 +295,24 @@
             mode: "0600"
             owner: slurm
             group: slurm
-          when: openhpc_enable.control | default(false) or not openhpc_slurm_configless
-          notify:
-            - Restart slurmctld service
+          when: openhpc_enable.control | default(false)
           register: ohpc_gres_conf
-          # NB uses restart rather than reload as this is needed in some cases
-
-        - name: Template cgroup.conf
-          # appears to be required even with NO cgroup plugins: https://slurm.schedmd.com/cgroups.html#cgroup_design
-          template:
-            src: cgroup.conf.j2
-            dest: /etc/slurm/cgroup.conf
-            mode: "0644" # perms/ownership based off src from ohpc package
-            owner: root
-            group: root
-          when: openhpc_enable.control | default(false) or not openhpc_slurm_configless
-
-        - name: Remove local tempfile for slurm.conf templating
-          ansible.builtin.file:
-            path: "{{ _slurm_conf_tmpfile.path }}"
-            state: absent
-          when: _slurm_conf_tmpfile.path is defined
-          delegate_to: localhost
-          changed_when: false # so molecule doesn't fail
-          become: no
-
-        - name: Notify handler for slurmd restart
-          debug:
-            msg: "notifying handlers" # meta: noop doesn't support 'when'
-          changed_when: true
-          when:
-            - openhpc_slurm_control_host in ansible_play_hosts
-            - hostvars[openhpc_slurm_control_host].ohpc_slurm_conf.changed or hostvars[openhpc_slurm_control_host].ohpc_gres_conf.changed # noqa no-handler
-          notify:
-            - Restart slurmd service
 
         - name: Set slurmctld location for configless operation
           lineinfile:
             path: /etc/sysconfig/slurmd
-            line: "SLURMD_OPTIONS='--conf-server {{ openhpc_slurm_control_host_address | default(openhpc_slurm_control_host) }}'"
+            line: "SLURMD_OPTIONS='--conf-server {{ openhpc_conf_server }}'"
             regexp: "^SLURMD_OPTIONS="
             create: yes
             owner: root
             group: root
             mode: 0644
-          when:
-            - openhpc_enable.batch | default(false)
-            - openhpc_slurm_configless
-          notify:
-            - Restart slurmd service
-          # Reloading is sufficent, but using a single handler means no bounce. Realistically this won't regularly change on a running slurmd so restarting is ok.
 
-        # Munge state could be unchanged but the service is not running.
-        # Handle that here.
         - name: Configure Munge service
           service:
             name: munge
             enabled: "{{ openhpc_slurm_service_enabled | bool }}"
             state: "{{ 'started' if openhpc_slurm_service_started | bool else 'stopped' }}"
-
-        - name: Flush handler
-          meta: flush_handlers # as then subsequent "ensure" is a no-op if slurm services bounced
-
-        - name: Ensure slurmdbd state
-          service:
-            name: slurmdbd
-            enabled: "{{ openhpc_slurm_service_enabled | bool }}"
-            state: "{{ 'started' if openhpc_slurm_service_started | bool else 'stopped' }}"
-          when: openhpc_enable.database | default(false) | bool
-
-        # - name: Ensure slurmctld state
-        #   service:
-        #     name: slurmctld
-        #     enabled: "{{ openhpc_slurm_service_enabled | bool }}"
-        #     state: "{{ 'started' if openhpc_slurm_service_started | bool else 'stopped' }}"
-        #   when: openhpc_enable.control | default(false) | bool
 
         - name: Ensure slurmd state
           service:
