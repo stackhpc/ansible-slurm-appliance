@@ -123,6 +123,10 @@
         slurm_exporter_state: stopped
       when: "'slurm_exporter' in group_names"
     
+- hosts: prometheus
+  become: yes
+  gather_facts: yes
+  tasks:
     - name: kube prometheus stack
       import_role:
         name: kube_prometheus_stack
