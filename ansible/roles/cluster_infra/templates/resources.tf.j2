@@ -415,6 +415,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   network {
     port = openstack_networking_port_v2.control.id
+    access_network = true
   }
 
   {% if cluster_storage_network is defined %}
