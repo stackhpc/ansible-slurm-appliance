@@ -21,7 +21,7 @@ roles:
     version: v3.1.5
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: fix/rl8-ceph # Bump when merges # Support ceph quincy for RL9
+    version: v24.11.0 # Support ceph quincy for RL9
 
 collections:
   - name: containers.podman
