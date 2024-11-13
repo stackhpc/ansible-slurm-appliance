@@ -1,12 +1,17 @@
 ---
 
-- name: Ensure templates directory exists
+- name: Ensure directories exist
   file: 
-    path: /etc/ansible-init/templates
+    path: "/etc/ansible-init/{{ item.directory }}"
     state: directory
     owner: root
     group: root
-    mode: 0644
+    mode: 0755
+  loop:
+    - { directory: "templates" }
+    - { directory: "files" }
+    - { directory: "library" }
+    - { directory: "filter_plugins" }
 
 - name: Inject templates
   copy:
@@ -21,14 +26,6 @@
     - ../../stackhpc.os-manila-mount/templates/ceph.keyring.j2
     - ../../stackhpc.openhpc/templates/gres.conf.j2
 
-- name: Ensure files directory exists
-  file: 
-    path: /etc/ansible-init/files
-    state: directory
-    owner: root
-    group: root
-    mode: 0644
-
 - name: Inject files
   copy:
     src: '{{ item }}'
@@ -38,14 +35,6 @@
     mode: 0644
   loop:
     - ../../resolv_conf/files/NetworkManager-dns-none.conf
-
-- name: Ensure library directory exists
-  file: 
-    path: /etc/ansible-init/library
-    state: directory
-    owner: root
-    group: root
-    mode: 0644
 
 - name: Inject files
   copy:
@@ -58,14 +47,6 @@
     - ../../basic_users/library/terminate_user_sessions.py
     - ../../stackhpc.os-manila-mount/library/os_manila_share.py
     - ../../stackhpc.openhpc/library/sacct_cluster.py
-
-- name: Ensure filter_plugins directory exists
-  file: 
-    path: /etc/ansible-init/filter_plugins
-    state: directory
-    owner: root
-    group: root
-    mode: 0644
 
 - name: Inject filter_plugins
   copy:
@@ -87,15 +68,39 @@
     group: root
     mode: 0644
 
-- name: Write openhpc munge key
-  copy:
-    content: "{{ vault_openhpc_mungekey | b64decode }}"
-    dest: "/exports/cluster/openhpc_munge.key"
-    owner: munge
-    group: munge
-    mode: 0400
-  delegate_to: "{{ groups['control'] | first }}"
+- name: Ensure nfs /exports/cluster configured
+  block:
+    - name: Ensure the /exports/hosts directory exists
+      file:
+        path: /exports/cluster
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
 
+    - name: Copy /etc/hosts to /exports/cluster
+      copy:
+        src: /etc/hosts
+        dest: /exports/cluster/hosts
+        owner: root
+        group: root
+        mode: 0644
+        remote_src: true
+
+    - name: Copy manila share info to /exports/cluster
+      copy:
+        content: "{{ os_manila_mount_share_info | to_nice_yaml }}"
+        dest: "/exports/cluster/manila_share_info.yml"
+      when: os_manila_mount_share_info is defined
+
+    - name: Write openhpc munge key
+      copy:
+        content: "{{ vault_openhpc_mungekey | b64decode }}"
+        dest: "/exports/cluster/openhpc_munge.key"
+        owner: munge
+        group: munge
+        mode: 0400
+  delegate_to: "{{ groups['control'] | first }}"
 
 - name: Inject compute initialisation playbook
   copy:

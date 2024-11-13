@@ -6,8 +6,6 @@
   # VARS TO BE SUPPLIED VIA CLOUD INIT METADATA
   vars:
     control_node_ip: "172.16.1.228"
-    nfs_export_hosts: "/exports/hosts"
-    nfs_export_cluster: "/exports/cluster"
     resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
 
 
@@ -53,7 +51,7 @@
     cvmfs_config_overrides: {}
     cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
 
-    openhpc_conf_server: control_node_ip
+    openhpc_conf_server: "{{ control_node_ip }}"
     openhpc_gres_template: /etc/ansible-init/templates/gres.conf.j2
     openhpc_slurm_service_enabled: true
     openhpc_slurm_service_started: "{{ openhpc_slurm_service_enabled }}"
@@ -90,25 +88,25 @@
           when: _copy_nm_config.changed | default(false)
 
 
-    - name: Mount /etc/hosts on compute nodes
+    - name: Mount /mnt/cluster on compute nodes and copy hosts to /etc/hosts
       block:
         - name: Ensure the mount directory exists
           file:
-            path: /mnt/hosts
+            path: /mnt/cluster
             state: directory
             mode: 0755
         
-        - name: Mount /mnt/hosts
+        - name: Mount /mnt/cluster
           mount:
-            path: /mnt/hosts
-            src: "{{ vars.control_node_ip }}:{{ nfs_export_hosts }}"
+            path: /mnt/cluster
+            src: "{{ vars.control_node_ip }}:/exports/cluster"
             fstype: nfs
             opts: rw,sync
             state: mounted
 
-        - name: Copy /mnt/hosts/hosts contents to /etc/hosts
+        - name: Copy /mnt/cluster/hosts contents to /etc/hosts
           copy:
-            src: /mnt/hosts/hosts
+            src: /mnt/cluster/hosts
             dest: /etc/hosts
             owner: root
             group: root
@@ -128,27 +126,13 @@
             src: "{{ nfs_server }}:{{ nfs_export }}"
             fstype: nfs
             state: "{{ nfs_client_mnt_state }}"
-        
-        - name: Ensure the mount directory exists
-          file:
-            path: /mnt/
-            state: directory
-            mode: 0755
-        
-        - name: Mount /mnt/
-          mount:
-            path: /mnt/
-            src: "{{ vars.control_node_ip }}:{{ nfs_export_cluster }}"
-            fstype: nfs
-            opts: rw,sync
-            state: mounted
 
 
     - name: Manila mount
       block:
         - name: Read manila share from nfs file
           slurp:
-            src: "/mnt/manila_share_info.yml"
+            src: "/mnt/cluster/manila_share_info.yml"
           register: manila_share_info_file
 
         - name: Parse and set fact for manila share info
@@ -293,7 +277,7 @@
 
         - name: Copy Munge key from NFS-mounted directory to /etc/munge
           copy:
-            src: "/mnt/openhpc_munge.key"
+            src: "/mnt/cluster/openhpc_munge.key"
             dest: "/etc/munge/munge.key"
             owner: munge
             group: munge

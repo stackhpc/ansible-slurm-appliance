@@ -16,15 +16,8 @@ nfs_configurations:
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
 
-  - comment: Export /etc/hosts copy from Slurm control node
+  - comment: Export /exports/cluster from Slurm control node
     nfs_enable:
         server: "{{ inventory_hostname in groups['control'] }}"
         clients: false
-    nfs_export: "/exports/hosts" # control node has to copy in /etc/hosts to here
-
-  - comment: Export cluster info from control node
-    nfs_enable:
-      server: "{{ inventory_hostname in groups['control']}}"
-      clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
-    nfs_server: "{{ nfs_server_default }}"
-    nfs_export: "/exports/cluster"
+    nfs_export: "/exports/cluster" # control node has to copy in /etc/hosts to here

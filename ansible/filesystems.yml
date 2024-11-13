@@ -24,22 +24,3 @@
   tasks:
     - include_role:
         name: stackhpc.os-manila-mount
-
-- name: Manage /exports/cluster and Manila share info
-  hosts: control
-  become: true
-  tasks:
-    - block:
-        - name: Ensure /exports/cluster directory exists
-          file: 
-            path: /exports/cluster
-            state: directory
-            owner: root
-            group: root
-            mode: 0755
-
-        - name: Copy manila share info to /exports/cluster
-          copy:
-            content: "{{ os_manila_mount_share_info | to_nice_yaml }}"
-            dest: "/exports/cluster/manila_share_info.yml"
-      when: os_manila_mount_share_info is defined
