@@ -2,8 +2,8 @@
 prometheus_port: 30000
 
 prometheus_db_dir: "{{ appliances_state_dir }}/prometheus"
-prometheus_storage_retention: "30d"
-prometheus_storage_retention_size: "40GB"
+prometheus_storage_retention: "31d"
+prometheus_storage_retention_size: "100GB"
 prometheus_scrape_configs_default:
 - job_name: "slurm_exporter"
   scrape_interval: 30s
