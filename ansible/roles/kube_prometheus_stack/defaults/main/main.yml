@@ -63,13 +63,16 @@ prometheus_external_labels:
 
 prometheus_scrape_configs: []
 
-prometheus_extra_rules: []
+prometheus_extra_recording_rules: []
+prometheus_extra_alerting_rules: []
 
 prometheus_rules:
   appliance-rules:
     groups:
-    - name: all
-      rules: "{{ prometheus_extra_rules }}" 
+    - name: appliance-recording-rules
+      rules: "{{ prometheus_extra_recording_rules }}"
+    - name: appliance-alerting-rules
+      rules: "{{ prometheus_extra_alerting_rules }}" 
 
 # ------------------------------------------------------------------------------------------
 grafana_image_tag: 11.2.2

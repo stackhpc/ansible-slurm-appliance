@@ -20,14 +20,7 @@ prometheus_scrape_configs_default:
     replacement:   '${1}'
 
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"
-prometheus_extra_rules:
-  - alert: SlurmNodeDown
-    annotations:
-      description: '{% raw %}{{ $value }} Slurm nodes are in down status.{% endraw %}'
-      summary: 'At least one Slurm node is down.'
-    expr: "slurm_nodes_down > 0\n"
-    labels:
-      severity: critical
+prometheus_extra_recording_rules:
   - record: node_cpu_system_seconds:record
     expr: (100 * sum by(instance)(increase(node_cpu_seconds_total{mode="system",job="node-exporter"}[60s]))) / (sum by(instance)(increase(node_cpu_seconds_total{job="node-exporter"}[60s])))
   - record: node_cpu_user_seconds:record
@@ -42,3 +35,12 @@ prometheus_extra_rules:
     expr: min by (instance) (node_cpu_scaling_frequency_hertz)
   - record: node_cpu_scaling_frequency_hertz_max:record
     expr: max by (instance) (node_cpu_scaling_frequency_hertz)
+
+prometheus_extra_alerting_rules:
+  - alert: SlurmNodeDown
+    annotations:
+      description: '{% raw %}{{ $value }} Slurm nodes are in down status.{% endraw %}'
+      summary: 'At least one Slurm node is down.'
+    expr: "slurm_nodes_down > 0\n"
+    labels:
+      severity: critical

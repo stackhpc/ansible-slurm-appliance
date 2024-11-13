@@ -236,7 +236,7 @@ The appliance previously used [cloudalchemy.prometheus](https://github.com/cloud
 
 See the upstream documentation for [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) and [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) rules.
 
-In addition to the default recording and alerting rules set by kube-prometheus-stack, the appliances provides a default set of rules which can be found in the `prometheus_extra_rules` list in:
+In addition to the default recording and alerting rules set by kube-prometheus-stack, the appliance provides its own sets of default rules which can be found and modified in the `prometheus_extra_recording_rules` and `prometheus_extra_alerting_rules` lists in:
 
 > [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml)
 
