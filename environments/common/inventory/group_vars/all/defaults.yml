@@ -15,8 +15,7 @@ internal_address: "{{ inventory_hostname }}"
 api_address: "{{ inventory_hostname }}"
 
 # Service endpoints
-opensearch_address: "127.0.0.1"
-prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}:{{ prometheus_port }}"
+prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
 grafana_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 

@@ -20,7 +20,7 @@ alertmanager_slack_receiver:
         authorization:
           credentials: "{{ alertmanager_slack_integration.app_creds | default('none') }}"
       text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
-      title_link: "http://{{ prometheus_address }}/alertmanager/#/alerts?receiver=slack-receiver"
+      title_link: "http://{{ prometheus_address }}:{{ prometheus_port }}/alertmanager/#/alerts?receiver=slack-receiver"
       send_resolved: true
 
 # Uncomment below and add Slack bot app creds for Slack integration
