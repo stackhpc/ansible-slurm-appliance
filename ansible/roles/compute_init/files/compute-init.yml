@@ -7,6 +7,7 @@
   vars:
     control_node_ip: "172.16.1.228"
     nfs_export_hosts: "/exports/hosts"
+    nfs_export_cluster: "/exports/cluster"
     resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
 
 
@@ -127,6 +128,20 @@
             src: "{{ nfs_server }}:{{ nfs_export }}"
             fstype: nfs
             state: "{{ nfs_client_mnt_state }}"
+        
+        - name: Ensure the mount directory exists
+          file:
+            path: /mnt/
+            state: directory
+            mode: 0755
+        
+        - name: Mount /mnt/
+          mount:
+            path: /mnt/
+            src: "{{ vars.control_node_ip }}:{{ nfs_export_cluster }}"
+            fstype: nfs
+            opts: rw,sync
+            state: mounted
 
 
     - name: Manila mount
