@@ -1,4 +1,4 @@
-ofed_version: '23.10-3.2.2.0' # LTS
+ofed_version: '24.07-0.6.1.0'
 ofed_download_url: https://content.mellanox.com/ofed/MLNX_OFED-{{ ofed_version }}/MLNX_OFED_LINUX-{{ ofed_version }}-{{ ofed_distro }}{{ ofed_distro_version }}-{{ ofed_arch }}.tgz
 ofed_distro: rhel # NB: not expected to work on other distros due to installation differences
 ofed_distro_version: "{{ ansible_distribution_version }}" # e.g. '8.9'

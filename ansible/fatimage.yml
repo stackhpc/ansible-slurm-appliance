@@ -207,8 +207,14 @@
   gather_facts: yes
   tags: finalise
   tasks:
-    - name: Cleanup image
-      import_tasks: cleanup.yml
+    - name: Carry out checks on image
+      import_role:
+        name: builder
+        tasks_from: checks.yml
+    - name: Finalise image
+      import_role:
+        name: builder
+        tasks_from: finalise.yml
 
     - name: Shutdown Packer VM
       community.general.shutdown:

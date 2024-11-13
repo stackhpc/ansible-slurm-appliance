@@ -23,6 +23,7 @@ data "git-commit" "cwd-head" { }
 locals {
     git_commit = data.git-commit.cwd-head.hash
     timestamp = formatdate("YYMMDD-hhmm", timestamp())
+    image_version = var.image_version == "auto" ? "${local.timestamp}-${substr(local.git_commit, 0, 8)}" : var.image_version
 }
 
 # Path pointing to root of repository - automatically set by environment variable PKR_VAR_repo_root
@@ -37,12 +38,6 @@ variable "environment_root" {
 
 variable "networks" {
   type = list(string)
-}
-
-variable "os_version" {
-  type = string
-  description = "'RL8' or 'RL9' with default source_image_* mappings"
-  default = "RL9"
 }
 
 # Must supply either source_image_name or source_image_id
@@ -123,19 +118,13 @@ variable "volume_type" {
 }
 
 variable "volume_size" {
-  type = map(number)
-  default = {
-    # fat image builds, GB:
-    rocky-latest = 15
-    rocky-latest-cuda = 30
-    openhpc = 15
-    openhpc-cuda = 30
-  }
-}
-
-variable "extra_build_volume_size" {
   type = number
   default = 15 # same as default non-CUDA build
+}
+
+variable "volume_size_cuda" {
+  type = number
+  default = 30
 }
 
 variable "image_disk_format" {
@@ -148,27 +137,34 @@ variable "metadata" {
   default = {}
 }
 
-variable "groups" {
-  type = map(list(string))
-  description = "Additional inventory groups (other than 'builder') to add build VM to, keyed by source name"
-  default = {
-    # fat image builds:
-    rocky-latest = ["update", "ofed"]
-    rocky-latest-cuda = ["update", "ofed", "cuda"]
-    openhpc = ["control", "compute", "login"]
-    openhpc-cuda = ["control", "compute", "login"]
-  }
-}
-
-variable "extra_build_groups" {
-  type = list(string)
-  default = []
-}
-
-variable "extra_build_image_name" {
+variable "inventory_groups" {
   type = string
-  description = "Infix for 'extra' build image name"
-  default = "extra"
+  description = "comma-separated list of inventory groups, in addition to 'builder'"
+  default = ""
+}
+
+# variable "groups" {
+#   type = map(list(string))
+#   description = "Additional inventory groups (other than 'builder') to add build VM to, keyed by source name"
+#   default = {
+    # fat image builds:
+    # rocky-latest = ["update", "ofed"]
+    # rocky-latest-cuda = ["update", "ofed", "cuda"]
+    # openhpc = ["control", "compute", "login"]
+    # openhpc-cuda = ["control", "compute", "login"]
+#   }
+# }
+
+variable "image_name" {
+  type = string
+  description = "Built image name."
+  default = "openhpc"
+}
+
+variable "image_version" {
+  type = string
+  description = "Suffix for built image names. Default special value 'auto' uses a timestamp+git commit"
+  default = "auto"
 }
 
 source "openstack" "openhpc" {
@@ -176,7 +172,7 @@ source "openstack" "openhpc" {
   flavor = var.flavor
   use_blockstorage_volume = var.use_blockstorage_volume
   volume_type = var.volume_type
-  volume_size = lookup(var.volume_size, source.name, var.extra_build_volume_size)
+  volume_size = contains(split(",", var.inventory_groups), "cuda") ? var.volume_size_cuda : var.volume_size
   metadata = var.metadata
   instance_metadata = {ansible_init_disable = "true"}
   networks = var.networks
@@ -204,39 +200,14 @@ source "openstack" "openhpc" {
 
 build {
 
-  # latest nightly image:
   source "source.openstack.openhpc" {
     name = "rocky-latest"
-    image_name = "${source.name}-${var.os_version}"
-  }
-
-  # latest nightly cuda image:
-  source "source.openstack.openhpc" {
-    name = "rocky-latest-cuda"
-    image_name = "${source.name}-${var.os_version}"
-  }
-
-  # OFED fat image:
-  source "source.openstack.openhpc" {
-    name = "openhpc"
-    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
-  }
-
-  # CUDA fat image:
-  source "source.openstack.openhpc" {
-    name = "openhpc-cuda"
-    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
-  }
-
-  # Extended site-specific image, built on fat image:
-  source "source.openstack.openhpc" {
-    name = "openhpc-extra"
-    image_name = "openhpc-${var.extra_build_image_name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
+    image_name = replace(join("-", [var.image_name, local.image_version]), "/", "-")
   }
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
-    groups = concat(["builder"], lookup(var.groups, source.name, var.extra_build_groups))
+    groups = concat(["builder"], split(",", var.inventory_groups))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     extra_arguments = [
