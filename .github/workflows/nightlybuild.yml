@@ -108,6 +108,11 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
 
+      - name: Make image usable for further builds
+        run: |
+          . venv/bin/activate
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+
       - name: Delete old latest image
         run: |
           . venv/bin/activate
