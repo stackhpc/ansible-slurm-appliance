@@ -18,15 +18,15 @@ openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
 openhpc_slurm_partitions:
   - name: "compute"
 openhpc_packages_default:
-  # system packages
-  - podman
-  # OpenHPC packages
-  #- slurm-libpmi-ohpc # to allow intel mpi to work properly
-  #- ohpc-gnu12-openmpi4-perf-tools # for hpctests
-  #- openblas-gnu12-ohpc # for hpctests (HPL)
-  # EPEL packages:
-  - apptainer
-  - podman-compose
+#   # system packages
+   - podman
+#   # OpenHPC packages
+#   #- slurm-libpmi-ohpc # to allow intel mpi to work properly
+#   #- ohpc-gnu12-openmpi4-perf-tools # for hpctests
+#   #- openblas-gnu12-ohpc # for hpctests (HPL)
+#   # EPEL packages:
+#   - apptainer
+   - podman-compose
 openhpc_packages_extra: []
 openhpc_packages: "{{ openhpc_packages_default + openhpc_packages_extra }}"
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
