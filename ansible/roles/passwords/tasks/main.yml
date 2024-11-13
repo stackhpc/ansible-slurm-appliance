@@ -8,9 +8,9 @@
   run_once: true
 
 - name: Get templated passwords from target environment
+# inventory group/host vars created in a play cannot be accessed in the same play, even after meta: refresh_inventory
   ansible.builtin.include_vars:
     file: "{{ openhpc_passwords_output_path }}"
-    name: templated_secrets
 
 - name:  Template k3s token to terraform
   template:
