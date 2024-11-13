@@ -12,9 +12,15 @@ compute_names = {
   vtgpu-003: "gpu"
   vtgpu-004: "gpu"
 
-  vtgpu-005: "gpu3"
-  vtgpu-006: "gpu3"
-  vtgpu-007: "gpu3"
-  vtgpu-008: "gpu3"
-
+  vtgpu-011: "gpu3"
+  vtgpu-012: "gpu3"
+  vtgpu-013: "gpu3"
+  vtgpu-014: "gpu3"
+  vtgpu-015: "gpu3"
+  vtgpu-016: "gpu3"
+  vtgpu-017: "gpu3"
+  vtgpu-018: "gpu3"
+  vtgpu-019: "gpu3"
+  vtgpu-020: "gpu3"
+  vtgpu-021: "gpu3"
 }

@@ -48,7 +48,7 @@ ${cluster_name}-vtgpu-[001:004]
 
 # the A100-80:8 nodes
 [${cluster_name}_gpu3]
-${cluster_name}-vtgpu-[005:008]
+${cluster_name}-vtgpu-[011:021]
 
 # A100-40:4 nodes
 # [${cluster_name}_gpu5]
