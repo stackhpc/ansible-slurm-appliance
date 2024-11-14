@@ -1,3 +1,9 @@
 inventory/group_vars/all/secrets.yml
 terraform/.terraform.lock.hcl
 *.bak
+*version*
+-v.hwm
+-v.pwd
+-v.pwi
+/logs/
+

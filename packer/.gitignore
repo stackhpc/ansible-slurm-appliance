@@ -2,3 +2,5 @@ packer_cache
 roles
 output_*
 *.gz
+init*
+packer-manifest.json
