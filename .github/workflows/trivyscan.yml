@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: ["RL8", "RL9", "RL9-cuda"]
+        build: ["RL8", "RL9"]
     env:
       JSON_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack

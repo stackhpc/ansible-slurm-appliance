@@ -153,8 +153,8 @@ variable "groups" {
   description = "Additional inventory groups (other than 'builder') to add build VM to, keyed by source name"
   default = {
     # fat image builds:
-    rocky-latest = ["update", "ofed"]
-    rocky-latest-cuda = ["update", "ofed", "cuda"]
+    rocky-latest = ["update"]
+    rocky-latest-cuda = ["update", "cuda"]
     openhpc = ["control", "compute", "login"]
     openhpc-cuda = ["control", "compute", "login"]
   }

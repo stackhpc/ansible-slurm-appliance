@@ -28,11 +28,6 @@ jobs:
           - RL9
         build:
           - openstack.rocky-latest
-          - openstack.rocky-latest-cuda
-        exclude:
-          - os_version: RL8
-            build: openstack.rocky-latest-cuda
-
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -144,10 +139,7 @@ jobs:
           - RL9
         image:
           - rocky-latest
-          - rocky-latest-cuda
         exclude:
-          - os_version: RL8
-            image: rocky-latest-cuda
           - target_cloud: LEAFCLOUD
     env:
       OS_CLOUD: openstack
