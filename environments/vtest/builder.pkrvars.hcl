@@ -9,10 +9,10 @@
 #   openstack.pkr.hcl
 
 flavor = "slurm_test_compute_lg"
-networks = ["7c5451cc-f042-464c-a335-6e2fd120a58d"] # compute network
-source_image_name = "slurm_hpc_vs_base_r94_20240609"
+networks = ["3a3c1da0-9b3f-47bc-bccf-e5ea155f37fa"] # external network
+source_image_name = "rocky94_generic_cloud"
 #ssh_username = rocky
-ssh_private_key_file = /home/rocky/.ssh/vsdeployer
+ssh_private_key_file = "/home/rocky/.ssh/vsdeployer"
 ssh_keypair_name = "vsdeployer"
 
 groups = {
