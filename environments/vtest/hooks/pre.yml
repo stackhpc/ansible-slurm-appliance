@@ -9,7 +9,7 @@
   become: true
   gather_facts: False
   tasks:
-    - name: does localhome/stck dir exist
+    - name: does localhome/stack dir exist
       stat:
         path: /localhome/stack
       register: localstack
@@ -20,34 +20,50 @@
   tags:
     - add_stack_user
 
-- name: move rocky home to /localhome/rocky
+- name: cp rocky home to /localhome/rocky
   hosts: all
   # tags: pre_tasks_all
   become: true
   gather_facts: False
   tasks:
+    - name: does /home/rocky dir exist
+      stat:
+        path: /var/lib/rocky/.ssh/authorized_keys
+      register: homerocky
+
     - name: does localhome dir exist
       stat:
         path: /localhome/rocky
-      register: localrocky
+      register: localhomerocky
 
-#    - name: cp home dir
-#      copy:
-#        src: /home/rocky
-#        dest: /localhome/rocky
-#        mode: preserve
-#      when: not localrocky.stat.exists
+    - name: does /var/lib/rocky dir exist
+      stat:
+        path: /var/lib/rocky/.ssh/authorized_keys
+      register: varlibrocky
 
-    - name: cp home dir
-      shell: cp -a /home/rocky /localhome/rocky
-      when: not localrocky.stat.exists
+
+    - name: cp homerocky to localhome dir
+      shell: |
+        cp -a /home/rocky /localhome/rocky
+      when: 
+        - not localhomerocky.stat.exists
+        - homerocky.stat.exists
+
+    - name: cp auth_keys
+      shell: |
+        cp -a /home/rocky/.ssh /var/lib/rocky/.ssh
+      when: 
+        - varlibrocky.stat.exists
+        - homerocky.stat.exists
       
     - name: Hack passwd file for rocky user
       ansible.builtin.lineinfile:
         path: /etc/passwd
-        regexp: '^rocky.*Cloud.*'
+        regexp: '^rocky.*1000.*'
         line: "rocky:x:1000:1000:rockyUser:/localhome/rocky:/bin/bash"
-      when: not localrocky.stat.exists
+      when: 
+        - varlibrocky.stat.exists
+        - not localhomerocky.stat.exists 
   tags:
     - rocky_localhome
 
@@ -56,8 +72,14 @@
   # tags: pre_tasks_all
   become: true
   tasks:
+    - name: does vs_pre_complete.txt exist 
+      stat:
+        path: /root/vs_pre_complete.txt
+      register: vs_pre_complete
+
     - include_role:
         name: vshpc.prov.pre-tasks
+      when: not vs_pre_complete.stat.exists
 
 # TODO: KBENDL - check compatibility with new playbook
 - name: "NREL pre - Mount cephfs volumes"
@@ -67,7 +89,12 @@
     - aco.core.cephfs
   become: true
   tasks:
+    - name: does ceph exist 
+      stat:
+        path: /etc/ceph
+      register: vs_does_cephdir
     - include_role:
         name: aco.core.cephfs
       tags:
         - aco.core.cephfs
+      when: not vs_does_cephdir.stat.exists
