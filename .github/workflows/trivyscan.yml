@@ -114,3 +114,4 @@ jobs:
           timeout: 15m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
