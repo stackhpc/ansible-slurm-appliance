@@ -9,10 +9,47 @@
   become: true
   gather_facts: False
   tasks:
+    - name: does localhome/stck dir exist
+      stat:
+        path: /localhome/stack
+      register: localstack
+
     - include_role:
         name: vs.core.stack_user
+      when: not localstack.stat.exists
   tags:
     - add_stack_user
+
+- name: move rocky home to /localhome/rocky
+  hosts: all
+  # tags: pre_tasks_all
+  become: true
+  gather_facts: False
+  tasks:
+    - name: does localhome dir exist
+      stat:
+        path: /localhome/rocky
+      register: localrocky
+
+#    - name: cp home dir
+#      copy:
+#        src: /home/rocky
+#        dest: /localhome/rocky
+#        mode: preserve
+#      when: not localrocky.stat.exists
+
+    - name: cp home dir
+      shell: cp -a /home/rocky /localhome/rocky
+      when: not localrocky.stat.exists
+      
+    - name: Hack passwd file for rocky user
+      ansible.builtin.lineinfile:
+        path: /etc/passwd
+        regexp: '^rocky.*Cloud.*'
+        line: "rocky:x:1000:1000:rockyUser:/localhome/rocky:/bin/bash"
+      when: not localrocky.stat.exists
+  tags:
+    - rocky_localhome
 
 - name: "Do the preliminary node setups"
   hosts: all
