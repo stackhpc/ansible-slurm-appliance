@@ -17,7 +17,7 @@ jobs:
   openstack:
     name: openstack-imagebuild
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }} # to branch/PR + OS
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
@@ -26,6 +26,8 @@ jobs:
         os_version:
           - RL8
           - RL9
+        build:
+          - openstack.rocky-latest
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -35,7 +37,6 @@ jobs:
           "RL8": "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2",
           "RL9": "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
         }
-      BUILD: openstack.openhpc
 
     steps:
       - uses: actions/checkout@v2
@@ -81,7 +82,7 @@ jobs:
 
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -only=${{ env.BUILD }} \
+          -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
           openstack.pkr.hcl
