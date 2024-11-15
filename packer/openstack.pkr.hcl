@@ -127,15 +127,13 @@ variable "volume_size" {
   default = {
     # fat image builds, GB:
     rocky-latest = 15
-    rocky-latest-cuda = 30
     openhpc = 15
-    openhpc-cuda = 30
   }
 }
 
 variable "extra_build_volume_size" {
   type = number
-  default = 15 # same as default non-CUDA build
+  default = 15
 }
 
 variable "image_disk_format" {
@@ -154,9 +152,7 @@ variable "groups" {
   default = {
     # fat image builds:
     rocky-latest = ["update"]
-    rocky-latest-cuda = ["update", "cuda"]
     openhpc = ["control", "compute", "login"]
-    openhpc-cuda = ["control", "compute", "login"]
   }
 }
 
@@ -210,21 +206,9 @@ build {
     image_name = "${source.name}-${var.os_version}"
   }
 
-  # latest nightly cuda image:
-  source "source.openstack.openhpc" {
-    name = "rocky-latest-cuda"
-    image_name = "${source.name}-${var.os_version}"
-  }
-
-  # OFED fat image:
+  # fat image:
   source "source.openstack.openhpc" {
     name = "openhpc"
-    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
-  }
-
-  # CUDA fat image:
-  source "source.openstack.openhpc" {
-    name = "openhpc-cuda"
     image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
   }
 

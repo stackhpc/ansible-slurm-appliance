@@ -10,7 +10,7 @@ on:
 jobs:
   scan:
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + OS + build
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + build
       cancel-in-progress: true
     runs-on: ubuntu-latest
     strategy:
@@ -100,7 +100,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
-          category: "${{ matrix.os_version }}-${{ matrix.build }}"
+          category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
         uses: aquasecurity/trivy-action@0.24.0

@@ -15,17 +15,15 @@ jobs:
   openstack:
     name: openstack-imagebuild
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }} # to branch/PR + OS
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
-      matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
+      matrix: # build RL8, RL9
         os_version:
           - RL8
           - RL9
-        build:
-          - openstack.openhpc
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -39,6 +37,7 @@ jobs:
             "openstack.openhpc": "rocky-latest-RL9"
           }
         }
+      BUILD: openstack.openhpc
 
     steps:
       - uses: actions/checkout@v2
@@ -84,13 +83,13 @@ jobs:
 
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -only=${{ matrix.build }} \
+          -only=${{ env.BUILD }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
           openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}
-          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][matrix.build] }}
+          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][env.BUILD] }}
 
       - name: Get created image names from manifest
         id: manifest
@@ -107,7 +106,7 @@ jobs:
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: image-details-${{ matrix.build }}-${{ matrix.os_version }}
+          name: image-details-${{ env.BUILD }}-${{ matrix.os_version }}
           path: |
             ./image-id.txt
             ./image-name.txt
