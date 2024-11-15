@@ -202,7 +202,7 @@ kube_prometheus_stack_loki_release_values:
       compactor:
         retention_enabled: true
       limits_config:
-        retention_period: 72h
+        retention_period: "{{ kube_prometheus_stack_loki_retention_period }}"
     persistence:
       enabled: true
       selector:

@@ -26,6 +26,7 @@ kube_prometheus_stack_loki_test_pod_tag: 1.8.2
 
 kube_prometheus_stack_loki_data_dir: "{{ appliances_state_dir }}/loki"
 kube_prometheus_stack_loki_persistence_size: "10Gi"
+kube_prometheus_stack_loki_retention_period: "72h"
 
 control_ip: "{{ hostvars[groups['control'].0].ansible_host }}"
 
