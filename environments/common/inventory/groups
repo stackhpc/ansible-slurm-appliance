@@ -138,3 +138,6 @@ freeipa_client
 
 [compute_init]
 # Hosts to deploy compute initialisation ansible-init script to.
+
+[lustre]
+# Hosts to run lustre client

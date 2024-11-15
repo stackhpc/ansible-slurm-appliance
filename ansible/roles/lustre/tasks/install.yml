@@ -1,0 +1,70 @@
+- name: Install lustre build prerequisites
+  ansible.builtin.dnf:
+    name: "{{ lustre_build_packages }}"
+  register: _lustre_dnf_build_packages
+ 
+- name: Clone lustre git repo
+  # https://git.whamcloud.com/?p=fs/lustre-release.git;a=summary
+  ansible.builtin.git:
+    repo: git://git.whamcloud.com/fs/lustre-release.git
+    dest: "{{ lustre_build_dir }}"
+    version: "{{ lustre_version }}"
+
+- name: Prepare for lustre configuration
+  ansible.builtin.command:
+    cmd: sh ./autogen.sh
+    chdir: "{{ lustre_build_dir }}"
+
+- name: Configure lustre build
+  ansible.builtin.command:
+    cmd: "./configure {{ lustre_configure_opts | join(' ') }}"
+    chdir: "{{ lustre_build_dir }}"
+
+- name: Build lustre
+  ansible.builtin.command:
+    cmd: make rpms
+    chdir: "{{ lustre_build_dir }}"
+
+- name: Find rpms
+  ansible.builtin.find:
+    paths: "{{ lustre_build_dir }}"
+    patterns: "{{ lustre_rpm_globs }}"
+    use_regex: false
+  register: _lustre_find_rpms
+
+- name: Check rpms found
+  assert:
+    that: _lustre_find_rpms.files | length
+    fail_msg: "No lustre repos found with lustre_rpm_globs = {{ lustre_rpm_globs }}"
+
+- name: Install lustre rpms
+  ansible.builtin.dnf:
+    name: "{{ _lustre_find_rpms.files | map(attribute='path')}}"
+    disable_gpg_check: yes
+  
+- block:
+  - name: Remove lustre build prerequisites
+    # NB Only remove ones this role installed which weren't upgrades
+    ansible.builtin.dnf:
+      name: "{{ _new_pkgs }}"
+      state: absent
+    vars:
+      _installed_pkgs: |
+        {{
+          _lustre_dnf_build_packages.results |
+          select('match', 'Installed:') |
+          map('regex_replace', '^Installed: (.+?)-[0-9].*$', '\1')
+        }}
+      _removed_pkgs: |
+        {{
+          _lustre_dnf_build_packages.results |
+          select('match', 'Removed:') |
+          map('regex_replace', '^Removed: (.+?)-[0-9].*$', '\1')
+        }}
+      _new_pkgs: "{{ _installed_pkgs | difference(_removed_pkgs) }}"
+  
+  - name: Delete lustre build dir
+    file:
+      path: "{{ lustre_build_dir }}"
+      state: absent
+  when: lustre_build_cleanup | bool

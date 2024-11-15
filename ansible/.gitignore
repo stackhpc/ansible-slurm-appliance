@@ -60,4 +60,5 @@ roles/*
 !roles/tuned/**
 !roles/compute_init/
 !roles/compute_init/**
-
+!roles/lustre/
+!roles/lustre/**
