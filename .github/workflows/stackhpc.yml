@@ -170,6 +170,11 @@ jobs:
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
+      - name: Get timestamp in milliseconds before rebuild
+        id: timestamp
+        run: |
+          echo "TIME_BEFORE_REBUILD=$(date +%s%N | cut -b1-13)" >> $GITHUB_OUTPUT
+
       # - name: Build environment-specific compute image
       #   id: packer_build
       #   run: |
@@ -208,6 +213,14 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible-playbook -vv ansible/ci/check_grafana.yml
+
+      - name: Check Loki Slurm logs persisted through rebuild
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ansible-playbook -vv ansible/ci/check_loki.yml -e "end_timestamp=${{ steps.timestamp.outputs.TIME_BEFORE_REBUILD }} testuser_password=$TESTUSER_PASSWORD"
+        env:
+          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Delete infrastructure
         run: |
