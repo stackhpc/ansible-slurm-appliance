@@ -64,12 +64,12 @@ jobs:
       - name: Delete clusters if control node not tagged with keep
         run: |
           . venv/bin/activate
-          if [[ -z "${CI_CLUSTERS}" ]]; then
+          if [[ -z "${{ env.ci_clusters }}" ]]; then
             echo "No clusters to delete."
             exit 0
           fi
           
-          for cluster_prefix in ${CI_CLUSTERS}
+          for cluster_prefix in ${{ env.ci_clusters }}
           do
             TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
             if [[ $TAGS =~ "keep" ]]; then
