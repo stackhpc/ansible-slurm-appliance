@@ -44,18 +44,21 @@ jobs:
         run: |
           . venv/bin/activate
           CI_CLUSTERS=$(openstack server list | grep --only-matching 'slurmci-RL.-[0-9]\+'  | sort | uniq || true)
+          echo "DEBUG: Raw CI clusters: $CI_CLUSTERS"
+      
           if [[ -z "$CI_CLUSTERS" ]]; then
             echo "No matching CI clusters found."
           else
-            echo "Found clusters: $CI_CLUSTERS"
-            echo "ci_clusters=$CI_CLUSTERS" >> $GITHUB_ENV
+            # Flatten multiline value so can be passed as env var
+            CI_CLUSTERS_FORMATTED=$(echo "$CI_CLUSTERS" | tr '\n' ' ' | sed 's/ $//')
+            echo "DEBUG: Formatted CI clusters: $CI_CLUSTERS_FORMATTED"
+            echo "ci_clusters=$CI_CLUSTERS_FORMATTED" >> $GITHUB_ENV
           fi
         shell: bash
       
       - name: Delete clusters if control node not tagged with keep
         run: |
           . venv/bin/activate
-          echo "Found clusters: ${{ env.ci_clusters }}"
           if [[ -z ${ci_clusters} ]]; then
             echo "No clusters to delete."
             exit 0
@@ -67,7 +70,7 @@ jobs:
             if [[ $TAGS =~ "keep" ]]; then
               echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
             else
-              yes | ./dev/delete-cluster.py ${cluster_prefix}
+              ./dev/delete-cluster.py ${cluster_prefix} --force
             fi
           done
         shell: bash
