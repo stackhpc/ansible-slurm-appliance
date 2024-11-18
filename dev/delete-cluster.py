@@ -4,18 +4,18 @@
 Delete infrastructure for a cluster without using Terraform. Useful for CI clusters.
 
 Usage:
-    delete-cluster.py PREFIX
+    delete-cluster.py PREFIX [--force]
 
 Where PREFIX is the string at the start of the resource's names.
-It will list matching resources and prompt to confirm deletion.
+If --force is provided, it will delete all resources without confirmation.
 """
 
-import sys, json, subprocess, pprint
+import sys, json, subprocess
 
 
 CLUSTER_RESOURCES = ['server', 'port', 'volume']
 
-def delete_cluster(cluster_prefix):
+def delete_cluster(cluster_prefix, force=False):
     to_delete = {}
     for resource_type in CLUSTER_RESOURCES:
         to_delete[resource_type] = []
@@ -29,7 +29,8 @@ def delete_cluster(cluster_prefix):
             except:
                 print(resource_type, item)
                 raise
-    if input('Delete these (y/n)?:') == 'y':
+    
+    if force or input('Delete these (y/n)?:') == 'y':
         for resource_type in CLUSTER_RESOURCES:
             items = [v['ID'] for v in to_delete[resource_type]]
             if items:
@@ -40,7 +41,10 @@ def delete_cluster(cluster_prefix):
         print('Cancelled - no resources deleted')
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
         print('ERROR: Incorrect argument(s).\n' + __doc__)
         exit(1)
-    delete_cluster(sys.argv[1])
+    force_flag = '--force' in sys.argv
+    cluster_prefix = sys.argv[1]
+    delete_cluster(cluster_prefix, force_flag)
+
