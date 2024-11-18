@@ -11,7 +11,7 @@ on:
             - SMS
             - ARCUS
   schedule:
-    - cron: '0 20 * * *'  # Run at 8PM - image sync runs at midnight
+    - cron: '0 21 * * *'  # Run at 9PM - image sync runs at midnight
 
 jobs:
   ci_cleanup:
@@ -52,13 +52,23 @@ jobs:
       - name: Find CI clusters
         run: |
           . venv/bin/activate
-          CI_CLUSTERS=$(openstack server list | grep --only-matching 'slurmci-RL.-[0-9]\+'  | sort | uniq)
-          echo "ci_clusters=${CI_CLUSTERS}" >> GITHUB_ENV
+          CI_CLUSTERS=$(openstack server list | grep --only-matching 'slurmci-RL.-[0-9]\+'  | sort | uniq || true)
+          if [[ -z "$CI_CLUSTERS" ]]; then
+            echo "No matching CI clusters found."
+          else
+            echo "Found clusters: $CI_CLUSTERS"
+            echo "ci_clusters=${CI_CLUSTERS}" >> GITHUB_ENV
+          fi
         shell: bash
       
       - name: Delete clusters if control node not tagged with keep
         run: |
           . venv/bin/activate
+          if [[ -z "${CI_CLUSTERS}" ]]; then
+            echo "No clusters to delete."
+            exit 0
+          fi
+          
           for cluster_prefix in ${CI_CLUSTERS}
           do
             TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
