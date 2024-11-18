@@ -66,6 +66,7 @@ jobs:
           
           for cluster_prefix in ${ci_clusters}
           do
+            echo "Processing cluster: $cluster_prefix"
             TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
             if [[ $TAGS =~ "keep" ]]; then
               echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
