@@ -64,6 +64,7 @@ jobs:
       - name: Delete clusters if control node not tagged with keep
         run: |
           . venv/bin/activate
+          echo "Found clusters: ${{ env.ci_clusters }}"
           if [[ -z "${{ env.ci_clusters }}" ]]; then
             echo "No clusters to delete."
             exit 0
