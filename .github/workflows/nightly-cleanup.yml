@@ -57,7 +57,7 @@ jobs:
             echo "No matching CI clusters found."
           else
             echo "Found clusters: $CI_CLUSTERS"
-            echo "ci_clusters=${CI_CLUSTERS}" >> GITHUB_ENV
+            echo "ci_clusters=${CI_CLUSTERS}" >> $GITHUB_ENV
           fi
         shell: bash
       
