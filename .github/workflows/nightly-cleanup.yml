@@ -65,12 +65,12 @@ jobs:
         run: |
           . venv/bin/activate
           echo "Found clusters: ${{ env.ci_clusters }}"
-          if [[ -z "${{ env.ci_clusters }}" ]]; then
+          if [[ -z ${ci_clusters} ]]; then
             echo "No clusters to delete."
             exit 0
           fi
           
-          for cluster_prefix in ${{ env.ci_clusters }}
+          for cluster_prefix in ${ci_clusters}
           do
             TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
             if [[ $TAGS =~ "keep" ]]; then
