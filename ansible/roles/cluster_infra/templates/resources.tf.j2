@@ -455,7 +455,7 @@ resource "openstack_compute_instance_v2" "control" {
     {%- endif %}
     bootcmd:
     %{for volume in [openstack_blockstorage_volume_v3.state, {% if not cluster_home_manila_share | bool %} openstack_blockstorage_volume_v3.home {% endif %}]}
-    - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
+    - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${replace(substr(volume.id, 0, 20), "-", "*")}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
     %{endfor}
     mounts:
         - [LABEL=state, {{ appliances_state_dir }}, auto]
