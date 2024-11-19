@@ -38,7 +38,7 @@
 
 - name: Cleanup /tmp
   command : rm -rf /tmp/*
-
+    
 - name: Get package facts
   package_facts:
 

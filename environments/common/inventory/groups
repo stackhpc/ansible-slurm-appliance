@@ -136,5 +136,11 @@ freeipa_client
 [ansible_init]
 # Hosts to run linux-anisble-init
 
+[k3s]
+# Hosts to run k3s server/agent
+
+[k9s]
+# Hosts to install k9s on
+
 [lustre]
 # Hosts to run lustre client
