@@ -3,7 +3,7 @@
   - name: Check if k9s is installed
     ansible.builtin.stat:
       path: "/usr/bin/k9s"
-    register: result
+    register: _k9s_stat_result
 
   - name: Install k9s and clean up temporary files
     block:
@@ -14,7 +14,7 @@
         owner: root
         group: root
         mode: "744"
-      when: not result.stat.exists
+      when: not _k9s_stat_result.stat.exists
 
     - name: Download k9s
       ansible.builtin.get_url:
@@ -41,4 +41,4 @@
       ansible.builtin.file:
         path: /tmp/k9s
         state: absent
-    when: not result.stat.exists
+    when: not _k9s_stat_result.stat.exists
