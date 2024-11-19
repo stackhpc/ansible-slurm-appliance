@@ -42,7 +42,6 @@ jobs:
         build:
           - RL8
           - RL9
-          - RL9-cuda
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -112,7 +111,6 @@ jobs:
         build:
           - RL8
           - RL9
-          - RL9-cuda
         exclude: 
           - cloud: ${{ needs.image_upload.outputs.ci_cloud }}
 

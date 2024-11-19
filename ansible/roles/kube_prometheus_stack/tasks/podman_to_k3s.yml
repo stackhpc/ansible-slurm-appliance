@@ -1,0 +1,15 @@
+- name: "Pull {{ item.name }} image with podman"
+  containers.podman.podman_image:
+    name: "{{ item.name }}"
+    tag: "{{ item.tag }}"
+
+- name: "Export {{ item.name }} image to k3s"
+  containers.podman.podman_save:
+    image: "{{ item.name }}:{{ item.tag }}"
+    dest: "/var/lib/rancher/k3s/agent/images/{{ item.name | regex_replace('\\/|\\.','-')}}.tar"
+
+- name: "Clean up {{ item.name }} podman image"
+  containers.podman.podman_image:
+    state: absent
+    name: "{{ item.name }}"
+    tag: "{{ item.tag }}"

@@ -3,7 +3,7 @@
 ## Components overview
 
 ### [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
-An umbrella Helm chart which the appliance uses to deploy and manages containerised versions of Prometheus, Grafana, Alertmanager and Node Exporter.
+An umbrella Helm chart which the appliance uses to deploy and manage containerised versions of Prometheus, Grafana, Alertmanager and Node Exporter.
 
 ### [filebeat](https://www.elastic.co/beats/filebeat)
 
@@ -42,7 +42,7 @@ Where `role_name` is the name of the internal role.
 
 ## Customising variables
 
-You should only customise the variables in `environments/common` if you are working on a feature that you intend to contribute back. Instead you should override the variables in the environment relevant to your deployment. This is possible since inventories later in the inheritance chain have greater precedence. Please see [README.md](../README.md#environments) for a more detailed explanation. This notice exists to avoid the need to need to keep repeating this point in the following sections. Where it is noted that you should customise a variable, it is implied that this change should be made to your own environment e.g `environments/production` in preference to `environments/common`, even when
+You should only customise the variables in `environments/common` if you are working on a feature that you intend to contribute back. Instead you should override the variables in the environment relevant to your deployment. This is possible since inventories later in the inheritance chain have greater precedence. Please see [README.md](../environments/README.md) for a more detailed explanation. This notice exists to avoid the need to need to keep repeating this point in the following sections. Where it is noted that you should customise a variable, it is implied that this change should be made to your own environment e.g `environments/production` in preference to `environments/common`, even when
 this is not explicitly stated.
 
 ## filebeat
@@ -109,7 +109,7 @@ Note that if Open OnDemand is enabled, Grafana is only accessible through OOD's 
 
 ### grafana dashboards
 
-In addition to the default set of dashboards that are deployed by kube-prometheus-stack, the appliance ships with a default set of dashboards (listed below). The set of appliance-specific dashboards can be configured via the `grafana_dashboards` variable. The dashboards are either internal to the [grafana-dashboards role](../ansible/roles/grafana-dashboards/files/) or downloaded from grafana.com. If you wish to selectively remove the default dashboards deployed by kube-prometheus-stack, this can be done by overriding the `grafana_exclude_default_dashboards` variable in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml).
+In addition to the default set of dashboards that are deployed by kube-prometheus-stack, the appliance ships with additional dashboards listed below. The set of appliance-specific dashboards can be configured via the `grafana_dashboards` variable. The dashboards are either internal to the [grafana-dashboards role](../ansible/roles/grafana-dashboards/files/) or downloaded from grafana.com. If you wish to selectively remove the default dashboards deployed by kube-prometheus-stack, this can be done by overriding the `grafana_exclude_default_dashboards` variable in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml).
 
 #### node exporter slurm
 
@@ -230,13 +230,13 @@ Note that this service is not password protected, allowing anyone with access to
 
 ### Upgrades
 
-The appliance previously used [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role to configure Prometheus, but our monitoring stack has since been moved into the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart running on a k3s cluster. The some of the default Grafana dashboards deployed by kube-prometheus-stack are hardcoded to rely on the `job` label of metrics scraped from Node Exporter to have the value `node-exporter`. By default, the cloudalchemy role scraped these metrics with the `job` label set to `node`. Therefore, if upgrading from previous versions of the appliance which used the cloudalchemy role, pre-upgrade data will not show up by default in Grafana dashboards. The old data can still be viewed in the OpenHPC and Node Exporter Slurm dashboards by selecting the previous `job` value from the Job dropdown.
+The appliance previously used [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role to configure Prometheus, but our monitoring stack has since been moved into the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart running on a k3s cluster. Some of the default Grafana dashboards deployed by kube-prometheus-stack are hardcoded to rely on the `job` label of metrics scraped from Node Exporter to have the value `node-exporter`. By default, the cloudalchemy role scraped these metrics with the `job` label set to `node`. Therefore, if upgrading from previous versions of the appliance which used the cloudalchemy role, pre-upgrade data will not show up by default in Grafana dashboards. The old data can still be viewed in the OpenHPC and Node Exporter Slurm dashboards by selecting the previous `job` value from the Job dropdown.
 
 ### Alerting and recording rules
 
 See the upstream documentation for [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) and [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) rules.
 
-In addition to the default recording and alerting rules set by kube-prometheus-stack, the appliances provides a default set of rules which can be found in the `prometheus_extra_rules` list in:
+In addition to the default recording and alerting rules set by kube-prometheus-stack, the appliance provides its own sets of default rules which can be found and modified in the `prometheus_extra_recording_rules` and `prometheus_extra_alerting_rules` lists in:
 
 > [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml)
 

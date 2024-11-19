@@ -15,7 +15,7 @@ resource "terraform_data" "k3s_token" {
     input = "{{ k3s_token }}"
     lifecycle {
         ignore_changes = [
-            input,
+            input, # makes it a write-once value (set via Ansible)
         ]
     }   
 }
@@ -399,7 +399,7 @@ resource "openstack_compute_instance_v2" "login" {
         ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
       {% endif %}
     {% endfor %} 
-    k3s_server = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
+    k3s_server = openstack_compute_instance_v2.control.network[0].fixed_ip_v4
     k3s_token = "{{ k3s_token }}"
   }
 }
@@ -412,7 +412,6 @@ resource "openstack_compute_instance_v2" "control" {
   {% else %}
   flavor_id = "{{ control_flavor }}"
   {% endif %}
-  for_each = toset(["control"])
 
   network {
     port = openstack_networking_port_v2.control.id
@@ -566,7 +565,7 @@ resource "openstack_compute_instance_v2" "{{ partition.name }}" {
         ansible_init_coll_{{ loop.index0 }}_source = "{{ collection.source }}"
       {% endif %}
     {% endfor %} 
-    k3s_server = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
+    k3s_server = openstack_compute_instance_v2.control.network[0].fixed_ip_v4
     k3s_token = "{{ k3s_token }}"
   }
 }

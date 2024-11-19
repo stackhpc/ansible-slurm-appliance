@@ -8,7 +8,7 @@ Installs k3s agent and server services on nodes and an ansible-init playbook to 
 Requirements
 ------------
 
-`azimuth_cloud.image_utils.linux_ansible_init` must have been run previously on targeted nodes
+`azimuth_cloud.image_utils.linux_ansible_init` must have been run previously on targeted nodes during image build.
 
 Role Variables
 --------------

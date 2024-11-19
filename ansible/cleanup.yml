@@ -38,11 +38,6 @@
 
 - name: Cleanup /tmp
   command : rm -rf /tmp/*
-
-- name: Delete ansible-init sentinel file created if ansible-init has run during build
-  ansible.builtin.file:
-    path: /var/lib/ansible-init.done
-    state: absent
     
 - name: Get package facts
   package_facts:

@@ -10,13 +10,13 @@ on:
 jobs:
   scan:
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + OS + build
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + build
       cancel-in-progress: true
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        build: ["RL8", "RL9", "RL9-cuda"]
+        build: ["RL8", "RL9"]
     env:
       JSON_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack
@@ -94,12 +94,13 @@ jobs:
           timeout: 15m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
-          category: "${{ matrix.os_version }}-${{ matrix.build }}"
+          category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
         uses: aquasecurity/trivy-action@0.24.0
@@ -114,3 +115,4 @@ jobs:
           timeout: 15m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2

@@ -131,3 +131,6 @@ freeipa_client
 
 [k9s]
 # Hosts to install k9s on
+
+[lustre]
+# Hosts to run lustre client

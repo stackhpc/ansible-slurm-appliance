@@ -1,22 +1,5 @@
 ---
 
 - name: Pre-pull kube-prometheus-stack images and import to k3s
-  block:
-    - name: Pull with images with podman
-      containers.podman.podman_image:
-        name: "{{ item.name }}"
-        tag: "{{ item.tag }}"
-      loop: "{{ image_list }}"
-
-    - name: Export images to k3s
-      containers.podman.podman_save:
-        image: "{{ item.name }}:{{ item.tag }}"
-        dest: "/var/lib/rancher/k3s/agent/images/{{ item.name | regex_replace('\\/|\\.','-')}}.tar"
-      loop: "{{ image_list }}"
-
-    - name: Clean up podman images
-      containers.podman.podman_image:
-        state: absent
-        name: "{{ item.name }}"
-        tag: "{{ item.tag }}"
-      loop: "{{ image_list }}"
+  ansible.builtin.include_tasks: podman_to_k3s.yml
+  loop: "{{ image_list }}"
