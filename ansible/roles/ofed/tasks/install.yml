@@ -28,6 +28,11 @@
     # dnf line format e.g. "kernel.x86_64  4.18.0-513.18.1.el8_9   @baseos  "
   when: _ofed_kernel_current != _ofed_dnf_kernels_newest
 
+- name: Get new running kernel
+  command: uname -r
+  register: _ofed_loaded_kernel
+  changed_when: false
+
 - name: Enable epel
   dnf:
     name: epel-release
