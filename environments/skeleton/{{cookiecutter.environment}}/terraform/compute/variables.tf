@@ -67,3 +67,12 @@ variable "root_volume_size" {
 variable "security_group_ids" {
     type = list
 }
+
+variable "k3s_token" {
+    type = string
+}
+
+variable "k3s_server" {
+    description = "Name/address of k3s server"
+    type = string
+}

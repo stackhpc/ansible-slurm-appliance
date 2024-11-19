@@ -131,3 +131,8 @@ variable "root_volume_size" {
     type = number
     default = 40
 }
+
+variable "k3s_token" {
+    description = "K3s cluster authentication token, set automatically by Ansible"
+    type = string
+}

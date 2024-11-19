@@ -58,5 +58,9 @@ roles/*
 !roles/squid/**
 !roles/tuned/
 !roles/tuned/**
+!roles/k3s/
+!roles/k3s/**
+!roles/k9s/
+!roles/k9s/**
 !roles/lustre/
 !roles/lustre/**
