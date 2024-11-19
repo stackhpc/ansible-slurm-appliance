@@ -1,3 +1,13 @@
+
+- name: Install latest kernel packages
+  ansible.builtin.dnf:
+    name:
+    - kernel
+    - kernel-core
+    - kernel-tools
+    - kernel-tools-libs
+    state: latest
+
 - name: Get installed kernels
   command: dnf list --installed kernel
   register: _ofed_dnf_kernels
@@ -8,16 +18,15 @@
   register: _ofed_loaded_kernel
   changed_when: false
 
-- name: Check current kernel is newest installed
-  assert:
-    that: _ofed_kernel_current == _ofed_dnf_kernels_newest
-    fail_msg: "Kernel {{ _ofed_loaded_kernel.stdout }} is loaded but newer {{ _ofed_dnf_kernels_newest }} is installed: consider rebooting?"
+- name: Reboot into new kernel if not on latest
+  ansible.builtin.reboot:
   vars:
     _ofed_kernel_current: >-
       {{ _ofed_loaded_kernel.stdout | regex_replace('\.(?:.(?!\.))+$', '') | regex_replace('\.(?:.(?!\.))+$', '') }}
     _ofed_dnf_kernels_newest: >-
       {{ _ofed_dnf_kernels.stdout_lines[1:] | map('split') | map(attribute=1) | map('regex_replace', '\.(?:.(?!\.))+$', '') | community.general.version_sort | last }}
     # dnf line format e.g. "kernel.x86_64  4.18.0-513.18.1.el8_9   @baseos  "
+  when: _ofed_kernel_current != _ofed_dnf_kernels_newest
 
 - name: Enable epel
   dnf:
