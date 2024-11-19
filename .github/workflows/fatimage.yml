@@ -20,16 +20,12 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
-      matrix: # build RL8+OFED, RL9+OFED, RL9+OFED+CUDA versions
+      matrix: # build RL8, RL9
         os_version:
           - RL8
           - RL9
         build:
           - openstack.openhpc
-          - openstack.openhpc-cuda
-        exclude:
-          - os_version: RL8
-            build: openstack.openhpc-cuda
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -37,12 +33,10 @@ jobs:
       SOURCE_IMAGES_MAP: |
         {
           "RL8": {
-            "openstack.openhpc": "rocky-latest-RL8",
-            "openstack.openhpc-cuda": "rocky-latest-cuda-RL8"
+            "openstack.openhpc": "rocky-latest-RL8"
           },
           "RL9": {
-            "openstack.openhpc": "rocky-latest-RL9",
-            "openstack.openhpc-cuda": "rocky-latest-cuda-RL9"
+            "openstack.openhpc": "rocky-latest-RL9"
           }
         }
 
