@@ -44,3 +44,11 @@
   tasks:
     - import_role:
         name: compute_init
+
+- name: Install k9s
+  become: yes
+  hosts: k9s
+  tags: k9s
+  tasks:
+  - import_role:
+      name: k9s

@@ -139,5 +139,11 @@ freeipa_client
 [compute_init]
 # Hosts to deploy compute initialisation ansible-init script to.
 
+[k3s]
+# Hosts to run k3s server/agent
+
+[k9s]
+# Hosts to install k9s on
+
 [lustre]
 # Hosts to run lustre client

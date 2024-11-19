@@ -86,5 +86,13 @@ cluster
 # Hosts to deploy compute initialisation ansible-init script to.
 compute
 
+[k3s:children]
+# Hosts to run k3s server/agent
+openhpc
+
+[k9s:children]
+# Hosts to install k9s on
+control
+
 [lustre]
 # Hosts to run lustre client
