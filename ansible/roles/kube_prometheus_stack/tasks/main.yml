@@ -82,6 +82,46 @@
           path: "{{ prometheus_db_dir }}"
           type: DirectoryOrCreate
 
+# Loki image seems to be hardcoded to use this uid/gid even when changed in
+# podSecurityContext
+- name: Create Loki group
+  ansible.builtin.group:
+    name: loki
+    gid: 10001
+
+- name: Create Loki user
+  ansible.builtin.user:
+    name: loki
+    uid: 10001
+    group: loki
+
+- name: Create Loki data directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ kube_prometheus_stack_loki_data_dir }}"
+    owner: 10001
+    group: 10001
+    mode: '775'
+
+- name: Create Loki hostPath volume in /var/lib/state
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: loki-dir
+        labels:
+          app.kubernetes.io/name: loki-dir
+      spec:
+        capacity:
+          storage: "{{ kube_prometheus_stack_loki_persistence_size }}" # not enforced but may be internally by loki?
+        accessModes:
+        - ReadWriteOnce
+        hostPath:
+          path: "{{ kube_prometheus_stack_loki_data_dir }}"
+          type: Directory
+
 - name: Setting up k3s services for OnDemand Exporter
   when: groups['openondemand'] | count > 0
   block:
@@ -175,6 +215,16 @@
 - name: Import grafana dashboards
   ansible.builtin.import_role:
     name: grafana-dashboards
+
+- name: Install loki stack helm chart
+  kubernetes.core.helm:
+    chart_ref: loki-stack
+    chart_repo_url: https://grafana.github.io/helm-charts
+    chart_version: "{{ kube_prometheus_stack_loki_chart_version }}"
+    release_name: loki
+    release_namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    release_values: "{{ kube_prometheus_stack_loki_release_values }}"
+    wait: yes
 
 - name: Install kube-prometheus-stack on target Kubernetes cluster
   kubernetes.core.helm:

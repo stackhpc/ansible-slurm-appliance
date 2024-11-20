@@ -38,6 +38,10 @@ grafana_dashboards_default:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
     revision_id: 3
+  - dashboard_file: loki-pod-logs-dashboard.json
+    replacements: []
+  - dashboard_file: loki-systemd-logs-dashboard.json
+    replacements: []
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 
 # Configmap names of kube prometheus stack's default dashboards to exclude
@@ -73,7 +77,13 @@ grafana_datasources:
       version: '7.10.2'
       flavor: elasticsearch
     editable: true
-    # readOnly: false
+    readOnly: false
+  - name: Loki
+    url: http://loki:3100
+    type: loki
+    access: proxy
+    version: 1
+    isDefault: false
 grafana_plugins:
   - grafana-opensearch-datasource 2.8.1
 

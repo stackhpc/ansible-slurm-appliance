@@ -20,6 +20,14 @@ kube_prometheus_stack_wait_timeout: 5m
 kube_prometheus_stack_metrics_image_tag: v2.12.0
 kube_prometheus_stack_patch_image_tag: v20221220-controller-v1.5.1-58-g787ea74b6
 
+kube_prometheus_stack_loki_chart_version: 2.10.2
+kube_prometheus_stack_loki_image_tag: 2.9.3 # also promtail tag
+kube_prometheus_stack_loki_test_pod_tag: 1.8.2
+
+kube_prometheus_stack_loki_data_dir: "{{ appliances_state_dir }}/loki"
+kube_prometheus_stack_loki_persistence_size: "10Gi"
+kube_prometheus_stack_loki_retention_period: "72h"
+
 control_ip: "{{ hostvars[groups['control'].0].ansible_host }}"
 
 grafana_auth_anonymous: false

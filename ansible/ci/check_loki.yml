@@ -1,0 +1,40 @@
+- hosts: control
+  gather_facts: no
+  become: no
+  tasks:
+    - name: Get Loki datasource uid
+      ansible.builtin.uri:
+        url: http://{{ grafana_api_address }}:{{ grafana_port }}/api/datasources/name/Loki
+        url_username: grafana
+        url_password: "{{ vault_grafana_admin_password }}"
+        follow_redirects: all
+      register: uid_response
+
+    - name: Get Loki logs from before rebuild
+      ansible.builtin.uri:
+        url: http://{{ grafana_api_address }}:{{ grafana_port }}/api/ds/query
+        follow_redirects: all
+        url_username: grafana
+        url_password: "{{ vault_grafana_admin_password }}"
+        method: POST	
+        body_format: json
+        headers:
+          Accept: application/json
+          Content-Type: application/json
+        # Queries from 20 mins before timestamp to timestamp
+        body: |
+          {
+            "queries":[
+              {
+                "expr":"{unit=\"slurmd.service\"} |= ``",
+                "datasource":{"uid":"{{ uid_response.json.uid }}"},
+                "format":"time_series"
+              }],
+            "from":"{{ end_timestamp | int - 1200000 }}",
+            "to":"{{ end_timestamp }}"
+          }
+      register: log_query_content
+
+    - name: Check that logs exist
+      ansible.builtin.assert:
+        that: log_query_content.json.results.A.frames[0].data['values'][2] | length > 0
