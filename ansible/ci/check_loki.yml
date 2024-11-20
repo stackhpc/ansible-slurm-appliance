@@ -11,8 +11,6 @@
       register: uid_response
 
     - name: Get Loki logs from before rebuild
-      vars:
-        testuser_password: mypassword
       ansible.builtin.uri:
         url: http://localhost:{{ grafana_port }}/api/ds/query
         follow_redirects: all
