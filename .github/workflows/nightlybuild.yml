@@ -41,14 +41,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Pin releasever to RL9.4
-        if: matrix.os_version == 'RL9'
-        run: |
-          echo "[main]" | sudo tee /etc/dnf/dnf.conf
-          echo "releasever=9.4" | sudo tee -a /etc/dnf/dnf.conf
-          echo "Pinned releasever to 9.4 for Rocky Linux 9 builds"
-        shell: bash
-
       - name: Record settings for CI cloud
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
