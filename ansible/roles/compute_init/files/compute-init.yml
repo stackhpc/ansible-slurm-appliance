@@ -42,13 +42,6 @@
     basic_users_groups: []
 
 
-    cvmfs_quota_limit_mb: 10000
-    cvmfs_config_default:
-      CVMFS_CLIENT_PROFILE: single
-      CVMFS_QUOTA_LIMIT: "{{ cvmfs_quota_limit_mb }}"
-    cvmfs_config_overrides: {}
-    cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
-
     openhpc_conf_server: "{{ control_node_ip }}"
 
   tasks:
@@ -219,36 +212,13 @@
 
     - name: Configure EESSI
       block:
-        - name: Download Cern GPG key
-          ansible.builtin.get_url:
-            url: http://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM 
-            dest: ./cvmfs-key.gpg
-
-        - name: Import downloaded GPG key
-          command: rpm --import cvmfs-key.gpg
-
-        - name: Add CVMFS repo
-          dnf:
-            name: https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
-
-        - name: Install CVMFS
-          dnf:
-            name: cvmfs
-
-        - name: Install EESSI CVMFS config
-          dnf:
-            name: https://github.com/EESSI/filesystem-layer/releases/download/latest/cvmfs-config-eessi-latest.noarch.rpm
-            # NOTE: Can't find any docs on obtaining gpg key - maybe downloading directly from github is ok?
-            disable_gpg_check: true
-
-        - name: Add base CVMFS config
-          community.general.ini_file:
+        - name: Copy /mnt/cluster/cvmfs/default.local contents to /etc/cvmfs/default.local
+          copy:
+            src: /mnt/cluster/cvmfs/default.local
             dest: /etc/cvmfs/default.local
-            section: null
-            option: "{{ item.key }}"
-            value: "{{ item.value }}"
-            no_extra_spaces: true
-          loop: "{{ cvmfs_config | dict2items }}"
+            owner: root
+            group: root
+            mode: 0644
 
         # NOTE: Not clear how to make this idempotent
         - name: Ensure CVMFS config is setup

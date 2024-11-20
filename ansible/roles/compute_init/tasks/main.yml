@@ -69,7 +69,7 @@
 
 - name: Ensure nfs /exports/cluster configured
   block:
-    - name: Ensure the /exports/hosts directory exists
+    - name: Ensure the /exports/cluster directory exists
       file:
         path: /exports/cluster
         state: directory
@@ -91,6 +91,23 @@
         content: "{{ os_manila_mount_share_info | to_nice_yaml }}"
         dest: "/exports/cluster/manila_share_info.yml"
       when: os_manila_mount_share_info is defined
+
+    - name: Ensure /exports/cluster/cvmfs directory exists
+      file:
+        path: /exports/cluster/cvmfs
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Copy EESSI CVMFS config to /exports/cluster
+      copy:
+        src: /etc/cvmfs/default.local
+        dest: /exports/cluster/cvmfs/default.local
+        owner: root
+        group: root
+        mode: 0644
+        remote_src: true
 
     - name: Write openhpc munge key
       copy:
