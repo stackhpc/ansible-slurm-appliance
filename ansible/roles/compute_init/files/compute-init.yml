@@ -52,7 +52,6 @@
     cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
 
     openhpc_conf_server: "{{ control_node_ip }}"
-    openhpc_gres_template: /etc/ansible-init/templates/gres.conf.j2
     openhpc_slurm_service_enabled: true
     openhpc_slurm_service_started: "{{ openhpc_slurm_service_enabled }}"
     openhpc_enable:
@@ -282,16 +281,6 @@
             owner: munge
             group: munge
             mode: 0400
-
-        - name: Create gres.conf
-          template:
-            src: "{{ openhpc_gres_template }}"
-            dest: /etc/slurm/gres.conf
-            mode: "0600"
-            owner: slurm
-            group: slurm
-          when: openhpc_enable.control | default(false)
-          register: ohpc_gres_conf
 
         - name: Set slurmctld location for configless operation
           lineinfile:
