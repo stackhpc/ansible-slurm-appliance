@@ -24,7 +24,6 @@
     - ../../resolv_conf/templates/resolv.conf.j2
     - ../../stackhpc.os-manila-mount/templates/ceph.conf.j2
     - ../../stackhpc.os-manila-mount/templates/ceph.keyring.j2
-    - ../../stackhpc.openhpc/templates/gres.conf.j2
 
 - name: Inject files
   copy:

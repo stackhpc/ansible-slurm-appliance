@@ -9,7 +9,6 @@
     resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
 
 
-    nfs_disk_location:
     nfs_export: "/exports/home"
     nfs_client_mnt_options:
     nfs_client_mnt_point: "/home"
@@ -25,7 +24,6 @@
       - noatime
       - _netdev # prevents mount blocking early boot before networking available
       - rw
-    os_manila_mount_share_info: [] # populated by lookup mode
     os_manila_mount_ceph_conf_path: /etc/ceph
 
 
@@ -52,13 +50,6 @@
     cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
 
     openhpc_conf_server: "{{ control_node_ip }}"
-    openhpc_slurm_service_enabled: true
-    openhpc_slurm_service_started: "{{ openhpc_slurm_service_enabled }}"
-    openhpc_enable:
-      control: false
-      batch: true
-      database: false
-      runtime: true
 
   tasks:
     - name: Configure resolve.conf
@@ -85,6 +76,7 @@
             name: NetworkManager
             state: reloaded
           when: _copy_nm_config.changed | default(false)
+      when: resolv_conf_nameservers is defined and resolv_conf_nameservers | length > 0
 
 
     - name: Mount /mnt/cluster on compute nodes and copy hosts to /etc/hosts
@@ -295,12 +287,11 @@
         - name: Configure Munge service
           service:
             name: munge
-            enabled: "{{ openhpc_slurm_service_enabled | bool }}"
-            state: "{{ 'started' if openhpc_slurm_service_started | bool else 'stopped' }}"
+            enabled: true
+            state: started
 
         - name: Ensure slurmd state
           service:
             name: slurmd
-            enabled: "{{ openhpc_slurm_service_enabled | bool }}"
-            state: "{{ 'started' if openhpc_slurm_service_started | bool else 'stopped' }}"
-          when: openhpc_enable.batch | default(false) | bool
+            enabled: true
+            state: started
