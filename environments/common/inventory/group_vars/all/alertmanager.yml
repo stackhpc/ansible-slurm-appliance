@@ -1,0 +1,29 @@
+alertmanager_image_tag: 'v0.27.0'
+
+alertmanager_config:
+  route:
+    group_by: ['...']
+    receiver: "{{ 'slack-receiver' if alertmanager_slack_integration is defined else 'null' }}"
+  receivers: "{{ alertmanager_default_receivers  + alertmanager_extra_receivers }}"
+
+alertmanager_default_receivers:
+  - name: 'null'
+
+alertmanager_extra_receivers: "{{ [alertmanager_slack_receiver] if alertmanager_slack_integration is defined else [] }}"
+
+alertmanager_slack_receiver:
+  name: slack-receiver
+  slack_configs:
+    - channel: "{{ alertmanager_slack_integration.channel | default('none') }}"
+      api_url: https://slack.com/api/chat.postMessage
+      http_config:
+        authorization:
+          credentials: "{{ alertmanager_slack_integration.app_creds | default('none') }}"
+      text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
+      title_link: "http://{{ prometheus_address }}:{{ prometheus_port }}/alertmanager/#/alerts?receiver=slack-receiver"
+      send_resolved: true
+
+# Uncomment below and add Slack bot app creds for Slack integration
+# alertmanager_slack_integration:
+#   channel: '#alerts'
+#   app_creds:

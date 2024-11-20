@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: "{{ kube_prometheus_stack_release_namespace }}"
+  name: "{{ item_filename }}"
+  labels:
+    grafana_dashboard: "1"
+data:
+  {{ item_filename }}: |
+{{ lookup('ansible.builtin.file', _tmp_dashboards.path+'/'+item_filename) | indent(4, first=True) }}
