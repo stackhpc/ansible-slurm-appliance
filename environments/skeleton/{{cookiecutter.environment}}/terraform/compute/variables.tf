@@ -76,3 +76,16 @@ variable "k3s_server" {
     description = "Name/address of k3s server"
     type = string
 }
+
+variable "match_ironic_node" {
+    description = "Whether to launch instances on the Ironic node of the same name as this cluster node"
+    type = bool
+    default = false
+
+}
+
+variable availability_zone {
+    description = "Name of availability zone. NB using ZONE:HOST or ZONE::NODE is not supported if setting match_ironic_node"
+    type = string
+    default = "nova"
+}

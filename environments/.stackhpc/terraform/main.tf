@@ -76,13 +76,16 @@ module "cluster" {
     k3s_token = var.k3s_token
 
     login_nodes = {
-        login-0: var.other_node_flavor
+        login-0 = {
+            flavor: var.other_node_flavor
+        }
     }
     compute = {
         standard: { # NB: can't call this default!
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
         }
+        
         # Example of how to add another partition:
         # extra: {
         #     nodes: ["compute-2", "compute-3"]

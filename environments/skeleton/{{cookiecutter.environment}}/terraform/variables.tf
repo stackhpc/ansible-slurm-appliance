@@ -31,7 +31,14 @@ variable "control_node_flavor" {
 
 variable "login_nodes" {
   type = map
-  description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> (str) flavor name"
+  description = <<-EOF
+    Mapping defining login nodes. Keys are the node name suffix. Values are a mapping as follows:
+        Required:
+            flavor: String flavor name
+        Optional:
+            availability_zone: String, name of availability zone. NB using ZONE:HOST or ZONE::NODE is not supported if setting match_ironic_node
+            match_ironic_node: Bool, whether to launch instances on the Ironic node of the same name as this cluster node
+    EOF
 }
 
 variable "cluster_image_id" {

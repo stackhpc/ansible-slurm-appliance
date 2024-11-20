@@ -1,5 +1,24 @@
 locals {
   control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  
+  login_node_defaults = {
+    availability_zone = "nova"
+    match_ironic_node = false
+  }
+  
+  login_nodes = {
+    for nodename, cfg in var.login_nodes:
+      nodename => merge(local.login_node_defaults, cfg)
+  }
+}
+
+data "external" "nodes" {
+  # returns an empty map if cannot list baremetal nodes
+  program = ["bash", "-c", <<-EOT
+    openstack baremetal node list --limit 0 -f json 2>/dev/null | \
+    jq -r 'try map( { (.Name|tostring): .UUID } ) | add catch {}' || echo '{}'
+  EOT
+  ]
 }
 
 resource "openstack_networking_port_v2" "login" {
@@ -99,11 +118,11 @@ resource "openstack_compute_instance_v2" "control" {
 
 resource "openstack_compute_instance_v2" "login" {
 
-  for_each = var.login_nodes
+  for_each = local.login_nodes
   
   name = "${var.cluster_name}-${each.key}"
   image_id = var.cluster_image_id
-  flavor_name = each.value
+  flavor_name = each.value.flavor
   key_pair = var.key_pair
 
   dynamic "block_device" {
@@ -128,6 +147,8 @@ resource "openstack_compute_instance_v2" "login" {
     k3s_token = var.k3s_token
     k3s_server = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
   }
+
+  availability_zone = each.value.match_ironic_node ? "${each.value.availability_zone}::${data.external.nodes.result[each.key]}" : each.value.availability_zone
 
   user_data = <<-EOF
     #cloud-config
