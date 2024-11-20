@@ -1,5 +1,19 @@
 ---
 
+- hosts: all
+  become: yes
+  tasks:
+    - name: Ensure releasever is pinned to 9.4 for RL9
+      when: ansible_distribution_major_version == "9"
+      copy:
+        content: |
+          [main]
+          releasever=9.4
+        dest: /etc/dnf/dnf.conf
+        owner: root
+        group: root
+        mode: '0644'
+
 - hosts: cluster
   gather_facts: false
   become: yes
