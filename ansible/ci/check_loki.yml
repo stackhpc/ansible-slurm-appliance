@@ -4,18 +4,18 @@
   tasks:
     - name: Get Loki datasource uid
       ansible.builtin.uri:
-        url: http://localhost:{{ grafana_port }}/api/datasources/name/Loki
-        url_username: 'testuser'
-        url_password: "{{ testuser_password }}"
+        url: http://{{ grafana_api_address }}:{{ grafana_port }}/api/datasources/name/Loki
+        url_username: grafana
+        url_password: "{{ vault_grafana_admin_password }}"
         follow_redirects: all
       register: uid_response
 
     - name: Get Loki logs from before rebuild
       ansible.builtin.uri:
-        url: http://localhost:{{ grafana_port }}/api/ds/query
+        url: http://{{ grafana_api_address }}:{{ grafana_port }}/api/ds/query
         follow_redirects: all
-        url_username: testuser
-        url_password: "{{ testuser_password }}"
+        url_username: grafana
+        url_password: "{{ vault_grafana_admin_password }}"
         method: POST	
         body_format: json
         headers:
