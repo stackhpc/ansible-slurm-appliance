@@ -8,15 +8,12 @@
     control_node_ip: "172.16.1.228"
     resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
 
-
     nfs_export: "/exports/home"
     nfs_client_mnt_options:
     nfs_client_mnt_point: "/home"
     nfs_client_mnt_state: mounted
     nfs_server: "{{ control_node_ip }}"
 
-
-    os_manila_mount_shares: []
     os_manila_mount_state: mounted
     os_manila_mount_opts:
       - x-systemd.device-timeout=30
@@ -25,7 +22,6 @@
       - _netdev # prevents mount blocking early boot before networking available
       - rw
     os_manila_mount_ceph_conf_path: /etc/ceph
-
 
     basic_users_manage_homedir: false
     basic_users_userdefaults:
@@ -38,9 +34,7 @@
       - name: testuser # can't use rocky as $HOME isn't shared!
         password: "{{ test_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
         uid: 1005
-        state: present
     basic_users_groups: []
-
 
     openhpc_conf_server: "{{ control_node_ip }}"
 
@@ -114,14 +108,24 @@
 
     - name: Manila mount
       block:
-        - name: Read manila share from nfs file
+        - name: Read manila share info from nfs file
           slurp:
             src: "/mnt/cluster/manila_share_info.yml"
           register: manila_share_info_file
+          no_log: true
 
         - name: Parse and set fact for manila share info
           set_fact:
             os_manila_mount_share_info: "{{ manila_share_info_file.content | b64decode | from_yaml }}"
+
+        - name: Read manila shares from nfs file
+          slurp:
+            src: "/mnt/cluster/manila_shares.yml"
+          register: manila_shares_file
+
+        - name: Parse and set fact for manila shares
+          set_fact:
+            os_manila_mount_shares: "{{ manila_shares_file.content | b64decode | from_yaml }}"
 
         - name: Ensure Ceph configuration directory exists
           ansible.builtin.file:
