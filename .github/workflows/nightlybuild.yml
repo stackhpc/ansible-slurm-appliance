@@ -138,7 +138,7 @@ jobs:
           - RL8
           - RL9
         image:
-          - rocky-latest
+          - rocky-latest-test
         exclude:
           - target_cloud: LEAFCLOUD
     env:
