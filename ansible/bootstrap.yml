@@ -13,6 +13,15 @@
         mode: '0644'
       when: ansible_distribution_major_version == "9"
 
+    - name: Configure EPEL repository to use releasever "9"
+      ansible.builtin.command:
+        cmd: "dnf config-manager --setopt=epel.releasever=9 --save"
+      when: ansible_distribution_major_version == "9"
+
+    - name: Clean DNF metadata
+      ansible.builtin.command:
+        cmd: dnf clean all
+
 - hosts: cluster
   gather_facts: false
   become: yes
