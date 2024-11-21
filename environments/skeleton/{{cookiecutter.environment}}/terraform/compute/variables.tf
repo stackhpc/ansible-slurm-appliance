@@ -89,3 +89,7 @@ variable availability_zone {
     type = string
     default = "nova"
 }
+
+variable "baremetal_nodes" {
+    type = map(string)
+}

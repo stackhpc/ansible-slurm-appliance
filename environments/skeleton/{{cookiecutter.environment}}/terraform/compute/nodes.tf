@@ -1,11 +1,3 @@
-data "external" "nodes" {
-  program = ["bash", "-c", <<-EOT
-    openstack baremetal node list --limit 0 -f json 2>/dev/null | \
-    jq -r 'try map( { (.Name|tostring): .UUID } ) | add catch {}' || echo '{}'
-  EOT
-  ]
-}
-
 resource "openstack_networking_port_v2" "compute" {
 
   for_each = toset(var.nodes)
@@ -58,7 +50,7 @@ resource "openstack_compute_instance_v2" "compute" {
     k3s_server = var.k3s_server
   }
 
-  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${data.external.nodes.result[each.key]}" : var.availability_zone
+  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : var.availability_zone
 
   user_data = <<-EOF
     #cloud-config

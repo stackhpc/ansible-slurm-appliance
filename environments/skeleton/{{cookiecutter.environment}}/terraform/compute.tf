@@ -18,4 +18,5 @@ module "compute" {
   k3s_token = var.k3s_token
   k3s_server = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
+  baremetal_nodes = data.external.baremetal_nodes.result
 }
