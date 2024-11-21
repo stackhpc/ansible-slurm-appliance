@@ -50,7 +50,7 @@ resource "openstack_compute_instance_v2" "compute" {
     k3s_server = var.k3s_server
   }
 
-  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : var.availability_zone
+  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
 
   user_data = <<-EOF
     #cloud-config

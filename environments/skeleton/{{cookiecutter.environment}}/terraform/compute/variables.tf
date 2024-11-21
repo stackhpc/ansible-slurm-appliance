@@ -85,7 +85,7 @@ variable "match_ironic_node" {
 }
 
 variable availability_zone {
-    description = "Name of availability zone. NB using ZONE:HOST or ZONE::NODE is not supported if setting match_ironic_node"
+    description = "Name of availability zone - ignored unless match_ironic_node is true"
     type = string
     default = "nova"
 }

@@ -36,8 +36,8 @@ variable "login_nodes" {
         Required:
             flavor: String flavor name
         Optional:
-            availability_zone: String, name of availability zone. NB using ZONE:HOST or ZONE::NODE is not supported if setting match_ironic_node
             match_ironic_node: Bool, whether to launch instances on the Ironic node of the same name as this cluster node
+            availability_zone: String, name of availability zone - ignored unless match_ironic_node is true
     EOF
 }
 
