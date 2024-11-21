@@ -13,7 +13,12 @@
         mode: '0644'
       when: ansible_distribution_major_version == "9"
 
-    - name: Configure EPEL repository to use releasever "9"
+    - name: Enable EPEL repository
+      ansible.builtin.dnf:
+        name: epel-release
+        state: present
+
+    - name: Configure EPEL repository to use releasever 9
       ansible.builtin.command:
         cmd: "dnf config-manager --setopt=epel.releasever=9 --save"
       when: ansible_distribution_major_version == "9"
