@@ -3,13 +3,14 @@
 - hosts: all
   become: yes
   tasks:
-    - name: Ensure releasever is pinned to 9.4 for RL9
-      lineinfile:
-        path: /etc/dnf/dnf.conf
-        regexp: '^releasever='
-        line: 'releasever=9.4'
-        insertafter: '^\[main\]'
+    - name: Override /etc/dnf/vars/releasever with "9.4"
+      ansible.builtin.lineinfile:
+        path: /etc/dnf/vars/releasever
+        line: "9.4"
         create: yes
+        owner: root
+        group: root
+        mode: '0644'
       when: ansible_distribution_major_version == "9"
 
 - hosts: cluster
