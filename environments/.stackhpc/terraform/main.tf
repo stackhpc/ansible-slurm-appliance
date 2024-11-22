@@ -54,6 +54,10 @@ variable "volume_backed_instances" {
     default = false
 }
 
+variable "root_volume_size" {
+    default = 15
+}
+
 variable "k3s_token" {
     type = string
 }
@@ -94,6 +98,7 @@ module "cluster" {
     }
     
     volume_backed_instances = var.volume_backed_instances
+    root_volume_size = var.root_volume_size
     
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:

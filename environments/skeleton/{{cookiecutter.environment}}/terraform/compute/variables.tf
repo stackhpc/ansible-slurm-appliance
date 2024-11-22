@@ -53,15 +53,11 @@ variable "vnic_profile" {
 }
 
 variable "volume_backed_instances" {
-    description = "Whether to use volumes for root disks"
     type = bool
-    default = false
 }
 
 variable "root_volume_size" {
-    description = "Size of volume for root volumes if using volume backed instances, in Gb"
     type = number
-    default = 40
 }
 
 variable "security_group_ids" {
