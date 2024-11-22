@@ -1,30 +1,92 @@
 ---
-  - name: "Set/fix the the ephemeral ssd mounts"
-    hosts: compute
-    tags: vs-set-ephemeral-mounts
-    become: true
-    tasks:
-      - include_role:
-          name: vs-set-ephemeral-mounts
+- name: "Set/fix the the ephemeral ssd mounts"
+  hosts: compute
+  tags: vs-set-ephemeral-mounts
+  become: true
+  tasks:
+    - name: Set ephemeral mounts
+      ansible.builtin.include_role:
+        name: vs-set-ephemeral-mounts
 
-  - name: pam_mkhomedir_plus
-    hosts: login
-    become: true
-    tags:
-      - pam_mkhomedir_plus
-    tasks:
-      - include_role:
-          name: vshpc.prov.pam_mkhomedir_plus
+- name: Do pam_mkhomedir_plus
+  hosts: login
+  become: true
+  tags:
+    - pam_mkhomedir_plus
+  tasks:
+    - name: Do role for IDM
+      ansible.builtin.include_role:
+        name: vshpc.prov.pam_mkhomedir_plus
 
-  - name: clean_packages
-    hosts: login
-    become: true
-    tags:
-      - clean_packages
-    tasks:
-      - name: "post task - dnf clean all"
-        shell:
-          cmd: dnf clean all
+- name: Do cuda
+  hosts: all
+  become: true
+  tags:
+    - cudafy
+  tasks:
+    - name: Install nvidia libs
+      ansible.builtin.include_role:
+        name: vshpc.prov.pam_mkhomedir_plus
+
+    - name: Install cuda repo
+      ansible.builtin.get_url:
+        dest: "/etc/yum.repos.d/cuda-{{ cuda_distro }}.repo"
+        url: "{{ cuda_repo }}"
+
+    - name: Check if nvidia driver module is enabled
+      ansible.builtin.shell:
+        cmd: dnf module list --enabled nvidia-driver
+      changed_when: false
+      failed_when: false
+      register: _cuda_driver_module_enabled
+
+    - name: Enable nvidia driver module
+      ansible.builtin.command: "dnf module enable -y nvidia-driver:open-dkms"
+      register: _cuda_driver_module_enable
+      when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
+      changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
+
+    - name: Install nvidia drivers
+      ansible.builtin.command: dnf module install -y nvidia-driver
+      register: _cuda_driver_install
+      when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
+      changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
+
+
+
+# - name: Do cp user home to /var/lib/USER
+#   hosts: all
+#   # tags: pre_tasks_all
+#   become: true
+#   gather_facts: false
+#   tasks:
+    # - name: Does home/USER dir exist
+    #   ansible.builtin.stat:
+    #     path: "/var/lib/{{ appliances_local_users_ansible_user_name }}/.ssh"
+    #   register: homerocky
+
+    # - name: Does /var/lib/rocky dir exist
+    #   ansible.builtin.stat:
+    #     path: "/var/lib/{{ appliances_local_users_ansible_user_name }}"
+    #   register: varlibrocky
+
+    # - name: Move copy home dir
+    #   ansible.builtin.command: cp -a /home/{{ appliances_local_users_ansible_user_name }} /var/lib/{{ appliances_local_users_ansible_user_name }}
+    #   when: not homerocky.stat.exists
+    #   register: cpa_output # <- Registers the command output.
+    #   changed_when: cpa_output.rc != 0 # <- Uses the return code to define when the task has changed.
+
+- name: Clean post_final_cleanup
+  hosts: all
+  become: true
+  tags:
+    - post_final_cleanup
+  tasks:
+    - name: Do a thing to clean
+      ansible.builtin.command: dnf clean all
+      become: true
+      register: dnfcl_output # <- Registers the command output.
+      changed_when: dnfcl_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
 # - name: sync_slurm_allocations install on admin node
 #   hosts: admin
