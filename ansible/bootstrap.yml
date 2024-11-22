@@ -13,16 +13,6 @@
         mode: '0644'
       when: ansible_distribution_major_version == "9"
 
-    - name: Set EPEL repository releasever to 9 (major version)
-      ansible.builtin.lineinfile:
-        path: /etc/yum.repos.d/epel.repo
-        regexp: '^releasever='
-        line: 'releasever=9'
-        create: yes
-        owner: root
-        group: root
-        mode: '0644'
-
     - name: Clean DNF metadata
       ansible.builtin.command:
         cmd: dnf clean all
