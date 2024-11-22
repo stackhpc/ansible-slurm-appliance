@@ -1,6 +1,6 @@
 cuda_distro: "rhel{{ ansible_distribution_major_version }}"
 cuda_repo: "https://developer.download.nvidia.com/compute/cuda/repos/{{ cuda_distro }}/x86_64/cuda-{{ cuda_distro }}.repo"
-cuda_driver_stream: default
+cuda_driver_stream: open-dkms
 cuda_package_version: 'latest'
 cuda_packages:
   - "cuda{{ ('-' + cuda_package_version) if cuda_package_version != 'latest' else '' }}"
