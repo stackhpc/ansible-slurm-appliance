@@ -1,0 +1,22 @@
+---
+
+- name: Check for existing backup folder
+  stat:
+    path: /etc/yum.repos.d.backup
+  register: _stat_yum_backup_file
+
+- name: Backup existing package repos
+  ansible.builtin.copy:
+    remote_src: true
+    src: /etc/yum.repos.d/
+    dest: /etc/yum.repos.d.backup
+  when: not _stat_yum_backup_file.stat.exists
+
+- name: Replace package repos with release train repos
+  no_log: true
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: /etc/yum.repos.d/{{ item }}
+  loop:
+  - rocky-extras.repo
+  - rocky.repo

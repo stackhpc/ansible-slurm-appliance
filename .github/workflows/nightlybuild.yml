@@ -37,6 +37,7 @@ jobs:
           "RL8": "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2",
           "RL9": "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
         }
+      ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
@@ -85,6 +86,7 @@ jobs:
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
+          -var "ark_password=${ARK_PASSWORD}" \
           openstack.pkr.hcl
 
         env:

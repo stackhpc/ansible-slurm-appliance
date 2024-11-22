@@ -17,3 +17,11 @@
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/hosts.yml"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/secrets.yml"
         - "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/test_user.yml"
+
+- hosts: builder
+  become: yes
+  tasks:
+    - name: Replace system repos with ark
+      ansible.builtin.include_role:
+        name: release_train
+        tasks_from: set_repos.yml

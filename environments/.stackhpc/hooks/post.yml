@@ -12,3 +12,11 @@
         - "/opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/{{ ondemand_package_version }}-1/gems/bootstrap_form-2.7.0/test/dummy/Gemfile.lock"
         - "/opt/ood/ondemand/root/usr/share/gems/3.1/ondemand/{{ ondemand_package_version }}-1/gems/bootstrap_form-4.5.0/demo/yarn.lock"
         - /var/www/ood/apps/sys/dashboard/node_modules/data-confirm-modal/Gemfile.lock
+
+- hosts: builder
+  become: yes
+  tasks:
+    - name: Revert ark repos
+      ansible.builtin.include_role:
+        name: release_train
+        tasks_from: revert_repos.yml

@@ -1,0 +1,19 @@
+---
+
+- name: Check for backup folder exists
+  stat:
+    path: /etc/yum.repos.d.backup
+  register: _stat_yum_backup_file
+
+- name: Fail if backup folder doesn't exist
+  assert:
+    that: _stat_yum_backup_file.stat.exists
+
+- name: Remove ark repos
+  ansible.builtin.file:
+    state: absent
+    path: /etc/yum.repos.d
+
+- name: Restore backup repos
+  ansible.builtin.shell:
+    cmd: mv /etc/yum.repos.d.backup /etc/yum.repos.d
