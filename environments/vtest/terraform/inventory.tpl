@@ -29,7 +29,7 @@ ${cluster_name}_amdlg
 ${cluster_name}_intellg
 
 [${cluster_name}_amdlg]
-${cluster_name}-vtlg-[001:003]
+${cluster_name}-vtlg-001
 
 [${cluster_name}_intellg]
 ${cluster_name}-vtlg-[004:006]
@@ -48,7 +48,7 @@ ${cluster_name}-vtgpu-[001:004]
 
 # the A100-80:8 nodes
 [${cluster_name}_gpu3]
-${cluster_name}-vtgpu-[011:021]
+${cluster_name}-vtgpu-[011:018]
 
 # A100-40:4 nodes
 # [${cluster_name}_gpu5]

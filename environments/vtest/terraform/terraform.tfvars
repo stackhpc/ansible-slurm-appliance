@@ -1,19 +1,19 @@
 compute_types = {
   gpu: {
     flavor: "slurm_test_gpu0"
-    image: "slurm_hpc_vs_base_r94_20240609"
+    image: "vslurmbasesrcimage95"
   }
   gpu3: {
     flavor: "slurm_test_gpu3"
-    image: "slurm_hpc_vs_base_r94_20240609"
+    image: "vslurmbasesrcimage95"
   }
   large: {
     flavor: "slurm_test_compute_lg"
-    image: "slurm_hpc_vs_base_r94_20240609"
+    image: "vslurmbasesrcimage95"
   }
   large_intel: {
     flavor: "slurm_test_compute_lg_intel"
-    image: "slurm_hpc_vs_base_r94_20240609"
+    image: "vslurmbasesrcimage95"
   }
 }
 # openhpc-ofed-RL9-240712-1425
@@ -31,13 +31,13 @@ compute_types = {
 # #############################################
 
 #---- login node info ----
-login_image = "slurm_hpc_vs_base_r94_20240609"
+login_image = "vslurmbasesrcimage95"
 login_flavor = "vermilion_slurm_login_c8m15"
 
 proxy_name = "vtadmin"
 
-# The `admin` node is like a login node, 
-# but access is limited for admin-type worlflows
+# The `admin` node is like a login node,
+# but access is limited for admin-type worlflows`
 
 login_names = {
   vtlogin-1: "vermilion_slurm_login_c8m15"
@@ -50,9 +50,8 @@ login_ips = {
 }
 
 #---- CONTROL node info ----
+control_image = "vslurmbasesrcimage95"
 
-control_image = "slurm_hpc_vs_base_r94_20240609"
-#control_image = "openhpc-ofed-RL9-240712-1425"
 control_ip = "10.60.105.70"
 control_flavor = "vermilion_util_c8m15"
 

@@ -1,8 +1,8 @@
 compute_names = {
 
   vtlg-001: "large"
-  vtlg-002: "large"
-  vtlg-003: "large"
+
+
   vtlg-004: "large_intel"
   vtlg-005: "large_intel"
   vtlg-006: "large_intel"
@@ -20,7 +20,5 @@ compute_names = {
   vtgpu-016: "gpu3"
   vtgpu-017: "gpu3"
   vtgpu-018: "gpu3"
-  vtgpu-019: "gpu3"
-  vtgpu-020: "gpu3"
-  vtgpu-021: "gpu3"
+
 }
