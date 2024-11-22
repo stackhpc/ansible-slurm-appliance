@@ -23,6 +23,16 @@ roles:
     type: git
     version: main
 
+  - name: vs.core.stack_user
+    src: git+git@github.nrel.gov:acoinf/vs.core.stack_user.git
+    type: git
+    version: main
+
+  - name: vshpc.rocky_user
+    src: git+git@github.nrel.gov:acoinf/vshpc.rocky_user.git
+    type: git
+    version: main
+
   # - name: vs.core.vastmount
   #   src: git+git@github.nrel.gov:acoinf/vs.core.vastmount.git
   #   type: git
