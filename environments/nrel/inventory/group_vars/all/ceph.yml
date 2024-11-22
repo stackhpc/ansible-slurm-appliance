@@ -18,40 +18,45 @@
 #     access_key: AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA==
 
 # The aco.core.cephfs way:
-#ACO_CEPH_MOUNT_DATA:
-#  - NAME: "home"
-#    STORAGE_SERVER: "softiron"
-#    CEPH_ID: "nrel"
-#    SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/12aa91d9-5297-4c1d-a8f2-e1dde1f3e3dd"
-#    PATH: "/home"
-#    FSTYPE: "ceph"
-#    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
-#    CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
-#
-#  - NAME: "nopt"
-#    STORAGE_SERVER: "softiron"
-#    CEPH_ID: "nrel"
-#    SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/15071be0-2c8f-46be-ae0f-d2ecc0c89430"
-#    PATH: "/nopt"
-#    FSTYPE: "ceph"
-#    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
-#    CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
-#
-#  - NAME: "projects"
-#    STORAGE_SERVER: "softiron"
-#    CEPH_ID: "nrel"
-#    SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/572f375c-7b29-486f-8e12-aecbd3b4cfb4"
-#    PATH: "/projects"
-#    FSTYPE: "ceph"
-#    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
-#    CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
-#
-#  - NAME: "scratch"
-#    STORAGE_SERVER: "softiron"
-#    CEPH_ID: "nrel"
-#    SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/efea823b-b78a-46bb-9e37-6e4f10e59462"
-#    PATH: "/scratch"
-#    FSTYPE: "ceph"
-#    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
-#    CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
+ACO_CEPH_MOUNT_DATA:
+  - NAME: "home"
+    STORAGE_SERVER: "lagos"
+    DESCRIPTION: "vermilion home share"
+    CEPH_ID: "acoRWaccess"
+    SRC: "{{LAGOS_SERVER_SOURCES}}:/volumes/_nogroup/18ac1155-3bce-4513-9fb4-562ae4658533/7ac54344-7524-4f4b-8711-99de6811ca38"
+    PATH: "/home"
+    FSTYPE: "ceph"
+    OPTS: _netdev,noatime
+    CEPH_SECRET: "AQDXDHJmbvhdBxAA3FsdiDsBZbbn6bu/ilospQ=="
 
+  - NAME: "nopt"
+    STORAGE_SERVER: "lagos"
+    DESCRIPTION: "vermilion nopt"
+    CEPH_ID: "acoRWaccess"
+    SRC: "{{LAGOS_SERVER_SOURCES}}:/volumes/_nogroup/bf48bcf7-fce5-453a-93dc-6b09395206fc/6aeec053-4a85-418d-a86f-bb8a22ce6c55"
+    PATH: "/nopt"
+    FSTYPE: "ceph"
+    OPTS: _netdev,noatime
+    CEPH_SECRET: "AQDXDHJmbvhdBxAA3FsdiDsBZbbn6bu/ilospQ=="
+
+  - NAME: "projects"
+    STORAGE_SERVER: "lagos"
+    DESCRIPTION: "vermilion projects"
+    CEPH_ID: "acoRWaccess"
+    SRC: "{{LAGOS_SERVER_SOURCES}}:/volumes/_nogroup/f749037f-f23d-4783-baee-cba36ba49dce/fb8c0a13-40fe-4a8b-8f7c-9c80b97f5e10"
+    PATH: "/projects"
+    FSTYPE: "ceph"
+    OPTS: _netdev,noatime
+    CEPH_SECRET: "AQDXDHJmbvhdBxAA3FsdiDsBZbbn6bu/ilospQ=="
+
+
+  - NAME: "scratch"
+    STORAGE_SERVER: "lagos"
+    CEPH_MOUNT_DESCRIPTION: " "
+    CEPH_ID: "acoRWaccess"
+    SRC: "{{LAGOS_SERVER_SOURCES}}:/volumes/_nogroup/fc24ae7f-f096-4bdd-b0ad-c304f5c69a04/48f0a383-5487-4801-9423-49710aad4bee"
+    PATH: "/scratch"
+    FSTYPE: "ceph"
+    OPTS: _netdev,noatime
+    CEPH_SECRET: "AQDXDHJmbvhdBxAA3FsdiDsBZbbn6bu/ilospQ=="
+  
