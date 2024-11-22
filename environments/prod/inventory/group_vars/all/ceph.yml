@@ -17,42 +17,42 @@
 #     access_key: AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA==
 
 
-ACO_CEPH_MOUNT_DATA:
-  - NAME: "home"
-    STORAGE_SERVER: "softiron"
-    CEPH_ID: "nrel"
-    SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/12aa91d9-5297-4c1d-a8f2-e1dde1f3e3dd"
-    PATH: "/home"
-    FSTYPE: "ceph"
-    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
-    CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
+# ACO_CEPH_MOUNT_DATA:
+#   - NAME: "home"
+#     STORAGE_SERVER: "softiron"
+#     CEPH_ID: "nrel"
+#     SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/12aa91d9-5297-4c1d-a8f2-e1dde1f3e3dd"
+#     PATH: "/home"
+#     FSTYPE: "ceph"
+#     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
+#     CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
 
-  - NAME: "nopt"
-    STORAGE_SERVER: "softiron"
-    CEPH_ID: "nrel"
-    SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/15071be0-2c8f-46be-ae0f-d2ecc0c89430"
-    PATH: "/nopt"
-    FSTYPE: "ceph"
-    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
-    CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
+#   - NAME: "nopt"
+#     STORAGE_SERVER: "softiron"
+#     CEPH_ID: "nrel"
+#     SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/15071be0-2c8f-46be-ae0f-d2ecc0c89430"
+#     PATH: "/nopt"
+#     FSTYPE: "ceph"
+#     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
+#     CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
 
-  - NAME: "projects"
-    STORAGE_SERVER: "softiron"
-    CEPH_ID: "nrel"
-    SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/572f375c-7b29-486f-8e12-aecbd3b4cfb4"
-    PATH: "/projects"
-    FSTYPE: "ceph"
-    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
-    CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
+#   - NAME: "projects"
+#     STORAGE_SERVER: "softiron"
+#     CEPH_ID: "nrel"
+#     SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/572f375c-7b29-486f-8e12-aecbd3b4cfb4"
+#     PATH: "/projects"
+#     FSTYPE: "ceph"
+#     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
+#     CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
 
-  - NAME: "scratch"
-    STORAGE_SERVER: "softiron"
-    CEPH_ID: "nrel"
-    SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/efea823b-b78a-46bb-9e37-6e4f10e59462"
-    PATH: "/scratch"
-    FSTYPE: "ceph"
-    OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
-    CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
+#   - NAME: "scratch"
+#     STORAGE_SERVER: "softiron"
+#     CEPH_ID: "nrel"
+#     SRC: "{{SOFTIRON_SERVER_SOURCES}}:/volumes/_nogroup/efea823b-b78a-46bb-9e37-6e4f10e59462"
+#     PATH: "/scratch"
+#     FSTYPE: "ceph"
+#     OPTS: _netdev,noatime,name=nrel,secretfile=/etc/ceph/ceph.client.nrel.softiron.nopt.secret
+#     CEPH_SECRET: "AQB5BZlgG8YINxAAlMih++WzNJuD8405pAjWrA=="
 
 
 
