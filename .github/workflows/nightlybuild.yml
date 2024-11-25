@@ -27,7 +27,7 @@ jobs:
           - RL8
           - RL9
         build:
-          - openstack.rocky-latest
+          - openstack.rocky-latest-test
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -138,7 +138,7 @@ jobs:
           - RL8
           - RL9
         image:
-          - rocky-latest
+          - rocky-latest-test
         exclude:
           - target_cloud: LEAFCLOUD
     env:
