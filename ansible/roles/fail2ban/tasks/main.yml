@@ -1,7 +1,10 @@
 ---
 - name: Use dnf to set EPEL releasever during installation
   ansible.builtin.command:
-    cmd: "dnf install epel-release --setopt=releasever=9"
+    cmd: >
+      dnf install epel-release -y
+      --setopt=releasever={{ ansible_distribution_major_version }}
+  when: ansible_distribution_major_version in ["8", "9"]
 
 - name: Install fail2ban packages
   package:

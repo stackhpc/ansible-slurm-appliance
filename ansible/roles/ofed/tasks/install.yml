@@ -19,9 +19,12 @@
       {{ _ofed_dnf_kernels.stdout_lines[1:] | map('split') | map(attribute=1) | map('regex_replace', '\.(?:.(?!\.))+$', '') | community.general.version_sort | last }}
     # dnf line format e.g. "kernel.x86_64  4.18.0-513.18.1.el8_9   @baseos  "
 
-- name: Enable epel
+- name: Use dnf to set EPEL releasever during installation
   ansible.builtin.command:
-    cmd: "dnf install epel-release --setopt=releasever=9"
+    cmd: >
+      dnf install epel-release -y
+      --setopt=releasever={{ ansible_distribution_major_version }}
+  when: ansible_distribution_major_version in ["8", "9"]
 
 - name: Check for existing OFED installation
   command: ofed_info
