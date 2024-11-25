@@ -1,21 +1,21 @@
 ---
 
-- hosts: all
-  become: yes
-  tasks:
-    - name: Override /etc/dnf/vars/releasever with "9.4"
-      ansible.builtin.lineinfile:
-        path: /etc/dnf/vars/releasever
-        line: "9.4"
-        create: yes
-        owner: root
-        group: root
-        mode: '0644'
-      when: ansible_distribution_major_version == "9"
+# - hosts: all
+#   become: yes
+#   tasks:
+#     - name: Override /etc/dnf/vars/releasever with "9.4"
+#       ansible.builtin.lineinfile:
+#         path: /etc/dnf/vars/releasever
+#         line: "9"
+#         create: yes
+#         owner: root
+#         group: root
+#         mode: '0644'
+#       when: ansible_distribution_major_version == "9"
 
-    - name: Clean DNF metadata
-      ansible.builtin.command:
-        cmd: dnf clean all
+#     - name: Clean DNF metadata
+#       ansible.builtin.command:
+#         cmd: dnf clean all
 
 - hosts: cluster
   gather_facts: false
