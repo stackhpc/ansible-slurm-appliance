@@ -88,7 +88,6 @@ jobs:
           -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
-          -var "ark_password=${ARK_PASSWORD}" \
           openstack.pkr.hcl
         env:
           PKR_VAR_os_version: ${{ matrix.os_version }}

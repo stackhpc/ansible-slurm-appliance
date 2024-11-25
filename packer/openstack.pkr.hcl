@@ -167,11 +167,6 @@ variable "extra_build_image_name" {
   default = "extra"
 }
 
-variable "ark_password" {
-  type = string
-  default = "none"
-}
-
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
@@ -233,7 +228,6 @@ build {
       "-i", "${var.repo_root}/packer/ansible-inventory.sh",
       "-vv",
       "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
-      "-e", "_github_secrets_ark_password=${var.ark_password}",
       ]
   }
 

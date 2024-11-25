@@ -5,4 +5,4 @@ release_train_url_suffix: "x86_64/os/{{ release_train_timestamp }}/"
 release_train_timestamp: 20240816T002610
 release_train_auth: |
   username = slurm-app-ci
-  password = {{ _github_secrets_ark_password }}
+  password = {{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}
