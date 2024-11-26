@@ -124,7 +124,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible all -m wait_for_connection
-          ansible-playbook -v ansible/site.yml
+          ansible-playbook -vvv ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Run MPI-based tests
