@@ -2,16 +2,16 @@
 
 - name: Ensure directories exist
   file: 
-    path: "/etc/ansible-init/{{ item.directory }}"
+    path: "/etc/ansible-init/{{ item }}"
     state: directory
     owner: root
     group: root
     mode: 0755
   loop:
-    - { directory: "templates" }
-    - { directory: "files" }
-    - { directory: "library" }
-    - { directory: "filter_plugins" }
+    - templates
+    - files
+    - library
+    - filter_plugins
 
 - name: Inject templates
   copy:
@@ -35,7 +35,7 @@
   loop:
     - ../../resolv_conf/files/NetworkManager-dns-none.conf
 
-- name: Inject files
+- name: Inject libraries
   copy:
     src: '{{ item }}'
     dest: '/etc/ansible-init/library/{{ item | basename }}'
