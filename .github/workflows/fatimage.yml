@@ -33,10 +33,10 @@ jobs:
       SOURCE_IMAGES_MAP: |
         {
           "RL8": {
-            "openstack.openhpc": "rocky-latest-test-RL8"
+            "openstack.openhpc": "rocky-latest-RL8"
           },
           "RL9": {
-            "openstack.openhpc": "rocky-latest-test-RL9"
+            "openstack.openhpc": "rocky-latest-RL9"
           }
         }
 
