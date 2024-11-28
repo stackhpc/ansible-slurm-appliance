@@ -25,7 +25,7 @@ roles:
 
 collections:
   - name: containers.podman
-    version: 1.10.2
+    version: 1.16.2
   - name: community.grafana
     version: 1.5.4
   - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools

@@ -127,6 +127,7 @@ variable "volume_size" {
   default = {
     # fat image builds, GB:
     rocky-latest = 15
+    rocky-latest-test = 15
     openhpc = 15
   }
 }
@@ -152,6 +153,7 @@ variable "groups" {
   default = {
     # fat image builds:
     rocky-latest = ["update"]
+    rocky-latest-test = ["update"]
     openhpc = ["control", "compute", "login"]
   }
 }
@@ -203,6 +205,12 @@ build {
   # latest nightly image:
   source "source.openstack.openhpc" {
     name = "rocky-latest"
+    image_name = "${source.name}-${var.os_version}"
+  }
+
+  # latest nightly image test:
+  source "source.openstack.openhpc" {
+    name = "rocky-latest-test"
     image_name = "${source.name}-${var.os_version}"
   }
 
