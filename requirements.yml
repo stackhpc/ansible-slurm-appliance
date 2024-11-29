@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v23.12.1 # Tolerate state nfs file handles
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.26.0 # https://github.com/stackhpc/ansible-role-openhpc/pull/168
+    version: feat/native-slurm-conf
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
@@ -36,7 +36,7 @@ collections:
   - name: ansible.netcommon
     version: 5.1.1
   - name: community.general
-    version: 7.1.0
+    version: 10.0.1
   - name: community.crypto
     version: 2.10.0
   - name: community.mysql

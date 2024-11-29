@@ -18,18 +18,6 @@
         that: groups['control'] | length
         fail_msg: "no hosts found in group 'control' - has control node been deployed?"
 
-- name: Validate openhpc configuration
-  hosts: openhpc
-  gather_facts: false
-  tags: openhpc
-  tasks:
-    - assert:
-        that: "'enable_configless' in openhpc_config.SlurmctldParameters | default([])"
-        fail_msg: |
-          'enable_configless' not found in openhpc_config.SlurmctldParameters - is variable openhpc_config overridden?
-          Additional slurm.conf parameters should be provided using variable openhpc_config_extra.
-        success_msg: Checked Slurm will be configured for configless operation
-
 - name: Validate filebeat configuration
   hosts: filebeat
   gather_facts: false

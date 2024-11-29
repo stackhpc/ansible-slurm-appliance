@@ -1,3 +1,5 @@
-openhpc_config_extra:
-  SlurmctldDebug: debug
-  SlurmdDebug: debug
+openhpc_slurm_conf_overrides: |
+  TaskPlugin=task/cgroup,task/affinity
+  AccountingStorageType=accounting_storage/slurmdbd
+  SlurmctldDebug=debug
+  SlurmdDebug=debug
