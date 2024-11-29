@@ -1,8 +1,0 @@
-release_train_url_prefix: https://ark.stackhpc.com/pulp/content/rocky/9.4
-release_train_url_suffix: "x86_64/os/{{ release_train_timestamp }}/"
-# most stable from https://github.com/stackhpc/stackhpc-kayobe-config/blob/stackhpc/2024.1/etc/kayobe/pulp-repo-versions.yml
-# note that some timestamps can't be used because not all repos have snapshots for them
-release_train_timestamp: 20240816T002610
-release_train_auth: |
-  username = slurm-app-ci
-  password = {{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}

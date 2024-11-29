@@ -64,5 +64,5 @@ roles/*
 !roles/k9s/**
 !roles/lustre/
 !roles/lustre/**
-!roles/release_train/
-!roles/release_train/**
+!roles/dnf_repos/
+!roles/dnf_repos/**

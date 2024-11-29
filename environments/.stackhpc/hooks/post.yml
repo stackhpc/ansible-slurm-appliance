@@ -16,8 +16,8 @@
 - hosts: builder
   become: yes
   tasks:
-    - name: Revert ark repos
+    - name: Disable ark repos
       ansible.builtin.include_role:
-        name: release_train
-        tasks_from: revert_repos.yml
+        name: dnf_repos
+        tasks_from: disable_repos.yml
       when: ansible_distribution_major_version == "9" #TODO update role once RL8 config decided

@@ -1,8 +1,5 @@
 # https://osc.github.io/ood-documentation/latest/authentication/pam.html
 ---
-- name: Install Apache PAM module
-  yum:
-    name: mod_authnz_pam
 
 - name: Enable Apache PAM module
   lineinfile:

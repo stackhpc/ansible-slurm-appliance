@@ -1,0 +1,18 @@
+---
+- name: Disable Pulp repos and remove creds
+  ansible.builtin.yum_repository:
+    file: "{{ item.file }}"
+    name: "{{ item.name }}"
+    baseurl: "{{ item.base_url }}"
+    description: "{{ item.name }}"
+    enabled: false
+  loop: "{{ dnf_repos_repolist }}"
+
+- name: Disable EPEL repo and remove creds
+  ansible.builtin.yum_repository:
+    name: epel
+    file: epel
+    description: epel
+    baseurl: "{{ dnf_repos_epel_baseurl }}"
+    gpgcheck: false
+    enabled: false

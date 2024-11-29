@@ -27,6 +27,7 @@
   tasks:
     - import_role:
         name: stackhpc.openhpc
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Set locked memory limits on user-facing nodes
   hosts:

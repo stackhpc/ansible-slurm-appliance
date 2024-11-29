@@ -23,6 +23,6 @@
   tasks:
     - name: Replace system repos with ark
       ansible.builtin.include_role:
-        name: release_train
+        name: dnf_repos
         tasks_from: set_repos.yml
       when: ansible_distribution_major_version == "9" #TODO update role once RL8 config decided

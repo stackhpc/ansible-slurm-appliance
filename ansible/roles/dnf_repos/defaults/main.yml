@@ -1,0 +1,24 @@
+dnf_repos_rocky_ark_prefix: https://ark.stackhpc.com/pulp/content/{{ ansible_distribution | lower }}/9.4
+dnf_repos_rocky_ark_suffix: "{{ ansible_architecture }}/os/{{ dnf_repos_ark_timestamp }}/"
+# most stable from https://github.com/stackhpc/stackhpc-kayobe-config/blob/stackhpc/2024.1/etc/kayobe/pulp-repo-versions.yml
+# note that some timestamps can't be used because not all repos have snapshots for them
+dnf_repos_ark_timestamp: 20240816T002610
+dnf_repos_username: slurm-app-ci
+dnf_repos_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}"
+
+# epel installed separately
+dnf_repos_repolist:
+- file: rocky
+  name: baseos
+  base_url: "{{ dnf_repos_rocky_ark_prefix }}/BaseOS/{{ dnf_repos_rocky_ark_suffix }}"
+- file: rocky
+  name: appstream
+  base_url: "{{ dnf_repos_rocky_ark_prefix }}/AppStream/{{ dnf_repos_rocky_ark_suffix }}"
+- file: rocky
+  name: crb
+  base_url: "{{ dnf_repos_rocky_ark_prefix }}/AppStream/{{ dnf_repos_rocky_ark_suffix }}"
+- file: rocky-extras
+  name: extras
+  base_url: "{{ dnf_repos_rocky_ark_prefix }}/extras/{{ dnf_repos_rocky_ark_suffix }}"
+
+dnf_repos_epel_baseurl: https://ark.stackhpc.com/pulp/content/epel/9/Everything/x86_64/20240902T080424

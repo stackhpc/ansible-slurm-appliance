@@ -38,3 +38,13 @@ openhpc_config_default:
 openhpc_config_extra: {}
 openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_extra, list_merge='append') }}"
 openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if appliances_state_dir is defined else '/var/spool' }}"
+
+ohpc_default_extra_repos:
+  "9": [] #overriding to ensure doesn't overwrite ark epel repo
+  "8":
+    - name: epel
+      file: epel
+      description: "Extra Packages for Enterprise Linux 8 - $basearch"
+      metalink: "https://mirrors.fedoraproject.org/metalink?repo=epel-8&arch=$basearch&infra=$infra&content=$contentdir"
+      gpgcheck: true
+      gpgkey: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8"
