@@ -25,7 +25,7 @@
   tags:
     - openhpc
   tasks:
-    - import_role:
+    - include_role:
         name: stackhpc.openhpc
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
