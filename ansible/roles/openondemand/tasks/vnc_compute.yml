@@ -48,6 +48,7 @@
   tags: install
   yum:
     name: '@Xfce'
+  when: appliances_mode != 'configure' # dnf group/module installs aren't idempotent so only run during build
   
 # - name: Ensure python3.9 installed
 #   dnf:

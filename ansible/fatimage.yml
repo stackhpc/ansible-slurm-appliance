@@ -69,10 +69,6 @@
         tasks_from: install.yml
       when: "'openhpc' in group_names"
 
-    - name: Install Apache PAM module # Extracted from start of roles/openondemand/tasks/pam_auth.yml to ensure only installed during build
-      yum:
-        name: mod_authnz_pam
-
     # - import_playbook: portal.yml
     - name: Open Ondemand server (packages)
       include_role:
@@ -101,6 +97,10 @@
         name: openondemand
         tasks_from: jupyter_compute.yml
       when: "'openondemand_jupyter' in group_names"
+
+    - name: Install Apache PAM module # Extracted from start of roles/openondemand/tasks/pam_auth.yml to ensure only installed during build
+      yum:
+        name: mod_authnz_pam
 
     # - import_playbook: monitoring.yml:
     - import_role:

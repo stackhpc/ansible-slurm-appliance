@@ -16,7 +16,7 @@ dnf_repos_repolist:
   base_url: "{{ dnf_repos_rocky_ark_prefix }}/AppStream/{{ dnf_repos_rocky_ark_suffix }}"
 - file: rocky
   name: crb
-  base_url: "{{ dnf_repos_rocky_ark_prefix }}/AppStream/{{ dnf_repos_rocky_ark_suffix }}"
+  base_url: "{{ dnf_repos_rocky_ark_prefix }}/CRB/{{ dnf_repos_rocky_ark_suffix }}"
 - file: rocky-extras
   name: extras
   base_url: "{{ dnf_repos_rocky_ark_prefix }}/extras/{{ dnf_repos_rocky_ark_suffix }}"

@@ -1,5 +1,8 @@
 # https://osc.github.io/ood-documentation/latest/authentication/pam.html
 ---
+- name: Install Apache PAM module # Extracted from start of roles/openondemand/tasks/pam_auth.yml to ensure only installed during build
+  yum:
+    name: mod_authnz_pam
 
 - name: Enable Apache PAM module
   lineinfile:
