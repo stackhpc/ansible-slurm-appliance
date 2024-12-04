@@ -39,6 +39,7 @@ jobs:
             "openstack.openhpc": "rocky-latest-RL9"
           }
         }
+      ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2

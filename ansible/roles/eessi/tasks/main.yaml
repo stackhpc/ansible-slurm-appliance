@@ -10,6 +10,7 @@
 - name: Add CVMFS repo
   dnf:
     name: https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
+    disable_gpg_check: true
 
 - name: Install CVMFS
   dnf:

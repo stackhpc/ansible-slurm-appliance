@@ -64,3 +64,5 @@ roles/*
 !roles/k9s/**
 !roles/lustre/
 !roles/lustre/**
+!roles/dnf_repos/
+!roles/dnf_repos/**
