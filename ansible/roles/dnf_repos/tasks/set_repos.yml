@@ -11,6 +11,7 @@
   loop: "{{ dnf_repos_repolist }}"
 
 - name: Install epel-release
+  # done so that roles installing epel via epel-release don't over-write our changes to the epel repo
   ansible.builtin.dnf:
     name: epel-release
 
