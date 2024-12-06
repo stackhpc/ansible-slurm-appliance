@@ -1,0 +1,73 @@
+---
+
+- name: Wait for Pulp server
+  pulp.squeezer.status:
+    pulp_url: "{{ pulp_site_url }}"
+    username: "{{ pulp_site_username }}"
+    password: "{{ pulp_site_password }}"
+  register: _pulp_status
+  until: _pulp_status.failed == false
+  retries: 30
+  delay: 20
+
+- name: Ensure Pulp CLI config directory exists
+  ansible.builtin.file:
+    path: ~/.config/pulp
+    state: directory
+
+- name: Create config file
+  no_log: true
+  ansible.builtin.template:
+    src: cli.toml.j2
+    dest: ~/.config/pulp/cli.toml
+    mode: '0644'
+
+- block:
+  - name: Ensure squeezer cache exists
+    ansible.builtin.file:
+      path: "{{ _cache_dir }}"
+      state: directory
+
+  - name: Check if squeezer cache is populated
+    ansible.builtin.stat:
+      path: "{{ _cache_dir }}/api.json"
+    register: _cache_stat
+
+  - name: Prepopulate squeezer cache # workaround for race on the cache
+    ansible.builtin.get_url:
+      url: "{{ pulp_site_url }}/pulp/api/v3/docs/api.json"
+      dest: "{{ _cache_dir }}/api.json"
+      timeout: 40
+    when: not _cache_stat.stat.exists
+  vars:
+    _cache_dir: "~/.cache/squeezer/{{ pulp_site_url | regex_replace( ':|/' , '_' ) }}"
+
+- name: Get Pulp repos from release train
+  ansible.builtin.include_role:
+    name: stackhpc.pulp.pulp_repository
+    tasks_from: rpm.yml
+  vars:
+    pulp_url: "{{ pulp_site_url }}"
+    pulp_username: "{{ pulp_site_username }}"
+    pulp_password: "{{ pulp_site_password }}"
+    pulp_repository_rpm_repos: "{{ pulp_site_rpm_repos }}"
+
+- name: Create Pulp publications
+  ansible.builtin.include_role:
+    name: stackhpc.pulp.pulp_publication
+    tasks_from: rpm.yml
+  vars:
+    pulp_url: "{{ pulp_site_url }}"
+    pulp_username: "{{ pulp_site_username }}"
+    pulp_password: "{{ pulp_site_password }}"
+    pulp_publication_rpm: "{{ pulp_site_rpm_publications }}"
+
+- name: Create Pulp distributions
+  ansible.builtin.include_role:
+    name: stackhpc.pulp.pulp_distribution
+    tasks_from: rpm.yml
+  vars:
+    pulp_url: "{{ pulp_site_url }}"
+    pulp_username: "{{ pulp_site_username }}"
+    pulp_password: "{{ pulp_site_password }}"
+    pulp_distribution_rpm: "{{ pulp_site_rpm_distributions }}"

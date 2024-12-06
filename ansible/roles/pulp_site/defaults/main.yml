@@ -1,0 +1,75 @@
+pulp_site_url: "http://{{ appliances_pulp_url }}:{{ pulp_site_port }}"
+pulp_site_port: 8080
+pulp_site_username: admin # shouldn't be changed
+pulp_site_upstream_username: slurm-app-ci
+pulp_site_upstream_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}"
+pulp_site_password: "{{ vault_pulp_admin_password }}"
+pulp_site_validate_certs: false
+pulp_site_install_dir: '/home/rocky/pulp'
+pulp_site_selinux_suffix: "{{ ':Z' if ansible_selinux.status == 'enabled' else '' }}"
+
+pulp_site_rpm_repos:
+  - name: baseos
+    url: https://ark.stackhpc.com/pulp/content/rocky/9.4/BaseOS/x86_64/os/20240816T002610
+    remote_username: "{{ pulp_site_upstream_username }}"
+    remote_password: "{{ pulp_site_upstream_password }}"
+    policy: on_demand
+    state: present
+  - name: appstream
+    url: https://ark.stackhpc.com/pulp/content/rocky/9.4/AppStream/x86_64/os/20240816T002610
+    remote_username: "{{ pulp_site_upstream_username }}"
+    remote_password: "{{ pulp_site_upstream_password }}"
+    policy: on_demand
+    state: present
+  - name: crb
+    url: https://ark.stackhpc.com/pulp/content/rocky/9.4/CRB/x86_64/os/20240816T002610
+    remote_username: "{{ pulp_site_upstream_username }}"
+    remote_password: "{{ pulp_site_upstream_password }}"
+    policy: on_demand
+    state: present
+  - name: extras
+    url: https://ark.stackhpc.com/pulp/content/rocky/9.4/extras/x86_64/os/20240816T002610
+    remote_username: "{{ pulp_site_upstream_username }}"
+    remote_password: "{{ pulp_site_upstream_password }}"
+    policy: on_demand
+    state: present
+  - name: epel
+    url: https://ark.stackhpc.com/pulp/content/epel/9/Everything/x86_64/20240902T080424
+    remote_username: "{{ pulp_site_upstream_username }}"
+    remote_password: "{{ pulp_site_upstream_password }}"
+    policy: on_demand
+    state: present
+
+pulp_site_rpm_publications:
+- repository: baseos
+  state: present
+- repository: appstream
+  state: present
+- repository: crb
+  state: present
+- repository: extras
+  state: present
+- repository: epel
+  state: present
+
+pulp_site_rpm_distributions:
+- name: baseos
+  base_path: rocky/9.4/baseos
+  repository: baseos
+  state: present
+- name: appstream
+  base_path: rocky/9.4/appstream
+  repository: appstream
+  state: present
+- name: crb
+  base_path: rocky/9.4/crb
+  repository: crb
+  state: present
+- name: extras
+  base_path: rocky/9.4/extras
+  repository: extras
+  state: present
+- name: epel
+  base_path: epel/9
+  repository: epel
+  state: present

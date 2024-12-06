@@ -1,2 +1,2 @@
 #update_enable: false # Can uncomment for speed debugging non-update related build issues
-dnf_repos_pulp_url: http://192.168.10.157:8080
+dnf_repos_pulp_url: http://192.168.10.157

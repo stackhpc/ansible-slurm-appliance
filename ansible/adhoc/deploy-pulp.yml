@@ -1,0 +1,25 @@
+# Usage: ansible-playbook ansible/adhoc/deploy-pulp.yml -e "pulp_server=<pulp server hostname>"
+
+- name: Add temporary pulp server host
+  hosts: localhost
+  tasks:
+  - ansible.builtin.add_host:
+      name: "{{ pulp_server }}"
+      group: "_pulp_host"
+
+- name: Install pulp on server
+  become: yes
+  hosts: _pulp_host
+  tasks:
+  - ansible.builtin.import_role:
+      name: pulp_site
+      tasks_from: install.yml
+
+- name: Add pulp host to environment
+  hosts: localhost
+  tasks:
+  - ansible.builtin.copy:
+      dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/pulp_server.yml"
+      content: |
+        # ansible managed
+        appliances_pulp_server: "http://{{ pulp_server }}"
