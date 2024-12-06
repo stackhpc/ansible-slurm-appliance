@@ -22,4 +22,4 @@
       dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/pulp_server.yml"
       content: |
         # ansible managed
-        appliances_pulp_server: "http://{{ pulp_server }}"
+        appliances_pulp_url: "http://{{ pulp_server }}"
