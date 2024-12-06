@@ -1,4 +1,4 @@
-pulp_site_url: "http://{{ appliances_pulp_url }}:{{ pulp_site_port }}"
+pulp_site_url: "http://{{ appliances_pulp_url }}"
 pulp_site_port: 8080
 pulp_site_username: admin # shouldn't be changed
 pulp_site_upstream_username: slurm-app-ci
