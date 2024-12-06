@@ -7,19 +7,31 @@
       name: "{{ pulp_server }}"
       group: "_pulp_host"
 
-- name: Install pulp on server
+- name: Install pulp on server and add to config
   become: yes
   hosts: _pulp_host
   tasks:
-  - ansible.builtin.import_role:
+
+  - name: Install pulp
+    ansible.builtin.include_role:
       name: pulp_site
       tasks_from: install.yml
+      public: true
 
-- name: Add pulp host to environment
-  hosts: localhost
-  tasks:
-  - ansible.builtin.copy:
+  - name: Add pulp host to environment
+    become: no
+    delegate_to: localhost
+    ansible.builtin.copy:
       dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/pulp_server.yml"
       content: |
         # ansible managed
-        appliances_pulp_url: "http://{{ pulp_server }}"
+        appliances_pulp_url: "http://{{ pulp_server }}:{{ pulp_site_port }}"
+
+# - name: Add pulp host to environment
+#   hosts: localhost
+#   tasks:
+#   - ansible.builtin.copy:
+#       dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/pulp_server.yml"
+#       content: |
+#         # ansible managed
+#         appliances_pulp_url: "http://{{ pulp_server }}:{{ pulp_site_port }}"
