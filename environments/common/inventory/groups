@@ -144,3 +144,7 @@ freeipa_client
 
 [lustre]
 # Hosts to run lustre client
+
+[dnf_repos:children]
+# Hosts to replace system repos with Pulp repos
+cluster
