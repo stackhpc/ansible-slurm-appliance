@@ -23,6 +23,7 @@ data "git-commit" "cwd-head" { }
 locals {
     git_commit = data.git-commit.cwd-head.hash
     timestamp = formatdate("YYMMDD-hhmm", timestamp())
+    image_name_version = var.image_name_version == "auto" ? "-${local.timestamp}-${substr(local.git_commit, 0, 8)}" : var.image_name_version
 }
 
 # Path pointing to root of repository - automatically set by environment variable PKR_VAR_repo_root
@@ -37,12 +38,6 @@ variable "environment_root" {
 
 variable "networks" {
   type = list(string)
-}
-
-variable "os_version" {
-  type = string
-  description = "'RL8' or 'RL9' with default source_image_* mappings"
-  default = "RL9"
 }
 
 # Must supply either source_image_name or source_image_id
@@ -123,15 +118,6 @@ variable "volume_type" {
 }
 
 variable "volume_size" {
-  type = map(number)
-  default = {
-    # fat image builds, GB:
-    rocky-latest = 15
-    openhpc = 15
-  }
-}
-
-variable "extra_build_volume_size" {
   type = number
   default = 15
 }
@@ -147,24 +133,23 @@ variable "metadata" {
 }
 
 variable "groups" {
-  type = map(list(string))
-  description = "Additional inventory groups (other than 'builder') to add build VM to, keyed by source name"
-  default = {
-    # fat image builds:
-    rocky-latest = ["update"]
-    openhpc = ["control", "compute", "login"]
-  }
-}
-
-variable "extra_build_groups" {
-  type = list(string)
-  default = []
-}
-
-variable "extra_build_image_name" {
   type = string
-  description = "Infix for 'extra' build image name"
-  default = "extra"
+  description = "Comma-separated list of additional inventory groups (other than 'builder') to add build VM to"
+  default = "" # this is 
+  # rocky-latest = ["update"]
+  # openhpc = ["control", "compute", "login"]
+}
+
+variable "image_name" {
+  type = string
+  description = "Name of image"
+  default = "openhpc"
+}
+
+variable "image_name_version" {
+  type = string
+  description = "Suffix for image name giving version. Default of 'auto' appends timestamp + short commit"
+  default = "auto"
 }
 
 source "openstack" "openhpc" {
@@ -172,9 +157,11 @@ source "openstack" "openhpc" {
   flavor = var.flavor
   use_blockstorage_volume = var.use_blockstorage_volume
   volume_type = var.volume_type
-  volume_size = lookup(var.volume_size, source.name, var.extra_build_volume_size)
+  volume_size = var.volume_size
   metadata = var.metadata
-  instance_metadata = {ansible_init_disable = "true"}
+  instance_metadata = {
+    ansible_init_disable = "true"
+  }
   networks = var.networks
   floating_ip_network = var.floating_ip_network
   security_groups = var.security_groups
@@ -201,26 +188,25 @@ source "openstack" "openhpc" {
 build {
 
   # latest nightly image:
-  source "source.openstack.openhpc" {
-    name = "rocky-latest"
-    image_name = "${source.name}-${var.os_version}"
-  }
+  # source "source.openstack.openhpc" {
+  #   name = "rocky-latest"
+  #   image_name = "${source.name}-${var.os_version}"
+  # }
 
   # fat image:
   source "source.openstack.openhpc" {
-    name = "openhpc"
-    image_name = "${source.name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
+    image_name = "${var.image_name}${local.image_name_version}"
   }
 
-  # Extended site-specific image, built on fat image:
-  source "source.openstack.openhpc" {
-    name = "openhpc-extra"
-    image_name = "openhpc-${var.extra_build_image_name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
-  }
+  # # Extended site-specific image, built on fat image:
+  # source "source.openstack.openhpc" {
+  #   name = "openhpc-extra"
+  #   image_name = "openhpc-${var.extra_build_image_name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
+  # }
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
-    groups = concat(["builder"], lookup(var.groups, source.name, var.extra_build_groups))
+    groups = concat(["builder"], split(",", var.groups))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     extra_arguments = [
