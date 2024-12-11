@@ -28,7 +28,7 @@ jobs:
   openstack:
     name: openstack-docabuild
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.label }} # to branch/PR + OS
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
@@ -122,7 +122,7 @@ jobs:
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: image-details-${{ matrix.build.label }}
+          name: image-details-${{ matrix.build.image_name }}
           path: |
             ./image-id.txt
             ./image-name.txt

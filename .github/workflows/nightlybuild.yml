@@ -17,7 +17,7 @@ jobs:
   openstack:
     name: openstack-imagebuild
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.label }} # to branch/PR + OS
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
@@ -130,15 +130,14 @@ jobs:
           - SMS
           - ARCUS
         build:
-          - label: RL8
-          - label: RL9
+          - image_name: rocky-latest-RL8
+          - image_name: rocky-latest-RL9
         exclude:
           - target_cloud: LEAFCLOUD
     env:
       OS_CLOUD: openstack
       SOURCE_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       TARGET_CLOUD: ${{ matrix.target_cloud }}
-      IMAGE_NAME: "rocky-latest-${{ matrix.build.label }}"
     steps:
       - uses: actions/checkout@v2
 
@@ -153,42 +152,37 @@ jobs:
           . venv/bin/activate
           pip install -U pip
           pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
-        shell: bash
 
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.SOURCE_CLOUD)] }}" > ~/.config/openstack/source_clouds.yaml
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.TARGET_CLOUD)] }}" > ~/.config/openstack/target_clouds.yaml
-        shell: bash
 
       - name: Download source image
         run: |
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/source_clouds.yaml
-          openstack image save --file ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}
-        shell: bash
+          openstack image save --file ${{ matrix.build.image_name }} ${{ matrix.build.image_name }}
 
       - name: Upload to target cloud
         run: |
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
 
-          openstack image create "${{ env.IMAGE_NAME }}" \
-            --file "${{ env.IMAGE_NAME }}" \
+          openstack image create "${{ matrix.build.image_name }}" \
+            --file "${{ matrix.build.image_name }}" \
             --disk-format qcow2 \
-        shell: bash
 
       - name: Delete old latest image from target cloud
         run: |
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
 
-          IMAGE_COUNT=$(openstack image list --name ${{ env.IMAGE_NAME }} -f value -c ID | wc -l)
+          IMAGE_COUNT=$(openstack image list --name ${{ matrix.build.image_name }} -f value -c ID | wc -l)
           if [ "$IMAGE_COUNT" -gt 1 ]; then
-            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ env.IMAGE_NAME }}"  -f value -c ID | head -n 1)
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ matrix.build.image_name }}"  -f value -c ID | head -n 1)
             openstack image delete "$OLD_IMAGE_ID"
           else
             echo "Only one image exists, skipping deletion."
           fi
-        shell: bash
