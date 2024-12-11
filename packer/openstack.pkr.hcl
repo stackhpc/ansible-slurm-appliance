@@ -136,8 +136,6 @@ variable "inventory_groups" {
   type = string
   description = "Comma-separated list of additional inventory groups (other than 'builder') to add build VM to. Default is none."
   default = ""
-  # rocky-latest = ["update"] # TODO: fix this in workflow
-  # openhpc = ["control", "compute", "login"]
 }
 
 variable "image_name" {

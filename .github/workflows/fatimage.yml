@@ -15,30 +15,21 @@ jobs:
   openstack:
     name: openstack-imagebuild
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.label }} # to branch/PR + OS
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
-        os_version:
-          - RL8
-          - RL9
         build:
-          - openstack.openhpc
+          - label: RL8
+            source_image_name: rocky-latest-RL8
+          - label: RL9
+            source_image_name: rocky-latest-RL9
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
-      SOURCE_IMAGES_MAP: |
-        {
-          "RL8": {
-            "openstack.openhpc": "rocky-latest-RL8"
-          },
-          "RL9": {
-            "openstack.openhpc": "rocky-latest-RL9"
-          }
-        }
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
 
     steps:
@@ -85,13 +76,11 @@ jobs:
 
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
+          -var "source_image_name=${{ matrix.build.source_image_name }}" \
+          -var "image_name=openhpc-${{ matrix.build.label }}" \
+          -var "inventory_groups=control,compute,login" \
           openstack.pkr.hcl
-        env:
-          PKR_VAR_os_version: ${{ matrix.os_version }}
-          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version][matrix.build] }}
 
       - name: Get created image names from manifest
         id: manifest
@@ -108,7 +97,7 @@ jobs:
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: image-details-${{ matrix.build }}-${{ matrix.os_version }}
+          name: image-details-${{ matrix.build.label }}
           path: |
             ./image-id.txt
             ./image-name.txt
