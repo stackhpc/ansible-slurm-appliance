@@ -36,10 +36,10 @@ jobs:
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-doca-RL8
-            source_image_name: openhpc-RL8 # TODO: needs to be injected from environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+            source_image_name_key: RL8 # key into environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
             inventory_groups: doca
           - image_name: openhpc-doca-RL9
-            source_image_name: openhpc-RL9 # TODO: as above
+            source_image_name_key: RL9
             inventory_groups: doca
     env:
       ANSIBLE_FORCE_COLOR: True
@@ -102,7 +102,7 @@ jobs:
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ matrix.build.source_image_name }}" \
+          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           openstack.pkr.hcl
