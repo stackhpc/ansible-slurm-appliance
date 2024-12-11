@@ -92,7 +92,7 @@ jobs:
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=openhpc-doca" \
-          -var "groups=doca" \
+          -var "inventory_groups=doca" \
           openstack.pkr.hcl
         
       - name: Get created image names from manifest

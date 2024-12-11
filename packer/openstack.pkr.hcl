@@ -132,11 +132,11 @@ variable "metadata" {
   default = {}
 }
 
-variable "groups" {
+variable "inventory_groups" {
   type = string
-  description = "Comma-separated list of additional inventory groups (other than 'builder') to add build VM to"
-  default = "" # this is 
-  # rocky-latest = ["update"]
+  description = "Comma-separated list of additional inventory groups (other than 'builder') to add build VM to. Default is none."
+  default = ""
+  # rocky-latest = ["update"] # TODO: fix this in workflow
   # openhpc = ["control", "compute", "login"]
 }
 
@@ -206,7 +206,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
-    groups = concat(["builder"], split(",", var.groups))
+    groups = concat(["builder"], var.inventory_groups == "" ? [] : split(",", var.inventory_groups))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     extra_arguments = [
