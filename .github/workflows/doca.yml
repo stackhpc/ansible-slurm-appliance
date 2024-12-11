@@ -50,9 +50,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Record settings for CI cloud
+      - name: Load current fat images into GITHUB_ENV
+        # see https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#example-of-a-multiline-string
+        run: |
+          {
+            echo 'FAT_IMAGES<<EOF'
+            cat cat environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+            echo EOF
+          } >> "$GITHUB_ENV"
+
+      - name: Record settings
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo FAT_IMAGES: ${FAT_IMAGES}
 
       - name: Setup ssh
         run: |
