@@ -22,10 +22,12 @@ jobs:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
-          - label: RL8
+          - image_name: openhpc-RL8
             source_image_name: rocky-latest-RL8
-          - label: RL9
+            inventory_groups: control,compute,login
+          - image_name: openhpc-RL9
             source_image_name: rocky-latest-RL9
+            inventory_groups: control,compute,login
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -78,8 +80,8 @@ jobs:
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
-          -var "image_name=openhpc-${{ matrix.build.label }}" \
-          -var "inventory_groups=control,compute,login" \
+          -var "image_name=${{ matrix.build.image_name }}" \
+          -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           openstack.pkr.hcl
 
       - name: Get created image names from manifest
@@ -97,7 +99,7 @@ jobs:
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: image-details-${{ matrix.build.label }}
+          name: image-details-${{ matrix.build.image_name }}
           path: |
             ./image-id.txt
             ./image-name.txt

@@ -24,10 +24,12 @@ jobs:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
-          - label: RL8
+          - image_name: rocky-latest-RL8
             source_image_name: Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2
-          - label: RL9
+            inventory_groups: update
+          - image_name: rocky-latest-RL9
             source_image_name: Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+            inventory_groups: update
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -80,8 +82,8 @@ jobs:
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
-          -var "image_name=rocky-latest-${{ matrix.build.label }}" \
-          -var "inventory_groups=update" \
+          -var "image_name=${{ matrix.build.image_name }}" \
+          -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           openstack.pkr.hcl
 
       - name: Get created image names from manifest

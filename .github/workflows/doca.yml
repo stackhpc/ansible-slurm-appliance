@@ -35,10 +35,12 @@ jobs:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
-          - label: RL8
-            source_image_name: rocky-latest-RL8
-          - label: RL9
-            source_image_name: rocky-latest-RL9
+          - image_name: openhpc-doca-RL8
+            source_image_name: openhpc-RL8 # TODO: needs to be injected from environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+            inventory_groups: doca
+          - image_name: openhpc-doca-RL9
+            source_image_name: openhpc-RL9 # TODO: as above
+            inventory_groups: doca
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -91,8 +93,8 @@ jobs:
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
-          -var "image_name=openhpc-doca-${{ matrix.build.label }}" \
-          -var "inventory_groups=doca" \
+          -var "image_name=${{ matrix.build.image_name }}" \
+          -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           openstack.pkr.hcl
         
       - name: Get created image names from manifest
