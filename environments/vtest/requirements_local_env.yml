@@ -6,6 +6,11 @@ roles:
     type: git
     version: main
 
+  - name: vshpc.slurm-post-tasks
+    src: git+github.nrel.gov:acoinf/vshpc.slurm-post-tasks.git
+    type: git
+    version: main
+
   # - name: aco.prov.yum
   #   src: git+git@github.nrel.gov:acoinf/aco.prov.yum.git
   #   version: main

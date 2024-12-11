@@ -14,22 +14,22 @@
         path: /localhome/stack
       register: localstack
 
-    - name: Does localhome/rocky dir exist
-      ansible.builtin.stat:
-        path: /localhome/rocky
-      register: localrockyuserdir
+    # - name: Does localhome/rocky dir exist
+    #   ansible.builtin.stat:
+    #     path: /localhome/rocky
+    #   register: localrockyuserdir
 
     - name: Add stack user
       ansible.builtin.include_role:
         name: vs.core.stack_user
       when: not localstack.stat.exists
 
-    - name: Add rocky user role
-      ansible.builtin.include_role:
-        name: vshpc.rocky_user
-      when: not localrockyuserdir.stat.exists
-      tags:
-        - add_stack_user
+    # - name: Add rocky user role
+    #   ansible.builtin.include_role:
+    #     name: vshpc.rocky_user
+    #   when: not localrockyuserdir.stat.exists
+    #   tags:
+    #     - add_stack_user
   tags:
     - add_stack_user
 
@@ -39,38 +39,38 @@
   become: true
   gather_facts: false
 
-  tasks:
-    - name: Does home/USER dir exist
-      ansible.builtin.stat:
-        path: "/home/{{ appliances_local_users_ansible_user_name }}"
-      register: homerocky
+  # tasks:
+  #   - name: Does home/USER dir exist
+  #     ansible.builtin.stat:
+  #       path: "/home/{{ appliances_local_users_ansible_user_name }}"
+  #     register: homerocky
 
-    - name: Does var/lib/rocky dir exist
-      ansible.builtin.stat:
-        path: "/var/lib/{{ appliances_local_users_ansible_user_name }}"
-      register: varlibrocky
+  #   - name: Does var/lib/rocky dir exist
+  #     ansible.builtin.stat:
+  #       path: "/var/lib/{{ appliances_local_users_ansible_user_name }}"
+  #     register: varlibrocky
 
-    - name: Cp homerocky to var/lib/ dir
-      ansible.builtin.command: cp -a /home/{{ appliances_local_users_ansible_user_name }} /var/lib/{{ appliances_local_users_ansible_user_name }}
-      when:
-        - homerocky.stat.exists
-      register: cph
-      changed_when: cph.rc != 0
+  #   - name: Cp homerocky to var/lib/ dir
+  #     ansible.builtin.command: cp -a /home/{{ appliances_local_users_ansible_user_name }} /var/lib/{{ appliances_local_users_ansible_user_name }}
+  #     when:
+  #       - homerocky.stat.exists
+  #     register: cph
+  #     changed_when: cph.rc != 0
 
-    # - name: cp auth_keys
-    #   shell: |
-    #     cp -a /home/rocky/.ssh /var/lib/rocky/.ssh
-    #   when:
-    #     - varlibrocky.stat.exists
-    #     - homerocky.stat.exists
+  #   # - name: cp auth_keys
+  #   #   shell: |
+  #   #     cp -a /home/rocky/.ssh /var/lib/rocky/.ssh
+  #   #   when:
+  #   #     - varlibrocky.stat.exists
+  #   #     - homerocky.stat.exists
 
-    - name: Hack passwd file for localhome/rocky
-      ansible.builtin.lineinfile:
-        path: /etc/passwd
-        regexp: '^rocky.*1000.*'
-        line: "rocky:x:1000:1000:vsRockyUser:/var/lib/{{ appliances_local_users_ansible_user_name }}:/bin/bash"
-  tags:
-    - rocky_localhome
+  #   - name: Hack passwd file for localhome/rocky
+  #     ansible.builtin.lineinfile:
+  #       path: /etc/passwd
+  #       regexp: '^rocky.*1000.*'
+  #       line: "rocky:x:1000:1000:vsRockyUser:/var/lib/{{ appliances_local_users_ansible_user_name }}:/bin/bash"
+  # tags:
+  #   - rocky_localhome
 
 - name: "Do the preliminary node setups"
   hosts: all
@@ -87,21 +87,21 @@
         name: vshpc.prov.pre-tasks
       when: not vs_pre_complete.stat.exists
 
-# TODO: KBENDL - check compatibility with new playbook
-- name: "NREL pre - Mount cephfs volumes"
-  hosts: all
-  tags:
-    - vs_pre
-    - aco.core.cephfs
-  become: true
-  tasks:
-    - name: Does ceph exist?
-      ansible.builtin.stat:
-        path: /etc/ceph
-      register: vs_does_cephdir
-    - name: CephFS now
-      ansible.builtin.include_role:
-        name: aco.core.cephfs
-      tags:
-        - aco.core.cephfs
-      when: not vs_does_cephdir.stat.exists
+# # TODO: KBENDL - check compatibility with new playbook
+# - name: "NREL pre - Mount cephfs volumes"
+#   hosts: all
+#   tags:
+#     - vs_pre
+#     - aco.core.cephfs
+#   become: true
+#   tasks:
+#     - name: Does ceph exist?
+#       ansible.builtin.stat:
+#         path: /etc/ceph
+#       register: vs_does_cephdir
+#     - name: CephFS now
+#       ansible.builtin.include_role:
+#         name: aco.core.cephfs
+#       tags:
+#         - aco.core.cephfs
+#       when: not vs_does_cephdir.stat.exists
