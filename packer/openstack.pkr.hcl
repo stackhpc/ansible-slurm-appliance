@@ -185,22 +185,9 @@ source "openstack" "openhpc" {
 
 build {
 
-  # latest nightly image:
-  # source "source.openstack.openhpc" {
-  #   name = "rocky-latest"
-  #   image_name = "${source.name}-${var.os_version}"
-  # }
-
-  # fat image:
   source "source.openstack.openhpc" {
     image_name = "${var.image_name}${local.image_name_version}"
   }
-
-  # # Extended site-specific image, built on fat image:
-  # source "source.openstack.openhpc" {
-  #   name = "openhpc-extra"
-  #   image_name = "openhpc-${var.extra_build_image_name}-${var.os_version}-${local.timestamp}-${substr(local.git_commit, 0, 8)}"
-  # }
 
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
