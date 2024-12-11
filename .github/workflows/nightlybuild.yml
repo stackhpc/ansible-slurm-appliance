@@ -119,7 +119,7 @@ jobs:
     name: upload-nightly-targets
     needs: openstack
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.label }}-${{ matrix.target_cloud }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }}-${{ matrix.target_cloud }}
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
