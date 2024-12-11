@@ -165,11 +165,11 @@ source "openstack" "openhpc" {
   networks = var.networks
   floating_ip_network = var.floating_ip_network
   security_groups = var.security_groups
-  
+
   # Input image:
   source_image = "${var.source_image}"
   source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
-  
+
   # SSH:
   ssh_username = var.ssh_username
   ssh_timeout = "20m"
@@ -178,11 +178,11 @@ source "openstack" "openhpc" {
   ssh_bastion_host = var.ssh_bastion_host
   ssh_bastion_username = var.ssh_bastion_username
   ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
-  
+
   # Output image:
   image_disk_format = "qcow2"
   image_visibility = var.image_visibility
-  
+
 }
 
 build {
@@ -225,7 +225,7 @@ build {
     extra_arguments = [
       "--limit", "builder", # prevent running against real nodes, if in inventory!
       "-i", "${var.repo_root}/packer/ansible-inventory.sh",
-      "-vv",
+      "-vvv",
       "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
       ]
   }
