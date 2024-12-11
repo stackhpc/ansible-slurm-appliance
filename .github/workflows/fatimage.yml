@@ -93,8 +93,15 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
           echo $IMAGE_ID > image-id.txt
           echo $IMAGE_NAME > image-name.txt
+
+      - name: Make image usable for further builds
+        run: |
+          . venv/bin/activate
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
