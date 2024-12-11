@@ -209,7 +209,6 @@
     - name: Install NVIDIA DOCA
       import_role:
         name: doca
-    - meta: end_here
 
 - name: Run post.yml hook
   vars:
