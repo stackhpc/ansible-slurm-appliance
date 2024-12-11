@@ -38,6 +38,7 @@ jobs:
           "RL9": "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
         }
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
+      LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2

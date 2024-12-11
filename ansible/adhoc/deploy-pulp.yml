@@ -26,12 +26,3 @@
       content: |
         # ansible managed
         appliances_pulp_url: "http://{{ pulp_server }}:{{ pulp_site_port }}"
-
-# - name: Add pulp host to environment
-#   hosts: localhost
-#   tasks:
-#   - ansible.builtin.copy:
-#       dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/pulp_server.yml"
-#       content: |
-#         # ansible managed
-#         appliances_pulp_url: "http://{{ pulp_server }}:{{ pulp_site_port }}"

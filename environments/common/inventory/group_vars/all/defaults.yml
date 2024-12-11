@@ -81,3 +81,11 @@ appliances_local_users_extra: [] # see format of appliances_local_users_default 
 appliances_local_users: "{{ appliances_local_users_default + appliances_local_users_extra }}"
 
 ###########################################################################################
+
+appliances_repo_timestamps:
+  '9.4':
+    baseos: 20240816T002610
+    appstream: 20240816T002610
+    crb: 20240816T002610
+    extras: 20240816T002610
+    epel: 20240902T080424

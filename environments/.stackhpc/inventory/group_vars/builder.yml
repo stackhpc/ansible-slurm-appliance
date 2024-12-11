@@ -1,2 +1,8 @@
-#update_enable: false # Can uncomment for speed debugging non-update related build issues
-appliances_pulp_url: http://192.168.10.157:8080
+# update_enable: false # Can uncomment for speed debugging non-update related build issues
+pulp_server_config:
+  LEAFCLOUD:
+    url: http://192.168.10.157:8080
+    password: lookup('env','LEAFCLOUD_PULP_PASSWORD')
+
+appliances_pulp_url: "{{ pulp_server_config[lookup('env','CI_CLOUD')].url }}"
+pulp_site_password: "{{ pulp_server_config[lookup('env','CI_CLOUD')].password }}"

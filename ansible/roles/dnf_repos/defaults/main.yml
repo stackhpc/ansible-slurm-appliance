@@ -3,20 +3,21 @@ dnf_repos_pulp_content_url: "{{ dnf_repos_pulp_url }}/pulp/content"
 dnf_repos_rocky_prefix: "{{ ansible_distribution | lower }}/{{ ansible_distribution_version }}"
 dnf_repos_epel_prefix: "epel/{{ ansible_distribution_major_version }}"
 dnf_repos_disable: true
+dnf_repos_version_timestamps: "{{ appliances_repo_timestamps[ansible_distribution_version] }}"
 
 # epel installed separately
 dnf_repos_repolist:
 - file: rocky
   name: baseos
-  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/baseos"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/baseos/{{ dnf_repos_version_timestamps.baseos }}"
 - file: rocky
   name: appstream
-  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/appstream"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/appstream/{{ dnf_repos_version_timestamps.appstream }}"
 - file: rocky
   name: crb
-  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/crb"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/crb/{{ dnf_repos_version_timestamps.crb }}"
 - file: rocky-extras
   name: extras
-  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/extras"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/extras/{{ dnf_repos_version_timestamps.extras }}"
 
-dnf_repos_epel_baseurl: "{{ dnf_repos_pulp_content_url }}/epel/{{ ansible_distribution_major_version }}"
+dnf_repos_epel_baseurl: "{{ dnf_repos_pulp_content_url }}/epel/{{ ansible_distribution_version }}/{{ dnf_repos_version_timestamps.epel }}"
