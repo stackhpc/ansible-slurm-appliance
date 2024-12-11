@@ -24,65 +24,44 @@ The steps for building site-specific fat images or extending an existing fat ima
     ```hcl
     flavor = "general.v1.small"                           # VM flavor to use for builder VMs
     networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
+    source_image_name = "Rocky-9-GenericCloud-Base-9.4"   # Name of image to create VM with, i.e. starting image
+    inventory_groups = "control,login,compute"            # Comma-separated list of inventory groups to add build VM to, in addition to "builder" group
+
     ```
     Note that:
     - The network used for the Packer VM must provide outbound internet access but does not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.).  
     - For additional options such as non-default private key locations or jumphost configuration see the variable descriptions in `./openstack.pkr.hcl`.
-    - For an example of configuration for extending an existing fat image see below.
+    - The `control,login,compute` inventory groups mean that the resultant image contains packages for all nodes in the cluster - this produces
+      a site-specific fat image.
 
 3. Activate the venv and the relevant environment.
 
 4. Build images using the relevant variable definition file, e.g.:
 
         cd packer/
-        PACKER_LOG=1 /usr/bin/packer build -only=openstack.openhpc --on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+        PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
 
-    Note that the `-only` flag here restricts Packer to a single specific "build" definition (in Packer terminology). Options here are:
-      - `-only=openstack.openhpc`: Build a fat image including Mellanox OFED
-      - `-only=openstack.openhpc-cuda`: Build a fat image including Mellanox OFED, Nvidia drivers and CUDA
-      - `-only=openstack.openhpc-extra`: Build an image which *extends* an existing fat image
+    **NB:** If the build fails while creating the volume, check if the source image has the `signature_verified` property:
 
-5. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc-` and including a timestamp and a shortened git hash.
+        openstack image show $SOURCE_IMAGE
 
-# Defining an "extra" image build
+      If it does, remove this property:
 
-An "extra" image build starts with an existing fat image (e.g. one provided by StackHPC) rather than a RockyLinux GenericCloud image, and only runs a specific subset of the
-Ansible in the appliance. This allows adding additional functionality into site-specific images, without modifying the existing functionality in the base fat image. This is the recommended way to build site-specific images.
+          openstack image unset --property signature_verified $SOURCE_IMAGE
 
-To configure an "extra" image build, prepare a Packer variable definition file as described above but also including:
-
-- `extra_build_image_name`: A string to add into the final image name.
-- `source_image` or `source_image_name`: The UUID or name of the fat image to start from (which must already be present in OpenStack).
-- `extra_build_groups`: A list of Ansible inventory groups to put the build VM into, in addition to the `builder` group. This defines the roles/functionality
-  which are added to the image.
-- `extra_build_volume_size`: A number giving the size in GB of the volume for the build VM's root disk and therefore the resulting image size.
-  Note this assumes the default of `use_blockstorage_volume = true`.
-
-E.g. to add the lustre client to an RockyLinux 9 image:
-
-    # environments/site/lustre.pkvars.hcl
-
-    extra_build_image_name = "lustre" # output image name will be like "openhpc-lustre-RL9-$timestamp-$commit"
-    source_image_name = "openhpc-ofed-RL9-240906-1041-32568dbb" # e.g. current StackHPC RL9 image
-    extra_build_groups = ["lustre"] # only run lustre role during this extra build
-    extra_build_volume_size = 15 # default non-CUDA build image size has enough free space
-
-    # ... define flavor, network, etc as normal
+      then delete the failed volume, select cancelling the build when Packer queries, and then retry. This is [Openstack bug 1823445](https://bugs.launchpad.net/cinder/+bug/1823445).
 
 
-Then, reference this build and variables file in the Packer build command:
+5. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc` and including a timestamp and a shortened git hash.
 
-    PACKER_LOG=1 /usr/bin/packer build -only=openstack.openhpc-extra --on-error=ask -var-file=environments/site/lustre.pkvars.hcl openstack.pkr.hcl
+# Extending an existing image
 
-**NB:** If the build fails while creating the volume, check if the source image has the `signature_verified` property:
+Extending an existing images uses the same process as described above is followed, but the Packer variable definition file should:
+  - Set `source_image_name` to be an existing fat image (e.g. one provided by StackHPC) rather than a RockyLinux GenericCloud image
+  - Set `inventory_groups` should only include the additional functionality (= role name), e.g. `lustre`
+  - Probably set the variable `image_name`, e.g. to `openhpc-lustre` to distinguish it from an existing fat image
 
-    openstack image show $SOURCE_IMAGE
-
-If it does, remove this property:
-
-    openstack image unset --property signature_verified $SOURCE_IMAGE
-
-then delete the failed volume, select cancelling the build when Packer queries, and then retry. This is [Openstack bug 1823445](https://bugs.launchpad.net/cinder/+bug/1823445).
+Setting the inventory groups in this way allows adding additional functionality into images from StackHPC, without modifying the existing packages in the image (which have been tested in CI). This is the recommended way to modify images to add site-specific functionality.
 
 # Build Process
 
