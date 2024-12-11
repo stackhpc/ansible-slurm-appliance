@@ -16,57 +16,31 @@ pulp_site_target_distribution_version: "{{ pulp_site_target_facts['distribution_
 pulp_site_target_distribution_version_major: "{{ pulp_site_target_facts['distribution_major_version'] }}"
 pulp_site_version_timestamps: "{{ appliances_repo_timestamps[pulp_site_target_distribution_version] }}"
 
+pulp_site_rpm_info:
+- name: "baseos-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.baseos }}"
+  url: "{{ pulp_site_default_upstream_prefix }}/BaseOS/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.baseos }}"
+  base_path: "rocky/{{ pulp_site_target_distribution_version }}/baseos/{{ pulp_site_version_timestamps.baseos }}"
+- name: "appstream-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.appstream }}"
+  url: "{{ pulp_site_default_upstream_prefix }}/AppStream/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.appstream }}"
+  base_path: "rocky/{{ pulp_site_target_distribution_version }}/appstream/{{ pulp_site_version_timestamps.appstream }}"
+- name: "crb-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.crb }}"
+  url: "{{ pulp_site_default_upstream_prefix }}/{{ 'PowerTools' if pulp_site_target_distribution_version_major == '8' else 'CRB' }}/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.crb }}"
+  base_path: "rocky/{{ pulp_site_target_distribution_version }}/crb/{{ pulp_site_version_timestamps.crb }}"
+- name: "extras-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.extras }}"
+  url: "{{ pulp_site_default_upstream_prefix }}/extras/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.extras }}"
+  base_path: "rocky/{{ pulp_site_target_distribution_version }}/extras/{{ pulp_site_version_timestamps.extras }}"
+- name: "epel-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.epel }}"
+  url: "https://ark.stackhpc.com/pulp/content/epel/{{ pulp_site_target_distribution_version_major }}/Everything/{{ pulp_site_target_arch }}/{{ pulp_site_version_timestamps.epel }}"
+  base_path: "epel/{{ pulp_site_target_distribution_version }}/{{ pulp_site_version_timestamps.epel }}"
 
-pulp_site_rpm_repo_list:
-  - name: "baseos-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.baseos }}"
-    url: "{{ pulp_site_default_upstream_prefix }}/BaseOS/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.baseos }}"
-  - name: "appstream-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.appstream }}"
-    url: "{{ pulp_site_default_upstream_prefix }}/AppStream/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.appstream }}"
-  - name: "crb-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.crb }}"
-    url: "{{ pulp_site_default_upstream_prefix }}/{{ 'PowerTools' if pulp_site_target_distribution_version_major == '8' else 'CRB' }}/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.crb }}"
-  - name: "extras-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.extras }}"
-    url: "{{ pulp_site_default_upstream_prefix }}/extras/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.extras }}"
-  - name: "epel-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.epel }}"
-    url: "https://ark.stackhpc.com/pulp/content/epel/{{ pulp_site_target_distribution_version_major }}/Everything/{{ pulp_site_target_arch }}/{{ pulp_site_version_timestamps.epel }}"
-
-pulp_site_defaults:
+pulp_site_rpm_repo_defaults:
   remote_username: "{{ pulp_site_upstream_username }}"
   remote_password: "{{ pulp_site_upstream_password }}"
   policy: on_demand
   state: present
 
-pulp_site_rpm_repos: "{{ pulp_site_rpm_repo_list | map('combine', pulp_site_defaults) }}"
+_pulp_site_rpm_info_all: "{{ pulp_site_rpm_info | map('combine', pulp_site_rpm_repo_defaults) }}"
 
-pulp_site_rpm_publications:
-- repository: "baseos-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.baseos }}"
-  state: present
-- repository: "appstream-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.appstream }}"
-  state: present
-- repository: "crb-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.crb }}"
-  state: present
-- repository: "extras-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.extras }}"
-  state: present
-- repository: "epel-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.epel }}"
-  state: present
-
-pulp_site_rpm_distributions:
-- name: "baseos-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.baseos }}"
-  base_path: "rocky/{{ pulp_site_target_distribution_version }}/baseos/{{ pulp_site_version_timestamps.baseos }}"
-  repository: "baseos-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.baseos }}"
-  state: present
-- name: "appstream-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.appstream }}"
-  base_path: "rocky/{{ pulp_site_target_distribution_version }}/appstream/{{ pulp_site_version_timestamps.appstream }}"
-  repository: "appstream-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.appstream }}"
-  state: present
-- name: "crb-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.crb }}"
-  base_path: "rocky/{{ pulp_site_target_distribution_version }}/crb/{{ pulp_site_version_timestamps.crb }}"
-  repository: "crb-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.crb }}"
-  state: present
-- name: "extras-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.extras }}"
-  base_path: "rocky/{{ pulp_site_target_distribution_version }}/extras/{{ pulp_site_version_timestamps.extras }}"
-  repository: "extras-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.extras }}"
-  state: present
-- name: "epel-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.epel }}"
-  base_path: "epel/{{ pulp_site_target_distribution_version }}/{{ pulp_site_version_timestamps.epel }}"
-  repository: "epel-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.epel }}"
-  state: present
+pulp_site_rpm_repos: "{{ _pulp_site_rpm_info_all | to_rpm_repos }}"
+pulp_site_rpm_publications: "{{ _pulp_site_rpm_info_all | to_rpm_pubs }}"
+pulp_site_rpm_distributions: "{{ _pulp_site_rpm_info_all | to_rpm_distros }}"
