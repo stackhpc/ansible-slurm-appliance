@@ -55,7 +55,7 @@ jobs:
         run: |
           {
             echo 'FAT_IMAGES<<EOF'
-            cat cat environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+            cat environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
             echo EOF
           } >> "$GITHUB_ENV"
 
