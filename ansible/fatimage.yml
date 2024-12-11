@@ -6,6 +6,9 @@
   tasks:
     - name: Report hostname (= final image name)
       command: hostname
+    - name: Report inventory groups
+      debug:
+        var: group_names
 
 - name: Run pre.yml hook
   vars:
@@ -203,9 +206,10 @@
   become: yes
   gather_facts: yes
   tasks:
-    - name: Install Mellanox DOCA
-      include_role:
+    - name: Install NVIDIA DOCA
+      import_role:
         name: doca
+    - meta: end_here
 
 - name: Run post.yml hook
   vars:
