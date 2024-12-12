@@ -39,13 +39,11 @@
 - name: Cleanup DOCA build directories
   ansible.builtin.file:
     state: absent
-    path: "{{ (_doca_kernel_repo.stdout | split('/'))[:2] | join('/') }}"
+    path: "{{ (_doca_kernel_repo.stdout | split('/'))[:3] | join('/') }}" # leading / means 1st element of split list is ''
 
 - name: Update initramfs
   ansible.builtin.command:
-    cmd: dracut -f --tmpdir /var/tmp
-  environment:
-     TMPDIR: /var/tmp
+    cmd: dracut -f
   register: _doca_dracut
   failed_when: _doca_dracut.stderr != '' # appears rc is always 0
 
