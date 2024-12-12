@@ -18,11 +18,10 @@
       tasks_from: install.yml
       public: true
 
-  - name: Add pulp host to environment
+  - name: Print Pulp endpoint
     become: no
-    delegate_to: localhost
-    ansible.builtin.copy:
-      dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/group_vars/all/pulp_server.yml"
-      content: |
-        # ansible managed
-        appliances_pulp_url: "http://{{ pulp_server }}:{{ pulp_site_port }}"
+    debug:
+      msg: | 
+        Server configured, override 'appliances_pulp_url' with
+          appliances_pulp_url: "http://{{ pulp_server }}:{{ pulp_site_port }}"
+        in your environments
