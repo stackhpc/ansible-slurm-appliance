@@ -14,6 +14,25 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Sync pulp repos with upstream
+  hosts: pulp
+  tasks:
+  - ansible.builtin.include_role:
+      name: pulp_site
+      tasks_from: sync.yml
+      apply:
+        delegate_to: localhost
+    when: appliances_mode != 'configure' and appliances_sync_pulp_on_build
+
+- hosts: dnf_repos
+  become: yes
+  tasks:
+  - name: Replace system repos with pulp repos 
+    ansible.builtin.include_role:
+      name: dnf_repos
+      tasks_from: set_repos.yml
+    when: appliances_mode != 'configure' and ansible_distribution_major_version == "9" #TODO update role once RL8 config decided
+
 - import_playbook: bootstrap.yml
 
 - name: Run post-bootstrap.yml hook
@@ -198,6 +217,15 @@
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
+
+- hosts: dnf_repos
+  become: yes
+  tasks:
+    - name: Disable pulp repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: disable_repos.yml
+      when: appliances_mode != 'configure' and ansible_distribution_major_version == "9" #TODO update role once RL8 config decided
 
 - name: Run post.yml hook
   vars:
