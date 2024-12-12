@@ -1,6 +1,6 @@
 ---
 - name: Disable Pulp repos and remove creds
   ansible.builtin.yum:
-    disablerepo: "{{ item.name }}"
-  loop: "{{ dnf_repos_repolist + [epel] }}"
+    disablerepo: "{{ item }}"
+  loop: "{{ dnf_repos_repolist | map(attribute='name') + ['epel'] }}"
   when: dnf_repos_disable
