@@ -31,3 +31,5 @@ compute
 [squid:children]
 # Install squid into fat image
 builder
+
+[pulp:children]

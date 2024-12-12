@@ -1,5 +1,10 @@
 ---
 
+- ansible.builtin.assert:
+    that: pulp_site_upstream_password != ''
+    quiet: true
+    fail_msg: "Upstream password not set. Either set env var ARK_PASSWORD or override pulp_site_upstream_password."
+
 - name: Wait for Pulp server
   pulp.squeezer.status:
     pulp_url: "{{ pulp_site_url }}"
