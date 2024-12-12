@@ -26,7 +26,7 @@ jobs:
             source_image_name: rocky-latest-RL8
             inventory_groups: control,compute,login
           - image_name: openhpc-RL9
-            source_image_name: rocky-latest-RL9
+            source_image_name: rocky-latest-RL9-241212-1532-3088f837
             inventory_groups: control,compute,login
     env:
       ANSIBLE_FORCE_COLOR: True
