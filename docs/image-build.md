@@ -2,37 +2,38 @@
 
 The appliance contains code and configuration to use [Packer](https://developer.hashicorp.com/packer) with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images.
 
-The Packer configuration defined here builds "fat images" which contain binaries for all nodes, but no cluster-specific configuration. Using these:
+The Packer configuration defined here builds "fat images" which contain packages, binaries and container images but no cluster-specific configuration. Using these:
 - Enables the image to be tested in CI before production use.
 - Ensures re-deployment of the cluster or deployment of additional nodes can be completed even if packages are changed in upstream repositories (e.g. due to RockyLinux or OpenHPC updates).
 - Improves deployment speed by reducing the number of package downloads to improve deployment speed.
 
-By default, a fat image build starts from a nightly image build containing Mellanox OFED, and updates all DNF packages already present. The 'latest' nightly build itself is from a RockyLinux GenericCloud image.
-
-The fat images StackHPC builds and test in CI are available from [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases). However with some additional configuration it is also possible to:
+The fat images StackHPC builds and tests in CI are available from [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases). However with some additional configuration it is also possible to:
 1. Build site-specific fat images from scratch.
-2. Extend an existing fat image with additional software.
+2. Extend an existing fat image with additional functionality.
 
 
 # Usage
 
-The steps for building site-specific fat images or extending an existing fat image are the same:
+To build either a site-specific fat image from scratch, or to extend an existing StackHPC fat image:
 
 1. Ensure the current OpenStack credentials have sufficient authorisation to upload images (this may or may not require the `member` role for an application credential, depending on your OpenStack configuration).
-2. Create a Packer [variable definition file](https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#assigning-values-to-input-variables) at e.g. `environments/<environment>/builder.pkrvars.hcl` containing at a minimum e.g.:
+2. Create a Packer [variable definition file](https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#assigning-values-to-input-variables) at e.g. `environments/<environment>/builder.pkrvars.hcl` containing at a minimum:
   
     ```hcl
     flavor = "general.v1.small"                           # VM flavor to use for builder VMs
     networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
     source_image_name = "Rocky-9-GenericCloud-Base-9.4"   # Name of image to create VM with, i.e. starting image
-    inventory_groups = "control,login,compute"            # Comma-separated list of inventory groups to add build VM to, in addition to "builder" group
+    inventory_groups = "control,login,compute"            # Additional inventory groups to add build VM to
 
     ```
+
     Note that:
-    - The network used for the Packer VM must provide outbound internet access but does not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.).  
-    - For additional options such as non-default private key locations or jumphost configuration see the variable descriptions in `./openstack.pkr.hcl`.
-    - The `control,login,compute` inventory groups mean that the resultant image contains packages for all nodes in the cluster - this produces
-      a site-specific fat image.
+    - The network used for the Packer VM must provide outbound internet access but does not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.).
+    - The flavor used must have sufficent memory for the build tasks, but otherwise does not need to match the final cluster nodes. Usually 8GB is sufficent. By default, the build VM is volume-backed to allow control of the root disk size (and hence final image size) so the flavor disk size does not matter.
+    - The source image should be either a RockyLinux GenericCloud image for a site-specific image build from scratch, or a StackHPC fat image if extending an existing image.
+    - The `inventory_groups` variable takes a comma-separated list of Ansible inventory groups to add the build VM to. This is in addition to the `builder` group which it is always added to. This controls which Ansible roles and functionality run during build, and hence what gets added to the image. All possible groups are listed in `environments/common/groups` but common options for this variable will be:
+      - `update,control,login,compute`: The resultant image has all packages in the source image updated, and then packages for all types of nodes in the cluster are added. When using a GenericCloud image for `source_image_name` this builds a site-specific fat image from scratch.
+      - One or more specific groups which are not enabled in the appliance by default, e.g. `lustre`. When using a StackHPC fat image for `source_image_name` this extends the image with just this additional functionality.
 
 3. Activate the venv and the relevant environment.
 
@@ -51,17 +52,7 @@ The steps for building site-specific fat images or extending an existing fat ima
 
       then delete the failed volume, select cancelling the build when Packer queries, and then retry. This is [Openstack bug 1823445](https://bugs.launchpad.net/cinder/+bug/1823445).
 
-
 5. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc` and including a timestamp and a shortened git hash.
-
-# Extending an existing image
-
-Extending an existing images uses the same process as described above is followed, but the Packer variable definition file should:
-  - Set `source_image_name` to be an existing fat image (e.g. one provided by StackHPC) rather than a RockyLinux GenericCloud image
-  - Set `inventory_groups` should only include the additional functionality (= role name), e.g. `lustre`
-  - Probably set the variable `image_name`, e.g. to `openhpc-lustre` to distinguish it from an existing fat image
-
-Setting the inventory groups in this way allows adding additional functionality into images from StackHPC, without modifying the existing packages in the image (which have been tested in CI). This is the recommended way to modify images to add site-specific functionality.
 
 # Build Process
 
