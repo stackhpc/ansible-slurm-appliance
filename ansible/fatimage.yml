@@ -6,6 +6,9 @@
   tasks:
     - name: Report hostname (= final image name)
       command: hostname
+    - name: Report inventory groups
+      debug:
+        var: group_names
 
 - name: Run pre.yml hook
   vars:
@@ -198,6 +201,14 @@
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
+
+- hosts: doca
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install NVIDIA DOCA
+      import_role:
+        name: doca
 
 - name: Run post.yml hook
   vars:
