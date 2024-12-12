@@ -6,3 +6,4 @@ pulp_server_config:
 
 appliances_pulp_url: "{{ pulp_server_config[lookup('env','CI_CLOUD')].url }}"
 pulp_site_password: "{{ pulp_server_config[lookup('env','CI_CLOUD')].password }}"
+appliances_sync_pulp_on_build: false

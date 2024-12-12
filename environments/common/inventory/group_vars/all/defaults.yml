@@ -82,6 +82,7 @@ appliances_local_users: "{{ appliances_local_users_default + appliances_local_us
 
 ###########################################################################################
 
+appliances_sync_pulp_on_build: true
 appliances_repo_timestamps:
   '9.4':
     baseos: 20240816T002610

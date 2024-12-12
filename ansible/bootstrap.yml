@@ -113,14 +113,12 @@
 - name: Sync pulp repos with upstream
   hosts: pulp
   tasks:
-  - debug:
-      var: hostvars[groups['builder'][0]]['ansible_facts']
   - ansible.builtin.include_role:
       name: pulp_site
       tasks_from: sync.yml
       apply:
         delegate_to: localhost
-    when: appliances_mode != 'configure'
+    when: appliances_mode != 'configure' and appliances_sync_pulp_on_build
 
 - hosts: dnf_repos
   become: yes
