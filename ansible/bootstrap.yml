@@ -216,6 +216,15 @@
           msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
       when: "update_enable | default('false') | bool"
 
+- hosts: extra_packages
+  become: yes
+  tags:
+   - extra_packages
+  tasks:
+    dnf:
+      - name: "{{ appliances_extra_packages }}"
+    when: appliances_mode != 'configure' or appliances_packages_during_configure
+
 - hosts:
     - selinux
     - update
