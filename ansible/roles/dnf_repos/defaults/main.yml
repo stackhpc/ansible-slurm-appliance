@@ -21,3 +21,4 @@ dnf_repos_repolist:
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/extras/{{ dnf_repos_version_timestamps.extras }}"
 
 dnf_repos_epel_baseurl: "{{ dnf_repos_pulp_content_url }}/epel/{{ ansible_distribution_version }}/{{ dnf_repos_version_timestamps.epel }}"
+dnf_repos_epel_description: "epel"
