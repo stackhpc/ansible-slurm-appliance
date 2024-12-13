@@ -30,9 +30,11 @@ jobs:
           - image_name: openhpc-extra-RL8
             source_image_name_key: RL8 # key into environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
             inventory_groups: doca,cuda
+            volume_size: 30 # needed for cuda
           - image_name: openhpc-extra-RL9
             source_image_name_key: RL9
             inventory_groups: doca,cuda
+            volume_size: 30 # needed for cuda
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -97,6 +99,7 @@ jobs:
           -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
+          -var "volume_size=${{ matrix.build.volume_size }}" \
           openstack.pkr.hcl
         
       - name: Get created image names from manifest
