@@ -3,9 +3,10 @@
 - name: Compute node initialisation
   hosts: localhost
   become: yes
-  # VARS TO BE SUPPLIED VIA CLOUD INIT METADATA
   vars:
-    server_node_ip: "172.16.1.154"
+    os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
+    server_node_ip: "{{ os_metadata.meta.k3s_server }}"
+
     resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
 
     nfs_configurations:
@@ -78,7 +79,7 @@
         - name: Mount /mnt/cluster
           mount:
             path: /mnt/cluster
-            src: "{{ vars.server_node_ip }}:/exports/cluster"
+            src: "{{ server_node_ip }}:/exports/cluster"
             fstype: nfs
             opts: rw,sync
             state: mounted
