@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure directories exist
-  file: 
+  file:
     path: "/etc/ansible-init/{{ item }}"
     state: directory
     owner: root
@@ -122,6 +122,23 @@
         owner: munge
         group: munge
         mode: 0400
+
+    # - name: Ensure /exports/cluster/inventory_hostname directory exists
+    #   file:
+    #     path: /exports/cluster/{{ inventory_hostname }}
+    #     state: directory
+    #     owner: root
+    #     group: root
+    #     mode: 0755
+
+    # - name: Template hostvars
+    #   template:
+    #     src: ../templates/hostvars.j2
+    #     dest: "/exports/cluster/{{ inventory_hostname }}/hostvars.yml"
+    #     owner: root
+    #     group: root
+    #     mode: 0644
+
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Inject compute initialisation playbook

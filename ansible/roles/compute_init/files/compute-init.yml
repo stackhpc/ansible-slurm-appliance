@@ -5,14 +5,15 @@
   become: yes
   # VARS TO BE SUPPLIED VIA CLOUD INIT METADATA
   vars:
-    control_node_ip: "172.16.1.228"
+    server_node_ip: "172.16.1.154"
     resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
 
-    nfs_export: "/exports/home"
-    nfs_client_mnt_options:
-    nfs_client_mnt_point: "/home"
-    nfs_client_mnt_state: mounted
-    nfs_server: "{{ control_node_ip }}"
+    nfs_configurations:
+      - nfs_export: "/exports/home"
+        nfs_client_mnt_options:
+        nfs_client_mnt_point: "/home"
+        nfs_client_mnt_state: mounted
+        nfs_server: "{{ server_node_ip }}"
 
     os_manila_mount_state: mounted
     os_manila_mount_opts:
@@ -36,7 +37,7 @@
         uid: 1005
     basic_users_groups: []
 
-    openhpc_conf_server: "{{ control_node_ip }}"
+    openhpc_conf_server: "{{ server_node_ip }}"
 
   tasks:
     - name: Configure resolve.conf
@@ -77,7 +78,7 @@
         - name: Mount /mnt/cluster
           mount:
             path: /mnt/cluster
-            src: "{{ vars.control_node_ip }}:/exports/cluster"
+            src: "{{ vars.server_node_ip }}:/exports/cluster"
             fstype: nfs
             opts: rw,sync
             state: mounted
@@ -90,20 +91,35 @@
             group: root
             mode: 0644
 
+    # - name: Include hostvars from NFS share
+    #   block:
+    #     - name: Extract short hostname using a shell block
+    #       shell: |
+    #         HOSTNAME=$(hostname)
+    #         echo "${HOSTNAME%.test.invalid}"
+    #       register: short_hostname
+
+    #     - name: Include vars from NFS mount
+    #       include_vars:
+    #         file: "/mnt/cluster/{{ short_hostname.stdout }}/hostvars.yml"
+
 
     - name: NFS client mount
       block:
         - name: ensure mount directory exists
           file:
-            path: "{{ nfs_client_mnt_point }}"
+            path: "{{ item.get('nfs_client_mnt_point', nfs_client_mnt_point) }}"
             state: directory
+          loop: "{{ nfs_configurations }}"
 
         - name: mount the filesystem
           mount:
-            path: "{{ nfs_client_mnt_point }}"
-            src: "{{ nfs_server }}:{{ nfs_export }}"
+            path: "{{ item.get('nfs_client_mnt_point', nfs_client_mnt_point) }}"
+            src: "{{ item.get('nfs_server', nfs_server) }}:{{ item.get('nfs_export', nfs_export) }}"
+            opts: "{{ item['nfs_client_mnt_options'] | default(nfs_client_mnt_options, true) | default(omit, true) }}" # for some reason items.get() here fails with "an incorrect mount option was specified"
             fstype: nfs
-            state: "{{ nfs_client_mnt_state }}"
+            state: "{{ item.get('nfs_client_mnt_state', nfs_client_mnt_state) }}"
+          loop: "{{ nfs_configurations }}"
 
 
     - name: Manila mount
