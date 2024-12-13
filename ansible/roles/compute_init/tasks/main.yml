@@ -140,11 +140,3 @@
     #     mode: 0644
 
   delegate_to: "{{ groups['control'] | first }}"
-
-- name: Inject compute initialisation playbook
-  copy:
-    src: compute-init.yml
-    dest: /etc/ansible-init/playbooks/compute-init.yml
-    owner: root
-    group: root
-    mode: 0644

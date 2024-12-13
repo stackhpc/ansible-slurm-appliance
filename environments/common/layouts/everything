@@ -83,8 +83,9 @@ openhpc
 cluster
 
 [compute_init:children]
-# Hosts to deploy compute initialisation ansible-init script to.
-cluster
+# EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
+# TODO: actually should be empty for now
+compute
 
 [k3s:children]
 # Hosts to run k3s server/agent

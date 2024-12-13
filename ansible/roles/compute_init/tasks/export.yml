@@ -1,0 +1,35 @@
+- name: Ensure the /exports/cluster directory exists
+  file:
+    path: /exports/cluster
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwX,go=
+  run_once: true
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Copy /etc/hosts to /exports/cluster
+  copy:
+    src: /etc/hosts
+    dest: /exports/cluster/hosts
+    owner: root
+    group: root
+    mode: u=rw,go=
+    remote_src: true
+  run_once: true
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Create hostvars directory
+  file:
+    path: /exports/cluster/hostvars/{{ inventory_hostname }}/
+    state: directory
+    mode: u=rwX,go=
+    # TODO: owner,mode,etc
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Template out hostvars
+  template:
+    src: hostvars.yml.j2
+    dest: /exports/cluster/hostvars/{{ inventory_hostname }}/hostvars.yml
+    mode: u=rw,go=
+  delegate_to: "{{ groups['control'] | first }}"

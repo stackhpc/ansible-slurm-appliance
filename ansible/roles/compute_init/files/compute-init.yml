@@ -5,323 +5,78 @@
   become: yes
   vars:
     os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
-    iam_slurm_compute: "{{ os_metadata.meta.slurm_compute | default(false) }}"
     server_node_ip: "{{ os_metadata.meta.k3s_server }}"
+    compute_groups: "{{ os_metadata.meta.compute_groups | default([]) }}"
 
-    resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
+    # TODO: "role defaults"
+    resolv_conf_nameservers: []
 
-    nfs_configurations:
-      - nfs_export: "/exports/home"
-        nfs_client_mnt_options:
-        nfs_client_mnt_point: "/home"
-        nfs_client_mnt_state: mounted
-        nfs_server: "{{ server_node_ip }}"
+    # nfs_configurations:
+    #   - nfs_export: "/exports/home"
+    #     nfs_client_mnt_options:
+    #     nfs_client_mnt_point: "/home"
+    #     nfs_client_mnt_state: mounted
+    #     nfs_server: "{{ server_node_ip }}"
 
-    os_manila_mount_state: mounted
-    os_manila_mount_opts:
-      - x-systemd.device-timeout=30
-      - x-systemd.mount-timeout=30
-      - noatime
-      - _netdev # prevents mount blocking early boot before networking available
-      - rw
-    os_manila_mount_ceph_conf_path: /etc/ceph
+    # os_manila_mount_state: mounted
+    # os_manila_mount_opts:
+    #   - x-systemd.device-timeout=30
+    #   - x-systemd.mount-timeout=30
+    #   - noatime
+    #   - _netdev # prevents mount blocking early boot before networking available
+    #   - rw
+    # os_manila_mount_ceph_conf_path: /etc/ceph
 
-    basic_users_manage_homedir: false
-    basic_users_userdefaults:
-      state: present
-      create_home: "{{ basic_users_manage_homedir }}"
-      generate_ssh_key: "{{ basic_users_manage_homedir }}"
-      ssh_key_comment: "{{ item.name }}"
-    test_user_password: "zXpcWyGQL7jtZnqylQra4g=="
-    basic_users_users:
-      - name: testuser # can't use rocky as $HOME isn't shared!
-        password: "{{ test_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
-        uid: 1005
-    basic_users_groups: []
+    # basic_users_manage_homedir: false
+    # basic_users_userdefaults:
+    #   state: present
+    #   create_home: "{{ basic_users_manage_homedir }}"
+    #   generate_ssh_key: "{{ basic_users_manage_homedir }}"
+    #   ssh_key_comment: "{{ item.name }}"
+    # test_user_password: "zXpcWyGQL7jtZnqylQra4g=="
+    # basic_users_users:
+    #   - name: testuser # can't use rocky as $HOME isn't shared!
+    #     password: "{{ test_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+    #     uid: 1005
+    # basic_users_groups: []
 
-    openhpc_conf_server: "{{ server_node_ip }}"
+    # openhpc_conf_server: "{{ server_node_ip }}"
 
   tasks:
-    - name: Skip initialization if slurm_compute metadata set to false
-      debug:
-        msg: "Skipping compute initialization"
-      when: not iam_slurm_compute | bool
-
-    - name: Configure resolve.conf
-      block:
-        - name: Set nameservers in /etc/resolv.conf
-          ansible.builtin.template:
-            src: /etc/ansible-init/templates/resolv.conf.j2
-            dest: /etc/resolv.conf
-            owner: root
-            group: root
-            mode: u=rw,og=r
-
-        - name: Disable NetworkManager control of resolv.conf
-          ansible.builtin.copy:
-            src: /etc/ansible-init/files/NetworkManager-dns-none.conf
-            dest: /etc/NetworkManager/conf.d/90-dns-none.conf
-            owner: root
-            group: root
-            mode: u=rw,og=r
-          register: _copy_nm_config
-
-        - name: Reload NetworkManager
-          ansible.builtin.systemd:
-            name: NetworkManager
-            state: reloaded
-          when: _copy_nm_config.changed | default(false)
-      when: 
-        - resolv_conf_nameservers is defined and resolv_conf_nameservers | length > 0
-        - iam_slurm_compute | bool
-
-
-    - name: Mount /mnt/cluster on compute nodes and copy hosts to /etc/hosts
-      block:
-        - name: Ensure the mount directory exists
-          file:
-            path: /mnt/cluster
-            state: directory
-            mode: 0755
-        
-        - name: Mount /mnt/cluster
-          mount:
-            path: /mnt/cluster
-            src: "{{ server_node_ip }}:/exports/cluster"
-            fstype: nfs
-            opts: rw,sync
-            state: mounted
-          register: nfs_mount_result
-          ignore_errors: true
-
-        - name: Fail gracefully if NFS mount is not available
+    - block:
+        - name: Report skipping initialization if not compute node
+          # meta: end_play produces no output
           debug:
-            msg: "NFS mount failed. Skipping compute initialization. Re-image if this persists."
-          when: nfs_mount_result.failed
+            msg: "Skipping compute initialization as metadata compute_groups is empty"
+        
+        - meta: end_play
+      when: compute_groups | length == 0 
 
-        - name: Copy /mnt/cluster/hosts contents to /etc/hosts
-          copy:
-            src: /mnt/cluster/hosts
-            dest: /etc/hosts
-            owner: root
-            group: root
-            mode: 0644
-          when: not nfs_mount_result.failed
-      when: iam_slurm_compute | bool
+    - name: Ensure the mount directory exists
+      file:
+        path: /mnt/cluster
+        state: directory
+        owner: root
+        group: root
+        mode: u=rwX,go= # is sensitive
+    
+    - name: Mount /mnt/cluster
+      mount:
+        path: /mnt/cluster
+        src: "{{ server_node_ip }}:/exports/cluster"
+        fstype: nfs
+        opts: ro,sync
+        state: mounted
+      register: nfs_mount_result
+      ignore_errors: true
+      register: _mount_mnt_cluster
+      # TODO: add some retries here?
 
-
-    - name: Include hostvars from NFS share
-      block:
-        - name: Extract short hostname using a shell block
-          shell: |
-            HOSTNAME=$(hostname)
-            echo "${HOSTNAME%.test.invalid}"
-          register: short_hostname
-
-    #     - name: Include vars from NFS mount
-    #       include_vars:
-    #         file: "/mnt/cluster/{{ short_hostname.stdout }}/hostvars.yml"
-      when:
-        - iam_slurm_compute | bool
-        - not nfs_mount_result.failed
-
-
-    - name: NFS client mount
-      block:
-        - name: ensure mount directory exists
-          file:
-            path: "{{ item.get('nfs_client_mnt_point', nfs_client_mnt_point) }}"
-            state: directory
-          loop: "{{ nfs_configurations }}"
-
-        - name: mount the filesystem
-          mount:
-            path: "{{ item.get('nfs_client_mnt_point', nfs_client_mnt_point) }}"
-            src: "{{ item.get('nfs_server', nfs_server) }}:{{ item.get('nfs_export', nfs_export) }}"
-            opts: "{{ item['nfs_client_mnt_options'] | default(nfs_client_mnt_options, true) | default(omit, true) }}" # for some reason items.get() here fails with "an incorrect mount option was specified"
-            fstype: nfs
-            state: "{{ item.get('nfs_client_mnt_state', nfs_client_mnt_state) }}"
-          loop: "{{ nfs_configurations }}"
-      when:
-        - iam_slurm_compute | bool
-        - not nfs_mount_result.failed
-
-
-    - name: Manila mount
-      block:
-        - name: Read manila share info from nfs file
-          slurp:
-            src: "/mnt/cluster/manila_share_info.yml"
-          register: manila_share_info_file
-          no_log: true
-
-        - name: Parse and set fact for manila share info
-          set_fact:
-            os_manila_mount_share_info: "{{ manila_share_info_file.content | b64decode | from_yaml }}"
-
-        - name: Read manila shares from nfs file
-          slurp:
-            src: "/mnt/cluster/manila_shares.yml"
-          register: manila_shares_file
-
-        - name: Parse and set fact for manila shares
-          set_fact:
-            os_manila_mount_shares: "{{ manila_shares_file.content | b64decode | from_yaml }}"
-
-        - name: Ensure Ceph configuration directory exists
-          ansible.builtin.file:
-            path: "{{ os_manila_mount_ceph_conf_path }}"
-            state: directory
-            mode: "0755"
-            owner: root
-            group: root
-
-        - name: Configure ceph.conf using os_manila_mount_host
-          ansible.builtin.template:
-            src: /etc/ansible-init/templates/ceph.conf.j2
-            dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.conf"
-            owner: root
-            group: root
-            mode: "0600"
-
-        - name: Ensure mount directory exists
-          ansible.builtin.file:
-            path: "{{ item.mount_path }}"
-            state: directory
-            owner: "{{ item.mount_user | default(omit) }}"
-            group: "{{ item.mount_group | default(omit) }}"
-            mode: "{{ item.mount_mode | default(omit) }}"
-          loop: "{{ os_manila_mount_shares }}"
-          loop_control:
-            label: "{{ item.share_name }}"
-
-        - name: Write Ceph client keyring
-          ansible.builtin.template:
-            src: /etc/ansible-init/templates/ceph.keyring.j2
-            dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ item.share_user }}.keyring"
-            mode: "0600"
-            owner: root
-            group: root
-          loop: "{{ os_manila_mount_share_info }}"
-          loop_control:
-            label: "{{ item.share_name }}"
-
-        - name: Mount the Ceph share
-          ansible.posix.mount:
-            path: "{{ item[0].mount_path }}"
-            src: "{{ item[1].host }}:{{ item[1].export }}"
-            fstype: ceph
-            opts: "name={{ item[1].share_user }},{{ (item[0].mount_opts | default(os_manila_mount_opts)) | join(',') }}"
-            # NB share_user is looked up here in case of autodetection
-            state: "{{ item[0].mount_state | default(os_manila_mount_state) }}"
-          loop: "{{ os_manila_mount_shares | zip(os_manila_mount_share_info) }}"
-          loop_control:
-            label: "{{ item[0].share_name }}"
-
-        - name: Ensure mounted directory has correct permissions
-          ansible.builtin.file:
-            path: "{{ item.mount_path }}"
-            state: directory
-            owner: "{{ item.mount_user | default(omit) }}"
-            group: "{{ item.mount_group | default(omit) }}"
-            mode: "{{ item.mount_mode | default(omit) }}"
-          loop: "{{ os_manila_mount_shares }}"
-          loop_control:
-            label: "{{ item.share_name }}"
-          when: item.mount_state | default(os_manila_mount_state) in ['mounted' or 'ephemeral']
-      when:
-        - iam_slurm_compute | bool
-        - not nfs_mount_result.failed
-
-
-    - name: Basic users setup
-      block:
-        - name: Create groups
-          ansible.builtin.group: "{{ item }}"
-          loop:  "{{ basic_users_groups }}"
-
-        - name: Create users
-          user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() }}"
-          loop: "{{ basic_users_users }}"
-          loop_control:
-            label: "{{ item.name }} [{{ item.state | default('present') }}]"
-          register: basic_users_info
-
-        - name: Write sudo rules
-          blockinfile:
-            path: /etc/sudoers.d/80-{{ item.name}}-user
-            block: "{{ item.sudo }}"
-            create: true
-          loop: "{{ basic_users_users }}"
-          loop_control:
-            label: "{{ item.name }}"
-          when: "'sudo' in item"
-      when:
-        - iam_slurm_compute | bool
-        - not nfs_mount_result.failed
-
-
-    - name: Configure EESSI
-      block:
-        - name: Copy /mnt/cluster/cvmfs/default.local contents to /etc/cvmfs/default.local
-          copy:
-            src: /mnt/cluster/cvmfs/default.local
-            dest: /etc/cvmfs/default.local
-            owner: root
-            group: root
-            mode: 0644
-
-        # NOTE: Not clear how to make this idempotent
-        - name: Ensure CVMFS config is setup
-          command:
-            cmd: "cvmfs_config setup"
-      when:
-        - iam_slurm_compute | bool
-        - not nfs_mount_result.failed
-
-
-    - name: Configure openhpc
-      block:
-        - name: Fix permissions on /etc to pass Munge startup checks
-          # Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2 makes /etc g=rwx rather than g=rx (where group=root)
-          # which fails munged startup checks
-          file:
-            path: /etc
-            state: directory
-            mode: g-w
-
-        - name: Copy Munge key from NFS-mounted directory to /etc/munge
-          copy:
-            src: "/mnt/cluster/openhpc_munge.key"
-            dest: "/etc/munge/munge.key"
-            owner: munge
-            group: munge
-            mode: 0400
-
-        - name: Set slurmctld location for configless operation
-          lineinfile:
-            path: /etc/sysconfig/slurmd
-            line: "SLURMD_OPTIONS='--conf-server {{ openhpc_conf_server }}'"
-            regexp: "^SLURMD_OPTIONS="
-            create: yes
-            owner: root
-            group: root
-            mode: 0644
-
-        - name: Configure Munge service
-          service:
-            name: munge
-            enabled: true
-            state: started
-
-        - name: Ensure slurmd state
-          service:
-            name: slurmd
-            enabled: true
-            state: started
-
-        - name: Ensure node is in cluster
-          command: scontrol update state=resume nodename={{ short_hostname.stdout }}
-      when:
-        - iam_slurm_compute | bool
-        - not nfs_mount_result.failed
+    - block:
+        - name: Report skipping initialization if cannot mount nfs
+          # meta: end_play produces no output
+          debug:
+            msg: "Skipping compute initialization as cannot mount exports/cluster share"
+        
+        - meta: end_play
+      when: _mount_mnt_cluster.failed

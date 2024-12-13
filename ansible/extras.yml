@@ -37,13 +37,26 @@
     - import_role:
         name: persist_hostkeys
 
-- name: Inject ansible-init compute script
+# TODO: I'm not convinced this is the right place
+- hosts: compute_init:!builder
+  tags: compute_init
+  become: yes
+  name: Export hostvars
+  tasks:
+    - include_role:
+        name: compute_init
+        tasks_from: export.yml
+
+# TODO: really this should only run during build
+# but handy not to for debugging
+- name: Install compute_init script
   hosts: compute_init
   tags: compute_init
   become: yes
   tasks:
-    - import_role:
+    - include_role:
         name: compute_init
+        tasks_from: install.yml
 
 - name: Install k9s
   become: yes
