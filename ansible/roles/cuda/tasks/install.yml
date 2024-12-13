@@ -43,12 +43,14 @@
 - name: Install cuda packages
   ansible.builtin.dnf:
     name: "{{ cuda_packages }}"
+  when: cuda_package_version != 'none'
   register: cuda_package_install
 
 - name: Add cuda binaries to path
   lineinfile:
     path: /etc/profile.d/sh.local
     line: 'export PATH=$PATH:$(ls -1d /usr/local/cuda-* | sort -V | tail -1)/bin'
+  when: cuda_package_version != 'none'
 
 - name: Enable NVIDIA Persistence Daemon
   systemd:
