@@ -18,8 +18,7 @@
     url: "{{ cuda_repo_url }}"
 
 - name: Check if nvidia driver module is enabled
-  shell:
-    cmd: dnf module list --enabled nvidia-driver
+  ansible.builtin.command: dnf module list --enabled nvidia-driver
   changed_when: false
   failed_when: false
   register: _cuda_driver_module_enabled
@@ -30,15 +29,22 @@
   when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
 
+- name: Check if nvidia driver module is installed
+  ansible.builtin.command: dnf module list --installed nvidia-driver
+  changed_when: false
+  failed_when: false
+  register: _cuda_driver_module_installed
+
 - name: Install nvidia drivers
   ansible.builtin.command: dnf module install -y nvidia-driver
   register: _cuda_driver_install
-  when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
+  when: "'No matching Modules to list' in _cuda_driver_module_installed.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
 
 - name: Check kernel has not been modified
   assert:
-    that: "'kernel' not in _cuda_driver_install.stdout"
+    that: "'kernel ' not in _cuda_driver_install.stdout | default('')" # space ensures we don't flag e.g. kernel-devel-matched
+    fail_msg: "{{ _cuda_driver_install.stdout_lines | default([]) | select('search', 'kernel ') }}"
 
 - name: Install cuda packages
   ansible.builtin.dnf:
@@ -66,3 +72,4 @@
 - name: Wait for hosts to be reachable
   wait_for_connection:
     sleep: 15
+  when: cuda_package_install.changed

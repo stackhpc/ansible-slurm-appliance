@@ -1,4 +1,4 @@
-- name: Enable NVIDIA Persistence Daemon
+- name: Ensure NVIDIA Persistence Daemon state
   systemd:
     name: nvidia-persistenced
     enabled: true
