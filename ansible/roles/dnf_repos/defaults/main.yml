@@ -2,7 +2,6 @@ dnf_repos_pulp_url: "{{ appliances_pulp_url }}"
 dnf_repos_pulp_content_url: "{{ dnf_repos_pulp_url }}/pulp/content"
 dnf_repos_rocky_prefix: "{{ ansible_distribution | lower }}/{{ ansible_distribution_version }}"
 dnf_repos_epel_prefix: "epel/{{ ansible_distribution_major_version }}"
-dnf_repos_version_timestamps: "{{ appliances_repo_minor_timestamps[ansible_distribution_version] }}"
 dnf_repos_username: "{{ omit }}"
 dnf_repos_password: "{{ omit }}"
 
