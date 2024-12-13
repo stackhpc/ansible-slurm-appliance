@@ -5,6 +5,7 @@
   become: yes
   vars:
     os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
+    iam_slurm_compute: "{{ os_metadata.meta.slurm_compute | default(false) }}"
     server_node_ip: "{{ os_metadata.meta.k3s_server }}"
 
     resolv_conf_nameservers: [1.1.1.1, 8.8.8.8]
@@ -41,6 +42,11 @@
     openhpc_conf_server: "{{ server_node_ip }}"
 
   tasks:
+    - name: Skip initialization if slurm_compute metadata set to false
+      debug:
+        msg: "Skipping compute initialization"
+      when: not iam_slurm_compute | bool
+
     - name: Configure resolve.conf
       block:
         - name: Set nameservers in /etc/resolv.conf
@@ -65,7 +71,9 @@
             name: NetworkManager
             state: reloaded
           when: _copy_nm_config.changed | default(false)
-      when: resolv_conf_nameservers is defined and resolv_conf_nameservers | length > 0
+      when: 
+        - resolv_conf_nameservers is defined and resolv_conf_nameservers | length > 0
+        - iam_slurm_compute | bool
 
 
     - name: Mount /mnt/cluster on compute nodes and copy hosts to /etc/hosts
@@ -91,6 +99,7 @@
             owner: root
             group: root
             mode: 0644
+      when: iam_slurm_compute | bool
 
     # - name: Include hostvars from NFS share
     #   block:
@@ -103,6 +112,7 @@
     #     - name: Include vars from NFS mount
     #       include_vars:
     #         file: "/mnt/cluster/{{ short_hostname.stdout }}/hostvars.yml"
+    #   when: iam_slurm_compute | bool
 
 
     - name: NFS client mount
@@ -121,6 +131,7 @@
             fstype: nfs
             state: "{{ item.get('nfs_client_mnt_state', nfs_client_mnt_state) }}"
           loop: "{{ nfs_configurations }}"
+      when: iam_slurm_compute | bool
 
 
     - name: Manila mount
@@ -205,6 +216,7 @@
           loop_control:
             label: "{{ item.share_name }}"
           when: item.mount_state | default(os_manila_mount_state) in ['mounted' or 'ephemeral']
+      when: iam_slurm_compute | bool
 
 
     - name: Basic users setup
@@ -229,6 +241,7 @@
           loop_control:
             label: "{{ item.name }}"
           when: "'sudo' in item"
+      when: iam_slurm_compute | bool
 
 
     - name: Configure EESSI
@@ -245,6 +258,7 @@
         - name: Ensure CVMFS config is setup
           command:
             cmd: "cvmfs_config setup"
+      when: iam_slurm_compute | bool
 
 
     - name: Configure openhpc
@@ -286,3 +300,4 @@
             name: slurmd
             enabled: true
             state: started
+      when: iam_slurm_compute | bool

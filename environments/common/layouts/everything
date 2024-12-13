@@ -84,7 +84,7 @@ cluster
 
 [compute_init:children]
 # Hosts to deploy compute initialisation ansible-init script to.
-compute
+cluster
 
 [k3s:children]
 # Hosts to run k3s server/agent
