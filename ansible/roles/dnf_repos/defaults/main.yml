@@ -1,25 +1,23 @@
-dnf_repos_rocky_ark_prefix: https://ark.stackhpc.com/pulp/content/{{ ansible_distribution | lower }}/{{ ansible_distribution_version }}
-dnf_repos_rocky_ark_suffix: "{{ ansible_architecture }}/os/{{ dnf_repos_rocky_ark_timestamp }}/"
-# most stable from https://github.com/stackhpc/stackhpc-kayobe-config/blob/stackhpc/2024.1/etc/kayobe/pulp-repo-versions.yml
-# note that some timestamps can't be used because not all repos have snapshots for them
-dnf_repos_rocky_ark_timestamp: 20240816T002610
-dnf_repos_username: slurm-app-ci
-dnf_repos_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}"
+dnf_repos_pulp_content_url: "{{ appliances_pulp_url }}/pulp/content"
+dnf_repos_rocky_prefix: "{{ ansible_distribution | lower }}/{{ ansible_distribution_version }}"
+dnf_repos_epel_prefix: "epel/{{ ansible_distribution_major_version }}"
+dnf_repos_username: "{{ omit }}"
+dnf_repos_password: "{{ omit }}"
 
 # epel installed separately
 dnf_repos_repolist:
 - file: rocky
   name: baseos
-  base_url: "{{ dnf_repos_rocky_ark_prefix }}/BaseOS/{{ dnf_repos_rocky_ark_suffix }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/BaseOS/{{ ansible_architecture }}/os/{{ appliances_repo_minor_timestamps[ansible_distribution_version].baseos }}"
 - file: rocky
   name: appstream
-  base_url: "{{ dnf_repos_rocky_ark_prefix }}/AppStream/{{ dnf_repos_rocky_ark_suffix }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/AppStream/{{ ansible_architecture }}/os/{{ appliances_repo_minor_timestamps[ansible_distribution_version].appstream }}"
 - file: rocky
   name: crb
-  base_url: "{{ dnf_repos_rocky_ark_prefix }}/CRB/{{ dnf_repos_rocky_ark_suffix }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/CRB/{{ ansible_architecture }}/os/{{ appliances_repo_minor_timestamps[ansible_distribution_version].crb }}"
 - file: rocky-extras
   name: extras
-  base_url: "{{ dnf_repos_rocky_ark_prefix }}/extras/{{ dnf_repos_rocky_ark_suffix }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/extras/{{ ansible_architecture }}/os/{{ appliances_repo_minor_timestamps[ansible_distribution_version].extras }}"
 
-dnf_repos_epel_timestamp: 20240902T080424
-dnf_repos_epel_baseurl: "https://ark.stackhpc.com/pulp/content/epel/{{ ansible_distribution_major_version }}/Everything/{{ ansible_architecture }}/{{ dnf_repos_epel_timestamp }}"
+dnf_repos_epel_baseurl: "{{ dnf_repos_pulp_content_url }}/epel/{{ ansible_distribution_major_version }}/Everything/{{ ansible_architecture }}/{{ appliances_repo_major_timestamps[ansible_distribution_major_version].epel }}"
+dnf_repos_epel_description: "epel"

@@ -1,0 +1,3 @@
+doca_version: '2.9.1' # 2.9 is LTS, last to support ConnectX-4, 3 years for bug fixes and CVE updates
+doca_profile: doca-ofed
+doca_repo_url: "https://linux.mellanox.com/public/repo/doca/{{ doca_version }}/rhel{{ ansible_distribution_version }}/{{ ansible_architecture }}/"

@@ -7,6 +7,7 @@ appliances_environment_name: "{{ appliances_environment_root | basename | regex_
 appliances_cockpit_state: absent # RHEL cockpit installed but not enabled in genericcloud images; appliance defaults to removing it
 #appliances_state_dir: # define an absolute path here to use for persistent state: NB: This is defined as /var/lib/state in inventory by the default Terraform
 appliances_mode: configure
+appliances_pulp_url: https://ark.stackhpc.com
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.
@@ -99,3 +100,16 @@ appliances_packages_during_configure: false
 appliances_other_extra_packages: []
   
 appliances_extra_packages: "{{ appliances_default_extra_packages + appliances_other_extra_packages }}"
+
+###################### ark repo timestamps ###################################################
+
+appliances_repo_minor_timestamps:
+  '9.4':
+    baseos: 20240816T002610
+    appstream: 20240816T002610
+    crb: 20240816T002610
+    extras: 20240816T002610
+
+appliances_repo_major_timestamps:
+  '9':
+    epel: 20240902T080424

@@ -147,3 +147,10 @@ freeipa_client
 
 [extra_packages]
 # Hosts to install specified additional packages on
+
+[dnf_repos:children]
+# Hosts to replace system repos with Pulp repos
+builder
+
+[pulp:children]
+# Hosts used to run Pulp API commands

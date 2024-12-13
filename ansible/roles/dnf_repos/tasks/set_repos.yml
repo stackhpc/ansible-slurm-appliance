@@ -19,8 +19,8 @@
   ansible.builtin.yum_repository:
     name: epel
     file: epel
-    description: epel
+    description: "{{ dnf_repos_epel_description }}"
     gpgcheck: false
+    baseurl: "{{ dnf_repos_epel_baseurl }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
-    baseurl: "{{ dnf_repos_epel_baseurl }}"

@@ -6,6 +6,9 @@
   tasks:
     - name: Report hostname (= final image name)
       command: hostname
+    - name: Report inventory groups
+      debug:
+        var: group_names
 
 - name: Run pre.yml hook
   vars:
@@ -13,6 +16,25 @@
     hook_path: "{{ appliances_environment_root }}/hooks/pre.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
+
+- name: Sync pulp repos with upstream
+  hosts: pulp
+  tasks:
+  - ansible.builtin.include_role:
+      name: pulp_site
+      tasks_from: sync.yml
+      apply:
+        delegate_to: localhost
+    when: appliances_mode != 'configure'
+
+- hosts: dnf_repos
+  become: yes
+  tasks:
+  - name: Replace system repos with pulp repos 
+    ansible.builtin.include_role:
+      name: dnf_repos
+      tasks_from: set_repos.yml
+    when: appliances_mode != 'configure' and ansible_distribution_major_version == "9" #TODO update role once RL8 config decided
 
 - import_playbook: bootstrap.yml
 
@@ -199,7 +221,24 @@
         name: cloudalchemy.grafana
         tasks_from: install.yml
 
+- hosts: doca
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install NVIDIA DOCA
+      import_role:
+        name: doca
+
 - ansible.builtin.import_playbook: packages.yml
+
+- hosts: dnf_repos
+  become: yes
+  tasks:
+    - name: Disable pulp repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: disable_repos.yml
+      when: appliances_mode != 'configure' and ansible_distribution_major_version == "9" #TODO update role once RL8 config decided
 
 - name: Run post.yml hook
   vars:
