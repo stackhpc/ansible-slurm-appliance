@@ -7,8 +7,7 @@ On deploy host:
 
 On compute node:
 
-    [root@rl9-compute-0 rocky]# rm /var/lib/ansible-init.done
-    [root@rl9-compute-0 rocky]# systemctl restart ansible-init
+    [root@rl9-compute-0 rocky]# rm -f /var/lib/ansible-init.done && systemctl restart ansible-init
     [root@rl9-compute-0 rocky]# systemctl status ansible-init
 
 
@@ -98,3 +97,25 @@ Now run site.yml, then restart ansible-init again:
     rl9-compute-0/ rl9-compute-1/ 
     [root@rl9-compute-0 rocky]# ls /mnt/cluster/hostvars/rl9-compute-0/
     hostvars.yml
+
+This commit - shows that hostvars have loaded:
+
+    [root@rl9-compute-0 rocky]# systemctl status ansible-init
+    ● ansible-init.service
+        Loaded: loaded (/etc/systemd/system/ansible-init.service; enabled; preset: disabled)
+        Active: active (exited) since Fri 2024-12-13 21:06:20 UTC; 5s ago
+        Process: 27585 ExecStart=/usr/bin/ansible-init (code=exited, status=0/SUCCESS)
+    Main PID: 27585 (code=exited, status=0/SUCCESS)
+            CPU: 8.161s
+
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27769]: TASK [Demonstrate hostvars have loaded] ****************************************
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27769]: ok: [127.0.0.1] => {
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27769]:     "prometheus_version": "2.27.0"
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27769]: }
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27769]: PLAY RECAP *********************************************************************
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27769]: 127.0.0.1                  : ok=5    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27585]: [INFO] executing remote playbooks for stage - post
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27585]: [INFO] writing sentinel file /var/lib/ansible-init.done
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid ansible-init[27585]: [INFO] ansible-init completed successfully
+    Dec 13 21:06:20 rl9-compute-0.rl9.invalid systemd[1]: Finished ansible-init.service.
+
