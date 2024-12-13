@@ -27,6 +27,7 @@
 - import_playbook: slurm.yml
 - import_playbook: portal.yml
 - import_playbook: monitoring.yml
+- import_playbook: packages.yml
 
 - name: Run post.yml hook
   vars:

@@ -199,6 +199,8 @@
         name: cloudalchemy.grafana
         tasks_from: install.yml
 
+- ansible.builtin.import_playbook: packages.yml
+
 - name: Run post.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"

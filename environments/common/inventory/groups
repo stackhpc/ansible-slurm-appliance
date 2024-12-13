@@ -145,7 +145,5 @@ freeipa_client
 [lustre]
 # Hosts to run lustre client
 
-[extra_packages:children]
+[extra_packages]
 # Hosts to install specified additional packages on
-cluster
-builder
