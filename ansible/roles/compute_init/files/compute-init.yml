@@ -91,6 +91,13 @@
             fstype: nfs
             opts: rw,sync
             state: mounted
+          register: nfs_mount_result
+          ignore_errors: true
+
+        - name: Fail gracefully if NFS mount is not available
+          debug:
+            msg: "NFS mount failed. Skipping compute initialization. Re-image if this persists."
+          when: nfs_mount_result.failed
 
         - name: Copy /mnt/cluster/hosts contents to /etc/hosts
           copy:
@@ -99,20 +106,24 @@
             owner: root
             group: root
             mode: 0644
+          when: not nfs_mount_result.failed
       when: iam_slurm_compute | bool
 
-    # - name: Include hostvars from NFS share
-    #   block:
-    #     - name: Extract short hostname using a shell block
-    #       shell: |
-    #         HOSTNAME=$(hostname)
-    #         echo "${HOSTNAME%.test.invalid}"
-    #       register: short_hostname
 
-    #     - name: Include vars from NFS mount
-    #       include_vars:
-    #         file: "/mnt/cluster/{{ short_hostname.stdout }}/hostvars.yml"
-    #   when: iam_slurm_compute | bool
+    - name: Include hostvars from NFS share
+      block:
+        - name: Extract short hostname using a shell block
+          shell: |
+            HOSTNAME=$(hostname)
+            echo "${HOSTNAME%.test.invalid}"
+          register: short_hostname
+
+        - name: Include vars from NFS mount
+          include_vars:
+            file: "/mnt/cluster/{{ short_hostname.stdout }}/hostvars.yml"
+      when:
+        - iam_slurm_compute | bool
+        - not nfs_mount_result.failed
 
 
     - name: NFS client mount
@@ -131,7 +142,9 @@
             fstype: nfs
             state: "{{ item.get('nfs_client_mnt_state', nfs_client_mnt_state) }}"
           loop: "{{ nfs_configurations }}"
-      when: iam_slurm_compute | bool
+      when:
+        - iam_slurm_compute | bool
+        - not nfs_mount_result.failed
 
 
     - name: Manila mount
@@ -216,7 +229,9 @@
           loop_control:
             label: "{{ item.share_name }}"
           when: item.mount_state | default(os_manila_mount_state) in ['mounted' or 'ephemeral']
-      when: iam_slurm_compute | bool
+      when:
+        - iam_slurm_compute | bool
+        - not nfs_mount_result.failed
 
 
     - name: Basic users setup
@@ -241,7 +256,9 @@
           loop_control:
             label: "{{ item.name }}"
           when: "'sudo' in item"
-      when: iam_slurm_compute | bool
+      when:
+        - iam_slurm_compute | bool
+        - not nfs_mount_result.failed
 
 
     - name: Configure EESSI
@@ -258,7 +275,9 @@
         - name: Ensure CVMFS config is setup
           command:
             cmd: "cvmfs_config setup"
-      when: iam_slurm_compute | bool
+      when:
+        - iam_slurm_compute | bool
+        - not nfs_mount_result.failed
 
 
     - name: Configure openhpc
@@ -300,4 +319,6 @@
             name: slurmd
             enabled: true
             state: started
-      when: iam_slurm_compute | bool
+      when:
+        - iam_slurm_compute | bool
+        - not nfs_mount_result.failed
