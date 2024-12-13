@@ -48,7 +48,7 @@
         tasks_from: export.yml
 
 # TODO: really this should only run during build
-# but handy not to for debugging
+# but handy not to for debugging without build
 - name: Install compute_init script
   hosts: compute_init
   tags: compute_init
