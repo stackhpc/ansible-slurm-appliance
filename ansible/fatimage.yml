@@ -19,6 +19,14 @@
 
 - import_playbook: bootstrap.yml
 
+- hosts: doca
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install NVIDIA DOCA
+      import_role:
+        name: doca
+
 - name: Run post-bootstrap.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
@@ -201,14 +209,6 @@
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
-
-- hosts: doca
-  become: yes
-  gather_facts: yes
-  tasks:
-    - name: Install NVIDIA DOCA
-      import_role:
-        name: doca
 
 - name: Run post.yml hook
   vars:
