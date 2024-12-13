@@ -1,0 +1,26 @@
+---
+
+- name: Replace system repos with Pulp repos
+  ansible.builtin.yum_repository:
+    file: "{{ item.file }}"
+    name: "{{ item.name }}"
+    baseurl: "{{ item.base_url }}"
+    description: "{{ item.name }}"
+    username: "{{ dnf_repos_username }}"
+    password: "{{ dnf_repos_password }}"
+  loop: "{{ dnf_repos_repolist }}"
+
+- name: Install epel-release
+  # done so that roles installing epel via epel-release don't over-write our changes to the epel repo
+  ansible.builtin.dnf:
+    name: epel-release
+
+- name: Use Pulp EPEL repo
+  ansible.builtin.yum_repository:
+    name: epel
+    file: epel
+    description: epel
+    gpgcheck: false
+    username: "{{ dnf_repos_username }}"
+    password: "{{ dnf_repos_password }}"
+    baseurl: "{{ dnf_repos_epel_baseurl }}"

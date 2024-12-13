@@ -1,19 +1,22 @@
-name: Build fat image
+name: Test DOCA extra build
 on:
   workflow_dispatch:
-      inputs:
-        ci_cloud:
-          description: 'Select the CI_CLOUD'
-          required: true
-          type: choice
-          options:
-            - LEAFCLOUD
-            - SMS
-            - ARCUS
+  push:
+    branches:
+      - main
+    paths:
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'ansible/roles/doca/**'
+      - '.github/workflows/doca'
+  pull_request:
+    paths:
+      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'ansible/roles/doca/**'
+      - '.github/workflows/doca'
 
 jobs:
-  openstack:
-    name: openstack-imagebuild
+  doca:
+    name: doca-build
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
       cancel-in-progress: true
@@ -22,24 +25,34 @@ jobs:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
-          - image_name: openhpc-RL8
-            source_image_name: rocky-latest-RL8
-            inventory_groups: control,compute,login
-          - image_name: openhpc-RL9
-            source_image_name: rocky-latest-RL9
-            inventory_groups: control,compute,login
+          - image_name: openhpc-doca-RL8
+            source_image_name_key: RL8 # key into environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+            inventory_groups: doca
+          - image_name: openhpc-doca-RL9
+            source_image_name_key: RL9
+            inventory_groups: doca
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Record settings for CI cloud
+      - name: Load current fat images into GITHUB_ENV
+        # see https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#example-of-a-multiline-string
+        run: |
+          {
+            echo 'FAT_IMAGES<<EOF'
+            cat environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+            echo EOF
+          } >> "$GITHUB_ENV"
+
+      - name: Record settings
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo FAT_IMAGES: ${FAT_IMAGES}
 
       - name: Setup ssh
         run: |
@@ -75,15 +88,15 @@ jobs:
           . environments/.stackhpc/activate
           cd packer/
           packer init .
-
+          
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ matrix.build.source_image_name }}" \
+          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           openstack.pkr.hcl
-
+        
       - name: Get created image names from manifest
         id: manifest
         run: |
@@ -102,6 +115,12 @@ jobs:
         run: |
           . venv/bin/activate
           openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+
+      - name: Delete image for automatically-run workflows
+        run: |
+          . venv/bin/activate
+          openstack image delete "${{ steps.manifest.outputs.image-id }}"
+        if: ${{ github.event_name != 'workflow_dispatch' }}
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
