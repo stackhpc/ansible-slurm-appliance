@@ -118,9 +118,9 @@
             echo "${HOSTNAME%.test.invalid}"
           register: short_hostname
 
-        - name: Include vars from NFS mount
-          include_vars:
-            file: "/mnt/cluster/{{ short_hostname.stdout }}/hostvars.yml"
+    #     - name: Include vars from NFS mount
+    #       include_vars:
+    #         file: "/mnt/cluster/{{ short_hostname.stdout }}/hostvars.yml"
       when:
         - iam_slurm_compute | bool
         - not nfs_mount_result.failed
@@ -319,6 +319,9 @@
             name: slurmd
             enabled: true
             state: started
+
+        - name: Ensure node is in cluster
+          command: scontrol update state=resume nodename={{ short_hostname.stdout }}
       when:
         - iam_slurm_compute | bool
         - not nfs_mount_result.failed
