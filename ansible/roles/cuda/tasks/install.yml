@@ -1,7 +1,7 @@
 
 # Based on https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#redhat8-installation
 
-- name: Check for OFED
+- name: Check for OFED/DOCA
   command:
     cmd: dnf list --installed rdma-core
   register: _dnf_rdma_core
@@ -10,12 +10,12 @@
 - name: Assert OFED installed
   assert: 
     that: "'mlnx' in _dnf_rdma_core.stdout"
-    fail_msg: "Did not find 'mlnx' in installed rdma-core package, is OFED installed?"
+    fail_msg: "Did not find 'mlnx' in installed rdma-core package, is OFED/DOCA installed?"
 
 - name: Install cuda repo
   get_url:
-    dest: "/etc/yum.repos.d/cuda-{{ cuda_distro }}.repo"
-    url: "{{ cuda_repo }}"
+    dest: "/etc/yum.repos.d/cuda-rhel{{ ansible_distribution_major_version }}.repo"
+    url: "{{ cuda_repo_url }}"
 
 - name: Check if nvidia driver module is enabled
   shell:
@@ -25,7 +25,7 @@
   register: _cuda_driver_module_enabled
 
 - name: Enable nvidia driver module
-  ansible.builtin.command: "dnf module enable -y nvidia-driver:open-dkms"
+  ansible.builtin.command: "dnf module enable -y nvidia-driver:{{ cuda_driver_stream }}"
   register: _cuda_driver_module_enable
   when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
@@ -35,6 +35,10 @@
   register: _cuda_driver_install
   when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
+
+- name: Check kernel has not been modified
+  assert:
+    that: "'kernel' not in _cuda_driver_install.stdout"
 
 - name: Install cuda packages
   ansible.builtin.dnf:
