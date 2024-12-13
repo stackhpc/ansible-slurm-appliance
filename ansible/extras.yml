@@ -26,7 +26,7 @@
   tasks:
     - import_role:
         name: cuda
-      tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'install.yml' }}"
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'install.yml' }}"
 
 - name: Persist hostkeys across rebuilds
   # Must be after filesystems.yml (for storage)
