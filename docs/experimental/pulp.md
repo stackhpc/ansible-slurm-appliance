@@ -14,4 +14,4 @@ An existing Pulp server can be used to host Ark repos by overriding `pulp_site_p
 
 ## Syncing Pulp content with Ark
 
-By default, the appliance will sync repos for the targetted distribution during build (can be disabled by setting `appliances_sync_pulp_on_build` to `false`). You must supply your Ark credentials, either by overriding `pulp_site_upstream_password` or setting environment variable `ARK_PASSWORD`. Content can also be synced by running `ansible/adhoc/sync-pulp.yml`, optionally setting extravars for `pulp_site_target_arch`, `pulp_site_target_distribution`, `pulp_site_target_distribution_version` and `pulp_site_target_distribution_version`.
+If the `pulp` group is added to the Packer build groups, the local Pulp server will be synced with Ark on build. You must supply your Ark credentials, either by overriding `pulp_site_upstream_password` or setting environment variable `ARK_PASSWORD`. Content can also be synced by running `ansible/adhoc/sync-pulp.yml`, optionally setting extravars for `pulp_site_target_arch`, `pulp_site_target_distribution`, `pulp_site_target_distribution_version` and `pulp_site_target_distribution_version`.

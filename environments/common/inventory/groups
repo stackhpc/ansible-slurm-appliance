@@ -147,9 +147,7 @@ freeipa_client
 
 [dnf_repos:children]
 # Hosts to replace system repos with Pulp repos
-cluster
 builder
 
 [pulp:children]
 # Hosts used to run Pulp API commands
-builder

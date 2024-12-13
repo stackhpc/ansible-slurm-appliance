@@ -8,4 +8,3 @@
         pulp_site_target_distribution: "rocky"
         pulp_site_target_distribution_version: "9.4"
         pulp_site_target_distribution_version_major: "9"
-        pulp_site_version_timestamps: "{{ appliances_repo_timestamps[pulp_site_target_distribution_version] }}"

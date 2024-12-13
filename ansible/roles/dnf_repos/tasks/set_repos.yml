@@ -6,6 +6,8 @@
     name: "{{ item.name }}"
     baseurl: "{{ item.base_url }}"
     description: "{{ item.name }}"
+    username: "{{ dnf_repos_username }}"
+    password: "{{ dnf_repos_password }}"
   loop: "{{ dnf_repos_repolist }}"
 
 - name: Install epel-release
@@ -20,3 +22,5 @@
     description: "{{ dnf_repos_epel_description }}"
     gpgcheck: false
     baseurl: "{{ dnf_repos_epel_baseurl }}"
+    username: "{{ dnf_repos_username }}"
+    password: "{{ dnf_repos_password }}"

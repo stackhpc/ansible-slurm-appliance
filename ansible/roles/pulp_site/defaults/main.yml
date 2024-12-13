@@ -14,7 +14,8 @@ pulp_site_target_arch: "{{ pulp_site_target_facts['architecture'] }}"
 pulp_site_target_distribution: "{{ pulp_site_target_facts['distribution'] | lower }}"
 pulp_site_target_distribution_version: "{{ pulp_site_target_facts['distribution_version'] }}"
 pulp_site_target_distribution_version_major: "{{ pulp_site_target_facts['distribution_major_version'] }}"
-pulp_site_version_timestamps: "{{ appliances_repo_timestamps[pulp_site_target_distribution_version] }}"
+pulp_site_version_timestamps: "{{ appliances_repo_minor_timestamps[pulp_site_target_distribution_version] }}"
+pulp_site_major_version_timestamps: "{{ appliances_repo_major_timestamps[pulp_site_target_distribution_version_major] }}"
 
 pulp_site_rpm_info:
 - name: "baseos-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.baseos }}"
@@ -30,7 +31,7 @@ pulp_site_rpm_info:
   url: "{{ pulp_site_default_upstream_prefix }}/extras/{{ pulp_site_default_upstream_suffix }}/{{ pulp_site_version_timestamps.extras }}"
   base_path: "rocky/{{ pulp_site_target_distribution_version }}/extras/{{ pulp_site_version_timestamps.extras }}"
 - name: "epel-{{ pulp_site_target_distribution_version }}-{{ pulp_site_version_timestamps.epel }}"
-  url: "https://ark.stackhpc.com/pulp/content/epel/{{ pulp_site_target_distribution_version_major }}/Everything/{{ pulp_site_target_arch }}/{{ pulp_site_version_timestamps.epel }}"
+  url: "https://ark.stackhpc.com/pulp/content/epel/{{ pulp_site_target_distribution_version_major }}/Everything/{{ pulp_site_target_arch }}/{{ pulp_site_major_version_timestamps.epel }}"
   base_path: "epel/{{ pulp_site_target_distribution_version }}/{{ pulp_site_version_timestamps.epel }}"
 
 pulp_site_rpm_repo_defaults:

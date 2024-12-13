@@ -25,7 +25,7 @@
       tasks_from: sync.yml
       apply:
         delegate_to: localhost
-    when: appliances_mode != 'configure' and appliances_sync_pulp_on_build
+    when: appliances_mode != 'configure'
 
 - hosts: dnf_repos
   become: yes
