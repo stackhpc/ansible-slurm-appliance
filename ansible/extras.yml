@@ -24,7 +24,7 @@
   gather_facts: yes
   tags: cuda
   tasks:
-    - import_role:
+    - include_role:
         name: cuda
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'install.yml' }}"
 
