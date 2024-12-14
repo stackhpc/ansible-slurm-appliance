@@ -84,7 +84,6 @@ cluster
 
 [compute_init:children]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
-# TODO: actually should be empty for now
 compute
 
 [k3s:children]

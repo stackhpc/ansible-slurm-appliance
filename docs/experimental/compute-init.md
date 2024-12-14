@@ -7,29 +7,22 @@ TODO: describe current status.
 To develop/debug this without actually having to build an image:
 
 
-1. Add the compute nodes into the `compute_init` group:
-
-        cat <<EOF >> $APPLIANCES_ENVIRONMENT_ROOT/inventory/extra_groups
-        [compute_init:children]
-        compute
-        EOF
-
-2. Deploy a cluster using tofu and ansible/site.yml as normal. This will
+1. Deploy a cluster using tofu and ansible/site.yml as normal. This will
    additionally configure the control node to export compute hosts over NFS.
    Check the cluster is up.
 
-3. Reimage the compute nodes:
+2. Reimage the compute nodes:
 
         ansible-playbook --limit compute ansible/adhoc/rebuild
 
-4. Add metadata to a compute node e.g. via Horzon to turn on compute-init
+3. Add metadata to a compute node e.g. via Horzon to turn on compute-init
    playbook functionality.
 
-5. Fake an image build to deploy the compute-init playbook:
+4. Fake an image build to deploy the compute-init playbook:
 
         ansible-playbook ansible/fatimage.yml --tags compute_init
 
-6. Fake a reimage of compute to run ansible-init and the compute-init playbook:
+5. Fake a reimage of compute to run ansible-init and the compute-init playbook:
 
     On compute node where metadata was added:
 
@@ -38,7 +31,7 @@ To develop/debug this without actually having to build an image:
 
     Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
 
-Steps 5/6 can be repeated with changes to the compute script. If desirable
+Steps 4/5 can be repeated with changes to the compute script. If desirable
 reimage the compute node(s) first as in step 3.
 
 # Results/progress
