@@ -20,4 +20,4 @@ nfs_configurations:
     nfs_enable:
         server: "{{ inventory_hostname in groups['control'] }}"
         clients: false
-    nfs_export: "/exports/cluster" # control node has to copy in /etc/hosts to here
+    nfs_export: "/exports/cluster"

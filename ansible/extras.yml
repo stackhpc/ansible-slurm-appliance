@@ -37,7 +37,7 @@
     - import_role:
         name: persist_hostkeys
 
-# TODO: I'm not convinced this is the right place
+# TODO: Is this is the right place?
 - hosts: compute_init:!builder
   tags: compute_init
   become: yes
@@ -46,17 +46,6 @@
     - include_role:
         name: compute_init
         tasks_from: export.yml
-
-# TODO: really this should only run during build
-# but handy not to for debugging without build
-- name: Install compute_init script
-  hosts: compute_init
-  tags: compute_init
-  become: yes
-  tasks:
-    - include_role:
-        name: compute_init
-        tasks_from: install.yml
 
 - name: Install k9s
   become: yes

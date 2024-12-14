@@ -1,15 +1,47 @@
+# compute-init
+
+TODO: describe current status.
+
+# Development
 
 To develop/debug this without actually having to build an image:
 
-On deploy host:
 
-    .stackhpc/ (venv) [rocky@steveb-dev slurm-app-rl9]$ ansible-playbook ansible/extras.yml --tags compute_init
+1. Add the compute nodes into the `compute_init` group:
 
-On compute node:
+        cat <<EOF >> $APPLIANCES_ENVIRONMENT_ROOT/inventory/extra_groups
+        [compute_init:children]
+        compute
+        EOF
 
-    [root@rl9-compute-0 rocky]# rm -f /var/lib/ansible-init.done && systemctl restart ansible-init
-    [root@rl9-compute-0 rocky]# systemctl status ansible-init
+2. Deploy a cluster using tofu and ansible/site.yml as normal. This will
+   additionally configure the control node to export compute hosts over NFS.
+   Check the cluster is up.
 
+3. Reimage the compute nodes:
+
+        ansible-playbook --limit compute ansible/adhoc/rebuild
+
+4. Add metadata to a compute node e.g. via Horzon to turn on compute-init
+   playbook functionality.
+
+5. Fake an image build to deploy the compute-init playbook:
+
+        ansible-playbook ansible/fatimage.yml --tags compute_init
+
+6. Fake a reimage of compute to run ansible-init and the compute-init playbook:
+
+    On compute node where metadata was added:
+
+        [root@rl9-compute-0 rocky]# rm -f /var/lib/ansible-init.done && systemctl restart ansible-init
+        [root@rl9-compute-0 rocky]# systemctl status ansible-init
+
+    Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
+
+Steps 5/6 can be repeated with changes to the compute script. If desirable
+reimage the compute node(s) first as in step 3.
+
+# Results/progress
 
 Without any metadata:
 
