@@ -13,3 +13,7 @@
 # Alternatively, configure to use ark directly:
 dnf_repos_username: slurm-app-ci
 dnf_repos_password: "{{ lookup('env','ARK_PASSWORD') }}"
+
+# Can be set regardless of approach above:
+pulp_site_upstream_username: slurm-app-ci
+pulp_site_upstream_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}"

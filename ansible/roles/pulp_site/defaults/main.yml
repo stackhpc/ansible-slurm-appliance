@@ -1,12 +1,10 @@
 pulp_site_url: "{{ appliances_pulp_url }}"
 pulp_site_port: 8080
 pulp_site_username: admin # shouldn't be changed
+pulp_site_password: "{{ vault_pulp_admin_password }}"
 pulp_site_upstream_content_url: https://ark.stackhpc.com/pulp/content
-pulp_site_upstream_username: slurm-app-ci
-pulp_site_upstream_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}"
 _pulp_site_rocky_prefix: "{{ pulp_site_target_distribution }}/{{ pulp_site_target_distribution_version }}"
 pulp_site_default_upstream_suffix: "{{ pulp_site_target_arch }}/os"
-pulp_site_password: "{{ vault_pulp_admin_password }}"
 pulp_site_validate_certs: false
 pulp_site_install_dir: '/home/rocky/pulp'
 pulp_site_selinux_suffix: "{{ ':Z' if ansible_selinux.status == 'enabled' else '' }}"
