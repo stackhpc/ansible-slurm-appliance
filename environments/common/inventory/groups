@@ -147,8 +147,8 @@ freeipa_client
 
 [dnf_repos:children]
 # Hosts to replace system repos with Pulp repos
+# Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` will leak Ark creds to users
 builder
 
 [pulp]
 # Add builder to this group to enable automatically syncing of pulp during image build
-# Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` risks leaking Ark creds
