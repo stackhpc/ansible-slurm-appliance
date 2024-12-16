@@ -44,3 +44,13 @@
   tasks:
   - import_role:
       name: k9s
+
+- hosts: extra_packages
+  become: yes
+  tags:
+   - extra_packages
+  tasks:
+  - name: Install additional packages
+    dnf:
+      name: "{{ appliances_extra_packages }}"
+    when: appliances_mode != 'configure' or appliances_packages_during_configure
