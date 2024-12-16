@@ -220,7 +220,7 @@
       import_role:
         name: doca
 
-- import_playbook: disable_repos.yml
+- import_playbook: disable-repos.yml
 
 - name: Run post.yml hook
   vars:
