@@ -6,6 +6,9 @@
   tasks:
     - name: Report hostname (= final image name)
       command: hostname
+    - name: Report inventory groups
+      debug:
+        var: group_names
 
 - name: Run pre.yml hook
   vars:
@@ -97,6 +100,10 @@
         name: openondemand
         tasks_from: jupyter_compute.yml
       when: "'openondemand_jupyter' in group_names"
+
+    - name: Install Apache PAM module # Extracted from start of roles/openondemand/tasks/pam_auth.yml to ensure only installed during build
+      yum:
+        name: mod_authnz_pam
 
     # - import_playbook: monitoring.yml:
     - import_role:
@@ -194,6 +201,14 @@
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
+
+- hosts: doca
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install NVIDIA DOCA
+      import_role:
+        name: doca
 
 - name: Run post.yml hook
   vars:
