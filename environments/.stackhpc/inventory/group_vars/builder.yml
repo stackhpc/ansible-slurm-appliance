@@ -9,6 +9,6 @@
 
 # appliances_pulp_url: "{{ pulp_server_config[lookup('env','CI_CLOUD')].url }}"
 # pulp_site_password: "{{ pulp_server_config[lookup('env','CI_CLOUD')].password }}"
-
+# Alternatively, configure to use ark directly:
 dnf_repos_username: slurm-app-ci
 dnf_repos_password: "{{ lookup('env','ARK_PASSWORD') }}"

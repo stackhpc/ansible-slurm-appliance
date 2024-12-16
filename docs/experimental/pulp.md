@@ -1,13 +1,13 @@
 # Pulp Server
 
-In order to ensure reproducible builds, the appliance can build images using repository mirrors from StackHPC's Ark Pulp server. The appliance will sync relevant repositories to local Pulp server which will be used for image builds. Using a local server can be enabled by adding `pulp` to the build groups and overriding `dnf_repos_repolist` to point at content hosted on the local server.
+In order to ensure reproducible builds, the appliance can build images using repository mirrors from StackHPC's "Ark" Pulp server. The appliance can sync relevant repositories to a local Pulp server which will then be used instead of Ark. Using a local Pulp can be enabled by adding `pulp` to the build groups and overriding `dnf_repos_repolist` to point at content hosted on the local server.
 
 ## Deploying/configuring Pulp Server
 
 ### Deploying a Pulp server
 A playbook is provided to install and configure a Pulp server on a given host. Admin credentials for this server are automatically generated through the `ansible/adhoc/generate-passwords.yml' playbook. This can be run with
 `ansible-playbook ansible/adhoc/deploy-pulp.yml -e "pulp_server=<host_ip>"`
-This will print a Pulp endpoint which can be copied to your environments as appropriate. Ensure that the server is accessible on the specified port. Note that this server's content isn't authenticated so assumes the server is deployed behind a secure network.
+This will print a Pulp endpoint which can be copied to your environments as appropriate. Ensure that the server is accessible on the specified port. Note access to this server's content isn't authenticated so assumes the server is deployed behind a secure network.
 
 ### Using an existing Pulp server
 An existing Pulp server can be used to host Ark repos by overriding `pulp_site_password` and `appliances_pulp_url` in the target environment. Note that this assumes the same configuration as the appliance deployed pulp i.e no content authentication.

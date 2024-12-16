@@ -150,4 +150,4 @@ freeipa_client
 builder
 
 [pulp:children]
-# Hosts used to run Pulp API commands
+# Add builder to this group to enable automatically syncing of pulp during image build
