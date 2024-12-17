@@ -24,8 +24,6 @@ on:
       - '!.gitignore'
       - '!.github/workflows/'
       - '.github/workflows/stackhpc'
-    branches:
-      - '!feat/compute-script'
 jobs:
   openstack:
     name: openstack-ci
