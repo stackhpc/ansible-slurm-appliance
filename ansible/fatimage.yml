@@ -17,6 +17,16 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Sync pulp repos with upstream
+  hosts: pulp
+  tasks:
+  - ansible.builtin.include_role:
+      name: pulp_site
+      tasks_from: sync.yml
+      apply:
+        delegate_to: localhost
+    when: appliances_mode != 'configure'
+
 - import_playbook: bootstrap.yml
 
 - hosts: doca
@@ -210,12 +220,22 @@
         name: cloudalchemy.grafana
         tasks_from: install.yml
 
+- hosts: doca
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install NVIDIA DOCA
+      import_role:
+        name: doca
+
 - name: Run post.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
+
+- import_playbook: disable-repos.yml
 
 - hosts: builder
   become: yes

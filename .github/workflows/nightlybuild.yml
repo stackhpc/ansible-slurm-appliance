@@ -35,6 +35,7 @@ jobs:
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
+      LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
