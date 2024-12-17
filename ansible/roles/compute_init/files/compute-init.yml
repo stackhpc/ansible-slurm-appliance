@@ -6,7 +6,7 @@
   vars:
     os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
     server_node_ip: "{{ os_metadata.meta.k3s_server }}"
-    enable_slurmd: "{{ os_metadata.meta.enable_slurmd | default(false) | bool }}"
+    enable_compute: "{{ os_metadata.meta.enable_compute | default(false) | bool }}"
     enable_resolv_conf: "{{ os_metadata.meta.enable_senable_resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.enable_etc_hosts | default(false) | bool }}"
 
@@ -19,10 +19,10 @@
         - name: Report skipping initialization if not compute node
           # meta: end_play produces no output
           debug:
-            msg: "Skipping compute initialization: Metadata enable_slurmd is not true"
+            msg: "Skipping compute initialization: Metadata enable_compute is not true"
         
         - meta: end_play
-      when: not enable_slurmd
+      when: not enable_compute
 
     - name: Ensure the mount directory exists
       file:
@@ -103,7 +103,7 @@
     # TODO: - name: Configure EESSI
 
     # TODO: - name: Configure openhpc
-    # NB: don't need conditional block on enable_slurmd as have already exited
+    # NB: don't need conditional block on enable_compute as have already exited
     # if not the case
     - name: Write Munge key
       copy:
