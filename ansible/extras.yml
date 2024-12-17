@@ -37,8 +37,10 @@
     - import_role:
         name: persist_hostkeys
 
-# TODO: Is this is the right place?
-- hosts: compute_init:!builder
+
+- name: Setup NFS export for compute node configuration
+  hosts: compute_init:!builder
+  # NB: has to be after eeesi and os-manila-mount
   tags: compute_init
   become: yes
   name: Export hostvars
