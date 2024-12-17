@@ -110,6 +110,20 @@
         policy: "{{ selinux_policy }}"
       register: sestatus
 
+- hosts: dnf_repos
+  become: yes
+  tasks:
+  - name: Check that creds won't be leaked to users
+    ansible.builtin.assert:
+      that: dnf_repos_password is undefined
+      fail_msg: Passwords should not be templated into repofiles during configure, unset 'dnf_repos_password'
+    when: appliances_mode == 'configure'
+  - name: Replace system repos with pulp repos 
+    ansible.builtin.include_role:
+      name: dnf_repos
+      tasks_from: set_repos.yml
+    when: ansible_distribution_major_version == "9" #TODO update role once RL8 config decided
+
 # --- tasks after here require access to package repos ---
 - hosts: squid
   tags: squid

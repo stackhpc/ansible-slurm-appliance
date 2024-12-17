@@ -27,15 +27,6 @@
         delegate_to: localhost
     when: appliances_mode != 'configure'
 
-- hosts: dnf_repos
-  become: yes
-  tasks:
-  - name: Replace system repos with pulp repos 
-    ansible.builtin.include_role:
-      name: dnf_repos
-      tasks_from: set_repos.yml
-    when: appliances_mode != 'configure' and ansible_distribution_major_version == "9" #TODO update role once RL8 config decided
-
 - import_playbook: bootstrap.yml
 
 - name: Run post-bootstrap.yml hook
@@ -229,16 +220,7 @@
       import_role:
         name: doca
 
-- ansible.builtin.import_playbook: packages.yml
-
-- hosts: dnf_repos
-  become: yes
-  tasks:
-    - name: Disable pulp repos
-      ansible.builtin.include_role:
-        name: dnf_repos
-        tasks_from: disable_repos.yml
-      when: appliances_mode != 'configure' and ansible_distribution_major_version == "9" #TODO update role once RL8 config decided
+- import_playbook: disable-repos.yml
 
 - name: Run post.yml hook
   vars:
