@@ -1,1 +1,11 @@
 pulp_site_port: 8080
+
+# If using Ark directly (no local Pulp server), override the following with Ark creds
+
+# dnf_repos_username:
+# dnf_repos_password:
+
+# If instead using local Pulp server, override below with Ark creds
+
+# pulp_site_upstream_username:
+# pulp_site_upstream_password:

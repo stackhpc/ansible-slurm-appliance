@@ -17,7 +17,8 @@ The fat images StackHPC builds and tests in CI are available from [GitHub releas
 To build either a site-specific fat image from scratch, or to extend an existing StackHPC fat image:
 
 1. Ensure the current OpenStack credentials have sufficient authorisation to upload images (this may or may not require the `member` role for an application credential, depending on your OpenStack configuration).
-2. Create a Packer [variable definition file](https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#assigning-values-to-input-variables) at e.g. `environments/<environment>/builder.pkrvars.hcl` containing at a minimum:
+2. The provided dev credentials for StackHPC's "Ark" Pulp server must be added to the target environments. This is done by overriding `dnf_repos_username` and `dnf_repos_password` with your vault encrypted credentials in `environments/<base_environment>/inventory/group_vars/all/pulp.yml`. See the [experimental docs](experimental/pulp.md) if you wish instead wish to use a local Pulp server.
+3. Create a Packer [variable definition file](https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#assigning-values-to-input-variables) at e.g. `environments/<environment>/builder.pkrvars.hcl` containing at a minimum:
   
     ```hcl
     flavor = "general.v1.small"                           # VM flavor to use for builder VMs
@@ -35,9 +36,9 @@ To build either a site-specific fat image from scratch, or to extend an existing
       - `update,control,login,compute`: The resultant image has all packages in the source image updated, and then packages for all types of nodes in the cluster are added. When using a GenericCloud image for `source_image_name` this builds a site-specific fat image from scratch.
       - One or more specific groups which are not enabled in the appliance by default, e.g. `lustre`. When using a StackHPC fat image for `source_image_name` this extends the image with just this additional functionality.
 
-3. Activate the venv and the relevant environment.
+4. Activate the venv and the relevant environment.
 
-4. Build images using the relevant variable definition file, e.g.:
+5. Build images using the relevant variable definition file, e.g.:
 
         cd packer/
         PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
@@ -52,7 +53,7 @@ To build either a site-specific fat image from scratch, or to extend an existing
 
       then delete the failed volume, select cancelling the build when Packer queries, and then retry. This is [Openstack bug 1823445](https://bugs.launchpad.net/cinder/+bug/1823445).
 
-5. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc` and including a timestamp and a shortened git hash.
+6. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc` and including a timestamp and a shortened git hash.
 
 # Build Process
 
