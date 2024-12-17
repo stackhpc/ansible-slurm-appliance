@@ -17,6 +17,16 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Sync pulp repos with upstream
+  hosts: pulp
+  tasks:
+  - ansible.builtin.include_role:
+      name: pulp_site
+      tasks_from: sync.yml
+      apply:
+        delegate_to: localhost
+    when: appliances_mode != 'configure'
+
 - import_playbook: bootstrap.yml
 
 - name: Run post-bootstrap.yml hook
@@ -209,6 +219,8 @@
     - name: Install NVIDIA DOCA
       import_role:
         name: doca
+
+- import_playbook: disable-repos.yml
 
 - name: Run post.yml hook
   vars:

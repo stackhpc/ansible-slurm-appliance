@@ -66,5 +66,7 @@ roles/*
 !roles/lustre/**
 !roles/dnf_repos/
 !roles/dnf_repos/**
+!roles/pulp_site/
+!roles/pulp_site/**
 !roles/doca/
 !roles/doca/**
