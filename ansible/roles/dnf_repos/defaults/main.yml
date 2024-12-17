@@ -4,18 +4,32 @@ dnf_repos_epel_prefix: "epel/{{ ansible_distribution_major_version }}"
 dnf_repos_username: "{{ omit }}"
 dnf_repos_password: "{{ omit }}"
 
+dnf_repos_filenames:
+  '8':
+    baseos: 'Rocky-BaseOS'
+    appstream: 'Rocky-AppStream'
+    crb: 'Rocky-PowerTools'
+    extras: 'Rocky-Extras'
+  '9':
+    baseos: 'rocky'
+    appstream: 'rocky'
+    crb: 'rocky'
+    extras: 'rocky-extras'
+
+dnf_repos_version_filenames: "{{ dnf_repos_filenames[ansible_distribution_major_version] }}"
+
 # epel installed separately
 dnf_repos_repolist:
-- file: rocky
+- file: "{{ dnf_repos_version_filenames.baseos }}"
   name: baseos
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/BaseOS/{{ ansible_architecture }}/os/{{ appliances_repo_timestamps.baseos[ansible_distribution_version] }}"
-- file: rocky
+- file: "{{ dnf_repos_version_filenames.appstream }}"
   name: appstream
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/AppStream/{{ ansible_architecture }}/os/{{ appliances_repo_timestamps.appstream[ansible_distribution_version] }}"
-- file: rocky
-  name: crb
+- file: "{{ dnf_repos_version_filenames.crb }}"
+  name: "{{ 'powertools' if ansible_distribution_major_version == '8' else 'crb' }}"
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/CRB/{{ ansible_architecture }}/os/{{ appliances_repo_timestamps.crb[ansible_distribution_version] }}"
-- file: rocky-extras
+- file: "{{ dnf_repos_version_filenames.extras }}"
   name: extras
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/extras/{{ ansible_architecture }}/os/{{ appliances_repo_timestamps.extras[ansible_distribution_version] }}"
 
