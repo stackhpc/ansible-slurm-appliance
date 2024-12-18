@@ -12,6 +12,7 @@
     enable_nfs: "{{ os_metadata.meta.enable_nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.enable_manila | default(false) | bool }}"
     enable_basic_users: "{{ os_metadata.meta.enable_basic_users | default(false) | bool }}"
+    enable_eessi: "{{ os_metadata.meta.enable_eessi | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
@@ -228,9 +229,21 @@
           when: "'sudo' in item"
       when: enable_basic_users
 
-    # TODO: - name: Configure EESSI
+    - name: EESSI
+      block:
+        - name: Copy cvmfs config
+          copy:
+            src: /mnt/cluster/cvmfs/default.local
+            dest: /etc/cvmfs/default.local
+            owner: root
+            group: root
+            mode: 0644
 
-    # TODO: - name: Configure openhpc
+        - name: Ensure CVMFS config is setup
+          command:
+            cmd: "cvmfs_config setup"
+      when: enable_eessi
+
     # NB: don't need conditional block on enable_compute as have already exited
     # if not the case
     - name: Write Munge key

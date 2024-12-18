@@ -39,6 +39,8 @@ The following roles/groups are currently fully functional:
 - `openhpc`: all functionality
 - `basic_users`: all functionality, assumes home directory already exists on
   shared storage
+- `eessi`: all functionality, assumes `cvmfs_config` is the same on control
+  node and all compute nodes.
 
 # Development/debugging
 
