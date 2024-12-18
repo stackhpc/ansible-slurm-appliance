@@ -13,7 +13,17 @@
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     # this is a good example: common environment actually defines this (non-functional w/o compute groups), but role default is empty
     resolv_conf_nameservers: []
-    
+
+    nfs_client_mnt_point: "/mnt"
+    nfs_client_mnt_options:
+    nfs_client_mnt_state: mounted
+    nfs_configurations:
+    nfs_enable:
+      clients: false
+    nfs_enable:
+      server: false
+      clients: false
+
   tasks:
     - block:
         - name: Report skipping initialization if not compute node
@@ -95,6 +105,10 @@
       when: enable_etc_hosts
 
     # TODO: - name: NFS client mount
+    - name: If nfs-clients is present
+      include_tasks: nfs-clients.yml
+      when: nfs_enable.clients | bool or ('nfs_enable' in item and item.nfs_enable.clients | bool)
+      loop: "{{ nfs_configurations }}"
 
     # TODO: - name: Manila mount
 
@@ -116,7 +130,7 @@
     - name: Set slurmctld location for configless operation
       lineinfile:
         path: /etc/sysconfig/slurmd
-        line: "SLURMD_OPTIONS='--conf-server {{ server_node_ip }}'"
+        line: "SLURMD_OPTIONS='--conf-server {{ groups['control'] | first }}'"
         regexp: "^SLURMD_OPTIONS="
         create: yes
         owner: root

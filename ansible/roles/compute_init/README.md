@@ -32,9 +32,12 @@ to configure the node before the services on the control node are available
 (which requires running the site.yml playbook).
 
 The following roles are currently fully functional:
-- `resolv_conf`
-- `etc_hosts`
-- `stackhpc.openhpc`
+- `resolv_conf`: all functionality
+- `etc_hosts`: all functionality
+- `nfs`: client functionality only
+- `stackhpc.openhpc`: all functionality, except that the control server name
+  must be the control node's `inventory_hostname`; `openhpc_slurm_control_host`
+  and `openhpc_slurm_control_host_address` are ignored.
 
 # Development/debugging
 
@@ -113,7 +116,8 @@ as in step 3.
     More generally, there is nothing to stop any group var depending on a
     "{{ hostvars[] }}" interpolation ...
 
-    Currently, the only functionality this has been problematic for is setting
-    the control node address for the slurmd node, which has been done using
-    the (metadata-provided) IP, given this is needed to do the NFS mount anyway
-    in the absence of working internal DNS.
+    Currently, this has been worked around for the following cases:
+    - The inventory hostname for the control node, indirected via `.api_address`
+      in the above hostvars. This is needed for the default nfs configuration
+      and the slurmctld namne. For compute-init this has been Defined using
+      "{{ groups['control'] | first }}" as the hostvars do include the groups.

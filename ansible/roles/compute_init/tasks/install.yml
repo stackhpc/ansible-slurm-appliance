@@ -12,6 +12,7 @@
     - files
     - library
     - filter_plugins
+    - playbooks
 
 - name: Inject files from roles
   copy:
@@ -33,7 +34,9 @@
       dest: library/os_manila_share.py
     - src: ../../basic_users/filter_plugins/filter_keys.py
       dest: filter_plugins/filter_keys.py
-    
+    - src: ../../stackhpc.nfs/tasks/nfs-clients.yml
+      dest: playbooks/nfs-clients.yml
+
 - name: Add filter_plugins to ansible.cfg
   lineinfile:
     path: /etc/ansible-init/ansible.cfg
