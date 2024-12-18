@@ -55,6 +55,7 @@
       # Type Path Mode User Group Age Argument
       R! /tmp/containers-user-*
       R! /tmp/podman-run-*
+      R! /tmp/storage-run-*
     dest: /etc/tmpfiles.d/podman-local.conf
     owner: root
     group: root
