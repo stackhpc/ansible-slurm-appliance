@@ -84,12 +84,12 @@ appliances_local_users: "{{ appliances_local_users_default + appliances_local_us
 
 appliances_repo_timestamps:
   baseos:
-    '9.4': 20240816T002610
+    '9.4': 20241115T011711
   appstream:
-    '9.4': 20240816T002610
+    '9.4': 20241112T003151
   crb:
-    '9.4': 20240816T002610
+    '9.4': 20241115T003133
   extras:
-    '9.4': 20240816T002610
+    '9.4': 20241118T002802
   epel:
-    '9': 20240902T080424
+    '9': 20241213T010218
