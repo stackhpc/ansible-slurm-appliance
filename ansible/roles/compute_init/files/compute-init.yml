@@ -10,6 +10,7 @@
     enable_resolv_conf: "{{ os_metadata.meta.enable_resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.enable_etc_hosts | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.enable_nfs | default(false) | bool }}"
+    enable_manila: "{{ os_metadata.meta.enable_manila | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
@@ -22,6 +23,16 @@
       clients: false
 
     # openhpc: no defaults required
+
+    os_manila_mount_shares: []
+    os_manila_mount_ceph_conf_path: /etc/ceph
+    os_manila_mount_state: mounted
+    os_manila_mount_opts:
+      - x-systemd.device-timeout=30
+      - x-systemd.mount-timeout=30
+      - noatime
+      - _netdev # prevents mount blocking early boot before networking available
+      - rw
 
   tasks:
     - block:
@@ -103,15 +114,85 @@
         mode: 0644
       when: enable_etc_hosts
 
-    # TODO: - name: NFS client mount
+    # NFS client mount
     - name: If nfs-clients is present
-      include_tasks: ../tasks/nfs-clients.yml
+      include_tasks: tasks/nfs-clients.yml
       when:
         - enable_nfs
         - nfs_enable.clients | bool or ('nfs_enable' in item and item.nfs_enable.clients | bool)
       loop: "{{ nfs_configurations }}"
 
-    # TODO: - name: Manila mount
+    - name: Manila mounts
+      block:
+        - name: Read manila share info from nfs file
+          include_vars:
+            file: /mnt/cluster/manila_share_info.yml
+          no_log: true # contains secrets
+        
+        - name: Ensure Ceph configuration directory exists
+          ansible.builtin.file:
+            path: "{{ os_manila_mount_ceph_conf_path }}"
+            state: directory
+            mode: "0755"
+            owner: root
+            group: root
+
+        - name: Configure ceph.conf using os_manila_mount_host
+          ansible.builtin.template:
+            src: ceph.conf.j2
+            dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.conf"
+            owner: root
+            group: root
+            mode: "0600"
+
+        - name: Ensure mount directory exists
+          ansible.builtin.file:
+            path: "{{ item.mount_path }}"
+            state: directory
+            owner: "{{ item.mount_user | default(omit) }}"
+            group: "{{ item.mount_group | default(omit) }}"
+            mode: "{{ item.mount_mode | default(omit) }}"
+          loop: "{{ os_manila_mount_shares }}"
+          loop_control:
+            label: "{{ item.share_name }}"
+
+        - name: Write Ceph client keyring
+          ansible.builtin.template:
+            src: ceph.keyring.j2
+            dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ item.share_user }}.keyring"
+            mode: "0600"
+            owner: root
+            group: root
+          loop: "{{ os_manila_mount_share_info }}"
+          loop_control:
+            label: "{{ item.share_name }}"
+
+        - name: Mount the Ceph share
+          ansible.posix.mount:
+            path: "{{ item[0].mount_path }}"
+            src: "{{ item[1].host }}:{{ item[1].export }}"
+            fstype: ceph
+            opts: "name={{ item[1].share_user }},{{ (item[0].mount_opts | default(os_manila_mount_opts)) | join(',') }}"
+            # NB share_user is looked up here in case of autodetection
+            state: "{{ item[0].mount_state | default(os_manila_mount_state) }}"
+          loop: "{{ os_manila_mount_shares | zip(os_manila_mount_share_info) }}"
+          loop_control:
+            label: "{{ item[0].share_name }}"
+
+        - name: Ensure mounted directory has correct permissions
+          ansible.builtin.file:
+            path: "{{ item.mount_path }}"
+            state: directory
+            owner: "{{ item.mount_user | default(omit) }}"
+            group: "{{ item.mount_group | default(omit) }}"
+            mode: "{{ item.mount_mode | default(omit) }}"
+          loop: "{{ os_manila_mount_shares }}"
+          loop_control:
+            label: "{{ item.share_name }}"
+          when: item.mount_state | default(os_manila_mount_state) in ['mounted' or 'ephemeral']
+      when:
+        - enable_manila
+        - os_manila_mount_shares | length > 0
 
     # TODO: - name: Basic users setup
 

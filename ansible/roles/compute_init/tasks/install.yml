@@ -2,7 +2,7 @@
 
 - name: Ensure directories exist
   file:
-    path: "/etc/ansible-init/{{ item }}"
+    path: "/etc/ansible-init/playbooks/{{ item }}"
     state: directory
     owner: root
     group: root
@@ -17,7 +17,7 @@
 - name: Inject files from roles
   copy:
     src: '{{ item.src }}'
-    dest: '/etc/ansible-init/{{ item.dest }}'
+    dest: '/etc/ansible-init/playbooks/{{ item.dest }}'
     owner: root
     group: root
     mode: 0644
@@ -30,10 +30,8 @@
       dest: templates/ceph.keyring.j2
     - src: ../../resolv_conf/files/NetworkManager-dns-none.conf
       dest: files/NetworkManager-dns-none.conf
-    - src: ../../stackhpc.os-manila-mount/library/os_manila_share.py
-      dest: library/os_manila_share.py
-    - src: ../../basic_users/filter_plugins/filter_keys.py
-      dest: filter_plugins/filter_keys.py
+    # - src: ../../basic_users/filter_plugins/filter_keys.py
+    #   dest: filter_plugins/filter_keys.py
     - src: ../../stackhpc.nfs/tasks/nfs-clients.yml
       dest: tasks/nfs-clients.yml
 

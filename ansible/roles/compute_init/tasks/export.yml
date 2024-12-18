@@ -33,3 +33,14 @@
     dest: /exports/cluster/hostvars/{{ inventory_hostname }}/hostvars.yml
     mode: u=rw,go=
   delegate_to: "{{ groups['control'] | first }}"
+
+- name: Copy manila share info to /exports/cluster
+  copy:
+    content: "{{ os_manila_mount_share_info_var | to_nice_yaml }}"
+    dest: /exports/cluster/manila_share_info.yml
+  run_once: true
+  delegate_to: "{{ groups['control'] | first }}"
+  when: os_manila_mount_share_info is defined
+  vars:
+    os_manila_mount_share_info_var:
+      os_manila_mount_share_info: "{{ os_manila_mount_share_info }}"
