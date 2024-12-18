@@ -7,7 +7,7 @@
     os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
     server_node_ip: "{{ os_metadata.meta.k3s_server }}"
     enable_compute: "{{ os_metadata.meta.enable_compute | default(false) | bool }}"
-    enable_resolv_conf: "{{ os_metadata.meta.enable_senable_resolv_conf | default(false) | bool }}"
+    enable_resolv_conf: "{{ os_metadata.meta.enable_resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.enable_etc_hosts | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
