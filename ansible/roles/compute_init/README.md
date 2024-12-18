@@ -50,9 +50,9 @@ To develop/debug this without actually having to build an image:
 
 2. Reimage the compute nodes:
 
-        ansible-playbook --limit compute ansible/adhoc/rebuild
+        ansible-playbook --limit compute ansible/adhoc/rebuild.yml
 
-3. Add metadata to a compute node e.g. via Horzon to turn on compute-init
+3. Add metadata to a compute node e.g. via Horizon to turn on compute-init
    playbook functionality.
 
 4. Fake an image build to deploy the compute-init playbook:
