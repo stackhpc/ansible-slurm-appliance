@@ -82,6 +82,10 @@ openhpc
 # Hosts to run ansible-init
 cluster
 
+[compute_init:children]
+# Hosts to deploy compute initialisation ansible-init script to.
+cluster
+
 [k3s:children]
 # Hosts to run k3s server/agent
 openhpc
