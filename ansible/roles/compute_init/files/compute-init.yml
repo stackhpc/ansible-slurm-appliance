@@ -11,6 +11,7 @@
     enable_etc_hosts: "{{ os_metadata.meta.enable_etc_hosts | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.enable_nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.enable_manila | default(false) | bool }}"
+    enable_basic_users: "{{ os_metadata.meta.enable_basic_users | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
@@ -33,6 +34,15 @@
       - noatime
       - _netdev # prevents mount blocking early boot before networking available
       - rw
+
+    basic_users_groups: []
+    basic_users_manage_homedir: false # homedir must already exist on shared filesystem
+    basic_users_userdefaults:
+      state: present
+      create_home: "{{ basic_users_manage_homedir }}"
+      generate_ssh_key:  "{{ basic_users_manage_homedir }}"
+      ssh_key_comment: "{{ item.name }}"
+    basic_users_users: []
 
   tasks:
     - block:
@@ -194,7 +204,29 @@
         - enable_manila
         - os_manila_mount_shares | length > 0
 
-    # TODO: - name: Basic users setup
+    - name: Basic users
+      block:
+        - name: Create groups
+          ansible.builtin.group: "{{ item }}"
+          loop:  "{{ basic_users_groups }}"
+
+        - name: Create users
+          user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() }}"
+          loop: "{{ basic_users_users }}"
+          loop_control:
+            label: "{{ item.name }} [{{ item.state | default('present') }}]"
+          register: basic_users_info
+
+        - name: Write sudo rules
+          blockinfile:
+            path: /etc/sudoers.d/80-{{ item.name}}-user
+            block: "{{ item.sudo }}"
+            create: true
+          loop: "{{ basic_users_users }}"
+          loop_control:
+            label: "{{ item.name }}"
+          when: "'sudo' in item"
+      when: enable_basic_users
 
     # TODO: - name: Configure EESSI
 

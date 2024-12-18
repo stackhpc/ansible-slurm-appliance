@@ -30,8 +30,8 @@
       dest: templates/ceph.keyring.j2
     - src: ../../resolv_conf/files/NetworkManager-dns-none.conf
       dest: files/NetworkManager-dns-none.conf
-    # - src: ../../basic_users/filter_plugins/filter_keys.py
-    #   dest: filter_plugins/filter_keys.py
+    - src: ../../basic_users/filter_plugins/filter_keys.py
+      dest: filter_plugins/filter_keys.py
     - src: ../../stackhpc.nfs/tasks/nfs-clients.yml
       dest: tasks/nfs-clients.yml
 

@@ -31,11 +31,14 @@ The check in 4b. above is what prevents the compute-init script from trying
 to configure the node before the services on the control node are available
 (which requires running the site.yml playbook).
 
-The following roles are currently fully functional:
+The following roles/groups are currently fully functional:
 - `resolv_conf`: all functionality
 - `etc_hosts`: all functionality
 - `nfs`: client functionality only
-- `stackhpc.openhpc`: all functionality
+- `manila`: all functionality
+- `openhpc`: all functionality
+- `basic_users`: all functionality, assumes home directory already exists on
+  shared storage
 
 # Development/debugging
 
