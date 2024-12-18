@@ -35,9 +35,7 @@ The following roles are currently fully functional:
 - `resolv_conf`: all functionality
 - `etc_hosts`: all functionality
 - `nfs`: client functionality only
-- `stackhpc.openhpc`: all functionality, except that the control server name
-  must be the control node's `inventory_hostname`; `openhpc_slurm_control_host`
-  and `openhpc_slurm_control_host_address` are ignored.
+- `stackhpc.openhpc`: all functionality
 
 # Development/debugging
 
@@ -96,8 +94,8 @@ as in step 3.
      support certain subsets of role functionality or variables
      Examples: resolv_conf, stackhpc.openhpc
 
-- Some hostvars are tempalted from hostvars from other nodes, which aren't
-  available in the current approach:
+- Some variables are defined using hostvars from other nodes, which aren't
+  available v the current approach:
 
     ```
     [root@rl9-compute-0 rocky]# grep hostvars /mnt/cluster/hostvars/rl9-compute-0/hostvars.yml 
@@ -116,8 +114,12 @@ as in step 3.
     More generally, there is nothing to stop any group var depending on a
     "{{ hostvars[] }}" interpolation ...
 
-    Currently, this has been worked around for the following cases:
-    - The inventory hostname for the control node, indirected via `.api_address`
-      in the above hostvars. This is needed for the default nfs configuration
-      and the slurmctld namne. For compute-init this has been Defined using
-      "{{ groups['control'] | first }}" as the hostvars do include the groups.
+    Only `nfs_server_default` and `openhpc_slurm_control_host` are of concern
+    for compute nodes - both of these indirect via `api_address` to
+    `inventory_hostname`. This has been worked around by replacing this with
+    "{{ groups['control'] | first }}" which does result in the control node
+    inventory hostname when templating.
+
+    Note that although `groups` is defined in the templated hostvars, when
+    the hostvars are loaded using `include_vars:` is is ignored as it is a
+    "magic variable" determined by ansible itself and cannot be set.

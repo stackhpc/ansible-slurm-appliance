@@ -9,9 +9,9 @@
     enable_compute: "{{ os_metadata.meta.enable_compute | default(false) | bool }}"
     enable_resolv_conf: "{{ os_metadata.meta.enable_resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.enable_etc_hosts | default(false) | bool }}"
+    enable_nfs: "{{ os_metadata.meta.enable_nfs | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
-    # this is a good example: common environment actually defines this (non-functional w/o compute groups), but role default is empty
     resolv_conf_nameservers: []
 
     nfs_client_mnt_point: "/mnt"
@@ -20,9 +20,8 @@
     nfs_configurations:
     nfs_enable:
       clients: false
-    nfs_enable:
-      server: false
-      clients: false
+
+    # openhpc: no defaults required
 
   tasks:
     - block:
@@ -106,8 +105,10 @@
 
     # TODO: - name: NFS client mount
     - name: If nfs-clients is present
-      include_tasks: nfs-clients.yml
-      when: nfs_enable.clients | bool or ('nfs_enable' in item and item.nfs_enable.clients | bool)
+      include_tasks: ../tasks/nfs-clients.yml
+      when:
+        - enable_nfs
+        - nfs_enable.clients | bool or ('nfs_enable' in item and item.nfs_enable.clients | bool)
       loop: "{{ nfs_configurations }}"
 
     # TODO: - name: Manila mount
@@ -130,7 +131,7 @@
     - name: Set slurmctld location for configless operation
       lineinfile:
         path: /etc/sysconfig/slurmd
-        line: "SLURMD_OPTIONS='--conf-server {{ groups['control'] | first }}'"
+        line: "SLURMD_OPTIONS='--conf-server {{ openhpc_slurm_control_host_address | default(openhpc_slurm_control_host) }}'"
         regexp: "^SLURMD_OPTIONS="
         create: yes
         owner: root
@@ -152,3 +153,4 @@
     - name: Ensure node is resumed
       # TODO: consider if this is always safe for all job states?
       command: scontrol update state=resume nodename={{ ansible_hostname }}
+      # TODO: make safe for repeated runs

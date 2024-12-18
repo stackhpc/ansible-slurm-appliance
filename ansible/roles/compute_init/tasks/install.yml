@@ -12,7 +12,7 @@
     - files
     - library
     - filter_plugins
-    - playbooks
+    - tasks
 
 - name: Inject files from roles
   copy:
@@ -35,7 +35,7 @@
     - src: ../../basic_users/filter_plugins/filter_keys.py
       dest: filter_plugins/filter_keys.py
     - src: ../../stackhpc.nfs/tasks/nfs-clients.yml
-      dest: playbooks/nfs-clients.yml
+      dest: tasks/nfs-clients.yml
 
 - name: Add filter_plugins to ansible.cfg
   lineinfile:
