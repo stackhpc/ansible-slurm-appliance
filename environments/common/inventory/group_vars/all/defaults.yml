@@ -82,6 +82,7 @@ appliances_local_users: "{{ appliances_local_users_default + appliances_local_us
 
 ###########################################################################################
 
+# BEGIN Marker for ansible/ci/update_timestamps.yml (GH workflow managed)
 appliances_repo_timestamps:
   baseos:
     '9.4': 20240816T002610
@@ -93,3 +94,17 @@ appliances_repo_timestamps:
     '9.4': 20240816T002610
   epel:
     '9': 20240902T080424
+# END Marker for ansible/ci/update_timestamps.yml (GH workflow managed)
+
+# For CI
+appliances_repo_timestamp_sources:
+  baseos:
+    '9.4': https://ark.stackhpc.com/pulp/content/rocky/9.4/BaseOS/x86_64/os/
+  appstream:
+    '9.4': https://ark.stackhpc.com/pulp/content/rocky/9.4/AppStream/x86_64/os/
+  crb:
+    '9.4': https://ark.stackhpc.com/pulp/content/rocky/9.4/CRB/x86_64/os/
+  extras:
+    '9.4': https://ark.stackhpc.com/pulp/content/rocky/9.4/extras/x86_64/os/
+  epel:
+    '9': https://ark.stackhpc.com/pulp/content/epel/9/Everything/x86_64/

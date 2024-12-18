@@ -1,0 +1,28 @@
+name: Check for new Release Train snapshots
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'  # Run at 7am on default branch
+
+jobs:
+  upstream_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup environment
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+
+      - name: Check for updated Ark timestamps and replace in defaults.yml
+        run: ansible-playbook ansible/ci/update_timestamps.yml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: environments/common/inventory/group_vars/all/defaults.yml
+          commit-message: "[automated] bumped repo timestamps to latest"
+          branch: auto/bump-timestamps
+          title: "[Automation] Bumped repo timestamps to latest"
+          body: Automated changes by .github/workflows/update-timestamps.yml

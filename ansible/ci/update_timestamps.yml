@@ -1,0 +1,28 @@
+- hosts: localhost
+  tasks:
+  - name: Check sources are defined for all repos
+    ansible.builtin.assert:
+      that: appliances_repo_timestamps[item].keys() == appliances_repo_timestamp_sources[item].keys()
+      fail_msg: "'appliances_repo_timestamps.{{ item }}' is missing a source definition in 'appliances_repo_timestamp_sources'"
+    loop: "{{ appliances_repo_timestamps.keys() }}"
+
+  - name: Get latest timestamps from sources
+    latest_timestamps:
+      sources_dict: "{{ appliances_repo_timestamp_sources }}"
+      current_timestamps_dict: "{{ appliances_repo_timestamps }}"
+    register: _result
+
+  - name: Print updated timestamps
+    ansible.builtin.debug:
+      var: _result.changed_timestamps
+
+  - name: Overwrite repo timestamps with latest
+    ansible.builtin.blockinfile:
+      path: "{{ playbook_dir }}/../../environments/common/inventory/group_vars/all/defaults.yml"
+      marker: "# {mark} Marker for ansible/ci/update_timestamps.yml (GH workflow managed)"
+      block: |
+          {{ yaml_template | to_nice_yaml(indent=2) }}
+    vars:
+      yaml_template:
+        appliances_repo_timestamps: "{{ _result.latest_dict }}"
+    when: (_result.changed_timestamps | count) > 0
