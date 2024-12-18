@@ -94,7 +94,7 @@
       block:
         - name: Set nameservers in /etc/resolv.conf
           ansible.builtin.template:
-            src: /etc/ansible-init/templates/resolv.conf.j2
+            src: resolv.conf.j2
             dest: /etc/resolv.conf
             owner: root
             group: root
@@ -102,7 +102,7 @@
 
         - name: Disable NetworkManager control of resolv.conf
           ansible.builtin.copy:
-            src: /etc/ansible-init/files/NetworkManager-dns-none.conf
+            src: files/NetworkManager-dns-none.conf
             dest: /etc/NetworkManager/conf.d/90-dns-none.conf
             owner: root
             group: root

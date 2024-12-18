@@ -36,11 +36,11 @@ The following roles/groups are currently fully functional:
 - `etc_hosts`: all functionality
 - `nfs`: client functionality only
 - `manila`: all functionality
-- `openhpc`: all functionality
 - `basic_users`: all functionality, assumes home directory already exists on
   shared storage
 - `eessi`: all functionality, assumes `cvmfs_config` is the same on control
   node and all compute nodes.
+- `openhpc`: all functionality
 
 # Development/debugging
 
