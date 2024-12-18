@@ -8,6 +8,7 @@
     description: "{{ item.name }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
+    gpgcheck: false
   loop: "{{ dnf_repos_repolist }}"
 
 - name: Install epel-release

@@ -28,7 +28,7 @@ dnf_repos_repolist:
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/AppStream/{{ ansible_architecture }}/os/{{ appliances_repo_timestamps.appstream[ansible_distribution_version] }}"
 - file: "{{ dnf_repos_version_filenames.crb }}"
   name: "{{ 'powertools' if ansible_distribution_major_version == '8' else 'crb' }}"
-  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/CRB/{{ ansible_architecture }}/os/{{ appliances_repo_timestamps.crb[ansible_distribution_version] }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/{{ 'PowerTools' if ansible_distribution_major_version == '8' else 'CRB' }}/{{ ansible_architecture }}/os/{{ appliances_repo_timestamps.crb[ansible_distribution_version] }}"
 - file: "{{ dnf_repos_version_filenames.extras }}"
   name: extras
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_rocky_prefix }}/extras/{{ ansible_architecture }}/os/{{ appliances_repo_timestamps.extras[ansible_distribution_version] }}"
