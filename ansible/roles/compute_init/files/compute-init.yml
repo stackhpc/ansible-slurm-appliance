@@ -153,4 +153,7 @@
     - name: Ensure node is resumed
       # TODO: consider if this is always safe for all job states?
       command: scontrol update state=resume nodename={{ ansible_hostname }}
-      # TODO: make safe for repeated runs
+      register: _scontrol_update
+      failed_when:
+        - _scontrol_update.rc > 0
+        - "'slurm_update error: Invalid node state specified' not in _scontrol_update.stderr"
