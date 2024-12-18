@@ -25,6 +25,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Override CI_CLOUD if PR label is present
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          # Iterate over the labels
+          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
+          echo $labels
+          for label in $labels; do
+             if [[ $label == CI_CLOUD=* ]]; then
+              # Extract the value after 'CI_CLOUD='
+              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> $GITHUB_ENV
+            fi
+          done
+
       - name: Record settings for CI cloud
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
