@@ -72,7 +72,7 @@ variable "k3s_token" {
     type = string
 }
 
-variable "k3s_server" {
-    description = "Name/address of k3s server"
+variable "control_address" {
+    description = "Name/address of control node"
     type = string
 }

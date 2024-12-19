@@ -58,6 +58,8 @@ roles/*
 !roles/squid/**
 !roles/tuned/
 !roles/tuned/**
+!roles/compute_init/
+!roles/compute_init/**
 !roles/k3s/
 !roles/k3s/**
 !roles/k9s/
