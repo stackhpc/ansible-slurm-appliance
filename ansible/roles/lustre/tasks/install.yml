@@ -41,30 +41,9 @@
   ansible.builtin.dnf:
     name: "{{ _lustre_find_rpms.files | map(attribute='path')}}"
     disable_gpg_check: yes
-  
-- block:
-  - name: Remove lustre build prerequisites
-    # NB Only remove ones this role installed which weren't upgrades
-    ansible.builtin.dnf:
-      name: "{{ _new_pkgs }}"
-      state: absent
-    vars:
-      _installed_pkgs: |
-        {{
-          _lustre_dnf_build_packages.results |
-          select('match', 'Installed:') |
-          map('regex_replace', '^Installed: (.+?)-[0-9].*$', '\1')
-        }}
-      _removed_pkgs: |
-        {{
-          _lustre_dnf_build_packages.results |
-          select('match', 'Removed:') |
-          map('regex_replace', '^Removed: (.+?)-[0-9].*$', '\1')
-        }}
-      _new_pkgs: "{{ _installed_pkgs | difference(_removed_pkgs) }}"
-  
-  - name: Delete lustre build dir
-    file:
-      path: "{{ lustre_build_dir }}"
-      state: absent
+
+- name: Delete lustre build dir
+  file:
+    path: "{{ lustre_build_dir }}"
+    state: absent
   when: lustre_build_cleanup | bool
