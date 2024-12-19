@@ -4,7 +4,7 @@
   ansible.builtin.yum_repository:
     file: "{{ item.file }}"
     name: "{{ item.name }}"
-    baseurl: "{{ item.base_url }}"
+    baseurl: "{{ dnf_repos_pulp_content_url }}/{{ item.subpath }}"
     description: "{{ item.name }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
@@ -21,6 +21,6 @@
     file: epel
     description: "{{ dnf_repos_epel_description }}"
     gpgcheck: false
-    baseurl: "{{ dnf_repos_epel_baseurl }}"
+    baseurl: "{{ dnf_repos_pulp_content_url }}/{{ dnf_repos_epel_subpath }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"

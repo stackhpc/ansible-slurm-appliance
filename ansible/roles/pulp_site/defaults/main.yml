@@ -3,28 +3,25 @@ pulp_site_port: 8080
 pulp_site_username: admin # shouldn't be changed
 pulp_site_password: "{{ vault_pulp_admin_password }}"
 pulp_site_upstream_content_url: https://ark.stackhpc.com/pulp/content
-_pulp_site_rocky_prefix: "{{ pulp_site_target_distribution }}/{{ pulp_site_target_distribution_version }}"
 pulp_site_default_upstream_suffix: "{{ pulp_site_target_arch }}/os"
 pulp_site_validate_certs: false
 pulp_site_install_dir: '/home/rocky/pulp'
 pulp_site_selinux_suffix: "{{ ':Z' if ansible_selinux.status == 'enabled' else '' }}"
 pulp_site_target_facts: "{{ hostvars[groups['builder'][0]]['ansible_facts'] }}"
-pulp_site_target_arch: "{{ pulp_site_target_facts['architecture'] }}"
-pulp_site_target_distribution: "{{ pulp_site_target_facts['distribution'] | lower }}"
 pulp_site_target_distribution_version: "{{ pulp_site_target_facts['distribution_version'] }}"
 pulp_site_target_distribution_version_major: "{{ pulp_site_target_facts['distribution_major_version'] }}"
 
 pulp_site_rpm_info:
-- name: "baseos-{{ pulp_site_target_distribution_version }}-{{ appliances_repo_timestamps.baseos[pulp_site_target_distribution_version] }}"
-  subpath: "{{ _pulp_site_rocky_prefix }}/BaseOS/{{ pulp_site_default_upstream_suffix }}/{{ appliances_repo_timestamps.baseos[pulp_site_target_distribution_version] }}"
-- name: "appstream-{{ pulp_site_target_distribution_version }}-{{ appliances_repo_timestamps.appstream[pulp_site_target_distribution_version] }}"
-  subpath: "{{ _pulp_site_rocky_prefix }}/AppStream/{{ pulp_site_default_upstream_suffix }}/{{ appliances_repo_timestamps.appstream[pulp_site_target_distribution_version] }}"
-- name: "crb-{{ pulp_site_target_distribution_version }}-{{ appliances_repo_timestamps.crb[pulp_site_target_distribution_version] }}"
-  subpath: "{{ _pulp_site_rocky_prefix }}/{{ 'PowerTools' if pulp_site_target_distribution_version_major == '8' else 'CRB' }}/{{ pulp_site_default_upstream_suffix }}/{{ appliances_repo_timestamps.crb[pulp_site_target_distribution_version] }}"
-- name: "extras-{{ pulp_site_target_distribution_version }}-{{ appliances_repo_timestamps.extras[pulp_site_target_distribution_version] }}"
-  subpath: "{{ _pulp_site_rocky_prefix }}/extras/{{ pulp_site_default_upstream_suffix }}/{{ appliances_repo_timestamps.extras[pulp_site_target_distribution_version] }}"
-- name: "epel-{{ pulp_site_target_distribution_version_major }}-{{ appliances_repo_timestamps.epel[pulp_site_target_distribution_version_major] }}"
-  subpath: "epel/{{ pulp_site_target_distribution_version_major }}/Everything/{{ pulp_site_target_arch }}/{{ appliances_repo_timestamps.epel[pulp_site_target_distribution_version_major] }}"
+- name: "baseos-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.baseos[pulp_site_target_distribution_version].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.baseos[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
+- name: "appstream-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.appstream[pulp_site_target_distribution_version].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.appstream[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
+- name: "crb-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.crb[pulp_site_target_distribution_version].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.crb[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
+- name: "extras-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.extras[pulp_site_target_distribution_version].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.extras[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
+- name: "epel-{{ pulp_site_target_distribution_version_major }}-{{ appliances_pulp_repos.epel[pulp_site_target_distribution_version_major].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.epel[pulp_site_target_distribution_version_major] | appliances_repo_to_subpath }}"
 
 pulp_site_rpm_repo_defaults:
   remote_username: "{{ pulp_site_upstream_username }}"
