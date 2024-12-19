@@ -75,11 +75,11 @@ By default, the following utility packages are installed during build:
 - git
 - latest python version for system (3.6 for for Rocky 8.9 and 3.12 for Rocky 9.4)
 
-Additional packages from any DNF repositories which are enabled during build (which always includes EPEL, PowerTools and OpenHPC) can be added to the image by defining a list `appliances_other_extra_packages` (defaulted to the empty list in the common environment) in e.g. `environments/$SITE_ENV/inventory/group_vars/all/defaults.yml`. For example:
+Additional packages from any DNF repositories which are enabled during build (which always includes EPEL, PowerTools and OpenHPC) can be added to the image by defining a list `appliances_extra_packages_other` (defaulted to the empty list in the common environment) in e.g. `environments/$SITE_ENV/inventory/group_vars/all/defaults.yml`. For example:
 
 ```yaml
     # environments/foo-base/inventory/group_vars/all/defaults.yml:
-    appliances_other_extra_package:
+    appliances_extra_packages_other:
     - somepackage
     - anotherpackage
 
