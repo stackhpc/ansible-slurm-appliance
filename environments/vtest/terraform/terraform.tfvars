@@ -1,33 +1,26 @@
 compute_types = {
   gpu: {
     flavor: "slurm_test_gpu0"
-    image: "aco-rocky9.5-final"
+    image: "vslurm95_20241216_111931"
   }
   gpu3: {
     flavor: "slurm_test_gpu3"
-    image: "aco-rocky9.5-final"
+    image: "vslurm95_20241216_111931"
   }
   gpu5: {
     flavor: "slurm_test_gpu5"
-    image: "aco-rocky9.5-final"
+    image: "vslurm95_20241216_111931"
   }
   large: {
     flavor: "slurm_test_compute_lg"
-    image: "aco-rocky9.5-final"
+    image: "vslurm95_20241216_111931"
   }
   large_intel: {
     flavor: "slurm_test_compute_lg_intel"
-    image: "aco-rocky9.5-final"
+    image: "vslurm95_20241216_111931"
   }
 }
-# openhpc-ofed-RL9-240712-1425
-# rocky94_generic_cloud
-# aco-rocky9.4-finaxl does not work
-# openhpc-ofed-RL9-240712-1425
-#  small: {
-#    flavor: "slurm_test_compute_sm"
-#    image: "openhpc-ofed-RL9-240712-1425"
-#  }
+
 
 # #############################################
 # SEE: compute_names.auto.tfvars
@@ -35,13 +28,8 @@ compute_types = {
 # #############################################
 
 #---- login node info ----
-login_image = "aco-rocky9.5-final"
+login_image = "vslurm95_20241216_111931"
 login_flavor = "vermilion_slurm_login_c8m15"
-
-proxy_name = "vtadmin"
-
-# The `admin` node is like a login node,
-# but access is limited for admin-type worlflows`
 
 login_names = {
   vtlogin-1: "vermilion_slurm_login_c8m15"
@@ -53,11 +41,14 @@ login_ips = {
   vtadmin: "10.60.105.73"
 }
 
-#---- CONTROL node info ----
-control_image = "aco-rocky9.5-final"
-
-control_ip = "10.60.105.70"
+# CONTROL node info
 control_flavor = "vermilion_util_c8m15"
+control_ip     = "10.60.105.70"
+control_image = "vslurm95_20241216_111931"
+
+proxy_name = "vtadmin"
+# The `admin` node is like a login node,
+# but access is limited for admin-type worlflows
 
 ###################################################
 
