@@ -80,7 +80,7 @@ resource "openstack_networking_port_v2" "control_control" {
 #### NREL test control name set here:
 resource "openstack_compute_instance_v2" "control" {
 
-  name = "${var.cluster_name}-vtcontrol"
+  name = "${var.cluster_name}-control"
   image_id = data.openstack_images_image_v2.control.id
   flavor_name = var.control_flavor
   key_pair = var.key_pair
@@ -121,7 +121,7 @@ resource "openstack_compute_instance_v2" "control" {
     #cloud-config
     bootcmd:
       - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(data.openstack_blockstorage_volume_v3.state.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L state $BLKDEV
-      
+
     mounts:
       - [LABEL=state, /var/lib/state]
   EOF
