@@ -10,3 +10,4 @@ selinux # this is a shim to avoid having to use --system-site-packages, you stil
 netaddr
 matplotlib
 pulp-cli==0.29.2
+beautifulsoup4==4.12.3
