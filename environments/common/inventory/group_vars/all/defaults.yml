@@ -82,7 +82,7 @@ appliances_local_users: "{{ appliances_local_users_default + appliances_local_us
 
 ################## bootstrap: extra package installs ######################################
 
-appliances_default_extra_packages:
+appliances_extra_packages_default:
  - htop
  - nano
  - screen
@@ -95,11 +95,11 @@ appliances_default_extra_packages:
  - "{{ 'python36' if ansible_distribution_version == '8.9' else 'python312' }}"
  
 
-appliances_packages_during_configure: false
+appliances_extra_packages_during_configure: false
 
-appliances_other_extra_packages: []
+appliances_extra_packages_other: []
   
-appliances_extra_packages: "{{ appliances_default_extra_packages + appliances_other_extra_packages }}"
+appliances_extra_packages: "{{ appliances_extra_packages_default + appliances_extra_packages_other }}"
 
 ###################### ark repo timestamps ###################################################
 
