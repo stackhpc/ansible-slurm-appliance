@@ -1,5 +1,5 @@
 # generic allows a standalone slurm vs the openhpc distribution package.
-openhpc_install_type: generic  
+openhpc_install_type: generic
 
 # define paths to slurm on nodes:
 slurm_build_version: '23.11.1' # quote to avoid ansible autoconversion weirdness
@@ -37,7 +37,7 @@ openhpc_slurm_partitions:
 
 openhpc_packages_extra_nrel: # extra indirection to allow lab environment to filter this
   - vim
- 
+
 # system package installs - generic slurm
 openhpc_generic_packages:
   # below are default in the role, required to get slurm to work:
@@ -71,11 +71,11 @@ openhpc_config_extra:
   # PROLOGUE & EPILOGUE
   # JobSubmitPlugins: 'require_timelimit,lua'
   # PrologSlurmctld: '/nopt/slurm/etc/prologslurmctld.sh'
-  Prolog: '/nopt/slurm/scripts/prolog.d/*'
+  Prolog: '{{slurm_build_path}}/scripts/prolog.d/*'
   # PrologFlags: 'X11'
   # X11Parameters: 'local_xauthority'
   #Epilog: '<absent>' # /nopt/slurm/etc/epilog.d/*'
-  Epilog: '/nopt/slurm/scripts/epilog.d/*'
+  Epilog: '{{slurm_build_path}}/scripts/epilog.d/*'
   # PrologEpilogTimeout: 180
   # UnkillableStepTimeout: 180
 
