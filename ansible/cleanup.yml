@@ -66,5 +66,4 @@
       slurm-ohpc: "{{ ansible_facts.packages['slurm-ohpc'].0.version | default('-') }}"
 
 - name: Show image summary
-  debug:
-    var: image_info
+  command: cat /var/lib/image/image.json
