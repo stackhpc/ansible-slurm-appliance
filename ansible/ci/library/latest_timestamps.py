@@ -23,8 +23,8 @@ EXAMPLES = r'''
 # Pass in a message
 - name: Get latest timestamps
   latest_timestamps:
-    current_timestamps_dict: "{{ appliances_repo_timestamps }}"
-    sources_dict: "{{ appliances_repo_timestamp_sources }}"
+    repos_dict: "{{ appliances_repo_timestamp_sources }}"
+    content_url: "https://ark.stackhpc.com/pulp/content"
   register: result
 
 '''
@@ -44,11 +44,12 @@ changed_timestamps:
 from ansible.module_utils.basic import AnsibleModule
 import requests
 from bs4 import BeautifulSoup
+from copy import deepcopy
 
 def run_module():
     module_args = dict(
-        current_timestamps_dict=dict(type='dict', required=True),
-        sources_dict=dict(type='dict', required=True)
+        repos_dict=dict(type='dict', required=True),
+        content_url=dict(type='str', required=True)
     )
 
     result = dict(
@@ -62,17 +63,23 @@ def run_module():
         supports_check_mode=True
     )
 
-    latest_timestamps = {}
+    original_timestamps = dict(module.params['repos_dict'])
+    latest_timestamps = deepcopy(original_timestamps)
     changed_timestamps = []
-    for repo in module.params['sources_dict']:
-        latest_timestamps[repo] = module.params['sources_dict'][repo]
-        for version in module.params['sources_dict'][repo]:
-            html_txt = requests.get(url=module.params['sources_dict'][repo][version]).text
-            timestamp_link_list = BeautifulSoup(html_txt,features="html.parser").body.find('pre').find_all()
-            timestamp_link_list = map(lambda x: x.string,timestamp_link_list) # xml tags
-            latest_timestamps[repo][version] = list(timestamp_link_list)[-1][:-1] # last timestamp in list with trailing / removed
-            if module.params['sources_dict'][repo][version] != module.params['current_timestamps_dict'][repo][version]:
-                changed_timestamps.append(repo+' '+version)
+    
+    for repo in original_timestamps:
+        for version in original_timestamps[repo]:
+            
+            html_txt = requests.get(
+                    url= module.params['content_url'] + '/' + original_timestamps[repo][version]['path']
+                ).text
+            timestamp_link_list = BeautifulSoup(html_txt,features="html.parser").body.find('pre').find_all() # getting raw list of timestamps from html
+            timestamp_link_list = map(lambda x: x.string,timestamp_link_list) # stripping xml tags
+            latest_timestamp = list(timestamp_link_list)[-1][:-1] # last timestamp in list with trailing / removed
+
+            latest_timestamps[repo][version]['timestamp'] = latest_timestamp
+            if original_timestamps[repo][version]['timestamp'] != latest_timestamp:
+                changed_timestamps.append(repo+' '+version+': '+original_timestamps[repo][version]['timestamp']+' -> '+latest_timestamp)
 
     result['latest_dict'] = latest_timestamps
     result['changed_timestamps'] = changed_timestamps

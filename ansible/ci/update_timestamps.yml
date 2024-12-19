@@ -1,15 +1,9 @@
 - hosts: localhost
   tasks:
-  - name: Check sources are defined for all repos
-    ansible.builtin.assert:
-      that: appliances_repo_timestamps[item].keys() == appliances_repo_timestamp_sources[item].keys()
-      fail_msg: "'appliances_repo_timestamps.{{ item }}' is missing a source definition in 'appliances_repo_timestamp_sources'"
-    loop: "{{ appliances_repo_timestamps.keys() }}"
-
   - name: Get latest timestamps from sources
     latest_timestamps:
-      sources_dict: "{{ appliances_repo_timestamp_sources }}"
-      current_timestamps_dict: "{{ appliances_repo_timestamps }}"
+      repos_dict: "{{ appliances_pulp_repos }}"
+      content_url: "https://ark.stackhpc.com/pulp/content"
     register: _result
 
   - name: Print updated timestamps
