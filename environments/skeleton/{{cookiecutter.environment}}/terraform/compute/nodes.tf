@@ -50,6 +50,8 @@ resource "openstack_compute_instance_v2" "compute" {
     k3s_server = var.k3s_server
   }
 
+  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
+
   user_data = <<-EOF
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
