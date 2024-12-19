@@ -6,16 +6,16 @@ dnf_repos_password: "{{ omit }}"
 dnf_repos_repolist:
 - file: rocky
   name: baseos
-  subpath: "{{ appliances_pulp_repos.baseos[ansible_distribution_version] | appliances_repo_to_subpath }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.baseos[ansible_distribution_version] | appliances_repo_to_subpath }}"
 - file: rocky
   name: appstream
-  subpath: "{{ appliances_pulp_repos.appstream[ansible_distribution_version] | appliances_repo_to_subpath }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.appstream[ansible_distribution_version] | appliances_repo_to_subpath }}"
 - file: rocky
   name: crb
-  subpath: "{{ appliances_pulp_repos.crb[ansible_distribution_version] | appliances_repo_to_subpath }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.crb[ansible_distribution_version] | appliances_repo_to_subpath }}"
 - file: rocky-extras
   name: extras
-  subpath: "{{ appliances_pulp_repos.extras[ansible_distribution_version] | appliances_repo_to_subpath }}"
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.extras[ansible_distribution_version] | appliances_repo_to_subpath }}"
 
-dnf_repos_epel_subpath: "{{ appliances_pulp_repos.epel[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
+dnf_repos_epel_baseurl: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.epel[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
 dnf_repos_epel_description: "epel"
