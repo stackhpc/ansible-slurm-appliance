@@ -82,7 +82,7 @@ appliances_local_users: "{{ appliances_local_users_default + appliances_local_us
 
 ###########################################################################################
 
-appliances_pulp_repositories:
+appliances_pulp_repos:
   baseos:
     '9.4':
       timestamp: 20241115T011711
