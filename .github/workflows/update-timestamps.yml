@@ -38,6 +38,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git commit -m "Bumped repo timestamps"
+          git config --global --add --bool push.autoSetupRemote true
           git push
   
   build_fatimage:
