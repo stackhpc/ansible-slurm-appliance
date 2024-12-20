@@ -50,7 +50,7 @@ jobs:
 
       # TODO: find way to stop CI running if pushing to existing PR
       - name: Push new timestamps
-        if: "${{ steps.timestamp_check.outputs.timestamps_changed }} == 0"
+        if: steps.timestamp_check.outputs.timestamps_changed == '1'
         run: |
           git add environments/common/inventory/group_vars/all/defaults.yml
           git config user.name 'github-actions[bot]'
@@ -59,16 +59,16 @@ jobs:
           git config --global --add --bool push.autoSetupRemote true
           git push
   
+  # todo: don't skip if rerun
   build_fatimage:
-    if: "${{ needs.upstream_check.outputs.timestamps_changed }} == 0"
+    if: needs.upstream_check.outputs.timestamps_changed == '1'
     needs: upstream_check
     uses: stackhpc/ansible-slurm-appliance/.github/workflows/fatimage.yml@auto/bump-timestamps
     with:
       ci_cloud: LEAFCLOUD
-      branch: auto/bump-timestamps
 
   ci_and_pr:
-    if: "${{ needs.upstream_check.outputs.timestamps_changed }} == 0"
+    if: needs.upstream_check.outputs.timestamps_changed == '1'
     needs:
      - upstream_check
      - build_fatimage
@@ -100,5 +100,5 @@ jobs:
           echo "pr_exists=$?" >> "$GITHUB_OUTPUT"
 
       - name: Create PR
-        if: ${{ steps.pr-check.outputs.pr_exists }}
+        if: steps.pr-check.outputs.pr_exists
         run: gh pr create --title "[Auto] Bump repo timestamps to latest" --base main --head auto/bump-timestamps
