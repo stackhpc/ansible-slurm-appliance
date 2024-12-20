@@ -18,5 +18,5 @@
           {{ yaml_template | to_nice_yaml(indent=2) }}
     vars:
       yaml_template:
-        appliances_repo_timestamps: "{{ _result.latest_dict }}"
+        appliances_pulp_repos: "{{ _result.latest_dict }}"
     when: (_result.changed_timestamps | count) > 0

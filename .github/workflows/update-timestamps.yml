@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with: #temporary
-          ref: feat/auto-bump-timestamps #temporary
 
       - name: Check for updated Ark timestamps and replace in defaults.yml
         run: |
@@ -45,6 +43,9 @@ jobs:
     if: "${{ needs.upstream_check.outputs.timestamps_changed }} == 0"
     needs: upstream_check
     uses: ./.github/workflows/fatimage.yml
+    with:
+      ci_cloud: LEAFCLOUD
+      branch: auto/bump-timestamps
 
   ci_and_pr:
     if: "${{ needs.upstream_check.outputs.timestamps_changed }} == 0"
