@@ -38,6 +38,18 @@
     - import_role:
         name: persist_hostkeys
 
+
+- name: Setup NFS export for compute node configuration
+  hosts: compute_init:!builder
+  # NB: has to be after eeesi and os-manila-mount
+  tags: compute_init
+  become: yes
+  name: Export hostvars
+  tasks:
+    - include_role:
+        name: compute_init
+        tasks_from: export.yml
+
 - name: Install k9s
   become: yes
   hosts: k9s
