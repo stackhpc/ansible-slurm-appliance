@@ -15,14 +15,60 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
 
+      - name: Switch to automation branch
+        run: git checkout -b auto/bump-timestamps || git checkout auto/bump-timestamps
+
       - name: Check for updated Ark timestamps and replace in defaults.yml
         run: ansible-playbook ansible/ci/update_timestamps.yml
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          add-paths: environments/common/inventory/group_vars/all/defaults.yml
-          commit-message: "[automated] bumped repo timestamps to latest"
-          branch: auto/bump-timestamps
-          title: "[Automation] Bumped repo timestamps to latest"
-          body: Automated changes by .github/workflows/update-timestamps.yml
+      - name: Check if timestamps were changed
+        id: timestamp_check
+        run: |
+          git diff --quiet
+          echo "timestamps_changed=$?" >> "$GITHUB_OUTPUT"
+
+      # TODO: find way to stop CI running if pushing to existing PR
+      - name: Push new timestamps
+        if: "${{ steps.timestamp_check.outputs.timestamps_changed }} == 0"
+        run: |
+          git add environments/common/inventory/group_vars/all/defaults.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "Bumped repo timestamps"
+          git push
+  
+  build_fatimage:
+    if: "${{ steps.timestamp_check.outputs.timestamps_changed }} == 0"
+    needs: upstream_check
+    uses: stackhpc/ansible-slurm-appliance/.github/workflows/fatimage.yml
+
+  ci_and_pr:
+    if: "${{ steps.timestamp_check.outputs.timestamps_changed }} == 0"
+    needs: build_fatimage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Bump CI with new images
+        run: |
+          git checkout auto/bump-timestamps
+          sed -i 's/"RL8".*$/"RL8": "${{ needs.build_fatimage.outputs.openhpc-RL8-image }}"/' environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+          sed -i 's/"RL9".*$/"RL9": "${{ needs.build_fatimage.outputs.openhpc-RL9-image }}"/' environments/.stackhpc/terraform/cluster_image.auto.tfvars.json 
+
+      - name: Push new images
+        run: |
+          git add environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "Bumped images"
+          git push
+
+      - name: Check if PR exists
+        id: pr-check
+        run: |
+          gh pr list --json headRefName --jq '.[].headRefName' | grep auto/bump-timestamps
+          echo "pr_exists=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Create PR
+        if: ${{ steps.pr-check.outputs.pr_exists }}
+        run: gh pr create --title "[Auto] Bump repo timestamps to latest" --base main --head auto/bump-timestamps
