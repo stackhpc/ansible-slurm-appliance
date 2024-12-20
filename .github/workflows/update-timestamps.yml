@@ -15,17 +15,13 @@ jobs:
         with: #temporary
           ref: feat/auto-bump-timestamps #temporary
 
-      - name: Setup environment
+      - name: Check for updated Ark timestamps and replace in defaults.yml
         run: |
           dev/setup-env.sh
           . venv/bin/activate
           . environments/.stackhpc/activate
-
-      - name: Switch to automation branch
-        run: git checkout -b auto/bump-timestamps || git checkout auto/bump-timestamps
-
-      - name: Check for updated Ark timestamps and replace in defaults.yml
-        run: ansible-playbook ansible/ci/update_timestamps.yml
+          git checkout -b auto/bump-timestamps || git checkout auto/bump-timestamps
+          ansible-playbook ansible/ci/update_timestamps.yml
 
       - name: Check if timestamps were changed
         id: timestamp_check
