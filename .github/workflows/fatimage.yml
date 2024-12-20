@@ -16,8 +16,12 @@ on:
           type: string
           default: LEAFCLOUD
       outputs:
-        openhpc-RL8-image: ${{ steps.manifest.outputs.openhpc-RL8-image }}
-        openhpc-RL9-image: ${{ steps.manifest.outputs.openhpc-RL9-image }}
+        openhpc-RL8-image:
+          description: "RL8 image"
+          value: "${{ jobs.openstack.outputs.openhpc-RL8-image }}"
+        openhpc-RL9-image:
+          description: "RL9 image"
+          value: "${{ jobs.openstack.outputs.openhpc-RL9-image }}"
 
 jobs:
   openstack:
@@ -42,6 +46,9 @@ jobs:
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
+    outputs:
+      openhpc-RL8-image: "${{ steps.manifest.outputs.openhpc-RL8-image }}"
+      openhpc-RL9-image: "${{ steps.manifest.outputs.openhpc-RL9-image }}"
 
     steps:
       - uses: actions/checkout@v2
