@@ -48,6 +48,9 @@ def to_ood_regex(items):
     r = ['(%s)' % v for v in r]
     return '|'.join(r)
 
+def appliances_repo_to_subpath(repo_entry):
+    return repo_entry['path']+'/'+repo_entry['timestamp']
+
 class FilterModule(object):
     ''' Ansible core jinja2 filters '''
 
@@ -63,4 +66,5 @@ class FilterModule(object):
             'exists': exists,
             'warn': self.warn,
             'to_ood_regex': to_ood_regex,
+            'appliances_repo_to_subpath': appliances_repo_to_subpath
         }
