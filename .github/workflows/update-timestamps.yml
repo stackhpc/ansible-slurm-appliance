@@ -21,11 +21,12 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           git checkout -b auto/bump-timestamps || git checkout auto/bump-timestamps
-          ansible-playbook ansible/ci/update_timestamps.yml
+          ansible-playbook ansible/ci/update_timestamps.yml -v
 
       - name: Check if timestamps were changed
         id: timestamp_check
         run: |
+          set +e
           git diff --quiet
           echo "timestamps_changed=$?" >> "$GITHUB_OUTPUT"
 
@@ -70,6 +71,7 @@ jobs:
       - name: Check if PR exists
         id: pr-check
         run: |
+          set +e
           gh pr list --json headRefName --jq '.[].headRefName' | grep auto/bump-timestamps
           echo "pr_exists=$?" >> "$GITHUB_OUTPUT"
 
