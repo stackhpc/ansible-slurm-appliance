@@ -15,6 +15,7 @@ jobs:
 
       - name: Setup environment
         run: |
+          dev/setup-env.sh
           . venv/bin/activate
           . environments/.stackhpc/activate
 
