@@ -82,6 +82,7 @@ appliances_local_users: "{{ appliances_local_users_default + appliances_local_us
 
 ###########################################################################################
 
+# BEGIN Marker for ansible/ci/update_timestamps.yml (GH workflow managed)
 appliances_pulp_repos:
   baseos:
     '9.4':
@@ -103,3 +104,4 @@ appliances_pulp_repos:
     '9':
       timestamp: 20241213T010218
       path: epel/9/Everything/x86_64
+# END Marker for ansible/ci/update_timestamps.yml (GH workflow managed)
