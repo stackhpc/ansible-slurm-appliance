@@ -13,13 +13,32 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Check automation branch exists
+        id: auto-branch-check
+        run: |
+          git fetch
+          branches=$(git branch -r)
+          set +e
+          echo $branches | grep auto/bump-timestamps
+          branch_exists="$?"
+          echo "branch_exists=$branch_exists" >> "$GITHUB_OUTPUT"
+
+      - name: Create automation branch
+        if: steps.auto-branch-check.outputs.branch_exists == '1'
+        run: |
+          git checkout -b auto/bump-timestamps
+          git config --global --add --bool push.autoSetupRemote true
+          git push
+
+      - uses: actions/checkout@v2
+        with:
+          ref: auto/bump-timestamps
+
       - name: Check for updated Ark timestamps and replace in defaults.yml
         run: |
           dev/setup-env.sh
           . venv/bin/activate
           . environments/.stackhpc/activate
-          git checkout auto/bump-timestamps || git checkout -b auto/bump-timestamps
-          git pull origin auto/bump-timestamps
           ansible-playbook ansible/ci/update_timestamps.yml -v
 
       - name: Check if timestamps were changed
@@ -43,7 +62,7 @@ jobs:
   build_fatimage:
     if: "${{ needs.upstream_check.outputs.timestamps_changed }} == 0"
     needs: upstream_check
-    uses: ./.github/workflows/fatimage.yml
+    uses: stackhpc/ansible-slurm-appliance/.github/workflows/fatimage.yml@auto/bump-timestamps
     with:
       ci_cloud: LEAFCLOUD
       branch: auto/bump-timestamps
@@ -56,6 +75,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: auto/bump-timestamps
 
       - name: Bump CI with new images
         run: |

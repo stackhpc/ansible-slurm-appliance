@@ -15,9 +15,6 @@ on:
         ci_cloud:
           type: string
           default: LEAFCLOUD
-        branch:
-          type: string
-          default: "${{ github.ref }}"
       outputs:
         openhpc-RL8-image:
           description: "RL8 image"
@@ -54,20 +51,7 @@ jobs:
       openhpc-RL9-image: "${{ steps.manifest.outputs.openhpc-RL9-image }}"
 
     steps:
-
-      - name: Get current context
-        id: get_branch
-        run: |
-          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then
-            target_branch=${{ github.ref }}
-          else
-            target_branch=${{ github.event.inputs.branch }}
-          fi
-          echo "target_branch=$target_branch" >> "$GITHUB_OUTPUT"
-
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ steps.get_branch.outputs.target_branch }}
 
       - name: Record settings for CI cloud
         run: |
