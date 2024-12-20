@@ -6,5 +6,5 @@
       vars:
         pulp_site_target_arch: "x86_64"
         pulp_site_target_distribution: "rocky"
-        pulp_site_target_distribution_version: "9.4"
+        pulp_site_target_distribution_version: "9.5"
         pulp_site_target_distribution_version_major: "9"
