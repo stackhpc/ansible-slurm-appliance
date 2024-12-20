@@ -26,8 +26,8 @@ jobs:
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
             inventory_groups: control,compute,login,update
           - image_name: openhpc-RL9
-            source_image_name: rocky-latest-RL9
-            inventory_groups: control,compute,login
+            source_image_name: Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+            inventory_groups: control,compute,login,update
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
