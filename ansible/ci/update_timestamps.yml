@@ -1,5 +1,8 @@
 - hosts: localhost
   tasks:
+  - name: test
+    debug:
+      var: appliances_repo_timestamps
   - name: Get latest timestamps from sources
     latest_timestamps:
       repos_dict: "{{ appliances_pulp_repos }}"
