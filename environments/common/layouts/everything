@@ -96,3 +96,7 @@ control
 
 [lustre]
 # Hosts to run lustre client
+
+[extra_packages:children]
+# Hosts to install specified additional packages on
+cluster
