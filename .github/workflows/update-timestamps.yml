@@ -18,7 +18,8 @@ jobs:
           dev/setup-env.sh
           . venv/bin/activate
           . environments/.stackhpc/activate
-          git checkout -b auto/bump-timestamps || git checkout auto/bump-timestamps
+          git checkout auto/bump-timestamps || git checkout -b auto/bump-timestamps
+          git pull origin auto/bump-timestamps
           ansible-playbook ansible/ci/update_timestamps.yml -v
 
       - name: Check if timestamps were changed
