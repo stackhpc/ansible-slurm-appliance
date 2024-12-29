@@ -125,9 +125,9 @@ variable "volume_size" {
   type = map(number)
   default = {
     # fat image builds, GB:
-    rocky-latest = 15
+    rocky-latest = 30
     rocky-latest-cuda = 30
-    openhpc = 15
+    openhpc = 30
     openhpc-cuda = 30
   }
 }

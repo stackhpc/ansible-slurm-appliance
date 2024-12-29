@@ -42,7 +42,7 @@ login_ips = {
 }
 
 # CONTROL node info
-control_flavor = "vermilion_util_c8m15"
+control_flavor = "slurm_admin_c8m12s1d50"
 control_ip     = "10.60.105.70"
 control_image = "vslurm95_20241216_111931"
 
