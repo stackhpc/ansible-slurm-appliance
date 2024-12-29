@@ -1,7 +1,7 @@
 [all:vars]
 ansible_user=rocky
 openhpc_cluster_name=${cluster_name}
-ansible_ssh_common_args='-o ProxyCommand="ssh rocky@${proxy_fip} -W %h:%p"'
+#ansible_ssh_common_args='-o ProxyCommand="ssh rocky@${proxy_fip} -W %h:%p"'
 ansible_python_interpreter=/usr/bin/python3
 
 [control]
