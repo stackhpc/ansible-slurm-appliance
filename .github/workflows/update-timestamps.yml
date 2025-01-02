@@ -84,7 +84,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Debug
-        run: echo "${{ needs.upstream_check.outputs.new_fatimage }}"
+        run: echo "$TST"
+    env:
+      TST: ${{ needs.upstream_check.outputs.new_fatimage }}
   
   # todo: don't skip if rerun
   build_fatimage:
