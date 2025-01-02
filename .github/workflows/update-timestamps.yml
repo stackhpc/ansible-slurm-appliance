@@ -110,6 +110,7 @@ jobs:
 
   create_pr:
     needs: bump_timestamps
+    if: always() && (needs.bump_timestamps.result == 'skipped' || needs.bump_timestamps.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
