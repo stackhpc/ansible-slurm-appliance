@@ -108,6 +108,9 @@ appliances_pulp_repos:
     '9.4':
       timestamp: 20241115T011711
       path: rocky/9.4/BaseOS/x86_64/os
+    '9.5':
+      timestamp: 20241216T013503
+      path: rocky/9.5/BaseOS/x86_64/os
     '8.10':
       timestamp: 20241217T123729
       path: rocky/8.10/BaseOS/x86_64/os
@@ -115,6 +118,9 @@ appliances_pulp_repos:
     '9.4':
       timestamp: 20241112T003151
       path: rocky/9.4/AppStream/x86_64/os
+    '9.5':
+      timestamp: 20241217T005008
+      path: rocky/9.5/AppStream/x86_64/os
     '8.10':
       timestamp: 20241217T123729
       path: rocky/8.10/AppStream/x86_64/os
@@ -122,6 +128,9 @@ appliances_pulp_repos:
     '9.4':
       timestamp: 20241115T003133
       path: rocky/9.4/CRB/x86_64/os
+    '9.5':
+      timestamp: 20241217T005008
+      path: rocky/9.5/CRB/x86_64/os
     '8.10':
       timestamp: 20241217T123729
       path: rocky/8.10/PowerTools/x86_64/os
@@ -129,6 +138,9 @@ appliances_pulp_repos:
     '9.4':
       timestamp: 20241118T002802
       path: rocky/9.4/extras/x86_64/os
+    '9.5':
+      timestamp: 20241218T004632
+      path: rocky/9.5/extras/x86_64/os
     '8.10':
       timestamp: 20241217T123729
       path: rocky/8.10/extras/x86_64/os
