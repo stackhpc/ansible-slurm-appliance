@@ -43,7 +43,7 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ci_cloud || inputs.ci_cloud_override }}
+      CI_CLOUD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ci_cloud || inputs.ci_cloud_override }} # workaround for not being able to define string and choice in separate events
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
     outputs:
