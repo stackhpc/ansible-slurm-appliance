@@ -65,6 +65,7 @@ jobs:
       - name: Check if new fatimage needed
         id: fatimage_check
         run: |
+          git fetch origin refs/notes/*:refs/notes/*
           NEED_NEW_IMAGE=false
           set +e
           if git notes show ; then
@@ -74,8 +75,16 @@ jobs:
             fi
           fi
           set -e
+          echo $NEED_NEW_IMAGE
           echo "new_fatimage=$NEED_NEW_IMAGE" >> "$GITHUB_OUTPUT"
 
+  debug:
+    needs:
+      - upstream_check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug
+        run: echo "${{ needs.upstream_check.outputs.new_fatimage }}"
   
   # todo: don't skip if rerun
   build_fatimage:
