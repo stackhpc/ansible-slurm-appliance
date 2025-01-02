@@ -121,3 +121,5 @@ jobs:
       - name: Create PR
         if: steps.pr-check.outputs.pr_exists
         run: gh pr create --title "[Auto] Bump repo timestamps to latest" --base main --head auto/bump-timestamps
+        env:
+          GH_TOKEN: ${{ github.token }}
