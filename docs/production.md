@@ -13,7 +13,7 @@ production-ready deployments.
     - `staging`: staging environment
 
   A `dev` environment should also be created if considered required, or this
-  can be left till later.,
+  can be left until later.,
 
   These can all be produced using the cookicutter instructions, but the
   `production` and `staging` environments will need their
@@ -76,12 +76,12 @@ and referenced from the `site` and `production` environments, e.g.:
   instances) it may be necessary to configure or proxy `chronyd` via an
   environment hook.
 
-- The cookiecutter provided tofu configurations define resources for home and
+- The cookiecutter provided OpenTofu configurations define resources for home and
   state volumes. The former may not be required if the cluster's `/home` is
   provided from an external filesystem (or Manila). In any case, in at least
   the production environment, and probably also in the staging environment,
-  the volumes should be manually created and the resources changed to data
-  resources. This ensures that even if the cluster is deleted via tofu, the
+  the volumes should be manually created and the resources changed to [data
+  resources](https://opentofu.org/docs/language/data-sources/). This ensures that even if the cluster is deleted via tofu, the
   volumes will persist.
 
   For a development environment, having volumes under tofu control via volume
