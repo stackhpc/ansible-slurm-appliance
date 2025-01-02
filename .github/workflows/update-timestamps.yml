@@ -8,7 +8,7 @@ on:
 jobs:
   upstream_check:
     outputs:
-      timestamps_changed: "{{ steps.timestamp_check.outputs.timestamps_changed }}"
+      new_fatimage: "{{ steps.fatimage_check.outputs.new_fatimage }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -56,19 +56,35 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git commit -m "Bumped repo timestamps"
+          git notes add -m "timestamp_bump_commit"
           git config --global --add --bool push.autoSetupRemote true
           git push
+
+      - name: Check if new fatimage needed
+        id: fatimage_check
+        run: |
+          NEED_NEW_IMAGE=false
+          set +e
+          if $(git notes show) ; then
+            HEAD_NOTES=$(git notes show)
+            if [[ $HEAD_NOTES == "timestamp_bump_commit" ]] ; then
+              NEED_NEW_IMAGE=true
+            fi
+          fi
+          set -e
+          echo "new_fatimage=$NEED_NEW_IMAGE" >> "$GITHUB_OUTPUT"
+
   
   # todo: don't skip if rerun
   build_fatimage:
-    if: needs.upstream_check.outputs.timestamps_changed == '1'
+    if: needs.upstream_check.outputs.new_fatimage == 'true'
     needs: upstream_check
     uses: stackhpc/ansible-slurm-appliance/.github/workflows/fatimage.yml@auto/bump-timestamps
     with:
       ci_cloud: LEAFCLOUD
 
   ci_and_pr:
-    if: needs.upstream_check.outputs.timestamps_changed == '1'
+    if: needs.upstream_check.outputs.new_fatimage == 'true'
     needs:
      - upstream_check
      - build_fatimage
