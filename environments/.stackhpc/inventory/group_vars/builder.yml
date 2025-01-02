@@ -1,1 +1,19 @@
-#update_enable: false # Can uncomment for speed debugging non-update related build issues
+# update_enable: false # Can uncomment for speed debugging non-update related build issues
+
+# Uncomment below to use CI pulp servers
+
+# pulp_server_config:
+#   LEAFCLOUD:
+#     url: http://192.168.10.157:8080
+#     password: lookup('env','LEAFCLOUD_PULP_PASSWORD')
+
+# appliances_pulp_url: "{{ pulp_server_config[lookup('env','CI_CLOUD')].url }}"
+# pulp_site_password: "{{ pulp_server_config[lookup('env','CI_CLOUD')].password }}"
+
+# Alternatively, configure to use ark directly:
+dnf_repos_username: slurm-app-ci
+dnf_repos_password: "{{ lookup('env','ARK_PASSWORD') }}"
+
+# Can be set regardless of approach above:
+pulp_site_upstream_username: slurm-app-ci
+pulp_site_upstream_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}"

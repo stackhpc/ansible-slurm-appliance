@@ -17,6 +17,16 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Sync pulp repos with upstream
+  hosts: pulp
+  tasks:
+  - ansible.builtin.include_role:
+      name: pulp_site
+      tasks_from: sync.yml
+      apply:
+        delegate_to: localhost
+    when: appliances_mode != 'configure'
+
 - import_playbook: bootstrap.yml
 
 - hosts: doca
@@ -62,6 +72,16 @@
       when: "'lustre' in group_names"
 
 - import_playbook: extras.yml
+
+# TODO: is this the right place?
+- name: Install compute_init script
+  hosts: compute_init
+  tags: compute_init # tagged to allow running on cluster instances for dev
+  become: yes
+  tasks:
+    - include_role:
+        name: compute_init
+        tasks_from: install.yml
 
 - hosts: builder
   become: yes
@@ -216,6 +236,8 @@
     hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
+
+- import_playbook: disable-repos.yml
 
 - hosts: builder
   become: yes

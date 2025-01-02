@@ -82,6 +82,10 @@ openhpc
 # Hosts to run ansible-init
 cluster
 
+[compute_init:children]
+# EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
+compute
+
 [k3s:children]
 # Hosts to run k3s server/agent
 openhpc
@@ -92,3 +96,7 @@ control
 
 [lustre]
 # Hosts to run lustre client
+
+[extra_packages:children]
+# Hosts to install specified additional packages on
+cluster

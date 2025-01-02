@@ -58,6 +58,8 @@ roles/*
 !roles/squid/**
 !roles/tuned/
 !roles/tuned/**
+!roles/compute_init/
+!roles/compute_init/**
 !roles/k3s/
 !roles/k3s/**
 !roles/k9s/
@@ -66,5 +68,7 @@ roles/*
 !roles/lustre/**
 !roles/dnf_repos/
 !roles/dnf_repos/**
+!roles/pulp_site/
+!roles/pulp_site/**
 !roles/doca/
 !roles/doca/**

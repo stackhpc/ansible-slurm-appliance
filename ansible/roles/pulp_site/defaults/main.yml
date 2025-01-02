@@ -1,0 +1,36 @@
+pulp_site_url: "{{ appliances_pulp_url }}"
+pulp_site_port: 8080
+pulp_site_username: admin # shouldn't be changed
+pulp_site_password: "{{ vault_pulp_admin_password }}"
+pulp_site_upstream_content_url: https://ark.stackhpc.com/pulp/content
+pulp_site_default_upstream_suffix: "{{ pulp_site_target_arch }}/os"
+pulp_site_validate_certs: false
+pulp_site_install_dir: '/home/rocky/pulp'
+pulp_site_selinux_suffix: "{{ ':Z' if ansible_selinux.status == 'enabled' else '' }}"
+pulp_site_target_facts: "{{ hostvars[groups['pulp'][0]]['ansible_facts'] }}"
+pulp_site_target_distribution_version: "{{ pulp_site_target_facts['distribution_version'] }}"
+pulp_site_target_distribution_version_major: "{{ pulp_site_target_facts['distribution_major_version'] }}"
+
+pulp_site_rpm_info:
+- name: "baseos-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.baseos[pulp_site_target_distribution_version].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.baseos[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
+- name: "appstream-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.appstream[pulp_site_target_distribution_version].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.appstream[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
+- name: "crb-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.crb[pulp_site_target_distribution_version].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.crb[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
+- name: "extras-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.extras[pulp_site_target_distribution_version].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.extras[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
+- name: "epel-{{ pulp_site_target_distribution_version_major }}-{{ appliances_pulp_repos.epel[pulp_site_target_distribution_version_major].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.epel[pulp_site_target_distribution_version_major] | appliances_repo_to_subpath }}"
+
+pulp_site_rpm_repo_defaults:
+  remote_username: "{{ pulp_site_upstream_username }}"
+  remote_password: "{{ pulp_site_upstream_password }}"
+  policy: on_demand
+  state: present
+
+_pulp_site_rpm_info_all: "{{ pulp_site_rpm_info | map('combine', pulp_site_rpm_repo_defaults) }}"
+
+pulp_site_rpm_repos: "{{ _pulp_site_rpm_info_all | to_rpm_repos(pulp_site_upstream_content_url) }}"
+pulp_site_rpm_publications: "{{ _pulp_site_rpm_info_all | to_rpm_pubs }}"
+pulp_site_rpm_distributions: "{{ _pulp_site_rpm_info_all | to_rpm_distros }}"
