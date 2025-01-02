@@ -81,9 +81,10 @@ jobs:
   build_fatimage:
     if: needs.upstream_check.outputs.new_fatimage == 'true'
     needs: upstream_check
+    secrets: inherit
     uses: stackhpc/ansible-slurm-appliance/.github/workflows/fatimage.yml@auto/bump-timestamps
     with:
-      ci_cloud: LEAFCLOUD
+      ci_cloud: 'LEAFCLOUD'
 
   ci_and_pr:
     if: needs.upstream_check.outputs.new_fatimage == 'true'
