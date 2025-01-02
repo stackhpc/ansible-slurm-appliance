@@ -7,7 +7,7 @@ pulp_site_default_upstream_suffix: "{{ pulp_site_target_arch }}/os"
 pulp_site_validate_certs: false
 pulp_site_install_dir: '/home/rocky/pulp'
 pulp_site_selinux_suffix: "{{ ':Z' if ansible_selinux.status == 'enabled' else '' }}"
-pulp_site_target_facts: "{{ hostvars[groups['builder'][0]]['ansible_facts'] }}"
+pulp_site_target_facts: "{{ hostvars[groups['pulp'][0]]['ansible_facts'] }}"
 pulp_site_target_distribution_version: "{{ pulp_site_target_facts['distribution_version'] }}"
 pulp_site_target_distribution_version_major: "{{ pulp_site_target_facts['distribution_major_version'] }}"
 
