@@ -67,7 +67,7 @@ jobs:
         run: |
           NEED_NEW_IMAGE=false
           set +e
-          if $(git notes show) ; then
+          if git notes show ; then
             HEAD_NOTES=$(git notes show)
             if [[ $HEAD_NOTES == "timestamp_bump_commit" ]] ; then
               NEED_NEW_IMAGE=true
