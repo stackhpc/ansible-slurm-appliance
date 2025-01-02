@@ -59,6 +59,7 @@ jobs:
           git notes add -m "timestamp_bump_commit"
           git config --global --add --bool push.autoSetupRemote true
           git push
+          git push origin 'refs/notes/*'
 
       - name: Check if new fatimage needed
         id: fatimage_check
