@@ -12,7 +12,7 @@ on:
             - ARCUS
   workflow_call:
       inputs:
-        ci_cloud:
+        ci_cloud_override:
           type: string
           default: LEAFCLOUD
       outputs:
@@ -43,7 +43,7 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ inputs.ci_cloud }}
+      CI_CLOUD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ci_cloud || inputs.ci_cloud_override }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
     outputs:
