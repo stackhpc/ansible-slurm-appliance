@@ -10,6 +10,7 @@ slurm_appliance_secrets:
   vault_freeipa_admin_password: "{{ vault_freeipa_admin_password | default(lookup('password', '/dev/null')) }}"
   vault_k3s_token: "{{ vault_k3s_token | default(lookup('ansible.builtin.password', '/dev/null', length=64)) }}"
   vault_pulp_admin_password: "{{ vault_pulp_admin_password | default(lookup('password', '/dev/null', chars=['ascii_letters', 'digits'])) }}"
+  vault_demo_user_password: "{{ vault_demo_user_password | default(lookup('password', '/dev/null')) }}"
 
 secrets_openhpc_mungekey_default:
   content: "{{ lookup('pipe', 'dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64') }}"
