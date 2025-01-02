@@ -66,12 +66,12 @@ jobs:
         id: fatimage_check
         run: |
           git fetch origin refs/notes/*:refs/notes/*
-          NEED_NEW_IMAGE=false
+          NEED_NEW_IMAGE="false"
           set +e
           if git notes show ; then
             HEAD_NOTES=$(git notes show)
             if [[ $HEAD_NOTES == "timestamp_bump_commit" ]] ; then
-              NEED_NEW_IMAGE=true
+              NEED_NEW_IMAGE="true"
             fi
           fi
           set -e
