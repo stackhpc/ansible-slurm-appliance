@@ -7,3 +7,4 @@ This page contains some brief notes about differences between the default/demo c
 - Ensure created instances have accurate/synchronised time. For VM instances this is usually provided by the hypervisor, but if not (or for bare metal instances) it may be necessary to configure or proxy `chronyd` via an environment hook.
 - Remove production volumes from OpenTofu control. In the default OpenTofu configuration, deleting the resources also deletes the volumes used for persistent state and home directories. This is usually undesirable for production, so these resources should be removed from the OpenTofu configurations and manually deployed once. However note that for development environments leaving them under OpenTofu control is usually best.
 - Configure Open OpenOndemand - see [specific documentation](openondemand.README.md).
+- You may wish to remove the `demo_user` user from `environments/{ENV}/inventory/group_vars/all/basic_users.yml`
