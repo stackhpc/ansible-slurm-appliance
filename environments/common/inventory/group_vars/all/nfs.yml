@@ -3,7 +3,7 @@
 # See: https://github.com/stackhpc/ansible-role-cluster-nfs
 # for variable definitions
 
-nfs_server_default: "{{ hostvars[groups['control'] | first ].internal_address }}"
+nfs_server_default: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
 
 nfs_configurations:
   - comment: Export /exports/home from Slurm control node as /home
@@ -15,3 +15,9 @@ nfs_configurations:
     nfs_server: "{{ nfs_server_default }}"
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
+
+  - comment: Export /exports/cluster from Slurm control node
+    nfs_enable:
+        server: "{{ inventory_hostname in groups['control'] }}"
+        clients: false
+    nfs_export: "/exports/cluster"
