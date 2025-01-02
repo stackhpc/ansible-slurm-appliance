@@ -17,7 +17,7 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 ### General
 
 - `openondemand_clusters`: Required. Synonym for [osc.ood: clusters](https://github.com/OSC/ood-ansible#clusters) role variable.
-- `openondemand_servername`: Required. Synonym for [osc.ood: servername](https://github.com/OSC/ood-ansible/blob/master/defaults/main/ood_portal.yml#L27) role variable. This defines what the Open Ondemand portal's Apache server uses for the [name-based virtual host](https://httpd.apache.org/docs/current/mod/core.html#servername). It should be the IP or hostname(+domain) part of the URL used to access Open Ondemand in the browser, e.g. `ondemand.mysite.org`. **NB:** If a domain or external IP is not available, specify the host's internal IP here and use ssh with a `DynamicForward` option and a SOCKS proxy to access this address. Using ssh's `LocalForward` option is not recommended as the server name will have to be `localhost` which causes some issues.
+- `openondemand_servername`: Required. Synonym for [osc.ood: servername](https://github.com/OSC/ood-ansible/blob/master/defaults/main/ood_portal.yml#L27) role variable. This defines what the Open Ondemand portal's Apache server uses for the [name-based virtual host](https://httpd.apache.org/docs/current/mod/core.html#servername). It should be the IP or hostname(+domain) part of the URL used to access Open Ondemand in the browser, e.g. `ondemand.mysite.org`. **NB:** If a domain or external IP is not available, specify the host's internal IP here and use ssh with a `DynamicForward` option and a SOCKS proxy to access this address. Using ssh's `LocalForward` option is not recommended as the server name will have to be `localhost` which causes some issues. Changing this value on an already deployed cluster requires a reboot of the login node for OOD app state to be correctly refreshed.
 
 ### Authentication
 See the Open Ondemand [Authentication docs](https://osc.github.io/ood-documentation/latest/authentication/overview.html) for an overview of the authentication process.
@@ -77,7 +77,7 @@ The Open Ondemand portal can proxy other servers. Variables:
   to proxy:
   - All "compute" nodes, e.g. for Open Ondemand interactive apps such as remote desktop and Jupyter notebook server.
   - The Grafana server - note a link to Grafana is always added to the Open Ondemand dashboard.
-  
+
   The exact pattern depends on inventory hostnames / partitions / addresses.
 
 - `openondemand_node_proxy_directives`: Optional, default ''. Multiline string to insert into Apache directives definition for `node_uri` ([docs](https://osc.github.io/ood-documentation/master/reference/files/ood-portal-yml.html#configure-reverse-proxy)).
