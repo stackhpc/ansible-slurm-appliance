@@ -52,14 +52,15 @@ jobs:
       - name: Push new timestamps
         if: steps.timestamp_check.outputs.timestamps_changed == '1'
         run: |
+          git fetch origin refs/notes/*:refs/notes/*
           git add environments/common/inventory/group_vars/all/defaults.yml
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git commit -m "Bumped repo timestamps"
-          git notes add -m "timestamp_bump_commit"
+          git notes add --force -m "timestamp_bump_commit"
           git config --global --add --bool push.autoSetupRemote true
           git push
-          git push origin 'refs/notes/*'
+          git push origin refs/notes/*
 
       - name: Check if new fatimage needed
         id: fatimage_check
