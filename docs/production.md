@@ -115,6 +115,9 @@ and referenced from the `site` and `production` environments, e.g.:
 
   Using fixed IPs will require either using admin credentials or policy changes.
 
+- If floating IPs are required for login nodes, modify the OpenTofu configurations
+  appropriately.
+
 - Enable persisting login node hostkeys so users do not get annoying ssh warning
   messages on reimage:
 
