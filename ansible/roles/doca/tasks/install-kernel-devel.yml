@@ -8,12 +8,6 @@
   register: _ofed_loaded_kernel
   changed_when: false
 
-- name: Debug kernel versions
-  debug:
-    msg:
-      - "Loaded Kernel: {{ _ofed_loaded_kernel.stdout }}"
-      - "Installed Kernels: {{ _ofed_dnf_kernels.stdout_lines[1:] | map('split') | map(attribute=1) }}"
-
 - name: Check current kernel is newest installed
   assert:
     that: _ofed_kernel_current == _ofed_dnf_kernels_newest
