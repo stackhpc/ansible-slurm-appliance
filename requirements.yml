@@ -51,4 +51,8 @@ collections:
     version: 0.4.0
   - name: stackhpc.pulp
     version: 0.5.5
+  # stackhpc.pulp has pulp.squeezer as dependency, any version, but latest
+  # requires newer ansible than can install
+  - name: pulp.squeezer
+    version: 0.0.15
 ...
