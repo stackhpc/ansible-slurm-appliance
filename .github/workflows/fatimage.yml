@@ -15,6 +15,9 @@ on:
         ci_cloud_override:
           type: string
           default: LEAFCLOUD
+        target_branch:
+          type: string
+          default: ${{ github.ref }}
       outputs:
         openhpc-RL8-image:
           description: "RL8 image"
@@ -51,7 +54,9 @@ jobs:
       openhpc-RL9-image: "${{ steps.manifest.outputs.openhpc-RL9-image }}"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || inputs.target_branch }}
 
       - name: Record settings for CI cloud
         run: |
