@@ -8,32 +8,22 @@
   register: _ofed_loaded_kernel
   changed_when: false
 
-- name: Parse installed kernels
-  set_fact:
-    _ofed_dnf_kernels_sorted: >-
-      {{ _ofed_dnf_kernels.stdout_lines[1:]
-          | map('split')
-          | map(attribute=1)
-          | community.general.version_sort }}
-    # dnf line format e.g. "kernel.x86_64  4.18.0-513.18.1.el8_9   @baseos  "
-
-- name: Check current kernel is newest installed
-  assert:
-    that:
-      - _ofed_loaded_kernel.stdout in _ofed_dnf_kernels_sorted
-      - _ofed_loaded_kernel.stdout == _ofed_dnf_kernels_sorted[-1]
-    fail_msg: >
-      Loaded kernel ({{ _ofed_loaded_kernel.stdout }}) is not the newest installed kernel.
-      Newest installed kernel: {{ _ofed_dnf_kernels_sorted[-1] }}.
-      Consider rebooting to use the latest kernel.
-
 - name: Debug kernel versions
   debug:
     msg:
       - "Loaded Kernel: {{ _ofed_loaded_kernel.stdout }}"
       - "Installed Kernels: {{ _ofed_dnf_kernels.stdout_lines[1:] | map('split') | map(attribute=1) }}"
-      - "Newest Installed Kernel: {{ _ofed_dnf_kernels_sorted[-1] }}"
 
+- name: Check current kernel is newest installed
+  assert:
+    that: _ofed_kernel_current == _ofed_dnf_kernels_newest
+    fail_msg: "Kernel {{ _ofed_loaded_kernel.stdout }} is loaded but newer {{ _ofed_dnf_kernels_newest }} is installed: consider rebooting?"
+  vars:
+    _ofed_kernel_current: >-
+      {{ _ofed_loaded_kernel.stdout | regex_replace('\.(?:.(?!\.))+$', '') | regex_replace('\.(?:.(?!\.))+$', '') }}
+    _ofed_dnf_kernels_newest: >-
+      {{ _ofed_dnf_kernels.stdout_lines[1:] | map('split') | map(attribute=1) | map('regex_replace', '\.(?:.(?!\.))+$', '') | community.general.version_sort | last }}
+    # dnf line format e.g. "kernel.x86_64  4.18.0-513.18.1.el8_9   @baseos  "
 
 - name: Install matching kernel-devel package
   dnf:
