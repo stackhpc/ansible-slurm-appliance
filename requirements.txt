@@ -9,4 +9,4 @@ cookiecutter
 selinux # this is a shim to avoid having to use --system-site-packages, you still need sudo yum install libselinux-python3
 netaddr
 matplotlib
-pulp-cli==0.29.2
+pulp-cli==0.23.2
