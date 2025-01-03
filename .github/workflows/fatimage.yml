@@ -10,6 +10,21 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
+  workflow_call:
+      inputs:
+        ci_cloud_override:
+          type: string
+          default: LEAFCLOUD
+        target_branch:
+          type: string
+          default: ${{ github.ref }}
+      outputs:
+        openhpc-RL8-image:
+          description: "RL8 image"
+          value: "${{ jobs.openstack.outputs.openhpc-RL8-image }}"
+        openhpc-RL9-image:
+          description: "RL9 image"
+          value: "${{ jobs.openstack.outputs.openhpc-RL9-image }}"
 
 jobs:
   openstack:
@@ -31,12 +46,17 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      CI_CLOUD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ci_cloud || inputs.ci_cloud_override }} # workaround for not being able to define string and choice in separate events
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
+    outputs:
+      openhpc-RL8-image: "${{ steps.manifest.outputs.openhpc-RL8-image }}"
+      openhpc-RL9-image: "${{ steps.manifest.outputs.openhpc-RL9-image }}"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event_name != 'workflow_call' && github.ref || inputs.target_branch }}
 
       - name: Record settings for CI cloud
         run: |
@@ -96,6 +116,7 @@ jobs:
           IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo "${{ matrix.build.image_name }}-image=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo $IMAGE_ID > image-id.txt
           echo $IMAGE_NAME > image-name.txt
 
