@@ -134,6 +134,7 @@ jobs:
   run_ci:
     needs: bump_timestamps
     uses: ./.github/workflows/stackhpc.yml
+    secrets: inherit
     with:
       target_branch: auto/bump-timestamps
     
@@ -146,11 +147,16 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v3
-        with:
-          ref: auto/bump-timestamps
+
+      - name: Get created PR number
+        id: number_check
+        run: |
+          PR_NUMBER=$(gh pr list --head auto/bump-timestamps --state open --json number --jq .[0].number)
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Comment CI status
         uses: thollander/actions-comment-pull-request@v1
         with:
           message: 'CI ${{ needs.run_ci.result }}: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pr_number: steps.number_check.outputs.pr_number
