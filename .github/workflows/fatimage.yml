@@ -56,7 +56,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || inputs.target_branch }}
+          ref: ${{ github.event_name != 'workflow_call' && github.ref || inputs.target_branch }}
 
       - name: Record settings for CI cloud
         run: |

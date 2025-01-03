@@ -130,3 +130,27 @@ jobs:
         run: gh pr create --title "[Auto] Bump repo timestamps to latest" --base main --head auto/bump-timestamps --body "Updated Release Train timestamps in defaults.yml with latest from Ark"
         env:
           GH_TOKEN: ${{ github.token }}
+
+  run_ci:
+    needs: bump_timestamps
+    uses: ./.github/workflows/stackhpc.yml
+    with:
+      target_branch: auto/bump-timestamps
+    
+  comment_result:
+    if: always() && (needs.run_ci.result == 'failure' || needs.run_ci.result == 'success') && (needs.create_pr.result == 'skipped' || needs.create_pr.result == 'success')
+    needs:
+     - run_ci
+     - create_pr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+        with:
+          ref: auto/bump-timestamps
+
+      - name: Comment CI status
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: 'CI ${{ needs.run_ci.result }}: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
