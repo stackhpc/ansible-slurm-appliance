@@ -123,10 +123,11 @@ jobs:
         run: |
           set +e
           gh pr list --json headRefName --jq '.[].headRefName' | grep auto/bump-timestamps
-          echo "pr_exists=$?" >> "$GITHUB_OUTPUT"
+          PR_EXISTS=$?
+          echo "pr_exists=$PR_EXISTS" >> "$GITHUB_OUTPUT"
 
       - name: Create PR
-        if: steps.pr-check.outputs.pr_exists
+        if: steps.pr-check.outputs.pr_exists == '0'
         run: gh pr create --title "[Auto] Bump repo timestamps to latest" --base main --head auto/bump-timestamps --body "Updated Release Train timestamps in defaults.yml with latest from Ark"
         env:
           GH_TOKEN: ${{ github.token }}
