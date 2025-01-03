@@ -2,6 +2,11 @@
 name: Test deployment and reimage on OpenStack
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      target_branch:
+        type: string
+        default: ${{ github.ref }}
   push:
     branches:
       - main
@@ -44,7 +49,9 @@ jobs:
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event_name != 'workflow_call' && github.ref || inputs.target_branch }}
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
