@@ -98,7 +98,7 @@ jobs:
       - name: Bump CI with new images
         run: |
           git checkout auto/bump-timestamps
-          sed -i 's/"RL8".*$/"RL8": "${{ needs.build_fatimage.outputs.openhpc-RL8-image }},"/' environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+          sed -i 's/"RL8".*$/"RL8": "${{ needs.build_fatimage.outputs.openhpc-RL8-image }}",/' environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
           sed -i 's/"RL9".*$/"RL9": "${{ needs.build_fatimage.outputs.openhpc-RL9-image }}"/' environments/.stackhpc/terraform/cluster_image.auto.tfvars.json 
 
       - name: Push new images
