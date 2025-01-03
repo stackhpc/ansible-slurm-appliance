@@ -8,12 +8,14 @@ on:
       - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
       - 'ansible/roles/doca/**'
       - 'ansible/roles/cuda/**'
+      - 'ansible/roles/lustre/**'
       - '.github/workflows/extra.yml'
   pull_request:
     paths:
       - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
       - 'ansible/roles/doca/**'
       - 'ansible/roles/cuda/**'
+      - 'ansible/roles/lustre/**'
       - '.github/workflows/extra.yml'
 
 jobs:
@@ -29,11 +31,11 @@ jobs:
         build:
           - image_name: openhpc-extra-RL8
             source_image_name_key: RL8 # key into environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
-            inventory_groups: doca,cuda
+            inventory_groups: doca,cuda,lustre
             volume_size: 30 # needed for cuda
           - image_name: openhpc-extra-RL9
             source_image_name_key: RL9
-            inventory_groups: doca,cuda
+            inventory_groups: doca,cuda,lustre
             volume_size: 30 # needed for cuda
     env:
       ANSIBLE_FORCE_COLOR: True
