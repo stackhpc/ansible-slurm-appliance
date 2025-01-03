@@ -29,6 +29,14 @@
 
 - import_playbook: bootstrap.yml
 
+- hosts: doca
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install NVIDIA DOCA
+      import_role:
+        name: doca
+
 - name: Run post-bootstrap.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
@@ -64,6 +72,16 @@
       when: "'lustre' in group_names"
 
 - import_playbook: extras.yml
+
+# TODO: is this the right place?
+- name: Install compute_init script
+  hosts: compute_init
+  tags: compute_init # tagged to allow running on cluster instances for dev
+  become: yes
+  tasks:
+    - include_role:
+        name: compute_init
+        tasks_from: install.yml
 
 - hosts: builder
   become: yes
@@ -220,14 +238,14 @@
       import_role:
         name: doca
 
-- import_playbook: disable-repos.yml
-
 - name: Run post.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
+
+- import_playbook: disable-repos.yml
 
 - hosts: builder
   become: yes

@@ -13,7 +13,7 @@ openhpc_slurm_accounting_storage_type: 'accounting_storage/slurmdbd'
 openhpc_slurmdbd_mysql_database: slurm_acct_db
 openhpc_slurmdbd_mysql_password: "{{ vault_mysql_slurm_password }}"
 openhpc_slurmdbd_mysql_username: slurm
-openhpc_slurm_control_host: "{{ hostvars[groups['control'].0].api_address }}"
+openhpc_slurm_control_host: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
 openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
 openhpc_slurm_partitions:
   - name: "compute"
@@ -41,10 +41,4 @@ openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if applianc
 
 ohpc_default_extra_repos:
   "9": [] #overriding to ensure doesn't overwrite ark epel repo
-  "8":
-    - name: epel
-      file: epel
-      description: "Extra Packages for Enterprise Linux 8 - $basearch"
-      metalink: "https://mirrors.fedoraproject.org/metalink?repo=epel-8&arch=$basearch&infra=$infra&content=$contentdir"
-      gpgcheck: true
-      gpgkey: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8"
+  "8": []

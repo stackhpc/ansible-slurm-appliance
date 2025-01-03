@@ -3,7 +3,7 @@
   vars:
     os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
     k3s_token: "{{ os_metadata.meta.k3s_token }}"
-    k3s_server_name: "{{ os_metadata.meta.k3s_server }}"
+    k3s_server_name: "{{ os_metadata.meta.control_address }}"
     service_name: "{{ 'k3s-agent' if k3s_server_name is defined else 'k3s' }}"
   tasks:
     - name: Ensure password directory exists
