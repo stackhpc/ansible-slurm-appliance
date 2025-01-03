@@ -64,7 +64,7 @@ data "openstack_images_image_v2" "cluster" {
 }
 
 module "cluster" {
-    source = "../../skeleton/{{cookiecutter.environment}}/terraform/"
+    source = "../../skeleton/{{cookiecutter.environment}}/tofu/"
 
     cluster_name = var.cluster_name
     cluster_net = var.cluster_net
