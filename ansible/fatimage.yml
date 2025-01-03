@@ -230,14 +230,6 @@
         name: cloudalchemy.grafana
         tasks_from: install.yml
 
-- hosts: doca
-  become: yes
-  gather_facts: yes
-  tasks:
-    - name: Install NVIDIA DOCA
-      import_role:
-        name: doca
-
 - name: Run post.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
