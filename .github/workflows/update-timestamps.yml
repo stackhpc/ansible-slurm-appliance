@@ -133,7 +133,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
   run_ci:
-    needs: bump_timestamps
+    needs:
+    - bump_timestamps
+    - upstream_check
+    if: always() && (needs.bump_timestamps.result == 'success' || needs.upstream_check.outputs.new_fatimage == 'false') # should always run only on image bump commits
     uses: ./.github/workflows/stackhpc.yml
     secrets: inherit
     with:
