@@ -108,7 +108,7 @@ appliances_pulp_repos:
   appstream:
     '8.10':
       path: rocky/8.10/AppStream/x86_64/os
-      timestamp: 20250103T004904
+      timestamp: 20250106T113546
     '9.4':
       path: rocky/9.4/AppStream/x86_64/os
       timestamp: 20241112T003151
@@ -118,7 +118,7 @@ appliances_pulp_repos:
   baseos:
     '8.10':
       path: rocky/8.10/BaseOS/x86_64/os
-      timestamp: 20241225T015248
+      timestamp: 20250106T113546
     '9.4':
       path: rocky/9.4/BaseOS/x86_64/os
       timestamp: 20241115T011711
@@ -128,7 +128,7 @@ appliances_pulp_repos:
   crb:
     '8.10':
       path: rocky/8.10/PowerTools/x86_64/os
-      timestamp: 20241222T010136
+      timestamp: 20250106T113546
     '9.4':
       path: rocky/9.4/CRB/x86_64/os
       timestamp: 20241115T003133
