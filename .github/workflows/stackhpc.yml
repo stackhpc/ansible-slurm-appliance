@@ -49,6 +49,12 @@ jobs:
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
     steps:
+      - name: Debug
+        run: |
+          echo ${{ github.event_name }}
+          echo ${{ github.ref }}
+          echo ${{ inputs.target_branch }}
+
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event_name != 'workflow_call' && github.ref || inputs.target_branch }}
