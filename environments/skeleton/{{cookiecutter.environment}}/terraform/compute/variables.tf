@@ -76,3 +76,9 @@ variable "control_address" {
     description = "Name/address of control node"
     type = string
 }
+
+variable "compute_init_enable" {
+    type = list(string)
+    description = "Groups to activate for ansible-init compute rebuilds"
+    default = []
+}

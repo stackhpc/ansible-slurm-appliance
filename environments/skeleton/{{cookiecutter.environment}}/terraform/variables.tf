@@ -52,6 +52,7 @@ variable "compute" {
             image_id: Overrides variable cluster_image_id
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
+            compute_init_enable: Toggles ansible-init rebuild
     EOF
 }
 
@@ -135,4 +136,10 @@ variable "root_volume_size" {
 variable "k3s_token" {
     description = "K3s cluster authentication token, set automatically by Ansible"
     type = string
+}
+
+variable "compute_init_enable" {
+    type = list(string)
+    description = "Groups to activate for ansible-init compute rebuilds"
+    default = []
 }
