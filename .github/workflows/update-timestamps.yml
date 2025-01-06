@@ -1,0 +1,166 @@
+name: Check for new Release Train snapshots
+on:
+  workflow_dispatch:
+  pull_request: #temporary 
+  schedule:
+    - cron: '0 7 * * *'  # Run at 7am on default branch
+
+jobs:
+  upstream_check:
+    outputs:
+      new_fatimage: "${{ steps.fatimage_check.outputs.new_fatimage }}"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check automation branch exists
+        id: auto-branch-check
+        run: |
+          git fetch
+          branches=$(git branch -r)
+          set +e
+          echo $branches | grep auto/bump-timestamps
+          branch_exists="$?"
+          echo "branch_exists=$branch_exists" >> "$GITHUB_OUTPUT"
+
+      - name: Create automation branch
+        if: steps.auto-branch-check.outputs.branch_exists == '1'
+        run: |
+          git checkout -b auto/bump-timestamps
+          git config --global --add --bool push.autoSetupRemote true
+          git push
+
+      - uses: actions/checkout@v2
+        with:
+          ref: auto/bump-timestamps
+
+      - name: Check for updated Ark timestamps and replace in defaults.yml
+        run: |
+          dev/setup-env.sh
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ansible-playbook ansible/ci/update_timestamps.yml -v
+
+      - name: Check if timestamps were changed
+        id: timestamp_check
+        run: |
+          set +e
+          git diff --quiet
+          echo "timestamps_changed=$?" >> "$GITHUB_OUTPUT"
+
+      # TODO: find way to stop CI running if pushing to existing PR
+      - name: Push new timestamps
+        if: steps.timestamp_check.outputs.timestamps_changed == '1'
+        run: |
+          git fetch origin refs/notes/*:refs/notes/*
+          git add environments/common/inventory/group_vars/all/defaults.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "Bumped repo timestamps"
+          git notes add --force -m "timestamp_bump_commit"
+          git config --global --add --bool push.autoSetupRemote true
+          git push
+          git push origin refs/notes/*
+
+      - name: Check if new fatimage needed
+        id: fatimage_check
+        run: |
+          git fetch origin refs/notes/*:refs/notes/*
+          NEED_NEW_IMAGE="false"
+          set +e
+          if git notes show ; then
+            HEAD_NOTES=$(git notes show)
+            if [[ $HEAD_NOTES == "timestamp_bump_commit" ]] ; then
+              NEED_NEW_IMAGE="true"
+            fi
+          fi
+          set -e
+          echo $NEED_NEW_IMAGE
+          echo "new_fatimage=$NEED_NEW_IMAGE" >> "$GITHUB_OUTPUT"
+  
+  build_fatimage:
+    if: needs.upstream_check.outputs.new_fatimage == 'true'
+    needs: upstream_check
+    secrets: inherit
+    uses: ./.github/workflows/fatimage.yml
+    with:
+      ci_cloud_override: 'LEAFCLOUD'
+      target_branch: auto/bump-timestamps
+
+  bump_timestamps:
+    if: needs.upstream_check.outputs.new_fatimage == 'true'
+    needs: build_fatimage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: auto/bump-timestamps
+      - name: Bump CI with new images
+        run: |
+          git checkout auto/bump-timestamps
+          sed -i 's/"RL8".*$/"RL8": "${{ needs.build_fatimage.outputs.openhpc-RL8-image }}",/' environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+          sed -i 's/"RL9".*$/"RL9": "${{ needs.build_fatimage.outputs.openhpc-RL9-image }}"/' environments/.stackhpc/terraform/cluster_image.auto.tfvars.json 
+
+      - name: Push new images
+        run: |
+          git add environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "Bumped images"
+          git push
+
+  create_pr:
+    needs: bump_timestamps
+    if: always() && (needs.bump_timestamps.result == 'skipped' || needs.bump_timestamps.result == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: auto/bump-timestamps
+
+      - name: Check if PR exists
+        id: pr-check
+        run: |
+          set +e
+          gh pr list --json headRefName --jq '.[].headRefName' | grep auto/bump-timestamps
+          PR_EXISTS=$?
+          echo "pr_exists=$PR_EXISTS" >> "$GITHUB_OUTPUT"
+
+      - name: Create PR
+        if: steps.pr-check.outputs.pr_exists == '0'
+        run: gh pr create --title "[Auto] Bump repo timestamps to latest" --base main --head auto/bump-timestamps --body "Updated Release Train timestamps in defaults.yml with latest from Ark"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  run_ci:
+    needs:
+    - bump_timestamps
+    - upstream_check
+    if: always() && (needs.bump_timestamps.result == 'success' || needs.upstream_check.outputs.new_fatimage == 'false') # should always run only on image bump commits
+    uses: ./.github/workflows/stackhpc.yml
+    secrets: inherit
+    with:
+      target_branch: auto/bump-timestamps
+    
+  comment_result:
+    if: always() && (needs.run_ci.result == 'failure' || needs.run_ci.result == 'success') && (needs.create_pr.result == 'skipped' || needs.create_pr.result == 'success')
+    needs:
+     - run_ci
+     - create_pr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+
+      - name: Get created PR number
+        id: number_check
+        run: |
+          PR_NUMBER=$(gh pr list --head auto/bump-timestamps --state open --json number --jq .[0].number)
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Comment CI status
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: 'CI ${{ needs.run_ci.result }}: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pr_number: steps.number_check.outputs.pr_number
