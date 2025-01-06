@@ -10,6 +10,10 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
+        target_branch:
+          type: string
+          default: "testing"
+          description: test
   workflow_call:
       inputs:
         ci_cloud_override:
