@@ -54,9 +54,14 @@ jobs:
       openhpc-RL9-image: "${{ steps.manifest.outputs.openhpc-RL9-image }}"
 
     steps:
+      - uses: stackhpc/ansible-slurm-appliance/.github/actions/is_callee@feat/auto-bump-timestamps # todo: change to main once merges
+        id: callee_check
+        with:
+          current_workflow_file: fatimage.yml
+
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event_name != 'workflow_call' && github.ref || inputs.target_branch }}
+          ref: ${{ steps.callee_check.outputs.is_callee && inputs.target_branch || github.ref }}
 
       - name: Record settings for CI cloud
         run: |

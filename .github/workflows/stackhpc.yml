@@ -49,9 +49,14 @@ jobs:
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
     steps:
+      - uses: stackhpc/ansible-slurm-appliance/.github/actions/is_callee@feat/auto-bump-timestamps # todo: change to main once merges
+        id: callee_check
+        with:
+          current_workflow_file: stackhpc.yml
+
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event_name != 'workflow_call' && github.ref || inputs.target_branch }}
+          ref: ${{ steps.callee_check.outputs.is_callee && inputs.target_branch || github.ref }}
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
