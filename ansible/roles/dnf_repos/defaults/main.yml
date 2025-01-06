@@ -30,6 +30,9 @@ dnf_repos_repolist:
 - file: "{{ dnf_repos_version_filenames.extras }}"
   name: extras
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.extras[ansible_distribution_version] | appliances_repo_to_subpath }}"
+- file: ceph
+  name: Ceph
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.ceph[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
 
 dnf_repos_epel_baseurl: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.epel[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
 dnf_repos_epel_description: "epel"

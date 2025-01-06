@@ -22,6 +22,8 @@ pulp_site_rpm_info:
   subpath: "{{ appliances_pulp_repos.extras[pulp_site_target_distribution_version] | appliances_repo_to_subpath }}"
 - name: "epel-{{ pulp_site_target_distribution_version_major }}-{{ appliances_pulp_repos.epel[pulp_site_target_distribution_version_major].timestamp }}"
   subpath: "{{ appliances_pulp_repos.epel[pulp_site_target_distribution_version_major] | appliances_repo_to_subpath }}"
+- name: "ceph-{{ pulp_site_target_distribution_version_major }}-{{ appliances_pulp_repos.ceph[pulp_site_target_distribution_version_major].timestamp }}"
+  subpath: "{{ appliances_pulp_repos.ceph[pulp_site_target_distribution_version_major] | appliances_repo_to_subpath }}"
 
 pulp_site_rpm_repo_defaults:
   remote_username: "{{ pulp_site_upstream_username }}"

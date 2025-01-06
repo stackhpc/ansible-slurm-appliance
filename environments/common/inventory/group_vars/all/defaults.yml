@@ -151,3 +151,10 @@ appliances_pulp_repos:
     '8':
       timestamp: 20241216T235733
       path: epel/8/Everything/x86_64
+  ceph:
+    '8':
+      timestamp: 20231104T015751
+      path: centos/8-stream/storage/x86_64/ceph-quincy
+    '9':
+      timestamp: 20241114T011240
+      path: centos/9-stream/storage/x86_64/ceph-quincy
