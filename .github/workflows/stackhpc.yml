@@ -54,6 +54,8 @@ jobs:
           echo ${{ github.event_name }}
           echo ${{ github.ref }}
           echo ${{ inputs.target_branch }}
+          echo ${{ github.event_name != 'workflow_call' && github.ref }}
+          echo ${{ github.event_name != 'workflow_call' && github.ref || inputs.target_branch }}
 
       - uses: actions/checkout@v3
         with:
