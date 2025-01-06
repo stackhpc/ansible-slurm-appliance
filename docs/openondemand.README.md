@@ -30,10 +30,10 @@ The above functionality is configured by running the `ansible/portal.yml` playbo
 
 See the [ansible/roles/openondemand/README.md](../ansible/roles/openondemand/README.md) for more details on the variables described below.
 
-The following variables have been given default values to allow OOD to run in a newly created environment without additional configuration, but are likely to be overriden with site-specific values:
-- `openondemand_servername` - this must be defined for both `openondemand` and `grafana` hosts (when Grafana is enabled). It is suggested to place it groupvars for `all`. Defaults to the IP address of the first host in the `openondemand` group.
+The following variables have been given default values to allow Open Ondemand to work in a newly created environment without additional configuration, but generally should be overridden in `environment/site/inventory/group_vars/all/` with site-specific values:
+- `openondemand_servername` - this must be defined for both `openondemand` and `grafana` hosts (when Grafana is enabled). Default is `ansible_host` (i.e. the IP address) of the first host in the `openondemand` group.
 - `openondemand_auth` and any corresponding options. Defaults to `basic_pam`.
-- `openondemand_desktop_partition` and `openondemand_jupyter_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` Terraform variable in `environments/{ENV}/terraform`.
+- `openondemand_desktop_partition` and `openondemand_jupyter_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` Terraform variable in `environments/$ENV/terraform`.
 
 It is also recommended to set:
 - `openondemand_dashboard_support_url`
