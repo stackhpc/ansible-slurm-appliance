@@ -41,6 +41,9 @@ def to_ood_regex(items):
         eg {{ [compute-001, compute-002, control] | to_regex }} -> '(compute-\d+)|(control)'
     """
     
+    # NB: for python3.12+ the \d in this function & docstring
+    # need to be raw strings. See https://docs.python.org/3/reference/lexical_analysis.html
+
     # There's a python bug which means re.sub() can't use '\d' in the replacement so
     # have to do replacement in two stages:
     r = [re.sub(r"\d+", 'XBACKSLASHX', v) for v in items]
