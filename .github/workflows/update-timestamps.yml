@@ -9,7 +9,7 @@ jobs:
   upstream_check:
     outputs:
       new_fatimage: "${{ steps.fatimage_check.outputs.new_fatimage }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
 
@@ -90,7 +90,7 @@ jobs:
   bump_timestamps:
     if: needs.upstream_check.outputs.new_fatimage == 'true'
     needs: build_fatimage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -112,7 +112,7 @@ jobs:
   create_pr:
     needs: bump_timestamps
     if: always() && (needs.bump_timestamps.result == 'skipped' || needs.bump_timestamps.result == 'success')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -147,7 +147,7 @@ jobs:
     needs:
      - run_ci
      - create_pr
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout branch
         uses: actions/checkout@v3
