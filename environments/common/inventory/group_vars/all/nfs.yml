@@ -5,17 +5,7 @@
 
 nfs_server_default: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
 
-nfs_configurations:
-  - comment: Export /exports/home from Slurm control node as /home
-    nfs_enable:
-        server:  "{{ inventory_hostname in groups['control'] }}"
-        # Don't mount share on server where it is exported from...
-        # Could do something like `nfs_clients: "{{ 'nfs_servers' not in group_names }}"` instead.
-        clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
-    nfs_server: "{{ nfs_server_default }}"
-    nfs_export: "/exports/home" # assumes skeleton TF is being used
-    nfs_client_mnt_point: "/home"
-
+nfs_default_configs:
   - comment: Export /exports/cluster from Slurm control node
     nfs_enable:
         server: "{{ inventory_hostname in groups['control'] }}"
@@ -30,3 +20,17 @@ nfs_configurations:
     nfs_server: "{{ nfs_server_default }}"
     nfs_client_mnt_point: "/mnt/hostkeys"
     nfs_client_mnt_options: "x-systemd.required-by=zenith-ood.service,x-systemd.before=zenith-ood.service"
+
+# Separated to be overridable in caas
+nfs_home_config:
+- comment: Export /exports/home from Slurm control node as /home
+  nfs_enable:
+      server:  "{{ inventory_hostname in groups['control'] }}"
+      # Don't mount share on server where it is exported from...
+      # Could do something like `nfs_clients: "{{ 'nfs_servers' not in group_names }}"` instead.
+      clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
+  nfs_server: "{{ nfs_server_default }}"
+  nfs_export: "/exports/home" # assumes skeleton TF is being used
+  nfs_client_mnt_point: "/home"
+
+nfs_configurations: "{{ nfs_default_configs + nfs_home_config }}"

@@ -15,5 +15,3 @@ compute
 [podman:children]
 zenith
 
-[persist_hostkeys:children]
-openondemand
