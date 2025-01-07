@@ -21,3 +21,12 @@ nfs_configurations:
         server: "{{ inventory_hostname in groups['control'] }}"
         clients: false
     nfs_export: "/exports/cluster"
+
+  - comment: Export hostkeys from Slurm control node to OOD
+    nfs_enable:
+        server:  "{{ inventory_hostname in groups['control'] }}"
+        clients: "{{ inventory_hostname in groups['openondemand'] or inventory_hostname in groups['login'] }}"
+    nfs_export: "{{ appliances_state_dir | default('/var/lib/state') }}/hostkeys"
+    nfs_server: "{{ nfs_server_default }}"
+    nfs_client_mnt_point: "/mnt/hostkeys"
+    nfs_client_mnt_options: "x-systemd.required-by=zenith-ood.service,x-systemd.before=zenith-ood.service"

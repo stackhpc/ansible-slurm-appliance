@@ -2,7 +2,7 @@
 
 - name: Ensure hostkeys directory exists on persistent storage
   file:
-    path: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}"
+    path: "/mnt/hostkeys/{{ inventory_hostname }}"
     state: directory
     owner: root
     group: root
@@ -11,7 +11,7 @@
 - name: Copy hostkeys from persistent storage
   # won't fail if no keys are in persistent storage
   copy:
-    src: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/"
+    src: "/mnt/hostkeys/{{ inventory_hostname }}/"
     dest: /etc/ssh/
     remote_src: true
 
@@ -23,7 +23,7 @@
 
 - name: Persist hostkeys
   copy:
-    dest: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/"
+    dest: "/mnt/hostkeys/{{ inventory_hostname }}/"
     src: "{{ item }}"
     remote_src: true
     mode: preserve
