@@ -125,6 +125,8 @@ jobs:
           gh pr list --json headRefName --jq '.[].headRefName' | grep auto/bump-timestamps
           PR_EXISTS=$?
           echo "pr_exists=$PR_EXISTS" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Create PR
         if: steps.pr-check.outputs.pr_exists == '0'
