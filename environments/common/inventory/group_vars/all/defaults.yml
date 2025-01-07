@@ -170,5 +170,5 @@ appliances_pulp_repos:
       timestamp: 20231104T015751
       path: centos/8-stream/storage/x86_64/ceph-quincy
     '9':
-      timestamp: 20241114T011240
-      path: centos/9-stream/storage/x86_64/ceph-quincy
+      timestamp: 20240923T233036
+      path: centos/9-stream/storage/x86_64/ceph-reef
