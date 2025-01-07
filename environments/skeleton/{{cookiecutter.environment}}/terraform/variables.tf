@@ -52,6 +52,10 @@ variable "compute" {
             image_id: Overrides variable cluster_image_id
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
+            volumes: Mapping defining volumes to create and attach to compute nodes.
+                     Keys are a unique volume name.
+                     Values are a mapping containing:
+                        size: Size of volume in GB
     EOF
 }
 
