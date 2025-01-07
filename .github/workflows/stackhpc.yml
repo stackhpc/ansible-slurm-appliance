@@ -170,31 +170,20 @@ jobs:
         env:
           TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      # - name: Build environment-specific compute image
-      #   id: packer_build
-      #   run: |
-      #     . venv/bin/activate
-      #     . environments/.stackhpc/activate
-      #     cd packer/
-      #     packer init
-      #     PACKER_LOG=1 packer build -except openstack.fatimage -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
-      #     ../dev/output_manifest.py packer-manifest.json # Sets NEW_COMPUTE_IMAGE_ID outputs
-
-      # - name: Test reimage of compute nodes to new environment-specific image (via slurm)
-      #   run: |
-      #     . venv/bin/activate
-      #     . environments/.stackhpc/activate
-      #     ansible login -v -a "sudo scontrol reboot ASAP nextstate=RESUME reason='rebuild image:${{ steps.packer_build.outputs.NEW_COMPUTE_IMAGE_ID }}' ${TF_VAR_cluster_name}-compute-[0-3]"
-      #     ansible compute -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
-      #     ansible-playbook -v ansible/ci/check_slurm.yml
-
       - name: Test reimage of login and control nodes (via rebuild adhoc)
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible-playbook -v --limit control,login ansible/adhoc/rebuild.yml
-          ansible all -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
           ansible-playbook -v ansible/site.yml
+          ansible-playbook -v ansible/ci/check_slurm.yml
+
+      - name: Test reimage of compute nodes and compute-init (via rebuild adhoc)
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ansible-playbook -v --limit compute ansible/adhoc/rebuild.yml
+          ansible all -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
           ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Check sacct state survived reimage
