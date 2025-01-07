@@ -42,10 +42,35 @@ The following roles/groups are currently fully functional:
   node and all compute nodes.
 - `openhpc`: all functionality
 
+All of the above are defined in the skeleton cookiecutter config, and are
+toggleable via a terraform compute_init autovar file. In the .stackhpc
+environment, the compute init roles are set by default to:
+- `enable_compute`: This encompasses the openhpc role functionality while being
+  a global toggle for the entire compute-init script.
+- `etc_hosts`
+- `nfs`
+- `basic_users`
+- `eessi`
+
+# CI workflow
+
+The compute node rebuild is tested in CI after the tests for rebuilding the
+login and control nodes. The process follows
+
+1. Compute nodes are reimaged:
+
+         ansible-playbook -v --limit compute ansible/adhoc/rebuild.yml
+
+2. Ansible-init runs against newly reimaged compute nodes
+
+3. Run sinfo and check nodes have expected slurm state
+
+         ansible-playbook -v ansible/ci/check_slurm.yml
+
 # Development/debugging
 
-To develop/debug this without actually having to build an image:
-
+To develop/debug changes to the compute script without actually having to build
+a new image:
 
 1. Deploy a cluster using tofu and ansible/site.yml as normal. This will
    additionally configure the control node to export compute hostvars over NFS.
@@ -103,7 +128,7 @@ as in step 3.
   available v the current approach:
 
     ```
-    [root@rl9-compute-0 rocky]# grep hostvars /mnt/cluster/hostvars/rl9-compute-0/hostvars.yml 
+    [root@rl9-compute-0 rocky]# grep hostvars /mnt/cluster/hostvars/rl9-compute-0/hostvars.yml
         "grafana_address": "{{ hostvars[groups['grafana'].0].api_address }}",
         "grafana_api_address": "{{ hostvars[groups['grafana'].0].internal_address }}",
         "mysql_host": "{{ hostvars[groups['mysql'] | first].api_address }}",
