@@ -151,6 +151,20 @@ appliances_pulp_repos:
     '8':
       timestamp: 20241216T235733
       path: epel/8/Everything/x86_64
+  openhpc_base:
+    '8':
+      path: OpenHPC/2/EL_8
+      timestamp: 20241218T154614
+    '9':
+      path: OpenHPC/3/EL_9
+      timestamp: 20241218T154614
+  openhpc_updates:
+    '8':
+      path: OpenHPC/2/updates/EL_8
+      timestamp: 20241218T154614
+    '9':
+      path: OpenHPC/3/updates/EL_9
+      timestamp: 20241218T154614
   ceph:
     '8':
       timestamp: 20231104T015751
