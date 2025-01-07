@@ -20,6 +20,12 @@ login:
             ansible_host: ${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]}
             instance_id: ${ login.id }
 %{ endfor ~}
+    vars:
+        appliances_state_dir: ${state_dir}
+
+openondemand:
+    vars:
+        appliances_state_dir: ${state_dir}
 
 %{ for group_name in keys(compute_groups) ~}
 ${cluster_name}_${group_name}:
