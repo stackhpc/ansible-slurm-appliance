@@ -1,0 +1,5 @@
+os_manila_mount_ceph_rpm_repos: []
+os_manila_mount_ceph_min_versions: 
+  Rocky:
+    "8": '17.2.7' # quincy
+    "9": '18.2.4' # reef
