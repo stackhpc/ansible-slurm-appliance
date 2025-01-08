@@ -41,28 +41,30 @@ and referenced from the `site` and `production` environments, e.g.:
 - OpenTofu configurations should be defined in the `site` environment and used
   as a module from the other environments. This can be done with the
   cookie-cutter generated configurations:
-  - Delete the *contents* of the cookie-cutter generated `terraform/` directories
+  - Delete the *contents* of the cookie-cutter generated `tofu/` directories
     from the `production` and `staging` environments.
-  - Create a `main.tf` in those directories which uses `site/terraform/` as a
+  - Create a `main.tf` in those directories which uses `site/tofu/` as a
     [module](https://opentofu.org/docs/language/modules/), e.g. :
 
     ```
     ...
     module "cluster" {
-        source = "../../site/terraform/"
+        source = "../../site/tofu/"
 
         cluster_name = "foo"
         ...
     }
     ```
 
-    Note that:
-        - Environment-specific variables (`cluster_name`) should be hardcoded
-          into the module block.
-        - Environment-independent variables (e.g. maybe `cluster_net` if the
-          same is used for staging and production) should be set as *defaults*
-          in `environments/site/terraform/variables.tf`, and then don't need to
-          be passed in to the module.
+  Note that:
+    - Environment-specific variables (e.g. `cluster_name`) should be hardcoded
+      into the module block.
+    - Environment-independent variables should be set as *defaults*
+      in `environments/site/tofu/variables.tf`, and then don't need to
+      be passed in to the module. Examples include `cluster_net` (assuming
+      staging/production use the same network) and `cluster_image_ids` (because
+      staging should test the image(s) which will subsequently be deployed
+      to production after testing on a branch).
 
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
