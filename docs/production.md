@@ -118,30 +118,6 @@ and referenced from the `site` and `production` environments, e.g.:
 - If floating IPs are required for login nodes, modify the OpenTofu configurations
   appropriately.
 
-- Enable persisting login node hostkeys so users do not get annoying ssh warning
-  messages on reimage:
-
-    ```yaml
-    # environments/site/inventory/groups:
-    [persist_hostkeys:children]
-    login
-    ```
-  And configure NFS to include exporting the state directory to these hosts:
-
-    ```yaml
-    # environments/common/inventory/group_vars/all/nfs.yml:
-    nfs_configurations:
-    # ... potentially, /home defintion from common environment
-    - comment: Export state directory to login nodes
-        nfs_enable:
-            server:  "{{ inventory_hostname in groups['control'] }}"
-            clients: "{{ inventory_hostname in groups['login'] }}"
-        nfs_server: "{{ nfs_server_default }}"
-        nfs_export: "/var/lib/state"
-        nfs_client_mnt_point: "/var/lib/state"
-    ```
-    See [issue 506](https://github.com/stackhpc/ansible-slurm-appliance/issues/506).
-
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
 
