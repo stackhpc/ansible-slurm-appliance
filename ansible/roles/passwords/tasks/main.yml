@@ -15,6 +15,6 @@
 - name:  Template k3s token to terraform
   template:
     src: k3s-token.auto.tfvars.json.j2
-    dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/terraform/k3s-token.auto.tfvars.json"
+    dest: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/tofu/k3s-token.auto.tfvars.json"
   delegate_to: localhost
   run_once: true

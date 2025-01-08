@@ -10,7 +10,7 @@ module "compute" {
   cluster_subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
 
   flavor = each.value.flavor
-  image_id = lookup(each.value, "image_id", var.cluster_image_id)
+  image_id = lookup(var.cluster_image_ids, each.key, var.cluster_image_ids["default"])
   vnic_type = lookup(each.value, "vnic_type", var.vnic_type)
   vnic_profile = lookup(each.value, "vnic_profile", var.vnic_profile)
   key_pair = var.key_pair

@@ -45,13 +45,13 @@ resource "openstack_compute_instance_v2" "control" {
   for_each = toset(["control"])
   
   name = "${var.cluster_name}-${each.key}"
-  image_id = var.cluster_image_id
+  image_id = var.cluster_image_ids["default"]
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
   
   # root device:
   block_device {
-      uuid = var.cluster_image_id
+      uuid = var.cluster_image_ids["default"]
       source_type  = "image"
       destination_type = var.volume_backed_instances ? "volume" : "local"
       volume_size = var.volume_backed_instances ? var.root_volume_size : null
@@ -102,14 +102,14 @@ resource "openstack_compute_instance_v2" "login" {
   for_each = var.login_nodes
   
   name = "${var.cluster_name}-${each.key}"
-  image_id = var.cluster_image_id
+  image_id = var.cluster_image_ids["default"]
   flavor_name = each.value
   key_pair = var.key_pair
 
   dynamic "block_device" {
     for_each = var.volume_backed_instances ? [1]: []
     content {
-      uuid = var.cluster_image_id
+      uuid = var.cluster_image_ids["default"]
       source_type  = "image"
       destination_type = "volume"
       volume_size = var.root_volume_size
