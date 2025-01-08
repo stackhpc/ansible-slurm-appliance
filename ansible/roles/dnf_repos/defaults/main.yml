@@ -17,7 +17,7 @@ dnf_repos_filenames:
 dnf_repos_version_filenames: "{{ dnf_repos_filenames[ansible_distribution_major_version] }}"
 
 # epel installed separately
-dnf_repos_repolist:
+dnf_repos_default_repolist:
 - file: "{{ dnf_repos_version_filenames.baseos }}"
   name: baseos
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.baseos[ansible_distribution_version] | appliances_repo_to_subpath }}"
@@ -30,6 +30,19 @@ dnf_repos_repolist:
 - file: "{{ dnf_repos_version_filenames.extras }}"
   name: extras
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.extras[ansible_distribution_version] | appliances_repo_to_subpath }}"
+- file: ceph
+  name: Ceph
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.ceph[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
+
+dnf_repos_openhpc_repolist:
+- name: OpenHPC
+  file: OpenHPC
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.openhpc_base[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
+- name: OpenHPC-updates
+  file: OpenHPC
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.openhpc_updates[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
+
+dnf_repos_repolist: "{{ dnf_repos_default_repolist + (dnf_repos_openhpc_repolist if (openhpc_install_type | default('ohpc')) == 'ohpc' else []) }}"
 
 dnf_repos_epel_baseurl: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.epel[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
 dnf_repos_epel_description: "epel"
