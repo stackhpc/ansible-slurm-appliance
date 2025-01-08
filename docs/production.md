@@ -98,6 +98,10 @@ and referenced from the `site` and `production` environments, e.g.:
 
 - Configure Open OpenOndemand - see [specific documentation](openondemand.README.md).
 
+- Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
+
+- Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
+
 - Modify `environments/site/terraform/nodes.tf` to provide fixed IPs for at least
   the control node, and (if not using FIPs) the login node(s):
 
