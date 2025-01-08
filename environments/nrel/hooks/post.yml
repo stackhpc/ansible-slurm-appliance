@@ -8,6 +8,12 @@
       ansible.builtin.include_role:
         name: vs-set-ephemeral-mounts
 
+- name: Enable /home ceph mount
+  ansible.builtin.systemd_service:
+    name: home.mount
+    state: started
+    enabled: true
+
 - name: Do pam_mkhomedir_plus
   hosts: login
   become: true
@@ -32,6 +38,9 @@
       ansible.builtin.get_url:
         dest: "/etc/yum.repos.d/cuda-{{ cuda_distro }}.repo"
         url: "{{ cuda_repo }}"
+        mode: '0644'
+        owner: root
+        group: root
 
     - name: Check if nvidia driver module is enabled
       ansible.builtin.shell:
@@ -51,8 +60,6 @@
       register: _cuda_driver_install
       when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
       changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
-
-
 
 # - name: Do cp user home to /var/lib/USER
 #   hosts: all
