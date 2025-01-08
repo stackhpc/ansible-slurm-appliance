@@ -1,3 +1,4 @@
+
 # This terraform configuration uses the "skeleton" terraform, so that is checked by CI.
 
 terraform {
@@ -25,9 +26,9 @@ variable "os_version" {
   default = "RL9"
 }
 
-variable "cluster_image" {
-    description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
-    type = map(string)
+variable "cluster_image_names" {
+    description = "image *names* keyed by os_version, for CI"
+    type = map(map(string))
 }
 
 variable "cluster_net" {}
@@ -58,8 +59,10 @@ variable "k3s_token" {
     type = string
 }
 
-data "openstack_images_image_v2" "cluster" {
-    name = var.cluster_image[var.os_version]
+data "openstack_images_image_v2" "cluster_images" {
+    for_each = var.cluster_image_names[var.os_version]
+
+    name = each.value
     most_recent = true
 }
 
@@ -71,7 +74,7 @@ module "cluster" {
     cluster_subnet = var.cluster_subnet
     vnic_type = var.vnic_type
     key_pair = "slurm-app-ci"
-    cluster_image_id = data.openstack_images_image_v2.cluster.id
+    cluster_image_ids = {for key, img in data.openstack_images_image_v2.cluster_images: key => img.id}
     control_node_flavor = var.control_node_flavor
     k3s_token = var.k3s_token
 

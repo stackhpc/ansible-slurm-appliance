@@ -34,9 +34,13 @@ variable "login_nodes" {
   description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> (str) flavor name"
 }
 
-variable "cluster_image_id" {
-    type = string
-    description = "ID of default image for the cluster"
+variable "cluster_image_ids" {
+    type = map(string)
+    description = <<-EOF
+     Mapping of UUIDs defining images for the cluster. Valid keys are:
+        - "default": required, defines default image for cluster
+        - any key from "compute" variable, to define different images for compute node groups
+    EOF
 }
 
 variable "compute" {
@@ -49,7 +53,6 @@ variable "compute" {
             nodes: List of node names
             flavor: String flavor name
         Optional:
-            image_id: Overrides variable cluster_image_id
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
     EOF
