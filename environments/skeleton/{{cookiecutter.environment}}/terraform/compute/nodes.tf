@@ -44,18 +44,14 @@ resource "openstack_compute_instance_v2" "compute" {
     access_network = true
   }
 
-  metadata = {
-    environment_root   = var.environment_root
-    k3s_token          = var.k3s_token
-    control_address    = var.control_address
-    enable_compute     = contains(var.compute_init_enable, "compute")
-    enable_resolv_conf = contains(var.compute_init_enable, "resolv_conf")
-    enable_etc_hosts   = contains(var.compute_init_enable, "etc_hosts")
-    enable_nfs         = contains(var.compute_init_enable, "nfs")
-    enable_manila      = contains(var.compute_init_enable, "manila")
-    enable_basic_users = contains(var.compute_init_enable, "basic_users")
-    enable_eessi       = contains(var.compute_init_enable, "eessi")
-  }
+  metadata = merge(
+    {
+        environment_root = var.environment_root
+        k3s_token          = var.k3s_token
+        control_address    = var.control_address
+     },
+    {for e in var.compute_init_enable: e => true}
+  )
 
   user_data = <<-EOF
     #cloud-config

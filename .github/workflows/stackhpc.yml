@@ -183,7 +183,6 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible-playbook -v --limit compute ansible/adhoc/rebuild.yml
-          ansible all -m wait_for_connection -a 'delay=60 timeout=600' # delay allows node to go down
           ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Check sacct state survived reimage

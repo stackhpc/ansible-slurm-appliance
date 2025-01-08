@@ -42,30 +42,8 @@ The following roles/groups are currently fully functional:
   node and all compute nodes.
 - `openhpc`: all functionality
 
-All of the above are defined in the skeleton cookiecutter config, and are
-toggleable via a terraform compute_init autovar file. In the .stackhpc
-environment, the compute init roles are set by default to:
-- `enable_compute`: This encompasses the openhpc role functionality while being
-  a global toggle for the entire compute-init script.
-- `etc_hosts`
-- `nfs`
-- `basic_users`
-- `eessi`
-
-# CI workflow
-
-The compute node rebuild is tested in CI after the tests for rebuilding the
-login and control nodes. The process follows
-
-1. Compute nodes are reimaged:
-
-         ansible-playbook -v --limit compute ansible/adhoc/rebuild.yml
-
-2. Ansible-init runs against newly reimaged compute nodes
-
-3. Run sinfo and check nodes have expected slurm state
-
-         ansible-playbook -v ansible/ci/check_slurm.yml
+The above may be enabled by setting the compute_init_enable property on the
+terraform compute variable.
 
 # Development/debugging
 

@@ -58,10 +58,6 @@ variable "k3s_token" {
     type = string
 }
 
-variable "compute_init_enable" {
-    type = list(string)
-}
-
 data "openstack_images_image_v2" "cluster" {
     name = var.cluster_image[var.os_version]
     most_recent = true
@@ -78,7 +74,6 @@ module "cluster" {
     cluster_image_id = data.openstack_images_image_v2.cluster.id
     control_node_flavor = var.control_node_flavor
     k3s_token = var.k3s_token
-    compute_init_enable = var.compute_init_enable
 
     login_nodes = {
         login-0: var.other_node_flavor
@@ -87,6 +82,7 @@ module "cluster" {
         standard: { # NB: can't call this default!
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
+            compute_init_enable: ["compute", "etc_hosts", "nfs", "basic_users", "eessi"]
         }
         # Example of how to add another partition:
         # extra: {

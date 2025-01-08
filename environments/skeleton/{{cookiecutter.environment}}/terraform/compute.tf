@@ -19,5 +19,5 @@ module "compute" {
   control_address = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
 
-  compute_init_enable = var.compute_init_enable
+  compute_init_enable = each.value.compute_init_enable
 }
