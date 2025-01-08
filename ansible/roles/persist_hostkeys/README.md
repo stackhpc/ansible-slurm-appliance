@@ -1,8 +1,5 @@
 # persist_hostkeys
 
-Save hostkeys to persistent storage and restore them after a rebuild/reimage.
+Idempotently generates a persistent set of hostkeys and restores them after a rebuild/reimage.
 
-Add hosts to the `persist_hostkeys` group to enable.
-
-This role has no variables but hosts in this group must have `appliances_state_dir`
-defined as a directory they can write to on persistent storage.
+Add hosts to the `persist_hostkeys` group to enable. All hosts in group will share the same set hostkeys.

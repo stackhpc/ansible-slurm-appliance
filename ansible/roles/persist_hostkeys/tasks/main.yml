@@ -1,33 +1,46 @@
 ---
 
-- name: Ensure hostkeys directory exists on persistent storage
-  file:
-    path: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0600
+- name: Generate persistent hostkeys in state directory
+  delegate_to: "{{ persist_hostkeys_state_server }}"
+  block:
+  - name: Ensure hostkeys directory exists on persistent storage
+    file:
+      path: "{{ persist_hostkeys_state_dir }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0600
 
-- name: Copy hostkeys from persistent storage
-  # won't fail if no keys are in persistent storage
+  - name: Check for existing hostkeys
+    find:
+      paths: "{{ persist_hostkeys_state_dir }}/"
+    register: _files_found
+
+  - name: Generate hostkeys
+    when: _files_found.matched == 0
+    shell:
+      cmd: |
+        mkdir -p {{ persist_hostkeys_state_dir }}/etc/ssh
+        ssh-keygen -A -N \"\" -f {{ persist_hostkeys_state_dir }}
+        mv {{ persist_hostkeys_state_dir }}/etc/ssh/* {{ persist_hostkeys_state_dir }}
+        rm -rf {{ persist_hostkeys_state_dir }}/etc/ssh
+  
+  - name: Get created key names
+    find:
+      path: "{{ persist_hostkeys_state_dir }}/"
+    register: _find_ssh_keys
+
+  - name: Create in-memory copies of keys
+    ansible.builtin.slurp:
+      src: "{{ item.path }}"
+    loop: "{{ _find_ssh_keys.files }}"
+    register: _slurp_keys
+
+- name: Copy keys to hosts
+  no_log: true
   copy:
-    src: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/"
-    dest: /etc/ssh/
-    remote_src: true
-
-- name: Find hostkeys
-  find:
-    path: /etc/ssh/
-    patterns: ssh_host_*_key*
-  register: _find_ssh_keys
-
-- name: Persist hostkeys
-  copy:
-    dest: "{{ appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/"
-    src: "{{ item }}"
-    remote_src: true
-    mode: preserve
-  loop: "{{ _find_ssh_keys.files | map(attribute='path') }}"
+    content: "{{ item.content | b64decode }}"
+    dest: "/etc/ssh/{{ item.source | regex_search('[^/]+$') }}"
+  loop: "{{ _slurp_keys.results }}"
 
 - meta: reset_connection
-
