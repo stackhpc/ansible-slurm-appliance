@@ -159,6 +159,8 @@ jobs:
         run: |
           PR_NUMBER=$(gh pr list --head auto/bump-timestamps --state open --json number --jq .[0].number)
           echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Comment CI status
         uses: thollander/actions-comment-pull-request@v1
