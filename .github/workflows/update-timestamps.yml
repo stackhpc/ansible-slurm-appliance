@@ -87,7 +87,7 @@ jobs:
       ci_cloud_override: 'LEAFCLOUD'
       target_branch: auto/bump-timestamps
 
-  bump_timestamps:
+  bump_images:
     if: needs.upstream_check.outputs.new_fatimage == 'true'
     needs: build_fatimage
     runs-on: ubuntu-22.04
@@ -110,8 +110,8 @@ jobs:
           git push
 
   create_pr:
-    needs: bump_timestamps
-    if: always() && (needs.bump_timestamps.result == 'skipped' || needs.bump_timestamps.result == 'success')
+    needs: bump_images
+    if: always() && (needs.bump_images.result == 'skipped' || needs.bump_images.result == 'success')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
@@ -136,9 +136,9 @@ jobs:
 
   run_ci:
     needs:
-    - bump_timestamps
+    - bump_images
     - upstream_check
-    if: always() && (needs.bump_timestamps.result == 'success' || needs.upstream_check.outputs.new_fatimage == 'false') # should always run only on image bump commits
+    if: always() && (needs.bump_images.result == 'success' || needs.upstream_check.outputs.new_fatimage == 'false') # should always run only on image bump commits
     uses: ./.github/workflows/stackhpc.yml
     secrets: inherit
     with:
