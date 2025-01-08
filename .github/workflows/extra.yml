@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
       - 'ansible/roles/doca/**'
       - 'ansible/roles/cuda/**'
       - 'ansible/roles/lustre/**'
       - '.github/workflows/extra.yml'
   pull_request:
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
       - 'ansible/roles/doca/**'
       - 'ansible/roles/cuda/**'
       - 'ansible/roles/lustre/**'
@@ -30,7 +30,7 @@ jobs:
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-extra-RL8
-            source_image_name_key: RL8 # key into environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+            source_image_name_key: RL8 # key into environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
             inventory_groups: doca,cuda,lustre
             volume_size: 30 # needed for cuda
           - image_name: openhpc-extra-RL9
@@ -51,7 +51,7 @@ jobs:
         run: |
           {
             echo 'FAT_IMAGES<<EOF'
-            cat environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+            cat environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
             echo EOF
           } >> "$GITHUB_ENV"
 
@@ -98,7 +98,7 @@ jobs:
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
+          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image_names'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           -var "volume_size=${{ matrix.build.volume_size }}" \

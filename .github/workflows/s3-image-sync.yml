@@ -5,10 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
 env:
   S3_BUCKET: openhpc-images-prerelease
-  IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+  IMAGE_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
 
 jobs:
   s3_cleanup:
