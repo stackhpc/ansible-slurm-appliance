@@ -165,4 +165,10 @@ appliances_pulp_repos:
     '9':
       path: OpenHPC/3/updates/EL_9
       timestamp: 20241218T154614
-      
+  ceph:
+    '8':
+      timestamp: 20231104T015751
+      path: centos/8-stream/storage/x86_64/ceph-quincy
+    '9':
+      timestamp: 20240923T233036
+      path: centos/9-stream/storage/x86_64/ceph-reef
