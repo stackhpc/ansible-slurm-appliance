@@ -98,7 +98,7 @@ jobs:
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image_names'][matrix.build.source_image_name_key] }}" \
+          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image_names'][matrix.build.source_image_name_key]['default'] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           -var "volume_size=${{ matrix.build.volume_size }}" \
