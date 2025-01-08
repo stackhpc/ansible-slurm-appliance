@@ -90,13 +90,17 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
     login_nodes = {
         login-0: "login_flavor_name"
     }
-    cluster_image_id = "rocky_linux_9_image_uuid"
+    cluster_image_ids = {
+        default: $ROCKYLINUX_9_IMAGE_UUID
+    }
     compute = {
         general = {
             nodes: ["compute-0", "compute-1"]
             flavor: "compute_flavor_name"
         }
     }
+
+where `$ROCKYLINUX_9_IMAGE_UUID` should be replaced with the ID of the appropriate image (see above).
 
 Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables and descriptions see `environments/$ENV/terraform/terraform.tfvars`.
 
