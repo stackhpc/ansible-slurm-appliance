@@ -1,0 +1,21 @@
+name: Check if being used as reusable workflow
+description: Determines if running as part of a reusable workflow by checking if the specified current workflow file is the same as the caller
+inputs:
+  current_workflow_file:
+    required: true
+    description: The name of the workflow file this action is called from
+outputs:
+  is_callee: 
+    value: ${{ steps.workflows_match.outputs.is_callee }}
+    description: Returns 'true' (string) if called as a reusable workflow
+runs:
+  using: "composite"
+  steps:
+    - id: workflows_match
+      run: |
+        if echo ${{ github.workflow_ref }} | grep ${{ inputs.current_workflow_file }}; then
+          echo "is_callee='false'" >> "$GITHUB_OUTPUT"
+        else
+          echo "is_callee='true'" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
