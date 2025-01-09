@@ -60,6 +60,7 @@ cluster
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
 [eessi:children]
+# Hosts on which EESSI stack should be configured
 openhpc
 
 [resolv_conf]
@@ -83,8 +84,14 @@ openondemand
 # Hosts to run TuneD configuration
 
 [ansible_init:children]
-# Hosts to run ansible-init
+# Hosts to run linux-anisble-init
 cluster
+
+[sssd]
+# Hosts to configure sssd on
+
+[sshd]
+# Hosts where the OpenSSH server daemon should be configured
 
 [compute_init:children]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
