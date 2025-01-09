@@ -21,7 +21,7 @@
     shell:
       cmd: |
         mkdir -p {{ persist_hostkeys_state_dir }}/etc/ssh
-        ssh-keygen -A -N \"\" -f {{ persist_hostkeys_state_dir }}
+        ssh-keygen -A -N '' -f {{ persist_hostkeys_state_dir }}
         mv {{ persist_hostkeys_state_dir }}/etc/ssh/* {{ persist_hostkeys_state_dir }}
         rm -rf {{ persist_hostkeys_state_dir }}/etc/ssh
   
