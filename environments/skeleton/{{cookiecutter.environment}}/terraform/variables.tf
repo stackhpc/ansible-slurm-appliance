@@ -53,6 +53,8 @@ variable "compute" {
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
+            volume_backed_instances: Overrides variable volume_backed_instances
+            root_volume_size: Overrides variable root_volume_size
     EOF
 }
 
