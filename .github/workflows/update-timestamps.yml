@@ -1,6 +1,6 @@
 name: Check for new Release Train snapshots
 on:
-  workflow_dispatch:
+  workflow_dispatch: # temporary, doesn't support workflow_dispatch due to issues with CI_CLOUD in fatimage
   pull_request: #temporary 
   schedule:
     - cron: '0 7 * * *'  # Run at 7am on default branch
