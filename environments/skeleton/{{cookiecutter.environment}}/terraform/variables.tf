@@ -6,7 +6,7 @@ variable "cluster_name" {
 variable "cluster_domain_suffix" {
     type = string
     description = "Domain suffix for cluster"
-    default = "invalid"
+    default = "internal"
 }
 
 variable "cluster_net" {
@@ -52,6 +52,8 @@ variable "compute" {
             image_id: Overrides variable cluster_image_id
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
+            volume_backed_instances: Overrides variable volume_backed_instances
+            root_volume_size: Overrides variable root_volume_size
     EOF
 }
 
