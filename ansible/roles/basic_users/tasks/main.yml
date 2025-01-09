@@ -32,7 +32,7 @@
   systemd:
     name: sssd
     state: started
-  when: _stop_sssd.changed | default(false)
+  when: _stop_sssd is changed
 
 - name: Write supplied public key as authorized for SSH access
   authorized_key:
