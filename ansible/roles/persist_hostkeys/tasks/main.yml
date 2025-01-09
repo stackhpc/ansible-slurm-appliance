@@ -19,6 +19,7 @@
   - name: Generate hostkeys
     when: _files_found.matched == 0
     shell:
+    # ssh-keygen -A needs a directory with an /etc/ssh suffix to write hostkeys into
       cmd: |
         mkdir -p {{ persist_hostkeys_state_dir }}/etc/ssh
         ssh-keygen -A -N '' -f {{ persist_hostkeys_state_dir }}
