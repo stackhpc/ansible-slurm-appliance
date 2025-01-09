@@ -36,8 +36,9 @@ login
 [block_devices:children]
 # Environment-specific so not defined here
 
-[basic_users]
+[basic_users:children]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
+openhpc
 
 [openondemand:children]
 # Host to run Open Ondemand server on - subset of login
@@ -51,8 +52,9 @@ compute
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
 compute
 
-[etc_hosts]
+[etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+cluster
 
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
