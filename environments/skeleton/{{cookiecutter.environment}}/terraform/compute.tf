@@ -18,6 +18,7 @@ module "compute" {
   vnic_profile = lookup(each.value, "vnic_profile", var.vnic_profile)
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
+  extra_volumes = lookup(each.value, "extra_volumes", {})
 
   key_pair = var.key_pair
   environment_root = var.environment_root

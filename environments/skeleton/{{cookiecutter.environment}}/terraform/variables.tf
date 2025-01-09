@@ -54,6 +54,11 @@ variable "compute" {
             vnic_profile: Overrides variable vnic_profile
             volume_backed_instances: Overrides variable volume_backed_instances
             root_volume_size: Overrides variable root_volume_size
+            extra_volumes: Mapping defining additional volumes to create and attach
+                           Keys are unique volume name.
+                           Values are a mapping with:
+                                size: Size of volume in GB
+                           **NB**: The order in /dev is not guaranteed to match the mapping
     EOF
 }
 
