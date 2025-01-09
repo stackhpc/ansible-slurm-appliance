@@ -14,6 +14,14 @@ Note that ansible-init does not run during an image build. It is disabled via a 
 sequenceDiagram
     participant ansible as Ansible Deploy Host
     participant cloud as Cloud
+    ansible->>cloud: Create VM
+    create participant pulp as Local Pulp Server
+    cloud->>pulp: Create VM
+    ansible->>pulp: Run ansible/adhoc/deploy-pulp.yml
+    note over pulp: Pulp server installed & configured
+    ansible->>pulp: Run ansible/adhoc/sync-pulp.yml # needs to point at ark too somehow
+    participant ark as Ark
+    ark-->>pulp: Sync repos
     note over ansible: $ packer build ...
     ansible->>cloud: Create VM
     create participant packer as Build VM
@@ -23,8 +31,14 @@ sequenceDiagram
     cloud->>packer: Metadata sent
     packer->>packer: Skip ansible-init
     ansible->>packer: Wait for ssh connection
-    ansible->>packer: Run ansible/fatimage.yml playbook
+    rect rgb(204, 232, 252)
+    note right of ansible: fatimage.yml
+    ansible->>packer: Overwrite repo files with Pulp repos and update
+    packer->>pulp: dnf update
+    pulp-->>packer: Package updates
+    ansible->>packer: Perform installation tasks
     ansible->>packer: Shutdown
+    end
     ansible->>cloud: Create image from Build VM root disk
     destroy packer
     note over cloud: Image openhpc-... created
