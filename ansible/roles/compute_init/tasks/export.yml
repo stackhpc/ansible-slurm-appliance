@@ -1,0 +1,67 @@
+- name: Ensure the /exports/cluster directory exists
+  file:
+    path: /exports/cluster
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwX,go=
+  run_once: true
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Copy /etc/hosts to /exports/cluster
+  copy:
+    src: /etc/hosts
+    dest: /exports/cluster/hosts
+    owner: root
+    group: root
+    mode: u=rw,go=
+    remote_src: true
+  run_once: true
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Create hostvars directory
+  file:
+    path: /exports/cluster/hostvars/{{ inventory_hostname }}/
+    state: directory
+    mode: u=rwX,go=
+    # TODO: owner,mode,etc
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Template out hostvars
+  template:
+    src: hostvars.yml.j2
+    dest: /exports/cluster/hostvars/{{ inventory_hostname }}/hostvars.yml
+    mode: u=rw,go=
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Copy manila share info to /exports/cluster
+  copy:
+    content: "{{ os_manila_mount_share_info_var | to_nice_yaml }}"
+    dest: /exports/cluster/manila_share_info.yml
+  run_once: true
+  delegate_to: "{{ groups['control'] | first }}"
+  when: os_manila_mount_share_info is defined
+  vars:
+    os_manila_mount_share_info_var:
+      os_manila_mount_share_info: "{{ os_manila_mount_share_info }}"
+
+- name: Ensure /exports/cluster/cvmfs directory exists
+  file:
+    path: /exports/cluster/cvmfs
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  run_once: true
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Copy EESSI CVMFS config to /exports/cluster
+  copy:
+    src: /etc/cvmfs/default.local
+    dest: /exports/cluster/cvmfs/default.local
+    owner: root
+    group: root
+    mode: 0644
+    remote_src: true
+  run_once: true
+  delegate_to: "{{ groups['control'] | first }}"

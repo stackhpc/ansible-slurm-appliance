@@ -1,17 +1,8 @@
 name: Cleanup CI clusters
 on:
   workflow_dispatch:
-      inputs:
-        ci_cloud:
-          description: 'Select the CI_CLOUD'
-          required: true
-          type: choice
-          options:
-            - LEAFCLOUD
-            - SMS
-            - ARCUS
   schedule:
-    - cron: '0 20 * * *'  # Run at 8PM - image sync runs at midnight
+    - cron: '0 21 * * *'  # Run at 9PM - image sync runs at midnight
 
 jobs:
   ci_cleanup:
@@ -52,20 +43,35 @@ jobs:
       - name: Find CI clusters
         run: |
           . venv/bin/activate
-          CI_CLUSTERS=$(openstack server list | grep --only-matching 'slurmci-RL.-[0-9]\+'  | sort | uniq)
-          echo "ci_clusters=${CI_CLUSTERS}" >> GITHUB_ENV
+          CI_CLUSTERS=$(openstack server list | grep --only-matching 'slurmci-RL.-[0-9]\+'  | sort | uniq || true)
+          echo "DEBUG: Raw CI clusters: $CI_CLUSTERS"
+      
+          if [[ -z "$CI_CLUSTERS" ]]; then
+            echo "No matching CI clusters found."
+          else
+            # Flatten multiline value so can be passed as env var
+            CI_CLUSTERS_FORMATTED=$(echo "$CI_CLUSTERS" | tr '\n' ' ' | sed 's/ $//')
+            echo "DEBUG: Formatted CI clusters: $CI_CLUSTERS_FORMATTED"
+            echo "ci_clusters=$CI_CLUSTERS_FORMATTED" >> $GITHUB_ENV
+          fi
         shell: bash
       
       - name: Delete clusters if control node not tagged with keep
         run: |
           . venv/bin/activate
-          for cluster_prefix in ${CI_CLUSTERS}
+          if [[ -z ${ci_clusters} ]]; then
+            echo "No clusters to delete."
+            exit 0
+          fi
+          
+          for cluster_prefix in ${ci_clusters}
           do
+            echo "Processing cluster: $cluster_prefix"
             TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
             if [[ $TAGS =~ "keep" ]]; then
               echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
             else
-              yes | ./dev/delete-cluster.py ${cluster_prefix}
+              ./dev/delete-cluster.py ${cluster_prefix} --force
             fi
           done
         shell: bash

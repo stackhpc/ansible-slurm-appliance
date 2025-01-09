@@ -3,7 +3,7 @@ roles:
   - src: stackhpc.nfs
     version: v23.12.1 # Tolerate state nfs file handles
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.26.0 # https://github.com/stackhpc/ansible-role-openhpc/pull/168
+    version: v0.27.0
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
@@ -21,11 +21,11 @@ roles:
     version: v3.1.5
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: v24.5.1 # Support ceph quincy for RL9
+    version: v25.1.1
 
 collections:
   - name: containers.podman
-    version: 1.10.2
+    version: 1.16.2
   - name: community.grafana
     version: 1.5.4
   - name: https://github.com/stackhpc/ansible_collection_slurm_openstack_tools
@@ -49,4 +49,10 @@ collections:
   - name: https://github.com/azimuth-cloud/ansible-collection-image-utils
     type: git
     version: 0.4.0
+  # stackhpc.pulp has pulp.squeezer as dependency, any version, but latest
+  # requires newer ansible than can install
+  - name: pulp.squeezer
+    version: 0.0.15
+  - name: stackhpc.pulp
+    version: 0.5.5
 ...

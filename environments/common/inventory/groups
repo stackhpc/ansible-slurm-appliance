@@ -142,5 +142,25 @@ freeipa_client
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
 
+[compute_init]
+# EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
+
+[k3s]
+# Hosts to run k3s server/agent
+
+[k9s]
+# Hosts to install k9s on
+
 [lustre]
 # Hosts to run lustre client
+
+[extra_packages]
+# Hosts to install specified additional packages on
+
+[dnf_repos:children]
+# Hosts to replace system repos with Pulp repos
+# Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` will leak Ark creds to users
+builder
+
+[pulp]
+# Add builder to this group to enable automatically syncing of pulp during image build

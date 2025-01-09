@@ -119,6 +119,19 @@
       import_role:
         name: sshd
 
+- hosts: dnf_repos
+  become: yes
+  tasks:
+  - name: Check that creds won't be leaked to users
+    ansible.builtin.assert:
+      that: dnf_repos_password is undefined
+      fail_msg: Passwords should not be templated into repofiles during configure, unset 'dnf_repos_password'
+    when: appliances_mode == 'configure'
+  - name: Replace system repos with pulp repos 
+    ansible.builtin.include_role:
+      name: dnf_repos
+      tasks_from: set_repos.yml
+
 # --- tasks after here require access to package repos ---
 - hosts: squid
   tags: squid
@@ -268,3 +281,11 @@
   tasks:
     - include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
+
+- hosts: k3s
+  become: yes
+  tags: k3s
+  tasks:
+    - ansible.builtin.include_role:
+        name: k3s
+        tasks_from: install.yml

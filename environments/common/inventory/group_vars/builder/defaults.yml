@@ -24,3 +24,4 @@ tuned_started: false
 tuned_enabled: false
 sssd_started: false
 sssd_enabled: false
+appliances_mode: build
