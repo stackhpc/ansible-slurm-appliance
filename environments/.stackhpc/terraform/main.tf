@@ -82,6 +82,7 @@ module "cluster" {
         standard: { # NB: can't call this default!
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
+            compute_init_enable: ["compute", "etc_hosts", "nfs", "basic_users", "eessi"]
         }
         # Example of how to add another partition:
         # extra: {

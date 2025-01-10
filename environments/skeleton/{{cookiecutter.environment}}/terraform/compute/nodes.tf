@@ -74,11 +74,14 @@ resource "openstack_compute_instance_v2" "compute" {
     access_network = true
   }
 
-  metadata = {
-    environment_root = var.environment_root
-    k3s_token = var.k3s_token
-    control_address = var.control_address
-  }
+  metadata = merge(
+    {
+        environment_root = var.environment_root
+        k3s_token          = var.k3s_token
+        control_address    = var.control_address
+     },
+    {for e in var.compute_init_enable: e => true}
+  )
 
   user_data = <<-EOF
     #cloud-config
