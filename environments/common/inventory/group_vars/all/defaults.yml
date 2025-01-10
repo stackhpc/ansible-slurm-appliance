@@ -103,6 +103,7 @@ appliances_extra_packages: "{{ appliances_extra_packages_default + appliances_ex
 
 ###################### ark repo timestamps ###################################################
 
+# BEGIN Marker for ansible/ci/update_timestamps.yml (GH workflow managed)
 appliances_pulp_repos:
   baseos:
     '9.4':
@@ -172,3 +173,4 @@ appliances_pulp_repos:
     '9':
       timestamp: 20240923T233036
       path: centos/9-stream/storage/x86_64/ceph-reef
+# END Marker for ansible/ci/update_timestamps.yml (GH workflow managed)
