@@ -96,7 +96,7 @@ The `grafana` group controls the placement of the grafana service. Load balancin
 
 ### Access
 
-If Open Ondemand is enabled then by default this is used to proxy Grafana, otherwise Grafana is accessed through the first . See `grafana_url` in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml). The port used (variable `grafana_port`) defaults to `3000`.
+If Open OnDemand is enabled then by default this is used to proxy Grafana, otherwise Grafana is accessed through the first . See `grafana_url` in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml). The port used (variable `grafana_port`) defaults to `3000`.
 
 The default credentials for the admin user are:
 

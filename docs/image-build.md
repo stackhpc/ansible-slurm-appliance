@@ -51,7 +51,7 @@ To build either a site-specific fat image from scratch, or to extend an existing
 
           openstack image unset --property signature_verified $SOURCE_IMAGE
 
-      then delete the failed volume, select cancelling the build when Packer queries, and then retry. This is [Openstack bug 1823445](https://bugs.launchpad.net/cinder/+bug/1823445).
+      then delete the failed volume, select cancelling the build when Packer queries, and then retry. This is [OpenStack bug 1823445](https://bugs.launchpad.net/cinder/+bug/1823445).
 
 6. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc` and including a timestamp and a shortened git hash.
 
