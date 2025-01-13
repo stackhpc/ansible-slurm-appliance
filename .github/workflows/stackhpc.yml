@@ -111,9 +111,9 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible-playbook ansible/adhoc/generate-passwords.yml
-          echo vault_testuser_password: "$TESTUSER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
+          echo vault_demo_user_password: "$DEMO_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
         env:
-          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Provision nodes using fat image
         id: provision_servers
@@ -175,12 +175,12 @@ jobs:
             --spider \
             --server-response \
             --no-check-certificate \
-            --http-user=testuser \
-            --http-password=${TESTUSER_PASSWORD} https://${openondemand_servername} \
+            --http-user=demo_user \
+            --http-password=${DEMO_USER_PASSWORD} https://${openondemand_servername} \
             2>&1)
           (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
         env:
-          TESTUSER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       # - name: Build environment-specific compute image
       #   id: packer_build
