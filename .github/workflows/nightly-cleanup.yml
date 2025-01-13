@@ -63,11 +63,20 @@ jobs:
             echo "No clusters to delete."
             exit 0
           fi
-           
+          
           for cluster_prefix in ${ci_clusters}
           do
             echo "Processing cluster: $cluster_prefix"
-            TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
+            # Get all servers with the matching name for control node
+            CONTROL_SERVERS=$(openstack server list --name ${cluster_prefix}-control --format json)
+            SERVER_COUNT=$(echo "$CONTROL_SERVERS" | jq length)
+            
+            if [[ $SERVER_COUNT -gt 1 ]]; then
+              echo "Warning: More than one server found for control node '${cluster_prefix}-control'."
+              continue
+            fi
+            TAGS=$(echo "$CONTROL_SERVERS" | jq -r '.[0].Tags' )
+            
             if [[ $TAGS =~ "keep" ]]; then
               echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
             else
