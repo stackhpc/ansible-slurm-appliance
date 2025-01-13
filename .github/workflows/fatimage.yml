@@ -46,7 +46,7 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ci_cloud || inputs.ci_cloud_override }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud || inputs.ci_cloud_override }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
     outputs:
@@ -61,7 +61,7 @@ jobs:
 
       - uses: actions/checkout@v3
         with:
-          ref: ${{ steps.callee_check.outputs.is_callee && inputs.target_branch || github.ref }}
+          ref: ${{ steps.callee_check.outputs.is_callee == 'true' && inputs.target_branch || github.ref }}
 
       - name: Record settings for CI cloud
         run: |

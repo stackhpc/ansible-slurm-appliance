@@ -14,8 +14,8 @@ runs:
     - id: workflows_match
       run: |
         if echo ${{ github.workflow_ref }} | grep ${{ inputs.current_workflow_file }}; then
-          echo "is_callee='false'" >> "$GITHUB_OUTPUT"
+          echo "is_callee=false" >> "$GITHUB_OUTPUT"
         else
-          echo "is_callee='true'" >> "$GITHUB_OUTPUT"
+          echo "is_callee=true" >> "$GITHUB_OUTPUT"
         fi
       shell: bash
