@@ -63,15 +63,43 @@ jobs:
             echo "No clusters to delete."
             exit 0
           fi
-          
+      
           for cluster_prefix in ${ci_clusters}
           do
             echo "Processing cluster: $cluster_prefix"
-            TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
-            if [[ $TAGS =~ "keep" ]]; then
-              echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
-            else
-              ./dev/delete-cluster.py ${cluster_prefix} --force
+      
+            # Retrieve all servers matching the cluster prefix
+            SERVERS=$(openstack server list --name "${cluster_prefix}-.*" -f value -c ID -c Name)
+      
+            if [[ -z "$SERVERS" ]]; then
+              echo "No servers found for cluster ${cluster_prefix}"
+              continue
+            fi
+      
+            KEEP_FLAG=false
+            while IFS= read -r line; do
+              SERVER_ID=$(echo "$line" | awk '{print $1}')
+              SERVER_NAME=$(echo "$line" | awk '{print $2}')
+      
+              # Check tags only on control nodes
+              if [[ "$SERVER_NAME" == "${cluster_prefix}-control" ]]; then
+                TAGS=$(openstack server show $SERVER_ID --column tags --format value)
+                if [[ $TAGS =~ "keep" ]]; then
+                  echo "Skipping cluster ${cluster_prefix} - control instance is tagged as keep"
+                  KEEP_FLAG=true
+                  break
+                fi
+              fi
+            done <<< "$SERVERS"
+      
+            # Delete all servers if control node is not tagged with keep
+            if [[ "$KEEP_FLAG" == false ]]; then
+              echo "Deleting all servers in cluster ${cluster_prefix}"
+              while IFS= read -r line; do
+                SERVER_ID=$(echo "$line" | awk '{print $1}')
+                echo "Deleting server $SERVER_ID"
+                openstack server delete $SERVER_ID || true
+              done <<< "$SERVERS"
             fi
           done
         shell: bash
