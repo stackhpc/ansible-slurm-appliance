@@ -2,9 +2,10 @@
 openhpc_install_type: generic
 
 # define paths to slurm on nodes:
-slurm_build_version: '23.11.1' # quote to avoid ansible autoconversion weirdness
+slurm_build_version: '24.11.0' # quote to avoid ansible autoconversion weirdness
 slurm_build_path: /nopt/vtest/slurm
-slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
+slurm_build_dir: "{{ slurm_build_path }}/current"
+#slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
 openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
 openhpc_lib_dir: "{{ slurm_build_dir }}/slurm"
 openhpc_bin_dir: "{{ slurm_build_dir }}/bin"
@@ -44,8 +45,12 @@ openhpc_generic_packages:
   - munge
   - mariadb-connector-c # only actually needed on slurmdbd
   - hwloc-libs          # only actuall needed on slurmd
+  - mariadb-devel
+  - munge-devel
+  - http-parser-devel
+  - json-c-devel
+
   # below added here to get pingpong and pingmatrix hpctests working:
-  - mpitests-openmpi
 
 # Additional parameters to set in slurm.conf - use yaml format
 openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
@@ -57,10 +62,10 @@ openhpc_config_extra:
   # vs cgid
   # ProctrackType: proctrack/cgroup
   ReturnToService: '1'
-  SlurmctldPidFile: /var/run/slurmctld.pid
-  SlurmdPidFile: /var/run/slurmd.pid
+  #SlurmctldPidFile: /var/run/slurmctld.pid
+  #SlurmdPidFile: /var/run/slurmd.pid
   SwitchType: 'switch/none'
-  TaskPlugin: 'task/affinity'
+  #TaskPlugin: 'task/affinity'
   # TaskPlugin: 'task/affinity,task/cgroup'
 
   # Use sbatch or srun, however...
@@ -71,16 +76,11 @@ openhpc_config_extra:
   # PROLOGUE & EPILOGUE
   # JobSubmitPlugins: 'require_timelimit,lua'
   # PrologSlurmctld: '/nopt/slurm/etc/prologslurmctld.sh'
-  Prolog: '{{slurm_build_path}}/scripts/prolog.d/*'
   # PrologFlags: 'X11'
   # X11Parameters: 'local_xauthority'
   #Epilog: '<absent>' # /nopt/slurm/etc/epilog.d/*'
-  Epilog: '{{slurm_build_path}}/scripts/epilog.d/*'
   # PrologEpilogTimeout: 180
   # UnkillableStepTimeout: 180
-
-  # FairShare/FairTree Halflife decay, starting at 14 days on Oct 5th 2020:
-  PriorityDecayHalfLife: '14-0'
 
   # PRIORITY
   # WHB on 2021-05-03 ref: HPCOPS-1447
@@ -91,6 +91,8 @@ openhpc_config_extra:
   #   partition = 5%
   #   Age 4%
 
+  # FairShare/FairTree Halflife decay, starting at 14 days on Oct 5th 2020:
+  PriorityDecayHalfLife: '14-0'
   PriorityType: 'priority/multifactor'
   PriorityMaxAge: '14-0'
   PriorityWeightFairshare: '100000'
@@ -110,32 +112,31 @@ openhpc_config_extra:
   # PreemptType=preempt/partition_prio
   # PreemptMode=SUSPEND,GANG
 
-
   # TIMERS  size because db on spinning disk so had to increase
   BatchStartTimeout: '30'
   MessageTimeout: '100'
   TCPTimeout: '10'
 
   # SCHEDULING
-  SchedulerType: 'sched/backfill'
-  SelectType: 'select/cons_tres'
-  SelectTypeParameters: 'CR_Core'
-  EnforcePartLimits: 'ALL'
-  SchedulerParameters:
-    - defer
-    - default_queue_depth=10750
-    - max_rpc_cnt=125
-    - max_sched_time=6
-    - partition_job_depth=10500
-    - sched_max_job_start=200
-    - sched_min_interval=2000000
-    - batch_sched_delay=20
-    - bf_max_job_test=13000
-    - bf_interval=30
-    - bf_continue
-    - bf_window=15840
-    - bf_resolution=250
-    - max_switch_wait=172800
+  # SchedulerType: 'sched/backfill'
+  # SelectType: 'select/cons_tres'
+  # SelectTypeParameters: 'CR_Core'
+  # EnforcePartLimits: 'ALL'
+  # SchedulerParameters:
+  #   - defer
+  #   - default_queue_depth=10750
+  #   - max_rpc_cnt=125
+  #   - max_sched_time=6
+  #   - partition_job_depth=10500
+  #   - sched_max_job_start=200
+  #   - sched_min_interval=2000000
+  #   - batch_sched_delay=20
+  #   - bf_max_job_test=13000
+  #   - bf_interval=30
+  #   - bf_continue
+  #   - bf_window=15840
+  #   - bf_resolution=250
+  #   - max_switch_wait=172800
   #FastSchedule=1
 
 # LOGGING
@@ -143,14 +144,14 @@ openhpc_config_extra:
   SlurmctldLogFile: '/var/log/slurmctld.log'
   SlurmdDebug: 'info'
 
-# ACCOUNTING
-### start with a qos
-  AccountingStorageEnforce:
-    - safe
-    - qos
-    - limits
-  AcctGatherNodeFreq: '30'
-  AccountingStorageTRES: 'gres/gpu'
+# # ACCOUNTING
+# ### start with a qos
+#   AccountingStorageEnforce:
+#     - safe
+#     - qos
+#     - limits
+#   AcctGatherNodeFreq: '30'
+#   AccountingStorageTRES: 'gres/gpu'
 
 ## added kmb
   # AcctGatherFilesystemType: 'acct_gather_filesystem/lustre'
@@ -161,18 +162,80 @@ openhpc_config_extra:
   ### NREL:
   # Kurt... Need to build this - may need the mellanox info here.
   #NHC Node Health Check
-  HealthCheckProgram: '/usr/sbin/nhc'
-  HealthCheckInterval: 300
+  # HealthCheckProgram: '/usr/sbin/nhc'
+  # HealthCheckInterval: 300
   # - HealthCheckNodeState: 'CYCLE,ANY'
 
-# kbendl - the ephemeral mount for SSD
-  TmpFS: '/tmp/scratch'
-  GresTypes: 'gpu'
-  ### - MpiDefault: "pmi2"    ### get the launcher to work! pmi1, pmi2, or pmix
-  # # spack mpi drivers were a mis-match... is this working now????
+  #GresTypes: 'gpu'
+  DebugFlags: NO_CONF_HASH
 
-  # # NREL: see topology.conf
-  # - 'TopologyPlugin: 'topology/tree'
-  # - 'JobRequeue: 0
-  # - 'MaxJobCount: 40000
+  SlurmUser: slurm
+  SlurmctldPort: 6817
+  SlurmdPort: 6818
+  AuthType: auth/munge
+  StateSaveLocation: /var/spool/slurm/slurmctld
+  SlurmdSpoolDir: /var/spool/slurm/slurmd
+  MpiDefault: pmi2
+  MpiParams: "ports=20000-32767"
+  SlurmctldPidFile: /var/run/slurmctld.pid
+  SlurmdPidFile: /var/run/slurmd.pid
+  #trackType: proctrack/cgroup
+  SlurmctldParameters: enable_configless
 
+  # This can probably be defined based on play?
+  AccountingStorageTRES: CPU,MEM,gres/gpu,gres/gpu:a100,gres/gpu:h100
+  AccountingStorageType: accounting_storage/slurmdbd
+  AccountingStorageEnforce: safe,qos,limits
+
+  # These locations can be filled in by build
+  Prolog: "{{slurm_build_dir}}/etc/prolog.d/*"
+  Epilog: "{{slurm_build_dir}}/etc/epilog.d/*"
+
+  PrologEpilogTimeout: 720
+  PrologFlags: X11,DeferBatch,contain
+  X11Parameters: home_xauthority
+  TopologyPlugin: topology/tree
+  JobRequeue: 0
+  UnkillableStepTimeout: 505
+
+  JobAcctGatherFrequency: 30
+  JobAcctGatherType: jobacct_gather/cgroup
+  ProctrackType: proctrack/cgroup
+  TaskPlugin: task/affinity,task/cgroup
+
+  # TIMERS
+  SlurmctldTimeout: 300
+  SlurmdTimeout: 300
+  InactiveLimit: 0
+  MinJobAge: 300
+  KillWait: 30
+  Waittime: 0
+
+  # SCHEDULING
+  SchedulerType: sched/backfill
+  SelectType: select/cons_tres
+  SelectTypeParameters: CR_Core_Memory
+  JobSubmitPlugins: require_timelimit,lua
+
+  # Will need to be updated based on install location
+  HealthCheckProgram: /usr/sbin/nhc
+  HealthCheckInterval: 300
+  HealthCheckNodeState: CYCLE,ANY
+  GresTypes: gpu
+  TmpFS: /tmp/scratch
+
+  # INCLUDES
+  # These locations can be filled in by build
+  #  include: "{{slurm_build_dir}}/etc/v*"
+  #  include: "{{slurm_build_dir}}/etc/vcgroup.conf"
+  #  include: "{{slurm_build_dir}}/etc/vnodes.conf"
+  #  include: "{{slurm_build_dir}}/etc/vgres.conf"
+  #  include: "{{slurm_build_dir}}/etc/vpartitions.conf"
+  #  include: "{{slurm_build_dir}}/etc/vtopology.conf"
+
+slurm_include_options:
+    - "{{slurm_build_dir}}/etc/cgroup.conf"
+    - "{{slurm_build_dir}}/etc/nodes.conf"
+    - "{{slurm_build_dir}}/etc/gres.conf"
+    - "{{slurm_build_dir}}/etc/partitions.conf"
+    - "{{slurm_build_dir}}/etc/topology.conf"
