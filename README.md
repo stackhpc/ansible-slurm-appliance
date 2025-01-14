@@ -36,6 +36,7 @@ Before starting ensure that:
 - You have an SSH keypair defined in OpenStack, with the private key available on the deploy host.
 - Created instances have access to internet (note proxies can be setup through the appliance if necessary).
 - Created instances have accurate/synchronised time (for VM instances this is usually provided by the hypervisor; if not or for bare metal instances it may be necessary to configure a time service via the appliance).
+- Three security groups are present: ``default`` allowing intra-cluster communication, ``SSH`` allowing external access via SSH and ``HTTPS`` allowing access for Open OnDemand.
 
 ### Setup deploy host
 
