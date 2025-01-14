@@ -186,7 +186,8 @@ jobs:
           ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Pause for debugging
-        run: sleep 1800
+        if: failure()
+        run: sleep 3600
 
       - name: Check sacct state survived reimage
         run: |
