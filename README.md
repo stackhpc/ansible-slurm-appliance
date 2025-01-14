@@ -68,8 +68,9 @@ and follow the prompts to complete the environment name and description.
 
 **NB:** In subsequent sections this new environment is referred to as `$ENV`.
 
-Activate the new environment:
+Go back to the root folder and activate the new environment:
 
+    cd ..
     . environments/$ENV/activate
 
 And generate secrets for it:
