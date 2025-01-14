@@ -96,7 +96,7 @@ and referenced from the `site` and `production` environments, e.g.:
     cluster
     ```
 
-- Configure Open OpenOndemand - see [specific documentation](openondemand.README.md).
+- Configure Open OnDemand - see [specific documentation](openondemand.README.md).
 
 - Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
 
