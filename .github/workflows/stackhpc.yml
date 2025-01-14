@@ -185,10 +185,6 @@ jobs:
           ansible-playbook -v --limit compute ansible/adhoc/rebuild.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Pause for debugging
-        if: failure()
-        run: sleep 3600
-
       - name: Check sacct state survived reimage
         run: |
           . venv/bin/activate

@@ -20,11 +20,11 @@ module "compute" {
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
   extra_volumes = lookup(each.value, "extra_volumes", {})
 
+  compute_init_enable = lookup(each.value, "compute_init_enable", [])
+
   key_pair = var.key_pair
   environment_root = var.environment_root
   k3s_token = var.k3s_token
   control_address = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
-
-  compute_init_enable = each.value.compute_init_enable
 }
