@@ -1,0 +1,22 @@
+- hosts: localhost
+  tasks:
+  - name: Get latest timestamps from sources
+    latest_timestamps:
+      repos_dict: "{{ appliances_pulp_repos }}"
+      content_url: "https://ark.stackhpc.com/pulp/content"
+    register: _result
+
+  - name: Print updated timestamps
+    ansible.builtin.debug:
+      var: _result.changed_timestamps
+
+  - name: Overwrite repo timestamps with latest
+    ansible.builtin.blockinfile:
+      path: "{{ playbook_dir }}/../../environments/common/inventory/group_vars/all/defaults.yml"
+      marker: "# {mark} Marker for ansible/ci/update_timestamps.yml (GH workflow managed)"
+      block: |
+          {{ yaml_template | to_nice_yaml(indent=2) }}
+    vars:
+      yaml_template:
+        appliances_pulp_repos: "{{ _result.latest_dict }}"
+    when: (_result.changed_timestamps | count) > 0
