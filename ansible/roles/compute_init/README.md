@@ -42,10 +42,13 @@ The following roles/groups are currently fully functional:
   node and all compute nodes.
 - `openhpc`: all functionality
 
+The above may be enabled by setting the compute_init_enable property on the
+terraform compute variable.
+
 # Development/debugging
 
-To develop/debug this without actually having to build an image:
-
+To develop/debug changes to the compute script without actually having to build
+a new image:
 
 1. Deploy a cluster using tofu and ansible/site.yml as normal. This will
    additionally configure the control node to export compute hostvars over NFS.
@@ -103,7 +106,7 @@ as in step 3.
   available v the current approach:
 
     ```
-    [root@rl9-compute-0 rocky]# grep hostvars /mnt/cluster/hostvars/rl9-compute-0/hostvars.yml 
+    [root@rl9-compute-0 rocky]# grep hostvars /mnt/cluster/hostvars/rl9-compute-0/hostvars.yml
         "grafana_address": "{{ hostvars[groups['grafana'].0].api_address }}",
         "grafana_api_address": "{{ hostvars[groups['grafana'].0].internal_address }}",
         "mysql_host": "{{ hostvars[groups['mysql'] | first].api_address }}",

@@ -44,7 +44,6 @@
   # NB: has to be after eeesi and os-manila-mount
   tags: compute_init
   become: yes
-  name: Export hostvars
   tasks:
     - include_role:
         name: compute_init
