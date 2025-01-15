@@ -82,7 +82,7 @@ Additional packages from any DNF repositories which are enabled during build (wh
     appliances_extra_packages_other:
     - somepackage
     - anotherpackage
-
+```
 
 The packages available from the OpenHPC repos are described in Appendix E of the OpenHPC installation guide (linked from the [OpenHPC releases page](https://github.com/openhpc/ohpc/releases/)). Note "user-facing" OpenHPC packages such as compilers, mpi libraries etc. include corresponding `lmod` modules.
 
