@@ -1,0 +1,34 @@
+---
+
+- name: Setup slurm tools
+  include_role:
+    name: pytools
+
+- name: Create a directory to house the log files
+  file:
+    state: directory
+    path: /var/log/slurm-stats
+  become: true
+
+- name: Create cron job
+  cron:
+    name: Generate slurm stats
+    minute: "*/5"
+    user: root
+    # NOTE: lasttimestamp is stored at /root/lasttimestamp
+    job: "TZ=UTC /opt/slurm-tools/bin/slurm-stats >> /var/log/slurm-stats/finished_jobs.json"
+    cron_file: slurm-stats
+  become: true
+
+- name: Setup log rotate
+  copy:
+    content: |
+      # WARNING: This file is managed by ansible, do not modify.
+      /var/log/slurm-stats/finished_jobs.json {
+              {{ slurm_stats_log_rotate_content_frequency }}
+              rotate {{ slurm_stats_log_rotate_content_rotate }}
+              compress
+              delaycompress
+      }
+    dest: /etc/logrotate.d/slurm-stats
+  become: true

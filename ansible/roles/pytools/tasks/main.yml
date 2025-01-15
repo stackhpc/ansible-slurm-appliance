@@ -1,0 +1,34 @@
+---
+- name: install python3
+  package:
+    name: python3,git
+  become: true
+
+- name: Create virtualenv directory
+  file:
+    path: /opt/slurm-tools
+    owner: "{{ pytools_user }}"
+    group: "{{ pytools_user }}"
+    state: directory
+  become: true
+
+- block:
+  - name: Upgrade pip
+    # This needs to a separate step so that we use the updated version
+    # to install the packages below.
+    pip:
+      name: pip
+
+  - name: Create virtualenv
+    pip:
+      name: "git+https://github.com/stackhpc/slurm-openstack-tools.git@{{ pytools_gitref }}#egg=slurm_openstack_tools"
+      editable: "{{ pytools_editable }}"
+
+  module_defaults:
+    ansible.builtin.pip:
+      virtualenv: /opt/slurm-tools
+      virtualenv_command: python3 -m venv
+      state: latest
+  become: true
+  become_user: "{{ pytools_user }}"
+  # become_flags: -H #'-s /bin/bash' # as has shell specified as /sbin/nologin
