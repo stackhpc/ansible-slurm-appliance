@@ -45,10 +45,10 @@ openhpc_generic_packages:
   - munge
   - mariadb-connector-c # only actually needed on slurmdbd
   - hwloc-libs          # only actuall needed on slurmd
-  - mariadb-devel
-  - munge-devel
-  - http-parser-devel
-  - json-c-devel
+#  - mariadb-devel
+#  - munge-devel
+#  - http-parser-devel
+#  - json-c-devel
 
   # below added here to get pingpong and pingmatrix hpctests working:
 
