@@ -65,4 +65,3 @@
   - name: Install additional packages
     dnf:
       name: "{{ appliances_extra_packages }}"
-    when: appliances_mode != 'configure' or appliances_extra_packages_during_configure
