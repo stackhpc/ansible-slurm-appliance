@@ -99,7 +99,7 @@ the OpenHPC installation guide (linked from the
 "user-facing" OpenHPC packages such as compilers, mpi libraries etc. include
 corresponding `lmod` modules.
 
-Packages *may* also be installed during the site.yml, by addding the `cluster`
+Packages *may* also be installed during the site.yml, by adding the `cluster`
 group into the `extra_packages` group. An error will occur if Ark credentials
 are defined in this case, as they are readable by unprivileged users in the
 `.repo` files and a local Pulp mirror must be used instead.
