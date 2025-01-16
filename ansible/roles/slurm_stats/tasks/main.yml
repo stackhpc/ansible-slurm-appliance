@@ -2,7 +2,7 @@
 
 - name: Setup slurm tools
   include_role:
-    name: pytools
+    name: slurm_tools
 
 - name: Create a directory to house the log files
   file:

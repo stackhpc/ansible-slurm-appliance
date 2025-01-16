@@ -1,5 +1,4 @@
 ---
-# defaults file for pytools
 pytools_editable: false
 pytools_gitref: master
 pytools_user: root

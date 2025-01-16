@@ -31,4 +31,3 @@
       state: latest
   become: true
   become_user: "{{ pytools_user }}"
-  # become_flags: -H #'-s /bin/bash' # as has shell specified as /sbin/nologin
