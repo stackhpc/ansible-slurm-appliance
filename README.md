@@ -37,6 +37,8 @@ Before starting ensure that:
 - Created instances have access to internet (note proxies can be setup through the appliance if necessary).
 - Created instances have accurate/synchronised time (for VM instances this is usually provided by the hypervisor; if not or for bare metal instances it may be necessary to configure a time service via the appliance).
 - Three security groups are present: ``default`` allowing intra-cluster communication, ``SSH`` allowing external access via SSH and ``HTTPS`` allowing access for Open OnDemand.
+- All instances will get a default route (needed for `k3s`). Normally the gateway
+  is defined on the relevant subnet.
 
 ### Setup deploy host
 

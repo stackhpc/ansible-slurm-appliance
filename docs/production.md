@@ -122,6 +122,35 @@ and referenced from the `site` and `production` environments, e.g.:
 - If floating IPs are required for login nodes, modify the OpenTofu configurations
   appropriately.
 
+- The main [README.md](../README.md) notes that all nodes require a default
+  route. This is to [allow k3s](https://docs.k3s.io/installation/airgap#default-network-route)
+  to detect the node's primary IP. Normally nodes get a default route from the
+  gateway defined on the subnet, but if networking must differ between hosts this
+  can be problematic. For example if the cluster has two networks with only
+  some nodes dual-homed, a gateway cannot be set on both subnets as this would
+  create routing problems for the dual-homed nodes. In this case set
+  `gateway_nmcli_connection = "dummy0"` in the OpenTofu compute group definition(s)
+  to create a dummy route using cloud-init as per the linked k3s docs, e.g.:
+  
+  ```terraform
+  # environments/$ENV/tofu/main.tf:
+  ...
+  compute = {
+    general = {
+        flavor = "general.v1.small"
+        nodes = [
+          "general-0",
+          "general-1",
+        ]
+        gateway_nmcli_connection = "dummy0"
+  }
+  ...
+  ```
+
+  Note that the `gateway_nmcli_connection` and `gateway_ip` options can also be
+  used to set a real default route in cases where the gateway cannot be defined
+  on the subnet for some reason.
+
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
 
