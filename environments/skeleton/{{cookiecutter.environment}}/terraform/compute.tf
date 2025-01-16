@@ -19,6 +19,8 @@ module "compute" {
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
   extra_volumes = lookup(each.value, "extra_volumes", {})
+  gateway_nmcli_connection = lookup(each.value, "gateway_nmcli_connection", "")
+  gateway_ip = lookup(each.value, "gateway_ip", "")
 
   compute_init_enable = lookup(each.value, "compute_init_enable", [])
 

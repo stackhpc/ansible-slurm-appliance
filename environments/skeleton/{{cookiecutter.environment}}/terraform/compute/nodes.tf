@@ -86,6 +86,18 @@ resource "openstack_compute_instance_v2" "compute" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
+
+    runcmd:
+%{ if var.gateway_nmcli_connection == "dummy0" ~}
+      - nmcli connection add type dummy ifname dummy0 con-name dummy0
+      - nmcli connection modify dummy0 ipv4.address ${openstack_networking_port_v2.compute[each.key].all_fixed_ips[0]} ipv4.gateway ${openstack_networking_port_v2.compute[each.key].all_fixed_ips[0]} ipv4.route-metric 1000 ipv4.method manual
+%{ endif ~}
+%{ if (var.gateway_nmcli_connection != "") &&  (var.gateway_nmcli_connection != "dummy0") ~}
+      - nmcli connection modify '${var.gateway_nmcli_connection}' ipv4.address ${openstack_networking_port_v2.compute[each.key].all_fixed_ips[0]} ipv4.gateway ${var.gateway_ip}
+%{ endif ~}
+%{ if var.gateway_nmcli_connection != "" }
+      - nmcli connection up '${var.gateway_nmcli_connection}'
+%{ endif ~}
   EOF
 
 }
