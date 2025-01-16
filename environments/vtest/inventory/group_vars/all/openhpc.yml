@@ -1,20 +1,178 @@
-#
-#openhpc_config_files:
-#  # gres.conf from role defaults:
-#  - template:
-#      dest: "{{ slurm_build_dir }}/etc/gres.conf"
-#      src: "{{ openhpc_gres_template }}"
-#      mode: "0600"
-#      owner: slurm
-#      group: slurm
-#    enable: control
-#
-#  # cgroups.conf - appears to be required even with NO cgroup plugins:
-#  - template:
-#      dest: "{{ slurm_build_dir }}/etc/cgroup.conf"
-#      src: "{{ appliances_environment_root }}/cgroup.conf.j2"
-#      mode: "0644" # perms/ownership based off src from ohpc package
-#      owner: root
-#      group: root
-#    enable: control
-#
+# generic allows a standalone slurm vs the openhpc distribution package.
+openhpc_install_type: generic
+
+# define paths to slurm on nodes:
+slurm_build_version: '23.11.1' # quote to avoid ansible autoconversion weirdness
+slurm_build_path: /nopt/vtest/slurm
+slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
+openhpc_sbin_dir: "{{ slurm_build_dir }}/sbin"
+openhpc_lib_dir: "{{ slurm_build_dir }}/slurm"
+openhpc_bin_dir: "{{ slurm_build_dir }}/bin"
+openhpc_slurm_conf_path: "{{ slurm_build_dir }}/etc/slurm.conf"
+
+openhpc_packages_extra: "{{ openhpc_packages_extra_nrel }}"
+
+openhpc_slurm_partitions:
+  - name: "sm"
+    default: YES
+    maxtime: "4-0" # 1 days 0 hours
+  - name: "gpu"
+    default: NO
+    maxtime: "4-0" # 1 days 0 hours
+  - name: "lg"
+    default: NO
+    maxtime: "4-0" # 1 days 0 hours
+  # - name: "gpu8a100"
+  #   default: NO
+  #   maxtime: "4-0" # 1 days 0 hours
+  # - name: "gpu4a100"
+  #   default: NO
+  #   maxtime: "4-0" # 1 days 0 hours
+  # - name: "std"
+  #   default: YES
+  #   maxtime: "1-0" # 1 days 0 hours
+  # - name: "t"
+  #   default: NO
+  #   maxtime: "4:0:0" # 4 hour 0m 0s
+
+openhpc_packages_extra_nrel: # extra indirection to allow lab environment to filter this
+  - vim
+
+# system package installs - generic slurm
+openhpc_generic_packages:
+  # below are default in the role, required to get slurm to work:
+  - munge
+  - mariadb-connector-c # only actually needed on slurmdbd
+  - hwloc-libs          # only actuall needed on slurmd
+  # below added here to get pingpong and pingmatrix hpctests working:
+  - mpitests-openmpi
+
+# Additional parameters to set in slurm.conf - use yaml format
+openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
+
+openhpc_config_extra:
+  LaunchParameters: use_interactive_step
+  FirstJobId: '50000000'
+  PropagateResourceLimits: 'NONE'
+  # vs cgid
+  # ProctrackType: proctrack/cgroup
+  ReturnToService: '1'
+  SlurmctldPidFile: /var/run/slurmctld.pid
+  SlurmdPidFile: /var/run/slurmd.pid
+  SwitchType: 'switch/none'
+  TaskPlugin: 'task/affinity'
+  # TaskPlugin: 'task/affinity,task/cgroup'
+
+  # Use sbatch or srun, however...
+  # Don't recomend salloc, but this makes it less troublesome
+  #### This fails kbendl - 2021-07-05
+  # SallocDefaultCommand: 'srun  --pty --gres=NONE --preserve-env $SHELL'
+
+  # PROLOGUE & EPILOGUE
+  # JobSubmitPlugins: 'require_timelimit,lua'
+  # PrologSlurmctld: '/nopt/slurm/etc/prologslurmctld.sh'
+  Prolog: '{{slurm_build_path}}/scripts/prolog.d/*'
+  # PrologFlags: 'X11'
+  # X11Parameters: 'local_xauthority'
+  #Epilog: '<absent>' # /nopt/slurm/etc/epilog.d/*'
+  Epilog: '{{slurm_build_path}}/scripts/epilog.d/*'
+  # PrologEpilogTimeout: 180
+  # UnkillableStepTimeout: 180
+
+  # FairShare/FairTree Halflife decay, starting at 14 days on Oct 5th 2020:
+  PriorityDecayHalfLife: '14-0'
+
+  # PRIORITY
+  # WHB on 2021-05-03 ref: HPCOPS-1447
+  # to rebalance things to give a small (4%) weight to job age:
+  #   fairshare 52%
+  #   QoS 27%
+  #   jobsize 12%
+  #   partition = 5%
+  #   Age 4%
+
+  PriorityType: 'priority/multifactor'
+  PriorityMaxAge: '14-0'
+  PriorityWeightFairshare: '100000'
+  PriorityWeightAge: '1000'
+  PriorityWeightJobSize: '1000'
+  #PriorityWeightQOS: '206477100'
+  PriorityWeightPartition: '38236500'
+
+  # #FastSchedule=0
+  # #PriorityUsageResetPeriod=14-0
+  # PriorityWeightFairshare=100000
+  # PriorityWeightAge=1000
+  # # PriorityWeightPartition=  #
+  # # larger the job, priority relative to fairshare per cpu/cores
+  # PriorityWeightJobSize=1000
+  # PriorityMaxAge=4-0
+  # PreemptType=preempt/partition_prio
+  # PreemptMode=SUSPEND,GANG
+
+
+  # TIMERS  size because db on spinning disk so had to increase
+  BatchStartTimeout: '30'
+  MessageTimeout: '100'
+  TCPTimeout: '10'
+
+  # SCHEDULING
+  SchedulerType: 'sched/backfill'
+  SelectType: 'select/cons_tres'
+  SelectTypeParameters: 'CR_Core'
+  EnforcePartLimits: 'ALL'
+  SchedulerParameters:
+    - defer
+    - default_queue_depth=10750
+    - max_rpc_cnt=125
+    - max_sched_time=6
+    - partition_job_depth=10500
+    - sched_max_job_start=200
+    - sched_min_interval=2000000
+    - batch_sched_delay=20
+    - bf_max_job_test=13000
+    - bf_interval=30
+    - bf_continue
+    - bf_window=15840
+    - bf_resolution=250
+    - max_switch_wait=172800
+  #FastSchedule=1
+
+# LOGGING
+  SlurmctldDebug: 'info'
+  SlurmctldLogFile: '/var/log/slurmctld.log'
+  SlurmdDebug: 'info'
+
+# ACCOUNTING
+### start with a qos
+  AccountingStorageEnforce:
+    - safe
+    - qos
+    - limits
+  AcctGatherNodeFreq: '30'
+  AccountingStorageTRES: 'gres/gpu'
+
+## added kmb
+  # AcctGatherFilesystemType: 'acct_gather_filesystem/lustre'
+  # JobAcctGatherType: 'jobacct_gather/linux'
+  # JobAcctGatherParams: 'UsePss'
+  # JobAcctGatherFrequency: 'task=30,energy=30'
+
+  ### NREL:
+  # Kurt... Need to build this - may need the mellanox info here.
+  #NHC Node Health Check
+  HealthCheckProgram: '/usr/sbin/nhc'
+  HealthCheckInterval: 300
+  # - HealthCheckNodeState: 'CYCLE,ANY'
+
+# kbendl - the ephemeral mount for SSD
+  TmpFS: '/tmp/scratch'
+  GresTypes: 'gpu'
+  ### - MpiDefault: "pmi2"    ### get the launcher to work! pmi1, pmi2, or pmix
+  # # spack mpi drivers were a mis-match... is this working now????
+
+  # # NREL: see topology.conf
+  # - 'TopologyPlugin: 'topology/tree'
+  # - 'JobRequeue: 0
+  # - 'MaxJobCount: 40000
+
