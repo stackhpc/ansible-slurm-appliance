@@ -60,6 +60,11 @@ variable "compute" {
                            Values are a mapping with:
                                 size: Size of volume in GB
                            **NB**: The order in /dev is not guaranteed to match the mapping
+            gateway_nmcli_connection: Name of nmcli connection to set a default
+                                      route on via cloud-init, e.g. "System eth0"
+                                      or "Bond bond0". Use "dummy0" to create
+                                      a dummy interface with dummy route.
+            gateway_ip: IP of default gateway. Ignored when gateway_nmcli_connection == "dummy0".
     EOF
 }
 
