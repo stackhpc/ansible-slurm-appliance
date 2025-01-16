@@ -54,6 +54,10 @@ variable "volume_backed_instances" {
     default = false
 }
 
+variable "root_volume_size" {
+    default = 15
+}
+
 variable "k3s_token" {
     type = string
 }
@@ -76,7 +80,9 @@ module "cluster" {
     k3s_token = var.k3s_token
 
     login_nodes = {
-        login-0: var.other_node_flavor
+        login-0 = {
+            flavor: var.other_node_flavor
+        }
     }
     compute = {
         standard: { # NB: can't call this default!
@@ -84,6 +90,7 @@ module "cluster" {
             flavor: var.other_node_flavor
             compute_init_enable: ["compute", "etc_hosts", "nfs", "basic_users", "eessi"]
         }
+        
         # Example of how to add another partition:
         # extra: {
         #     nodes: ["compute-2", "compute-3"]
@@ -92,6 +99,7 @@ module "cluster" {
     }
     
     volume_backed_instances = var.volume_backed_instances
+    root_volume_size = var.root_volume_size
     
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:
