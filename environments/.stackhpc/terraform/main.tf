@@ -73,7 +73,9 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     cluster_image_id = data.openstack_images_image_v2.cluster.id
     control_node_flavor = var.control_node_flavor
-    k3s_token = var.k3s_token
+    # need to override defaults as using terraform/ as a module but secrets templated
+    # out to *this* environment
+    inventory_secrets_path = "${path.module}/../inventory/group_vars/all/secrets.yml"
 
     login_nodes = {
         login-0: var.other_node_flavor
