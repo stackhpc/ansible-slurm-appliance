@@ -31,3 +31,7 @@ compute
 [squid:children]
 # Install squid into fat image
 builder
+
+[sssd:children]
+# Install sssd into fat image
+builder

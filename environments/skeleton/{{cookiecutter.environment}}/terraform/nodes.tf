@@ -145,7 +145,7 @@ resource "openstack_compute_instance_v2" "login" {
   metadata = {
     environment_root = var.environment_root
     k3s_token = var.k3s_token
-    k3s_server = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
+    control_address = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
   }
 
   availability_zone = each.value.match_ironic_node ? "${each.value.availability_zone}::${data.external.baremetal_nodes.result[each.key]}" : null

@@ -1,4 +1,4 @@
-lustre_version: '2.15.5' # https://www.lustre.org/lustre-2-15-5-released/
+lustre_version: '2.15.6' # https://www.lustre.org/lustre-2-15-6-released/
 lustre_lnet_label: tcp
 #lustre_mgs_nid:
 lustre_mounts: []

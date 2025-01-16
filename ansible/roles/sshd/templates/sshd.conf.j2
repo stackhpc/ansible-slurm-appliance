@@ -1,0 +1,2 @@
+# {{ ansible_managed }}
+PasswordAuthentication {{ 'yes' if sshd_password_authentication | bool else 'no' }}
