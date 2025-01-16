@@ -54,10 +54,6 @@ variable "volume_backed_instances" {
     default = false
 }
 
-variable "k3s_token" {
-    type = string
-}
-
 data "openstack_images_image_v2" "cluster" {
     name = var.cluster_image[var.os_version]
     most_recent = true
