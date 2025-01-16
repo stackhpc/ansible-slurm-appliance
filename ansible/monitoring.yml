@@ -19,7 +19,7 @@
   tags: slurm_stats
   tasks:
     - include_role:
-        name: slurm-stats
+        name: slurm_stats
 
 - name: Deploy filebeat
   hosts: filebeat
