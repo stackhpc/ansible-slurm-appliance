@@ -69,8 +69,8 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     cluster_image_id = data.openstack_images_image_v2.cluster.id
     control_node_flavor = var.control_node_flavor
-    # need to override defaults as using terraform/ as a module but secrets templated
-    # out to *this* environment
+    # have to override default, as unusually the actual module path and secrets
+    # are not in the same environment for stackhpc
     inventory_secrets_path = "${path.module}/../inventory/group_vars/all/secrets.yml"
 
     login_nodes = {
