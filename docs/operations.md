@@ -63,17 +63,46 @@ This is a usually a two-step process:
 Deploying the additional nodes and applying these changes requires rerunning both Terraform and the Ansible site.yml playbook - follow [Deploying a Cluster](#Deploying-a-Cluster).
 
 # Adding Additional Packages
-Packages from any enabled DNF repositories (which always includes EPEL, PowerTools and OpenHPC) can be added to all nodes by defining a list `openhpc_packages_extra` (defaulted to the empty list in the common environment) in e.g. `environments/$SITE_ENV/inventory/group_vars/all/openhpc.yml`. For example:
+By default, the following utility packages are installed during the StackHPC image build:
+- htop
+- nano
+- screen
+- tmux
+- wget
+- bind-utils
+- net-tools
+- postfix
+- git
+- latest python version for system (3.6 for for Rocky 8.9 and 3.12 for Rocky 9.4)
 
-    # environments/foo-base/inventory/group_vars/all/openhpc.yml:
-    openhpc_packages_extra:
-    - somepackage
-    - anotherpackage
+Additional packages can be added during image builds by:
+- adding the `extra_packages` group to the build `inventory_groups` (see
+[docs/image-build.md](./image-build.md))
+- defining a list of packages in `appliances_extra_packages_other` in e.g.
+`environments/$SITE_ENV/inventory/group_vars/all/defaults.yml`. For example:
 
+    ```yaml
+        # environments/foo-base/inventory/group_vars/all/defaults.yml:
+        appliances_extra_packages_other:
+        - somepackage
+        - anotherpackage
+    ```
 
-The packages available from the OpenHPC repos are described in Appendix E of the OpenHPC installation guide (linked from the [OpenHPC releases page](https://github.com/openhpc/ohpc/releases/)). Note "user-facing" OpenHPC packages such as compilers, mpi libraries etc. include corresponding `lmod` modules.
+For packages which come from repositories mirroed by StackHPC's "Ark" Pulp server
+(including rocky, EPEL and OpenHPC repositories), this will require either [Ark
+credentials](./image-build.md)) or a [local Pulp mirror](./experimental/pulp.md)
+to be configured. This includes rocky, EPEL and OpenHPC repos.
 
-To add these packages to the current cluster, run the same command as for [Reconfiguring Slurm](#Reconfiguring-Slurm). TODO: describe what's required to add these to site-specific images.
+The packages available from the OpenHPC repos are described in Appendix E of
+the OpenHPC installation guide (linked from the
+[OpenHPC releases page](https://github.com/openhpc/ohpc/releases/)). Note
+"user-facing" OpenHPC packages such as compilers, mpi libraries etc. include
+corresponding `lmod` modules.
+
+Packages *may* also be installed during the site.yml, by adding the `cluster`
+group into the `extra_packages` group. An error will occur if Ark credentials
+are defined in this case, as they are readable by unprivileged users in the
+`.repo` files and a local Pulp mirror must be used instead.
 
 If additional repositories are required, these could be added/enabled as necessary in a play added to `environments/$SITE_ENV/hooks/{pre,post}.yml` as appropriate. Note such a plat should NOT exclude the builder group, so that the repositories are also added to built images. There are various Ansible modules which might be useful for this:
     - `ansible.builtin.yum_repository`: Add a repo from an URL providing a 'repodata' directory.

@@ -36,8 +36,9 @@ login
 [block_devices:children]
 # Environment-specific so not defined here
 
-[basic_users]
+[basic_users:children]
 # Add `openhpc` group to add Slurm users via creation of users on each node.
+openhpc
 
 # [openondemand:children]
 # # Host to run Open Ondemand server on - subset of login
@@ -51,13 +52,15 @@ login
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
 compute
 
-[etc_hosts]
+[etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+cluster
 
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
 [eessi:children]
+# Hosts on which EESSI stack should be configured
 openhpc
 
 [resolv_conf]
@@ -69,8 +72,10 @@ openhpc
 [manila]
 # Hosts to configure for manila fileshares
 
-[persist_hostkeys]
-# Hosts to persist hostkeys for across reimaging. NB: Requires appliances_state_dir on hosts.
+[persist_hostkeys:children]
+# Hosts to use common set of hostkeys which persist across reimaging.
+login
+openondemand
 
 [squid]
 # Hosts to run squid proxy
@@ -79,5 +84,30 @@ openhpc
 # Hosts to run TuneD configuration
 
 [ansible_init:children]
-# Hosts to run ansible-init
+# Hosts to run linux-anisble-init
 cluster
+
+[sssd]
+# Hosts to configure sssd on
+
+[sshd]
+# Hosts where the OpenSSH server daemon should be configured
+
+[compute_init:children]
+# EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
+compute
+
+[k3s:children]
+# Hosts to run k3s server/agent
+openhpc
+
+[k9s:children]
+# Hosts to install k9s on
+control
+
+[lustre]
+# Hosts to run lustre client
+
+[extra_packages:children]
+# Hosts to install specified additional packages on
+builder

@@ -1,4 +1,4 @@
 ---
 
-selinux_state: permissive
+selinux_state: disabled
 selinux_policy: targeted
