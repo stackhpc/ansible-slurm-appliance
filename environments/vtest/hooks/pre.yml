@@ -83,6 +83,8 @@
       register: vs_pre_complete
 
     - name: Pre tasks now
+      vars:
+        pre_all_packages: [] # moved to appliances_extra_packages_other
       ansible.builtin.include_role:
         name: vshpc.prov.pre-tasks
       when: not vs_pre_complete.stat.exists

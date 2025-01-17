@@ -1,0 +1,20 @@
+appliances_extra_packages_other:
+  - rsyslog
+  - openssl
+  - hwloc
+  - readline
+  - ncurses
+  - man2html
+  - jq
+  - bzip2
+  - rng-tools
+  - vim
+  - lsof
+  - lshw
+  - tcpdump
+  - ethtool
+  - glibc-langpack-en
+  - pciutils
+  - chrony
+  - systemd-timesyncd
+  - munge
