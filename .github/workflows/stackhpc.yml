@@ -84,9 +84,9 @@ jobs:
         with:
           tofu_version: 1.6.2
 
-      - name: Initialise terraform
-        run: terraform init
-        working-directory: ${{ github.workspace }}/environments/.stackhpc/terraform
+      - name: Initialise tofu
+        run: tofu init
+        working-directory: ${{ github.workspace }}/environments/.stackhpc/tofu
 
       - name: Write clouds.yaml
         run: |
@@ -94,7 +94,7 @@ jobs:
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
-      - name: Setup environment-specific inventory/terraform inputs
+      - name: Setup environment-specific inventory/tofu inputs
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
@@ -108,15 +108,15 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
+          cd $APPLIANCES_ENVIRONMENT_ROOT/tofu
+          tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
 
       - name: Delete infrastructure if provisioning failed
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
+          cd $APPLIANCES_ENVIRONMENT_ROOT/tofu
+          tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
       - name: Configure cluster
@@ -201,8 +201,8 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $APPLIANCES_ENVIRONMENT_ROOT/terraform
-          terraform destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
+          cd $APPLIANCES_ENVIRONMENT_ROOT/tofu
+          tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
         if: ${{ success() || cancelled() }}
 
       # - name: Delete images
