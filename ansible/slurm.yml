@@ -9,16 +9,6 @@
     - include_role:
         name:  mysql
 
-- name: Setup slurm-driven reimage
-  hosts: rebuild
-  become: yes
-  tags:
-    - rebuild
-    - openhpc
-  tasks:
-    - import_role:
-        name: stackhpc.slurm_openstack_tools.rebuild
-
 - name: Setup slurm
   hosts: openhpc
   become: yes
