@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
 
 jobs:
   scan:
@@ -18,7 +18,7 @@ jobs:
       matrix:
         build: ["RL8", "RL9"]
     env:
-      JSON_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+      JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
 
