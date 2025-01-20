@@ -17,14 +17,9 @@
 - name: Setup slurm stats
   hosts: slurm_stats
   tags: slurm_stats
-  collections:
-    - stackhpc.slurm_openstack_tools
   tasks:
     - include_role:
-        name: slurm-stats
-        apply:
-          # Collection currently requires root for all tasks.
-          become: true
+        name: slurm_stats
 
 - name: Deploy filebeat
   hosts: filebeat

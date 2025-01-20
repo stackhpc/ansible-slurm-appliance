@@ -64,6 +64,18 @@ variable "root_volume_size" {
     default = 40
 }
 
+variable "extra_volumes" {
+    description = <<-EOF
+        Mapping defining additional volumes to create and attach.
+        Keys are unique volume name.
+        Values are a mapping with:
+            size: Size of volume in GB
+        **NB**: The order in /dev is not guaranteed to match the mapping
+        EOF
+    type = any
+    default = {}
+}
+
 variable "security_group_ids" {
     type = list
 }
@@ -72,7 +84,13 @@ variable "k3s_token" {
     type = string
 }
 
-variable "k3s_server" {
-    description = "Name/address of k3s server"
+variable "control_address" {
+    description = "Name/address of control node"
     type = string
+}
+
+variable "compute_init_enable" {
+    type = list(string)
+    description = "Groups to activate for ansible-init compute rebuilds"
+    default = []
 }

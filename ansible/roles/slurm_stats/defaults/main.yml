@@ -1,0 +1,13 @@
+---
+####################
+# log rotate options
+####################
+
+# These options affect the contents of the log-rotate file.
+# See: man logrotate
+
+# Log files are rotated count times before being removed
+slurm_stats_log_rotate_content_rotate: 7
+
+# How frequently are the log files rotated. Can be one of daily, monthly, ...
+slurm_stats_log_rotate_content_frequency: daily

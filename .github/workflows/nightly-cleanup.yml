@@ -67,11 +67,31 @@ jobs:
           for cluster_prefix in ${ci_clusters}
           do
             echo "Processing cluster: $cluster_prefix"
-            TAGS=$(openstack server show ${cluster_prefix}-control --column tags --format value)
-            if [[ $TAGS =~ "keep" ]]; then
-              echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
+            # Get all servers with the matching name for control node
+            CONTROL_SERVERS=$(openstack server list --name ${cluster_prefix}-control --format json)
+            SERVER_COUNT=$(echo "$CONTROL_SERVERS" | jq length)
+
+            if [[ $SERVER_COUNT -gt 1 ]]; then
+              echo "Multiple servers found for control node '${cluster_prefix}-control'. Checking tags for each..."
+              
+              for server in $(echo "$CONTROL_SERVERS" | jq -r '.[].ID'); do
+                # Get tags for each control node
+                TAGS=$(openstack server show "$server" --column tags --format value)
+                
+                if [[ $TAGS =~ "keep" ]]; then
+                  echo "Skipping ${cluster_prefix} (server ${server}) - control instance is tagged as keep"
+                else
+                  ./dev/delete-cluster.py ${cluster_prefix} --force
+                fi
+              done
             else
-              ./dev/delete-cluster.py ${cluster_prefix} --force
+              # If only one server, extract its tags and proceed
+              TAGS=$(echo "$CONTROL_SERVERS" | jq -r '.[0].Tags')
+              if [[ $TAGS =~ "keep" ]]; then
+                echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
+              else
+                ./dev/delete-cluster.py ${cluster_prefix} --force
+              fi
             fi
           done
         shell: bash

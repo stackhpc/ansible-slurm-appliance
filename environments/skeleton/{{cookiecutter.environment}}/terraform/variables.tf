@@ -6,7 +6,7 @@ variable "cluster_name" {
 variable "cluster_domain_suffix" {
     type = string
     description = "Domain suffix for cluster"
-    default = "invalid"
+    default = "internal"
 }
 
 variable "cluster_net" {
@@ -52,6 +52,14 @@ variable "compute" {
             image_id: Overrides variable cluster_image_id
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
+            compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
+            volume_backed_instances: Overrides variable volume_backed_instances
+            root_volume_size: Overrides variable root_volume_size
+            extra_volumes: Mapping defining additional volumes to create and attach
+                           Keys are unique volume name.
+                           Values are a mapping with:
+                                size: Size of volume in GB
+                           **NB**: The order in /dev is not guaranteed to match the mapping
     EOF
 }
 
@@ -132,7 +140,20 @@ variable "root_volume_size" {
     default = 40
 }
 
-variable "k3s_token" {
-    description = "K3s cluster authentication token, set automatically by Ansible"
-    type = string
+variable "inventory_secrets_path" {
+  description = "Path to inventory secrets.yml file. Default is standard cookiecutter location."
+  type = string
+  default = ""
+}
+
+data "external" "inventory_secrets" {
+  program = ["${path.module}/read-inventory-secrets.py"]
+
+  query = {
+    path = var.inventory_secrets_path == "" ? "${path.module}/../inventory/group_vars/all/secrets.yml" : var.inventory_secrets_path
+  }
+}
+
+locals {
+    k3s_token = data.external.inventory_secrets.result["vault_k3s_token"]
 }

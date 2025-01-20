@@ -54,10 +54,6 @@ variable "volume_backed_instances" {
     default = false
 }
 
-variable "k3s_token" {
-    type = string
-}
-
 data "openstack_images_image_v2" "cluster" {
     name = var.cluster_image[var.os_version]
     most_recent = true
@@ -73,7 +69,9 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     cluster_image_id = data.openstack_images_image_v2.cluster.id
     control_node_flavor = var.control_node_flavor
-    k3s_token = var.k3s_token
+    # have to override default, as unusually the actual module path and secrets
+    # are not in the same environment for stackhpc
+    inventory_secrets_path = "${path.module}/../inventory/group_vars/all/secrets.yml"
 
     login_nodes = {
         login-0: var.other_node_flavor
@@ -82,6 +80,7 @@ module "cluster" {
         standard: { # NB: can't call this default!
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
+            compute_init_enable: ["compute", "etc_hosts", "nfs", "basic_users", "eessi"]
         }
         # Example of how to add another partition:
         # extra: {

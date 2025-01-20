@@ -5,7 +5,12 @@
 
 # NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
-# openondemand_servername: '' # Must be defined when using openondemand
+openondemand_servername: "{{ hostvars[groups['openondemand'].0].ansible_host if groups['openondemand'] else '' }}"
+
+openondemand_auth: basic_pam
+
+openondemand_jupyter_partition: "{{ openhpc_slurm_partitions[0]['name'] }}"
+openondemand_desktop_partition: "{{ openhpc_slurm_partitions[0]['name'] }}"
 
 # Regex defining hosts which openondemand can proxy; the default regex is compute nodes (for apps) and grafana host,
 # e.g. if the group `compute` has hosts `compute-{0,1,2,..}` this will be '(compute-\d+)|(control)'.

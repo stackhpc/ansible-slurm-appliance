@@ -11,32 +11,31 @@ on:
             - SMS
             - ARCUS
   schedule:
-    - cron: '0 0 * * *'  # Run at midnight
+    - cron: '0 0 * * *'  # Run at midnight on default branch
 
 jobs:
   openstack:
     name: openstack-imagebuild
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.build }} # to branch/PR + OS + build
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
-        os_version:
-          - RL8
-          - RL9
         build:
-          - openstack.rocky-latest
+          - image_name: rocky-latest-RL8
+            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
+            inventory_groups: update
+          - image_name: rocky-latest-RL9
+            source_image_name: Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+            inventory_groups: update
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
-      SOURCE_IMAGES_MAP: |
-        {
-          "RL8": "Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2",
-          "RL9": "Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2"
-        }
+      ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
+      LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
@@ -82,14 +81,12 @@ jobs:
 
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -only=${{ matrix.build }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
-          -var "source_image_name=${{ env.SOURCE_IMAGE }}" \
+          -var "source_image_name=${{ matrix.build.source_image_name }}" \
+          -var "image_name=${{ matrix.build.image_name }}" \
+          -var "image_name_version=" \
+          -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           openstack.pkr.hcl
-
-        env:
-          PKR_VAR_os_version: ${{ matrix.os_version }}
-          SOURCE_IMAGE: ${{ fromJSON(env.SOURCE_IMAGES_MAP)[matrix.os_version] }}
 
       - name: Get created image names from manifest
         id: manifest
@@ -124,7 +121,7 @@ jobs:
     name: upload-nightly-targets
     needs: openstack
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }}-${{ matrix.image }}-${{ matrix.target_cloud }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }}-${{ matrix.target_cloud }}
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
@@ -134,18 +131,15 @@ jobs:
           - LEAFCLOUD
           - SMS
           - ARCUS
-        os_version:
-          - RL8
-          - RL9
-        image:
-          - rocky-latest
+        build:
+          - image_name: rocky-latest-RL8
+          - image_name: rocky-latest-RL9
         exclude:
           - target_cloud: LEAFCLOUD
     env:
       OS_CLOUD: openstack
       SOURCE_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       TARGET_CLOUD: ${{ matrix.target_cloud }}
-      IMAGE_NAME: "${{ matrix.image }}-${{ matrix.os_version }}"
     steps:
       - uses: actions/checkout@v2
 
@@ -160,42 +154,37 @@ jobs:
           . venv/bin/activate
           pip install -U pip
           pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
-        shell: bash
 
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.SOURCE_CLOUD)] }}" > ~/.config/openstack/source_clouds.yaml
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.TARGET_CLOUD)] }}" > ~/.config/openstack/target_clouds.yaml
-        shell: bash
 
       - name: Download source image
         run: |
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/source_clouds.yaml
-          openstack image save --file ${{ env.IMAGE_NAME }} ${{ env.IMAGE_NAME }}
-        shell: bash
+          openstack image save --file ${{ matrix.build.image_name }} ${{ matrix.build.image_name }}
 
       - name: Upload to target cloud
         run: |
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
 
-          openstack image create "${{ env.IMAGE_NAME }}" \
-            --file "${{ env.IMAGE_NAME }}" \
+          openstack image create "${{ matrix.build.image_name }}" \
+            --file "${{ matrix.build.image_name }}" \
             --disk-format qcow2 \
-        shell: bash
 
       - name: Delete old latest image from target cloud
         run: |
           . venv/bin/activate
           export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
 
-          IMAGE_COUNT=$(openstack image list --name ${{ env.IMAGE_NAME }} -f value -c ID | wc -l)
+          IMAGE_COUNT=$(openstack image list --name ${{ matrix.build.image_name }} -f value -c ID | wc -l)
           if [ "$IMAGE_COUNT" -gt 1 ]; then
-            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ env.IMAGE_NAME }}"  -f value -c ID | head -n 1)
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ matrix.build.image_name }}"  -f value -c ID | head -n 1)
             openstack image delete "$OLD_IMAGE_ID"
           else
             echo "Only one image exists, skipping deletion."
           fi
-        shell: bash

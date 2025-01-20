@@ -58,6 +58,12 @@ roles/*
 !roles/squid/**
 !roles/tuned/
 !roles/tuned/**
+!roles/sssd/
+!roles/sssd/**
+!roles/sshd/
+!roles/sshd/**
+!roles/compute_init/
+!roles/compute_init/**
 !roles/k3s/
 !roles/k3s/**
 !roles/k9s/
@@ -66,3 +72,13 @@ roles/*
 !roles/kube_prometheus_stack/**
 !roles/lustre/
 !roles/lustre/**
+!roles/dnf_repos/
+!roles/dnf_repos/**
+!roles/pulp_site/
+!roles/pulp_site/**
+!roles/doca/
+!roles/doca/**
+!roles/slurm_stats/
+!roles/slurm_stats/**
+!roles/pytools/
+!roles/pytools/**
