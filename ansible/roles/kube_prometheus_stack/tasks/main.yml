@@ -30,6 +30,13 @@
         cmd: "mv {{ item.path }} {{ prometheus_db_dir }}/prometheus-db/{{ item.path | regex_search('([^/]+$)') }}"
       loop: "{{ prometheus_files.files }}"
 
+    - name: Set ownership
+      ansible.builtin.file:
+        path: "{{ prometheus_db_dir }}"
+        owner: root
+        group: root
+        recurse: true
+
 - name: Creating namespace
   kubernetes.core.k8s:
     name: "{{ kube_prometheus_stack_release_namespace }}"
