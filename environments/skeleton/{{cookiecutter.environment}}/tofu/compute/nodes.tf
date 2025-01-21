@@ -51,7 +51,7 @@ resource "openstack_networking_port_v2" "compute" {
 resource "openstack_compute_instance_v2" "compute" {
 
   for_each = toset(var.nodes)
-  
+
   name = "${var.cluster_name}-${each.key}"
   image_id = var.image_id
   flavor_name = var.flavor
@@ -68,7 +68,7 @@ resource "openstack_compute_instance_v2" "compute" {
       delete_on_termination = true
     }
   }
-  
+
   network {
     port = openstack_networking_port_v2.compute[each.key].id
     access_network = true
@@ -82,6 +82,8 @@ resource "openstack_compute_instance_v2" "compute" {
      },
     {for e in var.compute_init_enable: e => true}
   )
+
+  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
 
   user_data = <<-EOF
     #cloud-config

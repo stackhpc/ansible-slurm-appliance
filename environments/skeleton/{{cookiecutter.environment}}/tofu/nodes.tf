@@ -1,5 +1,24 @@
 locals {
   control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+
+  login_node_defaults = {
+    availability_zone = "nova"
+    match_ironic_node = false
+  }
+
+  login_nodes = {
+    for nodename, cfg in var.login_nodes:
+      nodename => merge(local.login_node_defaults, cfg)
+  }
+}
+
+data "external" "baremetal_nodes" {
+  # returns an empty map if cannot list baremetal nodes
+  program = ["bash", "-c", <<-EOT
+    openstack baremetal node list --limit 0 -f json 2>/dev/null | \
+    jq -r 'try map( { (.Name|tostring): .UUID } ) | add catch {}' || echo '{}'
+  EOT
+  ]
 }
 
 resource "openstack_networking_port_v2" "login" {
@@ -41,14 +60,14 @@ resource "openstack_networking_port_v2" "control" {
 }
 
 resource "openstack_compute_instance_v2" "control" {
-  
+
   for_each = toset(["control"])
-  
+
   name = "${var.cluster_name}-${each.key}"
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
-  
+
   # root device:
   block_device {
       uuid = var.cluster_image_id
@@ -82,7 +101,7 @@ resource "openstack_compute_instance_v2" "control" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
-    
+
     bootcmd:
       %{for volume in local.control_volumes}
       - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(reverse(split("-", volume.name))[0])} $BLKDEV
@@ -99,11 +118,11 @@ resource "openstack_compute_instance_v2" "control" {
 
 resource "openstack_compute_instance_v2" "login" {
 
-  for_each = var.login_nodes
-  
+  for_each = local.login_nodes
+
   name = "${var.cluster_name}-${each.key}"
   image_id = var.cluster_image_id
-  flavor_name = each.value
+  flavor_name = each.value.flavor
   key_pair = var.key_pair
 
   dynamic "block_device" {
@@ -117,7 +136,7 @@ resource "openstack_compute_instance_v2" "login" {
       delete_on_termination = true
     }
   }
-  
+
   network {
     port = openstack_networking_port_v2.login[each.key].id
     access_network = true
@@ -128,6 +147,8 @@ resource "openstack_compute_instance_v2" "login" {
     k3s_token = local.k3s_token
     control_address = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
   }
+
+  availability_zone = each.value.match_ironic_node ? "${each.value.availability_zone}::${data.external.baremetal_nodes.result[each.key]}" : null
 
   user_data = <<-EOF
     #cloud-config
