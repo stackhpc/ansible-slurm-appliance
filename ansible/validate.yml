@@ -40,16 +40,6 @@
         tasks_from: validate.yml
       tags: validate
 
-- name: Validate rebuild configuration
-  hosts: rebuild
-  gather_facts: false
-  tags: rebuild
-  tasks:
-    - import_role:
-        name: stackhpc.slurm_openstack_tools.rebuild
-        tasks_from: validate.yml
-      tags: validate
-
 - name: Validate openondemand configuration
   hosts:
     - openondemand

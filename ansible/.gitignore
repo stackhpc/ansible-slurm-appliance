@@ -76,3 +76,7 @@ roles/*
 !roles/pulp_site/**
 !roles/doca/
 !roles/doca/**
+!roles/slurm_stats/
+!roles/slurm_stats/**
+!roles/pytools/
+!roles/pytools/**
