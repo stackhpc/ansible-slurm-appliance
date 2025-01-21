@@ -94,3 +94,15 @@ variable "compute_init_enable" {
     description = "Groups to activate for ansible-init compute rebuilds"
     default = []
 }
+
+variable "gateway_nmcli_connection" {
+    description = "Name of nmcli connection for default gateway, '' for none or 'dummy0' to create a dummy interface"
+    type = string
+    default = ""
+}
+
+variable "gateway_ip" {
+    description = "IP of default gateway. Ignored when gateway_nmcli_connection == 'dummy0'"
+    type = string
+    default = ""
+}
