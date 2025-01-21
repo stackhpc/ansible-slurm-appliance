@@ -53,6 +53,8 @@ variable "login" {
                         Values are a mapping with:
                             size: Size of volume in GB
                         **NB**: The order in /dev is not guaranteed to match the mapping
+        match_ironic_node: Bool, whether to launch instances on the Ironic node of the same name as this cluster node
+        availability_zone: String, name of availability zone - ignored unless match_ironic_node is true
   EOF
 }
 

@@ -30,4 +30,5 @@ module "compute" {
   k3s_token = local.k3s_token
   control_address = openstack_compute_instance_v2.control.access_ip_v4
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
+  baremetal_nodes = data.external.baremetal_nodes.result
 }
