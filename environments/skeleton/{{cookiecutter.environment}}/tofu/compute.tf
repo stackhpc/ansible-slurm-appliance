@@ -6,7 +6,6 @@ module "compute" {
   # must be set for group:
   nodes = each.value.nodes
   flavor = each.value.flavor
-
   cluster_name = var.cluster_name
   cluster_domain_suffix = var.cluster_domain_suffix
   cluster_net_id = data.openstack_networking_network_v2.cluster_net.id
@@ -21,6 +20,7 @@ module "compute" {
   extra_volumes = lookup(each.value, "extra_volumes", {})
 
   compute_init_enable = lookup(each.value, "compute_init_enable", [])
+  ignore_image_changes = lookup(each.value, "ignore_image_changes", false)
 
   key_pair = var.key_pair
   environment_root = var.environment_root
