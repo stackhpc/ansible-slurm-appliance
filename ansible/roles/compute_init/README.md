@@ -43,7 +43,7 @@ The following roles/groups are currently fully functional:
 - `openhpc`: all functionality
 
 The above may be enabled by setting the compute_init_enable property on the
-terraform compute variable.
+tofu compute variable.
 
 # Development/debugging
 

@@ -2,7 +2,7 @@
 
 This contains an inventory that defines variables which are common between the
 `production` and `development` environments. It is not intended to be used in
-a standalone fashion to deploy infrastructure (i.e no terraform), but is instead
+a standalone fashion to deploy infrastructure (i.e no tofu), but is instead
 referenced in `ansible.cfg` from the `production` and `development` configurations.
 
 The pattern we use is that all resources referenced in the inventory

@@ -102,7 +102,7 @@ and referenced from the `site` and `production` environments, e.g.:
 
 - Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
-- Modify `environments/site/terraform/nodes.tf` to provide fixed IPs for at least
+- Modify `environments/site/tofu/nodes.tf` to provide fixed IPs for at least
   the control node, and (if not using FIPs) the login node(s):
 
     ```
