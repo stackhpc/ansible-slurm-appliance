@@ -1,0 +1,2 @@
+dnf_repos_epel_baseurl: "https://mirrors.hpc.nrel.gov/epel/$releasever/Everything/$basearch/"
+dnf_repos_epel_description: "ACO EPEL repo"
