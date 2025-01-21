@@ -145,7 +145,20 @@ variable "root_volume_size" {
     default = 40
 }
 
-variable "k3s_token" {
-    description = "K3s cluster authentication token, set automatically by Ansible"
-    type = string
+variable "inventory_secrets_path" {
+  description = "Path to inventory secrets.yml file. Default is standard cookiecutter location."
+  type = string
+  default = ""
+}
+
+data "external" "inventory_secrets" {
+  program = ["${path.module}/read-inventory-secrets.py"]
+
+  query = {
+    path = var.inventory_secrets_path == "" ? "${path.module}/../inventory/group_vars/all/secrets.yml" : var.inventory_secrets_path
+  }
+}
+
+locals {
+    k3s_token = data.external.inventory_secrets.result["vault_k3s_token"]
 }
