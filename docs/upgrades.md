@@ -62,7 +62,7 @@ All other commands should be run on the Ansible deploy host.
 
 1. If required, build an "extra" image with local modifications, see [docs/image-build.md](./image-build.md).
 
-1. Modify your site-specific environment to use this image, e.g. via `cluster_image_id` in `environments/$SITE_ENV/terraform/variables.tf`.
+1. Modify your site-specific environment to use this image, e.g. via `cluster_image_id` in `environments/$SITE_ENV/tofu/variables.tf`.
 
 1. Test this in your staging cluster.
 
