@@ -7,15 +7,6 @@ control
 [prometheus:children]
 control
 
-[grafana:children]
-control
-
-[alertmanager:children]
-control
-
-[node_exporter:children]
-cluster
-
 [opensearch:children]
 control
 

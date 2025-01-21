@@ -1,6 +1,6 @@
 # Configure the Zenith clients that are required
 # Note zenith hosts are in podman group
-- hosts: grafana
+- hosts: prometheus
   tasks:
     - name: Deploy the Zenith client for Grafana
       include_role:
@@ -15,8 +15,8 @@
           tenancy-id: "{{ openstack_project_id }}"
         zenith_proxy_mitm_enabled: yes
         zenith_proxy_mitm_auth_inject: basic
-        zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
-        zenith_proxy_mitm_auth_basic_password: "{{ grafana_security.admin_password }}"
+        zenith_proxy_mitm_auth_basic_username: azimuth
+        zenith_proxy_mitm_auth_basic_password: "{{ vault_azimuth_user_password }}"
       when: zenith_subdomain_monitoring is defined
 
 - hosts: openondemand

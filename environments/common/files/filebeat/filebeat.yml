@@ -54,7 +54,7 @@ processors:
         - {from: "json.ElapsedRaw", type: "integer"}
 
 output.elasticsearch:
-  hosts: ["{{ opensearch_address }}:9200"]
+  hosts: ["{{ '127.0.0.1' if groups['opensearch'] == groups['filebeat'] else opensearch_ip }}:9200"]
   protocol: "https"
   ssl.verification_mode: none
   username: "admin"
