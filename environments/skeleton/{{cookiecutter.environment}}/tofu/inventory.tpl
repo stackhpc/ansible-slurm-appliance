@@ -28,6 +28,7 @@ ${cluster_name}_${group_name}:
         ${ node.name }:
             ansible_host: ${node.access_ip_v4}
             instance_id: ${ node.id }
+            image_id: ${ node.image_id }
 %{ endfor ~}
 %{ endfor ~}
 
