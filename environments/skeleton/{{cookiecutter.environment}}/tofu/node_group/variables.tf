@@ -17,14 +17,6 @@ variable "cluster_domain_suffix" {
     default = "invalid"
 }
 
-variable "cluster_net_id" {
-    type = string
-}
-
-variable "cluster_subnet_id" {
-    type = string
-}
-
 variable "key_pair" {
     type = string
     description = "Name of an existing keypair in OpenStack"
@@ -40,16 +32,14 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
-variable "vnic_type" {
-    type = string
-    description = "VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
-    default = "normal"
+variable "vnic_types" {
+    type = map(string)
+    default = {}
 }
 
-variable "vnic_profile" {
-    type = string
-    description = "VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
-    default = "{}"
+variable "vnic_profiles" {
+    type = map(string)
+    default = {}
 }
 
 variable "volume_backed_instances" {
@@ -99,4 +89,9 @@ variable "ignore_image_changes" {
     type = bool
     description = "Whether to ignore changes to the image_id parameter"
     default = false
+}
+
+variable "networks" {
+    type = list(map(string))
+    default = []
 }

@@ -9,6 +9,7 @@ control:
         ${ control.name }:
             ansible_host: ${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]}
             instance_id: ${ control.id }
+            networks: ${jsonencode({for n in control.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
 %{ endfor ~}
     vars:
         appliances_state_dir: ${state_dir} # NB needs to be set on group not host otherwise it is ignored in packer build!
@@ -22,6 +23,7 @@ ${cluster_name}_${group_name}:
             ansible_host: ${node.access_ip_v4}
             instance_id: ${ node.id }
             image_id: ${ node.image_id }
+            networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
 %{ endfor ~}
 %{ endfor ~}
 
@@ -39,6 +41,7 @@ ${cluster_name}_${group_name}:
             ansible_host: ${node.access_ip_v4}
             instance_id: ${ node.id }
             image_id: ${ node.image_id }
+            networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
 %{ endfor ~}
 %{ endfor ~}
 
