@@ -97,6 +97,6 @@ variable "compute_init_enable" {
 
 variable "ignore_image_changes" {
     type = bool
-    description = "Whether to prevent tofu from applying changes to the cluster image"
+    description = "Whether to ignore changes to the image_id parameter"
     default = false
 }

@@ -4,18 +4,15 @@ See the role README.md
 
 # Changes to image / tofu state
 
-When a compute group has ignore_image_changes set as true in a compute group
-partition within tofu/main.tf, and the image is updated:
+When a compute group has the `ignore_image_changes` parameter set to true,
+changes to the `image_id` parameter (which defaults to `cluster_image_id`) are
+ignored by OpenTofu.
 
-Subsequent changes to the tf cluster_image variable for that compute group don’t
-actually result in a change via tofu plan/apply. This is done with the
-lifecycle meta-argument "ignore_changes" in the compute resource.
-
-As part of compute-init, the image_id is templated out to hostvars so that
-ansible will have image_id for each compute node.
-
-WIP:    Attempts to change the cluster image from tofu then act as a target
-        for compute-init to read and rebuild to via slurm control.
+Regardless of whether `ignore_image_changes` is set, OpenTofu templates out the
+`image_id` into the Ansible inventory for each compute node. The `compute_init`
+role templates out hostvars to the control node, which means the "target" image
+ID is then available on the control node. Subsequent work will use this to
+rebuild the node via slurm.
 
 # CI workflow
 
