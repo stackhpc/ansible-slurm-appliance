@@ -4,39 +4,43 @@ locals {
 
 resource "openstack_networking_port_v2" "login" {
 
-  for_each = var.login_nodes
+  for_each = {for item in setproduct(keys(var.login_nodes), var.cluster_networks):
+                "${item[0]}-${item[1].network}" => item[1]
+              }
 
   name = "${var.cluster_name}-${each.key}"
-  network_id = data.openstack_networking_network_v2.cluster_net.id
+  network_id = data.openstack_networking_network_v2.cluster_networks[each.value.network].id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
+    subnet_id = data.openstack_networking_subnet_v2.cluster_subnets[each.value.subnet].id
   }
 
+  # TODO: can't differentiate on different networks:
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.login: o.id]
 
   binding {
-    vnic_type = var.vnic_type
-    profile = var.vnic_profile
+    vnic_type = lookup(var.vnic_types, each.value.network, "normal")
+    profile = lookup(var.vnic_profiles, each.value.network, "{}")
   }
 }
 
 resource "openstack_networking_port_v2" "control" {
 
   name = "${var.cluster_name}-control"
-  network_id = data.openstack_networking_network_v2.cluster_net.id
+  # TODO: currrently is only on 1st network
+  network_id = data.openstack_networking_network_v2.cluster_networks[var.cluster_networks[0].network].id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
+    subnet_id = data.openstack_networking_subnet_v2.cluster_subnets[var.cluster_networks[0].network].id
   }
 
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
 
   binding {
-    vnic_type = var.vnic_type
-    profile = var.vnic_profile
+    vnic_type = lookup(var.vnic_types, var.cluster_networks[0].network, "normal")
+    profile = lookup(var.vnic_profiles, var.cluster_networks[0].network, "{}")
   }
 }
 
@@ -71,7 +75,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   network {
     port = openstack_networking_port_v2.control.id
-    access_network = true
+    access_network = true # TODO: makes an assumption
   }
 
   metadata = {
@@ -118,9 +122,12 @@ resource "openstack_compute_instance_v2" "login" {
     }
   }
   
-  network {
-    port = openstack_networking_port_v2.login[each.key].id
-    access_network = true
+  dynamic "network" {
+    for_each = {for net in var.cluster_networks: net.network => net}
+    content {
+      port = openstack_networking_port_v2.login["${each.key}-${network.key}"].id
+      access_network = length(var.cluster_networks) == 1 ? true : lookup(network.value, "access_network", false)
+    }
   }
 
   metadata = {

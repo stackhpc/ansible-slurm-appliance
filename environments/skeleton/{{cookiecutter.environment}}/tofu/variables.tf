@@ -9,14 +9,17 @@ variable "cluster_domain_suffix" {
     default = "internal"
 }
 
-variable "cluster_net" {
-    type = string
-    description = "Name of existing cluster network"
-}
-
-variable "cluster_subnet" {
-    type = string
-    description = "Name of existing cluster subnet"
+variable "cluster_networks" {
+    type = list(map(string))
+    default = []
+    description = <<-EOF
+        List of cluster networks. Each entry is a mapping:
+            network: Required. Name of existing network
+            subnet: Required. Name of existing subnet
+            access_network: Bool. True if network is present on all nodes
+                            and should be used for Ansible and K3s. Can be
+                            ommitted if only one network exists.
+    EOF
 }
 
 variable "key_pair" {
@@ -98,16 +101,16 @@ variable "home_volume_type" {
     description = "Type of home volume, if not default type"
 }
 
-variable "vnic_type" {
-    type = string
-    description = "Default VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
-    default = "normal"
+variable "vnic_types" {
+    type = map(string)
+    #description = "Default VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
+    default = {}
 }
 
-variable "vnic_profile" {
-    type = string
-    description = "Default VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
-    default = "{}"
+variable "vnic_profiles" {
+    type = map(string)
+    #description = "Default VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
+    default = {}
 }
 
 variable "login_security_groups" {
