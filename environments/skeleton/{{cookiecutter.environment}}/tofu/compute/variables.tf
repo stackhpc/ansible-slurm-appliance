@@ -94,3 +94,9 @@ variable "compute_init_enable" {
     description = "Groups to activate for ansible-init compute rebuilds"
     default = []
 }
+
+variable "ignore_image_changes" {
+    type = bool
+    description = "Whether to ignore changes to the image_id parameter"
+    default = false
+}

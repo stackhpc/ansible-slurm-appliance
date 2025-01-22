@@ -81,6 +81,7 @@ module "cluster" {
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
             compute_init_enable: ["compute", "etc_hosts", "nfs", "basic_users", "eessi"]
+            # ignore_image_changes: true
         }
         # Example of how to add another partition:
         # extra: {

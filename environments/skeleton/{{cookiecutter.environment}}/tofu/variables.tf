@@ -53,6 +53,7 @@ variable "compute" {
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
+            ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
             volume_backed_instances: Overrides variable volume_backed_instances
             root_volume_size: Overrides variable root_volume_size
             extra_volumes: Mapping defining additional volumes to create and attach
