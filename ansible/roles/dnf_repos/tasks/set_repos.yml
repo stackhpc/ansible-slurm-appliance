@@ -21,7 +21,8 @@
     name: epel
     file: epel
     description: "{{ dnf_repos_epel_description }}"
-    gpgcheck: false
+    gpgcheck: "{{ dnf_repos_epel_upstream_gpg_check }}"
+    gpgkey: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9"
     baseurl: "{{ dnf_repos_epel_baseurl }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"

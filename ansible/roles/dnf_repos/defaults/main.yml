@@ -46,3 +46,4 @@ dnf_repos_repolist: "{{ dnf_repos_default_repolist + (dnf_repos_openhpc_repolist
 
 dnf_repos_epel_baseurl: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.epel[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
 dnf_repos_epel_description: "epel"
+dnf_repos_epel_upstream_gpg_check: true

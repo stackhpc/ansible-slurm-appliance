@@ -88,26 +88,3 @@
       ansible.builtin.include_role:
         name: vshpc.prov.pre-tasks
       when: not vs_pre_complete.stat.exists
-
-# TODO: KBENDL - check compatibility with new playbook
-- name: "NREL pre - Mount cephfs volumes"
-  hosts: all
-  tags:
-    - vs_pre
-    - aco.core.cephfs
-  become: true
-  tasks:
-    - name: Does ceph exist?
-      ansible.builtin.stat:
-        path: /etc/ceph
-      register: vs_does_cephdir
-    - name: CephFS now
-      ansible.builtin.include_role:
-        name: aco.core.cephfs
-      tags:
-        - aco.core.cephfs
-      when: not vs_does_cephdir.stat.exists
-    - name: Tmp umount /home
-      ansible.builtin.shell: systemctl stop home.mount
-      when: not vs_does_cephdir.stat.exists
-      become: true
