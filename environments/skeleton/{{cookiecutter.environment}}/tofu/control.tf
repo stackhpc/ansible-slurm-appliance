@@ -55,7 +55,7 @@ resource "openstack_compute_instance_v2" "control" {
     for_each = {for net in var.cluster_networks: net.network => net}
     content {
       port = openstack_networking_port_v2.control[network.key].id
-      access_network = length(var.cluster_networks) == 1 ? true : lookup(each.value, "access_network", false)
+      access_network = length(var.cluster_networks) == 1 ? true : lookup(network.value, "access_network", false)
     }
   }
 
