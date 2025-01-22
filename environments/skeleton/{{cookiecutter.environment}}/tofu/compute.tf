@@ -21,6 +21,7 @@ module "compute" {
   extra_volumes = lookup(each.value, "extra_volumes", {})
 
   compute_init_enable = lookup(each.value, "compute_init_enable", [])
+  ignore_image_changes = lookup(each.value, "ignore_image_changes", false)
 
   key_pair = var.key_pair
   environment_root = var.environment_root
