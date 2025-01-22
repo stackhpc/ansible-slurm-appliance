@@ -4,19 +4,21 @@ locals {
 
 resource "openstack_networking_port_v2" "control" {
 
-  name = "${var.cluster_name}-control"
-  network_id = data.openstack_networking_network_v2.cluster_net.id
+  for_each = {for net in var.cluster_networks: net.network => net}
+
+  name = "${var.cluster_name}-control-${each.key}"
+  network_id = data.openstack_networking_network_v2.cluster_net[each.key].id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
+    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet[each.key].id
   }
 
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
 
   binding {
-    vnic_type = var.vnic_type
-    profile = var.vnic_profile
+    vnic_type = lookup(var.vnic_types, each.key, "normal")
+    profile = lookup(var.vnic_profiles, each.key, "{}")
   }
 }
 
@@ -49,9 +51,12 @@ resource "openstack_compute_instance_v2" "control" {
     }
   }
 
-  network {
-    port = openstack_networking_port_v2.control.id
-    access_network = true
+  dynamic "network" {
+    for_each = {for net in var.cluster_networks: net.network => net}
+    content {
+      port = openstack_networking_port_v2.control[network.key].id
+      access_network = length(var.cluster_networks) == 1 ? true : lookup(each.value, "access_network", false)
+    }
   }
 
   metadata = {

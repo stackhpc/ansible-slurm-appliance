@@ -9,14 +9,16 @@ variable "cluster_domain_suffix" {
     default = "internal"
 }
 
-variable "cluster_net" {
-    type = string
-    description = "Name of existing cluster network"
-}
-
-variable "cluster_subnet" {
-    type = string
-    description = "Name of existing cluster subnet"
+variable "cluster_networks" {
+    type = list(map(string))
+    description = <<-EOT
+        List of mappings defining networks. Mapping key/values:
+            network: Name of existing network
+            subnet: Name of existing subnet
+            access_network: Bool defining whether to use network for Ansible and
+                            K3s. This network must be present on all nodes.
+                            Defaults to true if only one network is specified.
+    EOT
 }
 
 variable "key_pair" {
@@ -124,16 +126,23 @@ variable "home_volume_type" {
     description = "Type of home volume, if not default type"
 }
 
-variable "vnic_type" {
-    type = string
-    description = "Default VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
-    default = "normal"
+variable "vnic_types" {
+    type = map(string)
+    description = <<-EOT
+        Default VNIC types, keyed by network name. See https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type
+        If not given this defaults to the "normal" type.
+    EOT
+    default = {}
 }
 
-variable "vnic_profile" {
-    type = string
-    description = "Default VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
-    default = "{}"
+variable "vnic_profiles" {
+    type = map(string)
+    description = <<-EOT
+    Default VNIC binding profiles, keyed by network name. Values are json strings.
+    See https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile.
+    If not given this defaults to "{}"
+    EOT
+    default = {}
 }
 
 variable "login_security_groups" {

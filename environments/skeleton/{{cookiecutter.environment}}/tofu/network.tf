@@ -1,11 +1,16 @@
 
 data "openstack_networking_network_v2" "cluster_net" {
-  name           = var.cluster_net
+
+  for_each = {for net in var.cluster_networks: net.network => net}
+
+  name = each.value.network
 }
 
 data "openstack_networking_subnet_v2" "cluster_subnet" {
 
-  name            = var.cluster_subnet
+  for_each = {for net in var.cluster_networks: net.network => net}
+
+  name = each.value.subnet
 }
 
 data "openstack_networking_secgroup_v2" "login" {
