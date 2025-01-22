@@ -26,6 +26,6 @@ module "compute" {
 
   # computed
   k3s_token = local.k3s_token
-  control_address = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
+  control_address = openstack_compute_instance_v2.control.access_ip_v4
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
 }

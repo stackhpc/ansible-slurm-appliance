@@ -24,9 +24,7 @@ resource "openstack_networking_port_v2" "control" {
 
 resource "openstack_compute_instance_v2" "control" {
   
-  for_each = toset(["control"])
-  
-  name = "${var.cluster_name}-${each.key}"
+  name = "${var.cluster_name}-control"
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
@@ -62,11 +60,12 @@ resource "openstack_compute_instance_v2" "control" {
   metadata = {
     environment_root = var.environment_root
     k3s_token = local.k3s_token
+    # TODO: set k3s_subnet from access_network
   }
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
+    fqdn: ${var.cluster_name}-control.${var.cluster_name}.${var.cluster_domain_suffix}
     
     bootcmd:
       %{for volume in local.control_volumes}

@@ -138,6 +138,7 @@ resource "openstack_compute_instance_v2" "compute" {
         environment_root = var.environment_root
         k3s_token          = var.k3s_token
         control_address    = var.control_address
+        # TODO: set k3s_subnet from access_network
      },
     {for e in var.compute_init_enable: e => true}
   )
