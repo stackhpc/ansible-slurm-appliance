@@ -15,6 +15,4 @@ source_image_name = "vslurm_20241118"
 ssh_private_key_file = "/home/rocky/.ssh/vsdeployer"
 ssh_keypair_name = "vsdeployer"
 
-groups = {
-    openhpc = ["update", "compute"] # TODO: add cuda when ready
-}
+inventory_groups = "compute,control,login,update,cuda"
