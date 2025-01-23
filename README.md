@@ -90,9 +90,10 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
     key_pair = "my_key" # *
     control_node_flavor = "some_flavor_name"
     login = {
+        # Arbitrary group name for these login nodes
         interactive = {
             nodes: ["login-0"]
-            flavor: "login_flavor_name"
+            flavor: "login_flavor_name" # *
         }
     }
     cluster_image_id = "rocky_linux_9_image_uuid"
