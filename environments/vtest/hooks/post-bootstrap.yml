@@ -1,4 +1,17 @@
 # TODO: KBENDL - check compatibility with new playbook
+
+- name: Set timezone
+  hosts: all
+  become: true
+  tasks:
+  - name: Set timezone to Americas/Denver
+    timezone:
+      name: America/Denver
+  - include_role:
+      name: aco.core.ntp
+    tags:
+      - vs_all_nodes_timezone
+
 - name: "NREL pre - Mount cephfs volumes"
   hosts: all
   tags:
