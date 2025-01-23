@@ -73,8 +73,11 @@ module "cluster" {
     # are not in the same environment for stackhpc
     inventory_secrets_path = "${path.module}/../inventory/group_vars/all/secrets.yml"
 
-    login_nodes = {
-        login-0: var.other_node_flavor
+    login = {
+        login: {
+            nodes: ["login-0"]
+            flavor: var.other_node_flavor
+        }
     }
     compute = {
         standard: { # NB: can't call this default!
