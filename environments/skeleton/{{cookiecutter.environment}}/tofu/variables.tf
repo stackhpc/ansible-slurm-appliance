@@ -32,7 +32,11 @@ variable "control_node_flavor" {
 variable "login" {
   type = any
   description = <<-EOF
-    Mapping defining groups of login nodes. Keys are names of groups.
+    Mapping defining homogenous groups of login nodes. Multiple groups may
+    be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
+    to define login nodes with different capabilities such as high-memory.
+    
+    Keys are names of groups.
     Values are a mapping as follows:
 
     Required:
@@ -60,7 +64,10 @@ variable "cluster_image_id" {
 variable "compute" {
     type = any
     description = <<-EOF
-        Mapping defining groups of compute nodes. Keys are names of groups.
+        Mapping defining homogenous groups of compute nodes. Groups are used
+        in Slurm partition definitions.
+
+        Keys are names of groups.
         Values are a mapping as follows:
 
         Required:
