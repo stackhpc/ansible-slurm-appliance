@@ -25,8 +25,6 @@ control
 [filebeat:children]
 slurm_stats
 
-# NB: [rebuild] not defined here as this template is used in CI
-
 [update:children]
 
 [fail2ban:children]
@@ -111,3 +109,5 @@ control
 [extra_packages:children]
 # Hosts to install specified additional packages on
 builder
+
+# NB: [rebuild] not defined here as this template is used in CI

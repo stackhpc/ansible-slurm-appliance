@@ -62,9 +62,6 @@ mysql
 # All hosts requiring control of SELinux status.
 cluster
 
-[rebuild]
-# Enable rebuild of nodes on an OpenStack cloud; add 'control' group plus 'compute' group or a subset of it.
-
 [update]
 # All hosts to (optionally) run yum update on.
 
@@ -165,3 +162,6 @@ extra_packages
 
 [pulp]
 # Add builder to this group to enable automatically syncing of pulp during image build
+
+[rebuild]
+# Enable rebuild of nodes on an OpenStack cloud; add 'control' group plus 'compute' group or a subset of it.
