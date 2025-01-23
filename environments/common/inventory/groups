@@ -164,4 +164,4 @@ extra_packages
 # Add builder to this group to enable automatically syncing of pulp during image build
 
 [rebuild]
-# Enable rebuild of nodes on an OpenStack cloud; add 'control' group plus 'compute' group or a subset of it.
+# Enable rebuild of nodes on an OpenStack cloud; add 'control' group.
