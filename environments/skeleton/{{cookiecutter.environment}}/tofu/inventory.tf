@@ -4,7 +4,7 @@ resource "local_file" "hosts" {
                             "cluster_name": var.cluster_name,
                             "cluster_domain_suffix": var.cluster_domain_suffix,
                             "control_instances": openstack_compute_instance_v2.control
-                            "login_instances": openstack_compute_instance_v2.login
+                            "login_groups": module.login
                             "compute_groups": module.compute
                             "state_dir": var.state_dir
                           },

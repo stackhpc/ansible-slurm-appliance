@@ -89,14 +89,19 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
     cluster_subnet = "some_subnet" # *
     key_pair = "my_key" # *
     control_node_flavor = "some_flavor_name"
-    login_nodes = {
-        login-0: "login_flavor_name"
+    login = {
+        # Arbitrary group name for these login nodes
+        interactive = {
+            nodes: ["login-0"]
+            flavor: "login_flavor_name" # *
+        }
     }
     cluster_image_id = "rocky_linux_9_image_uuid"
     compute = {
+        # Group name used for compute node partition definition
         general = {
             nodes: ["compute-0", "compute-1"]
-            flavor: "compute_flavor_name"
+            flavor: "compute_flavor_name" # *
         }
     }
 
