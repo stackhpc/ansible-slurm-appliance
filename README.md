@@ -105,7 +105,7 @@ Variables marked `*` refer to OpenStack resources which must already exist. The 
 To deploy this infrastructure, ensure the venv and the environment are [activated](#create-a-new-environment) and run:
 
     export OS_CLOUD=openstack
-    cd environments/$ENV/terraform/
+    cd environments/$ENV/tofu/
     tofu init
     tofu apply
 
