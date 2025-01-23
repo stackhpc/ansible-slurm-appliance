@@ -9,6 +9,9 @@ locals {
   # this is a mapping with
   # keys "compute-0-vol-a", "compute-0-vol-b" ...
   # values which are a mapping e.g. {"node"="compute-0", "volume"="vol-a"}
+
+  # Workaround for lifecycle meta-argument only taking static values
+  compute_instances = var.ignore_image_changes ? openstack_compute_instance_v2.compute_fixed_image : openstack_compute_instance_v2.compute
 }
 
 resource "openstack_blockstorage_volume_v3" "compute" {
@@ -24,7 +27,7 @@ resource "openstack_compute_volume_attach_v2" "compute" {
 
   for_each = local.all_compute_volumes
 
-  instance_id = openstack_compute_instance_v2.compute["${each.value.node}"].id
+  instance_id = local.compute_instances["${each.value.node}"].id
   volume_id  = openstack_blockstorage_volume_v3.compute["${each.key}"].id
 }
 
@@ -48,9 +51,57 @@ resource "openstack_networking_port_v2" "compute" {
   }
 }
 
+resource "openstack_compute_instance_v2" "compute_fixed_image" {
+
+  for_each = var.ignore_image_changes ? toset(var.nodes) : []
+
+  name = "${var.cluster_name}-${each.key}"
+  image_id = var.image_id
+  flavor_name = var.flavor
+  key_pair = var.key_pair
+
+  dynamic "block_device" {
+    for_each = var.volume_backed_instances ? [1]: []
+    content {
+      uuid = var.image_id
+      source_type  = "image"
+      destination_type = "volume"
+      volume_size = var.root_volume_size
+      boot_index = 0
+      delete_on_termination = true
+    }
+  }
+
+  network {
+    port = openstack_networking_port_v2.compute[each.key].id
+    access_network = true
+  }
+
+  metadata = merge(
+    {
+        environment_root = var.environment_root
+        k3s_token          = var.k3s_token
+        control_address    = var.control_address
+    },
+    {for e in var.compute_init_enable: e => true}
+  )
+
+  user_data = <<-EOF
+    #cloud-config
+    fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
+  EOF
+
+  lifecycle {
+    ignore_changes = [
+      image_id,
+    ]
+  }
+
+}
+
 resource "openstack_compute_instance_v2" "compute" {
 
-  for_each = toset(var.nodes)
+  for_each = var.ignore_image_changes ? [] : toset(var.nodes)
   
   name = "${var.cluster_name}-${each.key}"
   image_id = var.image_id
@@ -91,5 +142,5 @@ resource "openstack_compute_instance_v2" "compute" {
 }
 
 output "compute_instances" {
-    value = openstack_compute_instance_v2.compute
+    value = local.compute_instances
 }

@@ -13,12 +13,22 @@ control:
     vars:
         appliances_state_dir: ${state_dir} # NB needs to be set on group not host otherwise it is ignored in packer build!
 
-login:
+
+%{ for group_name in keys(login_groups) ~}
+${cluster_name}_${group_name}:
     hosts:
-%{ for login in login_instances ~}
-        ${ login.name }:
-            ansible_host: ${[for n in login.network: n.fixed_ip_v4 if n.access_network][0]}
-            instance_id: ${ login.id }
+%{ for node in login_groups[group_name]["compute_instances"] ~}
+        ${ node.name }:
+            ansible_host: ${node.access_ip_v4}
+            instance_id: ${ node.id }
+            image_id: ${ node.image_id }
+%{ endfor ~}
+%{ endfor ~}
+
+login:
+    children:
+%{ for group_name in keys(login_groups) ~}
+        ${cluster_name}_${group_name}:
 %{ endfor ~}
 
 %{ for group_name in keys(compute_groups) ~}
@@ -28,6 +38,7 @@ ${cluster_name}_${group_name}:
         ${ node.name }:
             ansible_host: ${node.access_ip_v4}
             instance_id: ${ node.id }
+            image_id: ${ node.image_id }
 %{ endfor ~}
 %{ endfor ~}
 

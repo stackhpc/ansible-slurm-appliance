@@ -73,14 +73,18 @@ module "cluster" {
     # are not in the same environment for stackhpc
     inventory_secrets_path = "${path.module}/../inventory/group_vars/all/secrets.yml"
 
-    login_nodes = {
-        login-0: var.other_node_flavor
+    login = {
+        login: {
+            nodes: ["login-0"]
+            flavor: var.other_node_flavor
+        }
     }
     compute = {
         standard: { # NB: can't call this default!
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
             compute_init_enable: ["compute", "etc_hosts", "nfs", "basic_users", "eessi"]
+            # ignore_image_changes: true
         }
         # Example of how to add another partition:
         # extra: {

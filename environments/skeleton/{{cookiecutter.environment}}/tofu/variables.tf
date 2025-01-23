@@ -29,9 +29,31 @@ variable "control_node_flavor" {
     description = "Flavor name for control name"
 }
 
-variable "login_nodes" {
-  type = map
-  description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> (str) flavor name"
+variable "login" {
+  type = any
+  description = <<-EOF
+    Mapping defining homogenous groups of login nodes. Multiple groups may
+    be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
+    to define login nodes with different capabilities such as high-memory.
+    
+    Keys are names of groups.
+    Values are a mapping as follows:
+
+    Required:
+        nodes: List of node names
+        flavor: String flavor name
+    Optional:
+        image_id: Overrides variable cluster_image_id
+        vnic_type: Overrides variable vnic_type
+        vnic_profile: Overrides variable vnic_profile
+        volume_backed_instances: Overrides variable volume_backed_instances
+        root_volume_size: Overrides variable root_volume_size
+        extra_volumes: Mapping defining additional volumes to create and attach
+                        Keys are unique volume name.
+                        Values are a mapping with:
+                            size: Size of volume in GB
+                        **NB**: The order in /dev is not guaranteed to match the mapping
+  EOF
 }
 
 variable "cluster_image_id" {
@@ -42,8 +64,11 @@ variable "cluster_image_id" {
 variable "compute" {
     type = any
     description = <<-EOF
-        Mapping defining compute infrastructure. Keys are names of groups. Values are a
-        mapping as follows:
+        Mapping defining homogenous groups of compute nodes. Groups are used
+        in Slurm partition definitions.
+
+        Keys are names of groups.
+        Values are a mapping as follows:
 
         Required:
             nodes: List of node names
@@ -53,6 +78,7 @@ variable "compute" {
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
+            ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
             volume_backed_instances: Overrides variable volume_backed_instances
             root_volume_size: Overrides variable root_volume_size
             extra_volumes: Mapping defining additional volumes to create and attach

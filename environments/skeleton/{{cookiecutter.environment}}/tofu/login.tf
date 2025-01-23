@@ -1,7 +1,7 @@
-module "compute" {
+module "login" {
   source = "./node_group"
 
-  for_each = var.compute
+  for_each = var.login
 
   # must be set for group:
   nodes = each.value.nodes
@@ -20,12 +20,12 @@ module "compute" {
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
   extra_volumes = lookup(each.value, "extra_volumes", {})
 
-  compute_init_enable = lookup(each.value, "compute_init_enable", [])
-  ignore_image_changes = lookup(each.value, "ignore_image_changes", false)
+  compute_init_enable = []
+  ignore_image_changes = false
 
   key_pair = var.key_pair
   environment_root = var.environment_root
   k3s_token = local.k3s_token
   control_address = [for n in openstack_compute_instance_v2.control["control"].network: n.fixed_ip_v4 if n.access_network][0]
-  security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
+  security_group_ids = [for o in data.openstack_networking_secgroup_v2.login: o.id]
 }
