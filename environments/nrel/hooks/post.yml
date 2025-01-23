@@ -1,6 +1,6 @@
 ---
 - name: "Set/fix the the ephemeral ssd mounts"
-  hosts: compute
+  hosts: compute:!builder
   tags: vs-set-ephemeral-mounts
   become: true
   tasks:
@@ -9,7 +9,7 @@
         name: vs-set-ephemeral-mounts
 
 - name: Enable /home ceph mount
-  hosts: all
+  hosts: all:!builder
   become: true
   tasks:
     - name: Start systemd service
@@ -19,7 +19,7 @@
         enabled: true
 
 - name: Do pam_mkhomedir_plus
-  hosts: login
+  hosts: login:!builder
   become: true
   tags:
     - pam_mkhomedir_plus
@@ -86,18 +86,6 @@
     #   when: not homerocky.stat.exists
     #   register: cpa_output # <- Registers the command output.
     #   changed_when: cpa_output.rc != 0 # <- Uses the return code to define when the task has changed.
-
-- name: Clean post_final_cleanup
-  hosts: all
-  become: true
-  tags:
-    - post_final_cleanup
-  tasks:
-    - name: Do a thing to clean
-      ansible.builtin.command: dnf clean all
-      become: true
-      register: dnfcl_output # <- Registers the command output.
-      changed_when: dnfcl_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
 # - name: sync_slurm_allocations install on admin node
 #   hosts: admin
