@@ -95,3 +95,22 @@ variable "networks" {
     type = list(map(string))
     default = []
 }
+
+variable "fip_addresses" {
+    type = list(string)
+    description = <<-EOT
+        List of addresses of floating IPs to associate with nodes,
+        in same order as nodes parameter. The floating IPs must have
+        been allocated to the project.
+    EOT
+    default = []
+}
+
+variable "fip_network" {
+    type = string
+    description = <<-EOT
+        Name of network containing ports to attach FIPs to. Only required if multiple
+        networks are defined.
+    EOT
+    default = ""
+}

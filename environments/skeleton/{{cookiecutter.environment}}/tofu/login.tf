@@ -17,7 +17,11 @@ module "login" {
   vnic_profiles = lookup(each.value, "vnic_profiles", var.vnic_profiles)
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
+  
+  # can be set for groupl, defaults to nothing:
   extra_volumes = lookup(each.value, "extra_volumes", {})
+  fip_addresses = lookup(each.value, "fip_addresses", [])
+  fip_network = lookup(each.value, "fip_network", "")
 
   compute_init_enable = []
   ignore_image_changes = false

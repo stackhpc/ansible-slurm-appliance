@@ -50,6 +50,11 @@ variable "login" {
         vnic_profile: Overrides variable vnic_profile
         volume_backed_instances: Overrides variable volume_backed_instances
         root_volume_size: Overrides variable root_volume_size
+        fip_addresses: List of addresses of floating IPs to associate with nodes,
+                       in same order as nodes parameter. The floating IPs must have
+                       been allocated to the project.
+        fip_network: Name of network containing ports to attach FIPs to. Only
+                     required if multiple networks are defined.
         extra_volumes: Mapping defining additional volumes to create and attach
                         Keys are unique volume name.
                         Values are a mapping with:
