@@ -98,9 +98,10 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
     }
     cluster_image_id = "rocky_linux_9_image_uuid"
     compute = {
+        # Group name used for compute node partition definition
         general = {
             nodes: ["compute-0", "compute-1"]
-            flavor: "compute_flavor_name"
+            flavor: "compute_flavor_name" # *
         }
     }
 
