@@ -9,10 +9,14 @@
         name: vs-set-ephemeral-mounts
 
 - name: Enable /home ceph mount
-  ansible.builtin.systemd_service:
-    name: home.mount
-    state: started
-    enabled: true
+  hosts: all
+  become: true
+  tasks:
+    - name: Start systemd service
+      ansible.builtin.systemd:
+        name: home.mount
+        state: started
+        enabled: true
 
 - name: Do pam_mkhomedir_plus
   hosts: login
