@@ -6,31 +6,39 @@
     k3s_server_name: "{{ os_metadata.meta.control_address }}"
     service_name: "{{ 'k3s-agent' if k3s_server_name is defined else 'k3s' }}"
   tasks:
-    - name: Ensure password directory exists
-      ansible.builtin.file: 
-        path: "/etc/rancher/node"
-        state: directory
+    - name: "Start {{ service_name }}"
+      when: k3s_token is defined
+      block:
+      - name: Ensure password directory exists
+        ansible.builtin.file: 
+          path: "/etc/rancher/node"
+          state: directory
+          
+      - name: Set agent node password as token # uses token to keep password consistent between reimages
+        ansible.builtin.copy:
+          dest: /etc/rancher/node/password
+          content: "{{ k3s_token }}"
         
-    - name: Set agent node password as token # uses token to keep password consistent between reimages
-      ansible.builtin.copy:
-        dest: /etc/rancher/node/password
-        content: "{{ k3s_token }}"
-      
-    - name: Add the token for joining the cluster to the environment
-      no_log: true # avoid logging the server token
-      ansible.builtin.lineinfile:
-        path: "/etc/systemd/system/{{ service_name }}.service.env"
-        line: "K3S_TOKEN={{ k3s_token }}"
+      - name: Add the token for joining the cluster to the environment
+        no_log: true # avoid logging the server token
+        ansible.builtin.lineinfile:
+          path: "/etc/systemd/system/{{ service_name }}.service.env"
+          line: "K3S_TOKEN={{ k3s_token }}"
 
-    - name: Add server url to agents
-      ansible.builtin.lineinfile:
-        path: "/etc/systemd/system/{{ service_name }}.service.env"
-        line: "K3S_URL=https://{{ k3s_server_name }}:6443"
-      when: k3s_server_name is defined
+      - name: Add server url to agents
+        ansible.builtin.lineinfile:
+          path: "/etc/systemd/system/{{ service_name }}.service.env"
+          line: "K3S_URL=https://{{ k3s_server_name }}:6443"
+        when: k3s_server_name is defined
 
-    - name: Start k3s service
-      ansible.builtin.systemd:
-        name: "{{ service_name }}"
-        daemon_reload: true
-        state: started
-        enabled: true
+      - name: Start k3s service
+        ansible.builtin.systemd:
+          name: "{{ service_name }}"
+          daemon_reload: true
+          state: started
+          enabled: true
+
+    - name: Output
+      when: k3s_token is undefined
+      ansible.builtin.debug:
+        msg: K3s token not defined in Openstack metadata, skipping.
