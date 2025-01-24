@@ -113,10 +113,25 @@ variable "state_volume_type" {
     default = null
 }
 
+variable "home_volume_provisioning" {
+    type = string
+    description =<<-EOT
+        How to manage the home volume. Valid values are:
+            - "manage": (default) OpenTofu controls the volume
+            - "import": The volume must already exist and OpenTofu cannot modify it
+            - "none": No home volume is used (e.g. /home provided by an external filesystem)
+    EOT
+    default = "manage"
+    validation {
+        condition =  contains(["manage", "import", "none"], var.home_volume_provisioning)
+        error_message = "home_volume_provisioning must be one of manage, import, or none"
+    }
+}
+
 variable "home_volume_size" {
     type = number
-    description = "Size of state volume on control node, in GB"
-    default = 100 # GB, 0 means no home volume
+    description = "Size of state volume on control node, in GB. Only used for home_volume_provisioning=manage"
+    default = 100
 }
 
 variable "home_volume_type" {
@@ -124,6 +139,7 @@ variable "home_volume_type" {
     default = null
     description = "Type of home volume, if not default type"
 }
+
 
 variable "vnic_types" {
     type = map(string)

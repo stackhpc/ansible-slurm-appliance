@@ -1,5 +1,12 @@
 locals {
-  control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  control_volumes = concat(
+    [openstack_blockstorage_volume_v3.state],
+    {
+      "manage": [openstack_blockstorage_volume_v3.home][0]
+      "import": [data.openstack_blockstorage_volume_v3.home][0]
+      "none": []
+    }[var.home_volume_provisioning]
+  )
 }
 
 resource "openstack_networking_port_v2" "control" {

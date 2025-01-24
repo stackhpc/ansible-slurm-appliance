@@ -7,10 +7,19 @@ resource "openstack_blockstorage_volume_v3" "state" {
 
 resource "openstack_blockstorage_volume_v3" "home" {
 
-    count = var.home_volume_size > 0 ? 1 : 0
+    count = var.home_volume_provisioning == "manage" ? 1 : 0
 
     name = "${var.cluster_name}-home"  # last word used to label filesystem
     description = "Home for control node"
     size = var.home_volume_size
     volume_type = var.home_volume_type
+}
+
+# TODO: maybe this is better to do as a module, with an output which is either??
+# that will still destroy things though
+data "openstack_blockstorage_volume_v3" "home" {
+
+    count = var.home_volume_provisioning == "import" ? 1 : 0
+
+    name = "${var.cluster_name}-home"
 }
