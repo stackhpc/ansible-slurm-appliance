@@ -1,7 +1,5 @@
 locals {
   control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
-
-  access_network_name = length(var.cluster_networks) == 1 ? var.cluster_networks[0].network : [for n in var.cluster_networks: n if lookup(n, "access_network", false)][0].network
 }
 
 resource "openstack_networking_port_v2" "control" {
@@ -55,14 +53,14 @@ resource "openstack_compute_instance_v2" "control" {
     for_each = {for net in var.cluster_networks: net.network => net}
     content {
       port = openstack_networking_port_v2.control[network.key].id
-      access_network = network.key == local.access_network_name
+      access_network = network.key == var.cluster_networks[0].network
     }
   }
 
   metadata = {
     environment_root = var.environment_root
     k3s_token = local.k3s_token
-    access_ip = openstack_networking_port_v2.control[local.access_network_name].all_fixed_ips[0]
+    access_ip = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
   }
 
   user_data = <<-EOF

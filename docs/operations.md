@@ -57,10 +57,10 @@ This is a usually a two-step process:
 
 - If new nodes are required, define a new node group by adding an entry to the `compute` mapping in `environments/$ENV/tofu/main.tf` assuming the default OpenTofu configuration:
     - The key is the partition name.
-    - The value should be a mapping, with the parameters defined in `environments/$SITE_ENV/terraform/compute/variables.tf`, but in brief will need at least `flavor` (name) and `nodes` (a list of node name suffixes).
+    - The value should be a mapping, with the parameters defined in `environments/$SITE_ENV/tofu/compute/variables.tf`, but in brief will need at least `flavor` (name) and `nodes` (a list of node name suffixes).
 - Add a new partition to the partition configuration as described under [Modifying Slurm Partition-specific Configuration](#Modifying-Slurm-Partition-specific-Configuration).
 
-Deploying the additional nodes and applying these changes requires rerunning both Terraform and the Ansible site.yml playbook - follow [Deploying a Cluster](#Deploying-a-Cluster).
+Deploying the additional nodes and applying these changes requires rerunning both OpenTofu and the Ansible site.yml playbook - follow [Deploying a Cluster](#Deploying-a-Cluster).
 
 # Adding Additional Packages
 By default, the following utility packages are installed during the StackHPC image build:

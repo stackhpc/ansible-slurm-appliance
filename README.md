@@ -82,7 +82,7 @@ And generate secrets for it:
 
 Create an OpenTofu variables file to define the required infrastructure, e.g.:
 
-    # environments/$ENV/terraform/terraform.tfvars:
+    # environments/$ENV/tofu/tofu.tfvars:
 
     cluster_name = "mycluster"
     cluster_net = "some_network" # *
@@ -90,25 +90,27 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
     key_pair = "my_key" # *
     control_node_flavor = "some_flavor_name"
     login = {
+        # Arbitrary group name for these login nodes
         interactive = {
             nodes: ["login-0"]
-            flavor: "login_flavor_name"
+            flavor: "login_flavor_name" # *
         }
     }
     cluster_image_id = "rocky_linux_9_image_uuid"
     compute = {
+        # Group name used for compute node partition definition
         general = {
             nodes: ["compute-0", "compute-1"]
-            flavor: "compute_flavor_name"
+            flavor: "compute_flavor_name" # *
         }
     }
 
-Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables and descriptions see `environments/$ENV/terraform/terraform.tfvars`.
+Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables and descriptions see `environments/$ENV/tofu/tofu.tfvars`.
 
 To deploy this infrastructure, ensure the venv and the environment are [activated](#create-a-new-environment) and run:
 
     export OS_CLOUD=openstack
-    cd environments/$ENV/terraform/
+    cd environments/$ENV/tofu/
     tofu init
     tofu apply
 

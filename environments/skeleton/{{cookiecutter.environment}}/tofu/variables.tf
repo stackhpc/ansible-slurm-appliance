@@ -15,9 +15,6 @@ variable "cluster_networks" {
         List of mappings defining networks. Mapping key/values:
             network: Name of existing network
             subnet: Name of existing subnet
-            access_network: Bool defining whether to use network for Ansible and
-                            K3s. This network must be present on all nodes.
-                            Defaults to true if only one network is specified.
     EOT
 }
 
@@ -34,7 +31,11 @@ variable "control_node_flavor" {
 variable "login" {
   type = any
   description = <<-EOF
-    Mapping defining groups of login nodes. Keys are names of groups.
+    Mapping defining homogenous groups of login nodes. Multiple groups may
+    be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
+    to define login nodes with different capabilities such as high-memory.
+    
+    Keys are names of groups.
     Values are a mapping as follows:
 
     Required:
@@ -42,6 +43,7 @@ variable "login" {
         flavor: String flavor name
     Optional:
         image_id: Overrides variable cluster_image_id
+        extra_networks: List of mappings in same format as cluster_networks
         vnic_type: Overrides variable vnic_type
         vnic_profile: Overrides variable vnic_profile
         volume_backed_instances: Overrides variable volume_backed_instances
@@ -62,7 +64,10 @@ variable "cluster_image_id" {
 variable "compute" {
     type = any
     description = <<-EOF
-        Mapping defining groups of compute nodes. Keys are names of groups.
+        Mapping defining homogenous groups of compute nodes. Groups are used
+        in Slurm partition definitions.
+
+        Keys are names of groups.
         Values are a mapping as follows:
 
         Required:
@@ -70,6 +75,7 @@ variable "compute" {
             flavor: String flavor name
         Optional:
             image_id: Overrides variable cluster_image_id
+            extra_networks: List of mappings in same format as cluster_networks
             vnic_type: Overrides variable vnic_type
             vnic_profile: Overrides variable vnic_profile
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)

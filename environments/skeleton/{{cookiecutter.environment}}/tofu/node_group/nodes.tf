@@ -12,8 +12,6 @@ locals {
 
   # Workaround for lifecycle meta-argument only taking static values
   compute_instances = var.ignore_image_changes ? openstack_compute_instance_v2.compute_fixed_image : openstack_compute_instance_v2.compute
-
-  access_network_name = length(var.networks) == 1 ? var.networks[0].network : [for n in var.networks: n if lookup(n, "access_network", false)][0].network
 }
 
 resource "openstack_blockstorage_volume_v3" "compute" {
@@ -80,7 +78,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
     for_each = {for net in var.networks: net.network => net}
     content {
       port = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
-      access_network = network.key == local.access_network_name
+      access_network = network.key == var.networks[0].network
     }
   }
 
@@ -132,7 +130,7 @@ resource "openstack_compute_instance_v2" "compute" {
     for_each = {for net in var.networks: net.network => net}
     content {
       port = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
-      access_network = network.key == local.access_network_name
+      access_network = network.key == var.networks[0].network
     }
   }
 
@@ -141,7 +139,7 @@ resource "openstack_compute_instance_v2" "compute" {
         environment_root = var.environment_root
         k3s_token          = var.k3s_token
         control_address    = var.control_address
-        access_ip = openstack_networking_port_v2.compute["${each.key}-${local.access_network_name}"].all_fixed_ips[0]
+        access_ip = openstack_networking_port_v2.compute["${each.key}-${var.networks[0].network}"].all_fixed_ips[0]
      },
     {for e in var.compute_init_enable: e => true}
   )
