@@ -44,8 +44,6 @@ openhpc_generic_packages:
   - munge
   - mariadb-connector-c # only actually needed on slurmdbd
   - hwloc-libs          # only actuall needed on slurmd
-  # below added here to get pingpong and pingmatrix hpctests working:
-  - mpitests-openmpi
 
 # Additional parameters to set in slurm.conf - use yaml format
 openhpc_slurmd_spool_dir: /var/spool/slurm/slurmd
