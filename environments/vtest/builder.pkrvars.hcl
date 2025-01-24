@@ -15,4 +15,5 @@ source_image_name = "vslurm_20241118"
 ssh_private_key_file = "/home/rocky/.ssh/vsdeployer"
 ssh_keypair_name = "vsdeployer"
 
+volume_size = 30 # 30 GB volume for doca/cuda build
 inventory_groups = "compute,control,login,update,cuda"
