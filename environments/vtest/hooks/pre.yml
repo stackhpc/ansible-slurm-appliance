@@ -88,3 +88,15 @@
       ansible.builtin.include_role:
         name: vshpc.prov.pre-tasks
       when: not vs_pre_complete.stat.exists
+
+- name: Ensure init.d symlink # Temporary workaround until https://github.com/stackhpc/ansible-slurm-appliance/issues/551 is fixed upstream
+  hosts: all
+  become: true
+  tasks:
+    - name: Create link
+      ansible.builtin.file:
+        src: /etc/rc.d/init.d
+        dest: /etc/init.d
+        owner: root
+        group: root
+        state: link
