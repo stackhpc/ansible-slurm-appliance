@@ -5,7 +5,7 @@ subnets or associated infrastructure such as routers. The requirements are that:
 1. At least one network exists.
 2. At least one network spans all nodes, referred to as the "access network".
 3. Only one subnet per network is attached to nodes.
-4. One network on each node provides outbound internet access (either directly,
+4. At least one network on each node provides outbound internet access (either directly,
   or via a proxy).
 
 Futhermore, it is recommended that the deploy host has an interface on the
@@ -43,7 +43,7 @@ cluster_networks = [
 This is similar to the above, except each node has multiple networks. Therefore
 `access_network` must be explicitly set. Note that only one subnet must have
 a gateway defined, else default routes via both subnets will be present causing
-routing problems. It also shows the second network as using direct-type vNICs
+routing problems. It also shows the second network (netB) using direct-type vNICs
 for RDMA.
 
 ```terraform
@@ -81,6 +81,9 @@ cluster_networks = [
 ]
 
 compute = {
+  general = {
+    nodes = ["general-0", "general-1"]
+  }
   baremetal = {
     nodes = ["baremetal-0", "baremetal-1"]
     networks = [
