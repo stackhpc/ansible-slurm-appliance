@@ -1,12 +1,12 @@
-# Networks
+# Networking
 
 The default OpenTofu configurations in the appliance do not provision networks,
 subnets or associated infrastructure such as routers. The requirements are that:
 1. At least one network exists.
-2. At least one network spans all nodes, referred to as the "access network".
+2. The first network defined spans all nodes, referred to as the "access network".
 3. Only one subnet per network is attached to nodes.
-4. At least one network on each node provides outbound internet access (either directly,
-  or via a proxy).
+4. At least one network on each node provides outbound internet access (either
+directly, or via a proxy).
 
 Futhermore, it is recommended that the deploy host has an interface on the
 access network. While it is possible to e.g. use a floating IP on a login node
@@ -40,18 +40,17 @@ cluster_networks = [
 ```
 
 ## Multiple homogenous networks
-This is similar to the above, except each node has multiple networks. Therefore
-`access_network` must be explicitly set. Note that only one subnet must have
-a gateway defined, else default routes via both subnets will be present causing
-routing problems. It also shows the second network (netB) using direct-type vNICs
-for RDMA.
+This is similar to the above, except each node has multiple networks. The first
+network, "netA" is the access network. Note that only one subnet must have a
+gateway defined, else default routes via both subnets will be present causing
+routing problems. It also shows the second network (netB) using direct-type
+vNICs for RDMA.
 
 ```terraform
 cluster_networks = [
   {
     network = "netA"
     subnet = "subnetA"
-    access_network = true
   },
   {
     network = "netB"
@@ -68,7 +67,7 @@ vnic_types = {
 
 ## Additional networks on some nodes
 
-This example shows how to override variables for specific node groups. In this
+This example shows how to modify variables for specific node groups. In this
 case a baremetal node group has a second network attached. As above, only a
 single subnet can have a gateway IP.
 
@@ -86,12 +85,7 @@ compute = {
   }
   baremetal = {
     nodes = ["baremetal-0", "baremetal-1"]
-    networks = [
-      {
-        network = "netA"
-        subnet = "subnetA"
-        access_network = true
-      },
+    extra_networks = [
       {
         network = "netB"
         subnet = "subnetB"
@@ -101,6 +95,7 @@ compute = {
         netA = "baremetal"
         netB = "baremetal"
     ...
+    }
   }
 }
 ...

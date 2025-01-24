@@ -14,12 +14,14 @@ module "compute" {
   environment_root = var.environment_root
   
   # can be set for group, defaults to top-level value:
-  networks = lookup(each.value, "networks", var.cluster_networks)
   image_id = lookup(each.value, "image_id", var.cluster_image_id)
   vnic_types = lookup(each.value, "vnic_types", var.vnic_types)
   vnic_profiles = lookup(each.value, "vnic_profiles", var.vnic_profiles)
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
+  
+  # optionally set for group
+  networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
   extra_volumes = lookup(each.value, "extra_volumes", {})
   compute_init_enable = lookup(each.value, "compute_init_enable", [])
   ignore_image_changes = lookup(each.value, "ignore_image_changes", false)
