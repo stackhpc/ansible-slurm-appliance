@@ -144,3 +144,7 @@ resource "openstack_compute_instance_v2" "compute" {
 output "compute_instances" {
     value = local.compute_instances
 }
+
+output "image_id" {
+  value = var.image_id
+}

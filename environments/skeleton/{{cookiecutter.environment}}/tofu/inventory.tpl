@@ -38,8 +38,10 @@ ${cluster_name}_${group_name}:
         ${ node.name }:
             ansible_host: ${node.access_ip_v4}
             instance_id: ${ node.id }
-            image_id: ${ node.image_id }
 %{ endfor ~}
+    vars:
+        # NB: this is the target image, not necessarily what is provisioned
+        image_id: ${compute_groups[group_name]["image_id"]}
 %{ endfor ~}
 
 compute:
