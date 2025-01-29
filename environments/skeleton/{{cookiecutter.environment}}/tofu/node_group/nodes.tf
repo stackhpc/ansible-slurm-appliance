@@ -33,21 +33,23 @@ resource "openstack_compute_volume_attach_v2" "compute" {
 
 resource "openstack_networking_port_v2" "compute" {
 
-  for_each = toset(var.nodes)
+  for_each = {for item in setproduct(var.nodes, var.networks):
+    "${item[0]}-${item[1].network}" => item[1]
+  }
 
   name = "${var.cluster_name}-${each.key}"
-  network_id = var.cluster_net_id
+  network_id = data.openstack_networking_network_v2.network[each.value.network].id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = var.cluster_subnet_id
+    subnet_id = data.openstack_networking_subnet_v2.subnet[each.value.network].id
   }
 
   security_group_ids = var.security_group_ids
 
   binding {
-    vnic_type = var.vnic_type
-    profile = var.vnic_profile
+    vnic_type = lookup(var.vnic_types, each.value.network, "normal")
+    profile = lookup(var.vnic_profiles, each.value.network, "{}")
   }
 }
 
@@ -72,9 +74,12 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
     }
   }
 
-  network {
-    port = openstack_networking_port_v2.compute[each.key].id
-    access_network = true
+  dynamic "network" {
+    for_each = {for net in var.networks: net.network => net}
+    content {
+      port = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
+      access_network = network.key == var.networks[0].network
+    }
   }
 
   metadata = merge(
@@ -120,9 +125,12 @@ resource "openstack_compute_instance_v2" "compute" {
     }
   }
   
-  network {
-    port = openstack_networking_port_v2.compute[each.key].id
-    access_network = true
+  dynamic "network" {
+    for_each = {for net in var.networks: net.network => net}
+    content {
+      port = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
+      access_network = network.key == var.networks[0].network
+    }
   }
 
   metadata = merge(
@@ -130,6 +138,7 @@ resource "openstack_compute_instance_v2" "compute" {
         environment_root = var.environment_root
         k3s_token          = var.k3s_token
         control_address    = var.control_address
+        # TODO: set k3s_subnet from access_network
      },
     {for e in var.compute_init_enable: e => true}
   )
