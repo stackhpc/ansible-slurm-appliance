@@ -10,7 +10,7 @@
         name:  mysql
 
 - name: Setup slurm-driven rebuild
-  hosts: rebuild
+  hosts: rebuild:!builder
   become: yes
   tags:
     - rebuild
