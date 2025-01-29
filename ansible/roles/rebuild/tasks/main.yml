@@ -4,17 +4,17 @@
   file:
     path: /etc/openstack
     state: directory
-    owner: root
+    owner: slurm
     group: root
-    mode: '0400'
+    mode: u=rX,g=rwX
 
 - name: Copy out clouds.yaml
   copy:
     src: "{{ openhpc_rebuild_clouds }}"
     dest: /etc/openstack/clouds.yaml
-    owner: root
+    owner: slurm
     group: root
-    mode: '0400'
+    mode: u=r,g=rw
 
 - name: Setup slurm tools
   include_role:
