@@ -1,5 +1,41 @@
 ---
 
+- name: "Add a stack admin user"
+  hosts: all
+  # tags: pre_tasks_all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Does localhome/stack dir exist
+      ansible.builtin.stat:
+        path: /localhome/stack
+      register: localstack
+
+    # - name: Does localhome/rocky dir exist
+    #   ansible.builtin.stat:
+    #     path: /localhome/rocky
+    #   register: localrockyuserdir
+
+    - name: Add stack user
+      ansible.builtin.include_role:
+        name: vs.core.stack_user
+      when: not localstack.stat.exists
+
+    # - name: Add rocky user role
+    #   ansible.builtin.include_role:
+    #     name: vshpc.rocky_user
+    #   when: not localrockyuserdir.stat.exists
+    #   tags:
+    #     - add_stack_user
+  tags:
+    - add_stack_user
+
+- name: A cp user home to /var/lib/USER
+  hosts: all
+  # tags: pre_tasks_all
+  become: true
+  gather_facts: false
+
 - name: "Do the preliminary node setups"
   hosts: all
   # tags: pre_tasks_all
