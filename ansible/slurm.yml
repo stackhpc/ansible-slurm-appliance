@@ -14,6 +14,7 @@
   become: yes
   tags:
     - rebuild
+    - openhpc
   tasks:
     - import_role:
         name: rebuild
