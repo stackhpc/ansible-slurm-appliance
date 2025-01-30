@@ -59,8 +59,7 @@ login
 [etc_hosts:children]
 cluster
 
-[ceph:children]
-cluster
+[ceph]
 
 [extra_packages:children]
 builder
