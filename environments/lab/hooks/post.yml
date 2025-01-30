@@ -14,4 +14,7 @@
         cmd: sacctmgr -i create user Name={{ ansible_user }} Cluster={{ openhpc_cluster_name }} Account=root DefaultAccount=root
       when: "_sacctmgr_ansible_user.stdout == ''"
 
-    
+- name: Import parent hook
+  vars:
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+  import_playbook: "{{ appliances_environment_root }}/../nrel/hooks/post-bootstrap.yml"
