@@ -61,3 +61,6 @@ cluster
 
 [ceph:children]
 cluster
+
+[extra_packages:children]
+builder
