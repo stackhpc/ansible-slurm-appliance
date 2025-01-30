@@ -22,7 +22,7 @@ admin
 cluster
 
 [extra_packages:children]
-cluster
+builder
 
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH
