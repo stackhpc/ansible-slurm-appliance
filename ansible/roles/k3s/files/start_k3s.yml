@@ -5,6 +5,7 @@
     k3s_token: "{{ os_metadata.meta.k3s_token }}"
     k3s_server_name: "{{ os_metadata.meta.control_address }}"
     service_name: "{{ 'k3s-agent' if k3s_server_name is defined else 'k3s' }}"
+    access_ip: "{{ os_metadata.meta.access_ip }}"
   tasks:
     - name: Ensure password directory exists
       ansible.builtin.file: 
@@ -21,6 +22,13 @@
       ansible.builtin.lineinfile:
         path: "/etc/systemd/system/{{ service_name }}.service.env"
         line: "K3S_TOKEN={{ k3s_token }}"
+
+    - name: Add the node IP to the environment
+      # NB this isn't natively setable via envvars, have to modify
+      # INSTALL_K3S_EXEC to support it
+      ansible.builtin.lineinfile:
+        path: "/etc/systemd/system/{{ service_name }}.service.env"
+        line: "K3S_NODE_IP={{ access_ip }}"
 
     - name: Add server url to agents
       ansible.builtin.lineinfile:
