@@ -58,3 +58,6 @@ login
 # Don't have working internal DNS
 [etc_hosts:children]
 cluster
+
+[ceph:children]
+cluster

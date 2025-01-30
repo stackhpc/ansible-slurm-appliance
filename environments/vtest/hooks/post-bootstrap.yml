@@ -13,7 +13,7 @@
       - vs_all_nodes_timezone
 
 - name: "NREL pre - Mount cephfs volumes"
-  hosts: all
+  hosts: ceph
   tags:
     - vs_pre
     - aco.core.cephfs

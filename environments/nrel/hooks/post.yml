@@ -9,7 +9,7 @@
         name: vs-set-ephemeral-mounts
 
 - name: Enable /home ceph mount
-  hosts: all:!builder
+  hosts: ceph:!builder
   become: true
   tasks:
     - name: Start systemd service
@@ -27,43 +27,6 @@
     - name: Do role for IDM
       ansible.builtin.include_role:
         name: vshpc.prov.pam_mkhomedir_plus
-
-# - name: Do cuda
-#   hosts: all
-#   become: true
-#   tags:
-#     - cudafy
-#   tasks:
-#     - name: Install nvidia libs
-#       ansible.builtin.include_role:
-#         name: vshpc.prov.pam_mkhomedir_plus
-
-#     - name: Install cuda repo
-#       ansible.builtin.get_url:
-#         dest: "/etc/yum.repos.d/cuda-{{ cuda_distro }}.repo"
-#         url: "{{ cuda_repo }}"
-#         mode: '0644'
-#         owner: root
-#         group: root
-
-#     - name: Check if nvidia driver module is enabled
-#       ansible.builtin.shell:
-#         cmd: dnf module list --enabled nvidia-driver
-#       changed_when: false
-#       failed_when: false
-#       register: _cuda_driver_module_enabled
-
-#     - name: Enable nvidia driver module
-#       ansible.builtin.command: "dnf module enable -y nvidia-driver:560-open"
-#       register: _cuda_driver_module_enable
-#       when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
-#       changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
-
-#     - name: Install nvidia drivers
-#       ansible.builtin.command: dnf module install -y nvidia-driver
-#       register: _cuda_driver_install
-#       when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
-#       changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
 
 # - name: Do cp user home to /var/lib/USER
 #   hosts: all
@@ -191,3 +154,4 @@
 #   tasks:
 #     - include_role:
 #         name: hspd12
+
