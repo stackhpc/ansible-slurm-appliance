@@ -1,95 +1,66 @@
 ---
 
+- name: "Add a stack admin user"
+  hosts: all
+  # tags: pre_tasks_all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Does localhome/stack dir exist
+      ansible.builtin.stat:
+        path: /localhome/stack
+      register: localstack
+
+    # - name: Does localhome/rocky dir exist
+    #   ansible.builtin.stat:
+    #     path: /localhome/rocky
+    #   register: localrockyuserdir
+
+    - name: Add stack user
+      ansible.builtin.include_role:
+        name: vs.core.stack_user
+      when: not localstack.stat.exists
+
+    # - name: Add rocky user role
+    #   ansible.builtin.include_role:
+    #     name: vshpc.rocky_user
+    #   when: not localrockyuserdir.stat.exists
+    #   tags:
+    #     - add_stack_user
+  tags:
+    - add_stack_user
+
+- name: A cp user home to /var/lib/USER
+  hosts: all
+  # tags: pre_tasks_all
+  become: true
+  gather_facts: false
+
 - name: "Do the preliminary node setups"
   hosts: all
   # tags: pre_tasks_all
   become: true
   tasks:
-    - include_role:
-        name: vshpc.prov.pre-tasks
+    - name: Does vs_pre_complete.txt exist
+      ansible.builtin.stat:
+        path: /root/vs_pre_complete.txt
+      register: vs_pre_complete
 
-# TODO: KBENDL - check compatibility with new playbook
-- name: "NREL pre - Mount cephfs volumes"
+    - name: Pre tasks now
+      vars:
+        pre_all_packages: [] # moved to appliances_extra_packages_other
+      ansible.builtin.include_role:
+        name: vshpc.prov.pre-tasks
+      when: not vs_pre_complete.stat.exists
+
+- name: Ensure init.d symlink # Temporary workaround until https://github.com/stackhpc/ansible-slurm-appliance/issues/551 is fixed upstream
   hosts: all
-  tags:
-    - vs_pre
-    - aco.core.cephfs
   become: true
   tasks:
-    - include_role:
-        name: aco.core.cephfs
-      tags:
-        - aco.core.cephfs
-
-    # - name: Set timezone to Americas/Denver
-    #   timezone:
-    #     name: America/Denver
-    #   tags:
-    #     - pre_set_time_on_servers
-
-    # - include_role:
-    #     name: aco.core.ntp
-    #   tags:
-    #     - pre_set_time_on_servers
-
-# - name: "NREL PRE - dnf packages"
-#   hosts: all
-#   tags: dnf_initial_update
-#   become: true
-#   tasks:
-#     - lineinfile:
-#         path: /etc/yum.repos.d/cuda-rhel8.repo
-#         regexp: '^enabled'
-#         line: enabled=0
-
-#     - name: dnf fix challenging dependency issues
-#       dnf:
-#         name: "*"
-#         nobest: true
-#         allowerasing: true
-#         skip_broken: true
-
-# - name: "NREL pre - set cluster root password"
-#   hosts: all
-#   tags: root_pass_cli
-#   become: true
-#   tasks:
-#     - name: include root if called
-#       include_role:
-#         name: root_pass_cli
-#       when: new_root_pass is defined
-
-# - name: "NREL pre - set admin hostnames to hpc.nrel.gov domain"
-#   hosts: control,login
-#   tags: set_hpc_hostname
-#   become: true
-#   tasks:
-#     - shell: "hostnamectl set-hostname {{ ansible_hostname }}.hpc.nrel.gov"
-
-# This may be fixed now
-# # ref: Error: cannot setup namespace using "/usr/bin/newuidmap": should have setuid or have filecaps setuid:
-# - name: "podman uid-gid workaround"
-#   hosts:
-#     - cluster
-#   become: true
-#   tags:
-#     - vs_pre
-#     - uid_gid_hack
-#   tasks:
-#     - name: "set newuidmap/newgidmap perms so containers will start"
-#       file:
-#         path: "{{ item }}"
-#         mode: '4755'
-#       loop:
-#         - /usr/bin/newgidmap
-#         - /usr/bin/newuidmap
-
-# TODO - get latest playbook
-# - name: Ensure yum repos are local
-#   hosts: all
-#   tags: ansible_yum_config
-#   become: true
-#   tasks:
-#     - include_role:
-#         name: ansible_yum_config
-# git@github.nrel.gov:acoinf/vshpc.prov.pre-tasks.git
+    - name: Create link
+      ansible.builtin.file:
+        src: /etc/rc.d/init.d
+        dest: /etc/init.d
+        owner: root
+        group: root
+        state: link
