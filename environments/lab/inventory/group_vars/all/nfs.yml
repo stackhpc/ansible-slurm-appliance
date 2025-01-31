@@ -9,14 +9,14 @@ nfs_enable:
   clients: "{{ inventory_hostname in groups['cluster'] }}"
 nfs_configurations:
   - comment: NFS share /home from slurm controller
-    nfs_export: "/home"
+    nfs_export: "/exports/home"
     nfs_client_mnt_point: "/home"
   - comment: NFS share /nopt from slurm controller
-    nfs_export: /nopt
+    nfs_export: /exports/nopt
     nfs_client_mnt_point: "/nopt"
   - comment: NFS share /projects from slurm controller
-    nfs_export: /project
+    nfs_export: /exports/project
     nfs_client_mnt_point: /project
   - comment: NFS share /scratch from slurm controller
-    nfs_export: /scratch
+    nfs_export: /exports/scratch
     nfs_client_mnt_point: /scratch

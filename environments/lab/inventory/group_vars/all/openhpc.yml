@@ -2,7 +2,7 @@
 # openhpc_packages_extra: "{{ openhpc_packages_extra_nrel | reject('match', '.*-impi-') }}" # TODO: FIXME
 
 # define paths to slurm on nodes:
-slurm_build_version: '23.11.0' # quote to avoid ansible autoconversion weirdness
+slurm_build_version: '23.11.1' # quote to avoid ansible autoconversion weirdness
 slurm_build_path: /nopt/vtest/slurm
 slurm_build_dir: "{{ slurm_build_path }}/{{ slurm_build_version }}"
 
