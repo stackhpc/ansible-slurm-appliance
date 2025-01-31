@@ -1,2 +1,0 @@
-hpctests_ucx_net_devices: eth0 # nrel-compute
-hpctests_hpl_NB: 256 # sandy bridge
