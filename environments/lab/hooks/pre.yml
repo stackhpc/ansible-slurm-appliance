@@ -23,6 +23,11 @@
       url: http://tool.net/nrel-slurm.tgz
       dest: /tmp/slurmdir/slurm.tgz
 
+  - name: Ensure exports directory
+    file:
+      path: /exports
+      state: directory
+
   - name: Unarchive slurm
     ansible.builtin.unarchive:
       src: /tmp/slurmdir/slurm.tgz
