@@ -15,14 +15,14 @@ resource "openstack_networking_port_v2" "control_cluster" {
   network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.cluster.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.cluster.id
+  }
 
-  # binding {
-  #   vnic_type = var.cluster_network_vnic_type
-  #   profile = jsonencode(var.cluster_network_profile)
-  # }
+  binding {
+    vnic_type = var.cluster_network_vnic_type
+    profile = jsonencode(var.cluster_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -38,14 +38,14 @@ resource "openstack_networking_port_v2" "control_storage" {
   network_id = data.openstack_networking_network_v2.storage.id
   admin_state_up = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.storage.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.storage.id
+  }
 
-  # binding {
-  #   vnic_type = var.storage_network_vnic_type
-  #   profile = jsonencode(var.storage_network_profile)
-  # }
+  binding {
+    vnic_type = var.storage_network_vnic_type
+    profile = jsonencode(var.storage_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -61,14 +61,14 @@ resource "openstack_networking_port_v2" "control_control" {
   network_id = data.openstack_networking_network_v2.control.id
   admin_state_up = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.control.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.control.id
+  }
 
-  # binding {
-  #   vnic_type = var.control_network_vnic_type
-  #   profile = jsonencode(var.control_network_profile)
-  # }
+  binding {
+    vnic_type = var.control_network_vnic_type
+    profile = jsonencode(var.control_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -77,7 +77,7 @@ resource "openstack_networking_port_v2" "control_control" {
     ]
   }
 }
-
+#### NREL test control name set here:
 resource "openstack_compute_instance_v2" "control" {
 
   name = "${var.cluster_name}-control"
@@ -121,7 +121,7 @@ resource "openstack_compute_instance_v2" "control" {
     #cloud-config
     bootcmd:
       - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(data.openstack_blockstorage_volume_v3.state.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L state $BLKDEV
-      
+
     mounts:
       - [LABEL=state, /var/lib/state]
   EOF
@@ -137,14 +137,14 @@ resource "openstack_networking_port_v2" "login_cluster" {
   network_id = data.openstack_networking_network_v2.cluster.id
   admin_state_up = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.cluster.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.cluster.id
+  }
 
-  # binding {
-  #   vnic_type = var.cluster_network_vnic_type
-  #   profile = jsonencode(var.cluster_network_profile)
-  # }
+  binding {
+    vnic_type = var.cluster_network_vnic_type
+    profile = jsonencode(var.cluster_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -162,14 +162,14 @@ resource "openstack_networking_port_v2" "login_storage" {
   network_id = data.openstack_networking_network_v2.storage.id
   admin_state_up = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.storage.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.storage.id
+  }
 
-  # binding {
-  #   vnic_type = var.storage_network_vnic_type
-  #   profile = jsonencode(var.storage_network_profile)
-  # }
+  binding {
+    vnic_type = var.storage_network_vnic_type
+    profile = jsonencode(var.storage_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -187,14 +187,14 @@ resource "openstack_networking_port_v2" "login_control" {
   network_id = data.openstack_networking_network_v2.control.id
   admin_state_up = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.control.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.control.id
+  }
 
-  # binding {
-  #   vnic_type = var.control_network_vnic_type
-  #   profile = jsonencode(var.control_network_profile)
-  # }
+  binding {
+    vnic_type = var.control_network_vnic_type
+    profile = jsonencode(var.control_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -244,14 +244,14 @@ resource "openstack_networking_port_v2" "compute_cluster" {
   port_security_enabled = "false"
   no_security_groups = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.cluster.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.cluster.id
+  }
 
-  # binding {
-  #   vnic_type = var.cluster_network_vnic_type
-  #   profile = jsonencode(var.cluster_network_profile)
-  # }
+  binding {
+    vnic_type = var.cluster_network_vnic_type
+    profile = jsonencode(var.cluster_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -269,14 +269,14 @@ resource "openstack_networking_port_v2" "compute_storage" {
   network_id = data.openstack_networking_network_v2.storage.id
   admin_state_up = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.storage.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.storage.id
+  }
 
-  # binding {
-  #   vnic_type = var.storage_network_vnic_type
-  #   profile = jsonencode(var.storage_network_profile)
-  # }
+  binding {
+    vnic_type = var.storage_network_vnic_type
+    profile = jsonencode(var.storage_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -294,14 +294,14 @@ resource "openstack_networking_port_v2" "compute_control" {
   network_id = data.openstack_networking_network_v2.control.id
   admin_state_up = "true"
 
-  # fixed_ip {
-  #   subnet_id = data.openstack_networking_subnet_v2.control.id
-  # }
+  fixed_ip {
+    subnet_id = data.openstack_networking_subnet_v2.control.id
+  }
 
-  # binding {
-  #   vnic_type = var.control_network_vnic_type
-  #   profile = jsonencode(var.control_network_profile)
-  # }
+  binding {
+    vnic_type = var.control_network_vnic_type
+    profile = jsonencode(var.control_network_profile)
+  }
 
   # don't overrite os-vif adding chosen PCI device
   lifecycle {
@@ -317,11 +317,28 @@ resource "openstack_compute_instance_v2" "computes" {
   for_each = var.compute_names
 
   name = "${var.cluster_name}-${each.key}"
-  image_name = lookup(var.compute_images, each.key, var.compute_types[each.value].image)
+  image_id = lookup(var.compute_images, each.key, var.compute_types[each.value].image_id)
   flavor_name = var.compute_types[each.value].flavor
   key_pair = var.key_pair
   config_drive = true
   availability_zone = var.cluster_availability_zone
+
+  block_device {
+    uuid                  = lookup(var.compute_images, each.key, var.compute_types[each.value].image_id)
+    source_type           = "image"
+    destination_type      = "local"
+    boot_index            = 0
+    delete_on_termination = true
+  }
+
+  # fake ephemeral mount
+  block_device {
+    source_type           = "blank"
+    destination_type      = "volume"
+    volume_size           = 10
+    delete_on_termination = true
+    boot_index            = 1
+  }
 
   network {
     port = openstack_networking_port_v2.compute_control[each.key].id
@@ -339,7 +356,19 @@ resource "openstack_compute_instance_v2" "computes" {
 }
 
 # --- floating ips ---
-# Deleted in lab as it is impossible to guarantee what's available
+
+# resource "openstack_networking_floatingip_associate_v2" "logins" {
+#   for_each = var.login_names
+
+#   floating_ip = var.login_ips[each.key]
+#   port_id = openstack_networking_port_v2.login_control[each.key].id
+# }
+
+# resource "openstack_networking_floatingip_associate_v2" "control" {
+
+#   floating_ip = var.control_ip
+#   port_id = openstack_networking_port_v2.control_control.id
+# }
 
 # --- template ---
 
@@ -349,7 +378,7 @@ resource "local_file" "hosts" {
                           {
                             "cluster_name": var.cluster_name
                             "cluster_slurm_name": var.cluster_slurm_name
-                            "proxy_fip": [for n in openstack_compute_instance_v2.logins[var.proxy_name].network: n.fixed_ip_v4 if n.access_network][0]
+                            "proxy_fip": var.login_ips[var.proxy_name]
                             "control": openstack_compute_instance_v2.control,
                             "logins": openstack_compute_instance_v2.logins,
                             "computes": openstack_compute_instance_v2.computes,
