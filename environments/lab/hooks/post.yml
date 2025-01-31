@@ -5,13 +5,13 @@
     - name: Check for ansible slurm user
       # rc 0, empty stdout when not found
       shell:
-        cmd: "sacctmgr show user --parsable2 --noheader {{ ansible_user }}"
+        cmd: "{{ openhpc_bin_dir }}/sacctmgr show user --parsable2 --noheader {{ ansible_user }}"
       register: _sacctmgr_ansible_user
       changed_when: false
 
     - name: Allow ansible user to run jobs
       shell:
-        cmd: sacctmgr -i create user Name={{ ansible_user }} Cluster={{ openhpc_cluster_name }} Account=root DefaultAccount=root
+        cmd: "{{ openhpc_bin_dir }}/sacctmgr -i create user Name={{ ansible_user }} Cluster={{ openhpc_cluster_name }} Account=root DefaultAccount=root"
       when: "_sacctmgr_ansible_user.stdout == ''"
 
 - name: Import parent hook
