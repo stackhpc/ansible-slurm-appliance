@@ -165,3 +165,9 @@ extra_packages
 
 [pulp]
 # Add builder to this group to enable automatically syncing of pulp during image build
+
+[apptainer]
+# Hosts to install and configure Apptainer on
+
+[nextflow]
+# Hosts to install and configure Nextflow on
