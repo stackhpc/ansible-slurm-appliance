@@ -1,23 +1,23 @@
 compute_types = {
   gpu: {
     flavor: "slurm_test_gpu0"
-    image: "vslurm_20241118"
+    image: "openhpc-250204-1517-8795b1ab"
   }
   gpu3: {
     flavor: "slurm_test_gpu3"
-    image: "vslurm_20241118"
+    image: "openhpc-250204-1517-8795b1ab"
   }
   gpu5: {
     flavor: "slurm_test_gpu5"
-    image: "vslurm_20241118"
+    image: "openhpc-250204-1517-8795b1ab"
   }
   large: {
     flavor: "slurm_test_compute_lg"
-    image: "vslurm_20241118"
+    image: "openhpc-250204-1517-8795b1ab"
   }
   large_intel: {
     flavor: "slurm_test_compute_lg_intel"
-    image: "vslurm_20241118"
+    image: "openhpc-250204-1517-8795b1ab"
   }
 }
 
@@ -28,7 +28,7 @@ compute_types = {
 # #############################################
 
 #---- login node info ----
-login_image = "vslurm_20241118"
+login_image = "openhpc-250204-1517-8795b1ab"
 login_flavor = "vermilion_slurm_login_c8m15"
 
 login_names = {
@@ -44,7 +44,7 @@ login_ips = {
 # CONTROL node info
 control_flavor = "slurm_admin_c8m12s1d50"
 control_ip     = "10.60.105.70"
-control_image = "vslurm_20241118"
+control_image = "openhpc-250204-1517-8795b1ab"
 
 proxy_name = "vtadmin"
 # The `admin` node is like a login node,
