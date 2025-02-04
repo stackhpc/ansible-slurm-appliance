@@ -125,3 +125,10 @@ builder
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
 builder
+
+[apptainer:children]
+login
+compute
+
+[nextflow:children]
+login
