@@ -17,3 +17,5 @@ ssh_keypair_name = "vsdeployer"
 
 volume_size = 30 # 30 GB volume for doca/cuda build
 inventory_groups = "compute,control,login,update,doca,cuda"
+image_name = "slgpu"
+

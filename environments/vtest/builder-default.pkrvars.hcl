@@ -16,3 +16,4 @@ ssh_private_key_file = "/home/rocky/.ssh/vsdeployer"
 ssh_keypair_name = "vsdeployer"
 
 inventory_groups = "compute,control,login,update"
+image_name = "slcompute"
