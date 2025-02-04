@@ -27,7 +27,7 @@
   module_defaults:
     ansible.builtin.pip:
       virtualenv: /opt/slurm-tools
-      virtualenv_command: python3 -m venv
+      virtualenv_command: "{{ 'python3.9 -m venv' if ansible_distribution_major_version == '8' else 'python3 -m venv' }}"
       state: latest
   become: true
   become_user: "{{ pytools_user }}"
