@@ -5,8 +5,69 @@
     k3s_token: "{{ os_metadata.meta.k3s_token }}"
     k3s_server_name: "{{ os_metadata.meta.control_address }}"
     service_name: "{{ 'k3s-agent' if k3s_server_name is defined else 'k3s' }}"
-    access_ip: "{{ os_metadata.meta.access_ip }}"
+    access_ip: "{{ os_metadata.meta.access_ip | default('') }}"
+    gateway_ip: "{{ os_metadata.meta.gateway_ip | default('') }}"
   tasks:
+    - name: Ensure access_ip is defined
+      assert:
+        that: access_ip != ''
+        fail_msg: 'ERROR: metadata access_ip not set - opentofu configuration may need updating'
+
+    - name: Read nmcli device info
+      command: nmcli --get GENERAL.DEVICE,GENERAL.CONNECTION,IP4.ADDRESS,IP4.GATEWAY device show
+      register: _nmcli_device_raw
+      changed_when: false
+
+    - name: Set fact for nmcli devices
+      set_fact:
+        # creates a dict with keys as per zip arg below, values might be ''
+        nmcli_devices: >-
+          {{
+            _nmcli_device_raw.stdout_lines |
+            batch(5, '') |
+            map('zip', ['device', 'connection', 'ip4_address', 'ip4_gateway']) |
+            map('map', 'reverse') | map('community.general.dict')
+          }}
+        # batch=5 because per device have 4x lines + blank line between devices
+        # batch takes default '' because last devices doesn't have trailing blank line
+
+    - name: Set facts for devices for gateway and access networks
+      # These are either 0- or 1-lists
+      set_fact:
+        nmcli_gateway_dev: "{{ nmcli_devices | selectattr('ip4_gateway') }}"
+        nmcli_access_dev: "{{ nmcli_devices | selectattr('ip4_address', 'contains', access_ip) }}"
+
+    - name: Warn for gateway_ip if a gateway exists
+      debug:
+        msg: "WARNING: A gateway {{ nmcli_gateway_dev[0].ip4_gateway }} already exists, ignoring metadata gateway_ip={{ gateway_ip }}"
+      when:
+        - gateway_ip != ''
+        - nmcli_gateway_dev | length > 0
+
+    - name: Add gateway_ip to access device
+      shell: |
+        nmcli connection modify '{{ nmcli_access_dev[0].connection }}' \
+          ipv4.address {{ access_ip }} \
+          ipv4.gateway {{ gateway_ip }}
+        nmcli connection up '{{ nmcli_access_dev[0].connection }}'
+      when:
+        - gateway_ip != ''
+        - nmcli_gateway_dev | length == 0
+
+    - name: Create dummy connection and gateway
+      # see https://docs.k3s.io/installation/airgap#default-network-route
+      shell: |
+        nmcli connection add type dummy ifname dummy0 con-name dummy0
+        nmcli connection modify dummy0 \
+          ipv4.address {{ access_ip }} \
+          ipv4.gateway {{ access_ip }} \
+          ipv4.route-metric 1000 \
+          ipv4.method manual
+        nmcli connection up dummy0
+      when:
+        - gateway_ip == ''
+        - nmcli_gateway_dev | length == 0
+
     - name: Ensure password directory exists
       ansible.builtin.file: 
         path: "/etc/rancher/node"
