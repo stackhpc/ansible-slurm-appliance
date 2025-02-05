@@ -111,3 +111,10 @@ control
 [extra_packages:children]
 # Hosts to install specified additional packages on
 builder
+
+[apptainer:children]
+login
+compute
+
+[nextflow:children]
+login
