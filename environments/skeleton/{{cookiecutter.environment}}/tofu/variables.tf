@@ -180,6 +180,12 @@ variable "inventory_secrets_path" {
   default = ""
 }
 
+variable "gateway_ip" {
+    description = "IP of default gateway, applied to interface on access network"
+    type = string
+    default = ""
+}
+
 data "external" "inventory_secrets" {
   program = ["${path.module}/read-inventory-secrets.py"]
 
