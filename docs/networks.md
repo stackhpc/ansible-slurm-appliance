@@ -8,11 +8,10 @@ subnets or associated infrastructure such as routers. The requirements are that:
 4. At least one network on each node provides outbound internet access (either
 directly, or via a proxy).
 
-Futhermore, it is recommended that the deploy host has an interface on the
-access network. While it is possible to e.g. use a floating IP on a login node
-as an SSH proxy to access the other nodes, this can create problems in recovering
-the cluster if the login node is unavailable and can make Ansible problems harder
-to debug.
+Futhermore, it is recommended that the deploy host's SSH access to the cluster
+does not use a cluster node as an SSH proxy, as this can create problems in
+recovering the cluster if the login node is unavailable and can make Ansible
+problems harder to debug.
 
 This page describes supported configurations and how to implement them using
 the OpenTofu variables. These will normally be set in
@@ -67,9 +66,10 @@ vnic_types = {
 
 ## Additional networks on some nodes
 
-This example shows how to modify variables for specific node groups. In this
-case a baremetal node group has a second network attached. As above, only a
-single subnet can have a gateway IP.
+This example shows how to modify variables for specific node groups. Here the
+baremetal node group has a second network attached. In this case "subnetA"
+must have a gateway IP defined and "subnetB" must not, to avoid routing
+problems on the multi-homed hosts.
 
 ```terraform
 cluster_networks = [
@@ -100,3 +100,92 @@ compute = {
 }
 ...
 ```
+
+
+## Multiple networks - no gateway
+
+In some multiple network configurations it may not be possible for all nodes to
+get a default route from a subnet gateway. For example:
+
+```terraform
+cluster_networks = [
+  {
+    network = "netA"
+    subnet = "subnetA"
+  }
+]
+
+login = {
+  interactive = {
+    nodes = ["login-0"]
+    extra_networks = [
+      network = "netB"
+      subnet = "subnetB"
+    ]
+  }
+}
+
+compute = {
+  general = {
+    nodes = ["compute-0", "compute-1"]
+  }
+}
+...
+```
+
+produces a cluster where the login node(s) have an extra network:
+
+```
+           netA   netB
+            |      |
+login-N ----x------x
+            |
+control ----x
+            |
+compute-N --x
+```
+
+Commonly here "netA" would be a high-speed network and "netB" might be a campus
+network providing outbound internet and inbound SSH / OpenOndemand traffic.
+In this case "subnetB" may need to have a default gateway, meaning "subnetA"
+cannot to avoid routing problems on the login node(s). The options are then:
+
+1. If "subnetA" has outbound connectivity (e.g. via a router), set the OpenTofu
+   variable `gateway_ip` (or equivalent compute group parameter) to the IP to
+   use. On first boot, any nodes without a default route will have a persistent
+   default route configured via that address using the interface on the access
+   network. E.g. setting:
+
+    ```terraform
+    ...
+    gateway_ip = "10.20.0.1"
+    ...
+    ```
+
+    will add a default route via `10.20.0.1` to the control and compute nodes,
+    ignoring the login node(s) which already get a default route via the gateway
+    defined on "subnetB".
+
+2. If "subnetB" does not have outbound connectivity, this can be provided for
+   the control and compute nodes by configuring a caching proxy on a node
+   which does have direct outbound connectivity. For the above cluster the
+   minimal configuration for this is:
+
+      ```yaml
+      # environments/$SITE/inventory/groups:
+      [squid:children]
+      login
+
+      [proxy:children]
+      control
+      compute
+      ```
+
+      ```yaml
+      # environments/$SITE/inventory/group_vars/all/squid:
+      squid_cache_disk: 1024 # MB
+      squid_cache_mem: "12 GB"
+      ```
+  In this case, for the nodes only on "netB" a dummy default route is
+  automatically configured [to ensure](https://docs.k3s.io/installation/airgap#default-network-route)
+  proper `k3s` operation.
