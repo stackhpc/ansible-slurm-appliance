@@ -30,12 +30,10 @@ variable "cluster_image" {
     type = map(string)
 }
 
-variable "cluster_net" {}
+variable "cluster_networks" {}
 
-variable "cluster_subnet" {}
-
-variable "vnic_type" {
-    default = "normal"
+variable "vnic_types" {
+    default = {}
 }
 
 variable "state_volume_type"{
@@ -63,9 +61,8 @@ module "cluster" {
     source = "../../skeleton/{{cookiecutter.environment}}/tofu/"
 
     cluster_name = var.cluster_name
-    cluster_net = var.cluster_net
-    cluster_subnet = var.cluster_subnet
-    vnic_type = var.vnic_type
+    cluster_networks = var.cluster_networks
+    vnic_types = var.vnic_types
     key_pair = "slurm-app-ci"
     cluster_image_id = data.openstack_images_image_v2.cluster.id
     control_node_flavor = var.control_node_flavor
@@ -84,7 +81,7 @@ module "cluster" {
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
             compute_init_enable: ["compute", "etc_hosts", "nfs", "basic_users", "eessi"]
-            # ignore_image_changes: true
+            ignore_image_changes: true
         }
         # Example of how to add another partition:
         # extra: {

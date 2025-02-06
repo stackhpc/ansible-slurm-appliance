@@ -2,9 +2,9 @@
   file:
     path: /exports/cluster
     state: directory
-    owner: root
+    owner: slurm
     group: root
-    mode: u=rwX,go=
+    mode: u=rX,g=rwX,o=
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
 
@@ -23,21 +23,27 @@
   file:
     path: /exports/cluster/hostvars/{{ inventory_hostname }}/
     state: directory
-    mode: u=rwX,go=
-    # TODO: owner,mode,etc
+    owner: slurm
+    group: root
+    mode: u=rX,g=rwX,o=
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Template out hostvars
   template:
     src: hostvars.yml.j2
     dest: /exports/cluster/hostvars/{{ inventory_hostname }}/hostvars.yml
-    mode: u=rw,go=
+    owner: slurm
+    group: root
+    mode: u=r,g=rw,o=
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Copy manila share info to /exports/cluster
   copy:
     content: "{{ os_manila_mount_share_info_var | to_nice_yaml }}"
     dest: /exports/cluster/manila_share_info.yml
+    owner: root
+    group: root
+    mode: u=rw,g=r
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
   when: os_manila_mount_share_info is defined
