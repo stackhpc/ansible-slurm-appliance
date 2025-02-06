@@ -1,8 +1,9 @@
-# Reboot compute nodes via slurm. The nodes will be rebuilt if image in hostvars is different to the active one in OpenStack.
+# Reboot compute nodes via slurm. Nodes will be rebuilt if `image_id` in inventory is different to the currently-provisioned image.
 # Example:
 #   ansible-playbook -v ansible/adhoc/reboot_via_slurm.yml
 
 - hosts: login
+  run_once: true
   become: yes
   gather_facts: no
   tasks:
@@ -14,7 +15,7 @@
       register: slurm_result
       failed_when: slurm_result.rc != 0
 
-    - name: Fetch Slurm logs if reboot fails
+    - name: Fetch Slurm controller logs if reboot fails
       ansible.builtin.shell: |
         journalctl -u slurmctld --since "10 minutes ago" | tail -n 50
       become_user: root

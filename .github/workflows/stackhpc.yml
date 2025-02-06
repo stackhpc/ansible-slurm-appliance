@@ -178,7 +178,7 @@ jobs:
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Test compute node reimage, compute-init, and reboot
+      - name: Test compute node reboot and compute-init
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate

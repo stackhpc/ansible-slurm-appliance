@@ -35,7 +35,7 @@ openhpc_config_default:
   SlurmctldParameters:
     - enable_configless
   TaskPlugin: task/cgroup,task/affinity
-  ReturnToService: 2
+  ReturnToService: 2 # is stackhpc.openhpc default, but templating bug means it is needed here too
 openhpc_config_rebuild:
   RebootProgram: /opt/slurm-tools/bin/slurm-openstack-rebuild
   SlurmctldParameters:
