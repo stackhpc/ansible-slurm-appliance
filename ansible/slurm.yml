@@ -9,24 +9,15 @@
     - include_role:
         name:  mysql
 
-- name: Setup slurm-driven reimage
-  hosts: rebuild
-  become: yes
-  tags:
-    - rebuild
-    - openhpc
-  tasks:
-    - import_role:
-        name: stackhpc.slurm_openstack_tools.rebuild
-
 - name: Setup slurm
   hosts: openhpc
   become: yes
   tags:
     - openhpc
   tasks:
-    - import_role:
+    - include_role:
         name: stackhpc.openhpc
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Set locked memory limits on user-facing nodes
   hosts:

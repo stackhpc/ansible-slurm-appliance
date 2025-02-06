@@ -1,0 +1,78 @@
+---
+
+- name: Check for existing k3s installation
+  stat:
+    path: /var/lib/rancher/k3s
+  register: stat_result
+
+- name: Perform air-gapped installation of k3s
+  # Using air-gapped install so containers are pre-installed to avoid rate-limiting from registries on cluster startup
+  when: not stat_result.stat.exists
+  block:
+
+  - name: Download k3s binary
+    ansible.builtin.get_url:
+      url: "https://github.com/k3s-io/k3s/releases/download/{{ k3s_version | urlencode }}/k3s"
+      dest: /usr/bin/k3s
+      owner: root
+      group: root
+      mode: "0755"
+
+  - name: Install k3s SELinux policy package
+    yum:
+      name: "https://github.com/k3s-io/k3s-selinux/releases/download/{{ k3s_selinux_release }}/k3s-selinux-{{ k3s_selinux_rpm_version }}.el{{ ansible_distribution_major_version }}.noarch.rpm"
+      disable_gpg_check: true
+
+  - name: Create image directory
+    ansible.builtin.file: 
+      path: "/var/lib/rancher/k3s/agent/images"
+      state: directory
+
+  - name: Install k3s' internal images
+    ansible.builtin.get_url:
+      url: "https://github.com/k3s-io/k3s/releases/download/{{ k3s_version | urlencode }}/k3s-airgap-images-amd64.tar.zst"
+      dest: /var/lib/rancher/k3s/agent/images/k3s-airgap-images-amd64.tar.zst
+
+  - name: Download k3s install script
+    ansible.builtin.get_url:
+      url: https://get.k3s.io/
+      timeout: 120
+      dest: /usr/bin/k3s-install.sh
+      owner: root
+      group: root
+      mode: "0755"
+
+  - name: Install k3s
+    ansible.builtin.shell:
+      cmd: /usr/bin/k3s-install.sh
+    environment:
+      INSTALL_K3S_VERSION: "{{ k3s_version }}"
+      INSTALL_K3S_EXEC: "{{ item }} --node-ip=${K3S_NODE_IP}"
+      INSTALL_K3S_SKIP_START: "true"
+      INSTALL_K3S_SKIP_ENABLE: "true"
+      INSTALL_K3S_BIN_DIR: "/usr/bin"
+      INSTALL_K3S_SKIP_DOWNLOAD: "true"
+    changed_when: true
+    loop:
+      - server --disable=traefik
+      - agent
+
+- name: Install helm
+  unarchive:
+    src: "https://get.helm.sh/helm-{{ k3s_helm_version }}-linux-amd64.tar.gz"
+    dest: /usr/bin
+    extra_opts: "--strip-components=1"
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: true
+
+- name: Add k3s kubeconfig as environment variable
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    line: "KUBECONFIG=/etc/rancher/k3s/k3s.yaml"
+
+- name: Install ansible-init playbook for k3s agent or server activation
+  copy:
+    src: start_k3s.yml
+    dest: /etc/ansible-init/playbooks/0-start-k3s.yml

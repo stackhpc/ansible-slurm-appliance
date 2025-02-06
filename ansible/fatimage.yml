@@ -6,6 +6,9 @@
   tasks:
     - name: Report hostname (= final image name)
       command: hostname
+    - name: Report inventory groups
+      debug:
+        var: group_names
 
 - name: Run pre.yml hook
   vars:
@@ -14,7 +17,25 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Sync pulp repos with upstream
+  hosts: pulp
+  tasks:
+  - ansible.builtin.include_role:
+      name: pulp_site
+      tasks_from: sync.yml
+      apply:
+        delegate_to: localhost
+    when: appliances_mode != 'configure'
+
 - import_playbook: bootstrap.yml
+
+- hosts: doca
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install NVIDIA DOCA
+      import_role:
+        name: doca
 
 - name: Run post-bootstrap.yml hook
   vars:
@@ -25,7 +46,7 @@
 
 - hosts: builder
   become: yes
-  gather_facts: no
+  gather_facts: yes
   tasks:
     # - import_playbook: iam.yml
     - name: Install FreeIPA client
@@ -33,6 +54,11 @@
         name: freeipa
         tasks_from: client-install.yml
       when: "'freeipa_client' in group_names"
+    - name: Install sssd
+      import_role:
+        name: sssd
+        tasks_from: install.yml
+      when: "'sssd' in group_names"
 
     # - import_playbook: filesystems.yml:
     - name: Install nfs packages
@@ -44,8 +70,23 @@
         name: stackhpc.os-manila-mount
         tasks_from: install.yml
       when: "'manila' in group_names"
+    - name: Install Lustre packages
+      include_role:
+        name: lustre
+        tasks_from: install.yml
+      when: "'lustre' in group_names"
 
 - import_playbook: extras.yml
+
+# TODO: is this the right place?
+- name: Install compute_init script
+  hosts: compute_init
+  tags: compute_init # tagged to allow running on cluster instances for dev
+  become: yes
+  tasks:
+    - include_role:
+        name: compute_init
+        tasks_from: install.yml
 
 - hosts: builder
   become: yes
@@ -57,6 +98,7 @@
         name: mysql
         tasks_from: install.yml
       when: "'mysql' in group_names"
+
     - name: OpenHPC
       import_role:
         name: stackhpc.openhpc
@@ -83,18 +125,25 @@
       import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+
       when: "'openondemand_desktop' in group_names"
+
     - name: Open Ondemand jupyter node
       import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
-      when: "'openondemand' in group_names"
+      when: "'openondemand_jupyter' in group_names"
+
+    - name: Install Apache PAM module # Extracted from start of roles/openondemand/tasks/pam_auth.yml to ensure only installed during build
+      yum:
+        name: mod_authnz_pam
 
     # - import_playbook: monitoring.yml:
     - import_role:
         name: opensearch
         tasks_from: install.yml
       when: "'opensearch' in group_names"
+
     # slurm_stats - nothing to do
     - import_role:
         name: filebeat
@@ -192,6 +241,8 @@
     hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
+
+- import_playbook: disable-repos.yml
 
 - hosts: builder
   become: yes

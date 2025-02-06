@@ -5,10 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
 env:
   S3_BUCKET: openhpc-images-prerelease
-  IMAGE_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+  IMAGE_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
 
 jobs:
   s3_cleanup:
@@ -42,7 +42,6 @@ jobs:
         build:
           - RL8
           - RL9
-          - RL9-cuda
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
@@ -112,7 +111,6 @@ jobs:
         build:
           - RL8
           - RL9
-          - RL9-cuda
         exclude: 
           - cloud: ${{ needs.image_upload.outputs.ci_cloud }}
 

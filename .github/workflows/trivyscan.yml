@@ -5,25 +5,39 @@ on:
     branches:
       - main
     paths:
-      - 'environments/.stackhpc/terraform/cluster_image.auto.tfvars.json'
+      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
 
 jobs:
   scan:
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + OS + build
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + build
       cancel-in-progress: true
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        build: ["RL8", "RL9", "RL9-cuda"]
+        build: ["RL8", "RL9"]
     env:
-      JSON_PATH: environments/.stackhpc/terraform/cluster_image.auto.tfvars.json
+      JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Override CI_CLOUD if PR label is present
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          # Iterate over the labels
+          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
+          echo $labels
+          for label in $labels; do
+             if [[ $label == CI_CLOUD=* ]]; then
+              # Extract the value after 'CI_CLOUD='
+              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> $GITHUB_ENV
+            fi
+          done
 
       - name: Record settings for CI cloud
         run: |
@@ -94,12 +108,13 @@ jobs:
           timeout: 15m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
-          category: "${{ matrix.os_version }}-${{ matrix.build }}"
+          category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
         uses: aquasecurity/trivy-action@0.24.0
@@ -114,3 +129,4 @@ jobs:
           timeout: 15m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2

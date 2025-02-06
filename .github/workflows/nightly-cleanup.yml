@@ -1,0 +1,97 @@
+name: Cleanup CI clusters
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 21 * * *'  # Run at 9PM - image sync runs at midnight
+
+jobs:
+  ci_cleanup:
+    name: ci-cleanup
+    concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.cloud }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cloud:
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+    runs-on: ubuntu-22.04
+    env:
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ matrix.cloud }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Record which cloud CI is running on
+        run: |
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+
+      - name: Setup environment
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Find CI clusters
+        run: |
+          . venv/bin/activate
+          CI_CLUSTERS=$(openstack server list | grep --only-matching 'slurmci-RL.-[0-9]\+'  | sort | uniq || true)
+          echo "DEBUG: Raw CI clusters: $CI_CLUSTERS"
+      
+          if [[ -z "$CI_CLUSTERS" ]]; then
+            echo "No matching CI clusters found."
+          else
+            # Flatten multiline value so can be passed as env var
+            CI_CLUSTERS_FORMATTED=$(echo "$CI_CLUSTERS" | tr '\n' ' ' | sed 's/ $//')
+            echo "DEBUG: Formatted CI clusters: $CI_CLUSTERS_FORMATTED"
+            echo "ci_clusters=$CI_CLUSTERS_FORMATTED" >> $GITHUB_ENV
+          fi
+        shell: bash
+      
+      - name: Delete clusters if control node not tagged with keep
+        run: |
+          . venv/bin/activate
+          if [[ -z ${ci_clusters} ]]; then
+            echo "No clusters to delete."
+            exit 0
+          fi
+          
+          for cluster_prefix in ${ci_clusters}
+          do
+            echo "Processing cluster: $cluster_prefix"
+            # Get all servers with the matching name for control node
+            CONTROL_SERVERS=$(openstack server list --name ${cluster_prefix}-control --format json)
+            SERVER_COUNT=$(echo "$CONTROL_SERVERS" | jq length)
+
+            if [[ $SERVER_COUNT -gt 1 ]]; then
+              echo "Multiple servers found for control node '${cluster_prefix}-control'. Checking tags for each..."
+              
+              for server in $(echo "$CONTROL_SERVERS" | jq -r '.[].ID'); do
+                # Get tags for each control node
+                TAGS=$(openstack server show "$server" --column tags --format value)
+                
+                if [[ $TAGS =~ "keep" ]]; then
+                  echo "Skipping ${cluster_prefix} (server ${server}) - control instance is tagged as keep"
+                else
+                  ./dev/delete-cluster.py ${cluster_prefix} --force
+                fi
+              done
+            else
+              # If only one server, extract its tags and proceed
+              TAGS=$(echo "$CONTROL_SERVERS" | jq -r '.[0].Tags')
+              if [[ $TAGS =~ "keep" ]]; then
+                echo "Skipping ${cluster_prefix} - control instance is tagged as keep"
+              else
+                ./dev/delete-cluster.py ${cluster_prefix} --force
+              fi
+            fi
+          done
+        shell: bash
