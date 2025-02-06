@@ -85,8 +85,12 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
     # environments/$ENV/tofu/tofu.tfvars:
 
     cluster_name = "mycluster"
-    cluster_net = "some_network" # *
-    cluster_subnet = "some_subnet" # *
+    cluster_networks = [
+      {
+        network = "some_network" # *
+        subnet = "some_subnet" # *
+      }
+    ]
     key_pair = "my_key" # *
     control_node_flavor = "some_flavor_name"
     login = {
