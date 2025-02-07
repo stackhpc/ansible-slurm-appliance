@@ -82,7 +82,7 @@ And generate secrets for it:
 
 Create an OpenTofu variables file to define the required infrastructure, e.g.:
 
-    # environments/$ENV/tofu/tofu.tfvars:
+    # environments/$ENV/tofu/terraform.tfvars:
 
     cluster_name = "mycluster"
     cluster_networks = [
