@@ -63,3 +63,8 @@ cluster
 
 [extra_packages:children]
 builder
+
+[dnf_repos:children]
+cluster
+
+
