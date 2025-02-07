@@ -23,7 +23,7 @@ control
 cluster
 
 [opensearch:children]
-control
+# control
 
 [slurm_stats:children]
 control
