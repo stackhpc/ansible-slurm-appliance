@@ -5,8 +5,6 @@ openondemand_desktop_partition: "{{ openhpc_slurm_partitions[0]['name'] }}"
 
 httpd_listen_addr_port:
   - 80
-  - 443
 
-openondemand_osc_ood_defaults:
-  httpd_port: 80
-  ssl: []
+httpd_port: 80
+ssl: []
