@@ -4,6 +4,9 @@
 [admin]
 # NREL-specific group for an admin node.
 
+[dnf_repos:children]
+cluster
+
 [mysql:children]
 control
 
@@ -35,7 +38,7 @@ login
 
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH
-login
+#login
 
 [block_devices:children]
 # Environment-specific so not defined here
