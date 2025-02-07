@@ -109,7 +109,7 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
         }
     }
 
-Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables and descriptions see `environments/$ENV/tofu/tofu.tfvars`.
+Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables and descriptions see `environments/$ENV/tofu/variables.tf`.
 
 To deploy this infrastructure, ensure the venv and the environment are [activated](#create-a-new-environment) and run:
 
