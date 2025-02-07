@@ -63,6 +63,7 @@ login
 cluster
 
 [ceph]
+cluster
 
 [extra_packages:children]
 builder
