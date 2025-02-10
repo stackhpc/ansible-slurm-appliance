@@ -1,3 +1,6 @@
+- name: Grab facts to determine distribution
+  setup:
+
 - name: Template sshd configuration
   # NB: If parameters are defined multiple times the first value wins;
   # The default /etc/ssh/sshd_config has
@@ -13,3 +16,17 @@
     validate: sshd -t -f %s
   notify:
     - Restart sshd
+  when: ansible_facts.distribution_major_version == '9'
+
+- name: Disallow SSH password authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication {{ 'yes' if sshd_password_authentication | bool else 'no' }}"
+    state: present
+    validate: sshd -t -f %s
+  notify:
+    - Restart sshd
+  become: true
+  when: ansible_facts.distribution_major_version == '8'
+
