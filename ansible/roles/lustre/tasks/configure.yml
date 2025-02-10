@@ -9,9 +9,11 @@
 
 - name: Set facts for Lustre interface
   set_fact:
-    _lustre_interface: "{{ _lustre_ip_r_mgs_info[4] }}"
-    _lustre_ip: "{{ _lustre_ip_r_mgs_info[6] }}"
+    _lustre_interface: "{{ _lustre_ip_r_mgs_info[interface_index | int] }}"
+    _lustre_ip: "{{ _lustre_ip_r_mgs_info[ip_index | int] }}"
   vars:
+    interface_index: "{{ 4 if 'via' in _lustre_ip_r_mgs.stdout_lines.0 else 2 }}"
+    ip_index: "{{ 6 if 'via' in _lustre_ip_r_mgs.stdout_lines.0 else 4 }}"
     _lustre_ip_r_mgs_info: "{{ _lustre_ip_r_mgs.stdout_lines.0 | split }}"
     # first line e.g. "10.167.128.1 via 10.179.0.2 dev eth0 src 10.179.3.149 uid 1000"
 
