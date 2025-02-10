@@ -26,3 +26,9 @@
 - name: Configure nsswitch and PAM for SSSD
   command: "authselect select sssd --force{% if sssd_enable_mkhomedir | bool %} with-mkhomedir{% endif %}"
   when: "'sssd' not in _authselect_current.stdout"
+
+- name: "Ensure oddjob is started"
+  service:
+    name: oddjobd
+    state: started
+    enabled: "{{ sssd_enable_mkhomedir }}"
