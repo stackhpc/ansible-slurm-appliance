@@ -12,7 +12,7 @@
     _lustre_interface: "{{ _lustre_ip_r_mgs_info.dev }}"
     _lustre_ip: "{{ _lustre_ip_r_mgs_info.prefsrc }}"
   vars:
-    _lustre_ip_r_mgs_info: "{{ _lustre_ip_r_mgs.stdout | from_json }}"
+    _lustre_ip_r_mgs_info: "{{ _lustre_ip_r_mgs.stdout | from_json | first }}"
 
 - name: Write LNet configuration file
   template:
