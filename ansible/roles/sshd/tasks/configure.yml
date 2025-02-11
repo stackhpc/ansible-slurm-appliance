@@ -13,7 +13,7 @@
     regexp: "^Include /etc/ssh/sshd_config.d/*.conf"
     line: "Include /etc/ssh/sshd_config.d/*.conf"
     state: present
-    insertafter: EOF
+    insertbefore: "BOF"
     validate: sshd -t -f %s
   notify:
     - Restart sshd
