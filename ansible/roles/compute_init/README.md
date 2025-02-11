@@ -49,7 +49,7 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | sshd                    | None at present                 | No                  |
 | bootstrap.yml            | dnf_repos               | None at present [2]             | -                   |
 | bootstrap.yml            | squid                   | Not relevant for compute nodes  | n/a                 |
-| bootstrap.yml            | tuned                   | None                            | -                   |         
+| bootstrap.yml            | tuned                   | Fully supported                 | No                  |         
 | bootstrap.yml            | freeipa_server          | Not relevant for compute nodes  | n/a                 |
 | bootstrap.yml            | cockpit                 | None required - use image build | No                  |
 | bootstrap.yml            | firewalld               | Not relevant for compute nodes  | n/a                 |
