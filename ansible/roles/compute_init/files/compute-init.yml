@@ -59,9 +59,9 @@
       file:
         path: /mnt/cluster
         state: directory
-        owner: root
+        owner: slurm
         group: root
-        mode: u=rwX,go= # is sensitive
+        mode: u=rX,g=rwX,o=
     
     - name: Mount /mnt/cluster
       mount:
