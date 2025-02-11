@@ -83,7 +83,8 @@ it also requires an image build with the role name added to the
 | portal.yml               | (openondemand server)   | Not relevant for compute nodes  | n/a                 |
 | portal.yml               | (openondemand vnc desktop)  | None required - use image build | No              |
 | portal.yml               | (openondemand jupyter server) | None required - use image build | No            |
-| monitoring.yml           | (all monitoring)        | None at present [6]             | -                   |
+| monitoring.yml           | node_exporter           | None required - use image build | No                  |
+| monitoring.yml           | (other  monitoring)     | Not relevant for compute nodes  | -                   |
 | disable-repos.yml        | dnf_repos               | None at present [8]             | -                   |
 | hooks/post.yml           | ?                       | None at present                 | -                   |
 
