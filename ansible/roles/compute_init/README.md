@@ -27,76 +27,81 @@ To enable this:
 
 ## Supported appliance functionalities
 
-The string "compute" must be present in the `compute_init_enable` flag to enable
-this functionality. The table below shows which other appliance functionalities
-are currently supported - use the name in the role column to enable these.
+In the table below, if a role is marked as supported then its functionality
+can be enabled during boot by adding the role name to the `compute_init_enable`
+property described above. If a role is marked as requiring a custom image then
+it also requires an image build with the role name added to the
+[Packer inventory_groups variable](../../../docs/image-build.md).
 
-| Playbook                 | Role (or functionality) | Support         |
-| -------------------------|-------------------------|-----------------|
-| hooks/pre.yml            | ?                       | None at present |
-| validate.yml             | n/a                     | Not relevant during boot |
-| bootstrap.yml            | (wait for ansible-init) | Not relevant during boot |
-| bootstrap.yml            | resolv_conf             | Fully supported |
-| bootstrap.yml            | etc_hosts               | Fully supported |
-| bootstrap.yml            | proxy                   | None at present |
-| bootstrap.yml            | (/etc permissions)      | None required - use image build |
-| bootstrap.yml            | (ssh /home fix)         | None required - use image build |
-| bootstrap.yml            | (system users)          | None required - use image build |
-| bootstrap.yml            | systemd                 | None required - use image build |
-| bootstrap.yml            | selinux                 | None required - use image build |
-| bootstrap.yml            | sshd                    | None at present |
-| bootstrap.yml            | dnf_repos               | None at present (requirement TBD) |
-| bootstrap.yml            | squid                   | Not relevant for compute nodes |
-| bootstrap.yml            | tuned                   | None |
-| bootstrap.yml            | freeipa_server          | Not relevant for compute nodes |
-| bootstrap.yml            | cockpit                 | None required - use image build |
-| bootstrap.yml            | firewalld               | Not relevant for compute nodes |
-| bootstrap.yml            | fail2ban                | Not relevant for compute nodes |
-| bootstrap.yml            | podman                  | Not relevant for compute nodes |
-| bootstrap.yml            | update                  | Not relevant during boot |
-| bootstrap.yml            | reboot                  | Not relevant for compute nodes |
-| bootstrap.yml            | ofed                    | Not relevant during boot |
-| bootstrap.yml            | ansible_init (install)  | Not relevant during boot |
-| bootstrap.yml            | k3s (install)           | Not relevant during boot |
-| hooks/post-bootstrap.yml | ?                       | None at present |
-| iam.yml                  | freeipa_client          | None at present [1] |
-| iam.yml                  | freeipa_server          | Not relevant for compute nodes |
-| iam.yml                  | sssd                    | None at present |
-| filesystems.yml          | block_devices           | None required - role deprecated |
-| filesystems.yml          | nfs                     | All client functionality |
-| filesystems.yml          | manila                  | All functionality |
-| filesystems.yml          | lustre                  | None at present |
-| extras.yml               | basic_users             | All functionality [2] |
-| extras.yml               | eessi                   | All functionality [3] |
-| extras.yml               | cuda                    | None required - use image build [4] |
-| extras.yml               | persist_hostkeys        | Not expected to be required for compute nodes |
-| extras.yml               | compute_init (export)   | Not relevant for compute nodes |
-| extras.yml               | k9s (install)           | Not relevant during boot |
-| extras.yml               | extra_packages          | None at present. Would require dnf_repos |
-| slurm.yml                | mysql                   | Not relevant for compute nodes |
-| slurm.yml                | rebuild                 | Not relevant for compute nodes |
-| slurm.yml                | openhpc [5]             | All slurmd-related functionality |
-| slurm.yml                | (set memory limits)     | None at present |
-| slurm.yml                | (block ssh)             | None at present |
-| portal.yml               | (openondemand server)   | Not relevant for compute nodes |
-| portal.yml               | (openondemand vnc desktop) | None required - use image build |
-| portal.yml               | (openondemand jupyter server) | None required - use image build |
-| monitoring.yml           | (all monitoring)        | None at present [6] |
-| disable-repos.yml        | dnf_repos               | None at present (requirement TBD) |
-| hooks/post.yml           | ?                       | None at present |
+| Playbook                 | Role (or functionality) | Support                         | Custom image reqd.? |
+| -------------------------|-------------------------|---------------------------------|---------------------|
+| hooks/pre.yml            | ?                       | None at present                 | n/a                 |
+| validate.yml             | n/a                     | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | (wait for ansible-init) | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | resolv_conf             | Fully supported                 | No                  |
+| bootstrap.yml            | etc_hosts               | Fully supported                 | No                  |
+| bootstrap.yml            | proxy                   | None at present                 | No                  |
+| bootstrap.yml            | (/etc permissions)      | None required - use image build | No                  |
+| bootstrap.yml            | (ssh /home fix)         | None required - use image build | No                  |
+| bootstrap.yml            | (system users)          | None required - use image build | No                  |
+| bootstrap.yml            | systemd                 | None required - use image build | No                  |
+| bootstrap.yml            | selinux                 | None required - use image build | Maybe [1]           |
+| bootstrap.yml            | sshd                    | None at present                 | No                  |
+| bootstrap.yml            | dnf_repos               | None at present [2]             | -                   |
+| bootstrap.yml            | squid                   | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | tuned                   | None                            | -                   |         
+| bootstrap.yml            | freeipa_server          | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | cockpit                 | None required - use image build | No                  |
+| bootstrap.yml            | firewalld               | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | fail2ban                | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | podman                  | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | update                  | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | reboot                  | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | ofed                    | Not relevant during boot        | Yes                 |
+| bootstrap.yml            | ansible_init (install)  | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | k3s (install)           | Not relevant during boot        | n/a                 |
+| hooks/post-bootstrap.yml | ?                       | None at present                 | n/a                 |
+| iam.yml                  | freeipa_client          | None at present [3]             | Yes                 |
+| iam.yml                  | freeipa_server          | Not relevant for compute nodes  | n/a                 |
+| iam.yml                  | sssd                    | None at present                 | No                  |
+| filesystems.yml          | block_devices           | None required - role deprecated | n/a                 |
+| filesystems.yml          | nfs                     | All client functionality        | No                  |
+| filesystems.yml          | manila                  | All functionality               | No [4]              |
+| filesystems.yml          | lustre                  | None at present                 | Yes                 |
+| extras.yml               | basic_users             | All functionality [5]           | No                  |
+| extras.yml               | eessi                   | All functionality [6]           | No                  |
+| extras.yml               | cuda                    | None required - use image build | Yes [7]             |
+| extras.yml               | persist_hostkeys        | Not relevant for compute nodes  | n/a                 |
+| extras.yml               | compute_init (export)   | Not relevant for compute nodes  | n/a                 |
+| extras.yml               | k9s (install)           | Not relevant during boot        | n/a                 |
+| extras.yml               | extra_packages          | None at present [8]             | -                   |
+| slurm.yml                | mysql                   | Not relevant for compute nodes  | n/a                 |
+| slurm.yml                | rebuild                 | Not relevant for compute nodes  | n/a                 |
+| slurm.yml                | openhpc [9]             | All slurmd functionality        | No                  |
+| slurm.yml                | (set memory limits)     | None at present                 | -                   |
+| slurm.yml                | (block ssh)             | None at present                 | -                   |
+| portal.yml               | (openondemand server)   | Not relevant for compute nodes  | n/a                 |
+| portal.yml               | (openondemand vnc desktop)  | None required - use image build | No              |
+| portal.yml               | (openondemand jupyter server) | None required - use image build | No            |
+| monitoring.yml           | node_exporter           | None required - use image build | No                  |
+| monitoring.yml           | (other  monitoring)     | Not relevant for compute nodes  | -                   |
+| disable-repos.yml        | dnf_repos               | None at present [2]             | -                   |
+| hooks/post.yml           | ?                       | None at present                 | -                   |
 
 
 Notes:
-1. FreeIPA client functionality would be better provided using a client fork
+1. `selinux` is set to disabled in StackHPC images.
+2. Requirement for this functionality is TBD.
+3. FreeIPA client functionality would be better provided using a client fork
    which uses pkinit keys rather than OTP to reenrol nodes.
-2. Assumes home directory already exists on shared storage.
-3. Assumes `cvmfs_config` is the same on control node and all compute nodes
-4. If `cuda` role was run during build, the nvidia-persistenced is enabled
+4. Assuming default Ceph client version.
+5. Assumes home directory already exists on shared storage.
+6. Assumes `cvmfs_config` is the same on control node and all compute nodes.
+7. If `cuda` role was run during build, the nvidia-persistenced is enabled
   and will start during boot.
-5. `openhpc` does not need to be added to `compute_init_enable`, this is
+8. Would require `dnf_repos`.
+9. `openhpc` does not need to be added to `compute_init_enable`, this is
    automatically enabled by adding `compute`.
-5. Only node-exporter tasks are relevant, and will be done via k3s in a future release.
-
 
 ## Approach
 This works as follows:
