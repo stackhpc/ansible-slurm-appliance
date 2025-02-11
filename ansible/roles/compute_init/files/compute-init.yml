@@ -244,27 +244,6 @@
             cmd: "cvmfs_config setup"
       when: enable_eessi
 
-    - name: Set locked memory limits on user-facing nodes
-      lineinfile:
-        path: /etc/security/limits.conf
-        regexp: '\* soft memlock unlimited'
-        line: "* soft memlock unlimited"
-
-    - name: Configure sshd pam module
-      blockinfile:
-        path: /etc/pam.d/sshd
-        insertafter: 'account\s+required\s+pam_nologin.so'
-        block: |
-          account    sufficient   pam_access.so
-          account    required     pam_slurm.so
-
-    - name: Configure login access control
-      blockinfile:
-        path: /etc/security/access.conf
-        block: |
-          +:adm:ALL
-          -:ALL:ALL
-
     # NB: don't need conditional block on enable_compute as have already exited
     # if not the case
     - name: Write Munge key
@@ -296,6 +275,27 @@
         name: slurmd
         enabled: true
         state: started
+
+    - name: Set locked memory limits on user-facing nodes
+      lineinfile:
+        path: /etc/security/limits.conf
+        regexp: '\* soft memlock unlimited'
+        line: "* soft memlock unlimited"
+
+    - name: Configure sshd pam module
+      blockinfile:
+        path: /etc/pam.d/sshd
+        insertafter: 'account\s+required\s+pam_nologin.so'
+        block: |
+          account    sufficient   pam_access.so
+          account    required     pam_slurm.so
+
+    - name: Configure login access control
+      blockinfile:
+        path: /etc/security/access.conf
+        block: |
+          +:adm:ALL
+          -:ALL:ALL
 
     - name: Ensure node is resumed
       # TODO: consider if this is always safe for all job states?
