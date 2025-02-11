@@ -1,5 +1,23 @@
-- name: Grab facts to determine distribution
-  setup:
+- name: Ensure drop in directory exists
+  file:
+    path: /etc/ssh/sshd_config.d/*.conf
+    state: directory
+    owner: root
+    group: root
+    mode: 700
+  become: true
+
+- name: Ensure drop in directory is included
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^Include /etc/ssh/sshd_config.d/*.conf"
+    line: "Include /etc/ssh/sshd_config.d/*.conf"
+    state: present
+    insertafter: EOF
+    validate: sshd -t -f %s
+  notify:
+    - Restart sshd
+  become: true
 
 - name: Template sshd configuration
   # NB: If parameters are defined multiple times the first value wins;
@@ -16,16 +34,3 @@
     validate: sshd -t -f %s
   notify:
     - Restart sshd
-  when: ansible_facts.distribution_major_version == '9'
-
-- name: Disallow SSH password authentication
-  lineinfile:
-    dest: /etc/ssh/sshd_config
-    regexp: "^PasswordAuthentication"
-    line: "PasswordAuthentication {{ 'yes' if sshd_password_authentication | bool else 'no' }}"
-    state: present
-    validate: sshd -t -f %s
-  notify:
-    - Restart sshd
-  become: true
-  when: ansible_facts.distribution_major_version == '8'
