@@ -24,6 +24,10 @@ cluster
 login
 compute
 
+[tuned:children]
+# Install tuned into fat image
+builder
+
 [squid:children]
 # Install squid into fat image
 builder
