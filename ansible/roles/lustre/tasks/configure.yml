@@ -43,4 +43,3 @@
     state: "{{ (item.mount_state | default(lustre_mount_state)) }}"
     opts: "{{ item.mount_options | default(lustre_mount_options) }}"
   loop: "{{ lustre_mounts }}"
- 
