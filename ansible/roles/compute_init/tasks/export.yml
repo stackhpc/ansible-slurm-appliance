@@ -71,3 +71,26 @@
     remote_src: true
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
+
+- name: Create hostconfig directory
+  file:
+    path: "/exports/cluster/hostconfig/{{ inventory_hostname }}/"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rw,go=
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Inject host specific config template files
+  template:
+    src: "{{ item.src }}"
+    dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: u=rw,go=
+  loop:
+    - src: "{{ sssd_conf_src }}"
+      dest: sssd.conf
+    - src: "{{ sshd_conf_src }}"
+      dest: sshd.conf
+  delegate_to: "{{ groups['control'] | first }}"

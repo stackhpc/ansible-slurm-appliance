@@ -17,6 +17,11 @@
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
 
+    sssd_enable_mkhomedir: false
+    sssd_conf_dest: /etc/sssd/sssd.conf
+    sssd_started: true
+    sssd_enabled: true
+
     nfs_client_mnt_point: "/mnt"
     nfs_client_mnt_options:
     nfs_client_mnt_state: mounted
@@ -124,6 +129,38 @@
         group: root
         mode: 0644
       when: enable_etc_hosts
+
+    - name: Configure sssd
+      block:
+        - name: Manage sssd.conf configuration
+          copy:
+            src: "/exports/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
+            dest: "{{ sssd_conf_dest }}"
+
+        - name: Restart sssd
+          systemd:
+            name: sssd
+            state: restarted
+          when: sssd_started | bool
+
+        - name: Ensure sssd service state
+          systemd:
+            name: sssd
+            state: "{{ 'started' if sssd_started | bool else 'stopped' }}"
+            enabled: "{{ sssd_enabled | bool }}"
+
+        - name: Get current authselect configuration
+          command: authselect current --raw
+          changed_when: false
+          failed_when:
+            - _authselect_current.rc != 0
+            - "'No existing configuration detected' not in _authselect_current.stdout"
+          register: _authselect_current # stdout: sssd with-mkhomedir
+
+        - name: Configure nsswitch and PAM for SSSD
+          command: "authselect select sssd --force{% if sssd_enable_mkhomedir | bool %} with-mkhomedir{% endif %}"
+          when: "'sssd' not in _authselect_current.stdout"
+      when: enable_sssd
 
     # NFS client mount
     - name: If nfs-clients is present
