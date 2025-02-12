@@ -25,7 +25,7 @@ control
 [filebeat:children]
 slurm_stats
 
-# NB: [rebuild] not defined here as this template is used in CI
+# NB: [rebuild] not defined here as likely to need features not currently supported
 
 [update:children]
 

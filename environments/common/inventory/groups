@@ -63,7 +63,7 @@ mysql
 cluster
 
 [rebuild]
-# Enable rebuild of nodes on an OpenStack cloud; add 'control' group plus 'compute' group or a subset of it.
+# Enable rebuild of nodes on an OpenStack cloud; add 'control' group.
 
 [update]
 # All hosts to (optionally) run yum update on.

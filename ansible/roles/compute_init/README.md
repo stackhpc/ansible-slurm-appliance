@@ -1,11 +1,109 @@
-# EXPERIMENTAL: compute-init
+# EXPERIMENTAL: compute_init
 
-Experimental / in-progress functionality to allow compute nodes to rejoin the
-cluster after a reboot.
+Experimental functionality to allow compute nodes to rejoin the cluster after
+a reboot without running the `ansible/site.yml` playbook.
 
-To enable this add compute nodes (or a subset of them into) the `compute_init`
-group.
+To enable this:
+1. Add the `compute` group (or a subset) into the `compute_init` group. This is
+   the default when using cookiecutter to create an environment, via the
+   "everything" template.
+2. Build an image which includes the `compute_init` group. This is the case
+   for StackHPC-built release images.
+3. Enable the required functionalities during boot, by setting the
+   `compute_init_enable` property for a compute group in the
+   OpenTofu `compute` variable to a list which includes "compute", plus the
+   other roles/functionalities required, e.g.:
 
+   ```terraform
+   ...
+   compute = {
+      general = {
+         nodes = ["general-0", "general-1"]
+         compute_init_enable = ["compute", ... ] # see below
+      }
+   }
+   ...
+   ```
+
+## Supported appliance functionalities
+
+In the table below, if a role is marked as supported then its functionality
+can be enabled during boot by adding the role name to the `compute_init_enable`
+property described above. If a role is marked as requiring a custom image then
+it also requires an image build with the role name added to the
+[Packer inventory_groups variable](../../../docs/image-build.md).
+
+| Playbook                 | Role (or functionality) | Support                         | Custom image reqd.? |
+| -------------------------|-------------------------|---------------------------------|---------------------|
+| hooks/pre.yml            | ?                       | None at present                 | n/a                 |
+| validate.yml             | n/a                     | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | (wait for ansible-init) | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | resolv_conf             | Fully supported                 | No                  |
+| bootstrap.yml            | etc_hosts               | Fully supported                 | No                  |
+| bootstrap.yml            | proxy                   | None at present                 | No                  |
+| bootstrap.yml            | (/etc permissions)      | None required - use image build | No                  |
+| bootstrap.yml            | (ssh /home fix)         | None required - use image build | No                  |
+| bootstrap.yml            | (system users)          | None required - use image build | No                  |
+| bootstrap.yml            | systemd                 | None required - use image build | No                  |
+| bootstrap.yml            | selinux                 | None required - use image build | Maybe [1]           |
+| bootstrap.yml            | sshd                    | None at present                 | No                  |
+| bootstrap.yml            | dnf_repos               | None at present [2]             | -                   |
+| bootstrap.yml            | squid                   | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | tuned                   | Fully supported                 | No                  |         
+| bootstrap.yml            | freeipa_server          | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | cockpit                 | None required - use image build | No                  |
+| bootstrap.yml            | firewalld               | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | fail2ban                | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | podman                  | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | update                  | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | reboot                  | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | ofed                    | Not relevant during boot        | Yes                 |
+| bootstrap.yml            | ansible_init (install)  | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | k3s (install)           | Not relevant during boot        | n/a                 |
+| hooks/post-bootstrap.yml | ?                       | None at present                 | n/a                 |
+| iam.yml                  | freeipa_client          | None at present [3]             | Yes                 |
+| iam.yml                  | freeipa_server          | Not relevant for compute nodes  | n/a                 |
+| iam.yml                  | sssd                    | None at present                 | No                  |
+| filesystems.yml          | block_devices           | None required - role deprecated | n/a                 |
+| filesystems.yml          | nfs                     | All client functionality        | No                  |
+| filesystems.yml          | manila                  | All functionality               | No [4]              |
+| filesystems.yml          | lustre                  | None at present                 | Yes                 |
+| extras.yml               | basic_users             | All functionality [5]           | No                  |
+| extras.yml               | eessi                   | All functionality [6]           | No                  |
+| extras.yml               | cuda                    | None required - use image build | Yes [7]             |
+| extras.yml               | persist_hostkeys        | Not relevant for compute nodes  | n/a                 |
+| extras.yml               | compute_init (export)   | Not relevant for compute nodes  | n/a                 |
+| extras.yml               | k9s (install)           | Not relevant during boot        | n/a                 |
+| extras.yml               | extra_packages          | None at present [8]             | -                   |
+| slurm.yml                | mysql                   | Not relevant for compute nodes  | n/a                 |
+| slurm.yml                | rebuild                 | Not relevant for compute nodes  | n/a                 |
+| slurm.yml                | openhpc [9]             | All slurmd functionality        | No                  |
+| slurm.yml                | (set memory limits)     | None at present                 | -                   |
+| slurm.yml                | (block ssh)             | None at present                 | -                   |
+| portal.yml               | (openondemand server)   | Not relevant for compute nodes  | n/a                 |
+| portal.yml               | (openondemand vnc desktop)  | None required - use image build | No              |
+| portal.yml               | (openondemand jupyter server) | None required - use image build | No            |
+| monitoring.yml           | node_exporter           | None required - use image build | No                  |
+| monitoring.yml           | (other  monitoring)     | Not relevant for compute nodes  | -                   |
+| disable-repos.yml        | dnf_repos               | None at present [2]             | -                   |
+| hooks/post.yml           | ?                       | None at present                 | -                   |
+
+
+Notes:
+1. `selinux` is set to disabled in StackHPC images.
+2. Requirement for this functionality is TBD.
+3. FreeIPA client functionality would be better provided using a client fork
+   which uses pkinit keys rather than OTP to reenrol nodes.
+4. Assuming default Ceph client version.
+5. Assumes home directory already exists on shared storage.
+6. Assumes `cvmfs_config` is the same on control node and all compute nodes.
+7. If `cuda` role was run during build, the nvidia-persistenced is enabled
+  and will start during boot.
+8. Would require `dnf_repos`.
+9. `openhpc` does not need to be added to `compute_init_enable`, this is
+   automatically enabled by adding `compute`.
+
+## Approach
 This works as follows:
 1. During image build, an ansible-init playbook and supporting files
 (e.g. templates, filters, etc) are installed.
@@ -31,21 +129,7 @@ The check in 4b. above is what prevents the compute-init script from trying
 to configure the node before the services on the control node are available
 (which requires running the site.yml playbook).
 
-The following roles/groups are currently fully functional:
-- `resolv_conf`: all functionality
-- `etc_hosts`: all functionality
-- `nfs`: client functionality only
-- `manila`: all functionality
-- `basic_users`: all functionality, assumes home directory already exists on
-  shared storage
-- `eessi`: all functionality, assumes `cvmfs_config` is the same on control
-  node and all compute nodes.
-- `openhpc`: all functionality
-
-The above may be enabled by setting the compute_init_enable property on the
-tofu compute variable.
-
-# Development/debugging
+## Development/debugging
 
 To develop/debug changes to the compute script without actually having to build
 a new image:
@@ -83,7 +167,7 @@ reimage the compute node(s) first as in step 2 and/or add additional metadata
 as in step 3.
 
 
-# Design notes
+## Design notes
 - Duplicating code in roles into the `compute-init` script is unfortunate, but
   does allow developing this functionality without wider changes to the
   appliance.

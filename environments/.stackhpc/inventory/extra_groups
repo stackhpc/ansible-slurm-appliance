@@ -1,10 +1,6 @@
 [basic_users:children]
 cluster
 
-[rebuild:children]
-control
-compute
-
 [etc_hosts:children]
 cluster
 
@@ -28,6 +24,10 @@ cluster
 login
 compute
 
+[tuned:children]
+# Install tuned into fat image
+builder
+
 [squid:children]
 # Install squid into fat image
 builder
@@ -35,3 +35,6 @@ builder
 [sssd:children]
 # Install sssd into fat image
 builder
+
+[rebuild:children]
+control
