@@ -53,6 +53,12 @@ variable "login" {
                         Values are a mapping with:
                             size: Size of volume in GB
                         **NB**: The order in /dev is not guaranteed to match the mapping
+        fip_addresses: List of addresses of floating IPs to associate with nodes,
+                       in the same order as nodes parameter. The floating IPs
+                       must already be allocated to the project.
+        fip_network: Name of network containing ports to attach FIPs to. Only
+                     required if multiple networks are defined.
+
   EOF
 }
 
