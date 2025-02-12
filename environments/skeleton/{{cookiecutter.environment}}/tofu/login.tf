@@ -25,6 +25,8 @@ module "login" {
   extra_volumes = lookup(each.value, "extra_volumes", {})
   fip_addresses = lookup(each.value, "fip_addresses", [])
   fip_network = lookup(each.value, "fip_network", "")
+  match_ironic_node = lookup(each.value, "match_ironic_node", false)
+  availability_zone = lookup(each.value, "availability_zone", "nova")
 
   # can't be set for login
   compute_init_enable = []
@@ -36,4 +38,5 @@ module "login" {
   # updates to node metadata on deletion/recreation of the control node:
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.login: o.id]
+  baremetal_nodes = data.external.baremetal_nodes
 }

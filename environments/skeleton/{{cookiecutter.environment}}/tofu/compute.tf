@@ -20,11 +20,13 @@ module "compute" {
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
   
-  # optionally set for group
+  # optionally set for group:
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
   extra_volumes = lookup(each.value, "extra_volumes", {})
   compute_init_enable = lookup(each.value, "compute_init_enable", [])
   ignore_image_changes = lookup(each.value, "ignore_image_changes", false)
+  match_ironic_node = lookup(each.value, "match_ironic_node", false)
+  availability_zone = lookup(each.value, "availability_zone", "nova")
 
   # computed
   k3s_token = local.k3s_token
@@ -32,4 +34,5 @@ module "compute" {
   # updates to node metadata on deletion/recreation of the control node:
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
+  baremetal_nodes = data.external.baremetal_nodes
 }
