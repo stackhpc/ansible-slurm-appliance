@@ -9,6 +9,7 @@
     enable_compute: "{{ os_metadata.meta.compute | default(false) | bool }}"
     enable_resolv_conf: "{{ os_metadata.meta.resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.etc_hosts | default(false) | bool }}"
+    enable_tuned:  "{{ os_metadata.meta.tuned | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
     enable_basic_users: "{{ os_metadata.meta.basic_users | default(false) | bool }}"
@@ -21,6 +22,12 @@
     sssd_conf_dest: /etc/sssd/sssd.conf
     sssd_started: true
     sssd_enabled: true
+
+    tuned_profile_baremetal: hpc-compute
+    tuned_profile_vm: virtual-guest
+    tuned_profile: "{{ tuned_profile_baremetal if ansible_virtualization_role != 'guest' else tuned_profile_vm }}"
+    tuned_enabled: true
+    tuned_started: true
 
     nfs_client_mnt_point: "/mnt"
     nfs_client_mnt_options:
@@ -64,9 +71,9 @@
       file:
         path: /mnt/cluster
         state: directory
-        owner: root
+        owner: slurm
         group: root
-        mode: u=rwX,go= # is sensitive
+        mode: u=rX,g=rwX,o=
     
     - name: Mount /mnt/cluster
       mount:
@@ -161,6 +168,10 @@
           command: "authselect select sssd --force{% if sssd_enable_mkhomedir | bool %} with-mkhomedir{% endif %}"
           when: "'sssd' not in _authselect_current.stdout"
       when: enable_sssd
+
+    - name: Configure tuned
+      include_tasks: tasks/tuned.yml
+      when: enable_tuned
 
     # NFS client mount
     - name: If nfs-clients is present
@@ -312,6 +323,27 @@
         name: slurmd
         enabled: true
         state: started
+
+    - name: Set locked memory limits on user-facing nodes
+      lineinfile:
+        path: /etc/security/limits.conf
+        regexp: '\* soft memlock unlimited'
+        line: "* soft memlock unlimited"
+
+    - name: Configure sshd pam module
+      blockinfile:
+        path: /etc/pam.d/sshd
+        insertafter: 'account\s+required\s+pam_nologin.so'
+        block: |
+          account    sufficient   pam_access.so
+          account    required     pam_slurm.so
+
+    - name: Configure login access control
+      blockinfile:
+        path: /etc/security/access.conf
+        block: |
+          +:adm:ALL
+          -:ALL:ALL
 
     - name: Ensure node is resumed
       # TODO: consider if this is always safe for all job states?
