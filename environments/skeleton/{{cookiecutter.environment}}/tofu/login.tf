@@ -23,6 +23,8 @@ module "login" {
   # optionally set for group
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
   extra_volumes = lookup(each.value, "extra_volumes", {})
+  fip_addresses = lookup(each.value, "fip_addresses", [])
+  fip_network = lookup(each.value, "fip_network", "")
 
   # can't be set for login
   compute_init_enable = []
