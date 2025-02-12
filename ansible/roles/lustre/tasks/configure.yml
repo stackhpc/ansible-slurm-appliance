@@ -1,7 +1,7 @@
 - name: Gather Lustre interface info
   shell:
     cmd: |
-      ip r get {{ _lustre_mgs_ip }}
+      ip --json r get {{ _lustre_mgs_ip }}
   changed_when: false
   register: _lustre_ip_r_mgs
   vars:
@@ -9,11 +9,10 @@
 
 - name: Set facts for Lustre interface
   set_fact:
-    _lustre_interface: "{{ _lustre_ip_r_mgs_info[4] }}"
-    _lustre_ip: "{{ _lustre_ip_r_mgs_info[6] }}"
+    _lustre_interface: "{{ _lustre_ip_r_mgs_info.dev }}"
+    _lustre_ip: "{{ _lustre_ip_r_mgs_info.prefsrc }}"
   vars:
-    _lustre_ip_r_mgs_info: "{{ _lustre_ip_r_mgs.stdout_lines.0 | split }}"
-    # first line e.g. "10.167.128.1 via 10.179.0.2 dev eth0 src 10.179.3.149 uid 1000"
+    _lustre_ip_r_mgs_info: "{{ _lustre_ip_r_mgs.stdout | from_json | first }}"
 
 - name: Write LNet configuration file
   template:
@@ -44,4 +43,3 @@
     state: "{{ (item.mount_state | default(lustre_mount_state)) }}"
     opts: "{{ item.mount_options | default(lustre_mount_options) }}"
   loop: "{{ lustre_mounts }}"
- 
