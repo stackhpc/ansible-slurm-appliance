@@ -126,7 +126,9 @@
     ansible.builtin.assert:
       that: dnf_repos_password is undefined
       fail_msg: Passwords should not be templated into repofiles during configure, unset 'dnf_repos_password'
-    when: appliances_mode == 'configure'
+    when:
+      - appliances_mode == 'configure'
+      - not (dnf_repos_allow_insecure_creds | default(false)) # useful for development
 
 - hosts: squid
   tags: squid

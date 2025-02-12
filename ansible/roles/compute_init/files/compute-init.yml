@@ -9,6 +9,7 @@
     enable_compute: "{{ os_metadata.meta.compute | default(false) | bool }}"
     enable_resolv_conf: "{{ os_metadata.meta.resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.etc_hosts | default(false) | bool }}"
+    enable_tuned:  "{{ os_metadata.meta.tuned | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
     enable_basic_users: "{{ os_metadata.meta.basic_users | default(false) | bool }}"
@@ -16,6 +17,12 @@
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
+
+    tuned_profile_baremetal: hpc-compute
+    tuned_profile_vm: virtual-guest
+    tuned_profile: "{{ tuned_profile_baremetal if ansible_virtualization_role != 'guest' else tuned_profile_vm }}"
+    tuned_enabled: true
+    tuned_started: true
 
     nfs_client_mnt_point: "/mnt"
     nfs_client_mnt_options:
@@ -59,9 +66,9 @@
       file:
         path: /mnt/cluster
         state: directory
-        owner: root
+        owner: slurm
         group: root
-        mode: u=rwX,go= # is sensitive
+        mode: u=rX,g=rwX,o=
     
     - name: Mount /mnt/cluster
       mount:
@@ -124,6 +131,10 @@
         group: root
         mode: 0644
       when: enable_etc_hosts
+
+    - name: Configure tuned
+      include_tasks: tasks/tuned.yml
+      when: enable_tuned
 
     # NFS client mount
     - name: If nfs-clients is present

@@ -32,6 +32,8 @@
       dest: files/NetworkManager-dns-none.conf
     - src: ../../basic_users/filter_plugins/filter_keys.py
       dest: filter_plugins/filter_keys.py
+    - src: ../../tuned/tasks/configure.yml
+      dest: tasks/tuned.yml
     - src: ../../stackhpc.nfs/tasks/nfs-clients.yml
       dest: tasks/nfs-clients.yml
 
