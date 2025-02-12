@@ -71,3 +71,16 @@
     remote_src: true
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
+
+- name: Copy cacerts from deploy host to /exports/cluster/cacerts/
+  copy:
+    src: "{{ item }}"
+    dest: /exports/cluster/cacerts/
+    owner: root
+    group: root
+    mode: 0644
+  with_fileglob:
+    - "{{ cacerts_cert_dir | default(appliances_environment_root + '/cacerts') }}/*" # role default
+  delegate_to: "{{ groups['control'] | first }}"
+  run_once: true
+  when: "'cacerts' in group_names"

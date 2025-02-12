@@ -48,6 +48,7 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | selinux                 | None required - use image build | Maybe [1]           |
 | bootstrap.yml            | sshd                    | None at present                 | No                  |
 | bootstrap.yml            | dnf_repos               | None at present [2]             | -                   |
+| bootstrap.yml            | cacerts                 | Supported [3]                   | -                   |
 | bootstrap.yml            | squid                   | Not relevant for compute nodes  | n/a                 |
 | bootstrap.yml            | tuned                   | Fully supported                 | No                  |         
 | bootstrap.yml            | freeipa_server          | Not relevant for compute nodes  | n/a                 |
@@ -61,23 +62,23 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | ansible_init (install)  | Not relevant during boot        | n/a                 |
 | bootstrap.yml            | k3s (install)           | Not relevant during boot        | n/a                 |
 | hooks/post-bootstrap.yml | ?                       | None at present                 | n/a                 |
-| iam.yml                  | freeipa_client          | None at present [3]             | Yes                 |
+| iam.yml                  | freeipa_client          | None at present [4]             | Yes                 |
 | iam.yml                  | freeipa_server          | Not relevant for compute nodes  | n/a                 |
 | iam.yml                  | sssd                    | None at present                 | No                  |
 | filesystems.yml          | block_devices           | None required - role deprecated | n/a                 |
 | filesystems.yml          | nfs                     | All client functionality        | No                  |
-| filesystems.yml          | manila                  | All functionality               | No [4]              |
+| filesystems.yml          | manila                  | All functionality               | No [5]              |
 | filesystems.yml          | lustre                  | None at present                 | Yes                 |
-| extras.yml               | basic_users             | All functionality [5]           | No                  |
-| extras.yml               | eessi                   | All functionality [6]           | No                  |
-| extras.yml               | cuda                    | None required - use image build | Yes [7]             |
+| extras.yml               | basic_users             | All functionality [6]           | No                  |
+| extras.yml               | eessi                   | All functionality [7]           | No                  |
+| extras.yml               | cuda                    | None required - use image build | Yes [8]             |
 | extras.yml               | persist_hostkeys        | Not relevant for compute nodes  | n/a                 |
 | extras.yml               | compute_init (export)   | Not relevant for compute nodes  | n/a                 |
 | extras.yml               | k9s (install)           | Not relevant during boot        | n/a                 |
-| extras.yml               | extra_packages          | None at present [8]             | -                   |
+| extras.yml               | extra_packages          | None at present [9]             | -                   |
 | slurm.yml                | mysql                   | Not relevant for compute nodes  | n/a                 |
 | slurm.yml                | rebuild                 | Not relevant for compute nodes  | n/a                 |
-| slurm.yml                | openhpc [9]             | All slurmd functionality        | No                  |
+| slurm.yml                | openhpc [10]            | All slurmd functionality        | No                  |
 | slurm.yml                | (set memory limits)     | None at present                 | -                   |
 | slurm.yml                | (block ssh)             | None at present                 | -                   |
 | portal.yml               | (openondemand server)   | Not relevant for compute nodes  | n/a                 |
@@ -92,16 +93,17 @@ it also requires an image build with the role name added to the
 Notes:
 1. `selinux` is set to disabled in StackHPC images.
 2. Requirement for this functionality is TBD.
-3. FreeIPA client functionality would be better provided using a client fork
+3. `cacerts_cert_dir` must be the same on all nodes.
+4. FreeIPA client functionality would be better provided using a client fork
    which uses pkinit keys rather than OTP to reenrol nodes.
-4. Assuming default Ceph client version.
-5. Assumes home directory already exists on shared storage.
-6. Assumes `cvmfs_config` is the same on control node and all compute nodes.
-7. If `cuda` role was run during build, the nvidia-persistenced is enabled
+5. Assuming default Ceph client version.
+6. Assumes home directory already exists on shared storage.
+7. Assumes `cvmfs_config` is the same on control node and all compute nodes.
+8. If `cuda` role was run during build, the nvidia-persistenced is enabled
   and will start during boot.
-8. Would require `dnf_repos`.
-9. `openhpc` does not need to be added to `compute_init_enable`, this is
-   automatically enabled by adding `compute`.
+9. Would require `dnf_repos`.
+10. `openhpc` does not need to be added to `compute_init_enable`, this is
+    automatically enabled by adding `compute`.
 
 ## Approach
 This works as follows:
