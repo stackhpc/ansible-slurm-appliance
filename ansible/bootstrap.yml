@@ -130,7 +130,7 @@
       - appliances_mode == 'configure'
       - not (dnf_repos_allow_insecure_creds | default(false)) # useful for development
 
-- hosts: cacerts
+- hosts: cacerts:!builder
   tags: cacerts
   gather_facts: false
   tasks:

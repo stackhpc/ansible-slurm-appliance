@@ -3,11 +3,12 @@
 - name: Copy all certificates
   copy:
     src: "{{ item }}"
-    dest: /etc/pki/ca-trust/source/anchors
+    dest: /etc/pki/ca-trust/source/anchors/
     owner: root
+    group: root
     mode: 0644
   with_fileglob:
-    - "{{ appliances_environment_root }}/cacerts"
+    - "{{ cacerts_cert_dir }}/*"
   become: true
 
 - name: Update trust store
