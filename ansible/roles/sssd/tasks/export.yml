@@ -1,3 +1,4 @@
+# Exclusively used for compute-init
 - name: Inject host specific config template
   template:
     src: "{{ sssd_conf_src | default('') }}"
