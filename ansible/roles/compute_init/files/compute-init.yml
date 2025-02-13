@@ -19,8 +19,6 @@
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
 
-    cacerts_cert_dir: "/mnt/cluster/cacerts"
-
     tuned_profile_baremetal: hpc-compute
     tuned_profile_vm: virtual-guest
     tuned_profile: "{{ tuned_profile_baremetal if ansible_virtualization_role != 'guest' else tuned_profile_vm }}"
@@ -136,7 +134,10 @@
       when: enable_etc_hosts
 
     - name: Configure cacerts
-      include_tasks: tasks/cacerts.yml
+      ansible.builtin.include_role:
+        name: cacerts
+      vars:
+        cacerts_cert_dir: "/mnt/cluster/cacerts"
       when: enable_cacerts
 
     - name: Configure tuned
