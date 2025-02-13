@@ -57,7 +57,7 @@ jobs:
       - name: Find stackhpc tofu/terraform directory
         # changed in https://github.com/stackhpc/ansible-slurm-appliance/pull/541
         run: |
-          echo STACKHPC_TF_DIR=$(find environments/.stackhpc/ -type d \( -name terraform -o -name tofu )) >> "$GITHUB_ENV"
+          echo STACKHPC_TF_DIR=$(find environments/.stackhpc/ -type d \( -name tofu -o -name terraform \)) >> "$GITHUB_ENV"
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
@@ -187,13 +187,11 @@ jobs:
 
       - name: Checkout current branch
         uses: actions/checkout@v4
-      
+
       - name: Find stackhpc tofu/terraform directory
         # changed in https://github.com/stackhpc/ansible-slurm-appliance/pull/541
         run: |
-          echo STACKHPC_TF_DIR=$(find environments/.stackhpc/ -type d -name tofu -o -type d -name terraform) >> "$GITHUB_ENV"
-        # something about GH actions parsing eats \( \) type expressions
-
+          echo STACKHPC_TF_DIR=$(find environments/.stackhpc/ -type d \( -name tofu -o -name terraform \)) >> "$GITHUB_ENV"
 
       - name: Reimage login and control nodes to image in current branch
         id: reimage_non_compute
