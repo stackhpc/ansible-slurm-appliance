@@ -202,7 +202,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           cd $STACKHPC_TF_DIR
-          tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" -var-file=cluster_image.latest.tfvars.json
+          tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
           
       - name: Configure cluster using current branch
         run: |
