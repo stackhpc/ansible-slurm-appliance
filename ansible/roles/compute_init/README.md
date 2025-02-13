@@ -79,8 +79,8 @@ it also requires an image build with the role name added to the
 | slurm.yml                | mysql                   | Not relevant for compute nodes  | n/a                 |
 | slurm.yml                | rebuild                 | Not relevant for compute nodes  | n/a                 |
 | slurm.yml                | openhpc [10]            | All slurmd functionality        | No                  |
-| slurm.yml                | (set memory limits)     | None at present                 | -                   |
-| slurm.yml                | (block ssh)             | None at present                 | -                   |
+| slurm.yml                | (set memory limits)     | Fully supported                 | No                  |
+| slurm.yml                | (block ssh)             | Fully supported                 | No                  |
 | portal.yml               | (openondemand server)   | Not relevant for compute nodes  | n/a                 |
 | portal.yml               | (openondemand vnc desktop)  | None required - use image build | No              |
 | portal.yml               | (openondemand jupyter server) | None required - use image build | No            |
