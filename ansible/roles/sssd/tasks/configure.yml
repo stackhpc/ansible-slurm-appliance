@@ -32,3 +32,10 @@
     name: oddjobd
     state: "{{ 'started' if sssd_enable_mkhomedir else 'stopped' }}"
     enabled: "{{ sssd_enable_mkhomedir }}"
+
+- name: "Ensure oddjob is started"
+  service:
+    name: oddjobd
+    state: 'started'
+    enabled: true
+  when: sssd_enable_mkhomedir | bool
