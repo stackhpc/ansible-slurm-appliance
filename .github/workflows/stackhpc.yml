@@ -191,7 +191,9 @@ jobs:
       - name: Find stackhpc tofu/terraform directory
         # changed in https://github.com/stackhpc/ansible-slurm-appliance/pull/541
         run: |
-          echo STACKHPC_TF_DIR=$(find environments/.stackhpc/ -type d \( -name terraform -o -name tofu \) ) >> "$GITHUB_ENV"
+          echo STACKHPC_TF_DIR=$(find environments/.stackhpc/ -type d -name tofu -o -type d -name terraform) >> "$GITHUB_ENV"
+        # something about GH actions parsing eats \( \) type expressions
+
 
       - name: Reimage login and control nodes to image in current branch
         id: reimage_non_compute
