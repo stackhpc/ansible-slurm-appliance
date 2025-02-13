@@ -53,6 +53,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ env.LATEST_RELEASE_TAG }}
+          fetch-depth: 0
 
       - name: Find stackhpc tofu/terraform directory
         # changed in https://github.com/stackhpc/ansible-slurm-appliance/pull/541
@@ -186,7 +187,7 @@ jobs:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Checkout current branch
-        uses: actions/checkout@v4
+        run: git checkout ${{ github.head_ref || github.ref_name }}
 
       - name: Update ansible, pip and galaxy requirements
         run: dev/setup-env.sh
