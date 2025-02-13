@@ -13,6 +13,7 @@
     - library
     - filter_plugins
     - tasks
+    - roles
 
 - name: Inject files from roles
   copy:
