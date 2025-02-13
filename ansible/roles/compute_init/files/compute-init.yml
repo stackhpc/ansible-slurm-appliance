@@ -143,90 +143,18 @@
       when: enable_etc_hosts
 
     - name: Configure sssd
-      block:
-        - name: Manage sssd.conf configuration
-          copy:
-            src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
-            dest: "{{ sssd_conf_dest }}"
-            owner: root
-            group: root
-            mode: "0600"
-
-        - name: Restart sssd
-          systemd:
-            name: sssd
-            state: restarted
-          when: sssd_started | bool
-
-        - name: Ensure sssd service state
-          systemd:
-            name: sssd
-            state: "{{ 'started' if sssd_started | bool else 'stopped' }}"
-            enabled: "{{ sssd_enabled | bool }}"
-
-        - name: Get current authselect configuration
-          command: authselect current --raw
-          changed_when: false
-          failed_when:
-            - _authselect_current.rc != 0
-            - "'No existing configuration detected' not in _authselect_current.stdout"
-          register: _authselect_current # stdout: sssd with-mkhomedir
-
-        - name: Configure nsswitch and PAM for SSSD
-          command: "authselect select sssd --force{% if sssd_enable_mkhomedir | bool %} with-mkhomedir{% endif %}"
-          when: "'sssd' not in _authselect_current.stdout"
-
-        - name: "Ensure oddjob is started"
-          service:
-            name: oddjobd
-            state: 'started'
-            enabled: true
-          when: sssd_enable_mkhomedir | bool
-      when: enable_sssd
+      ansible.builtin.include_role:
+        name: sssd
+        tasks_from: configure.yml
+      vars:
+        sssd_conf_src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
+      when: enable_sshd
 
     - name: Configure sshd
-      block:
-        - name: Grab facts to determine distribution
-          setup:
-
-        - name: Ensure drop in directory exists
-          file:
-            path: /etc/ssh/sshd_config.d/*.conf
-            state: directory
-            owner: root
-            group: root
-            mode: "0700"
-
-        - name: Ensure drop in directory is included
-          blockinfile:
-            dest: /etc/ssh/sshd_config
-            content: | 
-              # To modify the system-wide sshd configuration, create a  *.conf  file under
-              #  /etc/ssh/sshd_config.d/  which will be automatically included below
-              Include /etc/ssh/sshd_config.d/*.conf
-            state: present
-            insertafter: "# default value."
-            validate: sshd -t -f %s
-          when: ansible_facts.distribution_major_version == '8'
-
-        - name: Restart sshd
-          systemd:
-            name: sshd
-            state: restarted
-
-        - name: Manage sshd.conf configuration
-          copy:
-            src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sshd.conf"
-            dest: "{{ sshd_conf_dest }}"
-            owner: root
-            group: root
-            mode: "0600"
-            validate: sshd -t -f %s
-
-        - name: Restart sshd
-          systemd:
-            name: sshd
-            state: restarted
+      ansible.builtin.include_role:
+        name: sshd
+      vars:
+        sshd_conf_src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sshd.conf"
       when: enable_sshd
 
     - name: Configure tuned

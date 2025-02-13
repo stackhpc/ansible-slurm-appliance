@@ -85,8 +85,10 @@
   import_role:
     name: sssd
     tasks_from: export.yml
+  when: "'sssd' in group_names"
 
 - name: Template sshd config 
   import_role:
     name: sshd
     tasks_from: export.yml
+  when: "'sshd' in group_names"
