@@ -44,10 +44,16 @@ jobs:
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
     steps:
-      - uses: actions/checkout@v4
+
+      - name: Find the latest release
+        run: |
+          echo LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name) >> "$GITHUB_ENV"
+          echo LATEST_RELEASE_TAG: $LATEST_RELEASE_TAG
+      
+      - name: Checkout latest release
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          fetch-tags: true
+          ref: ${{ env.LATEST_RELEASE_TAG }}
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
@@ -79,14 +85,6 @@ jobs:
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
 
-      - name: Find the latest release
-        run: |
-          echo LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name) >> "$GITHUB_ENV"
-          echo LATEST_RELEASE_TAG: $LATEST_RELEASE_TAG
-      
-      - name: Checkout latest release
-        run: git checkout $LATEST_RELEASE_TAG
-      
       - name: Install ansible etc
         run: dev/setup-env.sh
 
@@ -181,9 +179,9 @@ jobs:
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
-      - name: Switch to current branch
-        run: git checkout -
-
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+      
       - name: Reimage login and control nodes to image in current branch
         id: reimage_non_compute
         run: |
