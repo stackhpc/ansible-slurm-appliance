@@ -52,6 +52,14 @@
     - import_role:
         name: proxy
 
+- hosts: chrony
+  gather_facts: false
+  tags: chrony
+  become: yes
+  tasks:
+    - import_role:
+        name: chrony
+
 - hosts: cluster
   gather_facts: false
   become: yes

@@ -40,6 +40,7 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | (wait for ansible-init) | Not relevant during boot        | n/a                 |
 | bootstrap.yml            | resolv_conf             | Fully supported                 | No                  |
 | bootstrap.yml            | etc_hosts               | Fully supported                 | No                  |
+| bootstrap.yml            | chrony                  | Fully supported                 | No                  |
 | bootstrap.yml            | proxy                   | None at present                 | No                  |
 | bootstrap.yml            | (/etc permissions)      | None required - use image build | No                  |
 | bootstrap.yml            | (ssh /home fix)         | None required - use image build | No                  |

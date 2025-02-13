@@ -17,6 +17,7 @@
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
     enable_basic_users: "{{ os_metadata.meta.basic_users | default(false) | bool }}"
     enable_eessi: "{{ os_metadata.meta.eessi | default(false) | bool }}"
+    enable_chrony: "{{ os_metadata.meta.chrony | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
@@ -99,6 +100,10 @@
         file: "/mnt/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml" # can't use inventory_hostname
 
       # TODO: should /mnt/cluster now be UNMOUNTED to avoid future hang-ups?
+
+    - name: Run chrony role
+      ansible.builtin.include_role:
+        name: mrlesmithjr.chrony
 
     - name: Configure resolve.conf
       block:
