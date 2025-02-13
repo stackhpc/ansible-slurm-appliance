@@ -1,0 +1,10 @@
+- name: Inject host specific config template
+  template:
+    src: "{{ sshd_conf_src | default('') }}"
+    dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/sshd.conf"
+    owner: root
+    group: root
+    mode: u=rw,go=
+  when:
+    - sshd_conf_src != ''
+  delegate_to: "{{ groups['control'] | first }}"

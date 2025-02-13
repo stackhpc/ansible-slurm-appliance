@@ -10,6 +10,7 @@
     enable_resolv_conf: "{{ os_metadata.meta.resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.etc_hosts | default(false) | bool }}"
     enable_sssd: "{{ os_metadata.meta.sssd | default(false) | bool }}"
+    enable_sshd: "{{ os_metadata.meta.sshd | default(false) | bool }}"
     enable_tuned:  "{{ os_metadata.meta.tuned | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
@@ -23,6 +24,9 @@
     sssd_conf_dest: /etc/sssd/sssd.conf
     sssd_started: true
     sssd_enabled: true
+
+    sshd_password_authentication: false
+    sshd_conf_dest: /etc/ssh/sshd_config.d/10-ansible.conf
 
     tuned_profile_baremetal: hpc-compute
     tuned_profile_vm: virtual-guest
@@ -141,8 +145,8 @@
     - name: Configure sssd
       block:
         - name: Manage sssd.conf configuration
-          ansible.builtin.template:
-            src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf.j2"
+          copy:
+            src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
             dest: "{{ sssd_conf_dest }}"
             owner: root
             group: root
@@ -178,6 +182,51 @@
             state: "{{ 'started' if sssd_enable_mkhomedir else 'stopped' }}"
             enabled: "{{ sssd_enable_mkhomedir }}"
       when: enable_sssd
+
+    - name: Configure sshd
+      block:
+        - name: Grab facts to determine distribution
+          setup:
+
+        - name: Ensure drop in directory exists
+          file:
+            path: /etc/ssh/sshd_config.d/*.conf
+            state: directory
+            owner: root
+            group: root
+            mode: "0700"
+
+        - name: Ensure drop in directory is included
+          blockinfile:
+            dest: /etc/ssh/sshd_config
+            content: | 
+              # To modify the system-wide sshd configuration, create a  *.conf  file under
+              #  /etc/ssh/sshd_config.d/  which will be automatically included below
+              Include /etc/ssh/sshd_config.d/*.conf
+            state: present
+            insertafter: "# default value."
+            validate: sshd -t -f %s
+          when: ansible_facts.distribution_major_version == '8'
+
+        - name: Restart sshd
+          systemd:
+            name: sshd
+            state: restarted
+
+        - name: Manage sshd.conf configuration
+          copy:
+            src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sshd.conf"
+            dest: "{{ sshd_conf_dest }}"
+            owner: root
+            group: root
+            mode: "0600"
+            validate: sshd -t -f %s
+
+        - name: Restart sshd
+          systemd:
+            name: sshd
+            state: restarted
+      when: enable_sshd
 
     - name: Configure tuned
       include_tasks: tasks/tuned.yml

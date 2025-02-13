@@ -81,18 +81,12 @@
     mode: u=rw,go=
   delegate_to: "{{ groups['control'] | first }}"
 
-- name: Inject host specific config template files
-  copy:
-    src: "{{ item.src }}"
-    dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/{{ item.dest }}"
-    owner: root
-    group: root
-    mode: u=rw,go=
-  loop:
-    - src: "{{ sssd_conf_src | default('') }}"
-      dest: sssd.conf.j2
-    - src: "{{ sshd_conf_src | default('') }}"
-      dest: sshd.conf.j2
-  when:
-    - item.src != ''
-  delegate_to: "{{ groups['control'] | first }}"
+- name: Template sssd config 
+  import_role:
+    name: sssd
+    tasks_from: export.yml
+
+- name: Template sshd config 
+  import_role:
+    name: sshd
+    tasks_from: export.yml
