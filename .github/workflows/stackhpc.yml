@@ -91,7 +91,7 @@ jobs:
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
 
-      - name: Install ansible etc
+      - name: Install ansible, pip and galaxy requirements
         run: dev/setup-env.sh
 
       - name: Install OpenTofu
@@ -187,6 +187,9 @@ jobs:
 
       - name: Checkout current branch
         uses: actions/checkout@v4
+
+      - name: Update ansible, pip and galaxy requirements
+        run: dev/setup-env.sh
 
       - name: Find stackhpc tofu/terraform directory
         # changed in https://github.com/stackhpc/ansible-slurm-appliance/pull/541
