@@ -190,6 +190,12 @@ variable "inventory_secrets_path" {
   default = ""
 }
 
+variable "gateway_ip" {
+    description = "IP of default gateway, applied to interface on access network"
+    type = string
+    default = ""
+}
+
 locals {
     k3s_token = data.external.inventory_secrets.result["vault_k3s_token"]
 }
