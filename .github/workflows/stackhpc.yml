@@ -55,10 +55,10 @@ jobs:
           ref: ${{ env.LATEST_RELEASE_TAG }}
           fetch-depth: 0
 
-      - name: Find stackhpc tofu/terraform directory
+      - name: Find stackhpc tofu/terraform directory at latest release
         # changed in https://github.com/stackhpc/ansible-slurm-appliance/pull/541
         run: |
-          echo STACKHPC_TF_DIR=$(find environments/.stackhpc/ -type d \( -name tofu -o -name terraform \)) >> "$GITHUB_ENV"
+          echo STACKHPC_TF_DIR_RELEASE=$(find environments/.stackhpc/ -type d \( -name tofu -o -name terraform \)) >> "$GITHUB_ENV"
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
@@ -77,7 +77,7 @@ jobs:
       - name: Record debug info
         run: |
           echo LATEST_RELEASE_TAG: $LATEST_RELEASE_TAG
-          echo STACKHPC_TF_DIR: $STACKHPC_TF_DIR
+          echo STACKHPC_TF_DIR_RELEASE: $STACKHPC_TF_DIR_RELEASE
           echo CI_CLOUD: $CI_CLOUD
 
       - name: Setup ssh
@@ -102,7 +102,7 @@ jobs:
 
       - name: Initialise tofu
         run: tofu init
-        working-directory: ${{ env.STACKHPC_TF_DIR }}
+        working-directory: ${{ env.STACKHPC_TF_DIR_RELEASE }}
 
       - name: Write clouds.yaml
         run: |
@@ -124,14 +124,14 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd $STACKHPC_TF_DIR_RELEASE
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
 
       - name: Delete infrastructure if provisioning failed
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd $STACKHPC_TF_DIR_RELEASE
           tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
@@ -192,17 +192,18 @@ jobs:
       - name: Update ansible, pip and galaxy requirements
         run: dev/setup-env.sh
 
-      - name: Find stackhpc tofu/terraform directory
+      - name: Find stackhpc tofu/terraform directory in current branch
         # changed in https://github.com/stackhpc/ansible-slurm-appliance/pull/541
         run: |
-          echo STACKHPC_TF_DIR=$(find environments/.stackhpc/ -type d \( -name tofu -o -name terraform \)) >> "$GITHUB_ENV"
+          echo STACKHPC_TF_DIR_BRANCH=$(find environments/.stackhpc/ -type d \( -name tofu -o -name terraform \)) >> "$GITHUB_ENV"
 
       - name: Reimage login and control nodes to image in current branch
         id: reimage_non_compute
         run: |
+          echo STACKHPC_TF_DIR_BRANCH: $STACKHPC_TF_DIR_BRANCH
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd $STACKHPC_TF_DIR_BRANCH
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
           
       - name: Configure cluster using current branch
@@ -242,6 +243,6 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd $STACKHPC_TF_DIR_BRANCH
           tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
         if: ${{ success() || cancelled() }}
