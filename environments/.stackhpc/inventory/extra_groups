@@ -38,3 +38,6 @@ builder
 
 [rebuild:children]
 control
+
+[cacerts:children]
+cluster

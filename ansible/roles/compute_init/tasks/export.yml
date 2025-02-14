@@ -72,6 +72,12 @@
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
 
+- name: Export cacerts
+  ansible.builtin.include_role:
+    name: cacerts
+    tasks_from: export.yml
+  when: "'cacerts' in group_names"
+
 - name: Create hostconfig directory
   file:
     path: "/exports/cluster/hostconfig/{{ inventory_hostname }}/"

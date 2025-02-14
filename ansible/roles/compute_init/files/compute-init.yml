@@ -9,6 +9,7 @@
     enable_compute: "{{ os_metadata.meta.compute | default(false) | bool }}"
     enable_resolv_conf: "{{ os_metadata.meta.resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.etc_hosts | default(false) | bool }}"
+    enable_cacerts: "{{ os_metadata.meta.cacerts | default(false) | bool }}"
     enable_sssd: "{{ os_metadata.meta.sssd | default(false) | bool }}"
     enable_sshd: "{{ os_metadata.meta.sshd | default(false) | bool }}"
     enable_tuned:  "{{ os_metadata.meta.tuned | default(false) | bool }}"
@@ -134,13 +135,12 @@
         mode: 0644
       when: enable_etc_hosts
 
-    - name: Configure sssd
+    - name: Configure cacerts
       ansible.builtin.include_role:
-        name: sssd
-        tasks_from: configure.yml
+        name: cacerts
       vars:
-        sssd_conf_src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
-      when: enable_sssd
+        cacerts_cert_dir: "/mnt/cluster/cacerts"
+      when: enable_cacerts
 
     - name: Configure sshd
       ansible.builtin.include_role:
@@ -152,6 +152,14 @@
     - name: Configure tuned
       include_tasks: tasks/tuned.yml
       when: enable_tuned
+
+    - name: Configure sssd
+      ansible.builtin.include_role:
+        name: sssd
+        tasks_from: configure.yml
+      vars:
+        sssd_conf_src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
+      when: enable_sssd
 
     # NFS client mount
     - name: If nfs-clients is present
