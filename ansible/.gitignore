@@ -82,3 +82,5 @@ roles/*
 !roles/pytools/**
 !roles/rebuild/
 !roles/rebuild/**
+!roles/slurm_tools/
+!roles/slurm_tools/**
