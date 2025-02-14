@@ -71,7 +71,7 @@ sequenceDiagram
 
 ```
 
-## Slurm Controlled Rebuild WIP
+## Slurm Controlled Rebuild
 
 This sequence applies to active clusters, after running ansible/site.yml for the first time, to reimage the cluster while main.tf has set:
 - `ignore_image_changes: true`
