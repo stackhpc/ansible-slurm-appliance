@@ -114,3 +114,20 @@ variable "fip_network" {
     EOT
     default = ""
 }
+
+variable "match_ironic_node" {
+    type = bool
+    description = "Whether to launch instances on the Ironic node of the same name as each cluster node"
+    default = false
+}
+
+variable "availability_zone" {
+    type = string
+    description = "Name of availability zone - ignored unless match_ironic_node is true"
+    default = "nova"
+}
+
+variable "baremetal_nodes" {
+    type = map(string)
+    default = {}
+}
