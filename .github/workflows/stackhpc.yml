@@ -195,6 +195,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
+          cp $STACKHPC_TF_DIR_OLD/terraform.tfstate $STACKHPC_TF_DIR_NEW
           cd $STACKHPC_TF_DIR_NEW
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
           
