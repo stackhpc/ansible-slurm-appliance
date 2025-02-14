@@ -20,14 +20,6 @@
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
 
-    sssd_enable_mkhomedir: false
-    sssd_conf_dest: /etc/sssd/sssd.conf
-    sssd_started: true
-    sssd_enabled: true
-
-    sshd_password_authentication: false
-    sshd_conf_dest: /etc/ssh/sshd_config.d/10-ansible.conf
-
     tuned_profile_baremetal: hpc-compute
     tuned_profile_vm: virtual-guest
     tuned_profile: "{{ tuned_profile_baremetal if ansible_virtualization_role != 'guest' else tuned_profile_vm }}"
@@ -148,7 +140,7 @@
         tasks_from: configure.yml
       vars:
         sssd_conf_src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
-      when: enable_sshd
+      when: enable_sssd
 
     - name: Configure sshd
       ansible.builtin.include_role:
