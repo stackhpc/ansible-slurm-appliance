@@ -58,7 +58,7 @@
   become: yes
   tasks:
     - import_role:
-        name: chrony
+        name: mrlesmithjr.chrony
 
 - hosts: cluster
   gather_facts: false
