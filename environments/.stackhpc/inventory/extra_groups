@@ -24,6 +24,9 @@ cluster
 login
 compute
 
+[chrony:children]
+cluster
+
 [tuned:children]
 # Install tuned into fat image
 builder

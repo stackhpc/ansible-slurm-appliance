@@ -43,6 +43,8 @@
       dest: tasks/tuned.yml
     - src: ../../stackhpc.nfs/tasks/nfs-clients.yml
       dest: tasks/nfs-clients.yml
+    - src: ../../mrlesmithjr.chrony
+      dest: roles/
 
 - name: Add filter_plugins to ansible.cfg
   lineinfile:
