@@ -53,6 +53,14 @@ variable "login" {
                         Values are a mapping with:
                             size: Size of volume in GB
                         **NB**: The order in /dev is not guaranteed to match the mapping
+        fip_addresses: List of addresses of floating IPs to associate with nodes,
+                       in the same order as nodes parameter. The floating IPs
+                       must already be allocated to the project.
+        fip_network: Name of network containing ports to attach FIPs to. Only
+                     required if multiple networks are defined.
+
+        match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
+        availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
   EOF
 }
 
@@ -87,6 +95,8 @@ variable "compute" {
                            Values are a mapping with:
                                 size: Size of volume in GB
                            **NB**: The order in /dev is not guaranteed to match the mapping
+            match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
+            availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
     EOF
 }
 
@@ -178,14 +188,6 @@ variable "inventory_secrets_path" {
   description = "Path to inventory secrets.yml file. Default is standard cookiecutter location."
   type = string
   default = ""
-}
-
-data "external" "inventory_secrets" {
-  program = ["${path.module}/read-inventory-secrets.py"]
-
-  query = {
-    path = var.inventory_secrets_path == "" ? "${path.module}/../inventory/group_vars/all/secrets.yml" : var.inventory_secrets_path
-  }
 }
 
 locals {

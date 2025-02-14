@@ -1,0 +1,9 @@
+# Exclusively used for compute-init
+- name: Inject host specific config template
+  template:
+    src: "{{ sssd_conf_src }}"
+    dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/sssd.conf"
+    owner: root
+    group: root
+    mode: u=rw,go=
+  delegate_to: "{{ groups['control'] | first }}"

@@ -178,12 +178,13 @@ jobs:
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Test reimage of compute nodes and compute-init (via rebuild adhoc)
+      - name: Test compute node reboot and compute-init
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible-playbook -v --limit compute ansible/adhoc/rebuild.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
+          ansible-playbook -v ansible/adhoc/reboot_via_slurm.yml
 
       - name: Check sacct state survived reimage
         run: |

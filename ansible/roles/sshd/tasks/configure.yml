@@ -1,3 +1,30 @@
+- name: Grab facts to determine distribution
+  setup:
+
+- name: Ensure drop in directory exists
+  file:
+    path: /etc/ssh/sshd_config.d/*.conf
+    state: directory
+    owner: root
+    group: root
+    mode: 700
+  become: true
+
+- name: Ensure drop in directory is included
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    content: | 
+      # To modify the system-wide sshd configuration, create a  *.conf  file under
+      #  /etc/ssh/sshd_config.d/  which will be automatically included below
+      Include /etc/ssh/sshd_config.d/*.conf
+    state: present
+    insertafter: "# default value."
+    validate: sshd -t -f %s
+  notify:
+    - Restart sshd
+  become: true
+  when: ansible_facts.distribution_major_version == '8'
+
 - name: Template sshd configuration
   # NB: If parameters are defined multiple times the first value wins;
   # The default /etc/ssh/sshd_config has

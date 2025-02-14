@@ -97,6 +97,8 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
   EOF
 
+  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
+
   lifecycle {
     ignore_changes = [
       image_id,
@@ -140,7 +142,7 @@ resource "openstack_compute_instance_v2" "compute" {
         k3s_token          = var.k3s_token
         control_address    = var.control_address
         access_ip = openstack_networking_port_v2.compute["${each.key}-${var.networks[0].network}"].all_fixed_ips[0]
-     },
+    },
     {for e in var.compute_init_enable: e => true}
   )
 
@@ -149,8 +151,22 @@ resource "openstack_compute_instance_v2" "compute" {
     fqdn: ${var.cluster_name}-${each.key}.${var.cluster_name}.${var.cluster_domain_suffix}
   EOF
 
+  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
+
+}
+
+resource "openstack_networking_floatingip_associate_v2" "fip" {
+  for_each = {for idx in range(length(var.fip_addresses)): var.nodes[idx] => var.fip_addresses[idx]} # zip, fip_addresses can be shorter
+
+  floating_ip = each.value
+  port_id     = openstack_networking_port_v2.compute["${each.key}-${length(var.networks) == 1 ? var.networks[0].network : var.fip_network}"].id
+
 }
 
 output "compute_instances" {
     value = local.compute_instances
+}
+
+output "image_id" {
+  value = var.image_id
 }
