@@ -46,7 +46,7 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | (system users)          | None required - use image build | No                  |
 | bootstrap.yml            | systemd                 | None required - use image build | No                  |
 | bootstrap.yml            | selinux                 | None required - use image build | Maybe [1]           |
-| bootstrap.yml            | sshd                    | None at present                 | No                  |
+| bootstrap.yml            | sshd                    | Fully supported                 | No                  |
 | bootstrap.yml            | dnf_repos               | None at present [2]             | -                   |
 | bootstrap.yml            | cacerts                 | Supported [3]                   | -                   |
 | bootstrap.yml            | squid                   | Not relevant for compute nodes  | n/a                 |
@@ -64,7 +64,7 @@ it also requires an image build with the role name added to the
 | hooks/post-bootstrap.yml | ?                       | None at present                 | n/a                 |
 | iam.yml                  | freeipa_client          | None at present [4]             | Yes                 |
 | iam.yml                  | freeipa_server          | Not relevant for compute nodes  | n/a                 |
-| iam.yml                  | sssd                    | None at present                 | No                  |
+| iam.yml                  | sssd                    | Fully supported                 | No                  |
 | filesystems.yml          | block_devices           | None required - role deprecated | n/a                 |
 | filesystems.yml          | nfs                     | All client functionality        | No                  |
 | filesystems.yml          | manila                  | All functionality               | No [5]              |

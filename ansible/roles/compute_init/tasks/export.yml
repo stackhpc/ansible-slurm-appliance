@@ -84,3 +84,24 @@
   delegate_to: "{{ groups['control'] | first }}"
   run_once: true
   when: "'cacerts' in group_names"
+
+- name: Create hostconfig directory
+  file:
+    path: "/exports/cluster/hostconfig/{{ inventory_hostname }}/"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rw,go=
+  delegate_to: "{{ groups['control'] | first }}"
+
+- name: Template sssd config 
+  import_role:
+    name: sssd
+    tasks_from: export.yml
+  when: "'sssd' in group_names"
+
+- name: Template sshd config 
+  import_role:
+    name: sshd
+    tasks_from: export.yml
+  when: "'sshd' in group_names"
