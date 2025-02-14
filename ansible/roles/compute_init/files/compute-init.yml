@@ -9,12 +9,9 @@
     enable_compute: "{{ os_metadata.meta.compute | default(false) | bool }}"
     enable_resolv_conf: "{{ os_metadata.meta.resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.etc_hosts | default(false) | bool }}"
-<<<<<<< HEAD
     enable_cacerts: "{{ os_metadata.meta.cacerts | default(false) | bool }}"
-=======
     enable_sssd: "{{ os_metadata.meta.sssd | default(false) | bool }}"
     enable_sshd: "{{ os_metadata.meta.sshd | default(false) | bool }}"
->>>>>>> main
     enable_tuned:  "{{ os_metadata.meta.tuned | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
