@@ -15,12 +15,14 @@
     - tasks
 
 - name: Inject files from roles
-  copy:
+  synchronize:
     src: '{{ item.src }}'
     dest: '/etc/ansible-init/playbooks/{{ item.dest }}'
-    owner: root
-    group: root
-    mode: 0644
+    archive: false
+    rsync_opts: ["-p", "--chmod=D770,F644", "--owner=root", "--group=root"]
+    recursive: true
+    use_ssh_args: true
+  become: true
   loop:
     - src: ../../resolv_conf/templates/resolv.conf.j2
       dest: templates/resolv.conf.j2
