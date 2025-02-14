@@ -119,10 +119,15 @@ login = {
   interactive = {
     nodes = ["login-0"]
     extra_networks = [
+<<<<<<< HEAD
       {
         network = "netB"
         subnet = "subnetB"
       }
+=======
+      network = "netB"
+      subnet = "subnetB"
+>>>>>>> 32d8e2caf78bf930b8f8f8689ac6d761011b0f2f
     ]
   }
 }
@@ -187,7 +192,7 @@ cannot to avoid routing problems on the login node(s). The options are then:
       # environments/$SITE/inventory/group_vars/all/squid.yml:
       # these are just examples
       squid_cache_disk: 1024 # MB
-      squid_cache_mem: '12 GB
+      squid_cache_mem: '12 GB'
       ```
   In this case, for the nodes only on "netB" a dummy default route is
   automatically configured [to ensure](https://docs.k3s.io/installation/airgap#default-network-route)
