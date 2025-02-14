@@ -104,6 +104,7 @@
     - name: Run chrony role
       ansible.builtin.include_role:
         name: mrlesmithjr.chrony
+      when: enable_chrony | bool
 
     - name: Configure resolve.conf
       block:
