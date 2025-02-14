@@ -69,3 +69,45 @@ sequenceDiagram
     ansible->>nodes: Ansible tasks
     note over nodes: All services running
 
+```
+
+## Slurm Controlled Rebuild WIP
+
+This sequence applies to active clusters, after running ansible/site.yml for the first time, to reimage the cluster while main.tf has set:
+- `ignore_image_changes: true`
+- `compute_init_enable: ['compute',..]`
+
+```mermaid
+sequenceDiagram
+    participant ansible as Ansible Deploy Host
+    participant cloud as Cloud
+    participant nodes as Cluster Instances
+    note over ansible: Update cluster_image.auto.tfvars.json
+    note over ansible: $ tofu apply ....
+    ansible->>ansible: target_image templated to hostvars
+    ansible->>cloud: Update state.tf with new image
+    cloud->>nodes: Reimage login and control nodes
+    note over ansible: $ ansible-playbook ansible/site.yml
+    ansible->>nodes: Hostvars templated to NFS exports directory
+    ansible->>nodes: Ansible tasks
+    note over nodes: $ srun --reboot ...
+    rect rgb(204, 232, 252)
+    note over nodes: RebootProgram
+    nodes->>cloud: Query and compare instance image
+    cloud->>nodes: Reimage if target =/= current
+    rect rgb(252, 200, 100)
+    note over nodes: compute-init
+    nodes->>nodes: Retrieve hostvars from nfs mount
+    note over nodes: Compute nodes rejoin cluster
+
+    end
+    nodes->>nodes: srun task completes
+    end
+
+
+
+
+
+
+
+
