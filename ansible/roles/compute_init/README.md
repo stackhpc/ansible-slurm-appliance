@@ -72,7 +72,7 @@ it also requires an image build with the role name added to the
 | filesystems.yml          | block_devices           | None required - role deprecated | n/a                 |
 | filesystems.yml          | nfs                     | All client functionality        | No                  |
 | filesystems.yml          | manila                  | All functionality               | No [5]              |
-| filesystems.yml          | lustre                  | None at present                 | Yes                 |
+| filesystems.yml          | lustre                  | All functionality               | Yes                 |
 | extras.yml               | basic_users             | All functionality [6]           | No                  |
 | extras.yml               | eessi                   | All functionality [7]           | No                  |
 | extras.yml               | cuda                    | None required - use image build | Yes [8]             |
