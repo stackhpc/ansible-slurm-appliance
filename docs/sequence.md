@@ -99,15 +99,6 @@ sequenceDiagram
     note over nodes: compute-init
     nodes->>nodes: Retrieve hostvars from nfs mount
     note over nodes: Compute nodes rejoin cluster
-
     end
     nodes->>nodes: srun task completes
     end
-
-
-
-
-
-
-
-
