@@ -32,6 +32,8 @@ roles/*
 !roles/mysql/**
 !roles/systemd/
 !roles/systemd/**
+!roles/cacerts/
+!roles/cacerts/**
 !roles/cuda/
 !roles/cuda/**
 !roles/freeipa/
