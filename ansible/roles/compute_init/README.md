@@ -9,9 +9,7 @@ mount the share on a user-controlled machine by tunnelling through a login
 node. This feature should not be enabled on production clusters at this time.
 
 To enable this:
-1. Add the `compute` group (or a subset) into the `compute_init` group. This is
-   the default when using cookiecutter to create an environment, via the
-   "everything" template.
+1. Add the `compute` group (or a subset) into the `compute_init` group.
 2. Build an image which includes the `compute_init` group. This is the case
    for StackHPC-built release images.
 3. Enable the required functionalities during boot, by setting the
