@@ -3,6 +3,11 @@
 Experimental functionality to allow compute nodes to rejoin the cluster after
 a reboot without running the `ansible/site.yml` playbook.
 
+**CAUTION:** The approach used here of exporting cluster secrets over NFS
+is considered to be a security risk due to the potential for cluster users to
+mount the share on a user-controlled machine by tunnelling through a login
+node. This feature should not be enabled on production clusters at this time.
+
 To enable this:
 1. Add the `compute` group (or a subset) into the `compute_init` group. This is
    the default when using cookiecutter to create an environment, via the
