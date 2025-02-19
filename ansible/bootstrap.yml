@@ -312,4 +312,4 @@
   tasks:
     - ansible.builtin.include_role:
         name: k3s
-        tasks_from: install.yml
+        tasks_from: "{{ 'install.yml' if 'builder' in group_names else 'runtime.yml' }}"

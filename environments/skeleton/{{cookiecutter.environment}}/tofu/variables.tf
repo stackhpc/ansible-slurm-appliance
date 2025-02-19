@@ -189,7 +189,3 @@ variable "inventory_secrets_path" {
   type = string
   default = ""
 }
-
-locals {
-    k3s_token = data.external.inventory_secrets.result["vault_k3s_token"]
-}

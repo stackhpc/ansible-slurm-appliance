@@ -1,0 +1,64 @@
+---
+- name: Check if k3s agents are already connected
+  service_facts:
+  register: services_state
+
+- name: Initialise and authenticate k3s server and agents
+  vars:
+    k3s_server_name: "{{ hostvars[groups['k3s_server'].0].ansible_host }}"
+    access_ip: "{{ ansible_default_ipv4.address }}"
+    services_states: > # getting list of all unique agent service states
+      groups['k3s_agent']
+      | map('extract', hostvars, ['services', 'k3s-agent.service', 'state'])
+      | unique
+  when: not (services_state | length == 1 and services_state[0] == 'running') 
+  block:
+  - name: Initialise server and generate bootstrap tokens
+    when: inventory_hostname in groups['k3s_server']
+    block:
+    - name: Template k3s env file
+      ansible.builtin.template:
+        dest: /etc/systemd/system/k3s.service.env
+        src: k3s.service.env.j2
+
+    - name: Start k3s server
+      ansible.builtin.systemd:
+        name: k3s
+        daemon_reload: true
+        state: started
+        enabled: true
+
+    - name: Generate bootstrap token
+      no_log: true
+      shell:
+        cmd: "k3s token create --ttl {{ k3s_bootstrap_token_expiry }}"
+      register: _token_output
+
+  - name: Initialise agents
+    when: inventory_hostname in groups['k3s_agent']
+    block:
+    - name: Template k3s agent env file
+      ansible.builtin.template:
+        dest: /etc/systemd/system/k3s-agent.service.env
+        src: k3s-agent.service.env.j2
+
+    - name: Ensure password directory exists
+      ansible.builtin.file: 
+        path: "/etc/rancher/node"
+        state: directory
+    
+    - name: Write node password
+      ansible.builtin.copy:
+        dest: /etc/rancher/node/password
+        content: "{{ vault_k3s_node_password }}"
+        owner: root
+        group: root
+        mode: 640 # normal k3s install is 644 but that doesn't feel right
+
+    - name: Start k3s agent
+      ansible.builtin.systemd:
+        name: k3s-agent
+        daemon_reload: true
+        state: started
+        enabled: true
+      
