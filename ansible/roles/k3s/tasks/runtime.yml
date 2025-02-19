@@ -6,7 +6,7 @@
 - name: Initialise and authenticate k3s server and agents
   vars:
     k3s_server_name: "{{ hostvars[groups['k3s_server'].0].ansible_host }}"
-    access_ip: "{{ ansible_default_ipv4.address }}"
+    access_ip: "{{ ansible_host }}"
     services_states: > # getting list of all unique agent service states
       groups['k3s_agent']
       | map('extract', hostvars, ['services', 'k3s-agent.service', 'state'])
