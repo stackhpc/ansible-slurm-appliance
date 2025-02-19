@@ -41,3 +41,6 @@ control
 
 [cacerts:children]
 cluster
+
+[compute_init:children]
+compute

@@ -2,28 +2,30 @@
 
 set -euo pipefail
 
-if [[ -f /etc/os-release ]]; then
-    . /etc/os-release
-    OS=$ID
-    OS_VERSION=$VERSION_ID
-else
-    exit 1
-fi
+PYTHON_VERSION=${PYTHON_VERSION:-}
 
-MAJOR_VERSION=$(echo $OS_VERSION | cut -d. -f1)
+if [[ "$PYTHON_VERSION" == "" ]]; then
+    if [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        OS=$ID
+        OS_VERSION=$VERSION_ID
+    else
+        exit 1
+    fi
 
-PYTHON_VERSION=""
+    MAJOR_VERSION=$(echo $OS_VERSION | cut -d. -f1)
 
-if [[ "$OS" == "ubuntu" && "$MAJOR_VERSION" == "22" ]]; then
-    PYTHON_VERSION="/usr/bin/python3.10"
-elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "8" ]]; then
-    # python3.9+ doesn't have selinux bindings
-    PYTHON_VERSION="/usr/bin/python3.8" # use `sudo yum install python38` on Rocky Linux 8 to install this
-elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "9" ]]; then
-    PYTHON_VERSION="/usr/bin/python3.9"
-else
-    echo "Unsupported OS version: $OS $MAJOR_VERSION"
-    exit 1
+    if [[ "$OS" == "ubuntu" && "$MAJOR_VERSION" == "22" ]]; then
+        PYTHON_VERSION="/usr/bin/python3.10"
+    elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "8" ]]; then
+        # python3.9+ doesn't have selinux bindings
+        PYTHON_VERSION="/usr/bin/python3.8" # use `sudo yum install python38` on Rocky Linux 8 to install this
+    elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "9" ]]; then
+        PYTHON_VERSION="/usr/bin/python3.9"
+    else
+        echo "Unsupported OS version: $OS $MAJOR_VERSION"
+        exit 1
+    fi
 fi
 
 if [[ ! -d "venv" ]]; then

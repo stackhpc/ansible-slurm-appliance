@@ -93,9 +93,8 @@ cluster
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
 
-[compute_init:children]
+[compute_init]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
-compute
 
 [k3s:children]
 # Hosts to run k3s server/agent
