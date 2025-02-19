@@ -16,7 +16,6 @@ module "login" {
   # can be set for group, defaults to top-level value:
   image_id = lookup(each.value, "image_id", var.cluster_image_id)
   vnic_types = lookup(each.value, "vnic_types", var.vnic_types)
-  vnic_profiles = lookup(each.value, "vnic_profiles", var.vnic_profiles)
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
   
