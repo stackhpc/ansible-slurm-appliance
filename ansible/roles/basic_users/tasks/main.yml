@@ -48,18 +48,19 @@
     - basic_users_manage_homedir
 
 - name: Write generated public key as authorized for SSH access
+  # this only runs on the basic_users_manage_homedir so has registered var
+  # from that host too
   authorized_key:
     user: "{{ item.name }}"
     state: present
     manage_dir: no
     key: "{{ item.ssh_public_key }}"
-  loop: "{{ hostvars[ansible_play_hosts | first].basic_users_info.results }}"
+  loop: "{{ basic_users_info.results }}"
   loop_control:
     label: "{{ item.name }}"
   when:
   - item.ssh_public_key is defined
   - basic_users_manage_homedir
-  run_once: true
 
 - name: Write sudo rules
   blockinfile:
