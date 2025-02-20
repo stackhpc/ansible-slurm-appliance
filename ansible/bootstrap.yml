@@ -52,6 +52,13 @@
     - import_role:
         name: proxy
 
+- hosts: chrony
+  tags: chrony
+  become: yes
+  tasks:
+    - import_role:
+        name: mrlesmithjr.chrony
+
 - hosts: cluster
   gather_facts: false
   become: yes
