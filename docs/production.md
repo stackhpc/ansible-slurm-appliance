@@ -127,3 +127,6 @@ and referenced from the `site` and `production` environments, e.g.:
 
 - Note [PR 473](https://github.com/stackhpc/ansible-slurm-appliance/pull/473)
   may help identify any site-specific configuration. 
+
+- See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
+  raising `hpctests_hpl_mem_frac` during tests.

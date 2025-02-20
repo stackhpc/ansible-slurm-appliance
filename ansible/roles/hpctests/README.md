@@ -29,8 +29,21 @@ Role Variables
 - `hpctests_ucx_net_devices`: Optional. Control which network device/interface to use, e.g. `mlx5_1:0`. The default of `all` (as per UCX) may not be appropriate for multi-rail nodes with different bandwidths on each device. See [here](https://openucx.readthedocs.io/en/master/faq.html#what-is-the-default-behavior-in-a-multi-rail-environment) and [here](https://github.com/openucx/ucx/wiki/UCX-environment-parameters#setting-the-devices-to-use). Alternatively a mapping of partition name (as `hpctests_partition`) to device/interface can be used. For partitions not defined in the mapping the default of `all` is used.
 - `hpctests_outdir`: Optional. Directory to use for test output on local host. Defaults to `$HOME/hpctests` (for local user).
 - `hpctests_hpl_NB`: Optional, default 192. The HPL block size "NB" - for Intel CPUs see [here](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-linux-developer-guide/top/intel-oneapi-math-kernel-library-benchmarks/intel-distribution-for-linpack-benchmark/configuring-parameters.html).
-- `hpctests_hpl_mem_frac`: Optional, default 0.8. The HPL problem size "N" will be selected to target using this fraction of each node's memory.
+- `hpctests_hpl_mem_frac`: Optional, default 0.3. The HPL problem size "N" will
+   be selected to target using this fraction of each node's memory -
+   **CAUTION: see note below**.
 - `hpctests_hpl_arch`: Optional, default 'linux64'. Arbitrary architecture name for HPL build. HPL is compiled on the first compute node of those selected (see `hpctests_nodes`), so this can be used to create different builds for different types of compute node.
+
+
+---
+**CAUTION**
+
+> The default of `hpctests_hpl_mem_frac=0.3` will not significantly load nodes.
+Values up to ~0.8 may be appropriate for a stress test but ensure cloud
+operators are aware in case this overloads e.g. power supplies or cooling.
+Values > 0.8 require longer runtimes and increase the risk of out-of-memory
+errors without normally significantly increasing the stress on the node.
+---
 
 The following variables should not generally be changed:
 - `hpctests_pre_cmd`: Optional. Command(s) to include in sbatch templates before module load commands.
