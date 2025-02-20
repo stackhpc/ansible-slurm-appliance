@@ -13,8 +13,9 @@ variable "cluster_networks" {
     type = list(map(string))
     description = <<-EOT
         List of mappings defining networks. Mapping key/values:
-            network: Name of existing network
-            subnet: Name of existing subnet
+            network: Required. Name of existing network
+            subnet: Required. Name of existing subnet
+            port_security_enabled: Optional. Bool, default true
     EOT
 }
 
