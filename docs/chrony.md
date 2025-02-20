@@ -1,8 +1,4 @@
-# Configuration
-
-This page provides configuration snippets for various services.
-
-## Chrony
+# Chrony configuration
 
 Use variables from the [mrlesmithjr.chrony](https://github.com/mrlesmithjr/ansible-chrony) role.
 

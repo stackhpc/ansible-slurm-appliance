@@ -170,4 +170,4 @@ extra_packages
 # Hosts to configure CA certificates and trusts on
 
 [chrony]
-# Hosts where crony configuration is applied. See docs/configuration.md#Chrony for more details.
+# Hosts where crony configuration is applied. See docs/chrony.md for more details.
