@@ -183,9 +183,3 @@ variable "root_volume_size" {
     type = number
     default = 40
 }
-
-variable "inventory_secrets_path" {
-  description = "Path to inventory secrets.yml file. Default is standard cookiecutter location."
-  type = string
-  default = ""
-}
