@@ -33,7 +33,6 @@ module "login" {
   ignore_image_changes = false
 
   # computed
-  k3s_token = local.k3s_token
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
   # updates to node metadata on deletion/recreation of the control node:
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]

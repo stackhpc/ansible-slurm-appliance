@@ -71,8 +71,3 @@
   ansible.builtin.lineinfile:
     path: /etc/environment
     line: "KUBECONFIG=/etc/rancher/k3s/k3s.yaml"
-
-- name: Install ansible-init playbook for k3s agent or server activation
-  copy:
-    src: start_k3s.yml
-    dest: /etc/ansible-init/playbooks/0-start-k3s.yml
