@@ -24,6 +24,9 @@ cluster
 login
 compute
 
+[chrony:children]
+cluster
+
 [tuned:children]
 # Install tuned into fat image
 builder
@@ -41,3 +44,6 @@ control
 
 [cacerts:children]
 cluster
+
+[compute_init:children]
+compute

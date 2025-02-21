@@ -182,9 +182,8 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -v --limit compute ansible/adhoc/rebuild.yml
-          ansible-playbook -v ansible/ci/check_slurm.yml
           ansible-playbook -v ansible/adhoc/reboot_via_slurm.yml
+          ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Check sacct state survived reimage
         run: |

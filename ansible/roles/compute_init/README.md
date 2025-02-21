@@ -3,10 +3,13 @@
 Experimental functionality to allow compute nodes to rejoin the cluster after
 a reboot without running the `ansible/site.yml` playbook.
 
+**CAUTION:** The approach used here of exporting cluster secrets over NFS
+is considered to be a security risk due to the potential for cluster users to
+mount the share on a user-controlled machine by tunnelling through a login
+node. This feature should not be enabled on production clusters at this time.
+
 To enable this:
-1. Add the `compute` group (or a subset) into the `compute_init` group. This is
-   the default when using cookiecutter to create an environment, via the
-   "everything" template.
+1. Add the `compute` group (or a subset) into the `compute_init` group.
 2. Build an image which includes the `compute_init` group. This is the case
    for StackHPC-built release images.
 3. Enable the required functionalities during boot, by setting the
@@ -40,6 +43,7 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | (wait for ansible-init) | Not relevant during boot        | n/a                 |
 | bootstrap.yml            | resolv_conf             | Fully supported                 | No                  |
 | bootstrap.yml            | etc_hosts               | Fully supported                 | No                  |
+| bootstrap.yml            | chrony                  | Fully supported                 | No                  |
 | bootstrap.yml            | proxy                   | None at present                 | No                  |
 | bootstrap.yml            | (/etc permissions)      | None required - use image build | No                  |
 | bootstrap.yml            | (ssh /home fix)         | None required - use image build | No                  |
