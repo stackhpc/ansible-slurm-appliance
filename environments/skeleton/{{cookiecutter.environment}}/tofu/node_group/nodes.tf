@@ -50,7 +50,6 @@ resource "openstack_networking_port_v2" "compute" {
 
   binding {
     vnic_type = lookup(var.vnic_types, each.value.network, "normal")
-    profile = lookup(var.vnic_profiles, each.value.network, "{}")
   }
 }
 

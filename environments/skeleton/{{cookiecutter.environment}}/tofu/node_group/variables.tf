@@ -37,11 +37,6 @@ variable "vnic_types" {
     default = {}
 }
 
-variable "vnic_profiles" {
-    type = map(string)
-    default = {}
-}
-
 variable "volume_backed_instances" {
     description = "Whether to use volumes for root disks"
     type = bool
