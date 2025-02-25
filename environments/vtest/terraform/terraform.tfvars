@@ -1,15 +1,15 @@
 compute_types = {
   gpu: {
     flavor: "slurm_test_gpu0"
-    image: "openhpc-250204-1517-8795b1ab"
+    image: "slgpu-250204-1541-8795b1ab"
   }
   gpu3: {
     flavor: "slurm_test_gpu3"
-    image: "openhpc-250204-1517-8795b1ab"
+    image: "slgpu-250204-1541-8795b1ab"
   }
   gpu5: {
     flavor: "slurm_test_gpu5"
-    image: "openhpc-250204-1517-8795b1ab"
+    image: "slgpu-250204-1541-8795b1ab"
   }
   large: {
     flavor: "slurm_test_compute_lg"
