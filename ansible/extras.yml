@@ -1,19 +1,17 @@
-- hosts: k3s_server
+- hosts: k3s_server:!builder
   become: yes
   tags: k3s
   tasks:
     - name: Start k3s server
-      when: "'builder' not in group_names"
       ansible.builtin.include_role:
         name: k3s
         tasks_from: server-runtime.yml
 
-- hosts: k3s_agent
+- hosts: k3s_agent:!builder
   become: yes
   tags: k3s
   tasks:
     - name: Start k3s agents
-      when: "'builder' not in group_names"
       vars: # set outside of role to allow compute init to define own value
         k3s_bootstrap_token: "{{ hostvars[groups['k3s_server'] | first]._k3s_token_output.stdout | default('') }}"
       ansible.builtin.include_role:

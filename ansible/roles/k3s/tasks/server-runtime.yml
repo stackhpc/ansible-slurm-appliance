@@ -15,11 +15,10 @@
 
 # Possible race here as there is a delay between agents disconnecting and being registered as down, probably won't be hit in general use though
 - name: Check if k3s agents are connected
-  ignore_errors: true
   ansible.builtin.shell:
     cmd: kubectl get nodes --no-headers | grep -w Ready
   register: _k3s_connected_nodes
-  retries: 5 # there may be a delay before the server reconnects to itself
+  retries: 6 # there may be a delay before the server reconnects to itself
   delay: 10
   until: not _k3s_connected_nodes.failed
 
