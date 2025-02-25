@@ -9,7 +9,7 @@
         name: vs-set-ephemeral-mounts
 
 - name: Enable /home ceph mount
-  hosts: ceph:!builder
+  hosts: compute:control:!builder
   become: true
   tasks:
     - name: Start systemd service
