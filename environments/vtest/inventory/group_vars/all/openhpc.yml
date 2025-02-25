@@ -10,6 +10,16 @@ openhpc_slurm_conf_path: "{{ slurm_build_dir }}/etc/slurm.conf"
 
 openhpc_packages_extra: "{{ openhpc_packages_extra_nrel }}"
 
+
+# openhpc_slurm_partitions:
+#  - name: general
+#    gres:
+#      - conf: gpu:A100:2
+#        device: /dev/nvidia[0-1]
+
+# openhpc_config_extra:
+#   gres:  <put things here>
+
 openhpc_slurm_partitions:
   - name: "gpu"
     default: NO
@@ -144,7 +154,6 @@ openhpc_config_extra:
 
 # kbendl - the ephemeral mount for SSD
   TmpFS: '/tmp/scratch'
-  GresTypes: 'gpu'
   ### - MpiDefault: "pmi2"    ### get the launcher to work! pmi1, pmi2, or pmix
   # # spack mpi drivers were a mis-match... is this working now????
 
@@ -152,4 +161,5 @@ openhpc_config_extra:
   # - 'TopologyPlugin: 'topology/tree'
   # - 'JobRequeue: 0
   # - 'MaxJobCount: 40000
+  GresTypes: 'gpu'
 
