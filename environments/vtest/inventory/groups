@@ -5,9 +5,6 @@
 [hpctests:children]
 login
 
-[mysql:children]
-control
-
 [prometheus:children]
 admin
 
@@ -16,21 +13,6 @@ admin
 
 [alertmanager:children]
 admin
-
-[node_exporter:children]
-cluster
-
-[opendistro:children]
-control
-
-[slurm_stats:children]
-control
-
-[filebeat:children]
-slurm_stats
-
-[spack:children]
-login
 
 # [rebuild:children]
 # control

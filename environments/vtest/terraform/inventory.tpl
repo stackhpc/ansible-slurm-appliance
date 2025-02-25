@@ -7,6 +7,9 @@ ansible_python_interpreter=/usr/bin/python3
 [control]
 ${control.name} ansible_host=${[for n in control.network: n.fixed_ip_v4 if n.access_network][0]} server_networks='${jsonencode({for net in control.network: net.name => [ net.fixed_ip_v4 ] })}'
 
+[control:vars]
+appliances_state_dir=/var/lib/state
+
 [admin]
 ${cluster_name}-vtadmin
 
