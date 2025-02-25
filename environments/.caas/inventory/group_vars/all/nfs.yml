@@ -1,14 +1,5 @@
 nfs_server: "{{ nfs_server_default }}"
 
-caas_nfs_ood_state:
-  - comment: Export /var/lib/state from Slurm control node to OOD
-    nfs_enable:
-        server:  "{{ inventory_hostname in groups['control'] }}"
-        clients: "{{ inventory_hostname in groups['openondemand'] }}"
-    nfs_export: "{{ appliances_state_dir }}"
-    nfs_client_mnt_point: "{{ appliances_state_dir }}"
-    nfs_client_mnt_options: "x-systemd.required-by=zenith-ood.service,x-systemd.before=zenith-ood.service"
-
 caas_nfs_home:
   - comment: Export /exports/home from Slurm control node as /home
     nfs_enable:
@@ -17,4 +8,4 @@ caas_nfs_home:
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
 
-nfs_configurations: "{{ caas_nfs_ood_state + (caas_nfs_home if not cluster_home_manila_share | bool else []) }}"
+nfs_configurations: "{{ caas_nfs_home if not cluster_home_manila_share | bool else [] }}"

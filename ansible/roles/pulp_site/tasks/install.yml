@@ -1,0 +1,43 @@
+---
+
+- name: Install packages
+  dnf:
+    name:
+    - podman
+
+- name: Create install directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ pulp_site_install_dir }}/{{ item }}"
+  loop:
+  - settings/certs
+  - pulp_storage
+  - pgsql
+  - containers
+
+- name: Template settings file
+  ansible.builtin.template:
+    src: settings.py.j2
+    dest: "{{ pulp_site_install_dir }}/settings/settings.py"
+
+- name: Install pulp podman container
+  containers.podman.podman_container:
+    name: pulp
+    publish:
+      - "{{ pulp_site_port }}:80"
+    volume:
+    - "{{ pulp_site_install_dir }}/settings:/etc/pulp{{ pulp_site_selinux_suffix }}"
+    - "{{ pulp_site_install_dir }}/pulp_storage:/var/lib/pulp{{ pulp_site_selinux_suffix }}"
+    - "{{ pulp_site_install_dir }}/pgsql:/var/lib/pgsql{{ pulp_site_selinux_suffix }}"
+    - "{{ pulp_site_install_dir }}/containers:/var/lib/containers{{ pulp_site_selinux_suffix }}"
+    device: /dev/fuse
+    image: docker.io/pulp/pulp:3.68.1
+
+- name: Reset admin password once container has initialised
+  no_log: true
+  ansible.builtin.shell:
+    cmd: "podman exec pulp bash -c 'pulpcore-manager reset-admin-password -p {{ pulp_site_password }}'"
+  register: _admin_reset_output
+  until: 0 == _admin_reset_output.rc
+  retries: 6
+  delay: 30

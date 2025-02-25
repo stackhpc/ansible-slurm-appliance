@@ -1,1 +1,8 @@
-openondemand_servername: "{{ hostvars[ groups['openondemand'] | first].ansible_host }}" # Use a SOCKS proxy to acccess
+openondemand_auth: basic_pam
+openondemand_jupyter_partition: standard
+openondemand_desktop_partition: standard
+#openondemand_dashboard_support_url: 
+#openondemand_dashboard_docs_url:
+#openondemand_filesapp_paths:
+ondemand_package: ondemand-"{{ ondemand_package_version }}"
+ondemand_package_version: '3.1.10'

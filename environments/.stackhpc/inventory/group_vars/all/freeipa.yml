@@ -2,8 +2,8 @@
 
 # NB: Users defined this way have expired passwords
 freeipa_users:
-  - name: testuser # can't use rocky as $HOME isn't shared!
-    password: "{{ test_user_password }}"
+  - name: demo_user # can't use rocky as $HOME isn't shared!
+    password: "{{ test_demo_user_password }}"
     givenname: test
     sn: test
 

@@ -1,0 +1,47 @@
+- name: Gather Lustre interface info
+  shell:
+    cmd: |
+      ip r get {{ _lustre_mgs_ip }}
+  changed_when: false
+  register: _lustre_ip_r_mgs
+  vars:
+    _lustre_mgs_ip: "{{ lustre_mgs_nid | split('@') | first }}"
+
+- name: Set facts for Lustre interface
+  set_fact:
+    _lustre_interface: "{{ _lustre_ip_r_mgs_info[4] }}"
+    _lustre_ip: "{{ _lustre_ip_r_mgs_info[6] }}"
+  vars:
+    _lustre_ip_r_mgs_info: "{{ _lustre_ip_r_mgs.stdout_lines.0 | split }}"
+    # first line e.g. "10.167.128.1 via 10.179.0.2 dev eth0 src 10.179.3.149 uid 1000"
+
+- name: Write LNet configuration file
+  template:
+    src: lnet.conf.j2
+    dest:  /etc/lnet.conf # exists from package install, expected by lnet service
+    owner: root
+    group: root
+    mode: u=rw,go=r # from package install
+  register: _lnet_conf
+
+- name: Ensure lnet service state
+  systemd:
+    name: lnet
+    state: "{{ 'restarted' if _lnet_conf.changed else 'started' }}"
+
+- name: Ensure mount points exist
+  ansible.builtin.file:
+    path: "{{ item.mount_point }}"
+    state: directory
+  loop: "{{ lustre_mounts }}"
+  when: "(item.mount_state | default(lustre_mount_state)) != 'absent'"
+
+- name: Mount lustre filesystem
+  ansible.posix.mount:
+    fstype: lustre
+    src: "{{ lustre_mgs_nid }}:/{{ item.fs_name }}"
+    path: "{{ item.mount_point }}"
+    state: "{{ (item.mount_state | default(lustre_mount_state)) }}"
+    opts: "{{ item.mount_options | default(lustre_mount_options) }}"
+  loop: "{{ lustre_mounts }}"
+ 

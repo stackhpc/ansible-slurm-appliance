@@ -1,0 +1,3 @@
+sshd_password_authentication: false
+sshd_conf_src: sshd.conf.j2
+sshd_conf_dest: /etc/ssh/sshd_config.d/10-ansible.conf

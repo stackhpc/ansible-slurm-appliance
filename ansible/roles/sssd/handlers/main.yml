@@ -1,0 +1,5 @@
+- name: Restart sssd
+  systemd:
+    name: sssd
+    state: restarted
+  when: sssd_started | bool

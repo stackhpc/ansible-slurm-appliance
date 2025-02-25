@@ -24,8 +24,9 @@
   gather_facts: yes
   tags: cuda
   tasks:
-    - import_role:
+    - include_role:
         name: cuda
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'install.yml' }}"
 
 - name: Persist hostkeys across rebuilds
   # Must be after filesystems.yml (for storage)
@@ -36,3 +37,31 @@
   tasks:
     - import_role:
         name: persist_hostkeys
+
+
+- name: Setup NFS export for compute node configuration
+  hosts: compute_init:!builder
+  # NB: has to be after eeesi and os-manila-mount
+  tags: compute_init
+  become: yes
+  tasks:
+    - include_role:
+        name: compute_init
+        tasks_from: export.yml
+
+- name: Install k9s
+  become: yes
+  hosts: k9s
+  tags: k9s
+  tasks:
+  - import_role:
+      name: k9s
+
+- hosts: extra_packages
+  become: yes
+  tags:
+   - extra_packages
+  tasks:
+  - name: Install additional packages
+    dnf:
+      name: "{{ appliances_extra_packages }}"

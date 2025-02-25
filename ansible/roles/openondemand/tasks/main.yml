@@ -6,12 +6,19 @@
   loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
   when: (item.key in hostvars[inventory_hostname]) or (item.value)
 
+# osc.ood variables are exposed to play here instead of setting 'public' in include role so that they will still be exposed during runtime
+- ansible.builtin.include_vars:
+    dir: "{{ playbook_dir }}/roles/osc.ood/defaults/main"
+
+- ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/roles/osc.ood/vars/Rocky/{{ ansible_distribution_major_version }}.yml"
+
 # if using PAM auth we need apache installed but NOT started so split the osc.ood role up:
 - include_role:
     name: osc.ood
     tasks_from: install-package.yml
     vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
-    public: yes # Expose the vars from this role to the rest of the play
+  when: appliances_mode != 'configure'
   # can't set vars: from a dict hence the workaround above
 
 - include_tasks:

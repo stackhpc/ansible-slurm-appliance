@@ -40,3 +40,12 @@
       import_role:
         name: freeipa
         tasks_from: users.yml
+
+- hosts: sssd
+  become: yes
+  gather_facts: no
+  tags: sssd
+  tasks:
+    - name: Configure sssd
+      import_role:
+        name: sssd

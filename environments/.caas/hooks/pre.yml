@@ -1,5 +1,13 @@
 ---
 
+# Generate k3s token
+- name: Generate k3s token
+  # NB: Although this generates a new token on each run, the actual token set in metadata is retrieved from a set-once tofu resource, hence only the first value ever generated is relevant.
+  hosts: openstack
+  tasks:
+    - ansible.builtin.set_fact:
+        k3s_token: "{{ lookup('ansible.builtin.password', '/dev/null', length=64) }}"
+
 # Provision the infrastructure using Terraform
 - name: Provision infrastructure
   hosts: openstack

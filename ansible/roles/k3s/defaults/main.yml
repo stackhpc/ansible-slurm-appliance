@@ -1,0 +1,5 @@
+# Warning: changes to these variables won't be reflected in the cluster/image if k3s is already installed
+k3s_version: "v1.31.0+k3s1"
+k3s_selinux_release: v1.6.latest.1
+k3s_selinux_rpm_version: 1.6-1
+k3s_helm_version: v3.11.0

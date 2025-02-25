@@ -1,0 +1,5 @@
+- name: Ensure NVIDIA Persistence Daemon state
+  systemd:
+    name: nvidia-persistenced
+    enabled: true
+    state: "{{ cuda_persistenced_state }}"

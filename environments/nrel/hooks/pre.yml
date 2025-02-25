@@ -36,39 +36,6 @@
   become: true
   gather_facts: false
 
-  # tasks:
-  #   - name: Does home/USER dir exist
-  #     ansible.builtin.stat:
-  #       path: "/home/{{ appliances_local_users_ansible_user_name }}"
-  #     register: homerocky
-
-  #   - name: Does var/lib/rocky dir exist
-  #     ansible.builtin.stat:
-  #       path: "/var/lib/{{ appliances_local_users_ansible_user_name }}"
-  #     register: varlibrocky
-
-  #   - name: Cp homerocky to var/lib/ dir
-  #     ansible.builtin.command: cp -a /home/{{ appliances_local_users_ansible_user_name }} /var/lib/{{ appliances_local_users_ansible_user_name }}
-  #     when:
-  #       - homerocky.stat.exists
-  #     register: cph
-  #     changed_when: cph.rc != 0
-
-  #   # - name: cp auth_keys
-  #   #   shell: |
-  #   #     cp -a /home/rocky/.ssh /var/lib/rocky/.ssh
-  #   #   when:
-  #   #     - varlibrocky.stat.exists
-  #   #     - homerocky.stat.exists
-
-  #   - name: Hack passwd file for localhome/rocky
-  #     ansible.builtin.lineinfile:
-  #       path: /etc/passwd
-  #       regexp: '^rocky.*1000.*'
-  #       line: "rocky:x:1000:1000:vsRockyUser:/var/lib/{{ appliances_local_users_ansible_user_name }}:/bin/bash"
-  # tags:
-  #   - rocky_localhome
-
 - name: "Do the preliminary node setups"
   hosts: all
   # tags: pre_tasks_all

@@ -1,7 +1,6 @@
-cuda_distro: "rhel{{ ansible_distribution_major_version }}"
-cuda_repo: "https://developer.download.nvidia.com/compute/cuda/repos/{{ cuda_distro }}/x86_64/cuda-{{ cuda_distro }}.repo"
-cuda_driver_stream: default
-cuda_package_version: 'latest'
+cuda_repo_url: "https://developer.download.nvidia.com/compute/cuda/repos/rhel{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/cuda-rhel{{ ansible_distribution_major_version }}.repo"
+cuda_nvidia_driver_stream: '560-open' # 565-open has problems with cuda packages
+cuda_package_version: '12.6.3-1'
 cuda_packages:
   - "cuda{{ ('-' + cuda_package_version) if cuda_package_version != 'latest' else '' }}"
   - nvidia-gds
