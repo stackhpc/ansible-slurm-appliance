@@ -1,4 +1,4 @@
 ---
 pytools_editable: false
-pytools_gitref: master
+pytools_gitref: master # TODO: FIXME: do a release!
 pytools_user: root
