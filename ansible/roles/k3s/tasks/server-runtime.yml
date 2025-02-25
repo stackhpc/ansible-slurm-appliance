@@ -14,15 +14,15 @@
     enabled: true
 
 # Possible race here as there is a delay between agents disconnecting and being registered as down, probably won't be hit in general use though
-- name: Check if k3s agents are connected
+- name: Check which k3s agents are connected
   ansible.builtin.shell:
     cmd: kubectl get nodes --no-headers | grep -w Ready
   register: _k3s_connected_nodes
-  retries: 6 # there may be a delay before the server reconnects to itself
+  retries: 6 # task may fail if server is not ready yet
   delay: 10
   until: not _k3s_connected_nodes.failed
 
-- name: Generate new bootstrap token
+- name: Generate new bootstrap token if not all agents are connected
   no_log: true
   when: _k3s_connected_nodes.stdout_lines | length != groups['k3s'] | length
   shell:
