@@ -11,8 +11,10 @@
       name: aco.core.ntp
     tags:
       - vs_all_nodes_timezone
-
+#
+#
 - name: "NREL pre - Mount cephfs volumes"
+
   hosts: ceph:!builder
   tags:
     - vs_pre
@@ -28,8 +30,8 @@
         name: aco.core.cephfs
       tags:
         - aco.core.cephfs
-      when: not vs_does_cephdir.stat.exists
-    - name: Tmp umount /home
-      ansible.builtin.shell: systemctl stop home.mount
-      when: not vs_does_cephdir.stat.exists
-      become: true
+#      when: not vs_does_cephdir.stat.exists
+    # - name: Tmp umount /home
+    #   ansible.builtin.shell: systemctl stop home.mount
+    #   when: not vs_does_cephdir.stat.exists
+    #   become: true
