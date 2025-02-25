@@ -23,7 +23,7 @@ control
 cluster
 
 [opensearch:children]
-# control
+control
 
 [slurm_stats:children]
 control
@@ -70,5 +70,4 @@ builder
 
 [dnf_repos:children]
 cluster
-
 
