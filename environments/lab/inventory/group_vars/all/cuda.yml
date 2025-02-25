@@ -1,0 +1,23 @@
+# `cuda_distro`: Optional. Default `rhel8`.
+# `cuda_repo`: Optional. Default `https://developer.download.nvidia.com/compute/cuda/repos/{{ cuda_distro }}/x86_64/cuda-{{ cuda_distro }}.repo`
+# `cuda_driver_stream`: Optional. The default value `default` will, on first use of this role, enable the dkms-flavour `nvidia-driver` DNF module stream with the current highest version number. The `latest-dkms` stream is not enabled, and subsequent runs of the role will *not* change the enabled stream, even if a later version has become available. Changing this value once an `nvidia-driver` stream has been enabled raises an error. If an upgrade of the `nvidia-driver` module is required, the currently-enabled stream and all packages should be manually removed.
+# `cuda_packages`: Optional. Default: `['cuda', 'nvidia-gds']`.
+# `cuda_persistenced_state`: Optional. State of systemd `nvidia-persistenced` service. Values as [ansible.builtin.systemd:state](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html#parameter-state). Default `started`.
+
+# cuda_distro: rhel9
+cuda_distro: "rhel{{ ansible_distribution_major_version }}"
+cuda_repo: "https://developer.download.nvidia.com/compute/cuda/repos/{{ cuda_distro }}/x86_64/cuda-{{ cuda_distro }}.repo"
+cuda_driver_stream: default
+cuda_package_version: 'latest'
+cuda_packages:
+  - "cuda{{ ('-' + cuda_package_version) if cuda_package_version != 'latest' else '' }}"
+  - nvidia-gds
+# _cuda_version_tuple: # discovered from installed package e.g. ('12', '1', '0')
+cuda_version_short: "{{ _cuda_version_tuple[0] }}.{{ _cuda_version_tuple[1] }}"
+cuda_samples_release_url: "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v{{ cuda_version_short }}.tar.gz"
+cuda_samples_path: "/var/lib/{{ ansible_user }}/cuda_samples"
+cuda_samples_programs:
+  - deviceQuery
+  - bandwidthTest
+# cuda_devices: # discovered from deviceQuery run
+cuda_persistenced_state: started

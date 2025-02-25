@@ -1,75 +1,57 @@
 compute_types = {
-  large: {
-    flavor: "compute.c60m240s120e1000"
-    image: "vs_rocky86_20221231"
-  }
-  standard: {
-    flavor: "compute.c30m120s60e500"
-    image: "vs_rocky86_20221231"
-  }
-  small: {
-    flavor: "en1.xsmall"
-    image: "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
-  }
-  tiny: {
-    flavor: "compute.c4m16s8e60"
-    image: "vs_rocky86_20221231"
-  }
-  gpu: {
-    flavor: "gpu.c30m120s32e6000"
-    image: "vs_rocky86_20221231"
+  stackhpc: {
+    flavor: "en1.small"
+    image_id: "7b05f133-a11b-4042-96c1-423ae1366055"
   }
 }
 
-compute_names = {
-# Node-inventory.txt
 
+# #############################################
+# SEE: compute_names.auto.tfvars
+#      for node instances that will be created.
+# #############################################
 
-sm-0001: "small"
-sm-0002: "small"
-
-
-}
-
-
-##########################################
+#---- login node info ----
+login_image = "openhpc-250130-1524-bc08e6e2"
+login_flavor = "en1.small"
 
 login_names = {
-  login-1: "gen.c8m16s16"
+  vtlogin-1: "vermilion_slurm_login_c8m15"
+  vtadmin: "vermilion_slurm_login_c8m15"
 }
-#
 
-login_ips = {} # Don't use FIPs for lab but need to define for symlinked variables.tf
-#
+# CONTROL node info
+control_flavor = "en1.medium"
+control_image = "openhpc-250130-1524-bc08e6e2"
 
-login_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
-login_flavor = "en1.xsmall"
+proxy_name = "vtadmin"
+# The `admin` node is like a login node,
+# but access is limited for admin-type worlflows
 
+###################################################
 
-control_image = "Rocky-9-GenericCloud-Base-9.3-20231113.0.x86_64.qcow2"
-control_flavor = "ec1.medium"
-
-control_ip = "" # Don't use FIPs for lab but need to define for symlinked variables.tf
-
-proxy_name = "login-1"
-
-#######################################
-
-cluster_name  = "vslab"
-cluster_slurm_name = "vermilion"
+cluster_name  = "lab"
+cluster_slurm_name = "lab"
 cluster_availability_zone = "europe-nl-ams1"
 
 # don't put dashes (creates invalid ansible group names) or underscores (creates hostnames which get mangled) in this
 
-key_pair = "slurm-app-ci"
+key_pair = "vsdeployer"
 
 external_network = "external"
-cluster_network = "nrel-lab-compute"
-cluster_subnet = "nrel-lab-compute" # 10.90.0.0/24
+cluster_network = "cluster"
+cluster_subnet = "cluster"
 
-storage_network = "nrel-lab-storage"
-storage_subnet = "nrel-lab-storage" # 10.91.0.0/24
+storage_network = "storage"
+storage_subnet = "storage"
 
-control_network = "stackhpc-dev"
-control_subnet = "stackhpc-dev"
+control_network = "control"
+control_subnet = "control"
+
+cluster_network_vnic_type = "normal"
+storage_network_vnic_type = "normal"
+
+storage_network_profile = {}
+cluster_network_profile = {}
+
 compute_images = {} # allows overrides for specific nodes, by name
