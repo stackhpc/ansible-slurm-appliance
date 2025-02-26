@@ -12,8 +12,6 @@
   tags: k3s
   tasks:
     - name: Start k3s agents
-      vars: # set outside of role to allow compute init to define own value
-        k3s_bootstrap_token: "{{ hostvars[groups['k3s_server'] | first]._k3s_token_output.stdout | default('') }}"
       ansible.builtin.include_role:
         name: k3s
         tasks_from: agent-runtime.yml

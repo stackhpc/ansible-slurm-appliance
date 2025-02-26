@@ -28,3 +28,7 @@
   shell:
     cmd: "k3s token create --ttl {{ k3s_bootstrap_token_expiry }}"
   register: _k3s_token_output
+
+- name: Set bootstrap token as fact
+  set_fact:
+     k3s_bootstrap_token: "{{ _k3s_token_output.stdout }}"
