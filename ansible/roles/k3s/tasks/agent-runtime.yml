@@ -1,7 +1,7 @@
 ---
 
 - name: Template k3s agent env file
-  when: k3s_bootstrap_token != ""
+  when: k3s_bootstrap_token != ''
   ansible.builtin.template:
     dest: /etc/systemd/system/k3s-agent.service.env
     src: k3s-agent.service.env.j2
