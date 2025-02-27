@@ -5,6 +5,9 @@
   ansible.builtin.template:
     dest: /etc/systemd/system/k3s-agent.service.env
     src: k3s-agent.service.env.j2
+    owner: root
+    group: root
+    mode: 0640
   register: _k3s_agent_token_result
 
 - name: Ensure password directory exists
