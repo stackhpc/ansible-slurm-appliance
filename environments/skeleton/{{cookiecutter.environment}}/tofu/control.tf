@@ -60,7 +60,6 @@ resource "openstack_compute_instance_v2" "control" {
 
   metadata = {
     environment_root = var.environment_root
-    k3s_token = local.k3s_token
     access_ip = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
   }
 
