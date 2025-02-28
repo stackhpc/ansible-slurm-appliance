@@ -21,12 +21,15 @@
   ansible.builtin.group: "{{ item }}"
   loop:  "{{ basic_users_groups }}"
 
-- name: Create users and generate public keys
-  user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() }}"
+- name: Create users
+  user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() | combine(_disable_homedir) }}"
   loop: "{{ basic_users_users }}"
   loop_control:
-    label: "{{ item.name }} [{{ item.state | default('present') }}]"
-  register: basic_users_info
+    label: "{{ item.name }}"
+  vars:
+    _disable_homedir: # ensure this task doesn't touch $HOME
+      create_home: false
+      generate_ssh_key: false
 
 - name: Restart sssd if required
   systemd:
@@ -34,35 +37,94 @@
     state: started
   when: _stop_sssd is changed
 
-- name: Write supplied public key as authorized for SSH access
-  authorized_key:
-    user: "{{ item.name }}"
-    state: present
-    key: "{{ item.public_key }}"
-  become_user: "{{ item.name }}"
-  loop: "{{ basic_users_users }}"
-  loop_control:
-    label: "{{ item.name }} [{{ item.state | default('present') }}]"
-  when:
-    - item.state | default('present') == 'present'
-    - item.public_key is defined
-    - _basic_users_manage_homedir
+- name: Modify home directories
+  delegate_to: "{{ basic_users_homedir_host }}"
+  run_once: true
+  block:
+    - name: Create home directories
+      # doesn't delete with state=absent, same as ansible.builtin.user
+      file:
+        state: directory
+        path: "{{ item.home | default( basic_users_homedir_host_path + '/' + item.name ) }}"
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: u=rwX,go=
+      loop: "{{ basic_users_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.state | default('present') == 'present'
+        - item.create_home | default(true) | bool
 
-- name: Write generated public key as authorized for SSH access
-  # this only runs on the _basic_users_manage_homedir so has registered var
-  # from that host too
-  authorized_key:
-    user: "{{ item.name }}"
-    state: present
-    manage_dir: no
-    key: "{{ item.ssh_public_key }}"
-  become_user: "{{ item.name }}"
-  loop: "{{ basic_users_info.results }}"
-  loop_control:
-    label: "{{ item.name }}"
-  when:
-  - item.ssh_public_key is defined
-  - _basic_users_manage_homedir
+    - name: Create ~/.ssh directories
+      file:
+        state: directory
+        path: "{{ _homedir }}/.ssh/"
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: u=rwX,go=
+      vars:
+        _homedir: "{{ item.home | default( basic_users_homedir_host_path + '/' + item.name ) }}"
+      become_user: "{{ item.name }}"
+      loop: "{{ basic_users_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.state | default('present') == 'present'
+  
+    - name: Generate cluster ssh key
+      community.crypto.openssh_keypair:
+        path: "{{ item.ssh_key_file | default(_homedir + '/.ssh/' + _ssh_key_type )}}"
+        type: "{{ _ssh_key_type }}"
+      vars:
+        _homedir: "{{ item.home | default( basic_users_homedir_host_path + '/' + item.name ) }}"
+        _ssh_key_type: "{{ item.ssh_key_type | default('ed25519') }}"
+      become_user: "{{ item.name }}"
+      loop: "{{ basic_users_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.state | default('present') == 'present'
+        - item.generate_ssh_key | default(true) | bool
+      register: _cluster_ssh_keypair
+
+      # - debug:
+      #     var: _cluster_ssh_keypair
+      # - meta: end_here
+
+    - name: Write supplied public key as authorized for SSH access
+      ansible.posix.authorized_key:
+        user: "{{ item.name }}"
+        state: present
+        manage_dir: false
+        key: "{{ item.public_key }}"
+        path: "{{ _homedir }}/.ssh/authorized_keys"
+      vars:
+        _homedir: "{{ item.home | default( basic_users_homedir_host_path + '/' + item.name ) }}"
+      become_user: "{{ item.name }}"
+      loop: "{{ basic_users_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.state | default('present') == 'present'
+        - item.public_key is defined
+
+    - name: Write generated public key as authorized for SSH access
+      ansible.posix.authorized_key:
+        user: "{{ item.item.name }}"
+        state: present
+        manage_dir: false
+        key: "{{ item.public_key }}"
+        path: "{{ _homedir }}/.ssh/authorized_keys"
+      vars:
+        _homedir: "{{ item.item.home | default( basic_users_homedir_host_path + '/' + item.item.name ) }}"
+      become_user: "{{ item.item.name }}"
+      loop: "{{ _cluster_ssh_keypair.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      when:
+        - item.item.state | default('present') == 'present'
+        - "'public_key' in item"
 
 - name: Write sudo rules
   blockinfile:
@@ -72,4 +134,6 @@
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
-  when: "'sudo' in item"
+  when:
+    - item.state | default('present') == 'present'
+    - "'sudo' in item"

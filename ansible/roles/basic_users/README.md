@@ -12,8 +12,8 @@ without requiring LDAP etc. Features:
 
 > [!IMPORTANT] This role assumes that `$HOME` for users managed by this role 
 (e.g. not `rocky` and other system users) is on a shared filesystem. The export
-of this sharef filesystem may be root squashed if the server is in the
-`basic_user` group - see configuration advice below.
+of this shared filesystem may be root squashed if its server is in the
+`basic_user` group - see configuration examples below.
 
 Role Variables
 --------------
@@ -35,8 +35,8 @@ Role Variables
   - Any other keys may present for other purposes (i.e. not used by this role).
 - `basic_users_groups`: Optional, default empty list. A list of mappings defining information for each group. Mapping keys/values are passed through as parameters to [ansible.builtin.group](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html) and default values are as given there.
 - `basic_users_override_sssd`: Optional bool, default false. Whether to disable `sssd` when ensuring users/groups exist with this role. Permits creating local users/groups even if they clash with users provided via sssd (e.g. from LDAP). Ignored if host is not in group `sssd` as well. Note with this option active `sssd` will be stopped and restarted each time this role is run.
-- `basic_users_homedir_host`: Optional inventory hostname. Host to run actions
-  which manipulate the home directories. If home directories are exported with
+- `basic_users_homedir_host`: Optional inventory hostname specifying the host
+  on which to manipulate home directories (assuming `create_home` is true). If home directories are exported with
   root squash, this *must* specify that server. If root squash is not used it
   can be any node in the `basic_users` group. Default is the `control` node,
   which assumes the default appliance NFS-exported home directory configuration.
