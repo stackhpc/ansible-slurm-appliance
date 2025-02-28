@@ -1,8 +1,11 @@
-basic_users_manage_homedir: "{{ ansible_hostname == (ansible_play_hosts | difference(groups['control']) | first) }}"
+basic_users_homedir_host: "{{ groups['control'] | first }}" # no way, generally, to find the nfs_server
+basic_users_homedir_host_path: /exports/home
+_basic_users_manage_homedir: "{{ ansible_hostname == basic_users_homedir_host }}"
 basic_users_userdefaults:
   state: present
-  create_home: "{{ basic_users_manage_homedir }}"
-  generate_ssh_key:  "{{ basic_users_manage_homedir }}"
+  home: "{{ basic_users_homedir_host_path }}/{{ item.name }}"
+  create_home: "{{ _basic_users_manage_homedir }}"
+  generate_ssh_key:  "{{ _basic_users_manage_homedir }}"
   ssh_key_comment: "{{ item.name }}"
   ssh_key_type: ed25519
   shell: "{{'/sbin/nologin' if 'control' in group_names else omit }}"

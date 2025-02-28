@@ -39,28 +39,30 @@
     user: "{{ item.name }}"
     state: present
     key: "{{ item.public_key }}"
+  become_user: "{{ item.name }}"
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }} [{{ item.state | default('present') }}]"
   when:
     - item.state | default('present') == 'present'
     - item.public_key is defined
-    - basic_users_manage_homedir
+    - _basic_users_manage_homedir
 
 - name: Write generated public key as authorized for SSH access
-  # this only runs on the basic_users_manage_homedir so has registered var
+  # this only runs on the _basic_users_manage_homedir so has registered var
   # from that host too
   authorized_key:
     user: "{{ item.name }}"
     state: present
     manage_dir: no
     key: "{{ item.ssh_public_key }}"
+  become_user: "{{ item.name }}"
   loop: "{{ basic_users_info.results }}"
   loop_control:
     label: "{{ item.name }}"
   when:
   - item.ssh_public_key is defined
-  - basic_users_manage_homedir
+  - _basic_users_manage_homedir
 
 - name: Write sudo rules
   blockinfile:

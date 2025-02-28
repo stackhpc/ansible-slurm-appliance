@@ -15,7 +15,4 @@ nfs_configurations:
     nfs_server: "{{ nfs_server_default }}"
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
-
-# Set 'secure' to prevent tunneling nfs mounts
-# Cannot set 'root_squash' due to home directory creation
-nfs_export_options: 'rw,secure,no_root_squash'
+    nfs_export_options: 'rw,secure,root_squash' # prevent tunnelling and setuid binaries
