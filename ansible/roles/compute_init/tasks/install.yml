@@ -58,7 +58,7 @@
 - name: Add compute initialisation playbook
   copy:
     src: compute-init.yml
-    dest: /etc/ansible-init/playbooks/1-compute-init.yml
+    dest: /etc/ansible-init/playbooks/10-compute-init.yml
     owner: root
     group: root
     mode: 0644
