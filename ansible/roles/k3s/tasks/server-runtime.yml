@@ -22,13 +22,14 @@
   delay: 10
   until: not _k3s_connected_nodes.failed
 
-- name: Generate new bootstrap token if not all agents are connected
-  no_log: true
-  when: _k3s_connected_nodes.stdout_lines | length != groups['k3s'] | length
-  shell:
-    cmd: "k3s token create --ttl {{ k3s_bootstrap_token_expiry }}"
-  register: _k3s_token_output
+- when: _k3s_connected_nodes.stdout_lines | length != groups['k3s'] | length
+  block:
+  - name: Generate new bootstrap token if not all agents are connected
+    no_log: true
+    shell:
+      cmd: "k3s token create --ttl {{ k3s_bootstrap_token_expiry }}"
+    register: _k3s_token_output
 
-- name: Set bootstrap token as fact
-  set_fact:
-     k3s_bootstrap_token: "{{ _k3s_token_output.stdout }}"
+  - name: Set bootstrap token as fact
+    set_fact:
+      k3s_bootstrap_token: "{{ _k3s_token_output.stdout }}"
