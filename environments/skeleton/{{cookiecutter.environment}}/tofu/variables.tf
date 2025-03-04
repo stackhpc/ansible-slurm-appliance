@@ -9,14 +9,14 @@ variable "cluster_domain_suffix" {
     default = "internal"
 }
 
-variable "cluster_net" {
-    type = string
-    description = "Name of existing cluster network"
-}
-
-variable "cluster_subnet" {
-    type = string
-    description = "Name of existing cluster subnet"
+variable "cluster_networks" {
+    type = list(map(string))
+    description = <<-EOT
+        List of mappings defining networks. Mapping key/values:
+            network: Required. Name of existing network
+            subnet: Required. Name of existing subnet
+            port_security_enabled: Optional. Bool, default null (for networks not owned by project)
+    EOT
 }
 
 variable "key_pair" {
@@ -29,9 +29,39 @@ variable "control_node_flavor" {
     description = "Flavor name for control name"
 }
 
-variable "login_nodes" {
-  type = map
-  description = "Mapping defining login nodes: key -> (str) nodename suffix, value -> (str) flavor name"
+variable "login" {
+  type = any
+  description = <<-EOF
+    Mapping defining homogenous groups of login nodes. Multiple groups may
+    be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
+    to define login nodes with different capabilities such as high-memory.
+    
+    Keys are names of groups.
+    Values are a mapping as follows:
+
+    Required:
+        nodes: List of node names
+        flavor: String flavor name
+    Optional:
+        image_id: Overrides variable cluster_image_id
+        extra_networks: List of mappings in same format as cluster_networks
+        vnic_type: Overrides variable vnic_type
+        volume_backed_instances: Overrides variable volume_backed_instances
+        root_volume_size: Overrides variable root_volume_size
+        extra_volumes: Mapping defining additional volumes to create and attach
+                        Keys are unique volume name.
+                        Values are a mapping with:
+                            size: Size of volume in GB
+                        **NB**: The order in /dev is not guaranteed to match the mapping
+        fip_addresses: List of addresses of floating IPs to associate with nodes,
+                       in the same order as nodes parameter. The floating IPs
+                       must already be allocated to the project.
+        fip_network: Name of network containing ports to attach FIPs to. Only
+                     required if multiple networks are defined.
+
+        match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
+        availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
+  EOF
 }
 
 variable "cluster_image_id" {
@@ -42,17 +72,21 @@ variable "cluster_image_id" {
 variable "compute" {
     type = any
     description = <<-EOF
-        Mapping defining compute infrastructure. Keys are names of groups. Values are a
-        mapping as follows:
+        Mapping defining homogenous groups of compute nodes. Groups are used
+        in Slurm partition definitions.
+
+        Keys are names of groups.
+        Values are a mapping as follows:
 
         Required:
             nodes: List of node names
             flavor: String flavor name
         Optional:
             image_id: Overrides variable cluster_image_id
+            extra_networks: List of mappings in same format as cluster_networks
             vnic_type: Overrides variable vnic_type
-            vnic_profile: Overrides variable vnic_profile
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
+            ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
             volume_backed_instances: Overrides variable volume_backed_instances
             root_volume_size: Overrides variable root_volume_size
             extra_volumes: Mapping defining additional volumes to create and attach
@@ -60,6 +94,8 @@ variable "compute" {
                            Values are a mapping with:
                                 size: Size of volume in GB
                            **NB**: The order in /dev is not guaranteed to match the mapping
+            match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
+            availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
     EOF
 }
 
@@ -98,16 +134,13 @@ variable "home_volume_type" {
     description = "Type of home volume, if not default type"
 }
 
-variable "vnic_type" {
-    type = string
-    description = "Default VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
-    default = "normal"
-}
-
-variable "vnic_profile" {
-    type = string
-    description = "Default VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
-    default = "{}"
+variable "vnic_types" {
+    type = map(string)
+    description = <<-EOT
+        Default VNIC types, keyed by network name. See https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type
+        If not given this defaults to the "normal" type.
+    EOT
+    default = {}
 }
 
 variable "login_security_groups" {
@@ -138,22 +171,4 @@ variable "root_volume_size" {
     description = "Size of volume for root volumes if using volume backed instances, in Gb"
     type = number
     default = 40
-}
-
-variable "inventory_secrets_path" {
-  description = "Path to inventory secrets.yml file. Default is standard cookiecutter location."
-  type = string
-  default = ""
-}
-
-data "external" "inventory_secrets" {
-  program = ["${path.module}/read-inventory-secrets.py"]
-
-  query = {
-    path = var.inventory_secrets_path == "" ? "${path.module}/../inventory/group_vars/all/secrets.yml" : var.inventory_secrets_path
-  }
-}
-
-locals {
-    k3s_token = data.external.inventory_secrets.result["vault_k3s_token"]
 }

@@ -52,6 +52,13 @@
     - import_role:
         name: proxy
 
+- hosts: chrony
+  tags: chrony
+  become: yes
+  tasks:
+    - import_role:
+        name: mrlesmithjr.chrony
+
 - hosts: cluster
   gather_facts: false
   become: yes
@@ -126,22 +133,46 @@
     ansible.builtin.assert:
       that: dnf_repos_password is undefined
       fail_msg: Passwords should not be templated into repofiles during configure, unset 'dnf_repos_password'
-    when: appliances_mode == 'configure'
-  - name: Replace system repos with pulp repos 
-    ansible.builtin.include_role:
-      name: dnf_repos
-      tasks_from: set_repos.yml
+    when:
+      - appliances_mode == 'configure'
+      - not (dnf_repos_allow_insecure_creds | default(false)) # useful for development
 
-# --- tasks after here require access to package repos ---
+- hosts: cacerts:!builder
+  tags: cacerts
+  gather_facts: false
+  tasks:
+    - name: Install custom cacerts
+      import_role:
+        name: cacerts
+
 - hosts: squid
   tags: squid
   gather_facts: yes
   become: yes
   tasks:
+    # - Installing squid requires working dnf repos
+    # - Configuring dnf_repos itself requires working dnf repos to install epel
+    # - Hence do this on squid nodes first in case they are proxying others
+    - name: Replace system repos with pulp repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: set_repos.yml
+      when: "'dnf_repos' in group_names"
     - name: Configure squid proxy
       import_role:
         name: squid
 
+- hosts: dnf_repos
+  tags: dnf_repos
+  gather_facts: yes
+  become: yes
+  tasks:
+  - name: Replace system repos with pulp repos 
+    ansible.builtin.include_role:
+      name: dnf_repos
+      tasks_from: set_repos.yml
+
+# --- tasks after here require general access to package repos ---
 - hosts: tuned
   tags: tuned
   gather_facts: yes
@@ -282,10 +313,11 @@
     - include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
 
-- hosts: k3s
+- hosts: k3s:&builder
   become: yes
   tags: k3s
   tasks:
-    - ansible.builtin.include_role:
+    - name: Install k3s
+      ansible.builtin.include_role:
         name: k3s
         tasks_from: install.yml

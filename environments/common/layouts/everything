@@ -16,7 +16,7 @@ control
 [filebeat:children]
 slurm_stats
 
-# NB: [rebuild] not defined here as this template is used in CI
+# NB: [rebuild] not defined here as likely to need features not currently supported
 
 [update:children]
 
@@ -84,13 +84,17 @@ cluster
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
 
-[compute_init:children]
+[compute_init]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
-compute
 
-[k3s:children]
-# Hosts to run k3s server/agent
-openhpc
+[k3s_server:children]
+# Hosts to run k3s server (should only be single node i.e control node)
+control
+
+[k3s_agent:children]
+# Hosts to run k3s agent
+compute
+login
 
 [k9s:children]
 # Hosts to install k9s on
@@ -102,3 +106,9 @@ control
 [extra_packages:children]
 # Hosts to install specified additional packages on
 builder
+
+[cacerts]
+# Hosts to configure CA certificates and trusts on
+
+[chrony]
+# Hosts where crony configuration is applied. See docs/chrony.md for more details.

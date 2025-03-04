@@ -11,6 +11,8 @@ roles:
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
     version: v25.1.1
+  - src: mrlesmithjr.chrony
+    version: v0.1.4
 
 collections:
   - name: containers.podman

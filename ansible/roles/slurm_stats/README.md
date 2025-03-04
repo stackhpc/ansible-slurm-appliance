@@ -21,7 +21,7 @@ Example Playbook
     - hosts: compute
       tasks:
         - import_role:
-            name: stackhpc.slurm_openstack_tools.slurm-stats
+            name: slurm_stats
 
 
 License

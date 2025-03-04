@@ -1,0 +1,35 @@
+---
+
+- name: Template k3s env file
+  ansible.builtin.template:
+    dest: /etc/systemd/system/k3s.service.env
+    src: k3s.service.env.j2
+  register: _k3s_env_file_status
+
+- name: Start k3s server
+  ansible.builtin.systemd:
+    name: k3s
+    daemon_reload: "{{ _k3s_env_file_status.changed }}"
+    state: started
+    enabled: true
+
+# Possible race here as there is a delay between agents disconnecting and being registered as down, probably won't be hit in general use though
+- name: Check which k3s agents are connected
+  ansible.builtin.shell:
+    cmd: kubectl get nodes --no-headers | grep -w Ready
+  register: _k3s_connected_nodes
+  retries: 6 # task may fail if server is not ready yet
+  delay: 10
+  until: not _k3s_connected_nodes.failed
+
+- when: _k3s_connected_nodes.stdout_lines | length != groups['k3s'] | length
+  block:
+  - name: Generate new bootstrap token if not all agents are connected
+    no_log: true
+    shell:
+      cmd: "k3s token create --ttl {{ k3s_bootstrap_token_expiry }}"
+    register: _k3s_token_output
+
+  - name: Set bootstrap token as fact
+    set_fact:
+      k3s_bootstrap_token: "{{ _k3s_token_output.stdout }}"

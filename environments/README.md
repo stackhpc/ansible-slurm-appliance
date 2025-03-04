@@ -7,7 +7,7 @@ typically contains all the environment specific config. It must output an ansibl
 that conforms to the structure we expect. Providing that the inventory conforms to this
 structure, the ansible code will still be able to interface with that inventory.
 This allows the ansible code to be decoupled from the code that deployed the infrastructure
-and can therefore be tool and cloud agnostic i.e we don't care if you use terraform or ansible.
+and can therefore be tool and cloud agnostic.
 
 A pattern we use is to chain multiple ansible inventories to provide a crude form of inheritance. e.g
 
@@ -94,7 +94,7 @@ varibles are set e.g role variables for the `stackhpc.nfs` role can be found in
 
 ## Parent pointers
 
-As the environments form a chain, a symlink pointing to the parent can be be created.
+As the environments form a chain, a symlink pointing to the parent can be created.
 
     `ln -s ../common/ parent`
 

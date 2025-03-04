@@ -41,15 +41,15 @@ and referenced from the `site` and `production` environments, e.g.:
 - OpenTofu configurations should be defined in the `site` environment and used
   as a module from the other environments. This can be done with the
   cookie-cutter generated configurations:
-  - Delete the *contents* of the cookie-cutter generated `terraform/` directories
+  - Delete the *contents* of the cookie-cutter generated `tofu/` directories
     from the `production` and `staging` environments.
-  - Create a `main.tf` in those directories which uses `site/terraform/` as a
+  - Create a `main.tf` in those directories which uses `site/tofu/` as a
     [module](https://opentofu.org/docs/language/modules/), e.g. :
 
     ```
     ...
     module "cluster" {
-        source = "../../site/terraform/"
+        source = "../../site/tofu/"
 
         cluster_name = "foo"
         ...
@@ -61,13 +61,13 @@ and referenced from the `site` and `production` environments, e.g.:
           into the module block.
         - Environment-independent variables (e.g. maybe `cluster_net` if the
           same is used for staging and production) should be set as *defaults*
-          in `environments/site/terraform/variables.tf`, and then don't need to
+          in `environments/site/tofu/variables.tf`, and then don't need to
           be passed in to the module.
 
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
   To ensure staging environments are a good model for production this should
-  generally be moved into the `site` environment. It should be be encrypted
+  generally be moved into the `site` environment. It should be encrypted
   using [Ansible vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
   and then committed to the repository.
 
@@ -96,13 +96,13 @@ and referenced from the `site` and `production` environments, e.g.:
     cluster
     ```
 
-- Configure Open OnDemand - see [specific documentation](openondemand.README.md).
+- Configure Open OnDemand - see [specific documentation](openondemand.md).
 
 - Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
 
 - Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
-- Modify `environments/site/terraform/nodes.tf` to provide fixed IPs for at least
+- Modify `environments/site/tofu/nodes.tf` to provide fixed IPs for at least
   the control node, and (if not using FIPs) the login node(s):
 
     ```
@@ -127,3 +127,6 @@ and referenced from the `site` and `production` environments, e.g.:
 
 - Note [PR 473](https://github.com/stackhpc/ansible-slurm-appliance/pull/473)
   may help identify any site-specific configuration. 
+
+- See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
+  raising `hpctests_hpl_mem_frac` during tests.

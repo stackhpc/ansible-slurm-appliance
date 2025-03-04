@@ -4,6 +4,8 @@
   tasks:
     - name: Output OS version
       command: cat /etc/redhat-release
+      changed_when: false
+
     - name: Write CI-generated inventory and secrets for debugging
       ansible.builtin.copy:
         dest: /etc/ci-config/

@@ -1,0 +1,11 @@
+- name: Copy cacerts from deploy host to /exports/cluster/cacerts/
+  copy:
+    src: "{{ item }}"
+    dest: /exports/cluster/cacerts/
+    owner: root
+    group: root
+    mode: 0644
+  with_fileglob:
+    - "{{ cacerts_cert_dir }}/*"
+  delegate_to: "{{ groups['control'] | first }}"
+  run_once: true

@@ -1,0 +1,21 @@
+---
+
+- name: Create /etc/openstack
+  file:
+    path: /etc/openstack
+    state: directory
+    owner: slurm
+    group: root
+    mode: u=rX,g=rwX
+
+- name: Copy out clouds.yaml
+  copy:
+    src: "{{ openhpc_rebuild_clouds }}"
+    dest: /etc/openstack/clouds.yaml
+    owner: slurm
+    group: root
+    mode: u=r,g=rw
+
+- name: Setup slurm tools
+  include_role:
+    name: slurm_tools

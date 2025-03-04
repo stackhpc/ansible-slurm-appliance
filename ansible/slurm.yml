@@ -9,6 +9,16 @@
     - include_role:
         name:  mysql
 
+- name: Setup slurm-driven rebuild
+  hosts: rebuild:!builder
+  become: yes
+  tags:
+    - rebuild
+    - openhpc
+  tasks:
+    - import_role:
+        name: rebuild
+
 - name: Setup slurm
   hosts: openhpc
   become: yes

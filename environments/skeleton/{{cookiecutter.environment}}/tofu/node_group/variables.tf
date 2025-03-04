@@ -17,14 +17,6 @@ variable "cluster_domain_suffix" {
     default = "invalid"
 }
 
-variable "cluster_net_id" {
-    type = string
-}
-
-variable "cluster_subnet_id" {
-    type = string
-}
-
 variable "key_pair" {
     type = string
     description = "Name of an existing keypair in OpenStack"
@@ -40,16 +32,9 @@ variable "environment_root" {
     description = "Path to environment root, automatically set by activate script"
 }
 
-variable "vnic_type" {
-    type = string
-    description = "VNIC type, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type"
-    default = "normal"
-}
-
-variable "vnic_profile" {
-    type = string
-    description = "VNIC binding profile as json string, see https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile."
-    default = "{}"
+variable "vnic_types" {
+    type = map(string)
+    default = {}
 }
 
 variable "volume_backed_instances" {
@@ -80,10 +65,6 @@ variable "security_group_ids" {
     type = list
 }
 
-variable "k3s_token" {
-    type = string
-}
-
 variable "control_address" {
     description = "Name/address of control node"
     type = string
@@ -93,4 +74,51 @@ variable "compute_init_enable" {
     type = list(string)
     description = "Groups to activate for ansible-init compute rebuilds"
     default = []
+}
+
+variable "ignore_image_changes" {
+    type = bool
+    description = "Whether to ignore changes to the image_id parameter"
+    default = false
+}
+
+variable "networks" {
+    type = list(map(string))
+    default = []
+}
+
+variable "fip_addresses" {
+    type = list(string)
+    description = <<-EOT
+        List of addresses of floating IPs to associate with nodes,
+        in same order as nodes parameter. The floating IPs must already be
+        allocated to the project.
+    EOT
+    default = []
+}
+
+variable "fip_network" {
+    type = string
+    description = <<-EOT
+        Name of network containing ports to attach FIPs to. Only required if multiple
+        networks are defined.
+    EOT
+    default = ""
+}
+
+variable "match_ironic_node" {
+    type = bool
+    description = "Whether to launch instances on the Ironic node of the same name as each cluster node"
+    default = false
+}
+
+variable "availability_zone" {
+    type = string
+    description = "Name of availability zone - ignored unless match_ironic_node is true"
+    default = "nova"
+}
+
+variable "baremetal_nodes" {
+    type = map(string)
+    default = {}
 }
