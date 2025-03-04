@@ -15,6 +15,7 @@
     enable_tuned:  "{{ os_metadata.meta.tuned | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
+    enable_lustre: "{{ os_metadata.meta.lustre | default(false) | bool }}"
     enable_basic_users: "{{ os_metadata.meta.basic_users | default(false) | bool }}"
     enable_eessi: "{{ os_metadata.meta.eessi | default(false) | bool }}"
     enable_chrony: "{{ os_metadata.meta.chrony | default(false) | bool }}"
@@ -246,6 +247,12 @@
       when:
         - enable_manila
         - os_manila_mount_shares | length > 0
+
+    - name: Configure lustre
+      ansible.builtin.include_role:
+        name: lustre
+        tasks_from: configure.yml
+      when: enable_lustre
 
     - name: Basic users
       block:
