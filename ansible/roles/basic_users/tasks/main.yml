@@ -90,7 +90,7 @@
 
     - name: Generate cluster ssh key
       community.crypto.openssh_keypair:
-        path: "{{ item.ssh_key_file | default('~/.ssh/' + _ssh_key_type )}}" # NB: ssh_key_file is from ansible.builtin.user
+        path: "{{ item.ssh_key_file | default('~/.ssh/id_' + _ssh_key_type )}}" # NB: ssh_key_file is from ansible.builtin.user
         type: "{{ _ssh_key_type }}"
       vars:
         _ssh_key_type: "{{ item.ssh_key_type | default('ed25519') }}"
