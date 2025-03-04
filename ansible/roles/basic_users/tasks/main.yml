@@ -53,9 +53,10 @@
 # handle root squashed exports
 - name: Create home directories
   # doesn't delete with state=absent, same as ansible.builtin.user
-  file:
-    state: directory
-    path: "{{ item.home | default( basic_users_homedir_host_path + '/' + item.name ) }}"
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ item.skeleton | default('/etc/skel/') }}"
+    dest: "{{ item.home | default( basic_users_homedir_host_path + '/' + item.name ) }}"
     owner: "{{ item.name }}"
     group: "{{ item.name }}"
     mode: u=rwX,go=
