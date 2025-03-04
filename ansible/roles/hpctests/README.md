@@ -22,8 +22,10 @@ Requirements
 
 Role Variables
 --------------
-
-- `hpctests_rootdir`: Required. Path to root of test directory tree, which must be on a r/w filesystem shared to all cluster nodes under test. The last directory component will be created.
+- `hpctests_user`: Optional. User to run jobs as. Default is `ansible_user`.
+- `hpctests_rootdir`: Optional. Path to root of test directory tree. This must
+  be a r/w filesystem shared to all cluster nodes under test. Default is
+  `/home/{{ hpctests_user }}/hpctests`. **NB:** Do not use `~` in this path.
 - `hpctests_partition`: Optional. Name of partition to use, otherwise default partition is used.
 - `hpctests_nodes`: Optional. A Slurm node expression, e.g. `'compute-[0-15,19]'` defining the nodes to use. If not set all nodes in the selected partition are used.
 - `hpctests_ucx_net_devices`: Optional. Control which network device/interface to use, e.g. `mlx5_1:0`. The default of `all` (as per UCX) may not be appropriate for multi-rail nodes with different bandwidths on each device. See [here](https://openucx.readthedocs.io/en/master/faq.html#what-is-the-default-behavior-in-a-multi-rail-environment) and [here](https://github.com/openucx/ucx/wiki/UCX-environment-parameters#setting-the-devices-to-use). Alternatively a mapping of partition name (as `hpctests_partition`) to device/interface can be used. For partitions not defined in the mapping the default of `all` is used.

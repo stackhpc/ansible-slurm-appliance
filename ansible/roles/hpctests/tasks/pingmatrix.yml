@@ -5,14 +5,6 @@
     path: "{{ hpctests_rootdir }}/pingmatrix"
     state: directory
 
-- name: Precreate files to workaround selinux context issues on NFS mounts
-  file:
-    path: "{{ hpctests_rootdir }}/pingmatrix/{{ item }}"
-    state: touch
-  loop:
-    - mpi_nxnlatbw.c
-    - pingmatrix.sh
-
 - name: Copy source
   copy:
     src: mpi_nxnlatbw.c
@@ -24,7 +16,7 @@
     dest: "{{ hpctests_rootdir }}/pingmatrix/pingmatrix.sh"
 
 - name: Run ping matrix
-  shell: sbatch --wait pingmatrix.sh
+  shell: bash -l -c 'sbatch --wait pingmatrix.sh' # need login shell for module command
   args:
     chdir: "{{ hpctests_rootdir }}/pingmatrix"
   register: hpctests_pingmatrix_sbatch

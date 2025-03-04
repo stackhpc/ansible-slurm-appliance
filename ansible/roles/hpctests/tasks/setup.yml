@@ -25,9 +25,8 @@
   file:
     path: "{{ hpctests_rootdir }}"
     state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-  become: true
+    owner: "{{ hpctests_user }}"
+    group: "{{ hpctests_user }}"
 
 - name: Set fact for UCX_NET_DEVICES
   set_fact:
