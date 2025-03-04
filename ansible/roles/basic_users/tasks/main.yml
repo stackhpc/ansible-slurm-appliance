@@ -87,7 +87,7 @@
         label: "{{ item.name }}"
       when:
         - item.state | default('present') == 'present'
-  
+
     - name: Generate cluster ssh key
       community.crypto.openssh_keypair:
         path: "{{ item.ssh_key_file | default('~/.ssh/' + _ssh_key_type )}}" # NB: ssh_key_file is from ansible.builtin.user
