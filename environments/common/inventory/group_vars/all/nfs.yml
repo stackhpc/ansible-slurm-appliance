@@ -15,4 +15,7 @@ nfs_configurations:
     nfs_server: "{{ nfs_server_default }}"
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
-    nfs_export_options: 'rw,secure,root_squash' # prevent tunnelling and setuid binaries
+    # prevent tunnelling and setuid binaries:
+    # NB: this is stackhpc.nfs role defaults but are set here to prevent being
+    # accidently overriden via default options
+    nfs_export_options: 'rw,secure,root_squash' 
