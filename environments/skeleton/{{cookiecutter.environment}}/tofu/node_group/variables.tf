@@ -65,10 +65,6 @@ variable "security_group_ids" {
     type = list
 }
 
-variable "k3s_token" {
-    type = string
-}
-
 variable "control_address" {
     description = "Name/address of control node"
     type = string

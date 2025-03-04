@@ -313,10 +313,11 @@
     - include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
 
-- hosts: k3s
+- hosts: k3s:&builder
   become: yes
   tags: k3s
   tasks:
-    - ansible.builtin.include_role:
+    - name: Install k3s
+      ansible.builtin.include_role:
         name: k3s
         tasks_from: install.yml

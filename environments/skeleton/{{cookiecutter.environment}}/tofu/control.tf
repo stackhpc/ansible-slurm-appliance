@@ -14,8 +14,8 @@ resource "openstack_networking_port_v2" "control" {
     subnet_id = data.openstack_networking_subnet_v2.cluster_subnet[each.key].id
   }
 
-  port_security_enabled = lookup(each.value, "port_security_enabled", true)
-  security_group_ids = lookup(each.value, "port_security_enabled", true) ? [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id] : []
+  port_security_enabled = lookup(each.value, "port_security_enabled", null)
+  security_group_ids = lookup(each.value, "port_security_enabled", null) != false ? [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id] : []
 
   binding {
     vnic_type = lookup(var.vnic_types, each.key, "normal")
@@ -59,7 +59,6 @@ resource "openstack_compute_instance_v2" "control" {
 
   metadata = {
     environment_root = var.environment_root
-    k3s_token = local.k3s_token
     access_ip = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
   }
 

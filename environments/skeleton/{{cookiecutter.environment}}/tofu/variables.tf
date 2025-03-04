@@ -15,7 +15,7 @@ variable "cluster_networks" {
         List of mappings defining networks. Mapping key/values:
             network: Required. Name of existing network
             subnet: Required. Name of existing subnet
-            port_security_enabled: Optional. Bool, default true
+            port_security_enabled: Optional. Bool, default null (for networks not owned by project)
     EOT
 }
 
@@ -171,14 +171,4 @@ variable "root_volume_size" {
     description = "Size of volume for root volumes if using volume backed instances, in Gb"
     type = number
     default = 40
-}
-
-variable "inventory_secrets_path" {
-  description = "Path to inventory secrets.yml file. Default is standard cookiecutter location."
-  type = string
-  default = ""
-}
-
-locals {
-    k3s_token = data.external.inventory_secrets.result["vault_k3s_token"]
 }
