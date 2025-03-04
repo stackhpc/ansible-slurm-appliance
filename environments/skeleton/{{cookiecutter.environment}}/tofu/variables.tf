@@ -46,7 +46,6 @@ variable "login" {
         image_id: Overrides variable cluster_image_id
         extra_networks: List of mappings in same format as cluster_networks
         vnic_type: Overrides variable vnic_type
-        vnic_profile: Overrides variable vnic_profile
         volume_backed_instances: Overrides variable volume_backed_instances
         root_volume_size: Overrides variable root_volume_size
         extra_volumes: Mapping defining additional volumes to create and attach
@@ -86,7 +85,6 @@ variable "compute" {
             image_id: Overrides variable cluster_image_id
             extra_networks: List of mappings in same format as cluster_networks
             vnic_type: Overrides variable vnic_type
-            vnic_profile: Overrides variable vnic_profile
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
             ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
             volume_backed_instances: Overrides variable volume_backed_instances
@@ -141,16 +139,6 @@ variable "vnic_types" {
     description = <<-EOT
         Default VNIC types, keyed by network name. See https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type
         If not given this defaults to the "normal" type.
-    EOT
-    default = {}
-}
-
-variable "vnic_profiles" {
-    type = map(string)
-    description = <<-EOT
-    Default VNIC binding profiles, keyed by network name. Values are json strings.
-    See https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile.
-    If not given this defaults to "{}"
     EOT
     default = {}
 }
