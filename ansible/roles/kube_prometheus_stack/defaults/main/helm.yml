@@ -1,0 +1,195 @@
+# The external URLs for Prometheus and Alertmanager
+_kube_prometheus_stack_external_url_tls_enabled: >-
+  {{-
+    admin_dashboard_ingress_tls_enabled |
+      default(ingress_tls_enabled | default(True))
+  }}
+_kube_prometheus_stack_external_url_scheme: >-
+  {{- "https" if _kube_prometheus_stack_external_url_tls_enabled else "http" }}
+_kube_prometheus_stack_alertmanager_host: >-
+  {{-
+    admin_dashboard_ingress_alertmanager_host |
+      default(
+        "{}.{}".format(ingress_alertmanager_subdomain, ingress_base_domain)
+        if ingress_alertmanager_subdomain is defined and ingress_base_domain is defined
+        else ""
+      )
+  }}
+kube_prometheus_stack_alertmanager_external_url: >-
+  {{-
+    "{}://{}".format(
+      _kube_prometheus_stack_external_url_scheme,
+      _kube_prometheus_stack_alertmanager_host
+    )
+    if _kube_prometheus_stack_alertmanager_host
+    else ""
+  }}
+_kube_prometheus_stack_prometheus_host: >-
+  {{-
+    admin_dashboard_ingress_prometheus_host |
+      default(
+        "{}.{}".format(ingress_prometheus_subdomain, ingress_base_domain)
+        if ingress_prometheus_subdomain is defined and ingress_base_domain is defined
+        else ""
+      )
+  }}
+kube_prometheus_stack_prometheus_external_url: >-
+  {{-
+    "{}://{}".format(
+      _kube_prometheus_stack_external_url_scheme,
+      _kube_prometheus_stack_prometheus_host
+    )
+    if _kube_prometheus_stack_prometheus_host
+    else ""
+  }}
+
+# The values for the kube-prometheus-stack release
+kube_prometheus_stack_release_defaults:
+  defaultRules:
+    disabled:
+      # None of these are relevant in k3s context
+      KubeSchedulerDown: true
+      KubeProxyDown: true
+      KubeControllerManagerDown: true
+  prometheus:
+    service:
+      type: NodePort
+      nodePort: "{{ prometheus_port }}"
+    prometheusSpec:
+      externalUrl: "{{ kube_prometheus_stack_prometheus_external_url }}"
+      podMonitorSelectorNilUsesHelmValues: false
+      serviceMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+      image:
+        tag: "{{ prometheus_image_tag }}"
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            volumeName: prometheus-dir
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi # not enforced but requires value > 0
+      retention: "{{ prometheus_storage_retention }}"
+      retentionSize: "{{ prometheus_storage_retention_size }}"
+      additionalAlertRelabelConfigs: "{{ prometheus_alert_relabel_configs }}"
+      scrapeInterval: "{{ prometheus_global.scrape_interval }}"
+      scrapeTimeout: "{{ prometheus_global.scrape_timeout }}"
+      evaluationInterval: "{{ prometheus_global.evaluation_interval }}"
+      externalLabels: "{{ prometheus_external_labels }}"
+      additionalScrapeConfigs: "{{ prometheus_scrape_configs }}"
+      # may need to change these
+      securityContext:
+        runAsUser: 0
+        runAsNonRoot: false
+        runAsGroup: 0
+        fsGroup: 0
+      nodeSelector:
+        clusterrole: "server"
+
+  additionalPrometheusRulesMap: "{{ prometheus_rules }}"
+                
+  grafana:
+    service:
+      type: NodePort
+      nodePort: "{{ grafana_port }}"
+    serviceMonitor:
+      enabled: false
+    ingress:
+      path: "/node/{{ groups['prometheus'].0 }}/{{ grafana_port }}"
+    sidecar:
+      image:
+        tag: "{{ grafana_sidecar_image_tag }}"
+      dashboards:
+        searchNamespace: ALL
+    grafana.ini:
+      server:
+        domain: "{{ grafana_domain }}"
+        root_url: "{{ grafana_url }}"
+        serve_from_sub_path: "{{ grafana_serve_from_sub_path }}"
+      auth: "{{ grafana_auth }}"
+      auth.anonymous:
+        enabled: "{{ grafana_auth_anonymous }}"
+      dashboards:
+        default_home_dashboard_path: "/tmp/dashboards/{{ grafana_home_dashboard }}"
+    additionalDataSources: "{{ grafana_datasources }}"
+    plugins: "{{ grafana_plugins }}"
+    nodeSelector:
+        clusterrole: "server"
+    ldap:
+      enabled: "{{ false if grafana_ldap == {} else true }}"
+      config: "{{ grafana_ldap | to_yaml }}"
+    image:
+      tag: "{{ grafana_image_tag }}"
+    adminUser: "{{ grafana_security.admin_user }}"
+    adminPassword: "{{ grafana_security.admin_password }}"
+  
+  alertmanager:
+    service:
+      type: NodePort
+      nodePort: "{{ alertmanager_port }}"
+    # Don't apply the namespace grouping by default
+    config: "{{ alertmanager_config }}"
+    alertmanagerSpec:
+      image:
+        tag: "{{ alertmanager_image_tag }}"
+      forceEnableClusterMode: true
+      externalUrl: "{{ kube_prometheus_stack_alertmanager_external_url }}"
+      # Make sure that alertmanager finds configurations with the alertmanager name as a label
+      alertmanagerConfigSelector:
+        matchLabels:
+          alertmanager: "{{ kube_prometheus_stack_release_name }}-alertmanager"
+      # Do NOT add the namespace matcher to routes from AlertmanagerConfig resources
+      alertmanagerConfigMatcherStrategy:
+        type: None
+      nodeSelector:
+        clusterrole: "server"
+      
+  
+  prometheusOperator:
+    image:
+      tag: "{{ kube_prometheus_stack_app_version }}"
+    prometheusConfigReloader:
+      image:
+        tag: "{{ kube_prometheus_stack_app_version }}"
+    admissionWebhooks:
+      patch:
+        image:
+          tag: "{{ kube_prometheus_stack_patch_image_tag }}"
+    nodeSelector:
+        clusterrole: "server"
+  
+  kube-state-metrics:
+    image:
+      tag: "{{ kube_prometheus_stack_metrics_image_tag }}"
+    nodeSelector:
+        clusterrole: "server"
+
+  prometheus-node-exporter:
+    extraArgs: "{{ node_exporter_args }}"
+    image:
+      tag: "{{ node_exporter_image_tag }}"
+    prometheus:
+      monitor:
+        relabelings:
+          # relabels instances to hostnames with suffixes stripped
+          - sourceLabels: [__meta_kubernetes_pod_node_name]
+            separator: ;
+            regex: ([^.]+).*
+            targetLabel: instance
+            replacement: $1
+            action: replace
+          - targetLabel: env
+            sourceLabels: [env]
+            regex: ^$
+            replacement: ungrouped
+
+kube_prometheus_stack_release_overrides: {}
+
+kube_prometheus_stack_release_values: >-
+  {{-
+    kube_prometheus_stack_release_defaults |
+      combine(kube_prometheus_stack_release_overrides, recursive = True)
+  }}

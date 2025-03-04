@@ -1,0 +1,207 @@
+---
+
+- name: Checking for existing Prometheus data directory
+  ansible.builtin.stat:
+    path: "{{ prometheus_db_dir }}"
+  register: prom_exists_result
+
+- name: Check if data is in kube-prometheus-stack
+  ansible.builtin.stat:
+    path: "{{ prometheus_db_dir }}/prometheus-db"
+  register: prom_already_migrated
+  when: prom_exists_result.stat.exists
+
+- name: Migrate existing Prometheus data from cloudalchemy roles to kube-prometheus-stack
+  when: prom_exists_result.stat.exists and not prom_already_migrated.stat.exists
+  block:
+    - name: Get existing files to copy
+      ansible.builtin.find:
+        paths: "{{ prometheus_db_dir }}"
+        file_type: any
+      register: prometheus_files
+
+    - name: Create KPS subdirectory
+      ansible.builtin.file:
+        path: "{{ prometheus_db_dir }}/prometheus-db"
+        state: directory
+
+    - name: Move data to KPS subdirectory
+      ansible.builtin.shell:
+        cmd: "mv {{ item.path }} {{ prometheus_db_dir }}/prometheus-db/{{ item.path | regex_search('([^/]+$)') }}"
+      loop: "{{ prometheus_files.files }}"
+
+    - name: Set ownership
+      ansible.builtin.file:
+        path: "{{ prometheus_db_dir }}"
+        owner: root
+        group: root
+        recurse: true
+
+- name: Creating namespace
+  kubernetes.core.k8s:
+    name: "{{ kube_prometheus_stack_release_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+# Because of the way Helm handles CRDs, we upgrade them first
+- name: Get kube-prometheus-stack CRDs
+  command: >-
+    helm show crds
+      {{ kube_prometheus_stack_chart_name }}
+      --repo {{ kube_prometheus_stack_chart_repo }}
+      --version {{ kube_prometheus_stack_chart_version }}
+  register: kube_prometheus_stack_crds
+
+- name: Install kube-prometheus-stack CRDs
+  # Use server-side apply because some of the CRDs are too big to fit in the annotation
+  command: kubectl apply --server-side=true --force-conflicts=true -f -
+  args:
+    stdin: "{{ kube_prometheus_stack_crds.stdout }}"
+
+- name: Disable rancher default storage class
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    state: patched
+    definition:
+      kind: StorageClass
+      metadata:
+        name: local-path
+        annotations:
+          storageclass.kubernetes.io/is-default-class: "false"
+
+- name: Create Prometheus hostPath volume in /var/lib/state
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: prometheus-dir
+        labels:
+          app.kubernetes.io/name: prometheus-dir
+      spec:
+        capacity:
+          storage: 1Gi # not enforced for hostpath volumes but requires value >0 to work
+        accessModes:
+        - ReadWriteOnce
+        hostPath:
+          path: "{{ prometheus_db_dir }}"
+          type: DirectoryOrCreate
+
+- name: Setting up k3s services for OnDemand Exporter
+  when: groups['openondemand'] | count > 0
+  block:
+    - name: Creating headless service for OOD exporter
+      kubernetes.core.k8s:
+        namespace: "{{ kube_prometheus_stack_release_namespace }}"
+        definition:
+          kind: Service
+          metadata:
+            name: ood-exporter
+          spec:
+            clusterIP: None
+            ports:
+            - name: ood-exporter
+              port: 9301
+              protocol: TCP
+
+    - name: Binding OOD exporter service to host
+      kubernetes.core.k8s:
+        namespace: "{{ kube_prometheus_stack_release_namespace }}"
+        definition:
+          kind: Endpoints
+          metadata:
+            name: ood-exporter
+          subsets:
+            - addresses:
+                - ip: "{{ openondemand_ip }}"
+              ports:
+                - port: 9301
+                  name: ood-exporter
+                  protocol: TCP
+
+- name: Creating headless service for slurm exporter
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      kind: Service
+      metadata:
+        name: slurm-exporter
+      spec:
+        clusterIP: None
+        ports:
+        - name: slurm-exporter
+          port: 9341
+          protocol: TCP
+
+- name: Binding slurm exporter service to host
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      kind: Endpoints
+      metadata:
+        name: slurm-exporter
+      subsets:
+        - addresses:
+            - ip: "{{ control_ip }}"
+          ports:
+            - port: 9341
+              name: slurm-exporter
+              protocol: TCP
+
+- name: Creating headless service for opensearch datasource
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      kind: Service
+      metadata:
+        name: opensearch
+      spec:
+        clusterIP: None
+        ports:
+        - name: opensearch
+          port: 9200
+          protocol: TCP
+
+- name: Binding opensearch service to host
+  kubernetes.core.k8s:
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      kind: Endpoints
+      metadata:
+        name: opensearch
+      subsets:
+        - addresses:
+            - ip: "{{ opensearch_ip }}"
+          ports:
+            - port: 9200
+              name: opensearch
+              protocol: TCP
+
+- name: Import grafana dashboards
+  ansible.builtin.import_role:
+    name: grafana-dashboards
+
+- name: Install kube-prometheus-stack on target Kubernetes cluster
+  kubernetes.core.helm:
+    chart_ref: "{{ kube_prometheus_stack_chart_name }}"
+    chart_repo_url: "{{ kube_prometheus_stack_chart_repo }}"
+    chart_version: "{{ kube_prometheus_stack_chart_version }}"
+    release_namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    release_name: "{{ kube_prometheus_stack_release_name }}"
+    release_values: "{{ kube_prometheus_stack_release_values }}"
+    atomic: no
+    create_namespace: no
+    wait: yes
+    wait_timeout: "{{ kube_prometheus_stack_wait_timeout }}"
+
+- name: Delete unwanted default dashboards # currently no way to selectively enable in helm chart
+  kubernetes.core.k8s:
+    state: absent
+    kind: ConfigMap
+    namespace: "{{ kube_prometheus_stack_release_namespace }}"
+    definition:
+      metadata:
+        name: "{{ item }}"
+  loop: "{{ grafana_exclude_default_dashboards }}"
