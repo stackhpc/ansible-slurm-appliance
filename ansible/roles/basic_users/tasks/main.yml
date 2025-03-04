@@ -93,6 +93,7 @@
       community.crypto.openssh_keypair:
         path: "{{ item.ssh_key_file | default('~/.ssh/id_' + _ssh_key_type )}}" # NB: ssh_key_file is from ansible.builtin.user
         type: "{{ _ssh_key_type }}"
+        comment: "{{ item.ssh_key_comment | default(item.name) }}"
       vars:
         _ssh_key_type: "{{ item.ssh_key_type | default('ed25519') }}"
       become_user: "{{ item.name }}"
