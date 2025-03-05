@@ -1,2 +1,3 @@
 # {{ ansible_managed }}
 PasswordAuthentication {{ 'yes' if sshd_password_authentication | bool else 'no' }}
+DisableForwarding {{ 'yes' if sshd_disable_forwarding | bool else 'no' }}

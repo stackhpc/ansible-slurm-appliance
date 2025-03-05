@@ -45,6 +45,8 @@
       dest: tasks/nfs-clients.yml
     - src: ../../mrlesmithjr.chrony
       dest: roles/
+    - src: ../../lustre
+      dest: roles/
 
 - name: Add filter_plugins to ansible.cfg
   lineinfile:

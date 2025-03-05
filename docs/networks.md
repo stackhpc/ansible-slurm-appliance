@@ -14,6 +14,15 @@ as an SSH proxy to access the other nodes, this can create problems in recoverin
 the cluster if the login node is unavailable and can make Ansible problems harder
 to debug.
 
+> [!WARNING]
+> If home directories are on a shared filesystem with no authentication (such
+> as the default NFS share) then the network(s) the fileserver is attached to
+> form a security boundary. If an untrusted user can access these networks they
+> could mount the home directories setting any desired uid/gid.
+>
+> Ensure there is no external access to these networks and that no untrusted
+> instances are attached to them.
+
 This page describes supported configurations and how to implement them using
 the OpenTofu variables. These will normally be set in
 `environments/site/tofu/terraform.tfvars` for the site base environment. If they

@@ -1,10 +1,3 @@
----
-
-# See: https://github.com/stackhpc/ansible-role-cluster-nfs
-# for variable definitions
-
-nfs_server_default: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
-
 nfs_configurations:
   - comment: Export /exports/home from Slurm control node as /home
     nfs_enable:
@@ -16,6 +9,9 @@ nfs_configurations:
     nfs_export: "/exports/home" # assumes skeleton TF is being used
     nfs_client_mnt_point: "/home"
 
-# Set 'secure' to prevent tunneling nfs mounts
-# Cannot set 'root_squash' due to home directory creation
-nfs_export_options: 'rw,secure,no_root_squash'
+  # EXPERIMENTAL - not generally secure
+  - comment: Export /exports/cluster from Slurm control node
+    nfs_enable:
+        server: "{{ inventory_hostname in groups['control'] }}"
+        clients: false
+    nfs_export: "/exports/cluster"
