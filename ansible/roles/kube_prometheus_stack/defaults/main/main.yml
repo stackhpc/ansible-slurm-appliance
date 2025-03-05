@@ -1,0 +1,105 @@
+---
+
+# The chart to use
+kube_prometheus_stack_chart_repo: https://prometheus-community.github.io/helm-charts
+kube_prometheus_stack_chart_name: kube-prometheus-stack
+kube_prometheus_stack_chart_version: 59.1.0
+
+# used as tag prometheus-operator image and helpers, 
+# should be kept in sync with the appVersion provided in the Chart.yaml of whichever
+# kube_prometheus_stack_chart_version is used
+kube_prometheus_stack_app_version: v0.74.0
+
+# Release information
+kube_prometheus_stack_release_namespace: monitoring-system
+kube_prometheus_stack_release_name: kube-prometheus-stack
+
+# The timeout to wait for the release to become ready
+kube_prometheus_stack_wait_timeout: 5m
+
+kube_prometheus_stack_metrics_image_tag: v2.12.0
+kube_prometheus_stack_patch_image_tag: v20221220-controller-v1.5.1-58-g787ea74b6
+
+control_ip: "{{ hostvars[groups['control'].0].ansible_host }}"
+
+grafana_auth_anonymous: false
+
+slack_integration:
+  channel: "#alerts"
+  app_creds: # TODO: need to find best way to build this into secrets store as must be manually retrieved from app
+
+alertmanager_config:
+  route:
+    group_by: ['...']
+  receivers:
+    - name: 'null'
+
+alertmanager_replicas: 1
+
+# Must be within K3s' reserved port range (default 30000-32767)
+prometheus_port: 30000
+grafana_port: 30001
+alertmanager_port: 30002
+
+prometheus_image_tag: "v2.27.0"
+
+prometheus_db_dir: "/var/lib/prometheus"
+
+prometheus_storage_retention: "30d"
+# Available since Prometheus 2.7.0
+# [EXPERIMENTAL] Maximum number of bytes that can be stored for blocks. Units
+# supported: KB, MB, GB, TB, PB.
+prometheus_storage_retention_size: "40GB"
+
+prometheus_alert_relabel_configs: []
+
+prometheus_global:
+  scrape_interval: 30s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+prometheus_external_labels:
+  environment: "{{ ansible_fqdn | default(inventory_hostname) | default(ansible_host) }}"
+
+prometheus_scrape_configs: []
+
+prometheus_extra_recording_rules: []
+prometheus_extra_alerting_rules: []
+
+prometheus_rules:
+  appliance-rules:
+    groups:
+    - name: appliance-recording-rules
+      rules: "{{ prometheus_extra_recording_rules }}"
+    - name: appliance-alerting-rules
+      rules: "{{ prometheus_extra_alerting_rules }}" 
+
+# ------------------------------------------------------------------------------------------
+grafana_image_tag: 11.2.2
+grafana_sidecar_image_tag: 1.26.1
+
+grafana_exclude_default_dashboards: []
+
+grafana_security:
+  admin_user: grafana
+  admin_password: "{{ vault_grafana_admin_password }}"
+
+# see https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml for configuration options
+grafana_auth: {}
+grafana_ldap: {}
+
+#######
+# Plugins from https://grafana.com/plugins
+grafana_plugins: []
+
+# Additional datasources to configure alongside kube-prometheus-stack defaults
+grafana_datasources: []
+
+grafana_home_dashboard: slurm-jobs.json
+
+alertmanager_image_tag: v0.27.0
+
+node_exporter_image_tag: v1.8.2
+node_exporter_args: 
+  - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+  - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$

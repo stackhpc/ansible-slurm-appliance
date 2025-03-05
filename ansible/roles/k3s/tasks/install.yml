@@ -54,8 +54,8 @@
       INSTALL_K3S_SKIP_DOWNLOAD: "true"
     changed_when: true
     loop:
-      - server --disable=traefik
-      - agent
+      - server --disable=traefik --node-label clusterrole=server
+      - agent --node-label clusterrole=agent
 
 - name: Install helm
   unarchive:
@@ -71,3 +71,12 @@
   ansible.builtin.lineinfile:
     path: /etc/environment
     line: "KUBECONFIG=/etc/rancher/k3s/k3s.yaml"
+
+- name: Install pip
+  dnf:
+    name: python3-pip
+
+- name: Install pip dependencies for k8s ansible module
+  ansible.builtin.pip:
+    name:
+      - kubernetes==30.1.0
