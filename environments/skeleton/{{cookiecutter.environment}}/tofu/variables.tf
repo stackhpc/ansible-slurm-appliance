@@ -15,7 +15,7 @@ variable "cluster_networks" {
         List of mappings defining networks. Mapping key/values:
             network: Required. Name of existing network
             subnet: Required. Name of existing subnet
-            port_security_enabled: Optional. Bool, default null (for networks not owned by project)
+            no_security_groups: Optional. Bool (default: false). Disable security groups
     EOT
 }
 

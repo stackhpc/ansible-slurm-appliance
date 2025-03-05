@@ -44,9 +44,9 @@ resource "openstack_networking_port_v2" "compute" {
   fixed_ip {
     subnet_id = data.openstack_networking_subnet_v2.subnet[each.value.network].id
   }
-
-  port_security_enabled = lookup(each.value, "port_security_enabled", null)
-  security_group_ids = lookup(each.value, "port_security_enabled", null) != false ? var.security_group_ids : []
+  
+  no_security_groups = lookup(each.value, "no_security_groups", false)
+  security_group_ids = lookup(each.value, "no_security_groups", false) ? [] : var.security_group_ids
 
   binding {
     vnic_type = lookup(var.vnic_types, each.value.network, "normal")
