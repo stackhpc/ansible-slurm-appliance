@@ -3,12 +3,8 @@
   gather_facts: false
   vars:
     os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
-    #gateway_ip: "{{ os_metadata.meta.gateway_ip | default('') }}"
+    gateway_ip: "{{ os_metadata.meta.gateway_ip | default('') }}"
     access_ip:  "{{ os_metadata.meta.access_ip | default('') }}"
-    gateway_ip: 172.16.0.1  # DEBUG - actual
-    # gateway_ip: 192.168.9.1
-    #gateway_ip: 10.20.0.0
-    gateway_ip: ''
   tasks:
     - name: Read nmcli device info
       command: nmcli --get GENERAL.DEVICE,GENERAL.CONNECTION,IP4.ADDRESS,IP4.GATEWAY device show
