@@ -14,8 +14,8 @@ resource "openstack_networking_port_v2" "control" {
     subnet_id = data.openstack_networking_subnet_v2.cluster_subnet[each.key].id
   }
 
-  port_security_enabled = lookup(each.value, "port_security_enabled", null)
-  security_group_ids = lookup(each.value, "port_security_enabled", true) ? [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id] : []
+  no_security_groups = lookup(each.value, "no_security_groups", false)
+  security_group_ids = lookup(each.value, "no_security_groups", false) ? [] : [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
 
   binding {
     vnic_type = lookup(var.vnic_types, each.key, "normal")
