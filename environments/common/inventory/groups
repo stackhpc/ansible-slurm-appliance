@@ -169,3 +169,6 @@ extra_packages
 
 [chrony]
 # Hosts where crony configuration is applied. See docs/chrony.md for more details.
+
+[gateway]
+# Add builder to this group to install gateway ansible-init playbook into image
