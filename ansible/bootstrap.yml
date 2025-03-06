@@ -67,6 +67,12 @@
   tasks:
     - import_role:
         name: mrlesmithjr.chrony
+        # skip install tasks as might not have network yet
+        tasks_from: config_chrony.yml
+      vars:
+        # workaround for set_facts.yml:
+        chrony_config: /etc/chrony.conf
+        chrony_service: chronyd
 
 - hosts: cluster
   gather_facts: false
