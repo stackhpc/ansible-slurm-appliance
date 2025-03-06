@@ -58,9 +58,9 @@ variable "login" {
                        must already be allocated to the project.
         fip_network: Name of network containing ports to attach FIPs to. Only
                      required if multiple networks are defined.
-
         match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
         availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
+        gateway_ip: Address to add default route via
   EOF
 }
 
@@ -96,6 +96,7 @@ variable "compute" {
                            **NB**: The order in /dev is not guaranteed to match the mapping
             match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
             availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
+            gateway_ip: Address to add default route via
     EOF
 }
 
@@ -171,4 +172,10 @@ variable "root_volume_size" {
     description = "Size of volume for root volumes if using volume backed instances, in Gb"
     type = number
     default = 40
+}
+
+variable "gateway_ip" {
+    description = "Address to add default route via"
+    type = string
+    default = ""
 }
