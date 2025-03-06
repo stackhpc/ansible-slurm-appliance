@@ -90,7 +90,7 @@
 
 - name: Install gateway playbook
   hosts: gateway
-  tags: compute_init
+  tags: gateway
   become: yes
   gather_facts: no
   tasks:
