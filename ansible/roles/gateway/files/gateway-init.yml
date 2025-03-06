@@ -27,7 +27,8 @@
     - name: Examine whether device address contains gateway_ip
       set_fact:
         device_is_gateway_device: "{{ nmcli_devices | map(attribute='ip4_address') | map('ansible.utils.network_in_network', gateway_ip) }}"
-    
+      # list of bools - false if gateway_ip == ''
+
     - name: Get name of connection containing gateway_ip
       # might be empty string
       set_fact:
@@ -35,7 +36,11 @@
           {{ nmcli_devices | map(attribute='connection') |
             zip(device_is_gateway_device) | selectattr('1') | 
             map(attribute=0) | list | first | default ('') }}
-    
+
+    - name: Show debug info
+      debug:
+        msg: "gateway_ip={{ gateway_ip }} access_ip={{ access_ip }} gateway_ip_connection={{ gateway_ip_connection }}"
+
     - name: Error if device has a gateway which is not the desired one
     # TODO: document
       assert:
@@ -48,40 +53,36 @@
       loop: "{{ nmcli_devices }}"
 
     - name: Remove undesired gateways
-      command: >-
-        echo nmcli connection modify '{{ item.connection }}' ipv4.gateway ''
-        &&
-        echo nmcli connection up '{{ item.connection }}'
+      shell: |
+        nmcli connection modify '{{ item.connection }}' ipv4.gateway ''
+        nmcli connection up '{{ item.connection }}'
       when:
         - gateway_ip != ''
         - item.ip4_gateway != ''
         - item.connection != gateway_ip_connection
       loop: "{{ nmcli_devices }}"
     
-    - name: Add desired gateways
-      command: >-
-        echo nmcli connection modify '{{ item.connection }}'
-            ipv4.address {{ item.ip4_address }}
-            ipv4.gateway {{ gateway_ip }}
-        &&
-        echo nmcli connection up '{{ item.connection }}'
+    - name: Add desired gateways # TESTED OK
+      shell: |
+        nmcli connection modify '{{ item.connection }}' \
+          ipv4.address {{ item.ip4_address }} \
+          ipv4.gateway {{ gateway_ip }}
+        nmcli connection up '{{ item.connection }}'
       when:
         - gateway_ip != ''
         - item.ip4_gateway != gateway_ip
         - item.connection == gateway_ip_connection
       loop: "{{ nmcli_devices }}"
     
-    - name: Create dummy connection and gateway
+    - name: Create dummy connection and gateway # TESTED OK
       # see https://docs.k3s.io/installation/airgap#default-network-route
-      command: >-
+      shell: |
         nmcli connection add type dummy ifname dummy0 con-name dummy0
-        &&
-        nmcli connection modify dummy0
-          ipv4.address {{ access_ip }}
-          ipv4.gateway {{ access_ip }}
-          ipv4.route-metric 1000
+        nmcli connection modify dummy0 \
+          ipv4.address {{ access_ip }} \
+          ipv4.gateway {{ access_ip }} \
+          ipv4.route-metric 1000 \
           ipv4.method manual
-        &&
         nmcli connection up dummy0
       when:
         - gateway_ip == '' # no gateway specified
