@@ -8,7 +8,16 @@
       stat:
         path: /etc/systemd/system/ansible-init.service
       register: _stat_ansible_init_unitfile
-    
+    - name: Check ansible-init status
+      command: systemctl is-failed ansible-init
+      register: _ansible_init_failed
+      failed_when: false # rc != 0 for non-failure!
+      changed_when: false
+    - name: Check ansible-init hasn't failed (yet)
+      # NB: only allows early exit if it has, does not catch future failures!
+      assert:
+        that: "'failed' not in _ansible_init_failed.stdout"
+        fail_msg: "ansible-init has failed - check journalctl -xeu ansible-init"
     - name: Wait for ansible-init to finish
       wait_for:
         path: /var/lib/ansible-init.done
