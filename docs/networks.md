@@ -162,6 +162,10 @@ If there is no default route at all (either from a subnet gateway or from
 ensure [correct](https://docs.k3s.io/installation/airgap#default-network-route)
 `k3s` operation.
 
+When using a subnet with no default gateway, OpenStack's nameserver for the
+subnet may refuse lookups. External nameservers can be defined using the
+[resolv_conf](../ansible/roles/resolv_conf/README.md) role.
+
 ## Proxies
 
 If some nodes have no outbound connectivity via any networks, the cluster can
@@ -185,3 +189,8 @@ compute
 squid_cache_disk: 1024 # MB
 squid_cache_mem: '12 GB'
 ```
+
+Note that name resolution must still be possible and may require defining an
+nameserver which is directly reachable from the node using the
+[resolv_conf](../ansible/roles/resolv_conf/README.md)
+role.
