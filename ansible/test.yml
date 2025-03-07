@@ -1,0 +1,89 @@
+---
+
+- hosts: compute
+  become: yes
+  gather_facts: yes
+  tasks:
+####### to be part of k3s role run at build time
+    - name: Install pip
+      dnf:
+        name: python3-pip
+      delegate_to: "{{ groups['control'] | first }}"
+      run_once: true
+
+    - name: Install pip dependencies for k8s ansible module
+      ansible.builtin.pip:
+        name:
+          - kubernetes==30.1.0
+      delegate_to: "{{ groups['control'] | first }}"
+      run_once: true
+#######
+    - name: Create Slurm Namespace
+      kubernetes.core.k8s:
+        name: slurm
+        api_version: v1
+        kind: Namespace
+        state: present
+      delegate_to: "{{ groups['control'] | first }}"
+      run_once: true
+
+    - name: Create Kubernetes Secret for each compute node hostvars
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: "{{ inventory_hostname }}-hostvars"
+            namespace: slurm
+          type: Opaque
+          data:
+            hostvars.yml: "{{ lookup('ansible.builtin.template', 'roles/compute_init/templates/hostvars.yml.j2') | b64encode }}"
+      delegate_to: "{{ groups['control'] | first }}"
+
+    - name: Deploy Slurm Config Push DaemonSet
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: DaemonSet
+          metadata:
+            name: "slurm-hostvars-writer-{{ inventory_hostname }}"
+            namespace: slurm
+          spec:
+            selector:
+              matchLabels:
+                name: slurm-hostvars-writer
+            template:
+              metadata:
+                labels:
+                  name: slurm-hostvars-writer
+              spec:
+                securityContext:
+                  runAsUser: 1000
+                  runAsGroup: 1000
+                  fsGroup: 1000
+                containers:
+                  - name: pause
+                    image: registry.k8s.io/pause
+                initContainers:
+                  - name: copy-hostvars
+                    image: busybox:1.37
+                    command: ['sh', '-c', 'mkdir -p /etc/compute-init/hostvars && cat /mnt/hostvars/hostvars.yml > /etc/compute-init/hostvars/{{ inventory_hostname }}.yml']
+                    volumeMounts:
+                      - name: hostvars-dir
+                        mountPath: /etc/
+                      - name: hostvars-secret
+                        mountPath: /mnt/hostvars
+                        readOnly: true
+                volumes:
+                  - name: hostvars-dir
+                    hostPath:
+                      path: /etc/
+                      type: Directory
+                  - name: hostvars-secret
+                    projected:
+                      sources:
+                        - secret:
+                            name: "{{ inventory_hostname }}-hostvars"
+      delegate_to: "{{ groups['control'] | first }}"
