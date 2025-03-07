@@ -18,6 +18,7 @@ module "login" {
   vnic_types = lookup(each.value, "vnic_types", var.vnic_types)
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
+  gateway_ip = lookup(each.value, "gateway_ip", var.gateway_ip)
   
   # optionally set for group
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))

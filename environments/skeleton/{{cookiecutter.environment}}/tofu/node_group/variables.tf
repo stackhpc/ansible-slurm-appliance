@@ -122,3 +122,8 @@ variable "baremetal_nodes" {
     type = map(string)
     default = {}
 }
+
+variable "gateway_ip" {
+    type = string
+    default = ""
+}

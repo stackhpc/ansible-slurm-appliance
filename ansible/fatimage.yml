@@ -79,7 +79,7 @@
 - import_playbook: extras.yml
 
 # TODO: is this the right place?
-- name: Install compute_init script
+- name: Install compute_init playbook
   hosts: compute_init
   tags: compute_init # tagged to allow running on cluster instances for dev
   become: yes
@@ -87,6 +87,15 @@
     - include_role:
         name: compute_init
         tasks_from: install.yml
+
+- name: Install gateway playbook
+  hosts: gateway
+  tags: gateway
+  become: yes
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: gateway
 
 - hosts: builder
   become: yes
