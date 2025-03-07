@@ -21,15 +21,20 @@ Role Variables
 
 - `basic_users_users`: Optional, default empty list. A list of mappings defining information for each user. In general, mapping keys/values are passed through as parameters to [ansible.builtin.user](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html) and default values are as given there. However:
   - `create_home` and `generate_ssh_key`: Normally set automatically. Can be
-    set `false` if necessary to disable home directory creation or cluster ssh
-    key creation, should not be set `true`.
+    set `false` if necessary to disable home directory creation/cluster ssh
+    key creation. Should not be set `true` to avoid trying to modify home
+    directories from multiple nodes simultaneously.
   - `ssh_key_comment`: Default is user name.
-  - `home`: Normally set automatically.
+  - `home`: Set automatically based on the user name and
+    `basic_users_homedir_host_path`. Can be overriden if required for e.g.
+     users with non-standard home directory paths.
   - `uid`: Should be set, so that the UID/GID is consistent across the cluster
     (which Slurm requires).
-  - `shell`: If *not* set will be `/sbin/nologin` on the `control` node and the
-     default shell on other users. Explicitly setting this defines the shell for
-     all nodes.
+  - `shell`: If *not* set will be `/sbin/nologin` on the `control` node to
+     prevent users logging in to this node, and the default shell on other
+     nodes. Explicitly setting this defines the shell for all nodes and if the
+     shared home directories are mounted on the control node will allow the
+     user to log in to the control node.
   - An additional key `public_key` may optionally be specified to define a key to log into the cluster.
   - An additional key `sudo` may optionally be specified giving a string (possibly multiline) defining sudo rules to be templated.
   - `ssh_key_type` defaults to `ed25519` instead of the `ansible.builtin.user` default of `rsa`.
