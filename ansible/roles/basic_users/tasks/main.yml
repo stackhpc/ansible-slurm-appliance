@@ -33,7 +33,7 @@
 
 - name: Write sudo rules
   blockinfile:
-    path: /etc/sudoers.d/80-{{ item.name}}-user
+    path: /etc/sudoers.d/80-{{ item.name }}-user
     block: "{{ item.sudo }}"
     create: true
   loop: "{{ basic_users_users }}"
@@ -49,7 +49,7 @@
     state: started
   when: _stop_sssd is changed
 
-# This task runs (only) on the home diretory server, if in the group, so it can
+# This task runs (only) on the home directory server, if in the group, so it can
 # handle root squashed exports
 - name: Create home directories
   # doesn't delete with state=absent, same as ansible.builtin.user

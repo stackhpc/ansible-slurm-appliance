@@ -71,10 +71,10 @@ basic_users_users:
 
 Using an external share which:
   - does not root squash (so this role can create directories on it)
-  - ismounted to all nodes including the control node (so this role can set
-    authorized keys there),
+  - is mounted to all nodes including the control node (so this role can set
+    authorized keys there)
 
-create user `Carol`:
+Create user `Carol`:
 
 ```yaml
 basic_users_homedir_host: "{{ ansible_play_hosts | first }}" # doesn't matter which host is used
@@ -96,7 +96,7 @@ basic_users_users:
   - comment: Dan Deer
     create_home: false
     name: dan
-    uuid: 2009
+    uuid: 2008
     public_key: ssh-ed25519 ...
 ```
 
@@ -106,11 +106,11 @@ authorized keys applies to all nodes), create user `Erin` with passwordless sudo
 ```yaml
 basic_users_users:
   - comment: Erin Eagle
-    name: dan
-    uid: 2008
+    name: erin
+    uid: 2009
     shell: /bin/bash # override default nologin on control
     groups:
       - adm # enables ssh to compute nodes even without a job running
-    sudo: dan ALL=(ALL) NOPASSWD:ALL
+    sudo: erin ALL=(ALL) NOPASSWD:ALL
     public_key: ssh-ed25519 ...
 ```
