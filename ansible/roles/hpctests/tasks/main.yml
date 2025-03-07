@@ -1,28 +1,38 @@
 - name: setup
   block:
-    - include: setup.yml
+    - include_tasks: setup.yml
+  become: true
+  become_user: "{{ hpctests_user }}"
   tags: always
 
 - name: pingpong
   block:
-    - include: pingpong.yml
+    - include_tasks: pingpong.yml
       when: hpctests_computes.stdout_lines | length > 1
+  become: true
+  become_user: "{{ hpctests_user }}"
   tags: pingpong
 
 - name: pingmatrix
   block:
-    - include: pingmatrix.yml
+    - include_tasks: pingmatrix.yml
       when: hpctests_computes.stdout_lines | length > 1
+  become: true
+  become_user: "{{ hpctests_user }}"
   tags: pingmatrix
 
 - name: build HPL
   block:
-    - include: build-hpl.yml
+    - include_tasks: build-hpl.yml
+  become: true
+  become_user: "{{ hpctests_user }}"
   tags:
     - hpl-solo
 
 - name: run HPL on individual nodes
   block:
-    - include: hpl-solo.yml
+    - include_tasks: hpl-solo.yml
+  become: true
+  become_user: "{{ hpctests_user }}"
   tags:
     - hpl-solo
