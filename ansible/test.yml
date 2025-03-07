@@ -60,16 +60,16 @@
                   name: slurm-hostvars-writer
               spec:
                 securityContext:
-                  runAsUser: 1000
-                  runAsGroup: 1000
-                  fsGroup: 1000
+                  runAsUser: 0
+                  runAsGroup: 0
+                  fsGroup: 0
                 containers:
                   - name: pause
                     image: registry.k8s.io/pause
                 initContainers:
                   - name: copy-hostvars
                     image: busybox:1.37
-                    command: ['sh', '-c', 'mkdir -p /etc/compute-init/hostvars && cat /mnt/hostvars/hostvars.yml > /etc/compute-init/hostvars/{{ inventory_hostname }}.yml']
+                    command: ['sh', '-c', 'mkdir -p /etc/compute-init/hostvars && cat /mnt/hostvars/hostvars.yml > /etc/compute-init/hostvars/{{ inventory_hostname }}.yml && chmod 0400 /etc/compute-init/hostvars/{{ inventory_hostname }}.yml']
                     volumeMounts:
                       - name: hostvars-dir
                         mountPath: /etc/
