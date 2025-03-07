@@ -26,7 +26,7 @@ variable "key_pair" {
 
 variable "control_node_flavor" {
     type = string
-    description = "Flavor name for control name"
+    description = "Flavor name for control node"
 }
 
 variable "login" {
