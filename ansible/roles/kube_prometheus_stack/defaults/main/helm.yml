@@ -51,6 +51,8 @@ kube_prometheus_stack_release_defaults:
       KubeSchedulerDown: true
       KubeProxyDown: true
       KubeControllerManagerDown: true
+      # Replaced with appliance specific versions
+      NodeCPUHighUsage: true
   prometheus:
     service:
       type: NodePort
