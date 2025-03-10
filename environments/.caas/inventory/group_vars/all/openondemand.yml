@@ -7,3 +7,6 @@ httpd_listen_addr_port:
   - 80
   - 443
 
+openondemand_osc_ood_defaults:
+  httpd_port: 80
+  ssl: []
