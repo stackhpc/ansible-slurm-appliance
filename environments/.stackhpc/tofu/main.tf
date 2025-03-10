@@ -5,6 +5,7 @@ terraform {
   required_providers {
     openstack = {
       source = "terraform-provider-openstack/openstack"
+      version = "~>3.0.0"
     }
   }
 }
@@ -86,9 +87,9 @@ module "cluster" {
         #     flavor: var.other_node_flavor
         # }
     }
-    
+
     volume_backed_instances = var.volume_backed_instances
-    
+
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10
