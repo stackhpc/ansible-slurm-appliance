@@ -151,7 +151,11 @@ a new image:
 3. Add metadata to a compute node e.g. via Horizon to turn on compute-init
    playbook functionality.
 
-4. Fake an image build to deploy the compute-init playbook:
+4. Stop ansible-init from running
+
+        ansible all -ba "systemctl stop ansible-init"
+
+5. Fake an image build to deploy the compute-init playbook:
 
         ansible-playbook ansible/fatimage.yml --tags compute_init
 
@@ -159,16 +163,13 @@ a new image:
     in the builder group, which conveniently means any changes made to that
     play also get picked up.
 
-5. Fake a reimage of compute to run ansible-init and the compute-init playbook:
+6. Fake a reimage of compute to run ansible-init and the updated compute-init playbook:
 
-    On compute node where metadata was added:
-
-        [root@rl9-compute-0 rocky]# rm -f /var/lib/ansible-init.done && systemctl restart ansible-init
-        [root@rl9-compute-0 rocky]# systemctl status ansible-init
+        ansible all -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
 
     Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
 
-Steps 4/5 can be repeated with changes to the compute script. If required,
+Steps 4/5/6 can be repeated with changes to the compute script. If required,
 reimage the compute node(s) first as in step 2 and/or add additional metadata
 as in step 3.
 
