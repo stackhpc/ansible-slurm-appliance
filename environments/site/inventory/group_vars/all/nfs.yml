@@ -1,0 +1,23 @@
+---
+# See: https://github.com/stackhpc/ansible-role-cluster-nfs
+# for variable definitions
+
+nfs_configurations:
+  # First item copied from environments/common/inventory/group_vars/all/nfs.yml
+  - comment: Export /exports/home from Slurm control node as /home
+    nfs_enable:
+        server:  "{{ inventory_hostname in groups['control'] }}"
+        # Don't mount share on server where it is exported from...
+        # Could do something like `nfs_clients: "{{ 'nfs_servers' not in group_names }}"` instead.
+        clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
+    nfs_server: "{{ nfs_server_default }}"
+    nfs_export: "/exports/home" # assumes skeleton TF is being used
+    nfs_client_mnt_point: "/home"
+  - comment: Mount NetApp as /storage
+    nfs_enable:
+        server: false
+        clients: "{{ inventory_hostname in groups['cluster'] }}"
+    nfs_server: "svm-cluster.meso2"
+    nfs_export: "/netapp"
+    nfs_client_mnt_point: "/storage"
+    nfs_client_mnt_options: 'ro' # Mount as read-only for now
