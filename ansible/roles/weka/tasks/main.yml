@@ -1,0 +1,22 @@
+---
+
+- name: Ensure required packages are installed
+  vars:
+    packages:
+      - elfutils-libelf-devel
+      - gcc
+      - glibc-devel
+      - glibc-headers
+      - kernel-devel
+      - make
+      - perl
+      - rpcbind
+      - xfsprogs
+  ansible.builtin.dnf:
+    name: "{{ packages }}"
+    state: present
+
+- name: Configure WEKA clients
+  include_tasks: clients.yml
+  when: weka_enable.clients | bool or ('weka_enable' in item and item.weka_enable.clients | bool)
+  loop: "{{ weka_configurations }}"
