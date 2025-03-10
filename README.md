@@ -31,7 +31,7 @@ It requires an OpenStack cloud, and an Ansible "deploy host" with access to that
 
 Before starting ensure that:
 - You have root access on the deploy host.
-- You can create instances from the [latest Slurm appliance image](https://github.com/stackhpc/ansible-slurm-appliance/releases), which already contains the required packages. This is built and tested in StackHPC's CI. Although you can use a Rocky Linux 9 GenericCloud instead, it is not recommended.
+- You can create instances from the [latest Slurm appliance image](https://github.com/stackhpc/ansible-slurm-appliance/releases), which already contains the required packages. This is built and tested in StackHPC's CI.
 - You have an SSH keypair defined in OpenStack, with the private key available on the deploy host.
 - Created instances have access to internet (note proxies can be setup through the appliance if necessary).
 - Created instances have accurate/synchronised time (for VM instances this is usually provided by the hypervisor; if not or for bare metal instances it may be necessary to configure a time service via the appliance).
@@ -49,6 +49,7 @@ These instructions assume the deployment host is running Rocky Linux 8:
     sudo yum install -y git python38
     git clone https://github.com/stackhpc/ansible-slurm-appliance
     cd ansible-slurm-appliance
+    git checkout ${latest-release-tag}
     ./dev/setup-env.sh
 
 You will also need to install [OpenTofu](https://opentofu.org/docs/intro/install/rpm/).
