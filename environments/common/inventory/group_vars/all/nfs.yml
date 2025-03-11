@@ -5,12 +5,17 @@
 
 nfs_server_default: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
 
+# create a space-separated list of nfs group IPs:
+_nfs_node_ips: "{{ groups['nfs'] | map('extract', hostvars, 'ansible_host') | join(' ') }}"
+
+# default *all* entries in nfs_configurations to only permitting mounts from above IPs:
+nfs_export_clients: "{{ _nfs_node_ips }}"
+
 nfs_configurations:
   - comment: Export /exports/home from Slurm control node as /home
     nfs_enable:
         server:  "{{ inventory_hostname in groups['control'] }}"
-        # Don't mount share on server where it is exported from...
-        # Could do something like `nfs_clients: "{{ 'nfs_servers' not in group_names }}"` instead.
+        # Don't mount share on control node:
         clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
     nfs_server: "{{ nfs_server_default }}"
     nfs_export: "/exports/home" # assumes skeleton TF is being used
@@ -18,4 +23,8 @@ nfs_configurations:
     # prevent tunnelling and setuid binaries:
     # NB: this is stackhpc.nfs role defaults but are set here to prevent being
     # accidently overriden via default options
-    nfs_export_options: 'rw,secure,root_squash' 
+    nfs_export_options: 'rw,secure,root_squash'
+    # prevent non-cluster IPs mounting the share:
+    # NB: this is set as default for all shares above but is repeated here
+    # in case nfs_export_clients is overriden
+    nfs_export_clients: "{{ _nfs_node_ips }}"
