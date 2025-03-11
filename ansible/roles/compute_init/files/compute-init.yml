@@ -95,6 +95,20 @@
         - meta: end_play
       when: _mount_mnt_cluster.failed
 
+    - name: Check if hostvars exist
+      stat:
+        path: "/mnt/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
+      register: hostvars_stat
+
+    - block:
+        - name: Report skipping initialization if host vars does not exist
+          # meta: end_play produces no output
+          debug:
+            msg: "Skipping compute initialization: hostvars does not exist"
+
+        - meta: end_play
+      when: not hostvars_stat.stat.exists
+
     - name: Load hostvars from NFS
       # this is higher priority than vars block = normal ansible's hostvars
       include_vars:
