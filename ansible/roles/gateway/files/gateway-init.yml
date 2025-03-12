@@ -53,7 +53,9 @@
 
     - name: Remove undesired gateways
       shell: |
-        nmcli connection modify '{{ item.connection }}' ipv4.gateway ''
+        nmcli connection modify '{{ item.connection }}' \
+          ipv4.never-default yes \
+          ipv6.never-default yes
         nmcli connection up '{{ item.connection }}'
       when:
         - gateway_ip != ''
@@ -61,7 +63,7 @@
         - item.connection != gateway_ip_connection
       loop: "{{ nmcli_devices }}"
     
-    - name: Add desired gateways # TESTED OK
+    - name: Add desired gateways
       shell: |
         nmcli connection modify '{{ item.connection }}' \
           ipv4.address {{ item.ip4_address }} \
