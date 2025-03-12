@@ -98,16 +98,16 @@ cluster
 
 [k3s_server:children]
 # Hosts to run k3s server (should only be single node i.e control node)
-control
+#control
 
 [k3s_agent:children]
 # Hosts to run k3s agent
-compute
-login
+#compute
+#login
 
 [k9s:children]
 # Hosts to install k9s on
-control
+#control
 
 [lustre]
 # Hosts to run lustre client
@@ -121,3 +121,7 @@ builder
 
 [chrony]
 # Hosts where crony configuration is applied. See docs/chrony.md for more details.
+
+[gateway:children]
+# Add builder to this group to install gateway ansible-init playbook into image
+builder
