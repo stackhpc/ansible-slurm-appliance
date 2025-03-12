@@ -42,7 +42,6 @@
         msg: "gateway_ip={{ gateway_ip }} access_ip={{ access_ip }} gateway_ip_connection={{ gateway_ip_connection }}"
 
     - name: Error if device has a gateway which is not the desired one
-    # TODO: document
       assert:
         that: item.gateway == gateway_ip
         fail_msg: "Device {{ item | to_nice_json }} has gateway: cannot apply gateway {{ gateway_ip }}"

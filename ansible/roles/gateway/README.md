@@ -19,6 +19,7 @@ Note that:
   an assert will be raised to fail the `ansible-init` service - see logs using
   `journalctl -xue ansible-init`.
 
+See [docs/networks.md](../../../docs/networks.md) for further discussion.
 
 ## Requirements
 
