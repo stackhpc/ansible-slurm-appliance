@@ -87,6 +87,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
         environment_root = var.environment_root
         control_address    = var.control_address
         access_ip = openstack_networking_port_v2.compute["${each.key}-${var.networks[0].network}"].all_fixed_ips[0]
+        gateway_ip = var.gateway_ip
     },
     {for e in var.compute_init_enable: e => true}
   )
@@ -140,6 +141,7 @@ resource "openstack_compute_instance_v2" "compute" {
         environment_root = var.environment_root
         control_address    = var.control_address
         access_ip = openstack_networking_port_v2.compute["${each.key}-${var.networks[0].network}"].all_fixed_ips[0]
+        gateway_ip = var.gateway_ip
     },
     {for e in var.compute_init_enable: e => true}
   )
