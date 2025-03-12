@@ -1,1 +1,9 @@
 ansible_init_wait: 1200 # seconds
+
+ansible_init_pip_packages:
+  # role defaults:
+  - ansible
+  - jmespath
+  - requests
+  # custom:
+  - netaddr # required for gateway role
