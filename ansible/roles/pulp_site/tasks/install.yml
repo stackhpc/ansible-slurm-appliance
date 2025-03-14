@@ -41,3 +41,11 @@
   until: 0 == _admin_reset_output.rc
   retries: 6
   delay: 30
+
+- name: Print Pulp endpoint
+  become: no
+  debug:
+    msg: |
+      Server configured, override 'appliances_pulp_url' with
+        appliances_pulp_url: "http://{{ inventory_hostname }}:{{ pulp_site_port }}"
+      in your environments

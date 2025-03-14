@@ -16,11 +16,3 @@
       name: pulp_site
       tasks_from: install.yml
       public: true
-
-  - name: Print Pulp endpoint
-    become: no
-    debug:
-      msg: | 
-        Server configured, override 'appliances_pulp_url' with
-          appliances_pulp_url: "http://{{ pulp_server }}:{{ pulp_site_port }}"
-        in your environments
