@@ -1,4 +1,11 @@
+# Config for either Ark or local Pulp:
 pulp_site_url: "{{ appliances_pulp_url }}"
+
+# Auth for Ark which local Pulp syncs from:
+# pulp_site_upstream_username:
+# pulp_site_upstream_password:
+
+# Config for local Pulp:
 pulp_site_port: 8080
 pulp_site_username: admin # shouldn't be changed
 pulp_site_password: "{{ vault_pulp_admin_password }}"
