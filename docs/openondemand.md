@@ -10,7 +10,7 @@ This appliance can deploy and configure:
 - The Open OnDemand server itself (usually on a single login node).
 - User authentication using one of:
     - An external OIDC provider.
-    - HTTP basic authenication and PAM.
+    - HTTP basic authentication and PAM.
 - Virtual desktops on compute nodes.
 - Jupyter nodebook servers on compute nodes.
 - Proxying of Grafana (usually deployed on the control node) via the Open OnDemand portal.
