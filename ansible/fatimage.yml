@@ -18,14 +18,16 @@
   when: hook_path | exists
 
 - name: Sync pulp repos with upstream
-  hosts: pulp
+  hosts: pulp # NB: feature switch plus autodetection of OS version
   tasks:
   - ansible.builtin.include_role:
       name: pulp_site
       tasks_from: sync.yml
       apply:
         delegate_to: localhost
-    when: appliances_mode != 'configure'
+    vars:
+      pulp_site_target_distribution_version: "{{ ansible_facts.distribution_version }}"
+      pulp_site_target_distribution_version_major: "{{ ansible_facts.distribution_major_version }}"
 
 - import_playbook: bootstrap.yml
 
