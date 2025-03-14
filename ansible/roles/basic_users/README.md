@@ -11,23 +11,37 @@ without requiring LDAP etc. Features:
 - Login to the control node is prevented (by default).
 - When deleting users, systemd user sessions are terminated first.
 
-> [!IMPORTANT] This role assumes that `$HOME` for users managed by this role
-(e.g. not `rocky` and other system users) is on a shared filesystem. The export
-of this shared filesystem may be root squashed if its server is in the
-`basic_user` group - see configuration examples below.
+> [!IMPORTANT] The defaults for this role assumes that `$HOME` for users
+managed by this role (e.g. not `rocky` and other system users) is on a shared
+filesystem. The export of this shared filesystem may be root squashed if its
+server is in the `basic_user` group - see configuration examples below.
 
 Role Variables
 --------------
 
-- `basic_users_users`: Optional, default empty list. A list of mappings defining information for each user. In general, mapping keys/values are passed through as parameters to [ansible.builtin.user](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html) and default values are as given there. However:
-  - `create_home` and `generate_ssh_key`: Normally set automatically. Can be
-    set `false` if necessary to disable home directory creation/cluster ssh
-    key creation. Should not be set `true` to avoid trying to modify home
-    directories from multiple nodes simultaneously.
+- `basic_users_homedir_server`: Optional inventory hostname in the `basic_users`
+  group defining the host to use to create home directories. If the home
+  directory export is root squashed, this host *must* be the home directory
+  server. Default is the `control` node which is appropriate for the default
+  appliance configuration. Not relevant if `create_home` is false for all users.
+- `basic_users_homedir_server_path`: Optional path prefix for home directories on
+   the `basic_users_homedir_server`, i.e. on the "server side". Default is
+   `/exports/home` which is appropriate for the default appliance configuration.
+- `basic_users_homedir_client`: Optional inventory hostname in the `basic_users`
+  group defining the host to use to create ssh keys etc in home directories.
+  This should be a host mounting the home directories. Default is the first
+  node in the `login` group which is appropriate for the default appliance
+  configuration.
+- `basic_users_users`: Optional, default empty list. A list of mappings defining
+   information for each user. In general, mapping keys/values are passed through
+   as parameters to [ansible.builtin.user](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html)
+   and default values are as given there, with the following differences:
+  - `generate_ssh_key`: Default is `true`, and the generated key is added to
+     the user's authorized keys.
   - `ssh_key_comment`: Default is user name.
   - `home`: Set automatically based on the user name and
-    `basic_users_homedir_host_path`. Can be overriden if required for e.g.
-     users with non-standard home directory paths.
+    `basic_users_homedir_server_path`. Can be overriden for users with
+     non-standard home directory paths.
   - `uid`: Should be set, so that the UID/GID is consistent across the cluster
     (which Slurm requires).
   - `shell`: If *not* set will be `/sbin/nologin` on the `control` node to
@@ -35,20 +49,14 @@ Role Variables
      nodes. Explicitly setting this defines the shell for all nodes and if the
      shared home directories are mounted on the control node will allow the
      user to log in to the control node.
-  - An additional key `public_key` may optionally be specified to define a key to log into the cluster.
-  - An additional key `sudo` may optionally be specified giving a string (possibly multiline) defining sudo rules to be templated.
-  - `ssh_key_type` defaults to `ed25519` instead of the `ansible.builtin.user` default of `rsa`.
+  - `public_key`: Optional, define a key to log into the cluster with.
+  - `sudo`: Optional, a (possibly multiline) string defining sudo rules for the
+     user.
+  - `ssh_key_type` defaults to `ed25519` instead of the `ansible.builtin.user`
+     default of `rsa`.
   - Any other keys may present for other purposes (i.e. not used by this role).
 - `basic_users_groups`: Optional, default empty list. A list of mappings defining information for each group. Mapping keys/values are passed through as parameters to [ansible.builtin.group](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html) and default values are as given there.
 - `basic_users_override_sssd`: Optional bool, default false. Whether to disable `sssd` when ensuring users/groups exist with this role. Permits creating local users/groups even if they clash with users provided via sssd (e.g. from LDAP). Ignored if host is not in group `sssd` as well. Note with this option active `sssd` will be stopped and restarted each time this role is run.
-- `basic_users_homedir_host`: Optional inventory hostname defining the host
-  to use to create home directories. If the home directory export is root
-  squashed, this host *must* be the home directory server. Default is the
-  `control` node which is appropriate for the default appliance configuration.
-  Not relevant if `create_home` is false for all users.
-- `basic_users_homedir_host_path`: Optional path prefix for home directories on
-   the `basic_users_homedir_host`, i.e. on the "server side". Default is
-   `/exports/home` which is appropriate for the default appliance configuration.
 
 Dependencies
 ------------
