@@ -1,6 +1,6 @@
-basic_users_homedir_host: "{{ groups['control'] | first }}" # no way, generally, to find the nfs_server
-basic_users_homedir_host_path: /exports/home
-# _basic_users_manage_homedir: "{{ ansible_hostname == basic_users_homedir_host }}"
+basic_users_homedir_server: "{{ groups['control'] | first }}" # no way, generally, to find the nfs_server
+basic_users_homedir_server_path: /exports/home
+basic_users_homedir_client: "{{ groups['login'] | first }}"  
 basic_users_userdefaults:
   state: present # need this here so don't have to add default() everywhere
   generate_ssh_key:  true
