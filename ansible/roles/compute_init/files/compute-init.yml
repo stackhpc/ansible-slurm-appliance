@@ -47,6 +47,8 @@
       - noatime
       - _netdev # prevents mount blocking early boot before networking available
       - rw
+      - nodev
+      - nosuid
 
     basic_users_userdefaults:
       state: present
