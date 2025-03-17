@@ -119,7 +119,6 @@
         recursive: yes
 
     - name: Unmount /mnt/cluster after sync
-      become_user: slurm
       mount:
         path: /mnt/cluster
         state: unmounted
