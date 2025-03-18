@@ -1,0 +1,13 @@
+# These lookups are set via configmaps and secrets when this environment is
+# used by the azimuth_caas_operator for pulp sync.
+
+# Address of Azimuth Pulp (ingress)
+appliances_pulp_url: "{{ lookup('env', 'appliances_pulp_url') }}"
+# Admin password for Azimuth Pulp
+pulp_site_password: "{{ lookup('env', 'pulp_site_password)' }}" # admin password
+# Ark creds, passed through from azimuth-config:
+pulp_site_upstream_username: "{{ lookup('env', 'pulp_site_upstream_username') }}"
+pulp_site_upstream_password: "{{ lookup('env', 'pulp_site_upstream_password') }}"
+
+# Note when used by azimuth_caas_operator for cluster creation,
+# appliances_pulp_url is (maybe) instead set via ansible-runner extravars
