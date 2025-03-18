@@ -5,8 +5,8 @@
       - pulp_site_upstream_username != ''
       - pulp_site_upstream_password != ''
     quiet: true
-    no_log: true
     fail_msg: "pulp_site_upstream_username and pulp_site_upstream_password must be set"
+  no_log: "{{ no_log | default(true) }}"
 
 - name: Wait for Pulp server
   pulp.squeezer.status:
