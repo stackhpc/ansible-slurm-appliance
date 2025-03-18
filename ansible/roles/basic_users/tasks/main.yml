@@ -66,7 +66,7 @@
   when:
     - item.state | default('present') == 'present'
     - item.create_home | default(true) | bool
-    - inventory_hostname == basic_users_homedir_server
+    - ansible_hostname == basic_users_homedir_server
 
 # The following tasks run on a single *client* node, so that home directory
 # paths are easily constructed, becoming each user so that root-squash
@@ -85,7 +85,7 @@
   when:
     - item.state | default('present') == 'present'
     - item.generate_ssh_key | default(true) | bool or item.public_key is defined
-    - inventory_hostname == basic_users_homedir_client
+    - ansible_hostname == basic_users_homedir_client
 
 - name: Generate cluster ssh key
   community.crypto.openssh_keypair:
@@ -101,7 +101,7 @@
   when:
     - item.state | default('present') == 'present'
     - item.generate_ssh_key | default(true)
-    - inventory_hostname == basic_users_homedir_client
+    - ansible_hostname == basic_users_homedir_client
   register: _cluster_ssh_keypair
 
 - name: Write generated cluster ssh key to authorized_keys
@@ -118,7 +118,7 @@
   when:
     - item.item.state | default('present') == 'present'
     - item.item.generate_ssh_key | default(true)
-    - inventory_hostname == basic_users_homedir_client
+    - ansible_hostname == basic_users_homedir_client
     - item.public_key is defined # NB this is the *returned* public key
 
 - name: Write supplied public key to authorized_keys
@@ -134,5 +134,5 @@
     label: "{{ item.name }}"
   when:
     - item.state | default('present') == 'present'
-    - inventory_hostname == basic_users_homedir_client
+    - ansible_hostname == basic_users_homedir_client
     - item.public_key is defined # NB this is the *provided* public key
