@@ -1,3 +1,6 @@
 ---
 cuda_package_version: latest
 cuda_nvidia_driver_stream: '570-open'
+
+# NOTE(wszumski): Role doesn't like rootsquash on home dir
+cuda_samples_path: /opt/cuda-samples
