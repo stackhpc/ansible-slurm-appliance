@@ -28,3 +28,13 @@ nfs_configurations:
     # NB: this is set as default for all shares above but is repeated here
     # in case nfs_export_clients is overriden
     nfs_export_clients: "{{ _nfs_node_ips }}"
+
+  - comment: Export /exports/cluster from Slurm control node
+    nfs_enable:
+        server: "{{ inventory_hostname in groups['control'] }}"
+        clients: false
+    nfs_export: "/exports/cluster"
+    # prevent non-cluster IPs mounting the share:
+    # NB: this is set as default for all shares above but is repeated here
+    # in case nfs_export_clients is overriden
+    nfs_export_clients: "{{ _nfs_node_ips }}"
