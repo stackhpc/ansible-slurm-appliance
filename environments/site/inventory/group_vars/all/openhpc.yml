@@ -1,0 +1,7 @@
+---
+
+openhpc_config_extra:
+  DebugFlags: GRES # consider this for initial setup.
+  SelectType: select/cons_tres
+  GresTypes: gpu
+
