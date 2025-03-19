@@ -1,0 +1,76 @@
+- hosts: localhost
+  #become: true
+  gather_facts: false
+  vars:
+    os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
+    gateway_ip: "{{ os_metadata.meta.gateway_ip | default('') }}"
+    access_ip:  "{{ os_metadata.meta.access_ip | default('') }}"
+  tasks:
+    - name: Read nmcli device info
+      command: nmcli --get GENERAL.DEVICE,GENERAL.CONNECTION,IP4.ADDRESS,IP4.GATEWAY device show
+      register: _nmcli_device_raw
+      changed_when: false
+
+    - name: Set fact for nmcli devices
+      set_fact:
+        # creates a dict with keys as per zip arg below, values might be ''
+        nmcli_devices: >-
+          {{
+            _nmcli_device_raw.stdout_lines |
+            batch(5, '') |
+            map('zip', ['device', 'connection', 'ip4_address', 'ip4_gateway']) |
+            map('map', 'reverse') | map('community.general.dict')
+          }}
+        # batch=5 because per device have 4x lines + blank line between devices
+        # batch takes default '' because last devices doesn't have trailing blank line
+
+    - name: Examine whether device address contains gateway_ip
+      set_fact:
+        device_is_gateway_device: "{{ nmcli_devices | map(attribute='ip4_address') | map('ansible.utils.network_in_network', gateway_ip) }}"
+      # list of bools - false if gateway_ip == ''
+
+    - name: Get name of connection containing gateway_ip
+      # might be empty string
+      set_fact:
+        gateway_ip_connection: >-
+          {{ nmcli_devices | map(attribute='connection') |
+            zip(device_is_gateway_device) | selectattr('1') | 
+            map(attribute=0) | list | first | default ('') }}
+
+    - name: Show debug info
+      debug:
+        msg: "gateway_ip={{ gateway_ip }} access_ip={{ access_ip }} gateway_ip_connection={{ gateway_ip_connection }}"
+
+    - name: Error if device has a gateway which is not the desired one
+      assert:
+        that: item.gateway == gateway_ip
+        fail_msg: "Device {{ item | to_nice_json }} has gateway: cannot apply gateway {{ gateway_ip }}"
+      when:
+        - item.connection == gateway_ip_connection
+        - item.ip4_gateway != ''
+        - item.ip4_gateway != gateway_ip
+      loop: "{{ nmcli_devices }}"
+
+    - name: Remove undesired gateways
+      shell: |
+        nmcli connection modify '{{ item.connection }}' \
+          ipv4.never-default yes \
+          ipv6.never-default yes
+        nmcli connection up '{{ item.connection }}'
+      when:
+        - gateway_ip != ''
+        - item.ip4_gateway != ''
+        - item.connection != gateway_ip_connection
+      loop: "{{ nmcli_devices }}"
+    
+    - name: Add desired gateways
+      shell: |
+        nmcli connection modify '{{ item.connection }}' \
+          ipv4.address {{ item.ip4_address }} \
+          ipv4.gateway {{ gateway_ip }}
+        nmcli connection up '{{ item.connection }}'
+      when:
+        - gateway_ip != ''
+        - item.ip4_gateway != gateway_ip
+        - item.connection == gateway_ip_connection
+      loop: "{{ nmcli_devices }}"

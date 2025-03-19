@@ -52,7 +52,6 @@
   
 - name: Build HPL executable
   shell:
-    cmd: "sbatch --wait hpl-build-{{ hpctests_hpl_arch }}.sh"
+    cmd: "bash -l -c 'sbatch --wait hpl-build-{{ hpctests_hpl_arch }}.sh'" # need login shell for module command
     chdir: "{{ hpctests_hpl_srcdir }}"
     creates: "bin/{{ hpctests_hpl_arch }}/xhpl"
-  become: no

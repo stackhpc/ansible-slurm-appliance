@@ -86,3 +86,5 @@ roles/*
 !roles/rebuild/**
 !roles/slurm_tools/
 !roles/slurm_tools/**
+!roles/gateway/
+!roles/gateway/**

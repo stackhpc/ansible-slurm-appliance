@@ -67,7 +67,7 @@ and referenced from the `site` and `production` environments, e.g.:
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
   To ensure staging environments are a good model for production this should
-  generally be moved into the `site` environment. It should be be encrypted
+  generally be moved into the `site` environment. It should be encrypted
   using [Ansible vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
   and then committed to the repository.
 
@@ -96,7 +96,7 @@ and referenced from the `site` and `production` environments, e.g.:
     cluster
     ```
 
-- Configure Open OnDemand - see [specific documentation](openondemand.README.md).
+- Configure Open OnDemand - see [specific documentation](openondemand.md).
 
 - Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
 
@@ -127,3 +127,6 @@ and referenced from the `site` and `production` environments, e.g.:
 
 - Note [PR 473](https://github.com/stackhpc/ansible-slurm-appliance/pull/473)
   may help identify any site-specific configuration. 
+
+- See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
+  raising `hpctests_hpl_mem_frac` during tests.

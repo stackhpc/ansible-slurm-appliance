@@ -1,3 +1,23 @@
+- hosts: k3s_server:!builder
+  become: yes
+  tags: k3s
+  tasks:
+    - name: Start k3s server
+      ansible.builtin.include_role:
+        name: k3s
+        tasks_from: server-runtime.yml
+
+# technically should be part of bootstrap.yml but hangs waiting on failed mounts
+# if runs before filesystems.yml after the control node has been reimaged
+- hosts: k3s_agent:!builder
+  become: yes
+  tags: k3s
+  tasks:
+    - name: Start k3s agents
+      ansible.builtin.include_role:
+        name: k3s
+        tasks_from: agent-runtime.yml
+
 - hosts: basic_users:!builder
   become: yes
   tags:

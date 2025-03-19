@@ -10,8 +10,8 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
-  schedule:
-    - cron: '0 0 * * *'  # Run at midnight on default branch
+  # schedule:
+  #   - cron: '0 0 * * *'  # Run at midnight on default branch
 
 jobs:
   openstack:

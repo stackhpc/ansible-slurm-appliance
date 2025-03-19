@@ -3,10 +3,13 @@
 Experimental functionality to allow compute nodes to rejoin the cluster after
 a reboot without running the `ansible/site.yml` playbook.
 
+**CAUTION:** The approach used here of exporting cluster secrets over NFS
+is considered to be a security risk due to the potential for cluster users to
+mount the share on a user-controlled machine by tunnelling through a login
+node. This feature should not be enabled on production clusters at this time.
+
 To enable this:
-1. Add the `compute` group (or a subset) into the `compute_init` group. This is
-   the default when using cookiecutter to create an environment, via the
-   "everything" template.
+1. Add the `compute` group (or a subset) into the `compute_init` group.
 2. Build an image which includes the `compute_init` group. This is the case
    for StackHPC-built release images.
 3. Enable the required functionalities during boot, by setting the
@@ -40,6 +43,7 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | (wait for ansible-init) | Not relevant during boot        | n/a                 |
 | bootstrap.yml            | resolv_conf             | Fully supported                 | No                  |
 | bootstrap.yml            | etc_hosts               | Fully supported                 | No                  |
+| bootstrap.yml            | chrony                  | Fully supported                 | No                  |
 | bootstrap.yml            | proxy                   | None at present                 | No                  |
 | bootstrap.yml            | (/etc permissions)      | None required - use image build | No                  |
 | bootstrap.yml            | (ssh /home fix)         | None required - use image build | No                  |
@@ -68,7 +72,7 @@ it also requires an image build with the role name added to the
 | filesystems.yml          | block_devices           | None required - role deprecated | n/a                 |
 | filesystems.yml          | nfs                     | All client functionality        | No                  |
 | filesystems.yml          | manila                  | All functionality               | No [5]              |
-| filesystems.yml          | lustre                  | None at present                 | Yes                 |
+| filesystems.yml          | lustre                  | All functionality               | Yes                 |
 | extras.yml               | basic_users             | All functionality [6]           | No                  |
 | extras.yml               | eessi                   | All functionality [7]           | No                  |
 | extras.yml               | cuda                    | None required - use image build | Yes [8]             |
@@ -147,7 +151,11 @@ a new image:
 3. Add metadata to a compute node e.g. via Horizon to turn on compute-init
    playbook functionality.
 
-4. Fake an image build to deploy the compute-init playbook:
+4. Stop ansible-init from running
+
+        ansible all -ba "systemctl stop ansible-init"
+
+5. Fake an image build to deploy the compute-init playbook:
 
         ansible-playbook ansible/fatimage.yml --tags compute_init
 
@@ -155,16 +163,13 @@ a new image:
     in the builder group, which conveniently means any changes made to that
     play also get picked up.
 
-5. Fake a reimage of compute to run ansible-init and the compute-init playbook:
+6. Fake a reimage of compute to run ansible-init and the updated compute-init playbook:
 
-    On compute node where metadata was added:
-
-        [root@rl9-compute-0 rocky]# rm -f /var/lib/ansible-init.done && systemctl restart ansible-init
-        [root@rl9-compute-0 rocky]# systemctl status ansible-init
+        ansible all -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
 
     Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
 
-Steps 4/5 can be repeated with changes to the compute script. If required,
+Steps 4/5/6 can be repeated with changes to the compute script. If required,
 reimage the compute node(s) first as in step 2 and/or add additional metadata
 as in step 3.
 

@@ -5,7 +5,7 @@
 # Apache 2 License
 
 from ansible.module_utils.basic import AnsibleModule
-import json
+import json, os
 
 ANSIBLE_METADATA = {
     "metadata_version": "0.1",
@@ -109,8 +109,8 @@ def run_module():
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     result = {"changed": False}
     
-    src = module.params["src"]
-    dest = module.params["dest"]
+    src = os.path.expanduser(module.params["src"])
+    dest = os.path.expanduser(module.params["dest"])
     nodes = module.params["nodes"]
     if nodes is not None:
         nodes = nodes.split(',')

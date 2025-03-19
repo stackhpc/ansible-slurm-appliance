@@ -1,0 +1,35 @@
+---
+
+- name: Template k3s agent env file
+  when: k3s_bootstrap_token != ''
+  ansible.builtin.template:
+    dest: /etc/systemd/system/k3s-agent.service.env
+    src: k3s-agent.service.env.j2
+    owner: root
+    group: root
+    mode: 0640
+  register: _k3s_agent_token_result
+
+- name: Ensure password directory exists
+  ansible.builtin.file: 
+    path: "/etc/rancher/node"
+    state: directory
+    owner: root
+    group: root
+    mode: 0640
+
+- name: Write node password
+  ansible.builtin.copy:
+    dest: /etc/rancher/node/password
+    content: "{{ vault_k3s_node_password }}"
+    owner: root
+    group: root
+    mode: 0640 # normal k3s install is 644 but that doesn't feel right
+
+- name: Start/restart k3s agent
+  when: _k3s_agent_token_result.changed
+  ansible.builtin.systemd:
+    name: k3s-agent
+    daemon_reload: true
+    state: restarted
+    enabled: true

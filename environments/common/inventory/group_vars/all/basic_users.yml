@@ -1,7 +1,9 @@
 ---
 
-# See: ansible/roles/basic_users/README.md 
-# for variable definitions.
+# See ansible/roles/basic_users/README.md for variable definitions.
 
-basic_users_homedir: /home
 basic_users_users: []
+
+# The following are defined for the purpose of compute-init
+basic_users_homedir_server: "{{ groups['control'] | first }}"
+basic_users_homedir_client: "{{ groups['login'] | first }}"
