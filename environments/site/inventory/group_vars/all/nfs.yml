@@ -12,7 +12,7 @@ nfs_configurations:
         clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
     nfs_server: "{{ nfs_server_default }}"
     nfs_export: "/exports/home" # assumes skeleton TF is being used
-    nfs_client_mnt_point: "/home"
+    nfs_client_mnt_point: "/var/lib/home"
   - comment: Mount NetApp as /storage
     nfs_enable:
         server: false

@@ -26,3 +26,13 @@
         group: root
         owner: root
         state: link
+
+- name: Ensure /var/lib/home directory exists
+  hosts: cluster
+  become: true
+  tasks:
+    - ansible.builtin.file:
+        path: /var/lib/home
+        owner: root
+        group: root
+        state: directory

@@ -1,1 +1,37 @@
-basic_users_users: []
+---
+basic_users_users:
+  - name: alex
+    uid: 10000
+    home: /var/lib/home/alex
+    public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIsXnKz0tf9BebIGEiWCnJe7AY9jVBvkZ8jMv6f3UAopVdLBDllN8OX76Wv54ndTNksUdp6PSW0D1EdQew92QqlirHRmraQuPwuw73WAKR0QEqLqCTibt1V8XImo1Hd97s688qa/8CgkJqGB689XinXRa84N6w0JjbhOvINkp9Cr44sCLDDD6ZOEgI1quOlJuVIvaa2UlUmwtSyYx9bm5lNWLC9Tev5RAzvTet8z7EaZA8cfMmwAtnUnHaNkdo+XdfDAJ71udDiABLQyhaWOE0Z8OZR+k8Oce7owvWRqaBLZshJBNhRx4cbCFxL7aGQs+Cz53PBtXxXghqQe7SQbmB alextmp
+    sudo: alex ALL=(ALL) NOPASSWD:ALL
+  - name: emma
+    uid: 10001
+    home: /var/lib/home/emma
+    public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA4npgvuADk+zdCB+CW+fpgbH/hhxvVIBvTuUlJyOfNK leaudevian@LDV-db12
+    sudo: emma ALL=(ALL) NOPASSWD:ALL
+  - name: jlo
+    uid: 10002
+    home: /var/lib/home/jlo
+    public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFaheH0OR/2EEYnTY8l6teD3Qs8KCExZP+PyKgnJrtzq ed25519 new jlo
+    sudo: jlo ALL=(ALL) NOPASSWD:ALL
+  - name: remy
+    uid: 10003
+    home: /var/lib/home/remy
+    public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEyWh7GhZ9cdD7BrS65VbDgzlyM9/N+nCDAldzibalN remy@RD-66-176
+    sudo: remy ALL=(ALL) NOPASSWD:ALL
+  - name: pitollat
+    uid: 10004
+    home: /var/lib/home/pitollat
+    public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhy9BLQdSLF3fRozqEaK6pB/R1HqfvxJG8aEiOng2hGBrsox4itDOH28b807f9VMitkNOeNTfxKjU73FudRf8eH9F5Q+ncqHM91/zwNanx3Ul5O7dwZH+d2RYTqagx5FroUreLNW0+ooajP3Yi/3lztxw57eZ2xexcO3ThjzILnhJW37D6ckewgSQqd2fP0hq1jNuKaQqgI+qWqtaLlLHJ80j7SMrIE7+WnybHRTfPmKTpO/m244SyLvFXQVkI8EfMPpIhgVm2ABXX4DBcAkY8LvzlYlXhu05CfPeUfkc7Dto/7z/e3d/3mGNIjIJW10CWNgu6N8qKjpPca+zyBEoB pitollat@PITOLLA_BE-S091
+    sudo: pitollat ALL=(ALL) NOPASSWD:ALL
+  - name: priteau
+    uid: 10005
+    home: /var/lib/home/priteau
+    public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDl2Kf4/ofguIecCJISLher+6HrooaSqavJbKtSwTbyd pierre@stackhpc.com
+    sudo: priteau ALL=(ALL) NOPASSWD:ALL
+  - name: will
+    uid: 10006
+    home: /var/lib/home/will
+    public_key: sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIAbCpJEeynf7Sv9775T7CNQ1G3U/i7jiDc67cNCBGEJrAAAABHNzaDo= will StackHPC key - 2024-08-29
+    sudo: will ALL=(ALL) NOPASSWD:ALL
