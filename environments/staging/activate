@@ -1,0 +1,22 @@
+export APPLIANCES_ENVIRONMENT_ROOT=$(dirname $(realpath ${BASH_SOURCE[0]:-${(%):-%x}}))
+echo "Setting APPLIANCES_ENVIRONMENT_ROOT to $APPLIANCES_ENVIRONMENT_ROOT"
+
+export PS1="$(basename $APPLIANCES_ENVIRONMENT_ROOT)/ ${PS1}"
+
+export APPLIANCES_REPO_ROOT=$(realpath "$APPLIANCES_ENVIRONMENT_ROOT/../..")
+echo "Setting APPLIANCES_REPO_ROOT to $APPLIANCES_REPO_ROOT"
+
+export TF_VAR_environment_root=$(realpath "$APPLIANCES_ENVIRONMENT_ROOT")
+echo "Setting TF_VAR_environment_root to $TF_VAR_environment_root"
+
+export PKR_VAR_environment_root=$(realpath "$APPLIANCES_ENVIRONMENT_ROOT")
+echo "Setting PKR_VAR_environment_root to $PKR_VAR_environment_root"
+
+export PKR_VAR_repo_root=$(realpath "$APPLIANCES_REPO_ROOT")
+echo "Setting PKR_VAR_repo_root to $PKR_VAR_repo_root"
+
+if [ -f "$APPLIANCES_ENVIRONMENT_ROOT/ansible.cfg" ]; then
+   export ANSIBLE_CONFIG=$APPLIANCES_ENVIRONMENT_ROOT/ansible.cfg
+fi
+
+
