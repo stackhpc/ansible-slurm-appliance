@@ -87,8 +87,9 @@ openondemand
 # Hosts to run linux-anisble-init
 cluster
 
-[sssd]
+[sssd:children]
 # Hosts to configure sssd on
+cluster
 
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
