@@ -1,0 +1,3 @@
+---
+cuda_package_version: latest
+cuda_nvidia_driver_stream: '570-open'

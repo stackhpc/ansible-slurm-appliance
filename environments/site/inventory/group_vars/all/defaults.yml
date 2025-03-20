@@ -1,0 +1,4 @@
+---
+appliances_extra_packages_other:
+  - cmake
+  - "{{ 'cuda-toolkit' if 'cuda' in group_names }}"
