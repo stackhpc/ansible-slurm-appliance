@@ -43,7 +43,7 @@ jobs:
       TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
-      STACKHPC_TF_DIR: environemnts/.stackhpc/tofu
+      STACKHPC_TF_DIR: environments/.stackhpc/tofu
     steps:
 
       - name: Find the latest release
