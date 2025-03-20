@@ -1,0 +1,15 @@
+---
+- name: Ensure /home symlink exists
+  hosts: cluster
+  become: true
+  tasks:
+    # Symlink /home to /storage/simple/users
+    - ansible.builtin.file:
+        dest: /home
+        src: /storage/simple/users
+        follow: false
+        force: true
+        group: root
+        owner: root
+        state: link
+        force: yes
