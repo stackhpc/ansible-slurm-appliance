@@ -43,10 +43,7 @@ jobs:
       TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
-      # Once a v1.158 is released including https://github.com/stackhpc/ansible-slurm-appliance/pull/541
-      # this can be simplified:
-      STACKHPC_TF_DIR_OLD: environments/.stackhpc/terraform/ # v1.158
-      STACKHPC_TF_DIR_NEW: environments/.stackhpc/tofu/
+      STACKHPC_TF_DIR: environemnts/.stackhpc/tofu
     steps:
 
       - name: Find the latest release
@@ -100,7 +97,7 @@ jobs:
 
       - name: Initialise tofu
         run: tofu init
-        working-directory: ${{ env.STACKHPC_TF_DIR_OLD }}
+        working-directory: ${{ env.STACKHPC_TF_DIR }}
 
       - name: Write clouds.yaml
         run: |
@@ -122,14 +119,14 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR_OLD
+          cd $STACKHPC_TF_DIR
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
 
       - name: Delete infrastructure if provisioning failed
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR_OLD
+          cd $STACKHPC_TF_DIR
           tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
@@ -195,8 +192,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cp $STACKHPC_TF_DIR_OLD/terraform.tfstate $STACKHPC_TF_DIR_NEW
-          cd $STACKHPC_TF_DIR_NEW
+          cd $STACKHPC_TF_DIR
           tofu init
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
           
@@ -237,9 +233,6 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR_OLD
-          tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" || echo "tofu failed in $STACKHPC_TF_DIR_OLD"
-          cd -
-          cd $STACKHPC_TF_DIR_NEW
-          tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" || echo "tofu failed in $STACKHPC_TF_DIR_NEW"
+          cd $STACKHPC_TF_DIR
+          tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" || echo "tofu failed in $STACKHPC_TF_DIR"
         if: ${{ success() || cancelled() }}
