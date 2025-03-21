@@ -29,9 +29,12 @@ sequenceDiagram
     participant pulp as Pulp
     cloud->>packer: Create VM
     note over packer: Boot
+    rect rgb(204, 232, 252)
+    note right of packer: ansible-init
     packer->>cloud: Query metadata
     cloud->>packer: Metadata sent
     packer->>packer: Skip ansible-init
+    end
     ansible->>packer: Wait for ssh connection
     rect rgb(204, 232, 252)
     note right of ansible: fatimage.yml
@@ -43,65 +46,88 @@ sequenceDiagram
     end
     ansible->>cloud: Create image from Build VM root disk
     destroy packer
-    note over cloud: Image openhpc-... created
+    note over cloud: Image created
 ```
 
 ## Cluster Creation
+
+In the below it is assumed that no additional packages are installed beyond
+what is present in the image, i.e. Ark/local Pulp access is not required.
 
 ```mermaid
 sequenceDiagram
     participant ansible as Ansible Deploy Host
     participant cloud as Cloud
+    rect rgb(204, 232, 252)
     note over ansible: $ ansible-playbook ansible/adhoc/generate-passwords.yml
-    ansible->>ansible: Template secrets to inventory group_vars and tofu metadata
-    note over ansible: $ tofu apply ....
+    ansible->>ansible: Template secrets to inventory group_vars
+    end
+    rect rgb(204, 232, 252)
+    note over ansible: $ tofu apply ...
     ansible->>cloud: Create infra
     create participant nodes as Cluster Instances
     cloud->>nodes: Create instances
+    end
     note over nodes: Boot
     rect rgb(204, 232, 252)
-    note over nodes: ansible-init
+    note right of nodes: ansible-init
     nodes->>cloud: Query metadata
     cloud->>nodes: Metadata sent
-    nodes->>nodes: Start k3s and connect to its peers
     end
+    rect rgb(204, 232, 252)
     note over ansible: $ ansible-playbook ansible/site.yml
     ansible->>nodes: Wait for ansible-init completion
     ansible->>nodes: Ansible tasks
     note over nodes: All services running
-
+    end
 ```
 
 ## Slurm Controlled Rebuild
 
-This sequence applies to active clusters, after running ansible/site.yml for the first time. Slurm controlled rebuild requires:
-- `ignore_image_changes: true` in `main.tf`
-- `compute_init_enable: ['compute',..]` in `main.tf`
-- `rebuild` group is populated with `control` in the inventory
+This sequence applies to active clusters, after running the `site.yml` playbook
+for the first time. Slurm controlled rebuild requires that:
+- Compute groups in the OpenTofu `compute` variable have:
+    - `ignore_image_changes: true`
+    - `compute_init_enable: ['compute', ... ]`
+- The Ansible `rebuild` inventory group contains the `control` group.
 
+TODO: should also document how compute-init does NOT run if the `site.yml`
+playbook has not been run.
 
 ```mermaid
 sequenceDiagram
     participant ansible as Ansible Deploy Host
     participant cloud as Cloud
     participant nodes as Cluster Instances
-    note over ansible: Update cluster_image.auto.tfvars.json
+    note over ansible: Update OpenTofu cluster_image variable [1]
+    rect rgb(204, 232, 250)
     note over ansible: $ tofu apply ....
-    ansible->>ansible: target_image templated to hostvars
-    ansible->>cloud: Update state.tf with new image
+    ansible<<->>cloud: Check login/compute current vs desired images
     cloud->>nodes: Reimage login and control nodes
+    ansible->>ansible: Update inventory/hosts.yml for<br>compute node image_id
+    end
+    rect rgb(204, 232, 250)
     note over ansible: $ ansible-playbook ansible/site.yml
-    ansible->>nodes: Hostvars templated to NFS exports directory
+    ansible->>nodes: Hostvars templated to nfs share
     ansible->>nodes: Ansible tasks
+    note over nodes:All services running
+    end
     note over nodes: $ srun --reboot ...
-    rect rgb(204, 232, 252)
-    note over nodes: RebootProgram
-    nodes->>cloud: Query and compare instance image
-    cloud->>nodes: Reimage if target =/= current
+    rect rgb(204, 232, 250)
+    note over nodes: RebootProgram [2]
+    nodes->>cloud: Compare current instance image to target from hostvars
+    cloud->>nodes: Reimage if target != current
     rect rgb(252, 200, 100)
-    note over nodes: compute-init
+    note over nodes: compute-init [3]
     nodes->>nodes: Retrieve hostvars from nfs mount
+    nodes->>nodes: Run ansible tasks
     note over nodes: Compute nodes rejoin cluster
     end
-    nodes->>nodes: srun task completes
     end
+    nodes->>nodes: srun task completes
+```
+Notes:
+1. And/or login/compute group overrides
+2. Running on control node
+3. On hosts targeted by job
+
