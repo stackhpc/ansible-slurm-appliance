@@ -1,9 +1,9 @@
-- name: Read cuda version file
+- name: Read CUDA version file
   slurp:
     src: /usr/local/cuda/version.json
   register: _cuda_samples_version
 
-- name: Set fact for discovered cuda version
+- name: Set fact for discovered CUDA version
   set_fact:
     _cuda_version_tuple: "{{ (_cuda_samples_version.content | b64decode | from_json).cuda.version | split('.') }}" # e.g. '12.1.0'
 
@@ -14,33 +14,39 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 
-- name: Download cuda sample release
+- name: Download CUDA samples release
   unarchive:
     remote_src: yes
     src: "{{ cuda_samples_release_url }}"
     dest: "{{ cuda_samples_path }}"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
+    creates: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}"
 
-- name: Build cuda samples
+- name: Create CUDA samples build directory
+  file:
+    state: directory
+    path: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build"
+
+- name: Build CUDA samples
   shell:
-    cmd: make
-    chdir: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/Samples/1_Utilities/{{ item }}"
-    creates: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/bin/x86_64/linux/release/{{ item }}"
-  loop: "{{ cuda_samples_programs }}"
+    # We need to source /etc/profile.d/sh.local to add CUDA to the PATH
+    cmd: . /etc/profile.d/sh.local && cmake .. && make -j {{ ansible_processor_vcpus }}
+    chdir: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build"
+    creates: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build/Samples/1_Utilities/deviceQuery/deviceQuery"
 
-- name: Run cuda deviceQuery
+- name: Run CUDA deviceQuery
   command:
-    cmd: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/bin/x86_64/linux/release/deviceQuery"
+    cmd: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build/Samples/1_Utilities/deviceQuery/deviceQuery"
   register: _cuda_devicequery
 
-- name: Set fact for cuda devices
+- name: Set fact for CUDA devices
   set_fact:
     cuda_devices: "{{ _cuda_devicequery.stdout | regex_findall('Device (\\d+):') }}"
 
-- name: Run cuda bandwidth test
+- name: Run CUDA bandwidth test
   command:
-    cmd: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/bin/x86_64/linux/release/bandwidthTest --device={{ item }}"
+    cmd: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build/Samples/1_Utilities/bandwidthTest/bandwidthTest --device={{ item }}"
   register: _cuda_bandwidthtest
   loop: "{{ cuda_devices }}"
   loop_control:
