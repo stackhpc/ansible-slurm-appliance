@@ -3,7 +3,7 @@
 
 - name: Ensure drop in directory exists
   file:
-    path: /etc/ssh/sshd_config.d/*.conf
+    path: /etc/ssh/sshd_config.d/
     state: directory
     owner: root
     group: root
