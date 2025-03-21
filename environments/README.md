@@ -94,7 +94,7 @@ varibles are set e.g role variables for the `stackhpc.nfs` role can be found in
 
 ## Parent pointers
 
-As the environments form a chain, a symlink pointing to the parent can be be created.
+As the environments form a chain, a symlink pointing to the parent can be created.
 
     `ln -s ../common/ parent`
 

@@ -13,8 +13,9 @@ variable "cluster_networks" {
     type = list(map(string))
     description = <<-EOT
         List of mappings defining networks. Mapping key/values:
-            network: Name of existing network
-            subnet: Name of existing subnet
+            network: Required. Name of existing network
+            subnet: Required. Name of existing subnet
+            no_security_groups: Optional. Bool (default: false). Disable security groups
     EOT
 }
 
@@ -25,7 +26,7 @@ variable "key_pair" {
 
 variable "control_node_flavor" {
     type = string
-    description = "Flavor name for control name"
+    description = "Flavor name for control node"
 }
 
 variable "login" {
@@ -45,7 +46,6 @@ variable "login" {
         image_id: Overrides variable cluster_image_id
         extra_networks: List of mappings in same format as cluster_networks
         vnic_type: Overrides variable vnic_type
-        vnic_profile: Overrides variable vnic_profile
         volume_backed_instances: Overrides variable volume_backed_instances
         root_volume_size: Overrides variable root_volume_size
         extra_volumes: Mapping defining additional volumes to create and attach
@@ -58,9 +58,9 @@ variable "login" {
                        must already be allocated to the project.
         fip_network: Name of network containing ports to attach FIPs to. Only
                      required if multiple networks are defined.
-
         match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
         availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
+        gateway_ip: Address to add default route via
   EOF
 }
 
@@ -85,7 +85,6 @@ variable "compute" {
             image_id: Overrides variable cluster_image_id
             extra_networks: List of mappings in same format as cluster_networks
             vnic_type: Overrides variable vnic_type
-            vnic_profile: Overrides variable vnic_profile
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
             ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
             volume_backed_instances: Overrides variable volume_backed_instances
@@ -97,6 +96,7 @@ variable "compute" {
                            **NB**: The order in /dev is not guaranteed to match the mapping
             match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
             availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
+            gateway_ip: Address to add default route via
     EOF
 }
 
@@ -144,16 +144,6 @@ variable "vnic_types" {
     default = {}
 }
 
-variable "vnic_profiles" {
-    type = map(string)
-    description = <<-EOT
-    Default VNIC binding profiles, keyed by network name. Values are json strings.
-    See https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#profile.
-    If not given this defaults to "{}"
-    EOT
-    default = {}
-}
-
 variable "login_security_groups" {
     type = list(string)
     description = "Name of preexisting security groups to apply to login nodes"
@@ -184,12 +174,8 @@ variable "root_volume_size" {
     default = 40
 }
 
-variable "inventory_secrets_path" {
-  description = "Path to inventory secrets.yml file. Default is standard cookiecutter location."
-  type = string
-  default = ""
-}
-
-locals {
-    k3s_token = data.external.inventory_secrets.result["vault_k3s_token"]
+variable "gateway_ip" {
+    description = "Address to add default route via"
+    type = string
+    default = ""
 }

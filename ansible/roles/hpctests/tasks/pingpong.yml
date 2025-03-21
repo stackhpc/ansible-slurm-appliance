@@ -5,13 +5,6 @@
     path: "{{ hpctests_rootdir }}/pingpong"
     state: directory
 
-- name: Precreate files to workaround selinux context issues on NFS mounts
-  file:
-    path: "{{ hpctests_rootdir }}/pingpong/{{ item }}"
-    state: touch
-  loop:
-    - pingpong.sh
-
 - name: Create sbatch script
   template:
     src: pingpong.sh.j2
@@ -20,8 +13,7 @@
 - name: Run pingpong
   block:
     - name: Submit jobscript
-      shell: sbatch --wait pingpong.sh
-      become: no
+      shell: bash -l -c 'sbatch --wait pingpong.sh' # need login shell for module command
       args:
         chdir: "{{ hpctests_rootdir }}/pingpong"
       register: hpctests_pingpong_sbatch
@@ -54,11 +46,13 @@
     path: "{{ _pingpong_local_output }}"
   register: hpctests_pingpong_out
   delegate_to: localhost
+  become: false
 
 - name: Read nodes used
   shell: "grep 'SLURM_JOB_NODELIST:' {{ _pingpong_local_output }}"
   register: hpctests_pingpong_run_nodes
   delegate_to: localhost
+  become: false
 
 - name: Plot image
   shell:
@@ -66,6 +60,7 @@
     creates: "{{ _pingpong_local_output | dirname }}/latency.png"
   register: _pingpong_plot
   delegate_to: localhost
+  become: false
   when: hpctests_pingpong_plot | bool
   
 - debug:

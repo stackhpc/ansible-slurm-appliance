@@ -1,9 +1,11 @@
-basic_users_manage_homedir: "{{ (ansible_hostname == (ansible_play_hosts | first)) }}"
+basic_users_homedir_server: "{{ groups['control'] | first }}" # no way, generally, to find the nfs_server
+basic_users_homedir_server_path: /exports/home
+basic_users_homedir_client: "{{ groups['login'] | first }}"  
 basic_users_userdefaults:
-  state: present
-  create_home: "{{ basic_users_manage_homedir }}"
-  generate_ssh_key:  "{{ basic_users_manage_homedir }}"
+  state: present # need this here so don't have to add default() everywhere
+  generate_ssh_key:  true
   ssh_key_comment: "{{ item.name }}"
+  ssh_key_type: ed25519
   shell: "{{'/sbin/nologin' if 'control' in group_names else omit }}"
 basic_users_users: []
 basic_users_groups: []

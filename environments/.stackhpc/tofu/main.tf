@@ -5,6 +5,7 @@ terraform {
   required_providers {
     openstack = {
       source = "terraform-provider-openstack/openstack"
+      version = "~>3.0.0"
     }
   }
 }
@@ -66,9 +67,6 @@ module "cluster" {
     key_pair = "slurm-app-ci"
     cluster_image_id = data.openstack_images_image_v2.cluster.id
     control_node_flavor = var.control_node_flavor
-    # have to override default, as unusually the actual module path and secrets
-    # are not in the same environment for stackhpc
-    inventory_secrets_path = "${path.module}/../inventory/group_vars/all/secrets.yml"
 
     login = {
         login: {
@@ -80,7 +78,7 @@ module "cluster" {
         standard: { # NB: can't call this default!
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
-            compute_init_enable: ["compute", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts"]
+            compute_init_enable: ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts"]
             ignore_image_changes: true
         }
         # Example of how to add another partition:
@@ -89,9 +87,9 @@ module "cluster" {
         #     flavor: var.other_node_flavor
         # }
     }
-    
+
     volume_backed_instances = var.volume_backed_instances
-    
+
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10

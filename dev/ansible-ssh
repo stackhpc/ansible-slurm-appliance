@@ -11,7 +11,7 @@ import os
 from collections import defaultdict
 
 def _optional_arg(prototype, *values):
-    # returns empty string if any of the the values are falsey
+    # returns empty string if any of the values are falsey
     filtered = [value for value in values if value]
     return prototype.format(*values) if len(values) == len(filtered) else ""
 

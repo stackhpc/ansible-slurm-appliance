@@ -16,9 +16,9 @@ module "compute" {
   # can be set for group, defaults to top-level value:
   image_id = lookup(each.value, "image_id", var.cluster_image_id)
   vnic_types = lookup(each.value, "vnic_types", var.vnic_types)
-  vnic_profiles = lookup(each.value, "vnic_profiles", var.vnic_profiles)
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
+  gateway_ip = lookup(each.value, "gateway_ip", var.gateway_ip)
   
   # optionally set for group:
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
@@ -29,7 +29,6 @@ module "compute" {
   availability_zone = lookup(each.value, "availability_zone", "nova")
 
   # computed
-  k3s_token = local.k3s_token
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
   # updates to node metadata on deletion/recreation of the control node:
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]

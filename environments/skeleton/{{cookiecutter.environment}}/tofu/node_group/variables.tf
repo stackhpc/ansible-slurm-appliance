@@ -37,11 +37,6 @@ variable "vnic_types" {
     default = {}
 }
 
-variable "vnic_profiles" {
-    type = map(string)
-    default = {}
-}
-
 variable "volume_backed_instances" {
     description = "Whether to use volumes for root disks"
     type = bool
@@ -68,10 +63,6 @@ variable "extra_volumes" {
 
 variable "security_group_ids" {
     type = list
-}
-
-variable "k3s_token" {
-    type = string
 }
 
 variable "control_address" {
@@ -130,4 +121,9 @@ variable "availability_zone" {
 variable "baremetal_nodes" {
     type = map(string)
     default = {}
+}
+
+variable "gateway_ip" {
+    type = string
+    default = ""
 }

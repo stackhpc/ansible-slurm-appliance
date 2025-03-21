@@ -2,7 +2,7 @@
   copy:
     src: "{{ item }}"
     dest: /exports/cluster/cacerts/
-    owner: root
+    owner: slurm
     group: root
     mode: 0644
   with_fileglob:

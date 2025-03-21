@@ -16,12 +16,14 @@
     - roles
 
 - name: Inject files from roles
-  copy:
+  synchronize:
     src: '{{ item.src }}'
     dest: '/etc/ansible-init/playbooks/{{ item.dest }}'
-    owner: root
-    group: root
-    mode: 0644
+    archive: false
+    rsync_opts: ["-p", "--chmod=D770,F644", "--owner=root", "--group=root"]
+    recursive: true
+    use_ssh_args: true
+  become: true
   loop:
     - src: ../../resolv_conf/templates/resolv.conf.j2
       dest: templates/resolv.conf.j2
@@ -31,8 +33,8 @@
       dest: templates/ceph.keyring.j2
     - src: ../../resolv_conf/files/NetworkManager-dns-none.conf
       dest: files/NetworkManager-dns-none.conf
-    - src: ../../basic_users/filter_plugins/filter_keys.py
-      dest: filter_plugins/filter_keys.py
+    - src: ../../basic_users
+      dest: roles/
     - src: ../../cacerts
       dest: roles/
     - src: ../../sssd
@@ -41,8 +43,12 @@
       dest: roles/
     - src: ../../tuned/tasks/configure.yml
       dest: tasks/tuned.yml
-    - src: ../../stackhpc.nfs/tasks/nfs-clients.yml
-      dest: tasks/nfs-clients.yml
+    - src: ../../stackhpc.nfs
+      dest: roles/
+    - src: ../../mrlesmithjr.chrony
+      dest: roles/
+    - src: ../../lustre
+      dest: roles/
 
 - name: Add filter_plugins to ansible.cfg
   lineinfile:
@@ -56,7 +62,7 @@
 - name: Add compute initialisation playbook
   copy:
     src: compute-init.yml
-    dest: /etc/ansible-init/playbooks/1-compute-init.yml
+    dest: /etc/ansible-init/playbooks/10-compute-init.yml
     owner: root
     group: root
     mode: 0644

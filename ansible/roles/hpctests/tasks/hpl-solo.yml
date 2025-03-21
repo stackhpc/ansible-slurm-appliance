@@ -80,8 +80,7 @@
     cmd: "rm -f {{ hpctests_rootdir }}/hpl-solo/hpl-solo.sh.*.out"
 
 - name: Run hpl-solo
-  shell: sbatch --wait hpl-solo.sh
-  become: no
+  shell: bash -l -c 'sbatch --wait hpl-solo.sh' # need login shell for module command
   args:
     chdir: "{{ hpctests_rootdir }}/hpl-solo"
   async: "{{ 20 * 60 }}" # wait for up to 20 minutes

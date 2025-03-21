@@ -12,9 +12,9 @@
   copy:
     src: /etc/hosts
     dest: /exports/cluster/hosts
-    owner: root
+    owner: slurm
     group: root
-    mode: u=rw,go=
+    mode: u=r,g=rw,o=
     remote_src: true
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
@@ -41,9 +41,9 @@
   copy:
     content: "{{ os_manila_mount_share_info_var | to_nice_yaml }}"
     dest: /exports/cluster/manila_share_info.yml
-    owner: root
+    owner: slurm
     group: root
-    mode: u=rw,g=r
+    mode: u=r,g=rw,o=
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
   when: os_manila_mount_share_info is defined
@@ -55,7 +55,7 @@
   file:
     path: /exports/cluster/cvmfs
     state: directory
-    owner: root
+    owner: slurm
     group: root
     mode: 0755
   run_once: true
@@ -65,7 +65,7 @@
   copy:
     src: /etc/cvmfs/default.local
     dest: /exports/cluster/cvmfs/default.local
-    owner: root
+    owner: slurm
     group: root
     mode: 0644
     remote_src: true
@@ -82,9 +82,9 @@
   file:
     path: "/exports/cluster/hostconfig/{{ inventory_hostname }}/"
     state: directory
-    owner: root
+    owner: slurm
     group: root
-    mode: u=rw,go=
+    mode: u=rX,g=rwX,o=
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Template sssd config 
