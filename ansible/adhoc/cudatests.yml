@@ -1,6 +1,6 @@
 - hosts: cuda
   become: yes
-  gather_facts: no
+  gather_facts: yes
   tags: cuda_samples
   tasks:
     - import_role:
