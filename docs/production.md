@@ -13,7 +13,7 @@ production-ready deployments.
     - `staging`: staging environment
 
   A `dev` environment should also be created if considered required, or this
-  can be left until later.,
+  can be left until later.
 
   These can all be produced using the cookicutter instructions, but the
   `production` and `staging` environments will need their
