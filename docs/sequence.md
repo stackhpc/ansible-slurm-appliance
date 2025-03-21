@@ -4,27 +4,29 @@
 
 ## Image build
 
-This sequence applies to both "fatimage" builds (usually only done in StackHPC CI) and "extra" builds. The differences are:
-- Which image the build VM uses, i.e. the starting image: A genericcloud image for fatimage builds or a fatimages build for an extra build.
-- Which inventory groups the build VM is added to.
+This sequence applies to both:
+- "fatimage" builds, starting from GenericCloud images and using
+  control,login,compute inventory groups to install all packages, e.g. StackHPC
+  CI builds
+- "extra" builds, starting from StackHPC images and using selected inventory
+  groups to add specfic features for a site-specific image.
 
-Note that ansible-init does not run during an image build. It is disabled via a metadata flag.
+Note that a generic Pulp server is shown in the below diagram. This may be
+StackHPC's Ark server or a local Pulp mirroring Ark. It is assumed a local Pulp
+has already had the relevant snapshots synced from Ark (although it is possible
+to trigger this during an image build).
+
+Note that ansible-init does not run during an image build. It is disabled via
+a metadata flag.
 
 ```mermaid
 sequenceDiagram
     participant ansible as Ansible Deploy Host
     participant cloud as Cloud
-    ansible->>cloud: Create VM
-    create participant pulp as Local Pulp Server
-    cloud->>pulp: Create VM
-    ansible->>pulp: Run ansible/adhoc/deploy-pulp.yml
-    note over pulp: Pulp server installed & configured
-    ansible->>pulp: Run ansible/adhoc/sync-pulp.yml # needs to point at ark too somehow
-    participant ark as Ark
-    ark-->>pulp: Sync repos
     note over ansible: $ packer build ...
     ansible->>cloud: Create VM
     create participant packer as Build VM
+    participant pulp as Pulp
     cloud->>packer: Create VM
     note over packer: Boot
     packer->>cloud: Query metadata
@@ -42,7 +44,6 @@ sequenceDiagram
     ansible->>cloud: Create image from Build VM root disk
     destroy packer
     note over cloud: Image openhpc-... created
-
 ```
 
 ## Cluster Creation
