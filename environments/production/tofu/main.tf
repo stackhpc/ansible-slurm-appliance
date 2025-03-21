@@ -47,6 +47,7 @@ module "cluster" {
         }
       ]
       match_ironic_node = true
+      use_ironic_node_name = true
       vnic_types = {
         netapp = "baremetal"
         infiniband = "baremetal"
@@ -72,6 +73,7 @@ module "cluster" {
         }
       ]
       match_ironic_node = true
+      use_ironic_node_name = true
       vnic_types = {
         netapp = "baremetal"
         infiniband = "baremetal"
