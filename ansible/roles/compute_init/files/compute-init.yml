@@ -193,7 +193,7 @@
         tasks_from: nfs-clients.yml
       when:
         - enable_nfs
-        - nfs_enable.clients | default(item.nfs_enable.clients) | bool
+        - nfs_enable.server | bool or ('nfs_enable' in item and item.nfs_enable.server | bool)
       loop: "{{ nfs_configurations }}"
 
     - name: Manila mounts
