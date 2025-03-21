@@ -112,6 +112,12 @@ variable "match_ironic_node" {
     default = false
 }
 
+variable "use_ironic_node_name" {
+    type = bool
+    description = "Whether to name instances the same as the matching Ironic node (no cluster name)"
+    default = false
+}
+
 variable "availability_zone" {
     type = string
     description = "Name of availability zone - ignored unless match_ironic_node is true"
