@@ -91,8 +91,9 @@ cluster
 # Hosts to configure sssd on
 cluster
 
-[sshd]
+[sshd:children]
 # Hosts where the OpenSSH server daemon should be configured
+login
 
 [compute_init]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on

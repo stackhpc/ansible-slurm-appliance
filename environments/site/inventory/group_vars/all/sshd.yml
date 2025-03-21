@@ -1,0 +1,3 @@
+---
+# Enable password authentication to allow LDAP users to log in
+sshd_password_authentication: true
