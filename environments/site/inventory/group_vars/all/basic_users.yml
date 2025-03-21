@@ -28,10 +28,10 @@ basic_users_users:
   - name: priteau
     uid: 10005
     home: /var/lib/home/priteau
-    public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDl2Kf4/ofguIecCJISLher+6HrooaSqavJbKtSwTbyd pierre@stackhpc.com
+    public_key: https://raw.githubusercontent.com/stackhpc/terraform-bastion/refs/heads/master/authorized_keys/pierre
     sudo: priteau ALL=(ALL) NOPASSWD:ALL
   - name: will
     uid: 10006
     home: /var/lib/home/will
-    public_key: sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIAbCpJEeynf7Sv9775T7CNQ1G3U/i7jiDc67cNCBGEJrAAAABHNzaDo= will StackHPC key - 2024-08-29
+    public_key: https://raw.githubusercontent.com/stackhpc/terraform-bastion/refs/heads/master/authorized_keys/will
     sudo: will ALL=(ALL) NOPASSWD:ALL
