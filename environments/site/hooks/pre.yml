@@ -36,3 +36,12 @@
         owner: root
         group: root
         state: directory
+
+- name: Configure NFS v4 identity mapping
+  hosts: cluster
+  become: true
+  tasks:
+    - ansible.builtin.lineinfile:
+        path: /etc/idmapd.conf
+        regexp: '^#Domain = local.domain.edu$'
+        line: 'Domain = cluster'
