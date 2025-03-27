@@ -1,0 +1,21 @@
+- name: Get list of nodes in partition
+  ansible.builtin.command:
+    cmd: >-
+      sinfo
+      --Node
+      --Format=NodeList
+      --noheader
+      --partition={{ _rebuild_job_current_partition }}
+  register: _sinfo_partition
+  when: rebuild_job_hostlist is not defined
+
+- name: Expand rebuild_job_hostlist to host names
+  ansible.builtin.command:
+    cmd: "scontrol show hostnames {{ rebuild_job_hostlist }}"
+  register: _scontrol_hostnames
+  when: rebuild_job_hostlist is defined
+
+- name: Submit rebuild jobs
+  ansible.builtin.command:
+    cmd: "{{ rebuild_job_template }}"
+  loop: "{{ _scontrol_hostnames.stdout_lines | default(_sinfo_partition.stdout_lines) }}"
