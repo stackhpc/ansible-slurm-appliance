@@ -142,44 +142,13 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml
+          ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
 
       # - name: Run EESSI tests
       #   run: |
       #     . venv/bin/activate
       #     . environments/.stackhpc/activate
       #     ansible-playbook -vv ansible/ci/check_eessi.yml
-
-      - name: Confirm Open Ondemand is up (via SOCKS proxy)
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-
-          # load ansible variables into shell:
-          ansible-playbook ansible/ci/output_vars.yml \
-            -e output_vars_hosts=openondemand \
-            -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
-            -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
-          source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
-
-          # setup ssh proxying:
-          sudo apt-get --yes install proxychains
-          echo proxychains installed
-          ssh -v -fN -D 9050 ${bastion_user}@${bastion_ip}
-          echo port 9050 forwarded
-
-          # check OOD server returns 200:
-          statuscode=$(proxychains wget \
-            --quiet \
-            --spider \
-            --server-response \
-            --no-check-certificate \
-            --http-user=demo_user \
-            --http-password=${DEMO_USER_PASSWORD} https://${openondemand_servername} \
-            2>&1)
-          (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
-        env:
-          DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Checkout current branch
         run: git checkout ${{ github.head_ref || github.ref_name }}
@@ -228,6 +197,37 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
+
+      - name: Confirm Open Ondemand is up (via SOCKS proxy)
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+
+          # load ansible variables into shell:
+          ansible-playbook ansible/ci/output_vars.yml \
+            -e output_vars_hosts=openondemand \
+            -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
+            -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
+          source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
+
+          # setup ssh proxying:
+          sudo apt-get --yes install proxychains
+          echo proxychains installed
+          ssh -v -fN -D 9050 ${bastion_user}@${bastion_ip}
+          echo port 9050 forwarded
+
+          # check OOD server returns 200:
+          statuscode=$(proxychains wget \
+            --quiet \
+            --spider \
+            --server-response \
+            --no-check-certificate \
+            --http-user=demo_user \
+            --http-password=${DEMO_USER_PASSWORD} https://${openondemand_servername} \
+            2>&1)
+          (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
+        env:
+          DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Delete infrastructure
         run: |
