@@ -221,7 +221,12 @@ This will create jobs to reimage every slurm-rebuildable node to the image
 currently defined in the OpenTofu configuration.
 
 Note that some of the [rebuild role variables](../../ansible/roles/rebuild/README.md)
-may also be useful as extravars, especially for testing or debugging.
+may also be useful as extravars, especially for testing or debugging. For
+example the following comand will run in a non-default partition and does not
+actually reboot/rebuild nodes, which may be useful for testing interactions with
+other priority or QOS settings:
+
+    ansible-playbook ansible/adhoc/rebuild-via-slurm.yml -e 'rebuild_job_partitions=test rebuild_job_reboot=false'
 
 ## Testing
 
