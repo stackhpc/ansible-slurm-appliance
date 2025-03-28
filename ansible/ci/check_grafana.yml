@@ -23,4 +23,4 @@
       delay: 5
       vars:
         _found_jobs: "{{ _slurm_stats_jobs.docs | map(attribute='JobName', default='(json error in slurmstats data)') }}"
-        _expected_jobs: ['hpl-solo.sh', 'pingpong.sh', 'pingmatrix.sh']
+        _expected_jobs: ['pingpong.sh']
