@@ -81,11 +81,12 @@ module "cluster" {
             compute_init_enable: ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts"]
             ignore_image_changes: true
         }
-        # Example of how to add another partition:
-        # extra: {
-        #     nodes: ["compute-2", "compute-3"]
-        #     flavor: var.other_node_flavor
-        # }
+        # Normally-empty partition for testing:
+        extra: {
+            nodes: []
+            #nodes: ["extra-0", "extra-1"]
+            flavor: var.other_node_flavor
+        }
     }
 
     volume_backed_instances = var.volume_backed_instances
