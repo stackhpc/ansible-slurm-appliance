@@ -34,9 +34,9 @@ running the `ansible/adhoc/rebuild-via-slurm.yml` playbook:
   send to `/dev/null` by default, as the root user running this has no shared
   directory for job output.
 
-- `rebuild_job_reboot`: Bool, whether to add the `--reboot` flag to the job
-  to actually trigger a rebuild. Useful for e.g. testing priorities. Default
-  `true`.
+- `rebuild_job_reboot`: Optional. A bool controlling whether to add the
+  `--reboot` flag to the job to actually trigger a rebuild. Useful for e.g.
+  testing partition configurations. Default `true`.
 
 - `rebuild_job_options`: Optional. A string giving any other options to pass to
   [sbatch](https://slurm.schedmd.com/sbatch.html). Default is empty string.

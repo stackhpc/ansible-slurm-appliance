@@ -42,9 +42,6 @@ In summary, the way this functionality works is as follows:
    registers the node as having finished rebooting. It then launches the actual
    job, which does not do anything.
 
-   # TODO: check that this is the LAST thing we do?
-   
-
 
 TODO: note terraform parallel limits
 
@@ -86,7 +83,13 @@ The configuration of this is complex and involves:
     compute = {
         general = {
             nodes = ["general-0", "general-1"]
-            ignore_image_changes: true
+            ignore_image_changes = true
+            ...
+        }
+        gpu = {
+            node = ["a100-0", "a100-1"]
+            ignore_image_changes = true
+            ...
         }
     }
     ...
@@ -118,7 +121,8 @@ The configuration of this is complex and involves:
    However production sites will probably be overriding this file anyway to
    customise it.
 
-   An example partition definition is:
+   An example partition definition, given the two node groups "general" and
+   "gpu" shown in Step 2, is:
 
     ```yaml
     openhpc_slurm_partitions:
@@ -126,6 +130,7 @@ The configuration of this is complex and involves:
         - name: rebuild
           groups:
             - name: general
+            - name: gpu
           default: NO
           maxtime: 30
           partition_params:
@@ -138,15 +143,16 @@ The configuration of this is complex and involves:
     ```
 
     Which has parameters as follows:
-    TODO: update me!
     - `name`: Partition name matching `rebuild` role variable `rebuild_partitions`,
       default `rebuild`.
-    - `groups`: A list of node group names, matching keys in the OpenTofu `compute`
-      variable (see example configuration above). See discussion below.
+    - `groups`: A list of node group names, matching keys in the OpenTofu
+      `compute` variable (see example in step 2 above). Normally every compute
+      node group should be listed here, unless Slurm-controlled rebuild is not
+      required for certain node groups.
     - `default`: Must be set to `NO` so that it is not the default partition.
     - `maxtime`: Maximum time to allow for rebuild jobs, in
       [slurm.conf format](https://slurm.schedmd.com/slurm.conf.html#OPT_MaxTime).
-      The example here is 30 minutes, but see discussion below
+      The example here is 30 minutes, but see discussion below.
     - `partition_params`: A mapping of additional parameters, which must be set
       as follows:
         - `PriorityJobFactor`: Ensures jobs in this partition (i.e. rebuild jobs)
@@ -166,9 +172,12 @@ The configuration of this is complex and involves:
           entire node. This means they do not run on nodes as the same time as
           user jobs running in partitions allowing non-exclusive use.
     
-    Note that this partition overlaps with "normal" partitions. If it is
-    desirable to roll out changes more gradually, it is possible to create
-    multiple "rebuild" partitions, but it is necessary that:
+    The value for `maxtime` needs to be sufficent not just for a single node
+    to be rebuilt, but also to allow for any batching in either OpenTofu or
+    in Nova - see remarks in the [production docs](../production.md).
+
+    If it is desirable to roll out changes more gradually, it is possible to
+    create multiple "rebuild" partitions, but it is necessary that:
     - The rebuild partitions should not themselves overlap, else nodes may be
       rebuilt more than once.
     - Each rebuild partition should entirely cover one or more "normal"
@@ -179,8 +188,8 @@ The configuration of this is complex and involves:
     - Add the `control` node into the `rebuild` group.
     - Ensure an application credential to use for rebuilding nodes is available
       on the deploy host (default location `~/.config/openstack/clouds.yaml`).
-      If not using that location override `rebuild_clouds`.
-    - **TODO:** CONFIGURE rebuild job defaults!
+    - If required, override `rebuild_clouds_path` or other variables in the site
+      environment.
 
 7. Run `tofu apply` as usual to apply the new OpenTofu configuration.
 
