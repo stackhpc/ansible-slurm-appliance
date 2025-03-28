@@ -21,4 +21,5 @@
           <end>
       vars:
         expected_sinfo:
+          - "  extra up 60-00:00:00 0 n/a" # empty partition
           - "{{ openhpc_cluster_name }}-compute-[0-1] standard* up 60-00:00:00 2 idle"

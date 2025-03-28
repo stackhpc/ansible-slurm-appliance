@@ -42,12 +42,6 @@ In summary, the way this functionality works is as follows:
    registers the node as having finished rebooting. It then launches the actual
    job, which does not do anything.
 
-
-TODO: note terraform parallel limits
-
-nova compute: 10 per nova controller, so either per HV or whole-cloud BM * (different in Caracel onwards). Could tune to 50-100 if properly set.
-
-
 ## Prerequsites
 
 To enable a compute node to rejoin the cluster after a vrebuild, functionality
