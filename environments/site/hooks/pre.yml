@@ -12,4 +12,17 @@
         group: root
         owner: root
         state: link
-        force: yes
+
+- name: Ensure /nfs symlink exists
+  hosts: cluster
+  become: true
+  tasks:
+    # Symlink /nfs to /storage/replicated/nfs
+    - ansible.builtin.file:
+        dest: /nfs
+        src: /storage/replicated/nfs
+        follow: false
+        force: true
+        group: root
+        owner: root
+        state: link
