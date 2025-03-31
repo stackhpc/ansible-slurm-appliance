@@ -1,4 +1,19 @@
 ---
 appliances_extra_packages_other:
-  - cmake
+  # Required to run CUDA samples
   - "{{ 'cuda-toolkit' if 'cuda' in group_names }}"
+  - cmake
+  # Packages requested by local operators
+  - clustershell
+  - dos2unix
+  - emacs
+  - gnupg
+  - iftop
+  - iotop
+  - multitail
+  - nethogs
+  - nmon
+  - telnet
+  - traceroute
+  - tree
+  - vim
