@@ -1,0 +1,16 @@
+---
+- name: Install EPEL
+  tags: install
+  dnf:
+    name: epel-release
+
+- name: Install certbot
+  tags: install
+  dnf:
+    name:
+      - certbot
+      - python3-certbot-apache
+
+- name: Generate Let's Encrypt certificate
+  command: sudo certbot certonly --apache -d {{ openondemand_servername }} -n
+  when: "'install' not in ansible_run_tags"
