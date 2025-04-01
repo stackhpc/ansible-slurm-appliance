@@ -1,10 +1,11 @@
 ---
-- name: Ensure /home symlink exists
+- name: Create NFS symlinks
   hosts: cluster:!builder
   become: true
   tasks:
     # Symlink /home to /storage/simple/users
-    - ansible.builtin.file:
+    - name: Ensure /home symlink exists
+      ansible.builtin.file:
         dest: /home
         src: /storage/simple/users
         follow: false
@@ -12,14 +13,25 @@
         group: root
         owner: root
         state: link
-
-- name: Ensure /nfs symlink exists
-  hosts: cluster:!builder
-  become: true
-  tasks:
-    # Symlink /nfs to /storage/replicated/nfs
-    - ansible.builtin.file:
+    - name: Ensure /nfs symlink exists
+      ansible.builtin.file:
         dest: /nfs
+        src: /storage/replicated/nfs
+        follow: false
+        force: true
+        group: root
+        owner: root
+        state: link
+    - name: Ensure /trinity exists
+      ansible.builtin.file:
+        path: /trinity
+        owner: root
+        group: root
+        state: directory
+
+    - name: Ensure /trinity/shared exists
+      ansible.builtin.file:
+        dest: /trinity/shared
         src: /storage/replicated/nfs
         follow: false
         force: true
