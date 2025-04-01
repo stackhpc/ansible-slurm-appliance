@@ -178,7 +178,7 @@ source "openstack" "openhpc" {
   ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
   
   # Output image:
-  image_disk_format = "qcow2"
+  # image_disk_format = "qcow2"
   image_visibility = var.image_visibility
   
 }

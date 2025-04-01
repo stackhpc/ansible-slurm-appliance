@@ -102,7 +102,8 @@ jobs:
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          # if there, remove signature_verified
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}" || true
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
