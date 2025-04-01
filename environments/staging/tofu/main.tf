@@ -23,8 +23,8 @@ module "cluster" {
       fip_addresses = ["194.199.232.111"]
     }
   }
-  # RL9.4 + OFED 24.10-1.1.4.0 + SSSD
-  cluster_image_id = "479747da-bfcd-4aec-81f0-8c9475e2d461"
+  # RL9.4 + OFED 24.10-1.1.4.0 + SSSD + local packages
+  cluster_image_id = "b28a9ba0-fe0b-44cc-819c-7e193989ef5b"
   compute = {
     # Group name used for compute node partition definition
     cpu = {
