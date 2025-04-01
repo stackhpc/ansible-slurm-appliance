@@ -44,6 +44,13 @@ ${cluster_name}_${group_name}:
         image_id: ${compute_groups[group_name]["image_id"]}
 %{ endfor ~}
 
+# Non-cluster prefixed groups so we can use same group name between dev and prod
+%{ for group_name in keys(compute_groups) ~}
+${group_name}:
+    children:
+        ${cluster_name}_${group_name}:
+%{ endfor ~}
+
 compute:
     children:
 %{ for group_name in keys(compute_groups) ~}
