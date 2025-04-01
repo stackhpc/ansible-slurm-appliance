@@ -23,10 +23,10 @@ jobs:
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-RL8
-            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
+            source_image_name: openhpc-RL8-250401-1025-9b80df10
             inventory_groups: control,compute,login
           - image_name: openhpc-RL9
-            source_image_name: Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.qcow2
+            source_image_name: openhpc-RL9-250401-1025-9b80df10
             inventory_groups: control,compute,login
     env:
       ANSIBLE_FORCE_COLOR: True
