@@ -1,8 +1,9 @@
 ---
 - name: Download Cern GPG key
   ansible.builtin.get_url:
-    url: http://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM 
+    url: http://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM
     dest: ./cvmfs-key.gpg
+    checksum: "{{ cvmfs_gpg_checksum }}"
 
 - name: Import downloaded GPG key
   command: rpm --import cvmfs-key.gpg
@@ -24,7 +25,7 @@
 
 # Alternative version using official repo - still no GPG key :(
 # - name: Add EESSI repo
-#   dnf: 
+#   dnf:
 #     name: http://repo.eessi-infra.org/eessi/rhel/8/noarch/eessi-release-0-1.noarch.rpm
 
 # - name: Install EESSI CVMFS config
@@ -39,7 +40,7 @@
     value: "{{ item.value }}"
     no_extra_spaces: true
   loop: "{{ cvmfs_config | dict2items }}"
-    
+
 
 # NOTE: Not clear how to make this idempotent
 - name: Ensure CVMFS config is setup
