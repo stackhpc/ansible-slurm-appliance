@@ -1,6 +1,6 @@
 ---
 - name: Ensure /home symlink exists
-  hosts: cluster
+  hosts: cluster:!builder
   become: true
   tasks:
     # Symlink /home to /storage/simple/users
@@ -14,7 +14,7 @@
         state: link
 
 - name: Ensure /nfs symlink exists
-  hosts: cluster
+  hosts: cluster:!builder
   become: true
   tasks:
     # Symlink /nfs to /storage/replicated/nfs
