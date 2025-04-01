@@ -1,2 +1,3 @@
 openondemand_certbot: true
+openondemand_certbot_email: jean-luc.oms@lirmm.fr
 openondemand_servername: io-ood.meso.umontpellier.fr
