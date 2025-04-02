@@ -14,3 +14,7 @@ compute
 
 [podman:children]
 zenith
+
+[extra_packages:children]
+# allow site.yml to install packages
+cluster
