@@ -20,4 +20,4 @@ nfs_configurations:
     nfs_server: "svm-cluster.meso2"
     nfs_export: "/netapp"
     nfs_client_mnt_point: "/storage"
-    nfs_client_mnt_options: 'ro' # Mount as read-only for now
+    nfs_client_mnt_options: 'rw'
