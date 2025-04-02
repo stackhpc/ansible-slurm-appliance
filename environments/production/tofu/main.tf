@@ -29,7 +29,7 @@ module "cluster" {
       ]
     }
   }
-  # RL9.4 + OFED 24.10-1.1.4.0 + SSSD + local packages
+  # RL9.4 + OFED 23.10-3.2.2.0 + SSSD + local packages
   cluster_image_id = "b28a9ba0-fe0b-44cc-819c-7e193989ef5b"
   compute = {
     # Group name used for compute node partition definition
@@ -55,8 +55,8 @@ module "cluster" {
     }
     gpu = {
       flavor = "baremetal-gpu"
-      # RL9.4 + OFED 24.10-1.1.4.0 + SSSD + CUDA 12.8
-      image_id = "527eb511-ee34-4c8d-9391-2ca101668022"
+      # RL9.4 + OFED 23.10-3.2.2.0 + SSSD + CUDA 12.8
+      image_id = "ec98d90f-6f38-47cb-831b-449892ef116c"
       nodes = [
         "io-gpu-01",
         "io-gpu-02",
