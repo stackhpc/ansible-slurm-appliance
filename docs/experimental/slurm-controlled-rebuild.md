@@ -44,7 +44,7 @@ In summary, the way this functionality works is as follows:
 
 ## Prerequsites
 
-To enable a compute node to rejoin the cluster after a vrebuild, functionality
+To enable a compute node to rejoin the cluster after a rebuild, functionality
 must be built into the image. Before progressing you should check that all the
 functionality required for your cluster is currently supported by the
 `compute_init` role. Review that role's [README](../../ansible/roles/compute_init/README.md)
