@@ -1,5 +1,5 @@
-# These lookups are set via configmaps and secrets when this environment is
-# used by the azimuth_caas_operator for pulp sync.
+# These lookups are set via environment variables in the container spec when
+# this environment is used by the azimuth_caas_operator for pulp sync.
 
 # Address of Azimuth Pulp (ingress)
 appliances_pulp_url: "{{ lookup('env', 'appliances_pulp_url') }}"
