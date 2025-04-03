@@ -27,7 +27,6 @@
         delegate_to: localhost
     vars:
       pulp_site_target_distribution_version: "{{ ansible_facts.distribution_version }}"
-      pulp_site_target_distribution_version_major: "{{ ansible_facts.distribution_major_version }}"
 
 - import_playbook: bootstrap.yml
 

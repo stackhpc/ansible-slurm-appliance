@@ -16,7 +16,7 @@ pulp_site_selinux_suffix: "{{ ':Z' if ansible_selinux.status == 'enabled' else '
 
 # The OS version to sync for:
 pulp_site_target_distribution_version: "9.5"
-pulp_site_target_distribution_version_major: "9"
+pulp_site_target_distribution_version_major: "{{ pulp_site_target_distribution_version | split('.') | first }}"
 
 pulp_site_rpm_info:
 - name: "baseos-{{ pulp_site_target_distribution_version }}-{{ appliances_pulp_repos.baseos[pulp_site_target_distribution_version].timestamp }}"

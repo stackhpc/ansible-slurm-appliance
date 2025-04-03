@@ -14,4 +14,21 @@ An existing Pulp server can be used to host Ark repos by overriding `pulp_site_p
 
 ## Syncing Pulp content with Ark
 
-If the `pulp` group is added to the Packer build groups, the local Pulp server will be synced with Ark on build. You must authenticate with Ark by overriding `pulp_site_upstream_username` and `pulp_site_upstream_password` with your vault encrypted Ark dev credentials. `dnf_repos_username` and `dnf_repos_password` must remain unset to access content from the local Pulp. Content can also be synced by running `ansible/adhoc/sync-pulp.yml`. By default this syncs repositories for Rocky 9.5 with x86_64 architecture, but can be overriden by setting extravars for `pulp_site_target_distribution`, `pulp_site_target_distribution_version` and `pulp_site_target_distribution_version_major`.
+The dnf repo snapshots used are defined in `environments/common/inventory/group_vars/all/timestamps.yml`
+and may change with each release.
+
+The current snapshots can be synced from Ark to the local Pulp by running `ansible/adhoc/sync-pulp.yml`.
+By default this syncs repositories for Rocky `9.5`, but this can be overriden
+if necessary by setting `pulp_site_target_distribution_version` via an extravar.
+
+Alternatively, this sync can be performed automatically during an image build.
+To enable this, add `builder` to the `pulp` group in e.g.
+`environments/$ENV/inventory/groups` (note the `pulp` group just dictates which
+host starts the sync, not which host is running the Pulp server). In this case
+`pulp_site_target_distribution_version` is automatically determined from the
+builder VM's OS distribution.
+
+In either case you must authenticate with Ark by overriding
+`pulp_site_upstream_username` and `pulp_site_upstream_password` with your vault
+encrypted Ark dev credentials, and `dnf_repos_username` and `dnf_repos_password`
+must remain unset.
