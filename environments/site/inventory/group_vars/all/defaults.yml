@@ -13,6 +13,7 @@ appliances_extra_packages_other:
   - multitail
   - nethogs
   - nmon
+  - s-nail
   - telnet
   - traceroute
   - tree
