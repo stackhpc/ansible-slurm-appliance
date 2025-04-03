@@ -57,3 +57,19 @@
         path: /etc/idmapd.conf
         regexp: '^#Domain = local.domain.edu$'
         line: 'Domain = cluster'
+
+- name: Configure MODULEPATH with local modules
+  hosts: cluster:!builder
+  become: true
+  tasks:
+    - name: Ensure /etc/profile.d/zzz-io.sh exists
+      ansible.builtin.file:
+        path: /etc/profile.d/zzz-io.sh
+        owner: root
+        group: root
+        state: touch
+    - name: Set MODULEPATH in /etc/profile.d/zzz-io.sh
+      ansible.builtin.lineinfile:
+        path: /etc/profile.d/zzz-io.sh
+        regexp: '^export MODULEPATH.*'
+        line: 'export MODULEPATH=$MODULEPATH:/trinity/shared/modulefiles/modulegroups:/trinity/shared/modulefiles/CV-standard:/trinity/shared/modulefiles/local'
