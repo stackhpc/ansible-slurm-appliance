@@ -37,8 +37,8 @@ login
 # Environment-specific so not defined here
 
 [basic_users:children]
-# Add `openhpc` group to add Slurm users via creation of users on each node.
-openhpc
+# Add `cluster` group to add operators via creation of users on each node.
+cluster
 
 [openondemand:children]
 # Host to run Open Ondemand server on - subset of login
