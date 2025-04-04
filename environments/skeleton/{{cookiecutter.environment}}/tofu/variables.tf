@@ -35,7 +35,7 @@ variable "login" {
     Mapping defining homogenous groups of login nodes. Multiple groups may
     be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
     to define login nodes with different capabilities such as high-memory.
-    
+
     Keys are names of groups.
     Values are a mapping as follows:
 
@@ -45,7 +45,7 @@ variable "login" {
     Optional:
         image_id: Overrides variable cluster_image_id
         extra_networks: List of mappings in same format as cluster_networks
-        vnic_type: Overrides variable vnic_type
+        vnic_types: Overrides variable vnic_types
         volume_backed_instances: Overrides variable volume_backed_instances
         root_volume_size: Overrides variable root_volume_size
         extra_volumes: Mapping defining additional volumes to create and attach
@@ -84,7 +84,7 @@ variable "compute" {
         Optional:
             image_id: Overrides variable cluster_image_id
             extra_networks: List of mappings in same format as cluster_networks
-            vnic_type: Overrides variable vnic_type
+            vnic_types: Overrides variable vnic_types
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
             ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
             volume_backed_instances: Overrides variable volume_backed_instances
