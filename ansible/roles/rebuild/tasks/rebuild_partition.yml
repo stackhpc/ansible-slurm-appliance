@@ -3,7 +3,7 @@
     cmd: >-
       sinfo
       --Node
-      --Format=NodeList
+      --format=%N
       --noheader
       --partition={{ _rebuild_job_current_partition }}
   register: _sinfo_partition
