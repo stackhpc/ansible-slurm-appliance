@@ -24,6 +24,12 @@ variable "key_pair" {
     description = "Name of an existing keypair in OpenStack"
 }
 
+variable "control_ip_addresses" {
+    type        = map(string)
+    description = "Mapping of networks to fixed IP addresses used by control node"
+    default     = {}
+}
+
 variable "control_node_flavor" {
     type = string
     description = "Flavor name for control node"

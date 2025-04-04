@@ -141,13 +141,13 @@ and referenced from the `site` and `production` environments, e.g.:
     resource "openstack_networking_port_v2" "control" {
         ...
         fixed_ip {
-            subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
-            ip_address = var.control_ip_address
+            subnet_id  = data.openstack_networking_subnet_v2.cluster_subnet.id
+            ip_address = (var.control_ip_addresses != {})? var.control_ip_addresses[each.key]: null
         }
     }
     ```
     
-  Note the variable `control_ip_address` is new.
+  Note the variable `control_ip_addresses` is new.
 
   Using fixed IPs will require either using admin credentials or policy changes.
 
