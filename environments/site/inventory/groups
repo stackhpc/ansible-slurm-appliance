@@ -42,6 +42,7 @@ cluster
 
 [openondemand:children]
 # Host to run Open Ondemand server on - subset of login
+builder
 
 [openondemand_desktop:children]
 # Subset of compute to run a interactive desktops on via Open Ondemand
