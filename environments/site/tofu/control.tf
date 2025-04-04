@@ -1,5 +1,5 @@
 locals {
-  control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  control_volumes = concat([data.openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [data.openstack_blockstorage_volume_v3.home] : [])
 }
 
 resource "openstack_networking_port_v2" "control" {
