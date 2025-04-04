@@ -1,0 +1,11 @@
+- name: Create rebuild jobs for partition
+  include_tasks:
+    file: rebuild_partition.yml
+  args:
+    apply:
+      become: yes
+      become_user: "{{ rebuild_job_user }}"
+  loop: "{{ rebuild_job_partitions | split(',') }}"
+  loop_control:
+    loop_var: _rebuild_job_current_partition
+

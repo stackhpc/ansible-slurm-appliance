@@ -1,0 +1,17 @@
+# Rebuild compute nodes via slurm.
+# Nodes will be rebuilt if `image_id` in inventory is different to the
+# currently-provisioned image. Otherwise they are rebooted.
+
+# Example:
+#   ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
+
+# See docs/slurm-controlled-rebuild.md.
+
+- hosts: login
+  run_once: true
+  gather_facts: no
+  tasks:
+    - name: Run slurm-controlled rebuild
+      import_role:
+        name: rebuild
+        tasks_from: rebuild.yml

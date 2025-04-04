@@ -324,12 +324,6 @@
         enabled: true
         state: started
 
-    - name: Ensure slurmd service state
-      service:
-        name: slurmd
-        enabled: true
-        state: started
-
     - name: Set locked memory limits on user-facing nodes
       lineinfile:
         path: /etc/security/limits.conf
@@ -350,6 +344,13 @@
         block: |
           +:adm:ALL
           -:ALL:ALL
+
+    - name: Ensure slurmd service state
+      service:
+        name: slurmd
+        enabled: true
+        state: started
+
 
     - name: Ensure node is resumed
       # TODO: consider if this is always safe for all job states?
