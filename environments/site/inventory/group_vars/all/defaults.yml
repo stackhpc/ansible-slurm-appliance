@@ -14,6 +14,7 @@ appliances_extra_packages_other:
   - nethogs
   - nmon
   - s-nail
+  - tcpdump
   - telnet
   - traceroute
   - tree
