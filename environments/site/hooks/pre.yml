@@ -73,3 +73,41 @@
         path: /etc/profile.d/zzz-io.sh
         regexp: '^export MODULEPATH.*'
         line: 'export MODULEPATH=$MODULEPATH:/trinity/shared/modulefiles/modulegroups:/trinity/shared/modulefiles/CV-standard:/trinity/shared/modulefiles/local'
+
+- name: Configure Postfix
+  hosts: control
+  become: true
+  tasks:
+    - name: Set Postfix myhostname configuration
+      ansible.builtin.lineinfile:
+        path: /etc/postfix/main.cf
+        line: 'myhostname = {{ inventory_hostname }}.meso.umontpellier.fr'
+
+    - name: Set Postfix myorigin configuration
+      ansible.builtin.lineinfile:
+        path: /etc/postfix/main.cf
+        line: 'myorigin = $myhostname'
+
+    - name: Set Postfix relayhost configuration
+      ansible.builtin.lineinfile:
+        path: /etc/postfix/main.cf
+        line: 'relayhost = smtp.meso2'
+
+    - name: Set Postfix sender_canonical_maps configuration
+      ansible.builtin.lineinfile:
+        path: /etc/postfix/main.cf
+        line: 'sender_canonical_maps = regexp:/etc/postfix/sender_canonical'
+
+    - name: Create Postfix sender_canonical file
+      ansible.builtin.copy:
+        content: '/.*/  io-no-reply@umontpellier.fr'
+        dest: /etc/postfix/sender_canonical
+
+    - name: Create Postfix lookup table
+      command: postmap /etc/postfix/sender_canonical
+
+    - name: Ensure Postfix service is enabled and started
+      ansible.builtin.systemd:
+        name: postfix
+        enabled: true
+        state: started
