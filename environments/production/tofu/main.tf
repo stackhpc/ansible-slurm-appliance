@@ -33,7 +33,7 @@ module "cluster" {
     }
   }
   # RL9.4 + OFED 23.10-3.2.2.0 + SSSD + local packages
-  cluster_image_id = "1e7fbaef-7a9e-4e9a-af66-9c35dfcc9431"
+  cluster_image_id = "597cbd0f-6060-4a1c-a7e3-afd9914a8cc8"
   compute = {
     # Group name used for compute node partition definition
     cpu = {
