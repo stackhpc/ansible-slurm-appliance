@@ -15,6 +15,9 @@ module "cluster" {
   ]
   key_pair = "rally"
   control_node_flavor = "m1.xlarge"
+  control_ip_addresses = {
+    "netapp" = "192.168.52.3",
+  }
   login = {
     # Arbitrary group name for these login nodes
     interactive = {

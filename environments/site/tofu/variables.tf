@@ -35,6 +35,12 @@ variable "control_node_flavor" {
     description = "Flavor name for control node"
 }
 
+variable "control_ip_addresses" {
+    type = map(string)
+    description = "Mapping of networks to fixed IP addresses used by control node"
+    default = {}
+}
+
 variable "login" {
   type = any
   description = <<-EOF
