@@ -119,10 +119,16 @@ jobs:
           echo $IMAGE_ID > image-id.txt
           echo $IMAGE_NAME > image-name.txt
 
-      - name: Make image usable for further builds
+      - name: Make image usable for further builds (if signature_verified property exists)
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          IMAGE_ID="${{ steps.manifest.outputs.image-id }}"
+          if openstack image show "$IMAGE_ID" -f json | jq -e '.properties.signature_verified' > /dev/null; then
+            echo "Unsetting signature_verified..."
+            openstack image unset --property signature_verified "$IMAGE_ID"
+          else
+            echo "signature_verified not set, skipping unset."
+          fi
 
       - name: Delete image for automatically-run workflows
         run: |
