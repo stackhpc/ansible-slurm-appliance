@@ -101,6 +101,7 @@ jobs:
           -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
+          -var "use_blockstorage_volume=true" \
           -var "volume_size=${{ matrix.build.volume_size }}" \
           openstack.pkr.hcl
         
@@ -118,10 +119,16 @@ jobs:
           echo $IMAGE_ID > image-id.txt
           echo $IMAGE_NAME > image-name.txt
 
-      - name: Make image usable for further builds
+      - name: Make image usable for further builds (if signature_verified property exists)
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          IMAGE_ID="${{ steps.manifest.outputs.image-id }}"
+          if openstack image show "$IMAGE_ID" -f json | jq -e '.properties.signature_verified' > /dev/null; then
+            echo "Unsetting signature_verified..."
+            openstack image unset --property signature_verified "$IMAGE_ID"
+          else
+            echo "signature_verified not set, skipping unset."
+          fi
 
       - name: Delete image for automatically-run workflows
         run: |
