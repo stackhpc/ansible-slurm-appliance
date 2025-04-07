@@ -101,6 +101,7 @@ jobs:
           -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
+          -var "use_blockstorage_volume=true" \
           -var "volume_size=${{ matrix.build.volume_size }}" \
           openstack.pkr.hcl
         

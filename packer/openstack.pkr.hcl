@@ -109,7 +109,7 @@ variable "manifest_output_path" {
 
 variable "use_blockstorage_volume" {
   type = bool
-  default = true
+  default = false
 }
 
 variable "volume_type" {
@@ -119,7 +119,7 @@ variable "volume_type" {
 
 variable "volume_size" {
   type = number
-  default = 15
+  default = null
 }
 
 variable "image_disk_format" {
@@ -178,7 +178,7 @@ source "openstack" "openhpc" {
   ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
   
   # Output image:
-  # image_disk_format = "qcow2"
+  image_disk_format = var.use_blockstorage_volume ? "qcow2" : null
   image_visibility = var.image_visibility
   
 }
