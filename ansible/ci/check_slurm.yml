@@ -6,19 +6,9 @@
       shell: 'sinfo --noheader --format="%N %P %a %l %D %t" | sort' # using --format ensures we control whitespace: Partition,partition_state,max_jobtime,num_nodes,node_state,node_name
       register: sinfo
       changed_when: false
-      until: not ("boot" in sinfo.stdout or "idle*" in sinfo.stdout or "down" in sinfo.stdout)
+      until: sinfo.stdout_lines == expected_sinfo
       retries: 10
       delay: 5
-    - name: Check nodes have expected slurm state
-      assert:
-        that: sinfo.stdout_lines == expected_sinfo
-        fail_msg: |
-          sinfo output not as expected:
-          actual:
-          {{ sinfo.stdout_lines }}
-          expected:
-          {{ expected_sinfo }}
-          <end>
       vars:
         expected_sinfo:
           - " extra up 60-00:00:00 0 n/a" # empty partition
