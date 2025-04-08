@@ -1,0 +1,19 @@
+---
+weka_configurations:
+  - comment: Mount WEKA file system as /scratch
+    weka_enable:
+        clients: "{{ inventory_hostname in groups['weka_clients'] }}"
+    weka_servers:
+      - "172.16.104.1"
+      - "172.16.104.2"
+      - "172.16.104.3"
+      - "172.16.104.4"
+      - "172.16.104.5"
+      - "172.16.104.6"
+      - "172.16.104.7"
+      - "172.16.104.8"
+      - "172.16.104.9"
+      - "172.16.104.10"
+    weka_export: "/scratch_fs"
+    weka_client_mnt_point: "/scratch"
+    weka_client_mnt_options: 'num_cores=4,net=ib0,x-systemd.requires=weka-agent.service,x-systemd.mount-timeout=240,_netdev'

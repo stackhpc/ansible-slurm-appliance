@@ -127,3 +127,9 @@ builder
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
 builder
+
+[weka:children]
+openhpc
+
+[weka_clients:children]
+compute
