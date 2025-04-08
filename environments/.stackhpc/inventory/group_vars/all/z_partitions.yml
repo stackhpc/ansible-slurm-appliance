@@ -1,0 +1,18 @@
+# override tofu-generated file:
+openhpc_slurm_partitions:
+    - name: extra
+    - name: standard
+    - name: rebuild
+      groups:
+      - name: extra
+      - name: standard
+      default: NO
+      maxtime: 30
+      partition_params:
+       PriorityJobFactor: 65533
+       Hidden: YES
+       RootOnly: YES
+       DisableRootJobs: NO
+       PreemptMode: 'OFF'
+       OverSubscribe: EXCLUSIVE
+

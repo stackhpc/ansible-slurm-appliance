@@ -173,11 +173,11 @@ jobs:
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Reimage compute nodes to image in current branch using slurm - tests compute-init
+      - name: Reimage compute nodes to image in current branch using slurm
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -v ansible/adhoc/reboot_via_slurm.yml
+          ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Check sacct state survived reimage to current branch

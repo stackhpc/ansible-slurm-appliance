@@ -130,3 +130,22 @@ and referenced from the `site` and `production` environments, e.g.:
 
 - See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
   raising `hpctests_hpl_mem_frac` during tests.
+
+- By default, OpenTofu (and Terraform) [limits](https://opentofu.org/docs/cli/commands/apply/#apply-options)
+  the number of concurrent operations to 10. This means that for example only
+  10 ports or 10 instances can be deployed at once. This should be raised by
+  modifying `environments/$ENV/activate` to add a line like:
+
+      export TF_CLI_ARGS_apply="-parallelism=25"
+
+  The value chosen should be the highest value demonstrated during testing.
+  Note that any time spent blocked due to this parallelism limit does not count
+  against the (un-overridable) internal OpenTofu timeout of 30 minutes
+
+- By default, OpenStack Nova also [limits](https://docs.openstack.org/nova/latest/configuration/config.html#DEFAULT.max_concurrent_builds)
+  the number of concurrent instance builds to 10. This is per Nova controller,
+  so 10x virtual machines per hypervisor. For baremetal nodes it is 10 per cloud
+  if the OpenStack version is earlier than Caracel, else this limit can be
+  raised using [shards](https://specs.openstack.org/openstack/nova-specs/specs/2024.1/implemented/ironic-shards.html).
+  In general it should be possible to raise this value to 50-100 if the cloud
+  is properly tuned, again, demonstrated through testing.
