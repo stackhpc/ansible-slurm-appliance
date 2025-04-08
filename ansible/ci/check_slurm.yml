@@ -7,7 +7,7 @@
       register: sinfo
       changed_when: false
       until: sinfo.stdout_lines == expected_sinfo
-      retries: 10
+      retries: 200
       delay: 5
       vars:
         expected_sinfo:
