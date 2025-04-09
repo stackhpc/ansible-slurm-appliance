@@ -13,6 +13,10 @@ module "cluster" {
         subnet = "slurm-staging"
       }
     ]
+    vnic_types = {
+      "slurm-staging" = "direct"
+      "external-ceph" = "direct"
+    }
 
     environment_root = var.environment_root
 }
