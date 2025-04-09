@@ -62,12 +62,6 @@
         group: root
         mode: u=rX,g=rwX,o=
 
-    - name: Wait for NFS to reachable (checks host network up)
-      ansible.builtin.wait_for:
-        port: 2049
-        host: '{{ server_node_ip }}'
-        timeout: 120
-
     - name: Mount /mnt/cluster
       mount:
         path: /mnt/cluster
@@ -76,6 +70,9 @@
         opts: ro,sync
         state: mounted
       register: _mount_mnt_cluster
+      ignore_errors: true
+      # exits from playbook if this failed below, allowing ansible-init to
+      # finish, which allows site.yml to continue on initial deploy
 
     - block:
         - name: Report skipping initialization if cannot mount nfs
