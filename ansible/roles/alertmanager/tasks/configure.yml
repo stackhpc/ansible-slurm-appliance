@@ -1,0 +1,40 @@
+- name: Create alertmanager directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ alertmanager_system_user }}"
+    group: "{{ alertmanager_system_group }}"
+    mode: u=rwX,go=rX
+  loop:
+    - "{{ alertmanager_config_path | dirname }}"
+    - "{{ alertmanager_storage_dir }}"
+
+# TODO: selinux?
+
+- name: Create alertmanager service file with immutable options
+  template:
+    src: alertmanager.service.j2
+    dest: /usr/lib/systemd/system/alertmanager.service
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: _alertmanager_service
+  notify: Restart alertmanager
+  # TODO: how do we cope with the binary changing?
+
+- name: Template alertmanager config
+  ansible.builtin.template:
+    src: "{{ alertmanager_config_template }}"
+    dest: "{{ alertmanager_config_path }}"
+    owner: "{{ alertmanager_system_user }}"
+    group: "{{ alertmanager_system_group }}"
+    mode: u=rw,go=r # TODO: check there are no sensitive things in here!
+  notify: Restart alertmanager
+
+- meta: flush_handlers
+
+- name: Ensure alertmanager service state
+  systemd:
+    name: alertmanager
+    state: "{{ 'started' if alertmanager_started | bool else 'stopped' }}"
+    enabled: "{{ alertmanager_enabled | bool }}"

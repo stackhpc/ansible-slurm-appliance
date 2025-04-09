@@ -1,0 +1,11 @@
+alertmanager_slack_receiver:
+  name: slack-receiver
+  slack_configs:
+    - channel: "{{ alertmanager_slack_integration.channel | default('none') }}"
+      api_url: https://slack.com/api/chat.postMessage
+      http_config:
+        authorization:
+          credentials: "{{ alertmanager_slack_integration.app_creds | default('none') }}"
+      text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
+      title_link: "http://{{ prometheus_address }}:9090/alertmanager/#/alerts?receiver=slack-receiver"
+      send_resolved: true

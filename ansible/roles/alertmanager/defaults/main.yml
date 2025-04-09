@@ -1,0 +1,45 @@
+alertmanager_version: '0.28.1'
+alertmanager_download_checksum: 'sha256:5ac7ab5e4b8ee5ce4d8fb0988f9cb275efcc3f181b4b408179fafee121693311'
+alertmanager_download_dest: /tmp/alertmanager.tar.gz
+alertmanager_binary_dir: /usr/local/bin
+alertmanager_started: true
+alertmanager_enabled: true
+
+alertmanager_system_user: alertmanager
+alertmanager_system_group: alertmanager
+alertmanager_config_path: /etc/alertmanager/alertmanager.yml
+alertmanager_storage_dir: /var/lib/alertmanager
+alertmanager_web_listen_addresses:
+  - ':9100'
+alertmanager_web_external_url: http://localhost:9093/
+alertmanager_config_flags: {}
+# TODO: data retention?
+alertmanager_config_template: alertmanager.yml.j2
+
+
+# everything below here is interpolated into alertmanager_config_default:
+
+# Uncomment below and add Slack bot app creds for Slack integration
+# alertmanager_slack_integration:
+#   channel: '#alerts'
+#   app_creds:
+
+
+alertmanager_default_receivers:
+  - name: 'null'
+
+alertmanager_slack_receiver: {} # really defined in common as it needs prometheus_address
+
+alertmanager_extra_receivers: "{{ [alertmanager_slack_receiver] if alertmanager_slack_integration is defined else [] }}"
+
+alertmanager_config_default:
+  route:
+    group_by: ['...']
+    receiver: "{{ 'slack-receiver' if alertmanager_slack_integration is defined else 'null' }}"
+  receivers: "{{ alertmanager_default_receivers  + alertmanager_extra_receivers }}"
+
+alertmanager_config_extra: {} # top-level only
+
+
+# TODO: routes??
+# TODO: see PR with additional alerts
