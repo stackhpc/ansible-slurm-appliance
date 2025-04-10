@@ -22,10 +22,9 @@ prometheus_alert_rules_files: "{{ ansible_inventory_sources | product([prometheu
 
 prometheus_alert_rules: []
 
-# Can set a hostvar 'env' to an arbitrary string to group prometheus targets, e.g. rack.
-# env: location-1
+# Can set a hostvar 'prometheus_env' to an arbitrary string to group prometheus targets, e.g. by rack.
 prometheus_targets:
-  node: "{{ groups.get('node_exporter', []) | reject('equalto', 'localhost') | prometheus_node_exporter_targets(env | default('ungrouped')) }}"
+  node: "{{ groups.get('node_exporter', []) | prometheus_node_exporter_targets(hostvars, 'prometheus_env') }}"
 
 prometheus_scrape_configs_default:
 - job_name: "prometheus"
@@ -40,7 +39,7 @@ prometheus_scrape_configs_default:
 - job_name: "node"
   file_sd_configs:
   - files:
-    - "/etc/prometheus/file_sd/node.yml"
+    - /etc/prometheus/file_sd/node.yml
   relabel_configs:
   # strip off port
   - source_labels: ['__address__']

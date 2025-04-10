@@ -11,11 +11,12 @@ from ansible.module_utils.six import string_types
 import os.path
 import re
 
-def prometheus_node_exporter_targets(hosts, env):
+def prometheus_node_exporter_targets(hosts, hostvars, env_key):
     result = []
     per_env = defaultdict(list)
     for host in hosts:
-        per_env[env].append(host)
+        host_env = hostvars[host].get(env_key, 'ungrouped')
+        per_env[host_env].append(host)
     for env, hosts in per_env.items():
         target = {
             "targets": ["{target}:9100".format(target=target) for target in hosts],
