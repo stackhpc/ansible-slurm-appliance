@@ -9,10 +9,16 @@ prometheus_storage_retention: "31d"
 prometheus_storage_retention_size: "100GB"
 prometheus_db_dir: "{{ appliances_state_dir | default('/var/lib') }}/prometheus"
 
-prometheus_alertmanager_config: []
+prometheus_alertmanager_config_default:
+    - static_configs:
+      - targets:
+        - "{{ alertmanager_address }}:{{ alertmanager_port }}"
+prometheus_alertmanager_config: "{{ prometheus_alertmanager_config_default if groups['alertmanager'] else {} }}"
 
-prometheus_alert_rules_files:
-- "{{ appliances_repository_root }}/environments/common/files/prometheus/rules/*.rules"
+# by default, use rule files from the following path relative to current and all parent environment inventory directories:
+prometheus_alert_rules_files_inventory_glob: ../files/prometheus/rules/*.rules
+prometheus_alert_rules_files: "{{ ansible_inventory_sources | product([prometheus_alert_rules_files_inventory_glob]) | map('join', '/') | map('realpath') }}"
+# TODO: find a way to include/exclude files?
 
 prometheus_alert_rules: []
 

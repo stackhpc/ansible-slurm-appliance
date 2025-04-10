@@ -16,8 +16,10 @@ Group={{ alertmanager_system_group }}
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart={{ alertmanager_binary_dir }}/alertmanager \
   --cluster.listen-address='' \
-  --config.file={{ alertmanager_config_path }} \
-  --storage.path={{ alertmanager_storage_dir }} \
+  --config.file={{ alertmanager_config_file }} \
+  --storage.path={{ alertmanager_storage_path }} \
+  --data.retention={{ alertmanager_data_retention }} \
+  --data.maintenance-interval={{ alertmanager_data_maintenance_interval }} \
 {% for address in alertmanager_web_listen_addresses %}
   --web.listen-address={{ address }} \
 {% endfor %}
@@ -36,7 +38,7 @@ NoNewPrivileges=true
 MemoryDenyWriteExecute=true
 PrivateTmp=true
 ProtectHome=true
-ReadWriteDirectories={{ alertmanager_storage_dir }}
+ReadWriteDirectories={{ alertmanager_storage_path }}
 RemoveIPC=true
 RestrictSUIDSGID=true
 

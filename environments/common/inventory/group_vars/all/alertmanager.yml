@@ -1,4 +1,7 @@
-alertmanager_slack_receiver:
+
+alertmanager_port: '9093' # defined here as required for prometheus
+
+alertmanager_slack_receiver: # defined here as needs prometheus address
   name: slack-receiver
   slack_configs:
     - channel: "{{ alertmanager_slack_integration.channel | default('none') }}"

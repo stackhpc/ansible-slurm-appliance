@@ -7,12 +7,18 @@ alertmanager_enabled: true
 
 alertmanager_system_user: alertmanager
 alertmanager_system_group: alertmanager
-alertmanager_config_path: /etc/alertmanager/alertmanager.yml
-alertmanager_storage_dir: /var/lib/alertmanager
-alertmanager_web_listen_addresses:
-  - ':9100'
-alertmanager_web_external_url: http://localhost:9093/
-alertmanager_config_flags: {}
+alertmanager_config_file: /etc/alertmanager/alertmanager.yml # --config.file: Alertmanager configuration file name
+alertmanager_storage_path: /var/lib/alertmanager # --storage.path: Base path for data storage
+
+alertmanager_port: '9093'
+alertmanager_web_listen_addresses: # elements of --web.listen-address
+  - ":{{ alertmanager_port }}"
+alertmanager_web_external_url: "http://localhost:{{ alertmanager_port}}/" # --web.external-url: The URL under which Alertmanager is externally reachable (for example, if Alertmanager is served via a reverse proxy). Used for generating relative and absolute links back to Alertmanager itself. If the URL has a path portion, it will be used to prefix all HTTP endpoints served by Alertmanager. If omitted, relevant URL components will be derived automatically
+# TODO: work out how we proxy this through ondemand
+
+alertmanager_data_retention: '120h' # --data.retention # How long to keep data for
+alertmanager_data_maintenance_interval: '15m' # --data.maintenance-interval: Interval between garbage collection and snapshotting to disk of the silences and the notification logs
+alertmanager_config_flags: {} # other command-line parameters as shown by `man alertmanager`
 # TODO: data retention?
 alertmanager_config_template: alertmanager.yml.j2
 
@@ -28,7 +34,7 @@ alertmanager_config_template: alertmanager.yml.j2
 alertmanager_default_receivers:
   - name: 'null'
 
-alertmanager_slack_receiver: {} # really defined in common as it needs prometheus_address
+alertmanager_slack_receiver: {} # defined in common env as it needs prometheus_address
 
 alertmanager_extra_receivers: "{{ [alertmanager_slack_receiver] if alertmanager_slack_integration is defined else [] }}"
 

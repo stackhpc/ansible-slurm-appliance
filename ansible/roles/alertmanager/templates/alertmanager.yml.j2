@@ -1,4 +1,4 @@
 {{ ansible_managed | comment }}
 
-{{ alertmanager_config_default }}
-{{ alertmanager_config_extra }}
+{{ alertmanager_config_default | to_nice_yaml }}
+{{ alertmanager_config_extra | to_nice_yaml if alertmanager_config_extra | length > 0 else '' }}

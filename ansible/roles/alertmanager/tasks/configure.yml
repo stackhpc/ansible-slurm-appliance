@@ -6,8 +6,8 @@
     group: "{{ alertmanager_system_group }}"
     mode: u=rwX,go=rX
   loop:
-    - "{{ alertmanager_config_path | dirname }}"
-    - "{{ alertmanager_storage_dir }}"
+    - "{{ alertmanager_config_file | dirname }}"
+    - "{{ alertmanager_storage_path }}"
 
 # TODO: selinux?
 
@@ -25,7 +25,7 @@
 - name: Template alertmanager config
   ansible.builtin.template:
     src: "{{ alertmanager_config_template }}"
-    dest: "{{ alertmanager_config_path }}"
+    dest: "{{ alertmanager_config_file }}"
     owner: "{{ alertmanager_system_user }}"
     group: "{{ alertmanager_system_group }}"
     mode: u=rw,go=r # TODO: check there are no sensitive things in here!
