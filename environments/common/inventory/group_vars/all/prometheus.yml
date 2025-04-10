@@ -27,6 +27,9 @@ prometheus_targets:
   control: "{{ groups.get('node_exporter', []) | intersect(groups['control']) | prometheus_node_exporter_targets(hostvars, 'prometheus_env', 'control') }}"
   login: "{{ groups.get('node_exporter', []) | intersect(groups['login']) | prometheus_node_exporter_targets(hostvars, 'prometheus_env', 'login') }}"
   compute: "{{ groups.get('node_exporter', []) | intersect(groups['compute']) | prometheus_node_exporter_targets(hostvars, 'prometheus_env', 'compute') }}"
+  # openhpc is defined as control+login+compute so this gets anything else:
+  other: "{{ groups.get('node_exporter', []) | difference(groups['openhpc']) | prometheus_node_exporter_targets(hostvars, 'prometheus_env', 'other') }}"
+  # TODO: check empty list gets coped with correctly!
 
 prometheus_scrape_configs_default:
 - job_name: "prometheus"
@@ -44,6 +47,7 @@ prometheus_scrape_configs_default:
     - /etc/prometheus/file_sd/control.yml
     - /etc/prometheus/file_sd/login.yml
     - /etc/prometheus/file_sd/compute.yml
+    - /etc/prometheus/file_sd/other.yml
   relabel_configs:
   # strip off port
   - source_labels: ['__address__']

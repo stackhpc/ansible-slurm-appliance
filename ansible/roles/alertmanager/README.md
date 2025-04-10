@@ -1,28 +1,90 @@
 # alertmanager
 
+Deploy [alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/)
+to route Prometheus alerts to a receiver. Currently Slack is the only supported
+receiver.
 
-notes:
-- HA is not supported
-- state ("notification state and configured silences") is not preserved across rebuild
-- not used for caas
-- no dashboard
+Note that:
+- HA configuration is not supported
+- Alertmanager state is not preserved when the node it runs on (by default,
+  control node) is reimaged, so any alerts silenced via the GUI will reoccur.
+- No Grafana dashboard for alerts is currently provided.
 
+- not used for caas - todo - maybe we should disable by default, unless everyone has slack?
+- have fixed bug with `env` hostvar for prom, now called `prometheus_env`
+- have added label "group" to prom for control,compute,login
 
+Alertmanager is enabled by default on the `control` node in the
+[everything](../../../environments/common/layouts/everything) template which
+`cookiecutter` uses for a new environment's `inventory/groups` file.
+
+In general usage may only require:
+- Adding the `control` node into the `alertmanager` group in `environments/site/groups`
+  if upgrading an existing environment.
+- Enabling the Slack integration (see below).
 
 ## Role variables
+
+All variables are optional. See [defaults/main.yml](defaults/main.yml) for
+all default values.
+
+General variables:
+- `alertmanager_version`: String, version (no leading 'v')
+- `alertmanager_download_checksum`: String, checksum for relevant version from
+  [prometheus.io download page](https://prometheus.io/download/), in format
+  `type:value`.
+- `alertmanager_download_dest`: String, path of temporary directory used for
+  download. Must exist.
+- `alertmanager_binary_dir`: String, path of directory to install alertmanager
+  binary to. Must exist.
+- `alertmanager_started`: Bool, whether the alertmanager service should be started.
+- `alertmanager_enabled`: Bool, whether the alertmanager service should be enabled.
+- `alertmanager_system_user`: String, name of user to run alertmanager as. Will be created.
+- `alertmanager_system_group`: String, name of group of alertmanager user.
+- `alertmanager_port`: Port to listen on.
 
 The following variables are equivalent to similarly-named arguments to the
 `alertmanager` binary. See `man alertmanager` for more info:
 
-- TODO:
+- `alertmanager_config_file`: String, path alertmanager config file will be
+  written to. Parent directory will be created if necessary. 
+- `alertmanager_storage_path`: String, base path for data storage.
+- `alertmanager_web_listen_addresses`: List of strings, defining addresses to listeen on.
+- `alertmanager_web_external_url`: String, the URL under which Alertmanager is
+   externally reachable. See man page for more details if proxying alertmanager.
+- `alertmanager_data_retention`: String, how long to keep data for
+- `alertmanager_data_maintenance_interval`: String, interval between garbage
+  collection and snapshotting to disk of the silences and the notification logs.
+- `alertmanager_config_flags`: Mapping. Keys/values in here are written to the
+  alertmanager commandline as `--{{ key }}={{ value }}`.
+- `alertmanager_default_receivers`:
 
-The following variables are templated into the alertmanager configuration file:
-
-- TODO:
-
-Other variables:
-- TODO:
-
+The following variables are templated into the [alertmanager configuration](https://prometheus.io/docs/alerting/latest/configuration/):
+- `alertmanager_config_template`: String, path to configuration template. The default
+  is to template in `alertmanager_config_default` and `alertmanager_config_extra`.
+- `alertmanager_config_default`: Mapping with default configuration for the
+  top-level `route` and `receivers` keys. The default is to send all alerts to
+  the Slack receiver, if that has been enabled (see below).
+- `alertmanager_receivers`: A list of [receiver](https://prometheus.io/docs/alerting/)
+  mappings to define under the top-level `receivers` configuration key. This
+  will contain the Slack receiver if that has been enabled (see below).
+- `alertmanager_extra_receivers`: A list of additional [receiver](https://prometheus.io/docs/alerting/),
+  mappings to add, by default empty.
+- `alertmanager_slack_receiver`: Mapping defining the [Slack receiver](https://prometheus.io/docs/alerting/latest/configuration/#slack_config). Note the default configuration for this is in
+`environments/common/inventory/group_vars/all/alertmanager.yml`.
+- `alertmanager_null_receiver`:  Mapping defining a `null` [receiver](https://prometheus.io/docs/alerting/latest/configuration/#receiver) so a receiver is always defined.
+- `alertmanager_config_extra`: Mapping with additional configuration. Keys in
+  this become top-level keys in the configuration. E.g this might be:
+    ```yaml
+    alertmanager_config_extra:
+    global:
+        smtp_from: smtp.example.org:587
+    time_intervals:
+    - name: monday-to-friday
+        time_intervals:
+        - weekdays: ['monday:friday']
+    ```
+  Note that `route` and `receivers` keys should not be added here.
 
 ## TODO
 
@@ -54,21 +116,42 @@ Swap:             0B          0B          0B
 
 2. Add the bot token into the config and enable Slurm integration
 
-- Open `environments/site/inventory/group_vars/all/vault_alertmanager.yml`
+- Open `environments/$ENV/inventory/group_vars/all/vault_alertmanager.yml`
 - Uncomment `vault_alertmanager_slack_integration_app_creds` and add the token
 - Vault-encrypt that file:
 
-    ansible-vault encrypt environments/$ENV/inventory/group_vars/all/vault_alertmanager.yml
+        ansible-vault encrypt environments/$ENV/inventory/group_vars/all/vault_alertmanager.yml
 
-- Open `environments/site/inventory/group_vars/all/alertmanager.yml`
-- Uncomment the config and set your alert channel name
+- Open `environments/$ENV/inventory/group_vars/all/alertmanager.yml`
+- Uncomment the `alertmanager_slack_integration` mapping and set your alert channel name
 
 3. Invite the bot to your alerts channel
 - In the appropriate Slack channel type:
 
-    /invite @YOUR_BOT_NAME
+        /invite @YOUR_BOT_NAME
 
 
-## Adding Rules
+## Alert Rules
 
-TODO: describe how prom config works
+These are part of [Prometheus configuration](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/), defined in the appliance at
+[environments/common/inventory/group_vars/all/prometheus.yml](../../../environments/common/inventory/group_vars/all/prometheus.yml).
+
+A fairly-minimal set of default alert rule files is provided at
+`environments/common/files/prometheus/rules/`. Because compute nodes are expected
+to operate with heavy CPU and memory load, no alerting on those parameters is
+defined for those nodes.
+
+By default `prometheus_alert_rules_files` is set such that any `*.rules` files
+in a directory `files/prometheus/rules` in the current environment or *any*
+parent environment are loaded. So usually, site-specific alerts should be added
+by creating additional rules files in `environments/site/files/prometheus/rules`.
+
+Note that the Prometheus targets are defined such that each node will have labels:
+    - `env`: `ungrouped`, by default, unless a group/host var `prometheus_env` is set
+    - `group`: One of `login`, `control`, `compute` or `other`
+These may be used to limit alerts to specific sets of nodes.
+
+Some ideas for future alerts which could be useful:
+- smartctl-exporter-based rules for baremetal nodes where the is no
+  infrastructure-level smart monitoring
+- loss of "up" network interfaces

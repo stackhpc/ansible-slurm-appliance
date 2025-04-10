@@ -6,15 +6,14 @@ alertmanager_started: true
 alertmanager_enabled: true
 
 alertmanager_system_user: alertmanager
-alertmanager_system_group: alertmanager
+alertmanager_system_group: "{{ alertmanager_system_user }}"
 alertmanager_config_file: /etc/alertmanager/alertmanager.yml # --config.file: Alertmanager configuration file name
 alertmanager_storage_path: /var/lib/alertmanager # --storage.path: Base path for data storage
 
 alertmanager_port: '9093'
-alertmanager_web_listen_addresses: # elements of --web.listen-address
+alertmanager_web_listen_addresses:
   - ":{{ alertmanager_port }}"
-alertmanager_web_external_url: "http://localhost:{{ alertmanager_port}}/" # --web.external-url: The URL under which Alertmanager is externally reachable (for example, if Alertmanager is served via a reverse proxy). Used for generating relative and absolute links back to Alertmanager itself. If the URL has a path portion, it will be used to prefix all HTTP endpoints served by Alertmanager. If omitted, relevant URL components will be derived automatically
-# TODO: work out how we proxy this through ondemand
+alertmanager_web_external_url: "http://localhost:{{ alertmanager_port}}/" # TODO: is this right??
 
 alertmanager_data_retention: '120h' # --data.retention # How long to keep data for
 alertmanager_data_maintenance_interval: '15m' # --data.maintenance-interval: Interval between garbage collection and snapshotting to disk of the silences and the notification logs
@@ -30,19 +29,18 @@ alertmanager_config_template: alertmanager.yml.j2
 #   channel: '#alerts'
 #   app_creds:
 
-
-alertmanager_default_receivers:
-  - name: 'null'
-
+alertmanager_null_receiver:
+  name: 'null'
 alertmanager_slack_receiver: {} # defined in common env as it needs prometheus_address
-
-alertmanager_extra_receivers: "{{ [alertmanager_slack_receiver] if alertmanager_slack_integration is defined else [] }}"
+alertmanager_extra_receivers: []
+alertmanager_default_receivers: "{{ [alertmanager_null_receiver] + ([alertmanager_slack_receiver] if alertmanager_slack_integration is defined else []) }}"
+alertmanager_receivers: "{{ alertmanager_default_receivers  + alertmanager_extra_receivers }}"
 
 alertmanager_config_default:
   route:
     group_by: ['...']
     receiver: "{{ 'slack-receiver' if alertmanager_slack_integration is defined else 'null' }}"
-  receivers: "{{ alertmanager_default_receivers  + alertmanager_extra_receivers }}"
+  receivers: "{{ alertmanager_receivers }}"
 
 alertmanager_config_extra: {} # top-level only
 
