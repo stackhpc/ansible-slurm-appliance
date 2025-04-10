@@ -176,6 +176,7 @@ variable "nonlogin_security_groups" {
     description = "Name of preexisting security groups to apply to non-login nodes"
     default = [
         "default",  # allow all in-cluster services
+        "SSH",      # access via ssh
     ]
 }
 
