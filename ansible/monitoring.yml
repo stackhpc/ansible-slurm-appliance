@@ -93,11 +93,6 @@
   become: yes
   gather_facts: false
   tasks:
-    # TODO: move elsewhere, still needs become
-    - name: Install alertmanager
-      include_role:
-        name: alertmanager
-        tasks_from: install.yml
     - name: Configure alertmanager
       include_role:
         name: alertmanager

@@ -178,6 +178,11 @@
         slurm_exporter_state: stopped
       when: "'slurm_exporter' in group_names"
 
+    - name: Install alertmanager
+      include_role:
+        name: alertmanager
+        tasks_from: install.yml
+
 - hosts: prometheus
   become: yes
   gather_facts: yes
