@@ -11,7 +11,15 @@ from ansible.module_utils.six import string_types
 import os.path
 import re
 
-def prometheus_node_exporter_targets(hosts, hostvars, env_key):
+def prometheus_node_exporter_targets(hosts, hostvars, env_key, group):
+    """ Return a mapping in cloudalchemy.nodeexporter prometheus_targets
+        format.
+
+        hosts: list of inventory_hostnames
+        hostvars: Ansible hostvars variable
+        env_key: key to lookup in each host's hostvars to add as label 'env' (default: 'ungrouped')
+        group: string to add as label 'group'
+    """
     result = []
     per_env = defaultdict(list)
     for host in hosts:
@@ -19,9 +27,10 @@ def prometheus_node_exporter_targets(hosts, hostvars, env_key):
         per_env[host_env].append(host)
     for env, hosts in per_env.items():
         target = {
-            "targets": ["{target}:9100".format(target=target) for target in hosts],
+            "targets": [f"{target}:9100" for target in hosts],
             "labels": {
-                "env": env
+                'env': env,
+                'group': group
             }
         }
         result.append(target)
