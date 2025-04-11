@@ -1,4 +1,6 @@
-# Mostly derived from https://samber.github.io/awesome-prometheus-alerts/rules#host-and-hardware
+# Mostly taken from https://samber.github.io/awesome-prometheus-alerts/rules#host-and-hardware
+# If modified, this is noted in a comment.
+# 
 # In general have ignored lack of resources (memory, cpu) on compute nodes as
 # this is expected, and ignored things which will be hard to threshold due to
 # the nature of a Slurm cluster.
@@ -7,11 +9,11 @@ groups:
 - name: node-exporter
   rules:
 
-  # Modified: only on login/control nodes
+  # Modified: ignore compute nodes
   - alert: HostOutOfMemory
     expr: (
-      node_memory_MemAvailable_bytes{group=~"login|control"} / 
-      node_memory_MemTotal_bytes{group=~"login|control"}
+      node_memory_MemAvailable_bytes{group!~"compute"} / 
+      node_memory_MemTotal_bytes{group!~"compute"}
       < .10
       )
     for: 2m
@@ -88,9 +90,9 @@ groups:
       summary: Host software RAID disk failure (instance {{ $labels.instance }})
       description: "MD RAID array {{ $labels.device }} on {{ $labels.instance }} needs attention.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-  # Modified: only on login/control nodes
+  # Modified: ignore compute nodes
   - alert: HostOomKillDetected
-    expr: (increase(node_vmstat_oom_kill{group=~"login|control"}[1m]) > 0)
+    expr: (increase(node_vmstat_oom_kill{group!~"compute"}[1m]) > 0)
     for: 0m
     labels:
       severity: warning
