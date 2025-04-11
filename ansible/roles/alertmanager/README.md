@@ -54,7 +54,8 @@ The following variables are equivalent to similarly-named arguments to the
 - `alertmanager_storage_path`: String, base path for data storage.
 - `alertmanager_web_listen_addresses`: List of strings, defining addresses to listeen on.
 - `alertmanager_web_external_url`: String, the URL under which Alertmanager is
-   externally reachable. See man page for more details if proxying alertmanager.
+   externally reachable - defaults to host IP address and `alertmanager_port`.
+   See man page for more details if proxying alertmanager.
 - `alertmanager_data_retention`: String, how long to keep data for
 - `alertmanager_data_maintenance_interval`: String, interval between garbage
   collection and snapshotting to disk of the silences and the notification logs.

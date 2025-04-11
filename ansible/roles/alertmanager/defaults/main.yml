@@ -7,13 +7,13 @@ alertmanager_enabled: true
 
 alertmanager_system_user: alertmanager
 alertmanager_system_group: "{{ alertmanager_system_user }}"
-alertmanager_config_file: /etc/alertmanager/alertmanager.yml # --config.file: Alertmanager configuration file name
-alertmanager_storage_path: /var/lib/alertmanager # --storage.path: Base path for data storage
+alertmanager_config_file: /etc/alertmanager/alertmanager.yml
+alertmanager_storage_path: /var/lib/alertmanager
 
 alertmanager_port: '9093'
 alertmanager_web_listen_addresses:
   - ":{{ alertmanager_port }}"
-alertmanager_web_external_url: "http://localhost:{{ alertmanager_port}}/" # TODO: is this right??
+alertmanager_web_external_url: "http://{{ hostvars[groups['alertmanager'].0].ansible_host }}:{{ alertmanager_port}}/"
 
 alertmanager_data_retention: '120h'
 alertmanager_data_maintenance_interval: '15m'
@@ -29,7 +29,7 @@ alertmanager_config_template: alertmanager.yml.j2
 
 alertmanager_null_receiver:
   name: 'null'
-alertmanager_slack_receiver: {} # defined in common env as it needs prometheus_address
+alertmanager_slack_receiver: {} # defined in environments/common/inventory/group_vars/all/alertmanager.yml as it needs prometheus_address
 alertmanager_extra_receivers: []
 alertmanager_default_receivers: "{{ [alertmanager_null_receiver] + ([alertmanager_slack_receiver] if alertmanager_slack_integration is defined else []) }}"
 alertmanager_receivers: "{{ alertmanager_default_receivers  + alertmanager_extra_receivers }}"
