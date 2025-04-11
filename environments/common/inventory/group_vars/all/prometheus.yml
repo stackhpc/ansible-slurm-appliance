@@ -15,10 +15,10 @@ prometheus_alertmanager_config_default:
         - "{{ alertmanager_address }}:{{ alertmanager_port }}"
 prometheus_alertmanager_config: "{{ prometheus_alertmanager_config_default if groups['alertmanager'] else {} }}"
 
-# by default, use rule files from the following path relative to current and all parent environment inventory directories:
+# By default, find rule files from the following path relative to current and all parent environment inventory directories:
+# Note: If the same file exists in parent and child environments, only the file in the latter has any effect.
 prometheus_alert_rules_files_inventory_glob: ../files/prometheus/rules/*.rules
 prometheus_alert_rules_files: "{{ ansible_inventory_sources | product([prometheus_alert_rules_files_inventory_glob]) | map('join', '/') | map('realpath') }}"
-# TODO: find a way to include/exclude files?
 
 prometheus_alert_rules: []
 

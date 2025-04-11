@@ -24,6 +24,8 @@ In general usage may only require:
 - Enabling the Slack integration (see section below).
 - Possibly setting `alertmanager_web_external_url`.
 
+TODO: explain where alertmanager web GUI is
+
 ## Role variables
 
 All variables are optional. See [defaults/main.yml](defaults/main.yml) for
@@ -156,3 +158,7 @@ Some ideas for future alerts which could be useful:
 - smartctl-exporter-based rules for baremetal nodes where the is no
   infrastructure-level smart monitoring
 - loss of "up" network interfaces
+
+
+TODO: suggest awesome alerts
+TODO: note that child env rule files override parent envs
