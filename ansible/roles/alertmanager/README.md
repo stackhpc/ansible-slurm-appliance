@@ -21,7 +21,8 @@ Alertmanager is enabled by default on the `control` node in the
 In general usage may only require:
 - Adding the `control` node into the `alertmanager` group in `environments/site/groups`
   if upgrading an existing environment.
-- Enabling the Slack integration (see below).
+- Enabling the Slack integration (see section below).
+- Possibly setting `alertmanager_web_external_url`.
 
 ## Role variables
 

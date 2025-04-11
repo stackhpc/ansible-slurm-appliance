@@ -9,8 +9,6 @@
     - "{{ alertmanager_config_file | dirname }}"
     - "{{ alertmanager_storage_path }}"
 
-# TODO: selinux?
-
 - name: Create alertmanager service file with immutable options
   template:
     src: alertmanager.service.j2
@@ -20,7 +18,7 @@
     mode: u=rw,go=r
   register: _alertmanager_service
   notify: Restart alertmanager
-  # TODO: how do we cope with the binary changing?
+
 
 - name: Template alertmanager config
   ansible.builtin.template:

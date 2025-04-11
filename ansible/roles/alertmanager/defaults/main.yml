@@ -15,12 +15,10 @@ alertmanager_web_listen_addresses:
   - ":{{ alertmanager_port }}"
 alertmanager_web_external_url: "http://localhost:{{ alertmanager_port}}/" # TODO: is this right??
 
-alertmanager_data_retention: '120h' # --data.retention # How long to keep data for
-alertmanager_data_maintenance_interval: '15m' # --data.maintenance-interval: Interval between garbage collection and snapshotting to disk of the silences and the notification logs
+alertmanager_data_retention: '120h'
+alertmanager_data_maintenance_interval: '15m'
 alertmanager_config_flags: {} # other command-line parameters as shown by `man alertmanager`
-# TODO: data retention?
 alertmanager_config_template: alertmanager.yml.j2
-
 
 # everything below here is interpolated into alertmanager_config_default:
 
@@ -43,7 +41,3 @@ alertmanager_config_default:
   receivers: "{{ alertmanager_receivers }}"
 
 alertmanager_config_extra: {} # top-level only
-
-
-# TODO: routes??
-# TODO: see PR with additional alerts
