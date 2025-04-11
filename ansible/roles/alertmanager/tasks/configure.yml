@@ -26,7 +26,7 @@
     dest: "{{ alertmanager_config_file }}"
     owner: "{{ alertmanager_system_user }}"
     group: "{{ alertmanager_system_group }}"
-    mode: u=rw,go=r # TODO: check there are no sensitive things in here!
+    mode: u=rw,go=
   notify: Restart alertmanager
 
 - meta: flush_handlers
