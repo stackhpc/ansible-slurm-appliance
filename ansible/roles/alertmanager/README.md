@@ -10,10 +10,6 @@ Note that:
   control node) is reimaged, so any alerts silenced via the GUI will reoccur.
 - No Grafana dashboard for alerts is currently provided.
 
-- not used for caas - todo - maybe we should disable by default, unless everyone has slack?
-- have fixed bug with `env` hostvar for prom, now called `prometheus_env`
-- have added label "group" to prom for control,compute,login
-
 Alertmanager is enabled by default on the `control` node in the
 [everything](../../../environments/common/layouts/everything) template which
 `cookiecutter` uses for a new environment's `inventory/groups` file.
@@ -24,7 +20,7 @@ In general usage may only require:
 - Enabling the Slack integration (see section below).
 - Possibly setting `alertmanager_web_external_url`.
 
-TODO: explain where alertmanager web GUI is
+The web UI is available on `alertmanager_web_external_url`.
 
 ## Role variables
 
@@ -89,78 +85,3 @@ The following variables are templated into the [alertmanager configuration](http
         - weekdays: ['monday:friday']
     ```
   Note that `route` and `receivers` keys should not be added here.
-
-## TODO
-
-memory usage looks a bit close:
-
-```
-[root@RL9-control rocky]# free -h
-               total        used        free      shared  buff/cache   available
-Mem:           3.6Gi       2.4Gi       168Mi        11Mi       1.5Gi       1.2Gi
-Swap:             0B          0B          0B
-```
-
-
-
-## Slack Integration
-
-1. Create an app with a bot token:
-
-- Go to https://api.slack.com/apps
-- select "Create an App"
-- select "From scratch"
-- Set app name and workspacef fields, select "Create"
-- Fill out "Short description" and "Background color" fields, select "Save changes"
-- Select "OAuth & Permissions" on left menu
-- Under "Scopes : Bot Token Scopes", select "Add an OAuth Scope", add
-  `chat:write` and select "Save changes"
-- Select "Install App" on left menu, select "Install to your-workspace", select Allow
-- Copy the Bot User OAuth token shown
-
-2. Add the bot token into the config and enable Slurm integration
-
-- Open `environments/$ENV/inventory/group_vars/all/vault_alertmanager.yml`
-- Uncomment `vault_alertmanager_slack_integration_app_creds` and add the token
-- Vault-encrypt that file:
-
-        ansible-vault encrypt environments/$ENV/inventory/group_vars/all/vault_alertmanager.yml
-
-- Open `environments/$ENV/inventory/group_vars/all/alertmanager.yml`
-- Uncomment the `alertmanager_slack_integration` mapping and set your alert channel name
-
-3. Invite the bot to your alerts channel
-- In the appropriate Slack channel type:
-
-        /invite @YOUR_BOT_NAME
-
-TODO: note that `prometheus_web_external_url` might need overriding too.
-
-## Alert Rules
-
-These are part of [Prometheus configuration](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/), defined in the appliance at
-[environments/common/inventory/group_vars/all/prometheus.yml](../../../environments/common/inventory/group_vars/all/prometheus.yml).
-
-A fairly-minimal set of default alert rule files is provided at
-`environments/common/files/prometheus/rules/`. Because compute nodes are expected
-to operate with heavy CPU and memory load, no alerting on those parameters is
-defined for those nodes.
-
-By default `prometheus_alert_rules_files` is set such that any `*.rules` files
-in a directory `files/prometheus/rules` in the current environment or *any*
-parent environment are loaded. So usually, site-specific alerts should be added
-by creating additional rules files in `environments/site/files/prometheus/rules`.
-
-Note that the Prometheus targets are defined such that each node will have labels:
-    - `env`: `ungrouped`, by default, unless a group/host var `prometheus_env` is set
-    - `group`: One of `login`, `control`, `compute` or `other`
-These may be used to limit alerts to specific sets of nodes.
-
-Some ideas for future alerts which could be useful:
-- smartctl-exporter-based rules for baremetal nodes where the is no
-  infrastructure-level smart monitoring
-- loss of "up" network interfaces
-
-
-TODO: suggest awesome alerts
-TODO: note that child env rule files override parent envs

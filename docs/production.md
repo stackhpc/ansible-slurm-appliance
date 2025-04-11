@@ -150,5 +150,4 @@ and referenced from the `site` and `production` environments, e.g.:
   In general it should be possible to raise this value to 50-100 if the cloud
   is properly tuned, again, demonstrated through testing.
 
-- Enable alertmanager following the [role docs](../ansible/roles/alertmanager/README.md)
-  if Slack is available.
+- Enable alertmanager if Slack is available - see [docs/alerting.md](./alerting.md).
