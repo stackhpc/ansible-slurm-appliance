@@ -10,5 +10,5 @@ alertmanager_slack_receiver: # defined here as needs prometheus address
         authorization:
           credentials: "{{ alertmanager_slack_integration.app_creds | default('none') }}"
       text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
-      title_link: "http://{{ prometheus_address }}:9090/alertmanager/#/alerts?receiver=slack-receiver"
+      title_link: "{{ prometheus_web_external_url }}/alerts?receiver=slack-receiver"
       send_resolved: true

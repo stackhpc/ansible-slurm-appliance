@@ -134,6 +134,7 @@ Swap:             0B          0B          0B
 
         /invite @YOUR_BOT_NAME
 
+TODO: note that `prometheus_web_external_url` might need overriding too.
 
 ## Alert Rules
 
