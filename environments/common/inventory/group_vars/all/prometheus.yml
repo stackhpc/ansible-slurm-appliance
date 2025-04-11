@@ -20,7 +20,13 @@ prometheus_alertmanager_config: "{{ prometheus_alertmanager_config_default if gr
 prometheus_alert_rules_files_inventory_glob: ../files/prometheus/rules/*.rules
 prometheus_alert_rules_files: "{{ ansible_inventory_sources | product([prometheus_alert_rules_files_inventory_glob]) | map('join', '/') | map('realpath') }}"
 
-prometheus_alert_rules: []
+prometheus_alert_rules:
+  - alert: SlurmDBDQueueLarge
+    # NB: {{ templates }} in annotations.description are interpolated by prometheus, in expr by ansible
+    annotations:
+      description: '{% raw %}Slurm DBD message queue size {{ $value }} is larger than half Slurm parameter MaxDBDMsgs - check database health{% endraw %}'
+      summary: 'Slurm DBD message queue is large.'
+    expr: "slurm_scheduler_dbd_queue_size > {{ hostvars[groups['control'].0].ansible_local.slurm.MaxDBDMsgs | int }}"
 
 # Can set a hostvar 'prometheus_env' to an arbitrary string to group prometheus targets, e.g. by rack.
 prometheus_targets:

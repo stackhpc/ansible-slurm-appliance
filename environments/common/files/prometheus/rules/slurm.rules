@@ -14,6 +14,3 @@ groups:
       description: '{{ $value }} Slurm nodes are in fail status'
       summary: 'At least one Slurm node is failed.'
     expr: "slurm_nodes_fail > 0\n"
-
-# TODO: alert on slurm_scheduler_dbd_queue_size - see vpenso exporter, man sdiag, and MaxDBDMsgs
-# but node its dynamic
