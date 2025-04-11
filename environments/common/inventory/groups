@@ -37,7 +37,7 @@ mysql
 # Single node to host monitoring dashboards.
 
 [alertmanager]
-# TODO:
+# Single node to host alertmanager
 
 [opensearch]
 # Single node to host ElasticSearch search engine for Slurm monitoring.

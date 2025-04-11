@@ -1,0 +1,6 @@
+# Uncomment below and add Slack bot app creds in the adjacent file
+# vault_alertmanager.ym for Slack integration:
+#
+# alertmanager_slack_integration:
+#   channel: '#alerts'
+#   app_creds: "{{ vault_alertmanager_slack_integration_app_creds }}"

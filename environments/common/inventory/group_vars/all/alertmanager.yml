@@ -1,0 +1,14 @@
+
+alertmanager_port: '9093' # defined here as required for prometheus
+
+alertmanager_slack_receiver: # defined here as needs prometheus address
+  name: slack-receiver
+  slack_configs:
+    - channel: "{{ alertmanager_slack_integration.channel | default('none') }}"
+      api_url: https://slack.com/api/chat.postMessage
+      http_config:
+        authorization:
+          credentials: "{{ alertmanager_slack_integration.app_creds | default('none') }}"
+      text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
+      title_link: "{{ prometheus_web_external_url }}/alerts?receiver=slack-receiver"
+      send_resolved: true

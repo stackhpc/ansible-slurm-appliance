@@ -215,6 +215,12 @@ Internally, we use the [cloudalchemy.prometheus](https://github.com/cloudalchemy
 
 > [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml)
 
+Prometheus will be functional by default but the following variables should
+commonly be modified:
+- `prometheus_web_external_url`
+- `prometheus_storage_retention`
+- `prometheus_storage_retention_size`
+
 ### Placement
 
 The `prometheus` group determines the placement of the prometheus service. Load balancing is currently unsupported so it is important that you only assign one host to this group.
@@ -240,12 +246,7 @@ This appliance provides a default set of recording rules which can be found here
 The intended purpose is to pre-compute some expensive queries that are used
 in the reference set of grafana dashboards.
 
-To add new, or to remove rules you will be to adjust the `prometheus_alert_rules_files` variable. The default value can be found in:
-
-> [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml)
-
-You can extend this variable in your environment specific configuration to reference extra files or to remove the defaults. The reference set of dashboards expect these variables to be defined, so if you remove them, you
-will also have to update your dashboards.
+For information on configuring alerting rules see [docs/alerting.md#alerting-rules](./alerting.md#alerting-rules).
 
 ### node_exporter
 
@@ -273,7 +274,14 @@ Variables in this file should *not* be customised directly, but should be overri
 
 #### prometheus_node_exporter_targets
 
-Groups prometheus targets into per environment groups. The ansible variable, `env` is used to determine the grouping. The metrics for each target in the group are given the prometheus label, `env: $env`, where `$env` is the value of the `env` variable for that host.
+Groups prometheus targets. Metrics from `node_exporter` hosts have two labels
+applied:
+   - `env`: This is set from the Ansible variable `prometheus_env` if present
+     (e.g. from hostvars or groupvars), defaulting to `ungrouped`. This can be
+     used to group metrics by some arbitrary "environment", e.g. rack.
+   - `group`: This refers to the "top-level" inventory group for the host and
+     is one of `control`, `login`, `compute` or `other`. This can be used to
+     define rules for specific host functionalities.
 
 ## slurm-stats
 

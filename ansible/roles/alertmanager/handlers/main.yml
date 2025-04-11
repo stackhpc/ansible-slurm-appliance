@@ -1,0 +1,6 @@
+- name: Restart alertmanager
+  systemd:
+    name: alertmanager
+    state: restarted
+    daemon_reload: "{{ _alertmanager_service.changed | default(false) }}"
+  when: alertmanager_started | bool
