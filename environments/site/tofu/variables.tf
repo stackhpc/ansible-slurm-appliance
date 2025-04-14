@@ -76,7 +76,7 @@ variable "login" {
 variable "cluster_image_id" {
     type = string
     description = "ID of default image for the cluster"
-    default = "fa4cd35b-a9a0-4042-be81-d4bdd4e87daa"
+    default = "fa334314-88f9-41eb-9b49-4a7bfa651641"
 }
 
 variable "compute" {

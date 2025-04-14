@@ -1,0 +1,3 @@
+---
+dnf_repos_username: "{{ ark_username }}"
+dnf_repos_password: "{{ ark_password }}"

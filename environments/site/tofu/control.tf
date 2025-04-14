@@ -16,7 +16,7 @@ resource "openstack_networking_port_v2" "control" {
 
   no_security_groups = lookup(each.value, "no_security_groups", false)
   security_group_ids = lookup(each.value, "no_security_groups", false) ? [] : [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
-
+  # port_security_enabled = lookup(each.value, "port_security_enabled", true)
   binding {
     vnic_type = lookup(var.vnic_types, each.key, "normal")
   }

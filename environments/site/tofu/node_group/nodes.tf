@@ -47,7 +47,7 @@ resource "openstack_networking_port_v2" "compute" {
   
   no_security_groups = lookup(each.value, "no_security_groups", false)
   security_group_ids = lookup(each.value, "no_security_groups", false) ? [] : var.security_group_ids
-
+  # port_security_enabled = lookup(each.value, "port_security_enabled", true)
   binding {
     vnic_type = lookup(var.vnic_types, each.value.network, "normal")
   }

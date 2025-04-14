@@ -17,6 +17,10 @@ module "cluster" {
         subnet = "external-ceph"
       }
     ]
+    vnic_types = {
+      "slurm-staging" = "normal"
+      "external-ceph" = "normal"
+    }
     compute = {
       # Group name used for compute node partition definition
       general = {
@@ -37,11 +41,21 @@ module "cluster" {
             "compute-13"
           ]
           flavor: "hpc.v2.32cpu.128ram"
-          vnic_types = {
-            "slurm-staging" = "direct"
-            "external-ceph" = "direct"
-          }
       }
+      # gpu = {
+      #     nodes: [
+      #       "gpu-0",
+      #       "gpu-1",
+      #     ]
+      #     flavor: "hpc.v2.16cpu.128ram.a100"
+      # }
+      # highmem = {
+      #     nodes: [
+      #       "highmem-0",
+      #       "highmem-1",
+      #     ]
+      #     flavor: "hpc.v2.60cpu.480ram"
+      # }
   }
 
     environment_root = var.environment_root
