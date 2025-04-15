@@ -8,19 +8,26 @@ alertmanager_enabled: true
 alertmanager_system_user: alertmanager
 alertmanager_system_group: "{{ alertmanager_system_user }}"
 alertmanager_config_file: /etc/alertmanager/alertmanager.yml
+alertmanager_web_config_file: /etc/alertmanager/alertmanager-web.yml
 alertmanager_storage_path: /var/lib/alertmanager
 
 alertmanager_port: '9093'
 alertmanager_web_listen_addresses:
   - ":{{ alertmanager_port }}"
-alertmanager_web_external_url: "http://{{ hostvars[groups['alertmanager'].0].ansible_host }}:{{ alertmanager_port}}/"
+alertmanager_web_external_url: '' # defined in environments/common/inventory/group_vars/all/alertmanager.yml for visibility
 
 alertmanager_data_retention: '120h'
 alertmanager_data_maintenance_interval: '15m'
 alertmanager_config_flags: {} # other command-line parameters as shown by `man alertmanager`
 alertmanager_config_template: alertmanager.yml.j2
+alertmanager_web_config_template: alertmanager-web.yml.j2
 
-# everything below here is interpolated into alertmanager_config_default:
+alertmanager_web_config_default:
+  basic_auth_users:
+    alertmanager: "{{ vault_alertmanager_admin_password | password_hash('bcrypt', '1234567890123456789012', ident='2b') }}"
+alertmanager_alertmanager_web_config_extra: {} # top-level only
+
+# Variables below are interpolated into alertmanager_config_default:
 
 # Uncomment below and add Slack bot app creds for Slack integration
 # alertmanager_slack_integration:

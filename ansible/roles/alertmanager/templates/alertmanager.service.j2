@@ -24,6 +24,7 @@ ExecStart={{ alertmanager_binary_dir }}/alertmanager \
   --web.listen-address={{ address }} \
 {% endfor %}
   --web.external-url={{ alertmanager_web_external_url }} \
+  --web.config.file={{ alertmanager_web_config_file }} \
 {% for flag, flag_value in alertmanager_config_flags.items() %}
   --{{ flag }}={{ flag_value }} \
 {% endfor %}

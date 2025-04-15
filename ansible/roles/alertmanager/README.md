@@ -45,8 +45,10 @@ General variables:
 The following variables are equivalent to similarly-named arguments to the
 `alertmanager` binary. See `man alertmanager` for more info:
 
-- `alertmanager_config_file`: String, path alertmanager config file will be
-  written to. Parent directory will be created if necessary. 
+- `alertmanager_config_file`: String, path the main alertmanager config file
+  will be written to. Parent directory will be created if necessary. 
+- `alertmanager_web_config_file`: String, path alertmanager web config file
+  will be written to. Parent directory will be created if necessary. 
 - `alertmanager_storage_path`: String, base path for data storage.
 - `alertmanager_web_listen_addresses`: List of strings, defining addresses to listeen on.
 - `alertmanager_web_external_url`: String, the URL under which Alertmanager is
@@ -59,7 +61,7 @@ The following variables are equivalent to similarly-named arguments to the
   alertmanager commandline as `--{{ key }}={{ value }}`.
 - `alertmanager_default_receivers`:
 
-The following variables are templated into the [alertmanager configuration](https://prometheus.io/docs/alerting/latest/configuration/):
+The following variables are templated into the alertmanager [main configuration](https://prometheus.io/docs/alerting/latest/configuration/):
 - `alertmanager_config_template`: String, path to configuration template. The default
   is to template in `alertmanager_config_default` and `alertmanager_config_extra`.
 - `alertmanager_config_default`: Mapping with default configuration for the
@@ -85,3 +87,9 @@ The following variables are templated into the [alertmanager configuration](http
         - weekdays: ['monday:friday']
     ```
   Note that `route` and `receivers` keys should not be added here.
+
+The following variables are templated into the alertmanager [web configuration](https://prometheus.io/docs/alerting/latest/https/):
+- `alertmanager_web_config_default`: Mapping with default configuration for
+  `basic_auth_users` providing the default web user.
+- `alertmanager_alertmanager_web_config_extra`: Mapping with additional web
+  configuration. Keys in this become top-level keys in the web configuration.

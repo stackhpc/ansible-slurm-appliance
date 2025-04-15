@@ -12,3 +12,5 @@ alertmanager_slack_receiver: # defined here as needs prometheus address
       text: "{{ '{{' }} .GroupLabels.alertname {{ '}}' }} : {{ '{{' }}  .CommonAnnotations.description {{ '}}' }}"
       title_link: "{{ prometheus_web_external_url }}/alerts?receiver=slack-receiver"
       send_resolved: true
+
+alertmanager_web_external_url: "http://{{ hostvars[groups['alertmanager'].0].ansible_host }}:{{ alertmanager_port}}/"

@@ -7,6 +7,7 @@
     mode: u=rwX,go=rX
   loop:
     - "{{ alertmanager_config_file | dirname }}"
+    - "{{ alertmanager_web_config_file | dirname }}"
     - "{{ alertmanager_storage_path }}"
 
 - name: Create alertmanager service file with immutable options
@@ -19,11 +20,19 @@
   register: _alertmanager_service
   notify: Restart alertmanager
 
-
 - name: Template alertmanager config
   ansible.builtin.template:
     src: "{{ alertmanager_config_template }}"
     dest: "{{ alertmanager_config_file }}"
+    owner: "{{ alertmanager_system_user }}"
+    group: "{{ alertmanager_system_group }}"
+    mode: u=rw,go=
+  notify: Restart alertmanager
+
+- name: Template alertmanager web config
+  ansible.builtin.template:
+    src: "{{ alertmanager_web_config_template }}"
+    dest: "{{ alertmanager_web_config_file }}"
     owner: "{{ alertmanager_system_user }}"
     group: "{{ alertmanager_system_group }}"
     mode: u=rw,go=
