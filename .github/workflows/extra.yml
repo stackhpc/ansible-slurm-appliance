@@ -121,7 +121,7 @@ jobs:
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}" || true
 
       - name: Delete image for automatically-run workflows
         run: |

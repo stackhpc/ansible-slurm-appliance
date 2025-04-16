@@ -26,6 +26,7 @@ jobs:
 
       - name: Install s3cmd
         run: |
+          sudo apt-get update
           sudo apt-get --yes install s3cmd
       
       - name: Cleanup S3 bucket
@@ -75,9 +76,10 @@ jobs:
           echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
         shell: bash
 
-      - name: Install s3cmd
+      - name: Install s3cmd and qemu-utils
         run: |
-          sudo apt-get --yes install s3cmd
+          sudo apt-get update
+          sudo apt-get --yes install s3cmd qemu-utils
 
       - name: Retrieve image name
         run: |
@@ -85,10 +87,27 @@ jobs:
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
         shell: bash
 
+      - name: Clear up some space on runner
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo apt-get clean
+          df -h
+
       - name: Download image to runner
         run: |
           . venv/bin/activate
-          openstack image save --file ${{ env.TARGET_IMAGE }} ${{ env.TARGET_IMAGE }}
+          openstack image save --file "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
+          df -h
+        shell: bash
+
+      - name: Convert image to QCOW2
+        run: |
+          . venv/bin/activate
+          qemu-img convert -f raw -O qcow2 -c "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
         shell: bash
 
       - name: Upload Image to S3
