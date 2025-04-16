@@ -12,7 +12,7 @@ env:
 
 jobs:
   s3_cleanup:
-    runs-on: ubuntu-22.04-2x1
+    runs-on: ubuntu-22.04
     concurrency: ${{ github.workflow }}-${{ github.ref }}
     strategy:
       fail-fast: false
@@ -96,7 +96,7 @@ jobs:
       - name: Convert image to QCOW2
         run: |
           . venv/bin/activate
-          qemu-img convert -f raw -O qcow2 "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
+          qemu-img convert -f raw -O qcow2 -c "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
         shell: bash
 
       - name: Upload Image to S3
