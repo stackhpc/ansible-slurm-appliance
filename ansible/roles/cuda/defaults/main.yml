@@ -5,6 +5,8 @@ cuda_version_short: '12.8'
 cuda_packages:
   - "cuda{{ ('-' + cuda_package_version) if cuda_package_version != 'latest' else '' }}"
   - nvidia-gds
+  - cmake
+  - cuda-toolkit-12-8
 cuda_samples_release_url: "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v{{ cuda_version_short }}.tar.gz"
 cuda_samples_path: "/var/lib/{{ ansible_user }}/cuda_samples"
 cuda_samples_programs:
