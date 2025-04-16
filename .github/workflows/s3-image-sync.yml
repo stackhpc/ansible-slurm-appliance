@@ -87,10 +87,21 @@ jobs:
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
         shell: bash
 
+      - name: Clear up some space on runner
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo apt-get clean
+          df -h
+
       - name: Download image to runner
         run: |
           . venv/bin/activate
           openstack image save --file "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
+          df -h
         shell: bash
 
       - name: Convert image to QCOW2
