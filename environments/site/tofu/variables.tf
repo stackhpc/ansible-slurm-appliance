@@ -183,7 +183,7 @@ variable "nonlogin_security_groups" {
 variable "volume_backed_instances" {
     description = "Whether to use volumes for root disks"
     type = bool
-    default = false
+    default = true
 }
 
 variable "root_volume_size" {
