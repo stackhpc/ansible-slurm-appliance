@@ -1,11 +1,11 @@
-- name: Read CUDA version file
-  slurp:
-    src: /usr/local/cuda/version.json
-  register: _cuda_samples_version
+# - name: Read CUDA version file
+#   slurp:
+#     src: /usr/local/cuda/version.json
+#   register: _cuda_samples_version
 
-- name: Set fact for discovered CUDA version
-  set_fact:
-    _cuda_version_tuple: "{{ (_cuda_samples_version.content | b64decode | from_json).cuda.version | split('.') }}" # e.g. '12.1.0'
+# - name: Set fact for discovered CUDA version
+#   set_fact:
+#     _cuda_version_tuple: "{{ (_cuda_samples_version.content | b64decode | from_json).cuda.version | split('.') }}" # e.g. '12.1.0'
 
 - name: Ensure cuda_samples_path exists
   file:
