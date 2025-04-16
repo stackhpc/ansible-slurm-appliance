@@ -12,7 +12,7 @@ env:
 
 jobs:
   s3_cleanup:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04-2x1
     concurrency: ${{ github.workflow }}-${{ github.ref }}
     strategy:
       fail-fast: false
