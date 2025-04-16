@@ -10,4 +10,4 @@ pulp_site_upstream_username: "{{ lookup('env', 'pulp_site_upstream_username') }}
 pulp_site_upstream_password: "{{ lookup('env', 'pulp_site_upstream_password') }}"
 
 # Note when used by azimuth_caas_operator for cluster creation,
-# appliances_pulp_url is (maybe) instead set via ansible-runner extravars
+# appliances_pulp_url is set instead via ansible-runner extravars, possibly to the empty string
