@@ -35,6 +35,13 @@
       - python3.9
       - dbus-x11
 
+- name: Stop turbovnc service
+  # This is not actually required
+  systemd:
+    name: tvncserver
+    state: stopped
+    enabled: false
+
 - name: Replace OFED-installed init scripts
   ansible.builtin.copy:
     src: /etc/init.d.orig/ # trailing / to get contents

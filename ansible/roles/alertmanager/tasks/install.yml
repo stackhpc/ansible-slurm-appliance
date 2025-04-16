@@ -1,0 +1,25 @@
+- name: Create alertmanager system user
+  ansible.builtin.user:
+    name: "{{ alertmanager_system_user }}"
+    system: true
+    create_home: false
+
+- name: Download alertmanager binary
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+    dest: "{{ alertmanager_download_dest }}"
+    owner: root
+    group: root
+    mode: u=rw,go=
+    checksum: "{{ alertmanager_download_checksum }}"
+
+- name: Unpack alertmanager binary
+  ansible.builtin.unarchive:
+    src: "{{ alertmanager_download_dest }}"
+    include: "alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager"
+    dest: "{{ alertmanager_binary_dir }}"
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+    remote_src: true
+    extra_opts: ['--strip-components=1', '--show-stored-names']

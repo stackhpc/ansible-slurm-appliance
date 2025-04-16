@@ -1,0 +1,53 @@
+
+
+
+{{ ansible_managed | comment }}
+[Unit]
+Description=Prometheus Alertmanager
+After=network-online.target
+StartLimitInterval=0
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+PIDFile=/run/alertmanager.pid
+User={{ alertmanager_system_user }}
+Group={{ alertmanager_system_group }}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart={{ alertmanager_binary_dir }}/alertmanager \
+  --cluster.listen-address='' \
+  --config.file={{ alertmanager_config_file }} \
+  --storage.path={{ alertmanager_storage_path }} \
+  --data.retention={{ alertmanager_data_retention }} \
+  --data.maintenance-interval={{ alertmanager_data_maintenance_interval }} \
+{% for address in alertmanager_web_listen_addresses %}
+  --web.listen-address={{ address }} \
+{% endfor %}
+  --web.external-url={{ alertmanager_web_external_url }} \
+  --web.config.file={{ alertmanager_web_config_file }} \
+{% for flag, flag_value in alertmanager_config_flags.items() %}
+  --{{ flag }}={{ flag_value }} \
+{% endfor %}
+
+SyslogIdentifier=alertmanager
+Restart=always
+RestartSec=5
+
+CapabilityBoundingSet=CAP_SET_UID
+LockPersonality=true
+NoNewPrivileges=true
+MemoryDenyWriteExecute=true
+PrivateTmp=true
+ProtectHome=true
+ReadWriteDirectories={{ alertmanager_storage_path }}
+RemoveIPC=true
+RestrictSUIDSGID=true
+
+PrivateUsers=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=yes
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

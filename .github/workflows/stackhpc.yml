@@ -109,7 +109,6 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook ansible/adhoc/generate-passwords.yml
           echo vault_demo_user_password: "$DEMO_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
@@ -135,6 +134,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible all -m wait_for_connection
+          ansible-playbook ansible/adhoc/generate-passwords.yml
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
@@ -170,6 +170,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible all -m wait_for_connection
+          ansible-playbook ansible/adhoc/generate-passwords.yml
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 

@@ -1,0 +1,16 @@
+
+groups:
+- name: Slurm
+  rules:
+  - alert: SlurmNodeDown
+    annotations:
+      description: '{{ $value }} Slurm nodes are in down status'
+      summary: 'At least one Slurm node is down.'
+    expr: "slurm_nodes_down > 0\n"
+    labels:
+      severity: critical
+  - alert: SlurmNodeFail
+    annotations:
+      description: '{{ $value }} Slurm nodes are in fail status'
+      summary: 'At least one Slurm node is failed.'
+    expr: "slurm_nodes_fail > 0\n"
