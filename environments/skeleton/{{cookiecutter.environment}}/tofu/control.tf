@@ -24,7 +24,7 @@ resource "openstack_networking_port_v2" "control" {
 
 resource "openstack_compute_instance_v2" "control" {
   
-  name = "${var.cluster_name}-control"
+  name = split(".", templatestring(var.cluster_nodename_template, {node="control", cluster_name=var.cluster_name,cluster_domain_suffix=var.cluster_domain_suffix}))[0]
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
@@ -65,7 +65,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${var.cluster_name}-control.${var.cluster_name}.${var.cluster_domain_suffix}
+    fqdn: ${templatestring(var.cluster_nodename_template, {node="control", cluster_name=var.cluster_name,cluster_domain_suffix=var.cluster_domain_suffix})}
     
     bootcmd:
       %{for volume in local.control_volumes}

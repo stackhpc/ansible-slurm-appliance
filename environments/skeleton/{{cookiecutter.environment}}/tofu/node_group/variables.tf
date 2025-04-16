@@ -127,3 +127,8 @@ variable "gateway_ip" {
     type = string
     default = ""
 }
+
+variable "nodename_template" {
+    type = string
+    default = ""
+}
