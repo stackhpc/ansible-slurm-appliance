@@ -63,3 +63,13 @@
     - include_role:
         name: stackhpc.openhpc
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
+
+- name: Setup Node Health Checks
+  # Has to be done here as it requires openhpc repos etc for installation
+  hosts: nhc
+  become: yes
+  tags:
+    - nhc
+  tasks:
+    - include_role:
+        name: nhc

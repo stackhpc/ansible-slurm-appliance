@@ -133,6 +133,7 @@
         name: sshd
 
 - hosts: dnf_repos
+  tags: dnf_repos
   become: yes
   tasks:
   - name: Check that creds won't be leaked to users
