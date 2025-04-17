@@ -76,7 +76,7 @@ variable "login" {
 variable "cluster_image_id" {
     type = string
     description = "ID of default image for the cluster"
-    default = "fa334314-88f9-41eb-9b49-4a7bfa651641"
+    default = "8ef0f859-426d-4c4e-a003-74f62f2aba56"
 }
 
 variable "compute" {
@@ -143,7 +143,7 @@ variable "state_volume_type" {
 variable "home_volume_size" {
     type = number
     description = "Size of state volume on control node, in GB"
-    default = 100 # GB, 0 means no home volume
+    default = 0 # GB, 0 means no home volume
 }
 
 variable "home_volume_type" {

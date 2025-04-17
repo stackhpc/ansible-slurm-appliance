@@ -95,8 +95,10 @@ appliances_extra_packages_default:
  - git
  - "{{ 'python36' if ansible_distribution_version == '8.9' else 'python312' }}"
  
-appliances_extra_packages_other: []
-  
+appliances_extra_packages_other:
+ - cmake
+ - cuda-toolkit-12-8
+
 appliances_extra_packages: "{{ appliances_extra_packages_default + appliances_extra_packages_other }}"
 
 ###################### ark repo timestamps ###################################################
