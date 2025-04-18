@@ -133,3 +133,4 @@ openhpc
 
 [weka_clients:children]
 compute
+login
