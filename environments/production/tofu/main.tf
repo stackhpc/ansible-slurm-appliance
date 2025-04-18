@@ -30,6 +30,13 @@ module "cluster" {
         "194.199.232.101",
         "194.199.232.102",
       ]
+      fip_network = "netapp"
+      extra_networks = [
+        {
+          network = "weka-3015"
+          subnet  = "weka-3015"
+        }
+      ]
     }
   }
   # RL9.4 + OFED 23.10-3.2.2.0 + SSSD + local packages
