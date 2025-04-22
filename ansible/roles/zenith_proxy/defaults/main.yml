@@ -15,7 +15,7 @@ zenith_proxy_pod_name: "{{ zenith_proxy_service_name }}"
 zenith_proxy_client_container_name: "{{ zenith_proxy_client_service_name }}"
 zenith_proxy_mitm_container_name: "{{ zenith_proxy_mitm_service_name }}"
 
-zenith_proxy_image_tag: '0.12.0'
+zenith_proxy_image_tag: '0.14.0'
 
 zenith_proxy_client_image_repository: ghcr.io/azimuth-cloud/zenith-client
 zenith_proxy_client_image: "{{ zenith_proxy_client_image_repository }}:{{ zenith_proxy_image_tag }}"
