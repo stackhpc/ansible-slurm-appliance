@@ -13,7 +13,8 @@ prometheus_alertmanager_config_default:
     - static_configs:
       - targets:
         - "{{ alertmanager_address }}:{{ alertmanager_port }}"
-prometheus_alertmanager_config: "{{ prometheus_alertmanager_config_default if groups['alertmanager'] else {} }}"
+prometheus_alertmanager_config_extra: []
+prometheus_alertmanager_config: "{{ (prometheus_alertmanager_config_default if groups['alertmanager'] else []) + prometheus_alertmanager_config_extra }}"
 
 # By default, find rule files from the following path relative to current and all parent environment inventory directories:
 # Note: If the same file exists in parent and child environments, only the file in the latter has any effect.
