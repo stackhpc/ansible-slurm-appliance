@@ -10,9 +10,13 @@ prometheus_storage_retention_size: "100GB"
 prometheus_db_dir: "{{ appliances_state_dir | default('/var/lib') }}/prometheus"
 
 prometheus_alertmanager_config_default:
-    - static_configs:
-      - targets:
-        - "{{ alertmanager_address }}:{{ alertmanager_port }}"
+  - static_configs:
+    - targets:
+      - "{{ alertmanager_address }}:{{ alertmanager_port }}"
+    basic_auth:
+      username: alertmanager
+      password: "{{ vault_alertmanager_admin_password }}"
+
 prometheus_alertmanager_config_extra: []
 prometheus_alertmanager_config: "{{ (prometheus_alertmanager_config_default if groups['alertmanager'] else []) + prometheus_alertmanager_config_extra }}"
 
