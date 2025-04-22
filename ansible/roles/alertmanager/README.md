@@ -74,6 +74,8 @@ The following variables are templated into the alertmanager [main configuration]
   mappings to add, by default empty.
 - `alertmanager_slack_receiver`: Mapping defining the [Slack receiver](https://prometheus.io/docs/alerting/latest/configuration/#slack_config). Note the default configuration for this is in
 `environments/common/inventory/group_vars/all/alertmanager.yml`.
+- `alertmanager_slack_receiver_name`: String, name for the above Slack reciever.
+- `alertmanager_slack_receiver_send_resolved`: Bool, whether to send resolved alerts via the above Slack reciever.
 - `alertmanager_null_receiver`:  Mapping defining a `null` [receiver](https://prometheus.io/docs/alerting/latest/configuration/#receiver) so a receiver is always defined.
 - `alertmanager_config_extra`: Mapping with additional configuration. Keys in
   this become top-level keys in the configuration. E.g this might be:

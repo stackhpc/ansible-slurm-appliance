@@ -44,7 +44,7 @@ alertmanager_receivers: "{{ alertmanager_default_receivers  + alertmanager_extra
 alertmanager_config_default:
   route:
     group_by: ['...']
-    receiver: "{{ 'slack-receiver' if alertmanager_slack_integration is defined else 'null' }}"
+    receiver: "{{ alertmanager_slack_receiver_name if alertmanager_slack_integration is defined else 'null' }}"
   receivers: "{{ alertmanager_receivers }}"
 
 alertmanager_config_extra: {} # top-level only
