@@ -56,7 +56,7 @@ jobs:
           fi
         shell: bash
       
-      - name: Delete clusters if control node not tagged with keep
+      - name: Delete clusters
         run: |
           . venv/bin/activate
           if [[ -z ${ci_clusters} ]]; then
@@ -69,12 +69,12 @@ jobs:
             echo "Processing cluster: $cluster_prefix"
 
             # Get all servers with the matching name for control node
-            CONTROL_SERVERS=$(openstack server list --name ${cluster_prefix}-control --long --format json)
+            CONTROL_SERVERS=$(openstack server list --name ${cluster_prefix}-control --format json)
 
             # Get unique server names to avoid duplicate cleanup
             UNIQUE_NAMES=$(echo "$CONTROL_SERVERS" | jq -r '.[].Name' | sort | uniq)
             for name in $UNIQUE_NAMES; do
-              echo "Checking control node: $name"
+              echo "Deleting cluster with control node: $name"
 
               # Get the first matching server ID by name
               server=$(echo "$CONTROL_SERVERS" | jq -r '.[] | select(.Name=="'"$name"'") | .ID' | head -n1)
@@ -85,15 +85,8 @@ jobs:
                 continue
               fi
 
-              # Get tags for the server
-              TAGS=$(openstack server show "$server" --column tags --format value)
-
-              if [[ $TAGS =~ "keep" ]]; then
-                echo "Skipping $cluster_prefix - control instance is tagged as keep"
-              else
-                echo "Deleting cluster $cluster_prefix (server $server)..."
-                ./dev/delete-cluster.py $cluster_prefix --force
-              fi
+              echo "Deleting cluster $cluster_prefix (server $server)..."
+              ./dev/delete-cluster.py $cluster_prefix --force
             done
           done
         shell: bash
