@@ -56,37 +56,13 @@ jobs:
           fi
         shell: bash
       
-      - name: Delete clusters
+      - name: Delete CI clusters
         run: |
           . venv/bin/activate
-          if [[ -z ${ci_clusters} ]]; then
+          if [[ -z "${ci_clusters}" ]]; then
             echo "No clusters to delete."
             exit 0
           fi
-          
-          for cluster_prefix in ${ci_clusters}
-          do
-            echo "Processing cluster: $cluster_prefix"
-
-            # Get all servers with the matching name for control node
-            CONTROL_SERVERS=$(openstack server list --name ${cluster_prefix}-control --format json)
-
-            # Get unique server names to avoid duplicate cleanup
-            UNIQUE_NAMES=$(echo "$CONTROL_SERVERS" | jq -r '.[].Name' | sort | uniq)
-            for name in $UNIQUE_NAMES; do
-              echo "Deleting cluster with control node: $name"
-
-              # Get the first matching server ID by name
-              server=$(echo "$CONTROL_SERVERS" | jq -r '.[] | select(.Name=="'"$name"'") | .ID' | head -n1)
-
-              # Make sure server still exists (wasn't deleted earlier)
-              if ! openstack server show "$server" &>/dev/null; then
-                echo "Server $server no longer exists, skipping $name."
-                continue
-              fi
-
-              echo "Deleting cluster $cluster_prefix (server $server)..."
-              ./dev/delete-cluster.py $cluster_prefix --force
-            done
-          done
+          echo "Deleting clusters: ${ci_clusters}"
+          ./dev/delete-cluster.py ${ci_clusters} --force
         shell: bash
