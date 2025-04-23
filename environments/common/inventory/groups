@@ -112,6 +112,10 @@ freeipa_client
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
+[vgpu]
+# FIXME: Update once PR merged
+# Hosts where vGPU/MIG should be configured - see https://github.com/stackhpc/ansible-collection-linux/pull/43/files#diff-74e43d9a34244aa54721f4dbd12a029baa87957afd762b88c2677aa75414f514R75
+
 [eessi]
 # Hosts on which EESSI stack should be configured
 

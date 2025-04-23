@@ -4,7 +4,7 @@ roles:
     version: v25.3.2
     name: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v0.28.0
+    version: feature/gres-autodetect
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
@@ -55,4 +55,7 @@ collections:
     version: 0.0.15
   - name: stackhpc.pulp
     version: 0.5.5
+  - name: https://github.com/stackhpc/ansible-collection-linux
+    type: git
+    version: feature/mig-only
 ...
