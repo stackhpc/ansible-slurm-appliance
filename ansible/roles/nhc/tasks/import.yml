@@ -1,0 +1,8 @@
+- name: Copy stored NHC configuration to active location
+  ansible.builtin.copy:
+    remote_src: true
+    src: "/exports/cluster share/hostconfig/{{ ansible_host }}"
+    dest: /etc/nhc/nhc.conf
+    owner: root
+    group: root
+    mode: u=rw,go= # HealthCheckProgram is run by root

@@ -1,0 +1,5 @@
+- name: Fetch generated NHC config to control node storage
+  ansible.builtin.fetch:
+    src: /etc/nhc/nhc.conf
+    flat: true
+    dest: "/exports/cluster/hostconfig{{ inventory_hostname }}/nhc.conf"
