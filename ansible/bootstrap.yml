@@ -312,6 +312,14 @@
     - include_role:
         name: ofed
 
+- hosts: doca:&builder
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install NVIDIA DOCA
+      import_role:
+        name: doca
+
 - hosts: ansible_init
   gather_facts: yes
   become: yes

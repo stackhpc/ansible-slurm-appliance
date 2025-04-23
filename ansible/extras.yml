@@ -74,21 +74,3 @@
   - name: Install additional packages
     dnf:
       name: "{{ appliances_extra_packages }}"
-
-- hosts: nhc
-  become: yes
-  tags: nhc
-  tasks:
-    - name: Configure node health checks
-      import_role:
-        name: nhc
-
-- name: Setup NFS export for compute_init
-  hosts: compute_init:!builder
-  # NB: done last so other orles can prepare configuration etc
-  tags: compute_init
-  become: yes
-  tasks:
-    - include_role:
-        name: compute_init
-        tasks_from: export.yml

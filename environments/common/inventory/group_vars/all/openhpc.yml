@@ -39,7 +39,7 @@ openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if applianc
 openhpc_config_extra: {}
 
 # default additional slurm.conf parameters for the appliance:
-openhpc_config_appliance_default:
+openhpc_config_default:
   SlurmctldParameters:
     - enable_configless
   TaskPlugin: task/cgroup,task/affinity
