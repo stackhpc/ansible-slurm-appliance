@@ -299,7 +299,9 @@
     # if not the case
     - name: Write Munge key
       copy:
-        content: "{{ openhpc_munge_key }}"
+        # NB: openhpc_munge_key is *binary* and may not survive json encoding
+        # so do same as environments/common/inventory/group_vars/all/openhpc.yml
+        content: "{{ vault_openhpc_mungekey | b64decode }}"
         dest: "/etc/munge/munge.key"
         owner: munge
         group: munge

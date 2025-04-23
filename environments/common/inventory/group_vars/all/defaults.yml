@@ -22,7 +22,7 @@ prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
 grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
 k3s_server_name: "{{ hostvars[groups['k3s_server'] | first].ansible_host }}"
-
+alertmanager_address: "{{ hostvars[groups['alertmanager'].0].api_address }}"
 ############################# bootstrap: local user configuration #########################
 
 # Note RockyLinux 8.5 defines system user/groups in range 201-999
