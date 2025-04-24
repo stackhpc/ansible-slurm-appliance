@@ -197,15 +197,4 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- import_playbook: disable-repos.yml
-
-- hosts: builder
-  become: yes
-  gather_facts: yes
-  tags: finalise
-  tasks:
-    - name: Cleanup image
-      import_tasks: cleanup.yml
-
-    - name: Shutdown Packer VM
-      community.general.shutdown:
+- import_playbook: final.yml
