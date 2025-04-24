@@ -319,13 +319,22 @@
       import_role:
         name: doca
 
-- hosts: ansible_init
+- hosts: ansible_init:&builder
   gather_facts: yes
   become: yes
   tags: linux_ansible_init
   tasks:
-    - include_role:
+    - name: Install ansible-init
+      ansible.builtin.include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
+
+- hosts: gateway:&builder
+  become: yes
+  tags: gateway
+  tasks:
+    - name: Install ansible-init gateway playbook
+      ansible.builtin.include_role:
+        name: gateway
 
 - hosts: k3s:&builder
   become: yes
