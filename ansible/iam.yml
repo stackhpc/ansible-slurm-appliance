@@ -1,4 +1,4 @@
-- hosts: freeipa_client
+- hosts: freeipa_client:!builder
   tags:
     - freeipa
     - freeipa_server # as this is only relevant if using freeipa_server
@@ -23,12 +23,20 @@
       import_role:
         name: freeipa
         tasks_from: client-install.yml
+
+- hosts: freeipa_client:!builder
+  tags:
+    - freeipa
+    - freeipa_client
+  gather_facts: yes
+  become: yes
+  tasks:
     - name: Enrol FreeIPA client
       import_role:
         name: freeipa
         tasks_from: enrol.yml
 
-- hosts: freeipa_server
+- hosts: freeipa_server:!builder
   tags:
     - freeipa
     - freeipa_server
@@ -49,3 +57,4 @@
     - name: Configure sssd
       import_role:
         name: sssd
+        tasks_from: "{{ 'install.yml' if appliances_mode == 'build' else 'main.yml' }}"

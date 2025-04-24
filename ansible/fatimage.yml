@@ -25,22 +25,12 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- import_playbook: iam.yml
+
 - hosts: builder
   become: yes
   gather_facts: yes
   tasks:
-    # - import_playbook: iam.yml
-    - name: Install FreeIPA client
-      import_role:
-        name: freeipa
-        tasks_from: client-install.yml
-      when: "'freeipa_client' in group_names"
-    - name: Install sssd
-      import_role:
-        name: sssd
-        tasks_from: install.yml
-      when: "'sssd' in group_names"
-
     # - import_playbook: filesystems.yml:
     - name: Install nfs packages
       dnf:
