@@ -44,7 +44,7 @@ See [Reconfiguring Slurm](#Reconfiguring-Slurm) to apply changes.
 
 # Modifying Slurm Partition-specific Configuration
 
-Modify the `openhpc_slurm_partitions` mapping usually in `enviroments/$SITE_ENV/inventory/group_vars/all/openhpc.yml` as described for [stackhpc.openhpc:slurmconf](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) (note the relevant version of this role is defined in the `requirements.yml`)
+Modify the `openhpc_slurm_partitions` mapping usually in `environments/$SITE_ENV/inventory/group_vars/all/openhpc.yml` as described for [stackhpc.openhpc:slurmconf](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) (note the relevant version of this role is defined in the `requirements.yml`)
 
 Note an Ansible inventory group for the partition is required. This is generally auto-defined by a template in the OpenTofu configuration.
 
