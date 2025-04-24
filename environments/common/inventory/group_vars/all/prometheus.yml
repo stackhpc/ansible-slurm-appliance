@@ -15,7 +15,9 @@ prometheus_alertmanager_config_default:
       - "{{ alertmanager_address }}:{{ alertmanager_port }}"
     basic_auth:
       username: alertmanager
-      password: "{{ vault_alertmanager_admin_password }}"
+      # cloudalchemy.prometheus/preflight checks this config so it must be
+      # templatable even during build when it is not used
+      password: "{{ vault_alertmanager_admin_password | default('UNDEFINED') }}"
 
 prometheus_alertmanager_config_extra: []
 prometheus_alertmanager_config: "{{ (prometheus_alertmanager_config_default if groups['alertmanager'] else []) + prometheus_alertmanager_config_extra }}"
