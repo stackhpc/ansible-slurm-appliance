@@ -57,4 +57,4 @@
   tasks:
     - include_role:
         name: stackhpc.openhpc
-        tasks_from: "{{ {'install':'install.yml', 'runtime.yml':'configure'}[appliances_mode] | default('main.yml') }}"
+        tasks_from: "{{ {'build':'install.yml', 'configure':'runtime.yml'}[appliances_mode] | default('main.yml') }}"
