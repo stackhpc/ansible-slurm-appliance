@@ -58,6 +58,14 @@
     - import_role:
         name: persist_hostkeys
 
+- name: Install compute_init playbook
+  hosts: compute_init:&builder
+  tags: compute_init # tagged to allow running on cluster instances for dev
+  become: yes
+  tasks:
+    - include_role:
+        name: compute_init
+        tasks_from: install.yml
 
 - name: Setup NFS export for compute node configuration
   hosts: compute_init:!builder
