@@ -15,7 +15,6 @@
       tasks_from: sync.yml
       apply:
         delegate_to: localhost
-    when: appliances_mode != 'configure'
 
 - import_playbook: bootstrap.yml
 
