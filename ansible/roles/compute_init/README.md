@@ -143,35 +143,32 @@ a new image:
    additionally configure the control node to export compute hostvars over NFS.
    Check the cluster is up.
 
-2. Reimage the compute nodes:
+2. Optionally, reimage the compute nodes to reset services etc.:
 
         ansible-playbook --limit compute ansible/adhoc/rebuild.yml
 
-3. Add metadata to a compute node e.g. via Horizon to turn on compute-init
-   playbook functionality.
+3. Add metadata to a compute node (directly via Horizon or via OpenTofu) to
+   enable the new compute-init playbook functionality.
 
-4. Stop ansible-init from running
+4. Stop ansible-init from running:
 
         ansible all -ba "systemctl stop ansible-init"
 
-5. Fake an image build to deploy the compute-init playbook:
+5. Fake an image build and rerunning the `site.yml` playbook:
 
-        ansible-playbook ansible/fatimage.yml --tags compute_init
+        ansible-playbook ansible/final.yml --tags compute_init
 
-    NB: This will also re-export the compute hostvars, as the nodes are not
-    in the builder group, which conveniently means any changes made to that
-    play also get picked up.
+   This both re-installs the compute-init playbook and re-configures the NFS
+   share with exported compute hostvars etc.
 
-6. Fake a reimage of compute to run ansible-init and the updated compute-init playbook:
+6. Fake a reimage of compute nodes to re-run ansible-init and the updated
+   compute-init playbook:
 
         ansible all -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
 
-    Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
+7. Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
 
-Steps 4/5/6 can be repeated with changes to the compute script. If required,
-reimage the compute node(s) first as in step 2 and/or add additional metadata
-as in step 3.
-
+Steps 4-7 can be repeated with changes to the compute script until it works.
 
 ## Design notes
 - Duplicating code in roles into the `compute-init` script is unfortunate, but

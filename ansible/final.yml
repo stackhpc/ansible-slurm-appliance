@@ -1,3 +1,23 @@
+- hosts: compute_init
+  tags: compute_init
+  become: yes
+  tasks:
+    - name: Install compute_init playbook
+      ansible.builtin.include_role:
+        name: compute_init
+        tasks_from: 'install.yml'
+      when: "{{ appliances_mode == 'build' }}"
+      # conditional used instead of compute_init!builder to make dev easier
+
+- hosts: compute_init:!builder
+  tags: compute_init
+  become: yes
+  tasks:
+    - name: Setup NFS export for compute node configuration
+      ansible.builtin.include_role:
+        name: compute_init
+        tasks_from: export.yml
+
 - hosts: dnf_repos
   become: yes
   tasks:
