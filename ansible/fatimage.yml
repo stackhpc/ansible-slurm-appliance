@@ -48,24 +48,12 @@
       when: "'lustre' in group_names"
 
 - import_playbook: extras.yml
+- import_playbook: slurm.yml
 
 - hosts: builder
   become: yes
   gather_facts: yes
   tasks:
-    # - import_playbook: slurm.yml:
-    - name: Setup DB
-      include_role:
-        name: mysql
-        tasks_from: install.yml
-      when: "'mysql' in group_names"
-
-    - name: OpenHPC
-      import_role:
-        name: stackhpc.openhpc
-        tasks_from: install.yml
-      when: "'openhpc' in group_names"
-
     # - import_playbook: portal.yml
     - name: Open Ondemand server (packages)
       include_role:
