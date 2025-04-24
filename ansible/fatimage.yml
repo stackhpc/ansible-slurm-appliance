@@ -1,15 +1,5 @@
 # Builder version of site.yml just installing binaries
 
-- hosts: builder
-  become: no
-  gather_facts: no
-  tasks:
-    - name: Report hostname (= final image name)
-      command: hostname
-    - name: Report inventory groups
-      debug:
-        var: group_names
-
 - name: Run pre.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
