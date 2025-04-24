@@ -55,6 +55,6 @@
   tags: sssd
   tasks:
     - name: Configure sssd
-      import_role:
+      ansible.builtin.include_role:
         name: sssd
         tasks_from: "{{ 'install.yml' if appliances_mode == 'build' else 'main.yml' }}"
