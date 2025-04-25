@@ -56,10 +56,17 @@
         block: |
           account    sufficient   pam_access.so
           account    required     pam_slurm.so
+    # See https://slurm.schedmd.com/pam_slurm_adopt.html#admin_access
     - name: Configure login access control
       blockinfile:
         path: /etc/security/access.conf
         block: |
-          +:adm:ALL
+          +:(adm):ALL
+          +:(stackhpc):ALL
+          +:dehneg:ALL
+          +:dernatr:ALL
+          +:larreure:ALL
+          +:omsj:ALL
+          +:pitollatb:ALL
           -:ALL:ALL
       # vagrant uses (deprecated) ansible_ssh_user
