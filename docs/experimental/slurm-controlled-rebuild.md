@@ -103,7 +103,7 @@ The configuration of this is complex and involves:
    be in:
     - `environments/site/tofu/variables.tf`: `cluster_image_id` for the default
       cluster image.
-    - `enviroments/$ENV/tofu/main.tf`: parameter `image_id` in node groups
+    - `environments/$ENV/tofu/main.tf`: parameter `image_id` in node groups
       defined in the `compute` or `login` variables, to override the default
       image for specific node groups.
 
