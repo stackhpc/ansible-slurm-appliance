@@ -86,3 +86,14 @@
         grafana_dashboards: []
     - import_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards
+
+- name: Deploy alertmanager
+  hosts: alertmanager
+  tags: alertmanager
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Configure alertmanager
+      include_role:
+        name: alertmanager
+        tasks_from: configure.yml
