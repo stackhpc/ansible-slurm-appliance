@@ -23,10 +23,10 @@ jobs:
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-RL8
-            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
+            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.raw
             inventory_groups: control,compute,login,update
           - image_name: openhpc-RL9
-            source_image_name: Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.qcow2
+            source_image_name: Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.raw
             inventory_groups: control,compute,login,update
     env:
       ANSIBLE_FORCE_COLOR: True
@@ -102,7 +102,7 @@ jobs:
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}" || true
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
