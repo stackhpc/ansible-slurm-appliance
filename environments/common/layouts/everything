@@ -25,7 +25,9 @@ control
 [filebeat:children]
 slurm_stats
 
-# NB: [rebuild] not defined here as likely to need features not currently supported
+[rebuild]
+# Add 'control' group to enable slurm-controlled rebuild of compute nodes
+# NB: Compute nodes need compute_init enabled
 
 [update:children]
 
@@ -90,7 +92,10 @@ openondemand
 # Hosts where the OpenSSH server daemon should be configured
 
 [compute_init]
-# EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
+# EXPERIMENTAL: Compute hosts which should rejoin the cluster after rebuild
+# without running site.yml playbook.
+# NB: Additional configuration is required and not all functionality is
+# currently supported - ee ansible/roles/compute_init/README.md
 
 [k3s_server:children]
 # Hosts to run k3s server (should only be single node i.e control node)
