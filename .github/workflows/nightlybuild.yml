@@ -24,16 +24,16 @@ jobs:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
-          - image_name: rocky-latest-RL8
+          - image_name: openhpc-RL8
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
             inventory_groups: update
-          - image_name: rocky-latest-RL9
-            source_image_name: Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
+          - image_name: openhpc-RL9
+            source_image_name: Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.qcow2
             inventory_groups: update
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
 
@@ -84,7 +84,6 @@ jobs:
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
-          -var "image_name_version=" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           openstack.pkr.hcl
 
@@ -99,92 +98,19 @@ jobs:
           IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo $IMAGE_ID > image-id.txt
+          echo $IMAGE_NAME > image-name.txt
 
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
           openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
 
-      - name: Delete old latest image
-        run: |
-          . venv/bin/activate
-          IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
-          if [ "$IMAGE_COUNT" -gt 1 ]; then
-            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ steps.manifest.outputs.image-name }}"  -f value -c ID | head -n 1)
-            echo "Deleting old image ID: $OLD_IMAGE_ID"
-            openstack image delete "$OLD_IMAGE_ID"
-          else
-            echo "Only one image exists, skipping deletion."
-          fi
-
-  upload:
-    name: upload-nightly-targets
-    needs: openstack
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }}-${{ matrix.target_cloud }}
-      cancel-in-progress: true
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        target_cloud:
-          - LEAFCLOUD
-          - SMS
-          - ARCUS
-        build:
-          - image_name: rocky-latest-RL8
-          - image_name: rocky-latest-RL9
-        exclude:
-          - target_cloud: LEAFCLOUD
-    env:
-      OS_CLOUD: openstack
-      SOURCE_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
-      TARGET_CLOUD: ${{ matrix.target_cloud }}
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Record settings for CI cloud
-        run: |
-          echo SOURCE_CLOUD: ${{ env.SOURCE_CLOUD }}
-          echo TARGET_CLOUD: ${{ env.TARGET_CLOUD }}
-
-      - name: Install openstackclient
-        run: |
-          python3 -m venv venv
-          . venv/bin/activate
-          pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
-
-      - name: Write clouds.yaml
-        run: |
-          mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.SOURCE_CLOUD)] }}" > ~/.config/openstack/source_clouds.yaml
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.TARGET_CLOUD)] }}" > ~/.config/openstack/target_clouds.yaml
-
-      - name: Download source image
-        run: |
-          . venv/bin/activate
-          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/source_clouds.yaml
-          openstack image save --file ${{ matrix.build.image_name }} ${{ matrix.build.image_name }}
-
-      - name: Upload to target cloud
-        run: |
-          . venv/bin/activate
-          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
-
-          openstack image create "${{ matrix.build.image_name }}" \
-            --file "${{ matrix.build.image_name }}" \
-            --disk-format qcow2 \
-
-      - name: Delete old latest image from target cloud
-        run: |
-          . venv/bin/activate
-          export OS_CLIENT_CONFIG_FILE=~/.config/openstack/target_clouds.yaml
-
-          IMAGE_COUNT=$(openstack image list --name ${{ matrix.build.image_name }} -f value -c ID | wc -l)
-          if [ "$IMAGE_COUNT" -gt 1 ]; then
-            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ matrix.build.image_name }}"  -f value -c ID | head -n 1)
-            openstack image delete "$OLD_IMAGE_ID"
-          else
-            echo "Only one image exists, skipping deletion."
-          fi
+      - name: Upload manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-details-${{ matrix.build.image_name }}
+          path: |
+            ./image-id.txt
+            ./image-name.txt
+          overwrite: true

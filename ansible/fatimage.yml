@@ -89,7 +89,7 @@
         tasks_from: install.yml
 
 - name: Install gateway playbook
-  hosts: gateway
+  hosts: gateway:&ansible_init
   tags: gateway
   become: yes
   gather_facts: no
