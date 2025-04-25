@@ -83,10 +83,6 @@ openondemand
 [tuned:children]
 # Hosts to run TuneD configuration
 
-[ansible_init:children]
-# Hosts to run linux-ansible-init
-cluster
-
 [sssd]
 # Hosts to configure sssd on
 
@@ -123,5 +119,5 @@ builder
 # Hosts where crony configuration is applied. See docs/chrony.md for more details.
 
 [gateway:children]
-# Add builder to this group to install gateway ansible-init playbook into image
-builder
+# Hosts to install compute_init playbook on during image build to configure ip gateway on boot
+cluster

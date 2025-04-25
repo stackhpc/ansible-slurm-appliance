@@ -133,8 +133,10 @@ freeipa_client
 [tuned]
 # Hosts to run TuneD configuration
 
-[ansible_init]
+[ansible_init:children]
 # Hosts to run linux-anisble-init
+compute_init
+gateway
 
 [sssd]
 # Hosts to configure sssd on
@@ -181,4 +183,4 @@ extra_packages
 # Hosts where crony configuration is applied. See docs/chrony.md for more details.
 
 [gateway]
-# Add builder to this group to install gateway ansible-init playbook into image
+# Hosts to install compute_init playbook on during image build to configure ip gateway on boot
