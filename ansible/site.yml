@@ -27,7 +27,7 @@
 - import_playbook: slurm.yml
 - import_playbook: portal.yml
 - import_playbook: monitoring.yml
-- import_playbook: disable-repos.yml
+- import_playbook: after.yml
 
 - name: Run post.yml hook
   vars:
@@ -36,13 +36,5 @@
     hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
-
-- name: Clean up and shutdown Packer VM
-  hosts: builder
-  gather_facts: no
-  become: yes
-  tasks:
-    - import_tasks: cleanup.yml
-    - community.general.shutdown:
 
 ...
