@@ -34,3 +34,12 @@
         name: lustre
         # NB install is ONLY run in builder
         tasks_from: configure.yml
+
+- name: Setup WEKA
+  hosts: weka
+  become: true
+  tags:
+    - weka
+  tasks:
+    - include_role:
+        name: weka

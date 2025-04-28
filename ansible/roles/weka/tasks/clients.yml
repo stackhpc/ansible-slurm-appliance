@@ -1,0 +1,35 @@
+---
+- name: Ensure mount directory exists
+  ansible.builtin.file:
+    path: "{{ item.get('weka_client_mnt_point', weka_client_mnt_point) }}"
+    state: directory
+
+- name: Install WEKA client
+  ansible.builtin.shell: "curl http://{{ item.get('weka_servers', weka_servers) | first }}:14000/dist/v1/install | WEKA_CGROUPS_MODE=force_v2 sh"
+
+- name: Ensure WEKA agent is enabled and running
+  ansible.builtin.systemd:
+    name: weka-agent
+    enabled: true
+    state: started
+
+- name: Ensure WEKA does not modify cpusets
+  ansible.builtin.lineinfile:
+    path: "/etc/wekaio/service.conf"
+    regexp: "^isolate_cpusets="
+    line: isolate_cpusets=false
+  register: isolate_cpusets
+
+- name: Restart weka-agent
+  ansible.builtin.systemd:
+    name: weka-agent
+    state: restarted
+  when: isolate_cpusets.changed
+
+- name: Mount the file system
+  ansible.posix.mount:
+    path: "{{ item.get('weka_client_mnt_point', weka_client_mnt_point) }}"
+    src: "{{ item.get('weka_servers', weka_servers) | join(',') }}{{ item.get('weka_export', weka_export) }}"
+    opts: "{{ item['weka_client_mnt_options'] | default(weka_client_mnt_options, true) | default(omit, true) }}" # for some reason items.get() here fails with "an incorrect mount option was specified"
+    fstype: wekafs
+    state: "{{ item.get('weka_client_mnt_state', weka_client_mnt_state) }}"

@@ -111,3 +111,19 @@
         name: postfix
         enabled: true
         state: started
+
+- name: Allow administrators to use sudo
+  hosts: cluster
+  become: true
+  tasks:
+    - name: Create /etc/sudoers.d/io-admins
+      copy:
+        content: |
+          %stackhpc   ALL=(ALL)       ALL
+          dehneg      ALL=(ALL)       ALL
+          dernatr     ALL=(ALL)       ALL
+          larreure    ALL=(ALL)       ALL
+          omsj        ALL=(ALL)       ALL
+          pitollatb   ALL=(ALL)       ALL
+        dest: /etc/sudoers.d/io-admins
+        validate: '/usr/sbin/visudo -csf %s'

@@ -1,0 +1,18 @@
+---
+# Path to mountpoint on weka clients
+weka_client_mnt_point: "/mnt"
+
+# weka client mount options
+weka_client_mnt_options:
+
+weka_client_mnt_state: mounted
+
+weka_enable:
+  server: false
+  clients: false
+
+# have to supply a default "empty" config to allow mapping from weka_configurations:
+weka_configurations:
+  - weka_enable:
+      server: false
+      clients: false
