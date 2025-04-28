@@ -1,7 +1,11 @@
 ---
-
 openhpc_config_extra:
   DebugFlags: GRES # consider this for initial setup.
-  SelectType: select/cons_tres
   GresTypes: gpu
-
+  JobAcctGatherType: jobacct_gather/cgroup # (optional) for gathering metrics
+  ProctrackType: proctrack/cgroup
+  PrologFlags: Contain
+  SelectType: select/cons_tres
+  SelectTypeParameters: CR_Core_Memory
+  TaskPlugin: task/affinity,task/cgroup
+  TaskPluginParam: SlurmdOffSpec
