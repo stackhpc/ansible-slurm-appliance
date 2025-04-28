@@ -26,7 +26,7 @@
     path: "{{ hpctests_rootdir }}"
     state: directory
     owner: "{{ hpctests_user }}"
-    group: "{{ hpctests_user }}"
+    group: "{{ hpctests_group }}"
 
 - name: Set fact for UCX_NET_DEVICES
   set_fact:
