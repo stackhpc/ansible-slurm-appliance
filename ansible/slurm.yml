@@ -7,7 +7,7 @@
   tasks:
     - include_role:
         name:  mysql
-        tasks_from: "{{ 'install.yml' if appliances_mode == 'build' else 'main.yml' }}"
+        tasks_from: "{{ {'build':'install.yml', 'configure':'configure.yml'}[appliances_mode] | default('main.yml') }}"
 
 - name: Setup slurm-driven rebuild
   hosts: rebuild:!builder
