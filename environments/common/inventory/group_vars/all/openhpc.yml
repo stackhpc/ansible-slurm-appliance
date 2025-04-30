@@ -28,7 +28,7 @@ openhpc_packages_default:
   - apptainer
   - podman-compose
 openhpc_packages_extra: []
-openhpc_packages: "{{ openhpc_packages_default + openhpc_packages_extra }}"
+openhpc_packages: "{{ (openhpc_packages_default + openhpc_packages_extra) | select | list }}"
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_login_only_nodes: login
 openhpc_config_default:
