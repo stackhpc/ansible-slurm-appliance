@@ -69,8 +69,10 @@ openhpc
 [proxy]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
 
-[manila]
+[manila:children]
 # Hosts to configure for manila fileshares
+login
+compute
 
 [persist_hostkeys:children]
 # Hosts to use common set of hostkeys which persist across reimaging.
@@ -125,3 +127,10 @@ builder
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
 builder
+
+[zenith:children]
+grafana
+openondemand
+
+[podman:children]
+zenith
