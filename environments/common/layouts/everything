@@ -124,5 +124,7 @@ builder
 # Hosts where crony configuration is applied. See docs/chrony.md for more details.
 
 [gateway:children]
-# Hosts to install compute_init playbook on during image build to configure ip gateway on boot
+# Hosts to install gateway configuration functionality on during image build.
+# The actual configuration is performed on boot using ansible-init.
+# Default `cluster` means this is installed during "fat image" builds.
 cluster

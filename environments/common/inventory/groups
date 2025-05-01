@@ -135,7 +135,7 @@ freeipa_client
 # Hosts to run TuneD configuration
 
 [ansible_init:children]
-# Hosts to run linux-anisble-init
+# Hosts to run linux-ansible-init
 compute_init
 gateway
 
@@ -187,4 +187,5 @@ extra_packages
 # Hosts where crony configuration is applied. See docs/chrony.md for more details.
 
 [gateway]
-# Hosts to install compute_init playbook on during image build to configure ip gateway on boot
+# Hosts to install gateway configuration functionality on during image build.
+# The actual configuration is performed on boot using ansible-init.
