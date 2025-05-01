@@ -71,8 +71,7 @@ openhpc
 
 [manila:children]
 # Hosts to configure for manila fileshares
-login
-compute
+cluster
 
 [persist_hostkeys:children]
 # Hosts to use common set of hostkeys which persist across reimaging.

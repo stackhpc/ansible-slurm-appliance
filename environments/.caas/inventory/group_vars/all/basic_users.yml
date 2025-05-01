@@ -10,3 +10,6 @@ basic_users_users:
       - adm
       - systemd-journal
     sudo: azimuth ALL=(ALL) NOPASSWD:ALL
+
+# the path *on the control node* for the home directories depends on the filesystem:
+basic_users_homedir_server_path: "{{ '/home' if cluster_home_manila_share | bool else '/exports/home' }}"
