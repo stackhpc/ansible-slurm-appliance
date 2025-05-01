@@ -1,6 +1,6 @@
 ---
 hpctests_user: "{{ ansible_user }}"
-hpctests_group: "{{ ansible_user }}"
+hpctests_group: "{{ hpctests_user }}"
 hpctests_rootdir: "/home/{{ hpctests_user }}/hpctests"
 hpctests_pre_cmd: ''
 hpctests_pingmatrix_modules: [gnu12 openmpi4]
