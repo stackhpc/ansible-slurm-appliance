@@ -10,6 +10,11 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
+        cleanup_on_failure:
+          description: Cleanup Packer resources on failure
+          type: boolean
+          required: true
+          default: true
 
 jobs:
   openstack:
@@ -78,7 +83,7 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ vars.PACKER_ON_ERROR }} \
+          -on-error=${{ github.event.inputs.cleanup_on_failure && 'cleanup' || 'abort' }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
