@@ -1,0 +1,8 @@
+{{ ansible_managed | comment }}
+[grafana]
+baseurl = {{ appliances_pulp_url }}/pulp/content/{{ appliances_pulp_repos.grafana[ansible_distribution_major_version] | appliances_repo_to_subpath }}
+name = grafana
+async = 1
+gpgcheck = 0
+password = {{ dnf_repos_password }}
+username = {{ dnf_repos_username }}
