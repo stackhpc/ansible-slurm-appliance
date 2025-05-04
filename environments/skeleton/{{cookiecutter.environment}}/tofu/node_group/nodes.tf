@@ -57,7 +57,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 
   for_each = var.ignore_image_changes ? toset(var.nodes) : []
 
-  name = "${var.cluster_name}-${each.key}"
+  name = var.use_ironic_node_name ? "${each.key}" : "${var.cluster_name}-${each.key}"
   image_id = var.image_id
   flavor_name = var.flavor
   key_pair = var.key_pair
@@ -111,7 +111,7 @@ resource "openstack_compute_instance_v2" "compute" {
 
   for_each = var.ignore_image_changes ? [] : toset(var.nodes)
   
-  name = "${var.cluster_name}-${each.key}"
+  name = var.use_ironic_node_name ? "${each.key}" : "${var.cluster_name}-${each.key}"
   image_id = var.image_id
   flavor_name = var.flavor
   key_pair = var.key_pair
