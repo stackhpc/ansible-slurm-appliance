@@ -1,4 +1,11 @@
 ---
+- name: Set timezone to Europe/Paris
+  hosts: cluster
+  become: true
+  tasks:
+    - community.general.timezone:
+        name: Europe/Paris
+
 - name: Create NFS symlinks
   hosts: cluster:!builder
   become: true
