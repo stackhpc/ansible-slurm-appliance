@@ -134,3 +134,65 @@
           pitollatb   ALL=(ALL)       ALL
         dest: /etc/sudoers.d/io-admins
         validate: '/usr/sbin/visudo -csf %s'
+
+- name: Create GNU Guix synlinks
+  hosts: cluster:!builder
+  become: true
+  tasks:
+    - name: Ensure /var/guix symlink exists
+      ansible.builtin.file:
+        dest: /var/guix
+        src: /storage/simple/guix/var
+        follow: false
+        force: true
+        group: root
+        owner: root
+        state: link
+    - name: Ensure /gnu symlink exists
+      ansible.builtin.file:
+        dest: /gnu
+        src: /storage/simple/guix/gnu
+        follow: false
+        force: true
+        group: root
+        owner: root
+        state: link
+    - name: Ensure /usr/local/bin/guix exists
+      ansible.builtin.file:
+        dest: /usr/local/bin/guix
+        src: /var/guix/profiles/per-user/root/current-guix/bin/guix
+        follow: false
+        force: true
+        group: root
+        owner: root
+        state: link
+    - name: Ensure /var/log/guix exists
+      ansible.builtin.file:
+        dest: /var/log/guix
+        src: /storage/simple/guix/log
+        follow: false
+        force: true
+        group: root
+        owner: root
+        state: link
+    - name: Create /etc/profile.d/guix.sh
+      copy:
+        content: |
+          GUIX_DAEMON_SOCKET="guix://guix.meso2:44146"
+          export GUIX_DAEMON_SOCKET
+
+          GUIX_LOCPATH=/var/guix/profiles/per-user/root/guix-profile/lib/locale
+          export GUIX_LOCPATH
+
+          # Here we must use a valid locale name.  Try "ls $GUIX_LOCPATH/*"
+          # to see what names can be used.
+          #LC_ALL=C.UTF-8
+          #export LC_ALL
+
+          for GUIX_PROFILE in "$HOME/.config/guix/current" "$HOME/.guix-profile"
+          do
+            if [ -f "$GUIX_PROFILE/etc/profile" ]; then
+              . "$GUIX_PROFILE/etc/profile"
+            fi
+          done
+        dest: /etc/profile.d/guix.sh
