@@ -18,9 +18,10 @@ locals {
     for n in var.nodes: n => templatestring(
       var.nodename_template,
       {
-        node=n,
-        cluster_name=var.cluster_name,
-        cluster_domain_suffix=var.cluster_domain_suffix
+        node = n,
+        cluster_name = var.cluster_name,
+        cluster_domain_suffix = var.cluster_domain_suffix,
+        environment_name = basename(var.environment_root)
       }
     )
   }

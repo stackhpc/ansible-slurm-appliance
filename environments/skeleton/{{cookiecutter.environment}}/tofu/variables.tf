@@ -190,7 +190,8 @@ variable "cluster_nodename_template" {
             $${cluster_domain_suffix}: From var.cluster_domain_suffix
             $${node}: The current entry in the "nodes" parameter for nodes
             defined by var.compute and var.login, or "control" for the control
-            node.
+            node
+            $${environment_name}: The last element of the current environment's path
     EOT
     type = string
     default = "$${cluster_name}-$${node}.$${cluster_name}.$${cluster_domain_suffix}"

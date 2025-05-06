@@ -3,9 +3,10 @@ locals {
   nodename = templatestring(
     var.cluster_nodename_template,
     {
-      node="control",
-      cluster_name=var.cluster_name,
-      cluster_domain_suffix=var.cluster_domain_suffix
+      node = "control",
+      cluster_name = var.cluster_name,
+      cluster_domain_suffix = var.cluster_domain_suffix,
+      environment_name = basename(var.environment_root)
     }
   )
 }
