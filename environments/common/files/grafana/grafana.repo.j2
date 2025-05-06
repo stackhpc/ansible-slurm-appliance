@@ -5,5 +5,7 @@ enabled = 0
 name = grafana
 async = 1
 gpgcheck = 0
+{% if dnf_repos_password is defined %}
 password = {{ dnf_repos_password }}
 username = {{ dnf_repos_username }}
+{% endif %}
