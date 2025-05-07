@@ -91,9 +91,9 @@ jobs:
         run: dev/setup-env.sh
 
       - name: Install OpenTofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v1.0.5
         with:
-          tofu_version: 1.6.2
+          tofu_version: 1.9.0
 
       - name: Initialise tofu
         run: tofu init
