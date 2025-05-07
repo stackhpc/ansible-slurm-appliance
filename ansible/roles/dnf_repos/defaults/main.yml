@@ -8,11 +8,13 @@ dnf_repos_filenames:
     appstream: 'Rocky-AppStream'
     crb: 'Rocky-PowerTools'
     extras: 'Rocky-Extras'
+    grafana: 'grafana'
   '9':
     baseos: 'rocky'
     appstream: 'rocky'
     crb: 'rocky'
     extras: 'rocky-extras'
+    grafana: 'grafana'
 
 dnf_repos_version_filenames: "{{ dnf_repos_filenames[ansible_distribution_major_version] }}"
 
@@ -33,6 +35,9 @@ dnf_repos_default_repolist:
 - file: ceph
   name: Ceph
   base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.ceph[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
+- file: "{{ dnf_repos_version_filenames.grafana }}"
+  name: grafana
+  base_url: "{{ dnf_repos_pulp_content_url }}/{{ appliances_pulp_repos.grafana[ansible_distribution_major_version] | appliances_repo_to_subpath }}"
 
 dnf_repos_openhpc_repolist:
 - name: OpenHPC

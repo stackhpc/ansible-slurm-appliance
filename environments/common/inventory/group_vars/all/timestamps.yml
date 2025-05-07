@@ -67,3 +67,10 @@ appliances_pulp_repos:
     '9':
       path: OpenHPC/3/updates/EL_9
       timestamp: 20241218T154614
+  grafana:
+    '8':
+      path: grafana/oss/rpm
+      timestamp: 20250505T025259
+    '9':
+      path: grafana/oss/rpm
+      timestamp: 20250505T025259
