@@ -61,6 +61,7 @@ variable "login" {
         match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
         availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
         gateway_ip: Address to add default route via
+        nodename_template: Overrides variable cluster_nodename_template
   EOF
 }
 
@@ -97,6 +98,7 @@ variable "compute" {
             match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
             availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
             gateway_ip: Address to add default route via
+            nodename_template: Overrides variable cluster_nodename_template
     EOF
 }
 
@@ -178,4 +180,19 @@ variable "gateway_ip" {
     description = "Address to add default route via"
     type = string
     default = ""
+}
+
+variable "cluster_nodename_template" {
+    description = <<-EOT
+        Template for node fully-qualified names. The following interpolations
+        can be used:
+            $${cluster_name}: From var.cluster_name
+            $${cluster_domain_suffix}: From var.cluster_domain_suffix
+            $${node}: The current entry in the "nodes" parameter for nodes
+            defined by var.compute and var.login, or "control" for the control
+            node
+            $${environment_name}: The last element of the current environment's path
+    EOT
+    type = string
+    default = "$${cluster_name}-$${node}.$${cluster_name}.$${cluster_domain_suffix}"
 }
