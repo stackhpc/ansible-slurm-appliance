@@ -11,9 +11,12 @@
 - name: Ensure mysql service state
   systemd:
     name: mysql
-    state: "{{ mysql_state | default('restarted' if _mysql_unitfile.changed else 'started') }}"
+    state: "{{ mysql_state | default('restarted' if _mysql_unitfile_changed else 'started') }}"
     enabled: "{{ mysql_systemd_service_enabled }}"
-    daemon_reload: "{{ _mysql_unitfile.changed }}"
+    daemon_reload: "{{ _mysql_unitfile_changed }}"
+  vars:
+    # cope with not having run install tasks
+    _mysql_unitfile_changed: "{{ _mysql_unitfile.changed | default(false) }}"
 
 - block:
   - name: Wait for mysql to initialise

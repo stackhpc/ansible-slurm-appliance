@@ -63,7 +63,8 @@ mysql
 cluster
 
 [rebuild]
-# Enable rebuild of nodes on an OpenStack cloud; add 'control' group.
+# Add 'control' group to enable slurm-controlled rebuild of compute nodes
+# NB: Compute nodes need compute_init enabled
 
 [update]
 # All hosts to (optionally) run yum update on.
@@ -133,8 +134,10 @@ freeipa_client
 [tuned]
 # Hosts to run TuneD configuration
 
-[ansible_init]
-# Hosts to run linux-anisble-init
+[ansible_init:children]
+# Hosts to run linux-ansible-init
+compute_init
+gateway
 
 [sssd]
 # Hosts to configure sssd on
@@ -143,7 +146,10 @@ freeipa_client
 # Hosts where the OpenSSH server daemon should be configured
 
 [compute_init]
-# EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
+# EXPERIMENTAL: Compute hosts which should rejoin the cluster after rebuild
+# without running site.yml playbook.
+# NB: Additional configuration is required and not all functionality is
+# currently supported - ee ansible/roles/compute_init/README.md
 
 [k3s:children]
 # Hosts to run k3s server/agent
@@ -181,4 +187,5 @@ extra_packages
 # Hosts where crony configuration is applied. See docs/chrony.md for more details.
 
 [gateway]
-# Add builder to this group to install gateway ansible-init playbook into image
+# Hosts to install gateway configuration functionality on during image build.
+# The actual configuration is performed on boot using ansible-init.

@@ -1,0 +1,38 @@
+- hosts: compute_init
+  tags: compute_init
+  become: yes
+  tasks:
+    - name: Install compute_init playbook
+      ansible.builtin.include_role:
+        name: compute_init
+        tasks_from: 'install.yml'
+      when: "{{ appliances_mode == 'build' }}"
+      # conditional used instead of compute_init!builder to make dev easier
+
+- hosts: compute_init:!builder
+  tags: compute_init
+  become: yes
+  tasks:
+    - name: Setup NFS export for compute node configuration
+      ansible.builtin.include_role:
+        name: compute_init
+        tasks_from: export.yml
+
+- hosts: dnf_repos
+  become: yes
+  tasks:
+    - name: Disable pulp repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: disable_repos.yml
+
+- hosts: builder
+  become: yes
+  gather_facts: yes
+  tags: finalise
+  tasks:
+    - name: Cleanup image
+      import_tasks: cleanup.yml
+
+    - name: Shutdown Packer VM
+      community.general.shutdown:

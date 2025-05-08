@@ -1,15 +1,5 @@
 # Builder version of site.yml just installing binaries
 
-- hosts: builder
-  become: no
-  gather_facts: no
-  tasks:
-    - name: Report hostname (= final image name)
-      command: hostname
-    - name: Report inventory groups
-      debug:
-        var: group_names
-
 - name: Run pre.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
@@ -25,17 +15,8 @@
       tasks_from: sync.yml
       apply:
         delegate_to: localhost
-    when: appliances_mode != 'configure'
 
 - import_playbook: bootstrap.yml
-
-- hosts: doca
-  become: yes
-  gather_facts: yes
-  tasks:
-    - name: Install NVIDIA DOCA
-      import_role:
-        name: doca
 
 - name: Run post-bootstrap.yml hook
   vars:
@@ -44,22 +25,12 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- import_playbook: iam.yml
+
 - hosts: builder
   become: yes
   gather_facts: yes
   tasks:
-    # - import_playbook: iam.yml
-    - name: Install FreeIPA client
-      import_role:
-        name: freeipa
-        tasks_from: client-install.yml
-      when: "'freeipa_client' in group_names"
-    - name: Install sssd
-      import_role:
-        name: sssd
-        tasks_from: install.yml
-      when: "'sssd' in group_names"
-
     # - import_playbook: filesystems.yml:
     - name: Install nfs packages
       dnf:
@@ -77,43 +48,12 @@
       when: "'lustre' in group_names"
 
 - import_playbook: extras.yml
-
-# TODO: is this the right place?
-- name: Install compute_init playbook
-  hosts: compute_init
-  tags: compute_init # tagged to allow running on cluster instances for dev
-  become: yes
-  tasks:
-    - include_role:
-        name: compute_init
-        tasks_from: install.yml
-
-- name: Install gateway playbook
-  hosts: gateway
-  tags: gateway
-  become: yes
-  gather_facts: no
-  tasks:
-    - include_role:
-        name: gateway
+- import_playbook: slurm.yml
 
 - hosts: builder
   become: yes
   gather_facts: yes
   tasks:
-    # - import_playbook: slurm.yml:
-    - name: Setup DB
-      include_role:
-        name: mysql
-        tasks_from: install.yml
-      when: "'mysql' in group_names"
-
-    - name: OpenHPC
-      import_role:
-        name: stackhpc.openhpc
-        tasks_from: install.yml
-      when: "'openhpc' in group_names"
-
     # - import_playbook: portal.yml
     - name: Open Ondemand server (packages)
       include_role:
@@ -257,15 +197,4 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- import_playbook: disable-repos.yml
-
-- hosts: builder
-  become: yes
-  gather_facts: yes
-  tags: finalise
-  tasks:
-    - name: Cleanup image
-      import_tasks: cleanup.yml
-
-    - name: Shutdown Packer VM
-      community.general.shutdown:
+- import_playbook: final.yml

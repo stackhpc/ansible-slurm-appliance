@@ -3,11 +3,11 @@
 - name: Setup DB
   hosts: mysql
   become: true
-  tags:
-    - mysql
+  tags: mysql
   tasks:
     - include_role:
         name:  mysql
+        tasks_from: "{{ {'build':'install.yml', 'configure':'configure.yml'}[appliances_mode] | default('main.yml') }}"
 
 - name: Setup slurm-driven rebuild
   hosts: rebuild:!builder
@@ -20,12 +20,9 @@
         name: rebuild
 
 - name: Set locked memory limits on user-facing nodes
-  hosts:
-    - compute
-    - login
+  hosts: compute:login:!builder
   become: yes
-  tags:
-    - openhpc
+  tags: openhpc
   tasks:
     - name: set memory limits
       lineinfile:
@@ -34,10 +31,9 @@
         line: "* soft memlock unlimited"
 
 - name: Block ssh to compute nodes for non-privileged users without running jobs
-  hosts: compute
+  hosts: compute:!builder
   become: yes
-  tags:
-    - openhpc
+  tags: openhpc
   tasks:
     - name: Configure sshd pam module
       blockinfile:
@@ -57,9 +53,8 @@
 - name: Setup slurm
   hosts: openhpc
   become: yes
-  tags:
-    - openhpc
+  tags: openhpc
   tasks:
     - include_role:
         name: stackhpc.openhpc
-        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
+        tasks_from: "{{ {'build':'install.yml', 'configure':'runtime.yml'}[appliances_mode] | default('main.yml') }}"
