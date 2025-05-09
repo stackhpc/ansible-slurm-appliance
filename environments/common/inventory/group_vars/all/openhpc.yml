@@ -17,7 +17,7 @@ openhpc_slurm_control_host: "{{ groups['control'] | first }}" # avoid using host
 openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
 openhpc_rebuild_partition: # not a role var - could actually add more indirection here for things we're expecting to be modified, e.g. groups and maxtime
   name: rebuild
-  groups: "{{ cluster_compute_groups }}"
+  nodegroups: "{{ cluster_compute_groups }}"
   default: NO
   maxtime: 30
   partition_params:
