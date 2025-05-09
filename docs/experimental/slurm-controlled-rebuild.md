@@ -107,42 +107,17 @@ The configuration of this is complex and involves:
       defined in the `compute` or `login` variables, to override the default
       image for specific node groups.
 
-5. Modify `openhpc_slurm_partitions` to add a new partition covering rebuildable
-   nodes to use for for rebuild jobs. If using the default OpenTofu
-   configurations, this variable is contained in an OpenTofu-templated file
-   `environments/$ENV/group_vars/all/partitions.yml` which must be overriden
-   by copying it to e.g. a `z_partitions.yml` file in the same directory.
-   However production sites will probably be overriding this file anyway to
-   customise it.
-
-   An example partition definition, given the two node groups "general" and
-   "gpu" shown in Step 2, is:
-
-    ```yaml
-    openhpc_slurm_partitions:
-        ...
-        - name: rebuild
-          groups:
-            - name: general
-            - name: gpu
-          default: NO
-          maxtime: 30
-          partition_params:
-            PriorityJobFactor: 65533
-            Hidden: YES
-            RootOnly: YES
-            DisableRootJobs: NO
-            PreemptMode: 'OFF'
-            OverSubscribe: EXCLUSIVE
-    ```
-
-    Which has parameters as follows:
+5. Ensure `openhpc_partitions` contains a partition covering the nodes to run
+   rebuild jobs. The default definition in `environments/common/inventory/group_vars/all/openhpc.yml`
+   will automatically include this via `openhpc_rebuild_partition` also in that
+   file. If modifying this, note the important parameters are:
+   
     - `name`: Partition name matching `rebuild` role variable `rebuild_partitions`,
       default `rebuild`.
-    - `groups`: A list of node group names, matching keys in the OpenTofu
-      `compute` variable (see example in step 2 above). Normally every compute
-      node group should be listed here, unless Slurm-controlled rebuild is not
-      required for certain node groups.
+    - `groups`: A list of nodegroup names, matching `openhpc_nodegroup` and
+      keys in the OpenTofu `compute` variable (see example in step 2 above).
+      Normally every compute node group should be listed here, unless
+      Slurm-controlled rebuild is not required for certain node groups.
     - `default`: Must be set to `NO` so that it is not the default partition.
     - `maxtime`: Maximum time to allow for rebuild jobs, in
       [slurm.conf format](https://slurm.schedmd.com/slurm.conf.html#OPT_MaxTime).
