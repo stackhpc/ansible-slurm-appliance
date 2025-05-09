@@ -23,7 +23,7 @@ The below are only used by this role's `rebuild.yml` task file, i.e. when
 running the `ansible/adhoc/rebuild-via-slurm.yml` playbook:
 
 - `rebuild_job_partitions`: Optional. Comma-separated list of names of rebuild
-  partitions defined in `openhpc_slurm_partitions`. Useful as an extra-var for
+  partitions defined in `openhpc_partitions`. Useful as an extra-var for
   limiting rebuilds. Default `rebuild`.
 
 - `rebuild_job_name`: Optional. Name of rebuild jobs. Default is `rebuild-`

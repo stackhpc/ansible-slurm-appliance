@@ -32,12 +32,12 @@ output "cluster_nodes" {
         }
       }
     ],
-    {% for partition in openhpc_slurm_partitions %}
+    {% for nodegroup in openhpc_nodegroups %}
     [
-      for compute in openstack_compute_instance_v2.{{ partition.name }}: {
+      for compute in openstack_compute_instance_v2.{{ nodegroup.name }}: {
         name          = compute.name
         ip            = compute.network[0].fixed_ip_v4
-        groups        = ["compute", "{{ cluster_name }}_compute", "{{ cluster_name }}_{{ partition.name }}"],
+        groups        = ["compute", "{{ cluster_name }}_compute", "{{ cluster_name }}_{{ nodegroup.name }}"],
         facts  = {
           openstack_project_id = data.openstack_identity_auth_scope_v3.scope.project_id
         }
