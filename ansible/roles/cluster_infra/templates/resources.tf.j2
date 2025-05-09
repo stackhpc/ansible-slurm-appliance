@@ -282,7 +282,7 @@ resource "openstack_networking_port_v2" "control_storage" {
 ###
 # Workers
 ###
-{% for nodegroup in openhpc_nodegroup %}
+{% for nodegroup in openhpc_nodegroups %}
 # Primary network
 resource "openstack_networking_port_v2" "{{ nodegroup.name }}" {
   count = {{ nodegroup.count }}
@@ -499,7 +499,7 @@ resource "openstack_compute_instance_v2" "control" {
   }
 }
 
-{% for nodegroup in openhpc_nodegroup %}
+{% for nodegroup in openhpc_nodegroups %}
 resource "openstack_compute_instance_v2" "{{ nodegroup.name }}" {
   count = {{ nodegroup.count }}
 
