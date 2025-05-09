@@ -51,3 +51,15 @@
   tasks:
     - name: Reset persistent SSH connections
       meta: reset_connection
+
+- hosts: localhost
+  gather_facts: no
+  become: no
+  tasks:
+    - name: Add hosts to dnf_repos group to enable repofiles
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups:
+          - dnf_repos
+      loop: "{{ groups['cluster'] }}"
+      when: dnf_repos_enabled | default(false) | bool
