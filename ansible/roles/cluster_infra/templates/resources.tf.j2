@@ -282,7 +282,7 @@ resource "openstack_networking_port_v2" "control_storage" {
 ###
 # Workers
 ###
-{% for partition in openhpc_slurm_partitions %}
+{% for partition in openhpc_partitions %}
 # Primary network
 resource "openstack_networking_port_v2" "{{ partition.name }}" {
   count = {{ partition.count }}
@@ -499,7 +499,7 @@ resource "openstack_compute_instance_v2" "control" {
   }
 }
 
-{% for partition in openhpc_slurm_partitions %}
+{% for partition in openhpc_partitions %}
 resource "openstack_compute_instance_v2" "{{ partition.name }}" {
   count = {{ partition.count }}
 

@@ -32,7 +32,7 @@ output "cluster_nodes" {
         }
       }
     ],
-    {% for partition in openhpc_slurm_partitions %}
+    {% for partition in openhpc_partitions %}
     [
       for compute in openstack_compute_instance_v2.{{ partition.name }}: {
         name          = compute.name
