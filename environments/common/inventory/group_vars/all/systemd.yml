@@ -1,9 +1,11 @@
 _systemd_requiresmount_statedir: |
+  {% if appliances_state_dir is defined %}
   [Unit]
   RequiresMountsFor={{ appliances_state_dir | default('') }}
+  {% endif %}
 
-_systemd_dropins_statedir:
-  # mysql not included as role handles state dir correctly
+systemd_dropins:
+  # NB: mysql does not need _systemd_requiresmount_statedir as role handles state dir correctly
   opensearch:
     group: opensearch
     content: "{{ _systemd_requiresmount_statedir }}"
@@ -12,12 +14,16 @@ _systemd_dropins_statedir:
     content: "{{ _systemd_requiresmount_statedir }}"
   slurmdbd:
     group: openhpc
-    content: "{{ _systemd_requiresmount_statedir }}"
+    content: |
+      {{ _systemd_requiresmount_statedir }}
+      
+      [Service]
+      # Allow slurmdbd to complete major version upgrades
+      TimeoutStartSec={{ openhpc_slurmdbd_timeout_start_sec }}
+
   slurmctld:
     group: openhpc
     content: "{{ _systemd_requiresmount_statedir }}"
   prometheus:
     group: prometheus
     content: "{{ _systemd_requiresmount_statedir }}"
-
-systemd_dropins: "{{ _systemd_dropins_statedir if appliances_state_dir is defined else {} }}"
