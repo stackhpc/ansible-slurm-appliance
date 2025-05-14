@@ -19,16 +19,6 @@
     - import_role:
         name: rebuild
 
-- name: Setup slurm
-  hosts: openhpc
-  become: yes
-  tags:
-    - openhpc
-  tasks:
-    - include_role:
-        name: stackhpc.openhpc
-        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
-
 - name: Set locked memory limits on user-facing nodes
   hosts:
     - compute
@@ -63,3 +53,13 @@
           +:adm:ALL
           -:ALL:ALL
       # vagrant uses (deprecated) ansible_ssh_user
+
+- name: Setup slurm
+  hosts: openhpc
+  become: yes
+  tags:
+    - openhpc
+  tasks:
+    - include_role:
+        name: stackhpc.openhpc
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"

@@ -2,7 +2,7 @@
 
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
-grafana_version: '9.5.21'
+grafana_version: '10.4.18'
 
 # need to copy some role defaults here so we can use in inventory:
 grafana_port: 3000
@@ -108,3 +108,6 @@ _grafana_auth_anon_cfg:
     org_role: Viewer
 grafana_auth: "{{ _grafana_auth_anon_cfg if grafana_auth_anonymous | bool else {} }}"
 _grafana_auth_is_anonymous: "{{ grafana_auth.anonymous | default({}) | length > 0 }}"
+
+# use ark or pulp for grafana as upstream packages disappear:
+grafana_yum_repo_template: "{{ appliances_repository_root }}/environments/common/files/grafana/grafana.repo.j2"

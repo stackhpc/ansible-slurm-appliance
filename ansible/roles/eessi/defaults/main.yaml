@@ -9,3 +9,5 @@ cvmfs_config_default:
 cvmfs_config_overrides: {}
 
 cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
+
+cvmfs_gpg_checksum: "sha256:4ac81adff957565277cfa6a4a330cdc2ce5a8fdd73b8760d1a5a32bef71c4bd6"

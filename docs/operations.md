@@ -7,7 +7,7 @@ All subsequent sections assume that:
 - An Ansible vault secret is configured.
 - The correct private key is available to Ansible.
 - Appropriate OpenStack credentials are available.
-- Any non-appliance controlled infrastructure is avaialble (e.g. networks, volumes, etc.).
+- Any non-appliance controlled infrastructure is available (e.g. networks, volumes, etc.).
 - `$ENV` is your current, activated environment, as defined by e.g. `environments/production/`.
 - `$SITE_ENV` is the base site-specific environment, as defined by e.g. `environments/mysite/`.
 - A string `some/path/to/file.yml:myvar` defines a path relative to the repository root and an Ansible variable in that file.
@@ -27,7 +27,7 @@ This depends on how the cluster is accessed.
 
 The script `dev/ansible-ssh` may generally be used to connect to a host specified by a `inventory_hostname` using the same connection details as Ansible. If this does not work:
 - Instance IPs are normally defined in `ansible_host` variables in an inventory file `environments/$ENV/inventory/hosts{,.yml}`.
-- The ssh user is defined by `ansible_user`, default is `rocky`. This may be overriden in your environment.
+- The ssh user is defined by `ansible_user`, default is `rocky`. This may be overridden in your environment.
 - If a jump host is required the user and address may be defined in the above inventory file.
 
 # Modifying general Slurm.conf parameters
@@ -44,7 +44,7 @@ See [Reconfiguring Slurm](#Reconfiguring-Slurm) to apply changes.
 
 # Modifying Slurm Partition-specific Configuration
 
-Modify the `openhpc_slurm_partitions` mapping usually in `enviroments/$SITE_ENV/inventory/group_vars/all/openhpc.yml` as described for [stackhpc.openhpc:slurmconf](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) (note the relevant version of this role is defined in the `requirements.yml`)
+Modify the `openhpc_slurm_partitions` mapping usually in `environments/$SITE_ENV/inventory/group_vars/all/openhpc.yml` as described for [stackhpc.openhpc:slurmconf](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) (note the relevant version of this role is defined in the `requirements.yml`)
 
 Note an Ansible inventory group for the partition is required. This is generally auto-defined by a template in the OpenTofu configuration.
 
@@ -88,7 +88,7 @@ Additional packages can be added during image builds by:
         - anotherpackage
     ```
 
-For packages which come from repositories mirroed by StackHPC's "Ark" Pulp server
+For packages which come from repositories mirrored by StackHPC's "Ark" Pulp server
 (including rocky, EPEL and OpenHPC repositories), this will require either [Ark
 credentials](./image-build.md)) or a [local Pulp mirror](./experimental/pulp.md)
 to be configured. This includes rocky, EPEL and OpenHPC repos.
@@ -96,7 +96,7 @@ to be configured. This includes rocky, EPEL and OpenHPC repos.
 The packages available from the OpenHPC repos are described in Appendix E of
 the OpenHPC installation guide (linked from the
 [OpenHPC releases page](https://github.com/openhpc/ohpc/releases/)). Note
-"user-facing" OpenHPC packages such as compilers, mpi libraries etc. include
+"user-facing" OpenHPC packages such as compilers, MPI libraries etc. include
 corresponding `lmod` modules.
 
 Packages *may* also be installed during the site.yml, by adding the `cluster`
@@ -142,7 +142,7 @@ Note that:
 - The above role provides variables to select specific partitions, nodes and interfaces which may be required. If not set in inventory, these can be passed as extravars:
 
         ansible-playbook ansible/adhoc/hpctests.yml -e hpctests_myvar=foo
-- The HPL-based test is only resonably optimised on Intel processors due the libaries and default parallelisation scheme used. For AMD processors it is recommended this
+- The HPL-based test is only reasonably optimised on Intel processors due the libraries and default parallelisation scheme used. For AMD processors it is recommended this
 is skipped using:
 
         ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo.

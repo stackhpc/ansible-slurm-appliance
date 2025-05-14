@@ -1,2 +1,23 @@
 ---
-openhpc_rebuild_clouds: ~/.config/openstack/clouds.yaml
+
+rebuild_clouds_path: ~/.config/openstack/clouds.yaml
+
+rebuild_job_partitions: rebuild
+rebuild_job_name: "rebuild-{{ item }}" # item is nodename
+rebuild_job_command: 'sleep 5'
+rebuild_job_reboot: true
+rebuild_job_options: ''
+rebuild_job_user: root
+rebuild_job_template: >-
+  sbatch
+  --nodelist={{ item }}
+  {{ '--reboot' if rebuild_job_reboot | bool else '' }}
+  --job-name={{ rebuild_job_name }}
+  --nodes=1
+  --exclusive
+  --partition={{ _rebuild_job_current_partition }}
+  --no-requeue
+  --output=/dev/null
+  --wrap="{{ rebuild_job_command }}"
+  {{ rebuild_job_options }}
+#rebuild_job_hostlist:

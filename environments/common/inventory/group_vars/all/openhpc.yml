@@ -28,7 +28,7 @@ openhpc_packages_default:
   - apptainer
   - podman-compose
 openhpc_packages_extra: []
-openhpc_packages: "{{ openhpc_packages_default + openhpc_packages_extra }}"
+openhpc_packages: "{{ (openhpc_packages_default + openhpc_packages_extra) | select | list }}"
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_login_only_nodes: login
 openhpc_config_default:
@@ -57,3 +57,8 @@ ohpc_openhpc_repos:
 ohpc_default_extra_repos:
   "9": []
   "8": []
+
+# systemd.service.unit.TimeoutStartSec to wait for slurmdbd startup
+# Set long enought to avoid problems with a major version upgrade
+# Currently implemented in environments/common/inventory/group_vars/all/systemd.yml
+openhpc_slurmdbd_timeout_start_sec: '45 minutes'

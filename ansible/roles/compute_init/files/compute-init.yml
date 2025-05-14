@@ -29,14 +29,8 @@
     tuned_enabled: true
     tuned_started: true
 
-    nfs_client_mnt_point: "/mnt"
-    nfs_client_mnt_options:
-    nfs_client_mnt_state: mounted
-    nfs_configurations:
     nfs_enable:
       clients: false
-
-    # openhpc: no defaults required
 
     os_manila_mount_shares: []
     os_manila_mount_ceph_conf_path: /etc/ceph
@@ -47,15 +41,8 @@
       - noatime
       - _netdev # prevents mount blocking early boot before networking available
       - rw
-
-    basic_users_groups: []
-    basic_users_manage_homedir: false # homedir must already exist on shared filesystem
-    basic_users_userdefaults:
-      state: present
-      create_home: "{{ basic_users_manage_homedir }}"
-      generate_ssh_key:  "{{ basic_users_manage_homedir }}"
-      ssh_key_comment: "{{ item.name }}"
-    basic_users_users: []
+      - nodev
+      - nosuid
 
   tasks:
     - block:
@@ -74,7 +61,7 @@
         owner: slurm
         group: root
         mode: u=rX,g=rwX,o=
-    
+
     - name: Mount /mnt/cluster
       mount:
         path: /mnt/cluster
@@ -84,7 +71,8 @@
         state: mounted
       register: _mount_mnt_cluster
       ignore_errors: true
-      # TODO: add some retries here?
+      # exits from playbook if this failed below, allowing ansible-init to
+      # finish, which allows site.yml to continue on initial deploy
 
     - block:
         - name: Report skipping initialization if cannot mount nfs
@@ -96,6 +84,7 @@
       when: _mount_mnt_cluster.failed
 
     - name: Check if hostvars exist
+      become_user: slurm
       stat:
         path: "/mnt/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
       register: hostvars_stat
@@ -109,17 +98,33 @@
         - meta: end_play
       when: not hostvars_stat.stat.exists
 
-    - name: Load hostvars from NFS
+    - name: Sync /mnt/cluster to /var/tmp
+      become_user: slurm
+      synchronize:
+        src: "/mnt/cluster/"
+        dest: "/var/tmp/cluster/"
+        archive: yes
+        recursive: yes
+
+    - name: Unmount /mnt/cluster after sync
+      mount:
+        path: /mnt/cluster
+        state: unmounted
+
+    - name: Load hostvars
       # this is higher priority than vars block = normal ansible's hostvars
       include_vars:
-        file: "/mnt/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml" # can't use inventory_hostname
-
-      # TODO: should /mnt/cluster now be UNMOUNTED to avoid future hang-ups?
+        file: "/var/tmp/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
 
     - name: Run chrony role
       ansible.builtin.include_role:
         name: mrlesmithjr.chrony
-      when: enable_chrony | bool
+        tasks_from: config_chrony.yml
+      vars:
+        # workaround for set_facts.yml:
+        chrony_config: /etc/chrony.conf
+        chrony_service: chronyd
+      when: enable_chrony
 
     - name: Configure resolve.conf
       block:
@@ -149,7 +154,7 @@
 
     - name: Copy cluster /etc/hosts
       copy:
-        src: /mnt/cluster/hosts
+        src: /var/tmp/cluster/hosts
         dest: /etc/hosts
         owner: root
         group: root
@@ -160,14 +165,14 @@
       ansible.builtin.include_role:
         name: cacerts
       vars:
-        cacerts_cert_dir: "/mnt/cluster/cacerts"
+        cacerts_cert_dir: "/var/tmp/cluster/cacerts"
       when: enable_cacerts
 
     - name: Configure sshd
       ansible.builtin.include_role:
         name: sshd
       vars:
-        sshd_conf_src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sshd.conf"
+        sshd_conf_src: "/var/tmp/cluster/hostconfig/{{ ansible_hostname }}/sshd.conf"
       when: enable_sshd
 
     - name: Configure tuned
@@ -179,12 +184,14 @@
         name: sssd
         tasks_from: configure.yml
       vars:
-        sssd_conf_src: "/mnt/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
+        sssd_conf_src: "/var/tmp/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
       when: enable_sssd
 
     # NFS client mount
     - name: If nfs-clients is present
-      include_tasks: tasks/nfs-clients.yml
+      ansible.builtin.include_role:
+        name: stackhpc.nfs
+        tasks_from: nfs-clients.yml
       when:
         - enable_nfs
         - nfs_enable.clients | bool or ('nfs_enable' in item and item.nfs_enable.clients | bool)
@@ -194,7 +201,7 @@
       block:
         - name: Read manila share info from nfs file
           include_vars:
-            file: /mnt/cluster/manila_share_info.yml
+            file: /var/tmp/cluster/manila_share_info.yml
           no_log: true # contains secrets
         
         - name: Ensure Ceph configuration directory exists
@@ -269,34 +276,15 @@
       when: enable_lustre
 
     - name: Basic users
-      block:
-        - name: Create groups
-          ansible.builtin.group: "{{ item }}"
-          loop:  "{{ basic_users_groups }}"
-
-        - name: Create users
-          user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() }}"
-          loop: "{{ basic_users_users }}"
-          loop_control:
-            label: "{{ item.name }} [{{ item.state | default('present') }}]"
-          register: basic_users_info
-
-        - name: Write sudo rules
-          blockinfile:
-            path: /etc/sudoers.d/80-{{ item.name}}-user
-            block: "{{ item.sudo }}"
-            create: true
-          loop: "{{ basic_users_users }}"
-          loop_control:
-            label: "{{ item.name }}"
-          when: "'sudo' in item"
+      ansible.builtin.include_role: 
+        name: basic_users
       when: enable_basic_users
 
     - name: EESSI
       block:
         - name: Copy cvmfs config
           copy:
-            src: /mnt/cluster/cvmfs/default.local
+            src: /var/tmp/cluster/cvmfs/default.local
             dest: /etc/cvmfs/default.local
             owner: root
             group: root
@@ -311,7 +299,9 @@
     # if not the case
     - name: Write Munge key
       copy:
-        content: "{{ openhpc_munge_key }}"
+        # NB: openhpc_munge_key is *binary* and may not survive json encoding
+        # so do same as environments/common/inventory/group_vars/all/openhpc.yml
+        content: "{{ vault_openhpc_mungekey | b64decode }}"
         dest: "/etc/munge/munge.key"
         owner: munge
         group: munge
@@ -330,12 +320,6 @@
     - name: Ensure Munge service state
       service:
         name: munge
-        enabled: true
-        state: started
-
-    - name: Ensure slurmd service state
-      service:
-        name: slurmd
         enabled: true
         state: started
 
@@ -359,6 +343,13 @@
         block: |
           +:adm:ALL
           -:ALL:ALL
+
+    - name: Ensure slurmd service state
+      service:
+        name: slurmd
+        enabled: true
+        state: started
+
 
     - name: Ensure node is resumed
       # TODO: consider if this is always safe for all job states?
