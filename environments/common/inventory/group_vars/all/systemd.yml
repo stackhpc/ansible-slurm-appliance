@@ -14,13 +14,7 @@ systemd_dropins:
     content: "{{ _systemd_requiresmount_statedir }}"
   slurmdbd:
     group: openhpc
-    content: |
-      {{ _systemd_requiresmount_statedir }}
-      
-      [Service]
-      # Allow slurmdbd to complete major version upgrades
-      TimeoutStartSec={{ openhpc_slurmdbd_timeout_start_sec }}
-
+    content: "{{ _systemd_requiresmount_statedir }}"
   slurmctld:
     group: openhpc
     content: "{{ _systemd_requiresmount_statedir }}"
