@@ -20,7 +20,6 @@ openhpc_slurm_partitions:
 openhpc_packages_default:
   # system packages
   - podman
-  - mysql
   # OpenHPC packages
   - slurm-libpmi-ohpc # to allow intel mpi to work properly
   - ohpc-gnu12-openmpi4-perf-tools # for hpctests
