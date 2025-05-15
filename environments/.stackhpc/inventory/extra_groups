@@ -29,7 +29,10 @@ cluster
 
 [tuned:children]
 # Install tuned into fat image
+# NB: builder has tuned_enabled and tuned_started false so does not configure it
 builder
+# Also test tuned during site playbook
+cluster
 
 [squid:children]
 # Install squid into fat image

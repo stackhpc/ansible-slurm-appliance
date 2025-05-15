@@ -12,9 +12,17 @@
   register: _tuned_profile_current
   changed_when: false
 
-- name: Set tuned-adm profile
+- name: Set TuneD profile
   ansible.builtin.command:
     cmd: "tuned-adm profile {{ tuned_profile }}"
-  when: 
+  when:
+    - tuned_started | bool
+    - tuned_profile not in _tuned_profile_current.stdout
+
+- name: Verify TuneD profile
+  ansible.builtin.command:
+    cmd: tuned-adm verify
+  changed_when: false
+  when:
     - tuned_started | bool
     - tuned_profile not in _tuned_profile_current.stdout
