@@ -230,6 +230,16 @@ jobs:
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
+      - name: Delete possible volume snapshot from slurm upgrade
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate  
+          if [ -n "$SNAPSHOT" ]
+          then
+              echo Deleting $SNAPSHOT
+              openstack volume snapshot delete $SNAPSHOT
+          fi
+
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
