@@ -4,7 +4,7 @@ roles:
     version: v25.3.2
     name: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: 'feat/upgrade-db' # local - TODO: bump on release
+    version: 362e3fc # feat/upgrade-db TODO: bump on release
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
