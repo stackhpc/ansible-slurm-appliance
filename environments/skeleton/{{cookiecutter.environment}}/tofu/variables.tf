@@ -101,28 +101,55 @@ variable "compute" {
             nodename_template: Overrides variable cluster_nodename_template
     EOF
     default = {}
-    type = map( # i.e. arbitrary keys, values are of given type ...
-        object({
-            # Only need to specify required/optional *keys* here to
-            # e.g. prevent missing/typos - value types are defined in
-            # module inputs so don't repeat here
-            nodes = any
-            flavor = any
-            
-            image_id = optional(any)
-            extra_networks = optional(any)
-            vnic_types = optional(any)
-            compute_init_enable = optional(any)
-            ignore_image_changes = optional(any)
-            volume_backed_instances = optional(any)
-            root_volume_size = optional(any)
-            extra_volumes = optional(any)
-            match_ironic_node = optional(any)
-            availability_zone = optional(any)
-            gateway_ip = optional(any)
-            nodename_template = optional(any)
-        })
-    )
+    type = any # can't do any better; TF type constraints can't cope with inhomogenous mappings
+    # module call will fail if missing required values so only need to check for unexpected ones
+    validation {
+        condition = length(
+                        setsubtract(
+                            flatten([for k, v in var.compute: keys(v)]),
+                            [
+                                "nodes",
+                                "flavor",
+                                "image_id",
+                                "extra_networks",
+                                "vnic_types",
+                                "compute_init_enable",
+                                "ignore_image_changes",
+                                "volume_backed_instances",
+                                "root_volume_size",
+                                "extra_volumes",
+                                "match_ironic_node",
+                                "availability_zone",
+                                "gateway_ip",
+                                "nodename_template"
+                            ]
+                        )
+                    ) == 0
+        error_message = <<-EOT
+            var.compute contains mappings with invalid keys: ${
+                join(", ", setsubtract(
+                                flatten([for k, v in var.compute: keys(v)]),
+                                [
+                                    "nodes",
+                                    "flavor",
+                                    "image_id",
+                                    "extra_networks",
+                                    "vnic_types",
+                                    "compute_init_enable",
+                                    "ignore_image_changes",
+                                    "volume_backed_instances",
+                                    "root_volume_size",
+                                    "extra_volumes",
+                                    "match_ironic_node",
+                                    "availability_zone",
+                                    "gateway_ip",
+                                    "nodename_template"
+                                ]
+                            )
+                            )
+            }
+        EOT
+    }
 }
 
 variable "environment_root" {

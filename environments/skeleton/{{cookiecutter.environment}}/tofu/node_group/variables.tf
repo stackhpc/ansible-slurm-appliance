@@ -63,6 +63,7 @@ variable "extra_volumes" {
         })
     )
     default = {}
+    nullable = false
 }
 
 variable "security_group_ids" {
@@ -78,17 +79,18 @@ variable "compute_init_enable" {
     type = list(string)
     description = "Groups to activate for ansible-init compute rebuilds"
     default = []
+    nullable = false
 }
 
 variable "ignore_image_changes" {
     type = bool
     description = "Whether to ignore changes to the image_id parameter"
     default = false
+    nullable = false
 }
 
 variable "networks" {
     type = list(map(string))
-    default = []
 }
 
 variable "fip_addresses" {
@@ -114,12 +116,14 @@ variable "match_ironic_node" {
     type = bool
     description = "Whether to launch instances on the Ironic node of the same name as each cluster node"
     default = false
+    nullable = false
 }
 
 variable "availability_zone" {
     type = string
     description = "Name of availability zone - ignored unless match_ironic_node is true"
     default = "nova"
+    nullable = false
 }
 
 variable "baremetal_nodes" {

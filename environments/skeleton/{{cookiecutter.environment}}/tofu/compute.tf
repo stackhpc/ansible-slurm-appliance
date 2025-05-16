@@ -14,20 +14,21 @@ module "compute" {
   environment_root = var.environment_root
   
   # can be set for group, defaults to top-level value:
-  image_id = coalesce(each.value.image_id, var.cluster_image_id)
-  vnic_types = coalesce(each.value.vnic_types, var.vnic_types)
-  volume_backed_instances = coalesce(each.valuevolume_backed_instances, var.volume_backed_instances)
-  root_volume_size = coalesce(each.value.root_volume_size, var.root_volume_size)
-  gateway_ip = coalesce(each.value.gateway_ip, var.gateway_ip)
-  nodename_template = coalesce(each.value.nodename_template, var.cluster_nodename_template)
+  image_id = lookup(each.value, "image_id", var.cluster_image_id)
+  vnic_types = lookup(each.value, "vnic_types", var.vnic_types)
+  volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
+  root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
+  gateway_ip = lookup(each.value, "gateway_ip", var.gateway_ip)
+  nodename_template = lookup(each.value, "nodename_template", var.cluster_nodename_template)
 
   # optionally set for group:
-  networks = concat(var.cluster_networks, coalesce(each.value.extra_networks, []))
-  extra_volumes = coalesce(each.value.extra_volumes, {})
-  compute_init_enable = coalesce(each.value.compute_init_enable, [])
-  ignore_image_changes = coalesce(each.value.ignore_image_changes, false)
-  match_ironic_node = coalesce(each.value.match_ironic_node, false)
-  availability_zone = coalesce(each.value.availability_zone, "nova")
+  networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
+  # here null means "use module var default"
+  extra_volumes = lookup(each.value, "extra_volumes", null)
+  compute_init_enable = lookup(each.value, "compute_init_enable", null)
+  ignore_image_changes = lookup(each.value, "ignore_image_changes", null)
+  match_ironic_node = lookup(each.value, "match_ironic_node", null)
+  availability_zone = lookup(each.value, "availability_zone", null)
 
   # computed
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
