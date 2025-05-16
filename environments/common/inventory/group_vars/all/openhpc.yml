@@ -70,3 +70,13 @@ ohpc_openhpc_repos:
 ohpc_default_extra_repos:
   "9": []
   "8": []
+
+# configure slurm database pre-upgrade backups:
+openhpc_slurm_accounting_storage_service: mysql
+openhpc_slurm_accounting_storage_backup_cmd: >-
+  openstack volume snapshot create
+  --volume {{ openhpc_cluster_name }}-state
+  --force
+  {{ openhpc_cluster_name }}-state-{{ ansible_date_time.iso8601_basic_short }}
+openhpc_slurm_accounting_storage_backup_host: localhost
+openhpc_slurm_accounting_storage_backup_become: false
