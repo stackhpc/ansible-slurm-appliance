@@ -1,5 +1,9 @@
 locals {
-  control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  control_volumes = concat(
+    [openstack_blockstorage_volume_v3.state],
+    # convert map to list:
+    [for v in data.openstack_blockstorage_volume_v3.home: v]
+  )
   nodename = templatestring(
     var.cluster_nodename_template,
     {

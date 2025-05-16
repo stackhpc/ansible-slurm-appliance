@@ -119,6 +119,11 @@ variable "state_volume_size" {
     default = 150 # GB
 }
 
+/* variable "state_volume_mode" {
+    type = string
+    description = "Whether to "
+}
+ */
 variable "state_volume_type" {
     type = string
     description = "Type of state volume, if not default type"
@@ -127,14 +132,23 @@ variable "state_volume_type" {
 
 variable "home_volume_size" {
     type = number
-    description = "Size of state volume on control node, in GB"
-    default = 100 # GB, 0 means no home volume
+    description = <<-EOT
+        Size of state volume on control node, in GB. If zero, a volume with the
+        name $cluster_name-home must already exist unless home_volume_enabled = false
+    EOT
+    default = 100
 }
 
 variable "home_volume_type" {
     type = string
     default = null
     description = "Type of home volume, if not default type"
+}
+
+variable "home_volume_enabled" {
+    type = bool
+    default = true
+    description = "Whether to use a home volume"
 }
 
 variable "vnic_types" {
