@@ -101,6 +101,7 @@ variable "fip_addresses" {
         allocated to the project.
     EOT
     default = []
+    nullable = false
 }
 
 variable "fip_network" {
@@ -110,6 +111,7 @@ variable "fip_network" {
         networks are defined.
     EOT
     default = ""
+    nullable = false
 }
 
 variable "match_ironic_node" {
@@ -149,7 +151,7 @@ variable "group_keys" {
     type = list
     validation {
       condition = length(setsubtract(var.group_keys, var.allowed_keys)) == 0
-      error_message = "Node group ${var.group_name} contains invalid key(s): ${
+      error_message = "Node group '${var.group_name}' contains invalid key(s): ${
         join(", ", setsubtract(var.group_keys, var.allowed_keys))}"
     }
 }
