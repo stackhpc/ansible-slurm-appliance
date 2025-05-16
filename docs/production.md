@@ -106,6 +106,8 @@ and referenced from the `site` and `production` environments, e.g.:
   by a parallel filesystem (e.g. manila) use
 
       home_volume_provisioning = "none"
+
+  In this case the NFS share for home directories is automatically disabled.
   
 - Enable `etc_hosts` templating:
 
