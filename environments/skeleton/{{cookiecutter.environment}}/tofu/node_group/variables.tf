@@ -57,7 +57,11 @@ variable "extra_volumes" {
             size: Size of volume in GB
         **NB**: The order in /dev is not guaranteed to match the mapping
         EOF
-    type = any
+    type = map(
+        object({
+            size = number
+        })
+    )
     default = {}
 }
 

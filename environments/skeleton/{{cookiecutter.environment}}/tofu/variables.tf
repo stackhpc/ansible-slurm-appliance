@@ -71,15 +71,7 @@ variable "cluster_image_id" {
 }
 
 variable "compute" {
-    type = object(
-        object({
-            nodes = list(string)
-            flavor = string
-            image_id = optional(string)
-            extra_networks = list(map(string))
-            vnic_types = map(string)
-            compute_init_enable = list(string)
-            ignore_image_changes = bool
+
     description = <<-EOF
         Mapping defining homogenous groups of compute nodes. Groups are used
         in Slurm partition definitions.
@@ -109,6 +101,28 @@ variable "compute" {
             nodename_template: Overrides variable cluster_nodename_template
     EOF
     default = {}
+    type = map( # i.e. arbitrary keys, values are of given type ...
+        object({
+            # Only need to specify required/optional *keys* here to
+            # e.g. prevent missing/typos - value types are defined in
+            # module inputs so don't repeat here
+            nodes = any
+            flavor = any
+            
+            image_id = optional(any)
+            extra_networks = optional(any)
+            vnic_types = optional(any)
+            compute_init_enable = optional(any)
+            ignore_image_changes = optional(any)
+            volume_backed_instances = optional(any)
+            root_volume_size = optional(any)
+            extra_volumes = optional(any)
+            match_ironic_node = optional(any)
+            availability_zone = optional(any)
+            gateway_ip = optional(any)
+            nodename_template = optional(any)
+        })
+    )
 }
 
 variable "environment_root" {

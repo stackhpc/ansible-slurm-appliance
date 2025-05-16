@@ -74,7 +74,7 @@ module "cluster" {
             flavor: var.other_node_flavor
         }
     }
-    compute = {
+    compute = tomap({
         standard: { # NB: can't call this default!
             nodes: ["compute-0", "compute-1"]
             flavor: var.other_node_flavor
@@ -87,7 +87,7 @@ module "cluster" {
             #nodes: ["extra-0", "extra-1"]
             flavor: var.other_node_flavor
         }
-    }
+    })
 
     volume_backed_instances = var.volume_backed_instances
 
