@@ -132,11 +132,14 @@ variable "state_volume_type" {
 
 variable "home_volume_size" {
     type = number
-    description = <<-EOT
-        Size of state volume on control node, in GB. If zero, a volume with the
-        name $cluster_name-home must already exist unless home_volume_enabled = false
-    EOT
+    description = "Size of state volume on control node, in GB."
     default = 100
+    validation {
+        condition = var.home_volume_provisioning == "manage" ? var.home_volume_size > 0 : true
+        error_message = <<-EOT
+            home_volume_size must be > 0 when var.home_volume_provisioning == "manage"
+        EOT
+    }
 }
 
 variable "home_volume_type" {
@@ -145,10 +148,26 @@ variable "home_volume_type" {
     description = "Type of home volume, if not default type"
 }
 
-variable "home_volume_enabled" {
-    type = bool
-    default = true
-    description = "Whether to use a home volume"
+variable "home_volume_provisioning" {
+    type = string
+    default = "manage"
+    description = <<-EOT
+        How to manage the home volume. Valid values are:
+            "manage": (Default) OpenTofu will create a volume "$cluster_name-home"
+                      and delete it when the cluster is destroyed. A volume
+                      with this name must not already exist. Use for demo and
+                      dev environments.
+            "attach": A single volume named "$cluster_name-home" must already
+                      exist. It is not managed by OpenTofu so e.g. is left
+                      intact if the cluster is destroyed. Use for production
+                      environments.
+            "none":   No home volume is used. Use if /home is provided by
+                      a parallel filesystem, e.g. manila.
+        EOT
+    validation {
+      condition = contains(["manage", "attach", "none"], var.home_volume_provisioning)
+      error_message = "home_volume_provisioning must be one of manage, attach or none"
+    }
 }
 
 variable "vnic_types" {

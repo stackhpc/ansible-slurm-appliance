@@ -87,7 +87,7 @@ resource "openstack_compute_instance_v2" "control" {
 
     mounts:
       - [LABEL=state, ${var.state_dir}]
-      %{if var.home_volume_size > 0}
+      %{if var.home_volume_provisioning != "none"}
       - [LABEL=home, /exports/home]
       %{endif}
   EOF

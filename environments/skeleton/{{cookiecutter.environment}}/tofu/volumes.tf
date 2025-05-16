@@ -7,11 +7,10 @@ resource "openstack_blockstorage_volume_v3" "state" {
 
 resource "openstack_blockstorage_volume_v3" "home" {
 
-    # NB: Changes CANNOT be made to this resource's "address"
-    # i.e. (label or for_each key)
-    # else existing clusters may get home volumes deleted and recreated!
+    # NB: Changes to this resource's "address" i.e. (label or for_each key)
+    # will lose user data for existing clusters using this volume
 
-    count = var.home_volume_size > 0 ? 1 : 0
+    count = var.home_volume_provisioning == "manage" ? 1 : 0
 
     name = "${var.cluster_name}-home"  # last word used to label filesystem
     description = "Home for control node"
@@ -21,25 +20,20 @@ resource "openstack_blockstorage_volume_v3" "home" {
 
 data "openstack_blockstorage_volume_v3" "home" {
 
-/*  May or may not have a volume, depending on home_volume_enabled, so this
-    has to use for_each.
-
-    For the case where we use the above provisioned volume resource, we need
-    to create a depenency on it to avoid a race.
-
-    The logic is:
-    - If not home_volume_enabled, there is no volume
-    - Else if home_volume_size > 0 - use the provisioned volume resource
-    - Else find an existing volume with the specified name
-*/
+/*  We use a data resource whether or not TF is managing the volume, so the
+    logic is all in one place. But that means this needs a dependency on the
+    actual resource to avoid a race.
     
-    for_each =  toset(
-                    (var.home_volume_enabled) ? (
-                        (var.home_volume_size > 0) ? 
-                            [for v in openstack_blockstorage_volume_v3.home: v.name] :
-                                ["${var.cluster_name}-home"]
-                    ) : []
-                )
+    Because there may be no volume, this has to use for_each.
+*/
+
+    for_each = toset(
+        (var.home_volume_provisioning == "manage") ?
+            [for v in openstack_blockstorage_volume_v3.home: v.name] :
+                (var.home_volume_provisioning == "attach") ?
+                    ["${var.cluster_name}-home"] :
+                        []
+    )
 
     name = each.key
 }

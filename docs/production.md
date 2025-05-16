@@ -58,7 +58,7 @@ and referenced from the `site` and `production` environments, e.g.:
 
     Note that:
         - Environment-specific variables (`cluster_name`) should be hardcoded
-          into the module block.
+          into the cluster module block.
         - Environment-independent variables (e.g. maybe `cluster_net` if the
           same is used for staging and production) should be set as *defaults*
           in `environments/site/tofu/variables.tf`, and then don't need to
@@ -76,18 +76,37 @@ and referenced from the `site` and `production` environments, e.g.:
   instances) it may be necessary to configure or proxy `chronyd` via an
   environment hook.
 
-- The cookiecutter provided OpenTofu configurations define resources for home and
-  state volumes. The former may not be required if the cluster's `/home` is
-  provided from an external filesystem (or Manila). In any case, in at least
-  the production environment, and probably also in the staging environment,
-  the volumes should be manually created and the resources changed to [data
-  resources](https://opentofu.org/docs/language/data-sources/). This ensures that even if the cluster is deleted via tofu, the
-  volumes will persist.
+- By default, the cookiecutter provided OpenTofu configurations provision
+  a volume named "$cluster_name-state" and attach it to the control node. This
+  is used to persist monitoring and Slurm data when the control node is re-built.
+  In production environments (and probably staging) it is undesirable to have
+  this volume deleted if the cluster is deleted. Therefore the volume should be
+  manually created, e.g. via the CLI:
 
-  For a development environment, having volumes under tofu control via volume
-  resources is usually appropriate as there may be many instantiations
-  of this environment.
+      openstack volume create --size 100 mycluster-home # size in GB
 
+  and OpenTofu configured to use that volume rather than managing one itself
+  by setting
+
+      home_volume_provisioning = "attach"
+
+  either for a specific environment in the cluster module block in
+  `environments/$ENV/tofu/main.tf`, or as the site default by changing the
+  default in `environments/site/tofu/variables.tf`.
+  
+  For a development environment allowing OpenTofu to manage the volume using
+  the default value
+  
+      home_volume_provisioning = "manage"
+  
+  is usually appropriate, as it allows for multiple clusters to be created with
+  this environment.
+  
+  If no home volume at all is required because the home directories are provided
+  by a parallel filesystem (e.g. manila) use
+
+      home_volume_provisioning = "none"
+  
 - Enable `etc_hosts` templating:
 
     ```yaml
