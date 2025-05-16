@@ -101,55 +101,7 @@ variable "compute" {
             nodename_template: Overrides variable cluster_nodename_template
     EOF
     default = {}
-    type = any # can't do any better; TF type constraints can't cope with inhomogenous mappings
-    # module call will fail if missing required values so only need to check for unexpected ones
-    validation {
-        condition = length(
-                        setsubtract(
-                            flatten([for k, v in var.compute: keys(v)]),
-                            [
-                                "nodes",
-                                "flavor",
-                                "image_id",
-                                "extra_networks",
-                                "vnic_types",
-                                "compute_init_enable",
-                                "ignore_image_changes",
-                                "volume_backed_instances",
-                                "root_volume_size",
-                                "extra_volumes",
-                                "match_ironic_node",
-                                "availability_zone",
-                                "gateway_ip",
-                                "nodename_template"
-                            ]
-                        )
-                    ) == 0
-        error_message = <<-EOT
-            var.compute contains mappings with invalid keys: ${
-                join(", ", setsubtract(
-                                flatten([for k, v in var.compute: keys(v)]),
-                                [
-                                    "nodes",
-                                    "flavor",
-                                    "image_id",
-                                    "extra_networks",
-                                    "vnic_types",
-                                    "compute_init_enable",
-                                    "ignore_image_changes",
-                                    "volume_backed_instances",
-                                    "root_volume_size",
-                                    "extra_volumes",
-                                    "match_ironic_node",
-                                    "availability_zone",
-                                    "gateway_ip",
-                                    "nodename_template"
-                                ]
-                            )
-                            )
-            }
-        EOT
-    }
+    type = any # can't do any better; TF type constraints can't cope with inhomogenous inner mappings
 }
 
 variable "environment_root" {

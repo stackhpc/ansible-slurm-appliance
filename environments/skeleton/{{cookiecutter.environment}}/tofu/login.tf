@@ -39,4 +39,8 @@ module "login" {
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.login: o.id]
   baremetal_nodes = data.external.baremetal_nodes.result
+
+  # input dict validation:
+  group_name = each.key
+  group_keys = keys(each.value)
 }
