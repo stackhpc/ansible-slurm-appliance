@@ -119,11 +119,6 @@ variable "state_volume_size" {
     default = 150 # GB
 }
 
-/* variable "state_volume_mode" {
-    type = string
-    description = "Whether to "
-}
- */
 variable "state_volume_type" {
     type = string
     description = "Type of state volume, if not default type"
