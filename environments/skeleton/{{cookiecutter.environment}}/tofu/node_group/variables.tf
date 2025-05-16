@@ -151,8 +151,12 @@ variable "group_keys" {
     type = list
     validation {
       condition = length(setsubtract(var.group_keys, var.allowed_keys)) == 0
-      error_message = "Node group '${var.group_name}' contains invalid key(s): ${
-        join(", ", setsubtract(var.group_keys, var.allowed_keys))}"
+      error_message = <<-EOT
+        Node group '${var.group_name}' contains invalid key(s) ${
+        join(", ", setsubtract(var.group_keys, var.allowed_keys))}.
+        
+        Valid keys are ${join(", ", var.allowed_keys)}.
+    EOT
     }
 }
 
