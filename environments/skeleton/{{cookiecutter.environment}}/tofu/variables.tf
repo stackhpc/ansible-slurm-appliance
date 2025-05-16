@@ -71,7 +71,15 @@ variable "cluster_image_id" {
 }
 
 variable "compute" {
-    type = any
+    type = object(
+        object({
+            nodes = list(string)
+            flavor = string
+            image_id = optional(string)
+            extra_networks = list(map(string))
+            vnic_types = map(string)
+            compute_init_enable = list(string)
+            ignore_image_changes = bool
     description = <<-EOF
         Mapping defining homogenous groups of compute nodes. Groups are used
         in Slurm partition definitions.
@@ -100,6 +108,7 @@ variable "compute" {
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
     EOF
+    default = {}
 }
 
 variable "environment_root" {
