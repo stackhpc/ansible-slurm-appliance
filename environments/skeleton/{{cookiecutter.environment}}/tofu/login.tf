@@ -43,4 +43,20 @@ module "login" {
   # input dict validation:
   group_name = each.key
   group_keys = keys(each.value)
+  allowed_keys = [
+        "nodes",
+        "flavor",
+        "image_id",
+        "extra_networks",
+        "vnic_types",
+        "volume_backed_instances",
+        "root_volume_size",
+        "extra_volumes",
+        "fip_addresses",
+        "fip_network",
+        "match_ironic_node",
+        "availability_zone",
+        "gateway_ip",
+        "nodename_template",
+  ]
 }

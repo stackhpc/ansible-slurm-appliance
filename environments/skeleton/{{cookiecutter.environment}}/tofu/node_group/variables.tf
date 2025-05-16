@@ -149,27 +149,12 @@ variable "group_keys" {
     type = list
     validation {
       condition = length(setsubtract(var.group_keys, var.allowed_keys)) == 0
-      error_message = "Compute group ${var.group_name} in var.compute contains invalid key(s): ${
+      error_message = "Node group ${var.group_name} contains invalid key(s): ${
         join(", ", setsubtract(var.group_keys, var.allowed_keys))}"
     }
 }
 
 variable "allowed_keys" {
     type = list
-    default = [
-        "nodes",
-        "flavor",
-        "image_id",
-        "extra_networks",
-        "vnic_types",
-        "compute_init_enable",
-        "ignore_image_changes",
-        "volume_backed_instances",
-        "root_volume_size",
-        "extra_volumes",
-        "match_ironic_node",
-        "availability_zone",
-        "gateway_ip",
-        "nodename_template"
-    ]
+    # don't provide a default here as allowed keys may depend on module use
 }
