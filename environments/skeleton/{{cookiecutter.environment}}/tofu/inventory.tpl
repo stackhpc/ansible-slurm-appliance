@@ -2,6 +2,7 @@ all:
     vars:
         openhpc_cluster_name: ${cluster_name}
         cluster_domain_suffix: ${cluster_domain_suffix}
+        cluster_compute_groups: ${jsonencode(keys(compute_groups))}
 
 control:
     hosts:
