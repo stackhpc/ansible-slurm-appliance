@@ -76,52 +76,50 @@ and referenced from the `site` and `production` environments, e.g.:
   instances) it may be necessary to configure or proxy `chronyd` via an
   environment hook.
 
-- By default, the cookiecutter-provided OpenTofu configuration provisions a
-  volume named "$cluster_name-home" and attaches it to the control node. This
-  is used to persist the NFS-shared home directories when the control node is
-  re-built. In production environments it is undesirable to have this volume
-  deleted if the cluster is deleted. Therefore the volume should be manually
+- By default, the cookiecutter-provided OpenTofu configuration provisions two
+  volumes and attaches them to the control node:
+    - "$cluster_name-home" for NFS-shared home directories
+    - "$cluster_name-state" for monitoring and Slurm data
+  The volumes mean this data is persisted when the control node is rebuilt.
+  However if the cluster is destroyed with `tofu destroy` then the volumes will
+  also be deleted. This is undesirable for production environments and usually
+  also for staging environments. Therefore the volumes should be manually
   created, e.g. via the CLI:
 
-      openstack volume create --size 100 mycluster-home # size in GB
+      openstack volume create --size 200 mycluster-home # size in GB
+      openstack volume create --size 100 mycluster-state
 
-  and OpenTofu configured to use that volume rather than managing one itself
-  by setting
+  and OpenTofu configured to use those volumes instead of managing them itself
+  by setting:
 
       home_volume_provisioning = "attach"
+      state_volume_provisioning = "attach"
 
-  either for a specific environment in the cluster module block in
+  either for a specific environment within the cluster module block in
   `environments/$ENV/tofu/main.tf`, or as the site default by changing the
   default in `environments/site/tofu/variables.tf`.
   
-  For a development environment allowing OpenTofu to manage the volume using
-  the default value
-  
-      home_volume_provisioning = "manage"
-  
-  is usually appropriate, as it allows for multiple clusters to be created with
-  this environment.
+  For a development environment allowing OpenTofu to manage the volumes using
+  the default value of `"manage"` for those varibles is usually appropriate, as
+  it allows for multiple clusters to be created with this environment.
   
   If no home volume at all is required because the home directories are provided
-  by a parallel filesystem (e.g. manila) use
+  by a parallel filesystem (e.g. manila) set
 
       home_volume_provisioning = "none"
 
   In this case the NFS share for home directories is automatically disabled.
 
-- By default, the cookiecutter-provided OpenTofu configuration provisions a
-  volume named "$cluster_name-state" and attaches it to the control node. This
-  is used to persist monitoring and Slurm data when the control node is re-built.
-  In production and staging environments it is undesirable to have this volume
-  deleted if the cluster is deleted. Therefore the volume should be manually
-  created, e.g. via the CLI:
+  **NB:** To apply "attach" options to existing clusters, first remove the
+    volume(s) from the tofu state, e.g.:
 
-      openstack volume create --size 100 mycluster-state # size in GB
+      tofu state list # find the volume(s)
+      tofu state rm 'module.cluster.openstack_blockstorage_volume_v3.state[0]'
   
-  and the `openstack_blockstorage_volume_v3.state` resource changed to a [data
-  resource](https://opentofu.org/docs/language/data-sources/). This ensures
-  that even if the cluster is deleted via `tofu destroy`, the volume will persist.
-  
+  This leaves the volume itself intact, but means OpenTofu "forgets" it. Then
+  set the "attach" options and run `tofu apply` again - this should show there
+  are no changes planned.
+
 - Enable `etc_hosts` templating:
 
     ```yaml

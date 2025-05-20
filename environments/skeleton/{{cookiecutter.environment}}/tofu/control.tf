@@ -1,7 +1,7 @@
 locals {
   control_volumes = concat(
-    [openstack_blockstorage_volume_v3.state],
-    # convert map to list:
+    # convert maps to list:
+    [for v in data.openstack_blockstorage_volume_v3.state: v],
     [for v in data.openstack_blockstorage_volume_v3.home: v]
   )
   nodename = templatestring(
