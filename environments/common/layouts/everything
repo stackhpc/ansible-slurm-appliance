@@ -84,7 +84,7 @@ openondemand
 # Hosts to run TuneD configuration
 
 [ansible_init:children]
-# Hosts to run linux-anisble-init
+# Hosts to run linux-ansible-init
 cluster
 
 [sssd]
