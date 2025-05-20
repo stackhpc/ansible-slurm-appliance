@@ -76,12 +76,12 @@ and referenced from the `site` and `production` environments, e.g.:
   instances) it may be necessary to configure or proxy `chronyd` via an
   environment hook.
 
-- By default, the cookiecutter provided OpenTofu configurations provision
-  a volume named "$cluster_name-state" and attach it to the control node. This
-  is used to persist monitoring and Slurm data when the control node is re-built.
-  In production environments (and probably staging) it is undesirable to have
-  this volume deleted if the cluster is deleted. Therefore the volume should be
-  manually created, e.g. via the CLI:
+- By default, the cookiecutter-provided OpenTofu configuration provisions a
+  volume named "$cluster_name-home" and attaches it to the control node. This
+  is used to persist the NFS-shared home directories when the control node is
+  re-built. In production environments it is undesirable to have this volume
+  deleted if the cluster is deleted. Therefore the volume should be manually
+  created, e.g. via the CLI:
 
       openstack volume create --size 100 mycluster-home # size in GB
 
@@ -108,6 +108,19 @@ and referenced from the `site` and `production` environments, e.g.:
       home_volume_provisioning = "none"
 
   In this case the NFS share for home directories is automatically disabled.
+
+- By default, the cookiecutter-provided OpenTofu configuration provisions a
+  volume named "$cluster_name-state" and attaches it to the control node. This
+  is used to persist monitoring and Slurm data when the control node is re-built.
+  In production and staging environments it is undesirable to have this volume
+  deleted if the cluster is deleted. Therefore the volume should be manually
+  created, e.g. via the CLI:
+
+      openstack volume create --size 100 mycluster-state # size in GB
+  
+  and the `openstack_blockstorage_volume_v3.state` resource changed to a [data
+  resource](https://opentofu.org/docs/language/data-sources/). This ensures
+  that even if the cluster is deleted via `tofu destroy`, the volume will persist.
   
 - Enable `etc_hosts` templating:
 
