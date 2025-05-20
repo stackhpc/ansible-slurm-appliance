@@ -11,7 +11,7 @@ _nfs_node_ips: "{{ groups['nfs'] | map('extract', hostvars, 'ansible_host') | jo
 # default *all* entries in nfs_configurations to only permitting mounts from above IPs:
 nfs_export_clients: "{{ _nfs_node_ips }}"
 
-nfs_configurations:
+nfs_configuration_home_volume: # volume-backed home directories
   - comment: Export /exports/home from Slurm control node as /home
     nfs_enable:
         server:  "{{ inventory_hostname in groups['control'] }}"
@@ -25,8 +25,20 @@ nfs_configurations:
     # accidently overriden via default options
     nfs_export_options: 'rw,secure,root_squash'
 
+nfs_configuration_compute_nodes: # cluster configuration for compute_init/slurm-controlled rebuild
   - comment: Export /exports/cluster from Slurm control node
     nfs_enable:
         server: "{{ inventory_hostname in groups['control'] }}"
         clients: false
     nfs_export: "/exports/cluster"
+
+nfs_configurations_extra: [] # site-specific nfs shares
+
+nfs_configurations: >- # construct stackhpc.nfs variable
+  {{
+    nfs_configuration_home_volume if (cluster_home_volume | default(true)) else []
+    +
+    nfs_configuration_compute_nodes
+    +
+    nfs_configurations_extra
+  }}
