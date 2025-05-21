@@ -1,8 +1,82 @@
 ---
 
+# STATUS:
+
+# looks like it works for caas, but not for normal now
+
+# can't use ansible.builtin.include_vars - that only looks on the deploy host
+# (even with delegate)
+
+# For caas where passwords_output_path isn't actually in inventory we need
+# to load them first, so that templating is idempotent
+
+- name: Slurp passwords if defined
+  ansible.builtin.slurp:
+    src: "{{ passwords_output_path }}"
+  delegate_to: "{{ passwords_host }}"
+  register: _passwords_slurp_first
+  failed_when:
+  - _passwords_slurp_first.failed
+  - "'file not found' not in _passwords_slurp_first.msg"
+
+- name: Set facts for passwords
+  set_fact:
+    "{{ item.key }}": "{{ item.value }}"
+  when: "'content' in _passwords_slurp_first"
+  loop: "{{ _passwords_slurp_first.content | b64decode | from_yaml | dict2items }}"
+  no_log: "{{ no_log | default(true) }}"
+
+# - name: Set facts for passwords
+#   set_fact:
+#     # nah can't template yaml keys so not sure we can do this!
+#   when: not _passwords_slurp.failed
+#   loop: "{{ _passwords_slurp.content | b64decode | from_yaml }}"
+
+- name: Ensure secrets directory exists
+  file:
+    path: "{{ passwords_output_path | dirname }}"
+    owner: "{{ passwords_owner }}"
+    group: "{{ passwords_group }}"
+    state: directory
+    #mode: ug=rwX,o=rX # non-caas for caas we want u=rwx,go=
+  delegate_to: "{{ passwords_host }}"
+  become: "{{ passwords_owner != ansible_user }}" # not sure about this in the general case but seems ok here
+  run_once: true
+
 - name: Template passwords
   template:
     src: passwords.yml
-    dest: "{{ openhpc_passwords_output_path }}"
-  delegate_to: localhost
+    dest: "{{ passwords_output_path }}"
+    owner: "{{ passwords_owner }}"
+    group: "{{ passwords_group }}"
+  become: "{{ passwords_owner != ansible_user }}"
+  delegate_to: "{{ passwords_host }}"
   run_once: true
+  register: _passwords_template
+
+# even if the files are in inventory, even meta: inventory_reload doesn't
+# get the new variables, so we need to set them as facts:
+- name: Slurp passwords if changed
+  ansible.builtin.slurp:
+    src: "{{ passwords_output_path }}"
+  delegate_to: "{{ passwords_host }}"
+  register: _passwords_slurp_second
+  when: _passwords_template.changed
+  
+- name: Set facts for passwords
+  set_fact:
+    "{{ item.key }}": "{{ item.value }}"
+  when: not _passwords_slurp_second.skipped | default(false)
+  loop: "{{ _passwords_slurp_second.content | b64decode | from_yaml | dict2items }}"
+  no_log: "{{ no_log | default(true) }}"
+
+
+  # we do see passwords end up in the templated config for slurm-controlled rebuild!
+  
+
+  # oh man maybe this doesn't work b/c things are accessed through hostvars[*] ...
+  
+  # also; does this work for caas?? Because the vars won't be in inventory to
+  # start with, so then they won't exist, so they'll be re-templated despite
+  # the fact the file exists. Maybe we need to load them first, if the file
+  # exists??
