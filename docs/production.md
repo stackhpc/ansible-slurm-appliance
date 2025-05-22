@@ -306,6 +306,9 @@ Once it completes you can log in to the cluster using:
   optional parameter `fip_addresses`. These need to be created in your project
   beforehand.
 
+- A production deployment may have a more complex networking requirements than
+  just a simple network. See the [networks docs](networks.md) for details.
+
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
 
