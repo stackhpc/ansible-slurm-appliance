@@ -59,7 +59,7 @@ create a fork of this repo.
 
 To start, you should use the [latest tagged
 release](https://github.com/stackhpc/ansible-slurm-appliance/releases). v1.161
-has been used as an example here, make sure to channge this. Do not use the
+has been used as an example here, make sure to change this. Do not use the
 default main branch, as this may have features that are still works in
 progress. The steps below show how to create a site-specific branch.
 
@@ -304,7 +304,7 @@ Once it completes you can log in to the cluster using:
 
 - If floating IPs are required for login nodes, modify the OpenTofu
   configurations appropriately.
-  TODO add example
+  **TODO: add example**
 
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
@@ -339,5 +339,9 @@ Once it completes you can log in to the cluster using:
 
 - Enable alertmanager if Slack is available - see
   [docs/alerting.md](./alerting.md).
+
+  **TODO: custom image builds, when/why and how**
+
+  **TODO: any further docs to link to. cuda, lustre, filesystems when written**
 
 For further information see the [docs](docs/) directory.
