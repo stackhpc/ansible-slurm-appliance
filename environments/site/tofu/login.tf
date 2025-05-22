@@ -27,6 +27,7 @@ module "login" {
   fip_network = lookup(each.value, "fip_network", "")
   match_ironic_node = lookup(each.value, "match_ironic_node", false)
   availability_zone = lookup(each.value, "availability_zone", "nova")
+  server_group_id = lookup(each.value, "server_group_id", "")
 
   # can't be set for login
   compute_init_enable = []

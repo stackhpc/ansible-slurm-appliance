@@ -9,7 +9,7 @@ Type=simple
 Restart=always
 User={{ zenith_proxy_podman_user }}
 Group={{ zenith_proxy_podman_user }}
-ExecStartPre=/usr/bin/podman pod create --replace --name {{ zenith_proxy_pod_name }}
+ExecStartPre=/usr/bin/podman pod create --replace --name {{ zenith_proxy_pod_name }} --network=slirp4netns
 ExecStartPre=/usr/bin/podman pod start {{ zenith_proxy_pod_name }}
 ExecStart=/usr/bin/podman-pod-infra-attach.sh {{ zenith_proxy_pod_name }}
 ExecStop=/usr/bin/podman pod stop --ignore -t 10 {{ zenith_proxy_pod_name }}

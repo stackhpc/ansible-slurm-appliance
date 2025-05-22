@@ -1,8 +1,12 @@
-resource "openstack_blockstorage_volume_v3" "state" {
+# resource "openstack_blockstorage_volume_v3" "state" {
+#     name = "${var.cluster_name}-state" # last word used to label filesystem
+#     description = "State for control node"
+#     size = var.state_volume_size
+#     volume_type = var.state_volume_type
+# }
+
+data "openstack_blockstorage_volume_v3" "state" {
     name = "${var.cluster_name}-state" # last word used to label filesystem
-    description = "State for control node"
-    size = var.state_volume_size
-    volume_type = var.state_volume_type
 }
 
 resource "openstack_blockstorage_volume_v3" "home" {

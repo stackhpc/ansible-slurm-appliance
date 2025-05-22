@@ -1,0 +1,2 @@
+---
+rebuild_clouds_path: ~/.config/openstack/staging/clouds.yaml

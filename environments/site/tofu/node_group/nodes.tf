@@ -102,6 +102,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
   lifecycle {
     ignore_changes = [
       image_id,
+      block_device,
     ]
   }
 
@@ -152,6 +153,10 @@ resource "openstack_compute_instance_v2" "compute" {
   EOF
 
   availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
+
+  scheduler_hints {
+    group = var.server_group_id
+  }
 
 }
 

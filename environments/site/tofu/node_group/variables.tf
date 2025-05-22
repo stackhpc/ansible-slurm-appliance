@@ -127,3 +127,8 @@ variable "gateway_ip" {
     type = string
     default = ""
 }
+
+variable "server_group_id" {
+    type = string
+    default = ""
+}

@@ -5,6 +5,7 @@ terraform {
   required_providers {
     openstack = {
       source = "terraform-provider-openstack/openstack"
+      version = "~>3.0.0"
     }
   }
 }
@@ -80,15 +81,16 @@ module "cluster" {
             compute_init_enable: ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts"]
             ignore_image_changes: true
         }
-        # Example of how to add another partition:
-        # extra: {
-        #     nodes: ["compute-2", "compute-3"]
-        #     flavor: var.other_node_flavor
-        # }
+        # Normally-empty partition for testing:
+        extra: {
+            nodes: []
+            #nodes: ["extra-0", "extra-1"]
+            flavor: var.other_node_flavor
+        }
     }
-    
+
     volume_backed_instances = var.volume_backed_instances
-    
+
     environment_root = var.environment_root
     # Can reduce volume size a lot for short-lived CI clusters:
     state_volume_size = 10

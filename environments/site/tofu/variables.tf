@@ -69,6 +69,7 @@ variable "login" {
       interactive = {
           nodes: ["login-0"]
           flavor: "hpc.v2.16cpu.64ram"
+          root_volume_size = 100
       }
   }
 }
@@ -76,7 +77,7 @@ variable "login" {
 variable "cluster_image_id" {
     type = string
     description = "ID of default image for the cluster"
-    default = "8ef0f859-426d-4c4e-a003-74f62f2aba56"
+    default = "ac385264-8ad8-4ec1-9db8-2416650a2267" # openhpc-RL9-250514-1502-5a923b2c-new
 }
 
 variable "compute" {
@@ -194,6 +195,11 @@ variable "root_volume_size" {
 
 variable "gateway_ip" {
     description = "Address to add default route via"
+    type = string
+    default = ""
+}
+
+variable "control_server_group_id" {
     type = string
     default = ""
 }

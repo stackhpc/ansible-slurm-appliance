@@ -1,5 +1,6 @@
 locals {
-  control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  # control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  control_volumes = concat([data.openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
 }
 
 resource "openstack_networking_port_v2" "control" {
@@ -78,5 +79,9 @@ resource "openstack_compute_instance_v2" "control" {
       - [LABEL=home, /exports/home]
       %{endif}
   EOF
+
+  scheduler_hints {
+    group = var.control_server_group_id
+  }
 
 }

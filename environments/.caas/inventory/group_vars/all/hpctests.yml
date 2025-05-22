@@ -8,3 +8,6 @@ hpctests_outdir: "{{ playbook_dir }}/.tmp/hpctests"
 # hpctests run by default in Azimuth but not trying to stress-test the nodes
 # just check compiler, mpi etc works
 hpctests_hpl_mem_frac: 0.05 # 5% node memory
+
+# use basic_user-defined user:
+hpctests_user: azimuth

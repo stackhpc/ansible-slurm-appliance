@@ -10,7 +10,7 @@
 
 - name: Copy out clouds.yaml
   copy:
-    src: "{{ openhpc_rebuild_clouds }}"
+    src: "{{ rebuild_clouds_path }}"
     dest: /etc/openstack/clouds.yaml
     owner: slurm
     group: root
