@@ -302,9 +302,9 @@ Once it completes you can log in to the cluster using:
   Using fixed IPs will require either using admin credentials or policy
   changes.
 
-- If floating IPs are required for login nodes, modify the OpenTofu
-  configurations appropriately.
-  **TODO: add example**
+- If floating IPs are required for login nodes, these can be set using the
+  optional parameter `fip_addresses`. These need to be created in your project
+  beforehand.
 
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
@@ -340,8 +340,10 @@ Once it completes you can log in to the cluster using:
 - Enable alertmanager if Slack is available - see
   [docs/alerting.md](./alerting.md).
 
-  **TODO: custom image builds, when/why and how**
+- For some features, such as installing [DOCA-OFED](../roles/doca/README.md) or
+  [CUDA](../roles/cuda/README.md), you will need to build a custom image. It is
+  recommended that you build this on top of the latest existing openhpc image.
+  See the [image-build docs](image-build.md) for details.
 
-  **TODO: any further docs to link to. cuda, lustre, filesystems when written**
-
-For further information see the [docs](docs/) directory.
+For further information, including additional configuration guides and
+operations instructions, see the [docs](README.md) directory.
