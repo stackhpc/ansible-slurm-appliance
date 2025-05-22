@@ -343,6 +343,16 @@ Once it completes you can log in to the cluster using:
 - Enable alertmanager if Slack is available - see
   [docs/alerting.md](./alerting.md).
 
+- By default, the appliance uses a built-in NFS share backed by an OpenStack
+  volume for the cluster home directories. You may find that you want to change
+  this. The following alternatives are supported:
+
+  - External NFS
+  <!--- External NFS docs TODO --->
+  - CephFS via OpenStack Manila
+  <!--- filesystems docs TODO --->
+  - [Lustre](../roles/lustre/README.md)
+
 - For some features, such as installing [DOCA-OFED](../roles/doca/README.md) or
   [CUDA](../roles/cuda/README.md), you will need to build a custom image. It is
   recommended that you build this on top of the latest existing openhpc image.
