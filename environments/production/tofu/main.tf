@@ -7,7 +7,6 @@ module "cluster" {
     source = "../../site/tofu/"
 
     cluster_name = "slurm-production"
-    volume_backed_instances = true
     cluster_networks = [
       {
         network = "slurm-production"
