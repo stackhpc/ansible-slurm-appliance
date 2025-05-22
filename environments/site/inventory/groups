@@ -25,7 +25,8 @@ control
 [filebeat:children]
 slurm_stats
 
-# NB: [rebuild] not defined here as likely to need features not currently supported
+[rebuild:children]
+control
 
 [update:children]
 
@@ -84,6 +85,7 @@ openondemand
 
 [tuned:children]
 # Hosts to run TuneD configuration
+compute
 
 [ansible_init:children]
 # Hosts to run linux-anisble-init
@@ -95,8 +97,9 @@ cluster
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
 
-[compute_init]
+[compute_init:children]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
+compute
 
 [k3s_server:children]
 # Hosts to run k3s server (should only be single node i.e control node)
