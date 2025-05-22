@@ -41,17 +41,17 @@ login
 # Add `openhpc` group to add Slurm users via creation of users on each node.
 openhpc
 
-[openondemand:children]
+#[openondemand:children]
 # Host to run Open Ondemand server on - subset of login
-login
+#login
 
-[openondemand_desktop:children]
+#[openondemand_desktop:children]
 # Subset of compute to run a interactive desktops on via Open Ondemand
-compute
+#compute
 
-[openondemand_jupyter:children]
+#[openondemand_jupyter:children]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
-compute
+#compute
 
 [etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
@@ -78,7 +78,7 @@ compute
 [persist_hostkeys:children]
 # Hosts to use common set of hostkeys which persist across reimaging.
 login
-openondemand
+#openondemand
 
 [squid]
 # Hosts to run squid proxy
