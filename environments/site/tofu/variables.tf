@@ -198,3 +198,8 @@ variable "gateway_ip" {
     type = string
     default = ""
 }
+
+variable "control_server_group_id" {
+    type = string
+    default = ""
+}

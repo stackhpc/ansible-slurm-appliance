@@ -154,6 +154,10 @@ resource "openstack_compute_instance_v2" "compute" {
 
   availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
 
+  scheduler_hints {
+    group = var.server_group_id
+  }
+
 }
 
 resource "openstack_networking_floatingip_associate_v2" "fip" {

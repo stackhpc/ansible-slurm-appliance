@@ -96,5 +96,16 @@ module "cluster" {
       #}
     }
 
+    login = {
+        interactive = {
+            nodes: ["login-0"]
+            flavor: "hpc.v2.16cpu.64ram"
+            root_volume_size = 100
+            server_group_id = openstack_compute_servergroup_v2.control.id
+        }
+    }
+
+    control_server_group_id = openstack_compute_servergroup_v2.control.id
+
     environment_root = var.environment_root
 }

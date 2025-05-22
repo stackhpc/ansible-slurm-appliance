@@ -80,4 +80,8 @@ resource "openstack_compute_instance_v2" "control" {
       %{endif}
   EOF
 
+  scheduler_hints {
+    group = var.control_server_group_id
+  }
+
 }
