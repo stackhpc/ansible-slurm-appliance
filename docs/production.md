@@ -33,6 +33,8 @@ Before starting ensure that:
 
 The following operating systems are supported for the deploy host:
 
+  - Ubuntu Jammy 22.04
+
   - Rocky Linux 9
 
   - Rocky Linux 8
