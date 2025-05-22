@@ -210,6 +210,10 @@ Variables marked `*` refer to OpenStack resources which must already exist.
 The above is a minimal configuration - for all variables and descriptions see
 `environments/$ENV/tofu/variables.tf`.
 
+The cluster image used should match the release which you are deploying with.
+Images are published alongside the release tags
+[here](https://github.com/stackhpc/ansible-slurm-appliance/releases). 
+
 To deploy this infrastructure, ensure the venv and the environment are
 [activated](#cookiecutter-instructions) and run:
 
