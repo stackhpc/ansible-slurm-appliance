@@ -22,13 +22,14 @@ grafana_serve_from_sub_path: "{{ groups['openondemand'] | count > 0 }}"
 
 grafana_dashboards_default:
   # node exporter slurm:
-  - dashboard_id: 13427
-    replacements:
-      - placeholder: DS_PROMETHEUS
-        replacement: prometheus
-      - placeholder: DS_ELASTICSEARCH
-        replacement: slurmstats
-    revision_id: 1
+  # DO NOT MERGE:
+  # - dashboard_id: 13427
+  #   replacements:
+  #     - placeholder: DS_PROMETHEUS
+  #       replacement: prometheus
+  #     - placeholder: DS_ELASTICSEARCH
+  #       replacement: slurmstats
+  #   revision_id: 1
   # openhpc slurm:
   - dashboard_file: openhpc-slurm.json
     replacements:
@@ -44,11 +45,12 @@ grafana_dashboards_default:
       - placeholder: DS_SLURMSTATS
         replacement: slurmstats
   # slurm exporter
-  - dashboard_id: 4323
-    replacements:
-      - placeholder: DS_PROMETHEUS
-        replacement: prometheus
-    revision_id: 3
+  # DO NOT MERGE:
+  # - dashboard_id: 4323
+  #   replacements:
+  #     - placeholder: DS_PROMETHEUS
+  #       replacement: prometheus
+  #   revision_id: 3
 
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 
