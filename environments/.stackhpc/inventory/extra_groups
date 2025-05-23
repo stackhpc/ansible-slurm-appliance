@@ -34,6 +34,8 @@ builder
 [squid:children]
 # Install squid into fat image
 builder
+
+[squid]
 # DO NOT MERGE:
 # configure squid on deploy host (steveb-dev) using stackhpc-dev network
 localhost ansible_host=10.20.0.121 ansible_connection=local
