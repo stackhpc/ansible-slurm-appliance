@@ -17,6 +17,7 @@
 - name: Setup slurm stats
   hosts: slurm_stats
   tags: slurm_stats
+  environment: "{{ appliances_environment_vars }}"
   tasks:
     - include_role:
         name: slurm_stats
@@ -33,7 +34,8 @@
   hosts: node_exporter
   tags: node_exporter
   tasks:
-    - import_role: name=cloudalchemy.node_exporter
+    - import_role:
+        name: cloudalchemy.node_exporter
 
 - name: Deploy OpenOndemand exporter
   hosts: openondemand
@@ -50,6 +52,7 @@
   hosts: control
   become: true
   tags: slurm_exporter
+  environment: "{{ appliances_environment_vars }}"
   tasks:
     - import_role:
         name: slurm_exporter
@@ -76,6 +79,7 @@
 - name: Deploy grafana
   hosts: grafana
   tags: grafana
+  environment: "{{ appliances_environment_vars }}"
   tasks:
     - assert:
         that: vault_grafana_admin_password is defined
