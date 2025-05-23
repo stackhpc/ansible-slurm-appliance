@@ -1,3 +1,9 @@
 # DO NOT COMMIT:
 squid_cache_disk: 1024 # MB
 squid_cache_mem: "50 MB"
+squid_acls:
+  - acl ncsa_users proxy_auth REQUIRED
+squid_auth_param: |
+    auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwords
+    auth_param basic children 5
+    auth_param basic credentialsttl 1 minute
