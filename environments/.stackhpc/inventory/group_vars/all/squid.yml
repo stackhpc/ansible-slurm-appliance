@@ -1,0 +1,3 @@
+# DO NOT COMMIT:
+squid_cache_disk: 1024 # MB
+squid_cache_mem: "50 MB"
