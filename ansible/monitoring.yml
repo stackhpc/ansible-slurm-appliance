@@ -25,8 +25,9 @@
   hosts: filebeat
   tags: filebeat
   tasks:
-    - import_role:
+    - include_role:
         name: filebeat
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Deploy node_exporter
   hosts: node_exporter
