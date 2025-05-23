@@ -99,4 +99,11 @@ module "cluster" {
     state_volume_type = var.state_volume_type
     home_volume_type = var.home_volume_type
 
+    login_security_groups = [
+        "isolated",  # allow all in-cluster services
+        "isolated-ssh-https",      # access via ssh and ondemand
+    ]
+    nonlogin_security_groups = [
+        "isolated"
+    ]
 }
