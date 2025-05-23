@@ -53,3 +53,8 @@ cluster
 
 [compute_init:children]
 compute
+
+# DO NOT MERGE:
+# turn on proxying for the cluster
+[proxy:children]
+cluster

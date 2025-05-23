@@ -1,0 +1,6 @@
+# DO NOT MERGE:
+# proxy is steveb-dev on sussex-slurm-data: can't use common default, that's hostname which isn't in /etc/hosts
+# TODO: actually need to add username:password@ in here ...
+# TODO: maybe add some quotes to this?
+proxy_http_proxy: "http://{{ hostvars[groups['squid'] | first].ansible_host }}:{{ squid_http_port }}"
+proxy_plays_only: true
