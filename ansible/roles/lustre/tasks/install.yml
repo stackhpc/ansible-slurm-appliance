@@ -4,9 +4,8 @@
   register: _lustre_dnf_build_packages
  
 - name: Clone lustre git repo
-  # https://git.whamcloud.com/?p=fs/lustre-release.git;a=summary
   ansible.builtin.git:
-    repo: "{{ lustre_git_repo }}"
+    repo: "{{ lustre_repo }}"
     dest: "{{ lustre_build_dir }}"
     version: "{{ lustre_version }}"
 
