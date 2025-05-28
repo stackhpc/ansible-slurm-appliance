@@ -36,7 +36,7 @@
   register: _cuda_driver_module_installed
 
 - name: Install nvidia drivers
-  ansible.builtin.command: dnf module install -y nvidia-driver
+  ansible.builtin.command: "dnf module install -y nvidia-driver-{{ cuda_nvidia_driver_version}}"
   register: _cuda_driver_install
   when: "'No matching Modules to list' in _cuda_driver_module_installed.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
