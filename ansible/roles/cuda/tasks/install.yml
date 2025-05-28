@@ -29,17 +29,19 @@
   when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
 
-- name: Check if nvidia driver module is installed
-  ansible.builtin.command: dnf module list --installed nvidia-driver
+- name: Read module info for list of packages
+  ansible.builtin.shell:
+    cmd: >-
+      dnf module info nvidia-driver:{{ cuda_nvidia_driver_stream }} |
+      grep {{ cuda_nvidia_driver_version }}.el{{ ansible_distribution_major_version }}.{{ ansible_architecture }}
   changed_when: false
-  failed_when: false
-  register: _cuda_driver_module_installed
+  register: _cuda_driver_module_packages
+  # returns a list of lines like '                 : libnvidia-cfg-3:570.133.20-1.el9.x86_64'
 
-- name: Install nvidia drivers
-  ansible.builtin.command: "dnf module install -y nvidia-driver-{{ cuda_nvidia_driver_version}}"
+- name: Install nvidia driver packages
+  ansible.builtin.dnf:
+    name: "{{ _cuda_driver_module_packages.stdout_lines | map('trim', ': ') }}"
   register: _cuda_driver_install
-  when: "'No matching Modules to list' in _cuda_driver_module_installed.stderr"
-  changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
 
 - name: Check kernel has not been modified
   assert:
