@@ -42,11 +42,9 @@ openhpc_packages_default:
   - podman-compose
 openhpc_packages_extra: []
 openhpc_packages: "{{ (openhpc_packages_default + openhpc_packages_extra) | select | list }}"
-openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
+openhpc_munge_key_b64: "{{ vault_openhpc_mungekey }}"
 openhpc_login_only_nodes: login
 openhpc_config_default:
-  SlurmctldParameters:
-    - enable_configless
   TaskPlugin: task/cgroup,task/affinity
   ReturnToService: 2 # is stackhpc.openhpc default, but templating bug means it is needed here too
 openhpc_config_rebuild:
