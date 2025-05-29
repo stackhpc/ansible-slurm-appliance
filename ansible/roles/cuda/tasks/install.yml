@@ -32,26 +32,22 @@
 - name: Read module info for list of packages
   # Even a single version of the module stream contains multiple package versions
   # so need to find the ones we want.
-  # The dnf .. command returns a list of lines like
-  # '                 : libnvidia-cfg-3:570.133.20-1.el9.x86_64'
-  # Some are duplicated for arch x86_64/.i684
-  # Some don't have arch or distro, or have .noarch
-  # so want to get full package name without any suffixes so we can use
-  # {{ | unique }} later to get the actual packages to dnf install.
-  # The literal dot after the vesion is important so we don't get
-  # e.g. -10. when we want -1.
-  # So from the example line above we extract
-  # ' libnvidia-cfg-3:570.133.20-1.'
-  ansible.builtin.shell:
-    cmd: >-
-      dnf module info nvidia-driver:{{ cuda_nvidia_driver_stream }} |
-      grep -o '[^:]*:{{ cuda_nvidia_driver_version }}\.'
-  changed_when: false
-  register: _cuda_driver_module_packages
-  
-- name: Install nvidia driver packages
+  dnf_module_info:
+    name: nvidia-driver
+    stream: "{{ cuda_nvidia_driver_stream }}"
+  register: _cuda_driver_module_info
+
+- name: Install nvidia driver packages for specific version
+  # entries in package list from above are e.g. 'nvidia-driver', where the
+  # actual package name is 'nvidia-driver-3:570.133.20-1.el9.x86_64'
+  # The epoch (3) and arch (x86_64) can be omitted but the release (1.el9)
+  # cannot be, so need to generate e.g. 'nvidia-driver-570.133.20-1.el9'
   ansible.builtin.dnf:
-    name: "{{ _cuda_driver_module_packages.stdout_lines | map('trim', ' .') | unique }}"
+    name: >-
+      {{
+        _cuda_driver_module_info.profiles.default |
+        map('regex_replace', '$', '-' ~ cuda_nvidia_driver_version)
+      }}
   register: _cuda_driver_install
 
 - name: Check kernel has not been modified
