@@ -24,11 +24,12 @@ module "login" {
   
   # optionally set for group
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
-  extra_volumes = lookup(each.value, "extra_volumes", {})
-  fip_addresses = lookup(each.value, "fip_addresses", [])
-  fip_network = lookup(each.value, "fip_network", "")
-  match_ironic_node = lookup(each.value, "match_ironic_node", false)
-  availability_zone = lookup(each.value, "availability_zone", "nova")
+  # here null means "use module var default"
+  extra_volumes = lookup(each.value, "extra_volumes", null)
+  fip_addresses = lookup(each.value, "fip_addresses", null)
+  fip_network = lookup(each.value, "fip_network", null)
+  match_ironic_node = lookup(each.value, "match_ironic_node", null)
+  availability_zone = lookup(each.value, "availability_zone", null)
 
   # can't be set for login
   compute_init_enable = []
@@ -40,4 +41,25 @@ module "login" {
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.login: o.id]
   baremetal_nodes = data.external.baremetal_nodes.result
+
+  # input dict validation:
+  group_name = each.key
+  group_keys = keys(each.value)
+  allowed_keys = [
+    "nodes",
+    "flavor",
+    "image_id",
+    "extra_networks",
+    "vnic_types",
+    "volume_backed_instances",
+    "root_volume_size",
+    "root_volume_type",
+    "extra_volumes",
+    "fip_addresses",
+    "fip_network",
+    "match_ironic_node",
+    "availability_zone",
+    "gateway_ip",
+    "nodename_template",
+  ]
 }
