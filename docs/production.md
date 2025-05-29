@@ -120,30 +120,6 @@ and referenced from the `site` and `production` environments, e.g.:
   set the "attach" options and run `tofu apply` again - this should show there
   are no changes planned.
 
-  and OpenTofu configured to use that volume rather than managing one itself
-  by setting
-
-      home_volume_provisioning = "attach"
-
-  either for a specific environment in the cluster module block in
-  `environments/$ENV/tofu/main.tf`, or as the site default by changing the
-  default in `environments/site/tofu/variables.tf`.
-  
-  For a development environment allowing OpenTofu to manage the volume using
-  the default value
-  
-      home_volume_provisioning = "manage"
-  
-  is usually appropriate, as it allows for multiple clusters to be created with
-  this environment.
-  
-  If no home volume at all is required because the home directories are provided
-  by a parallel filesystem (e.g. manila) use
-
-      home_volume_provisioning = "none"
-
-  In this case the NFS share for home directories is automatically disabled.
-  
 - Enable `etc_hosts` templating:
 
     ```yaml
