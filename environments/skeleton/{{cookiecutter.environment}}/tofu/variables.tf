@@ -229,7 +229,7 @@ variable "root_volume_size" {
 }
 
 variable "root_volume_type" {
-    description = "Type of root volume, if using volume backed instances. Default gives default volume type"
+    description = "Type of root volume, if using volume backed instances. If unset, the target cloud default volume type is used."
     type = string
     default = null
 }
