@@ -48,6 +48,7 @@ resource "openstack_compute_instance_v2" "control" {
       source_type  = "image"
       destination_type = var.volume_backed_instances ? "volume" : "local"
       volume_size = var.volume_backed_instances ? var.root_volume_size : null
+      volume_type = var.volume_backed_instances ? var.root_volume_type : null
       boot_index = 0
       delete_on_termination = true
   }
