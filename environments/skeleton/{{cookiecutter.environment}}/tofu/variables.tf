@@ -24,6 +24,20 @@ variable "key_pair" {
     description = "Name of an existing keypair in OpenStack"
 }
 
+variable "control_ip_addresses" {
+    type        = map(string)
+    description = <<-EOT
+        Mapping of fixed IP addresses for control node, keyed by network name.
+        The default means the cloud will select an address.
+    EOT
+    default     = {}
+    validation {
+        # check all keys are network names in cluster_networks
+        condition = length(setsubtract(keys(var.control_ip_addresses), [for n in var.cluster_networks: n.network])) == 0
+        error_message = "keys in var.control_ip_addresses must match network names in var.cluster_networks"
+    }
+}
+
 variable "control_node_flavor" {
     type = string
     description = "Flavor name for control node"
