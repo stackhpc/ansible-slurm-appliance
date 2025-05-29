@@ -26,7 +26,7 @@ variable "key_pair" {
 
 variable "control_ip_addresses" {
     type        = map(string)
-    description = "Mapping of networks to fixed IP addresses used by control node"
+    description = "Mapping of fixed IP addresses for control node, keyed by network name"
     default     = {}
 }
 
