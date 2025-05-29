@@ -18,6 +18,7 @@ module "login" {
   vnic_types = lookup(each.value, "vnic_types", var.vnic_types)
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
+  root_volume_type = lookup(each.value, "root_volume_type", var.root_volume_type)
   gateway_ip = lookup(each.value, "gateway_ip", var.gateway_ip)
   nodename_template = lookup(each.value, "nodename_template", var.cluster_nodename_template)
   

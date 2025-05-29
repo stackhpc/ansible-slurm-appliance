@@ -1,7 +1,7 @@
 locals {
   control_volumes = concat(
-    [openstack_blockstorage_volume_v3.state],
-    # convert map to list:
+    # convert maps to lists with zero or one entries:
+    [for v in data.openstack_blockstorage_volume_v3.state: v],
     [for v in data.openstack_blockstorage_volume_v3.home: v]
   )
   nodename = templatestring(
@@ -48,6 +48,7 @@ resource "openstack_compute_instance_v2" "control" {
       source_type  = "image"
       destination_type = var.volume_backed_instances ? "volume" : "local"
       volume_size = var.volume_backed_instances ? var.root_volume_size : null
+      volume_type = var.volume_backed_instances ? var.root_volume_type : null
       boot_index = 0
       delete_on_termination = true
   }

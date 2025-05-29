@@ -127,6 +127,28 @@ variable "state_volume_type" {
     default = null
 }
 
+variable "state_volume_provisioning" {
+    type = string
+    default = "manage"
+    description = <<-EOT
+        How to manage the state volume. Valid values are:
+            "manage": (Default) OpenTofu will create a volume "$cluster_name-state"
+                      and delete it when the cluster is destroyed. A volume
+                      with this name must not already exist. Use for demo and
+                      dev environments.
+            "attach": A single volume named "$cluster_name-state" must already
+                      exist. It is not managed by OpenTofu so e.g. is left
+                      intact if the cluster is destroyed. Use for production
+                      environments.
+        EOT
+    validation {
+      condition = contains(["manage", "attach"], var.state_volume_provisioning)
+      error_message = <<-EOT
+        home_volume_provisioning must be "manage" or "attach"
+    EOT
+    }
+}
+
 variable "home_volume_size" {
     type = number
     description = "Size of state volume on control node, in GB."
@@ -163,7 +185,9 @@ variable "home_volume_provisioning" {
         EOT
     validation {
       condition = contains(["manage", "attach", "none"], var.home_volume_provisioning)
-      error_message = "home_volume_provisioning must be one of manage, attach or none"
+      error_message = <<-EOT
+        home_volume_provisioning must be one of "manage", "attach" or "none"
+    EOT
     }
 }
 
@@ -204,6 +228,12 @@ variable "root_volume_size" {
     description = "Size of volume for root volumes if using volume backed instances, in Gb"
     type = number
     default = 40
+}
+
+variable "root_volume_type" {
+    description = "Type of root volume, if using volume backed instances. If unset, the target cloud default volume type is used."
+    type = string
+    default = null
 }
 
 variable "gateway_ip" {
