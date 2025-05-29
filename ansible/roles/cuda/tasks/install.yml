@@ -33,12 +33,15 @@
   ansible.builtin.shell:
     cmd: >-
       dnf module info nvidia-driver:{{ cuda_nvidia_driver_stream }} |
-      grep {{ cuda_nvidia_driver_version }}.el{{ ansible_distribution_major_version }}.{{ ansible_architecture }}
+      grep -F {{ cuda_nvidia_driver_version }}.el{{ ansible_distribution_major_version }}.{{ ansible_architecture }}
   changed_when: false
   register: _cuda_driver_module_packages
   # returns a list of lines like '                 : libnvidia-cfg-3:570.133.20-1.el9.x86_64'
 
 - name: Install nvidia driver packages
+  # its not possible to install a version of a module
+  # apparently this is the best way of approximating that
+  # but it is more idempotent than the module install anyway
   ansible.builtin.dnf:
     name: "{{ _cuda_driver_module_packages.stdout_lines | map('trim', ': ') }}"
   register: _cuda_driver_install
