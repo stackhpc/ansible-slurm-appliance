@@ -53,6 +53,7 @@ module "login" {
     "vnic_types",
     "volume_backed_instances",
     "root_volume_size",
+    "root_volume_type",
     "extra_volumes",
     "fip_addresses",
     "fip_network",

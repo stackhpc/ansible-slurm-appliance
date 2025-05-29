@@ -51,6 +51,7 @@ module "compute" {
     "ignore_image_changes",
     "volume_backed_instances",
     "root_volume_size",
+    "root_volume_type",
     "extra_volumes",
     "match_ironic_node",
     "availability_zone",
