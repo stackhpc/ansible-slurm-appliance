@@ -26,7 +26,10 @@ variable "key_pair" {
 
 variable "control_ip_addresses" {
     type        = map(string)
-    description = "Mapping of fixed IP addresses for control node, keyed by network name"
+    description = <<-EOT
+        Mapping of fixed IP addresses for control node, keyed by network name.
+        The default means the cloud will select an address.
+    EOT
     default     = {}
 }
 

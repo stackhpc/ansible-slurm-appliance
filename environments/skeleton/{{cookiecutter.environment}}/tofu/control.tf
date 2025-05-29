@@ -25,7 +25,7 @@ resource "openstack_networking_port_v2" "control" {
 
   fixed_ip {
     subnet_id  = data.openstack_networking_subnet_v2.cluster_subnet[each.key].id
-    ip_address = (var.control_ip_addresses != {})? var.control_ip_addresses[each.key]: null
+    ip_address = var.control_ip_addresses != {} ? var.control_ip_addresses[each.key] : null
   }
 
   no_security_groups = lookup(each.value, "no_security_groups", false)
