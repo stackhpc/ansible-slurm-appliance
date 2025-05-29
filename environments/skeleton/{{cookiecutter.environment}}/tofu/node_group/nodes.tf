@@ -82,6 +82,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
       source_type  = "image"
       destination_type = "volume"
       volume_size = var.root_volume_size
+      volume_type = var.root_volume_type
       boot_index = 0
       delete_on_termination = true
     }
@@ -136,6 +137,7 @@ resource "openstack_compute_instance_v2" "compute" {
       source_type  = "image"
       destination_type = "volume"
       volume_size = var.root_volume_size
+      volume_type = var.root_volume_type
       boot_index = 0
       delete_on_termination = true
     }
