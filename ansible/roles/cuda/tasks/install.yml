@@ -29,17 +29,30 @@
   when: "'No matching Modules to list' in _cuda_driver_module_enabled.stderr"
   changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
 
-- name: Check if nvidia driver module is installed
-  ansible.builtin.command: dnf module list --installed nvidia-driver
+- name: Read module info for list of packages
+  # Even a single version of the module stream contains multiple package versions
+  # so need to find the ones we want.
+  # The dnf .. command returns a list of lines like
+  # '                 : libnvidia-cfg-3:570.133.20-1.el9.x86_64'
+  # Some are duplicated for arch x86_64/.i684
+  # Some don't have arch or distro, or have .noarch
+  # so want to get full package name without any suffixes so we can use
+  # {{ | unique }} later to get the actual packages to dnf install.
+  # The literal dot after the vesion is important so we don't get
+  # e.g. -10. when we want -1.
+  # So from the example line above we extract
+  # ' libnvidia-cfg-3:570.133.20-1.'
+  ansible.builtin.shell:
+    cmd: >-
+      dnf module info nvidia-driver:{{ cuda_nvidia_driver_stream }} |
+      grep -o '[^:]*:{{ cuda_nvidia_driver_version }}\.'
   changed_when: false
-  failed_when: false
-  register: _cuda_driver_module_installed
-
-- name: Install nvidia drivers
-  ansible.builtin.command: dnf module install -y nvidia-driver
+  register: _cuda_driver_module_packages
+  
+- name: Install nvidia driver packages
+  ansible.builtin.dnf:
+    name: "{{ _cuda_driver_module_packages.stdout_lines | map('trim', ' .') | unique }}"
   register: _cuda_driver_install
-  when: "'No matching Modules to list' in _cuda_driver_module_installed.stderr"
-  changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
 
 - name: Check kernel has not been modified
   assert:
