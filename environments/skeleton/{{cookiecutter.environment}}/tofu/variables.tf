@@ -31,6 +31,11 @@ variable "control_ip_addresses" {
         The default means the cloud will select an address.
     EOT
     default     = {}
+    validation {
+        # check all keys are network names in cluster_networks
+        condition = length(setsubtract(keys(var.control_ip_addresses), [for n in var.cluster_networks: n.network])) == 0
+        error_message = "keys in var.control_ip_addresses must match network names in var.cluster_networks"
+    }
 }
 
 variable "control_node_flavor" {
