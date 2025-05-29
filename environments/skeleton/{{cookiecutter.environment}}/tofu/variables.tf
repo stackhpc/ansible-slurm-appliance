@@ -228,6 +228,12 @@ variable "root_volume_size" {
     default = 40
 }
 
+variable "root_volume_type" {
+    description = "Type of root volume, if using volume backed instances. Default gives default volume type"
+    type = string
+    default = null
+}
+
 variable "gateway_ip" {
     description = "Address to add default route via"
     type = string

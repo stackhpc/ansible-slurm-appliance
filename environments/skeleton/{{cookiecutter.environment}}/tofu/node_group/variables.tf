@@ -49,6 +49,11 @@ variable "root_volume_size" {
     default = 40
 }
 
+variable "root_volume_type" {
+    type = string
+    default = null
+}
+
 variable "extra_volumes" {
     description = <<-EOF
         Mapping defining additional volumes to create and attach.
