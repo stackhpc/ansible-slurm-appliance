@@ -4,7 +4,7 @@ roles:
     version: v25.3.2
     name: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v1.0.0
+    version: v1.1.0
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
@@ -55,4 +55,6 @@ collections:
     version: 0.0.15
   - name: stackhpc.pulp
     version: 0.5.5
+  - name: stackhpc.linux
+    version: 1.5.0
 ...
