@@ -36,7 +36,7 @@ nfs_configurations_extra: [] # site-specific nfs shares
 
 nfs_configurations: >- # construct stackhpc.nfs variable
   {{
-    nfs_configuration_home_volume if (cluster_home_volume | default(true)) else []
+    (nfs_configuration_home_volume if (cluster_home_volume | default(true)) else [])
     +
     nfs_configuration_compute_nodes
     +
