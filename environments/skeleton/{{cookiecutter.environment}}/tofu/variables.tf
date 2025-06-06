@@ -71,7 +71,7 @@ variable "cluster_image_id" {
 }
 
 variable "compute" {
-    type = any
+
     description = <<-EOF
         Mapping defining homogenous groups of compute nodes. Groups are used
         in Slurm partition definitions.
@@ -100,6 +100,8 @@ variable "compute" {
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
     EOF
+    default = {}
+    type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
 }
 
 variable "environment_root" {

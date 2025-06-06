@@ -24,11 +24,12 @@ module "compute" {
 
   # optionally set for group:
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
-  extra_volumes = lookup(each.value, "extra_volumes", {})
-  compute_init_enable = lookup(each.value, "compute_init_enable", [])
-  ignore_image_changes = lookup(each.value, "ignore_image_changes", false)
-  match_ironic_node = lookup(each.value, "match_ironic_node", false)
-  availability_zone = lookup(each.value, "availability_zone", "nova")
+  # here null means "use module var default"
+  extra_volumes = lookup(each.value, "extra_volumes", null)
+  compute_init_enable = lookup(each.value, "compute_init_enable", null)
+  ignore_image_changes = lookup(each.value, "ignore_image_changes", null)
+  match_ironic_node = lookup(each.value, "match_ironic_node", null)
+  availability_zone = lookup(each.value, "availability_zone", null)
 
   # computed
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
@@ -36,4 +37,25 @@ module "compute" {
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
   security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
   baremetal_nodes = data.external.baremetal_nodes.result
+  
+  # input dict validation:
+  group_name = each.key
+  group_keys = keys(each.value)
+  allowed_keys = [
+    "nodes",
+    "flavor",
+    "image_id",
+    "extra_networks",
+    "vnic_types",
+    "compute_init_enable",
+    "ignore_image_changes",
+    "volume_backed_instances",
+    "root_volume_size",
+    "root_volume_type",
+    "extra_volumes",
+    "match_ironic_node",
+    "availability_zone",
+    "gateway_ip",
+    "nodename_template",
+  ]
 }
