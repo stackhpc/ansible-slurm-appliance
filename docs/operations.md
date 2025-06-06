@@ -104,7 +104,7 @@ group into the `extra_packages` group. An error will occur if Ark credentials
 are defined in this case, as they are readable by unprivileged users in the
 `.repo` files and a local Pulp mirror must be used instead.
 
-If additional repositories are required, these could be added/enabled as necessary in a play added to `environments/$SITE_ENV/hooks/{pre,post}.yml` as appropriate. Note such a plat should NOT exclude the builder group, so that the repositories are also added to built images. There are various Ansible modules which might be useful for this:
+If additional repositories are required, these could be added/enabled as necessary in a play added to `environments/$SITE_ENV/hooks/{pre,post}.yml` as appropriate. Note such a play should NOT exclude the builder group, so that the repositories are also added to built images. There are various Ansible modules which might be useful for this:
     - `ansible.builtin.yum_repository`: Add a repo from an URL providing a 'repodata' directory.
     - `ansible.builtin.rpm_key` : Add a GPG key to the RPM database.
     - `ansible.builtin.get_url`: Can be used to install a repofile directly from an URL (e.g. https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo)
