@@ -4,7 +4,7 @@ roles:
     version: v25.3.2
     name: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v1.0.0
+    version: feat/only-configless # TODO: bump to release
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
