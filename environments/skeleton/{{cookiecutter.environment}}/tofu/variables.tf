@@ -71,7 +71,7 @@ variable "cluster_image_id" {
 }
 
 variable "compute" {
-    type = any
+
     description = <<-EOF
         Mapping defining homogenous groups of compute nodes. Groups are used
         in Slurm partition definitions.
@@ -100,6 +100,8 @@ variable "compute" {
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
     EOF
+    default = {}
+    type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
 }
 
 variable "environment_root" {
@@ -125,16 +127,68 @@ variable "state_volume_type" {
     default = null
 }
 
+variable "state_volume_provisioning" {
+    type = string
+    default = "manage"
+    description = <<-EOT
+        How to manage the state volume. Valid values are:
+            "manage": (Default) OpenTofu will create a volume "$cluster_name-state"
+                      and delete it when the cluster is destroyed. A volume
+                      with this name must not already exist. Use for demo and
+                      dev environments.
+            "attach": A single volume named "$cluster_name-state" must already
+                      exist. It is not managed by OpenTofu so e.g. is left
+                      intact if the cluster is destroyed. Use for production
+                      environments.
+        EOT
+    validation {
+      condition = contains(["manage", "attach"], var.state_volume_provisioning)
+      error_message = <<-EOT
+        home_volume_provisioning must be "manage" or "attach"
+    EOT
+    }
+}
+
 variable "home_volume_size" {
     type = number
-    description = "Size of state volume on control node, in GB"
-    default = 100 # GB, 0 means no home volume
+    description = "Size of state volume on control node, in GB."
+    default = 100
+    validation {
+        condition = var.home_volume_provisioning == "manage" ? var.home_volume_size > 0 : true
+        error_message = <<-EOT
+            home_volume_size must be > 0 when var.home_volume_provisioning == "manage"
+        EOT
+    }
 }
 
 variable "home_volume_type" {
     type = string
     default = null
     description = "Type of home volume, if not default type"
+}
+
+variable "home_volume_provisioning" {
+    type = string
+    default = "manage"
+    description = <<-EOT
+        How to manage the home volume. Valid values are:
+            "manage": (Default) OpenTofu will create a volume "$cluster_name-home"
+                      and delete it when the cluster is destroyed. A volume
+                      with this name must not already exist. Use for demo and
+                      dev environments.
+            "attach": A single volume named "$cluster_name-home" must already
+                      exist. It is not managed by OpenTofu so e.g. is left
+                      intact if the cluster is destroyed. Use for production
+                      environments.
+            "none":   No home volume is used. Use if /home is provided by
+                      a parallel filesystem, e.g. manila.
+        EOT
+    validation {
+      condition = contains(["manage", "attach", "none"], var.home_volume_provisioning)
+      error_message = <<-EOT
+        home_volume_provisioning must be one of "manage", "attach" or "none"
+    EOT
+    }
 }
 
 variable "vnic_types" {
@@ -174,6 +228,12 @@ variable "root_volume_size" {
     description = "Size of volume for root volumes if using volume backed instances, in Gb"
     type = number
     default = 40
+}
+
+variable "root_volume_type" {
+    description = "Type of root volume, if using volume backed instances. If unset, the target cloud default volume type is used."
+    type = string
+    default = null
 }
 
 variable "gateway_ip" {

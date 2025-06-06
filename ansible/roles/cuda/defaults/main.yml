@@ -1,12 +1,12 @@
 cuda_repo_url: "https://developer.download.nvidia.com/compute/cuda/repos/rhel{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/cuda-rhel{{ ansible_distribution_major_version }}.repo"
-cuda_nvidia_driver_stream: '570-open'
-cuda_package_version: '12.8.1-1'
-cuda_version_short: '12.8'
+cuda_nvidia_driver_stream: '575-open'
+cuda_package_version: '12.9.0-1'
+cuda_version_short: '12.9'
 cuda_packages:
   - "cuda{{ ('-' + cuda_package_version) if cuda_package_version != 'latest' else '' }}"
   - nvidia-gds
   - cmake
-  - cuda-toolkit-12-8
+  - cuda-toolkit-12-9
 cuda_samples_release_url: "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v{{ cuda_version_short }}.tar.gz"
 cuda_samples_path: "/var/lib/{{ ansible_user }}/cuda_samples"
 cuda_samples_programs:

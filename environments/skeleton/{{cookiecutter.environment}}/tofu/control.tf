@@ -1,5 +1,9 @@
 locals {
-  control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  control_volumes = concat(
+    # convert maps to lists with zero or one entries:
+    [for v in data.openstack_blockstorage_volume_v3.state: v],
+    [for v in data.openstack_blockstorage_volume_v3.home: v]
+  )
   nodename = templatestring(
     var.cluster_nodename_template,
     {
@@ -44,6 +48,7 @@ resource "openstack_compute_instance_v2" "control" {
       source_type  = "image"
       destination_type = var.volume_backed_instances ? "volume" : "local"
       volume_size = var.volume_backed_instances ? var.root_volume_size : null
+      volume_type = var.volume_backed_instances ? var.root_volume_type : null
       boot_index = 0
       delete_on_termination = true
   }
@@ -83,7 +88,7 @@ resource "openstack_compute_instance_v2" "control" {
 
     mounts:
       - [LABEL=state, ${var.state_dir}]
-      %{if var.home_volume_size > 0}
+      %{if var.home_volume_provisioning != "none"}
       - [LABEL=home, /exports/home]
       %{endif}
   EOF
