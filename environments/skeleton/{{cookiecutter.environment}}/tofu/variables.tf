@@ -101,7 +101,7 @@ variable "compute" {
             nodename_template: Overrides variable cluster_nodename_template
     EOF
     default = {}
-    type = any # can't do any better; TF type constraints can't cope with inhomogenous inner mappings
+    type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
 }
 
 variable "environment_root" {
