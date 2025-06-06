@@ -48,6 +48,26 @@
         name: cuda
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'install.yml' }}"
 
+- name: Setup Apptainer
+  hosts: apptainer
+  gather_facts: yes
+  tags: apptainer
+  tasks:
+    - name: Install and configure Apptainer
+      include_role:
+        name: azimuth_cloud.image_utils.apptainer
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
+
+- name: Setup Apptainer
+  hosts: nextflow
+  gather_facts: yes
+  tags: nextflow
+  tasks:
+    - name: Install and configure Nextflow
+      include_role:
+        name: azimuth_cloud.image_utils.nextflow
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
+
 - name: Persist hostkeys across rebuilds
   # Must be after filesystems.yml (for storage)
   # and before portal.yml (where OOD login node hostkeys are scanned)

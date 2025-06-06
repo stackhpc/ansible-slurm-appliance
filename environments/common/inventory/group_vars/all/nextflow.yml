@@ -1,0 +1,4 @@
+---
+
+nextflow_skel_config: |
+  process.executor = 'slurm'

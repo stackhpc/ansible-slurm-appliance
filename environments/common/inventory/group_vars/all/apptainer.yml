@@ -1,0 +1,7 @@
+---
+
+# Mounting /tmp by default can break assumptions made
+# by some containers used in nf-core workflows.
+apptainer_config_overrides:
+  - directive: "mount tmp"
+    value: "no"
