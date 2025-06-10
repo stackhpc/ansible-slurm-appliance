@@ -20,7 +20,7 @@
 
 - name: Install nvidia drivers
   ansible.builtin.dnf:
-    name: nvidia-open
+    name: "{{ cuda_nvidia_driver_pkg }}"
   register: _cuda_driver_install
 
 - name: Check kernel has not been modified
