@@ -19,10 +19,9 @@
   changed_when: "'Nothing to do' not in _cuda_driver_module_enable.stdout"
 
 - name: Install nvidia drivers
-  ansible.builtin.command: dnf install -y nvidia-open
+  ansible.builtin.dnf:
+    name: nvidia-open
   register: _cuda_driver_install
-  when: "'No matching Modules to list' in _cuda_driver_module_installed.stderr"
-  changed_when: "'Nothing to do' not in _cuda_driver_install.stdout"
 
 - name: Check kernel has not been modified
   assert:
