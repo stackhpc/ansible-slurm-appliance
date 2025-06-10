@@ -1,7 +1,21 @@
 ---
-openhpc_slurm_partitions:
-    - name: cpu
-    - name: gpu
-      gres:
-        - conf: "gpu:h100:4"
-          file: "/dev/nvidia[0-3]"
+openhpc_nodegroups:
+  - name: cpu
+    node_params:
+      CPUSpecList: 92-95
+  - name: gpu
+    node_params:
+      CPUSpecList: 92-95
+    gres:
+      - conf: "gpu:h100:4"
+        file: "/dev/nvidia[0-3]"
+
+openhpc_partitions:
+  - name: cpu
+    default: 'YES'
+    nodegroups:
+      - cpu
+  - name: gpu
+    default: 'NO'
+    nodegroups:
+      - gpu
