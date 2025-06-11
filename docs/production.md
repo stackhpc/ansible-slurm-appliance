@@ -134,10 +134,6 @@ and referenced from the `site` and `production` environments, e.g.:
 
 - Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
-- If fixed IP(s) are required for the control node, set the OpenTofu variable
-  `control_ip_addresses`. This will require either using admin credentials or
-  policy changes.
-
 - If floating IPs are required for login nodes, modify the OpenTofu configurations
   appropriately.
 
