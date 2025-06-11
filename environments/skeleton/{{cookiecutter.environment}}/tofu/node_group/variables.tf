@@ -119,6 +119,27 @@ variable "fip_network" {
     nullable = false
 }
 
+variable "ip_addresses" {
+    type = map(list(string))
+    description = <<-EOT
+        Mapping of list of fixed IP addresses for nodes, keyed by network name,
+        in same order as nodes parameter. For any networks not specified here
+        the cloud will select addresses.
+
+        NB: Changing IP addresses after deployment may hit terraform provider bugs.
+    EOT
+    default = {}
+    nullable = false
+    validation {
+      condition = length(setsubtract(keys(var.ip_addresses), var.networks[*].network)) == 0
+      error_message = "Keys in ip_addresses for nodegroup \"${var.group_name}\" must match network names in var.cluster_networks"
+    }
+    validation {
+      condition = alltrue([for v in values(var.ip_addresses): length(v) == length(var.nodes)])
+      error_message = "Values in ip_addresses for nodegroup \"${var.group_name}\" must be a list of the same length as var.nodes"
+    }
+}
+
 variable "match_ironic_node" {
     type = bool
     description = "Whether to launch instances on the Ironic node of the same name as each cluster node"
