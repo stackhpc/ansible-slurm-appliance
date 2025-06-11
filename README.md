@@ -25,8 +25,6 @@ The default configuration in this repository may be used to create a cluster to 
 - Persistent state backed by an OpenStack volume.
 - NFS-based shared file system backed by another OpenStack volume.
 
-Note that the Open OnDemand portal and its remote apps are not usable with this default configuration.
-
 It requires an OpenStack cloud, and an Ansible "deploy host" with access to that cloud.
 
 Before starting ensure that:
