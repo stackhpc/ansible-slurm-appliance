@@ -22,7 +22,7 @@ module "login" {
   gateway_ip = lookup(each.value, "gateway_ip", var.gateway_ip)
   nodename_template = lookup(each.value, "nodename_template", var.cluster_nodename_template)
   
-  # optionally set for group
+  # optionally set for group:
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
   # here null means "use module var default"
   extra_volumes = lookup(each.value, "extra_volumes", null)

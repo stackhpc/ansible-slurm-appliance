@@ -14,6 +14,7 @@ control:
     vars:
         appliances_state_dir: ${state_dir} # NB needs to be set on group not host otherwise it is ignored in packer build!
 
+# --- login nodes ---
 %{ for group_name in keys(login_groups) ~}
 ${cluster_name}_${group_name}:
     hosts:
@@ -32,6 +33,7 @@ login:
         ${cluster_name}_${group_name}:
 %{ endfor ~}
 
+# --- compute nodes ---
 %{ for group_name in keys(compute_groups) ~}
 ${cluster_name}_${group_name}:
     hosts:
@@ -44,10 +46,36 @@ ${cluster_name}_${group_name}:
     vars:
         # NB: this is the target image, not necessarily what is provisioned
         image_id: ${compute_groups[group_name]["image_id"]}
+
+${group_name}:
+    children:
+        ${cluster_name}_${group_name}:
+
 %{ endfor ~}
 
 compute:
     children:
 %{ for group_name in keys(compute_groups) ~}
+        ${cluster_name}_${group_name}:
+%{ endfor ~}
+
+# --- additional nodes ---
+%{ for group_name in keys(additional_groups) ~}
+${cluster_name}_${group_name}:
+    hosts:
+%{ for node in additional_groups[group_name]["compute_instances"] ~}
+        ${ node.name }:
+            ansible_host: ${node.access_ip_v4}
+            instance_id: ${ node.id }
+            networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
+%{ endfor ~}
+${group_name}:
+    children:
+        ${cluster_name}_${group_name}:
+
+%{ endfor ~}
+additional:
+    children:
+%{ for group_name in keys(additional_groups) ~}
         ${cluster_name}_${group_name}:
 %{ endfor ~}
