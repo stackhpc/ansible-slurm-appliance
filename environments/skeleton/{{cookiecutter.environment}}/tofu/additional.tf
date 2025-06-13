@@ -31,6 +31,7 @@ module "additional" {
   match_ironic_node = lookup(each.value, "match_ironic_node", null)
   availability_zone = lookup(each.value, "availability_zone", null)
   ip_addresses = lookup(each.value, "ip_addresses", null)
+  security_group_ids = lookup(each.value, "security_group_ids", [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id])
 
   # can't be set for additional nodes
   compute_init_enable = []
@@ -40,7 +41,6 @@ module "additional" {
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
   # updates to node metadata on deletion/recreation of the control node:
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
-  security_group_ids = [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
   baremetal_nodes = data.external.baremetal_nodes.result
 
   # input dict validation:
@@ -63,5 +63,6 @@ module "additional" {
     "ip_addresses",
     "gateway_ip",
     "nodename_template",
+    "security_group_ids",
   ]
 }
