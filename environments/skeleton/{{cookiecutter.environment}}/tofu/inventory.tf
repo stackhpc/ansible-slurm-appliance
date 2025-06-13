@@ -6,6 +6,7 @@ resource "local_file" "hosts" {
                             "control": openstack_compute_instance_v2.control
                             "login_groups": module.login
                             "compute_groups": module.compute
+                            "additional_groups": module.additional
                             "state_dir": var.state_dir
                             "cluster_home_volume": var.home_volume_provisioning != "none"
                           },
