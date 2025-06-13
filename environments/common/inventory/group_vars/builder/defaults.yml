@@ -24,4 +24,5 @@ tuned_started: false
 tuned_enabled: false
 sssd_started: false
 sssd_enabled: false
+slurm_exporter_state: stopped
 appliances_mode: build

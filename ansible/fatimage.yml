@@ -171,11 +171,9 @@
       when: "'openondemand' in group_names"
 
     - name: slurm exporter
-      import_role:
+      include_role:
         name: slurm_exporter
-        tasks_from: install
-      vars:
-        slurm_exporter_state: stopped
+        tasks_from: install.yml
       when: "'slurm_exporter' in group_names"
 
     - name: Install alertmanager
