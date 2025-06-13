@@ -30,6 +30,7 @@ module "compute" {
   ignore_image_changes = lookup(each.value, "ignore_image_changes", null)
   match_ironic_node = lookup(each.value, "match_ironic_node", null)
   availability_zone = lookup(each.value, "availability_zone", null)
+  ip_addresses = lookup(each.value, "ip_addresses", null)
 
   # computed
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
@@ -55,6 +56,7 @@ module "compute" {
     "extra_volumes",
     "match_ironic_node",
     "availability_zone",
+    "ip_addresses",
     "gateway_ip",
     "nodename_template",
   ]

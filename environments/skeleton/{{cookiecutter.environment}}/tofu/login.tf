@@ -30,6 +30,7 @@ module "login" {
   fip_network = lookup(each.value, "fip_network", null)
   match_ironic_node = lookup(each.value, "match_ironic_node", null)
   availability_zone = lookup(each.value, "availability_zone", null)
+  ip_addresses = lookup(each.value, "ip_addresses", null)
 
   # can't be set for login
   compute_init_enable = []
@@ -59,6 +60,7 @@ module "login" {
     "fip_network",
     "match_ironic_node",
     "availability_zone",
+    "ip_addresses",
     "gateway_ip",
     "nodename_template",
   ]
