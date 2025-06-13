@@ -54,8 +54,10 @@
   tags: slurm_exporter
   environment: "{{ appliances_environment_vars }}"
   tasks:
-    - import_role:
+    - include_role:
         name: slurm_exporter
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
+
 
 - name: Setup core monitoring software
   hosts: prometheus
