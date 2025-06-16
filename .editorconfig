@@ -1,0 +1,8 @@
+# The is primarily used to alter the behaviour of linters executed by super-linter.
+# See https://editorconfig.org/
+
+# shfmt will default to indenting shell scripts with tabs,
+# define the indent as 2 spaces
+[bin/*]
+indent_style = space
+indent_size = 2

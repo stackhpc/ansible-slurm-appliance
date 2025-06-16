@@ -1,0 +1,9 @@
+---
+skip_list:
+  - var-naming[no-role-prefix]
+  - galaxy[no-changelog]
+  - galaxy[version-incorrect]
+  - meta-runtime[unsupported-version]
+exclude_paths:
+  - actionlint.yml
+  - .github/

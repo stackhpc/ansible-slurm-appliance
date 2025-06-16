@@ -138,3 +138,20 @@ where the IP of the login node is given in `environments/$ENV/inventory/hosts.ym
 - `dev/`: Contains development tools.
 
 For further information see the [docs](docs/) directory.
+
+## Developing locally
+
+To run the GitHub Actions linters locally, use:
+
+```sh
+docker run --rm \
+    -e RUN_LOCAL=true \
+    --env-file "super-linter.env" \
+    -v "$(pwd)":/tmp/lint \
+    ghcr.io/super-linter/super-linter:v7.3.0
+```
+
+```sh
+ansible-lint -c .ansible-lint.yml ansible/
+```
+
