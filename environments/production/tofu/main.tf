@@ -18,8 +18,8 @@ module "cluster" {
       }
     ]
     vnic_types = {
-      "slurm-production" = "normal"
-      "external-ceph" = "normal"
+      "slurm-production" = "direct"
+      "external-ceph" = "direct"
     }
     compute = {
       # Group name used for compute node partition definition
@@ -91,7 +91,7 @@ module "cluster" {
       #      "highmem-00",
       #      "highmem-01",
       #    ]
-      #    flavor: "hpc.v2.60cpu.480ram"
+      #    flavor: "hpc.v2.56cpu.448ram"
       #    ignore_image_changes: true
       #}
     }
@@ -102,6 +102,8 @@ module "cluster" {
             flavor: "hpc.v2.16cpu.64ram"
             root_volume_size = 100
             server_group_id = openstack_compute_servergroup_v2.control.id
+            fip_addresses:  ["10.129.31.194"]
+            fip_network: "slurm-production"
         }
     }
 
