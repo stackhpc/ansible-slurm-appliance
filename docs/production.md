@@ -134,23 +134,6 @@ and referenced from the `site` and `production` environments, e.g.:
 
 - Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
-- Modify `environments/site/tofu/nodes.tf` to provide fixed IPs for at least
-  the control node, and (if not using FIPs) the login node(s):
-
-    ```
-    resource "openstack_networking_port_v2" "control" {
-        ...
-        fixed_ip {
-            subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
-            ip_address = var.control_ip_address
-        }
-    }
-    ```
-    
-  Note the variable `control_ip_address` is new.
-
-  Using fixed IPs will require either using admin credentials or policy changes.
-
 - If floating IPs are required for login nodes, modify the OpenTofu configurations
   appropriately.
 

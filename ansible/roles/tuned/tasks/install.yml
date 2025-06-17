@@ -3,3 +3,14 @@
   ansible.builtin.dnf:
     name: tuned
     state: present
+
+- name: Fix TuneD hpc-compute profile for hugepages
+  # See https://github.com/redhat-performance/tuned/issues/752
+  # This is done on install, not configure, so that it is available even
+  # for compute-init nodes
+  community.general.ini_file:
+    path: /usr/lib/tuned/hpc-compute/tuned.conf
+    section: sysctl
+    option: vm.min_free_kbytes
+    value: '>135168'
+    no_extra_spaces: true

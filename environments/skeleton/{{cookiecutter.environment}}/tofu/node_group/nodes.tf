@@ -47,22 +47,26 @@ resource "openstack_compute_volume_attach_v2" "compute" {
 resource "openstack_networking_port_v2" "compute" {
 
   for_each = {for item in setproduct(var.nodes, var.networks):
-    "${item[0]}-${item[1].network}" => item[1]
+    "${item[0]}-${item[1].network}" => {
+        node_idx = index(var.nodes, item[0])
+        net = item[1]
+      }
   }
 
   name = "${var.cluster_name}-${each.key}"
-  network_id = data.openstack_networking_network_v2.network[each.value.network].id
+  network_id = data.openstack_networking_network_v2.network[each.value.net.network].id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.subnet[each.value.network].id
+    subnet_id = data.openstack_networking_subnet_v2.subnet[each.value.net.network].id
+    ip_address = try(var.ip_addresses[each.value.net.network][each.value.node_idx], null)
   }
   
-  no_security_groups = lookup(each.value, "no_security_groups", false)
-  security_group_ids = lookup(each.value, "no_security_groups", false) ? [] : var.security_group_ids
+  no_security_groups = lookup(each.value.net, "no_security_groups", false)
+  security_group_ids = lookup(each.value.net, "no_security_groups", false) ? [] : var.security_group_ids
 
   binding {
-    vnic_type = lookup(var.vnic_types, each.value.network, "normal")
+    vnic_type = lookup(var.vnic_types, each.value.net.network, "normal")
   }
 }
 
