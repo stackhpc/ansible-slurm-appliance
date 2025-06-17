@@ -157,11 +157,6 @@ compute = {
 }
 ```
 
-If there is no default route at all (either from a subnet gateway or from
-`gateway_ip`) then a dummy route is created via the access network interface to
-ensure [correct](https://docs.k3s.io/installation/airgap#default-network-route)
-`k3s` operation.
-
 When using a subnet with no default gateway, OpenStack's nameserver for the
 subnet may refuse lookups. External nameservers can be defined using the
 [resolv_conf](../ansible/roles/resolv_conf/README.md) role.

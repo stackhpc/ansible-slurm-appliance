@@ -4,7 +4,7 @@ Configure CA certificates and trusts.
 
 ## Role variables
 
-- `ca-certificates`: Optional str. Path to directory containing certificates
+- `cacerts_cert_dir`: Optional str. Path to directory containing certificates
   in PEM or DER format. Any files here will be added to the list of CAs trusted
   by the system.
 
