@@ -1,5 +1,14 @@
 ---
 
+- name: Template passwords
+  hosts: cluster # TODO: maybe we need to run this
+  gather_facts: false
+  tasks:
+    - name: Include password generation role
+      include_role:
+        name: passwords
+    - meta: end_here
+
 - name: Run pre.yml hook
   vars:
     # hostvars not available here, so have to recalculate environment root:
