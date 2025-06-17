@@ -5,6 +5,9 @@
 - name: Validate secrets created
   hosts: localhost
   gather_facts: false
+  tags:
+    - validate
+    - passwords
   tasks:
     - import_role:
         name: passwords
@@ -14,6 +17,9 @@
   hosts: localhost
   gather_facts: false
   become: false
+  tags:
+    - validate
+    - galaxy
   tasks:
       # Can't use e.g. ansible-galaxy {role,collection} list to check installed
       # vs desired, as git-installed collections do not provide any metadata for
@@ -40,6 +46,9 @@
 - name: Ensure control node is in inventory
   hosts: all
   gather_facts: false
+  tags:
+    - validate
+    - openhpc
   tasks:
     - assert:
         that: groups['control'] | length
@@ -48,7 +57,9 @@
 - name: Validate openhpc configuration
   hosts: openhpc
   gather_facts: false
-  tags: openhpc
+  tags:
+    - validate
+    - openhpc
   tasks:
     - import_role:
         name: stackhpc.openhpc
@@ -65,7 +76,9 @@
 - name: Validate filebeat configuration
   hosts: filebeat
   gather_facts: false
-  tags: filebeat
+  tags:
+    - validate
+    - filebeat
   tasks:
     - import_role:
         name: filebeat
@@ -78,6 +91,7 @@
     - grafana
   gather_facts: false
   tags:
+    - validate
     - openondemand
     - openondemand_server
     - grafana
@@ -102,7 +116,9 @@
 
 - name: Validate freeipa configuration
   hosts: freeipa
-  tags: freeipa
+  tags:
+    - validate
+    - freeipa
   tasks:
     - import_role:
         name: freeipa
@@ -110,7 +126,9 @@
 
 - name: Validate lustre configuration
   hosts: lustre
-  tags: lustre
+  tags:
+    - validate
+    - lustre
   tasks:
     - import_role:
         name: lustre
