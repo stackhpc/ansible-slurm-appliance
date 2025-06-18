@@ -3,11 +3,11 @@
 - name: Setup DB
   hosts: mysql
   become: true
-  tags: mysql
+  tags:
+    - mysql
   tasks:
     - include_role:
         name:  mysql
-        tasks_from: "{{ 'install.yml' if appliances_mode == 'build' else 'main.yml' }}"
 
 - name: Setup slurm-driven rebuild
   hosts: rebuild:!builder
@@ -20,9 +20,12 @@
         name: rebuild
 
 - name: Set locked memory limits on user-facing nodes
-  hosts: compute:login:!builder
+  hosts:
+    - compute
+    - login
   become: yes
-  tags: openhpc
+  tags:
+    - openhpc
   tasks:
     - name: set memory limits
       lineinfile:
@@ -31,7 +34,7 @@
         line: "* soft memlock unlimited"
 
 - name: Block ssh to compute nodes for non-privileged users without running jobs
-  hosts: compute:!builder
+  hosts: compute
   become: yes
   tags:
     - openhpc
@@ -54,15 +57,12 @@
 - name: Setup slurm
   hosts: openhpc
   become: yes
-  tags: openhpc
+  tags:
+    - openhpc
   tasks:
     - include_role:
         name: stackhpc.openhpc
-        tasks_from: "{{ _openhpc_task_file[appliances_mode] | default('main.yml') }}"
-      vars:
-        _openhpc_task_file:
-          build: install.yml
-          configure: runtime.yml
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup Node Health Checks
   # Has to be done here as it requires openhpc repos etc for installation
