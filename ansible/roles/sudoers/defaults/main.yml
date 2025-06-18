@@ -1,0 +1,20 @@
+---
+# Default variables for sudoers role
+
+# List of sudo groups to configure
+# Each item should have:
+#   - group: the group name (required)
+#   - commands: the sudo commands specification (required)
+#   - state: present (default) or absent (optional)
+sudoers_groups: []
+
+# Example:
+# sudoers_groups:
+#   - group: SITE_Admins
+#     commands: "ALL=(ALL) ALL"
+#   - group: SITE_Users
+#     commands: "ALL=(ALL) ALL"
+#   - group: developers
+#     commands: "ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart myapp"
+#   - group: old_group
+#     state: absent

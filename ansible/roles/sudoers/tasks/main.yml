@@ -1,0 +1,24 @@
+---
+- name: Configure sudoers files
+  template:
+    src: sudoers.j2
+    dest: /etc/sudoers.d/{{ item.group | replace(' ', '_') | replace('/', '_') }}
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  become: true
+  with_items: "{{ sudoers_groups }}"
+  when:
+    - sudoers_groups is defined
+    - sudoers_groups | length > 0
+
+- name: Remove sudoers files for absent groups
+  file:
+    path: /etc/sudoers.d/{{ item.group | replace(' ', '_') | replace('/', '_') }}
+    state: absent
+  become: true
+  with_items: "{{ sudoers_groups }}"
+  when:
+    - sudoers_groups is defined
+    - item.state | default('present') == 'absent'
