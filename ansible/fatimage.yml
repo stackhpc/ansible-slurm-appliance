@@ -257,7 +257,7 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- import_playbook: after.yml
+- import_playbook: final.yml
 
 - hosts: builder
   become: yes
