@@ -1,7 +1,7 @@
 - name: Copy stored NHC configuration to active location
   ansible.builtin.copy:
     remote_src: true
-    src: "/exports/cluster share/hostconfig/{{ ansible_host }}"
+    src: "/var/tmp/cluster/hostconfig/{{ ansible_host }}/nhc.conf"
     dest: /etc/nhc/nhc.conf
     owner: root
     group: root
