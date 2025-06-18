@@ -1,10 +1,6 @@
-- name: Slurp generated NHC configuration
-  ansible.builtin.slurp:
-    src: /etc/nhc/nhc.conf
-  register: _nhc_generated_conf
-
-- name: Write generated NHC configuration to control node exports
-  ansible.builtin.copy:
+# Used for compute-init
+- name: Template out host specific NHC config
+  ansible.builtin.template:
+    src: "{{ nhc_config_template }}"
     dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/nhc.conf"
-    content: "{{ _nhc_generated_conf.content | b64decode }}"
   delegate_to: "{{ groups['control'] | first }}"

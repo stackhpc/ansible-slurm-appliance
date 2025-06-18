@@ -1,1 +1,2 @@
-nhc_config_changes: []
+nhc_config_template: nhc.conf.j2
+nhc_config_extra: ''

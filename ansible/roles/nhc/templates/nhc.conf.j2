@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+## Filesystem checks
+{% for mount in ansible_mounts %}
+{% set mount_mode = 'rw' if 'rw' in mount.options.split(',') else 'ro' %}
+{{ ansible_fqdn }} || check_fs_mount_{{ mount_mode }} -t "{{ mount.fstype }}" -s "{{ mount.device }}" -f "{{ mount.mount }}"
+{% endfor %}
+
+## Ethernet interface checks
+{% for iface in ansible_interfaces | select('match', 'eth') %}
+{{ ansible_fqdn }} || check_hw_eth {{ iface }}
+{% endfor %}
+
+## Site-specific checks
+{{ nhc_config_extra }}
