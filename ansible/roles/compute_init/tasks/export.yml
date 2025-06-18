@@ -99,7 +99,7 @@
     tasks_from: export.yml
   when: "'sshd' in group_names"
 
-- name: Retrieve generated NHC config
+- name: Export generated NHC config
   import_role:
     name: nhc
     tasks_from: export.yml

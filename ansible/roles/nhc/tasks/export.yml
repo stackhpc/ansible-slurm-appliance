@@ -1,5 +1,10 @@
-- name: Fetch generated NHC config to control node storage
-  ansible.builtin.fetch:
+- name: Slurp generated NHC configuration
+  ansible.builtin.slurp:
     src: /etc/nhc/nhc.conf
-    flat: true
-    dest: "/exports/cluster/hostconfig{{ inventory_hostname }}/nhc.conf"
+  register: _nhc_generated_conf
+
+- name: Write generated NHC configuration to control node exports
+  ansible.builtin.copy:
+    dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/nhc.conf"
+    content: "{{ _nhc_generated_conf.content | b64decode }}"
+  delegate_to: "{{ groups['control'] | first }}"

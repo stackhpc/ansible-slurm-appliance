@@ -1,5 +1,6 @@
 - hosts: dnf_repos
   become: yes
+  tags: dnf_repos
   tasks:
     - name: Disable pulp repos
       ansible.builtin.include_role:
