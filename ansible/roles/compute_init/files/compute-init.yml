@@ -354,7 +354,7 @@
     - name: Provide NHC configuration
       ansible.builtin.include_role:
         name: nhc
-        tasks_from: import.yml
+        tasks_from: boot.yml
       when: enable_nhc
 
     - name: Ensure node is resumed
