@@ -91,9 +91,9 @@ jobs:
         run: dev/setup-env.sh
 
       - name: Install OpenTofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v1.0.5
         with:
-          tofu_version: 1.6.2
+          tofu_version: 1.9.0
 
       - name: Initialise tofu
         run: tofu init
@@ -229,6 +229,16 @@ jobs:
           (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+
+      - name: Delete possible volume snapshot from slurm upgrade
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate  
+          if [ -n "$SNAPSHOT" ]
+          then
+              echo Deleting $SNAPSHOT
+              openstack volume snapshot delete $SNAPSHOT
+          fi
 
       - name: Delete infrastructure
         run: |

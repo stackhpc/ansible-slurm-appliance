@@ -124,7 +124,7 @@ variable "volume_size" {
 
 variable "image_disk_format" {
   type = string
-  default = "qcow2"
+  default = "raw"
 }
 
 variable "metadata" {
@@ -178,7 +178,7 @@ source "openstack" "openhpc" {
   ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
   
   # Output image:
-  image_disk_format = "qcow2"
+  image_disk_format = var.image_disk_format
   image_visibility = var.image_visibility
   
 }

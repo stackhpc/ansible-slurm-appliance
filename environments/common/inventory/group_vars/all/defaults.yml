@@ -42,7 +42,7 @@ appliances_local_users_default:
         home: /var/lib/{{ appliances_local_users_ansible_user_name }}
         move_home: true
         local: true
-    
+
     - user: "{{ appliances_local_users_podman }}"
       enable: "{{ 'podman' in group_names }}"
 
@@ -53,7 +53,7 @@ appliances_local_users_default:
         shell: /sbin/nologin
         uid: 202
         system: true
-    
+
     - group:
         name: prometheus
         gid: 976
@@ -64,7 +64,7 @@ appliances_local_users_default:
         shell: /usr/sbin/nologin
         system: true
       enable: "{{ 'prometheus' in group_names }}"
-    
+
     - group:
         name: grafana
         gid: 979
@@ -79,7 +79,7 @@ appliances_local_users_default:
 
 # Overide this to add extra users whilst keeping the defaults.
 appliances_local_users_extra: [] # see format of appliances_local_users_default above
-appliances_local_users: "{{ appliances_local_users_default + appliances_local_users_extra }}"
+appliances_local_users: "{{ (appliances_local_users_default + appliances_local_users_extra) | select | list }}"
 
 ################## bootstrap: extra package installs ######################################
 
@@ -94,7 +94,7 @@ appliances_extra_packages_default:
  - postfix
  - git
  - "{{ 'python36' if ansible_distribution_version == '8.9' else 'python312' }}"
- 
+
 appliances_extra_packages_other: []
-  
-appliances_extra_packages: "{{ appliances_extra_packages_default + appliances_extra_packages_other }}"
+
+appliances_extra_packages: "{{ (appliances_extra_packages_default + appliances_extra_packages_other) | select | list }}"

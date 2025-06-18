@@ -11,8 +11,6 @@
         zenith_proxy_upstream_host: "{{ ansible_host }}" # IP
         zenith_proxy_upstream_port: "{{ grafana_port }}"
         zenith_proxy_client_token: "{{ zenith_token_monitoring }}"
-        zenith_proxy_client_auth_params:
-          tenancy-id: "{{ openstack_project_id }}"
         zenith_proxy_mitm_enabled: yes
         zenith_proxy_mitm_auth_inject: basic
         zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
@@ -31,8 +29,6 @@
         zenith_proxy_upstream_host: "{{ ansible_host }}" # IP
         zenith_proxy_upstream_port: 443
         zenith_proxy_client_token: "{{ zenith_token_ood }}"
-        zenith_proxy_client_auth_params:
-          tenancy-id: "{{ openstack_project_id }}"
         zenith_proxy_mitm_enabled: yes
         zenith_proxy_mitm_auth_inject: basic
         zenith_proxy_mitm_auth_basic_username: azimuth

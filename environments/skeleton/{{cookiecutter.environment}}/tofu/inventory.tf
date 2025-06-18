@@ -7,16 +7,8 @@ resource "local_file" "hosts" {
                             "login_groups": module.login
                             "compute_groups": module.compute
                             "state_dir": var.state_dir
+                            "cluster_home_volume": var.home_volume_provisioning != "none"
                           },
                           )
   filename = "../inventory/hosts.yml"
-}
-
-resource "local_file" "partitions" {
-    content  = templatefile("${path.module}/partitions.tpl",
-                            {
-                              "compute_groups": module.compute,
-                            },
-    )
-    filename = "../inventory/group_vars/all/partitions.yml" # as all/ is created by skeleton
 }

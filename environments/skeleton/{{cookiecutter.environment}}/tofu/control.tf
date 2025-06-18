@@ -1,5 +1,18 @@
 locals {
-  control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  control_volumes = concat(
+    # convert maps to lists with zero or one entries:
+    [for v in data.openstack_blockstorage_volume_v3.state: v],
+    [for v in data.openstack_blockstorage_volume_v3.home: v]
+  )
+  nodename = templatestring(
+    var.cluster_nodename_template,
+    {
+      node = "control",
+      cluster_name = var.cluster_name,
+      cluster_domain_suffix = var.cluster_domain_suffix,
+      environment_name = basename(var.environment_root)
+    }
+  )
 }
 
 resource "openstack_networking_port_v2" "control" {
@@ -11,7 +24,8 @@ resource "openstack_networking_port_v2" "control" {
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.cluster_subnet[each.key].id
+    subnet_id  = data.openstack_networking_subnet_v2.cluster_subnet[each.key].id
+    ip_address = lookup(var.control_ip_addresses, each.key, null)
   }
 
   no_security_groups = lookup(each.value, "no_security_groups", false)
@@ -24,7 +38,7 @@ resource "openstack_networking_port_v2" "control" {
 
 resource "openstack_compute_instance_v2" "control" {
   
-  name = "${var.cluster_name}-control"
+  name = split(".", local.nodename)[0]
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
@@ -35,6 +49,7 @@ resource "openstack_compute_instance_v2" "control" {
       source_type  = "image"
       destination_type = var.volume_backed_instances ? "volume" : "local"
       volume_size = var.volume_backed_instances ? var.root_volume_size : null
+      volume_type = var.volume_backed_instances ? var.root_volume_type : null
       boot_index = 0
       delete_on_termination = true
   }
@@ -65,7 +80,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${var.cluster_name}-control.${var.cluster_name}.${var.cluster_domain_suffix}
+    fqdn: ${local.nodename}
     
     bootcmd:
       %{for volume in local.control_volumes}
@@ -74,7 +89,7 @@ resource "openstack_compute_instance_v2" "control" {
 
     mounts:
       - [LABEL=state, ${var.state_dir}]
-      %{if var.home_volume_size > 0}
+      %{if var.home_volume_provisioning != "none"}
       - [LABEL=home, /exports/home]
       %{endif}
   EOF

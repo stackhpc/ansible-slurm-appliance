@@ -58,7 +58,7 @@ and referenced from the `site` and `production` environments, e.g.:
 
     Note that:
         - Environment-specific variables (`cluster_name`) should be hardcoded
-          into the module block.
+          into the cluster module block.
         - Environment-independent variables (e.g. maybe `cluster_net` if the
           same is used for staging and production) should be set as *defaults*
           in `environments/site/tofu/variables.tf`, and then don't need to
@@ -76,17 +76,49 @@ and referenced from the `site` and `production` environments, e.g.:
   instances) it may be necessary to configure or proxy `chronyd` via an
   environment hook.
 
-- The cookiecutter provided OpenTofu configurations define resources for home and
-  state volumes. The former may not be required if the cluster's `/home` is
-  provided from an external filesystem (or Manila). In any case, in at least
-  the production environment, and probably also in the staging environment,
-  the volumes should be manually created and the resources changed to [data
-  resources](https://opentofu.org/docs/language/data-sources/). This ensures that even if the cluster is deleted via tofu, the
-  volumes will persist.
+- By default, the cookiecutter-provided OpenTofu configuration provisions two
+  volumes and attaches them to the control node:
+    - "$cluster_name-home" for NFS-shared home directories
+    - "$cluster_name-state" for monitoring and Slurm data
+  The volumes mean this data is persisted when the control node is rebuilt.
+  However if the cluster is destroyed with `tofu destroy` then the volumes will
+  also be deleted. This is undesirable for production environments and usually
+  also for staging environments. Therefore the volumes should be manually
+  created, e.g. via the CLI:
 
-  For a development environment, having volumes under tofu control via volume
-  resources is usually appropriate as there may be many instantiations
-  of this environment.
+      openstack volume create --size 200 mycluster-home # size in GB
+      openstack volume create --size 100 mycluster-state
+
+  and OpenTofu configured to use those volumes instead of managing them itself
+  by setting:
+
+      home_volume_provisioning = "attach"
+      state_volume_provisioning = "attach"
+
+  either for a specific environment within the cluster module block in
+  `environments/$ENV/tofu/main.tf`, or as the site default by changing the
+  default in `environments/site/tofu/variables.tf`.
+  
+  For a development environment allowing OpenTofu to manage the volumes using
+  the default value of `"manage"` for those varibles is usually appropriate, as
+  it allows for multiple clusters to be created with this environment.
+  
+  If no home volume at all is required because the home directories are provided
+  by a parallel filesystem (e.g. manila) set
+
+      home_volume_provisioning = "none"
+
+  In this case the NFS share for home directories is automatically disabled.
+
+  **NB:** To apply "attach" options to existing clusters, first remove the
+    volume(s) from the tofu state, e.g.:
+
+      tofu state list # find the volume(s)
+      tofu state rm 'module.cluster.openstack_blockstorage_volume_v3.state[0]'
+  
+  This leaves the volume itself intact, but means OpenTofu "forgets" it. Then
+  set the "attach" options and run `tofu apply` again - this should show there
+  are no changes planned.
 
 - Enable `etc_hosts` templating:
 
@@ -101,23 +133,6 @@ and referenced from the `site` and `production` environments, e.g.:
 - Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
 
 - Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
-
-- Modify `environments/site/tofu/nodes.tf` to provide fixed IPs for at least
-  the control node, and (if not using FIPs) the login node(s):
-
-    ```
-    resource "openstack_networking_port_v2" "control" {
-        ...
-        fixed_ip {
-            subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
-            ip_address = var.control_ip_address
-        }
-    }
-    ```
-    
-  Note the variable `control_ip_address` is new.
-
-  Using fixed IPs will require either using admin credentials or policy changes.
 
 - If floating IPs are required for login nodes, modify the OpenTofu configurations
   appropriately.

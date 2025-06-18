@@ -10,6 +10,11 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
+        cleanup_on_failure:
+          description: Cleanup Packer resources on failure
+          type: boolean
+          required: true
+          default: true
 
 jobs:
   openstack:
@@ -23,10 +28,10 @@ jobs:
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-RL8
-            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
+            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.raw
             inventory_groups: control,compute,login,update
           - image_name: openhpc-RL9
-            source_image_name: Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.qcow2
+            source_image_name: Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.raw
             inventory_groups: control,compute,login,update
     env:
       ANSIBLE_FORCE_COLOR: True
@@ -78,7 +83,7 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ vars.PACKER_ON_ERROR }} \
+          -on-error=${{ github.event.inputs.cleanup_on_failure && 'cleanup' || 'abort' }} \
           -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
@@ -102,7 +107,7 @@ jobs:
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}" || true
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4

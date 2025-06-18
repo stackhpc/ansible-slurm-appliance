@@ -134,7 +134,7 @@ freeipa_client
 # Hosts to run TuneD configuration
 
 [ansible_init]
-# Hosts to run linux-anisble-init
+# Hosts to run linux-ansible-init
 
 [sssd]
 # Hosts to configure sssd on

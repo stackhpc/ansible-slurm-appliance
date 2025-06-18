@@ -282,11 +282,11 @@ resource "openstack_networking_port_v2" "control_storage" {
 ###
 # Workers
 ###
-{% for partition in openhpc_slurm_partitions %}
+{% for nodegroup in openhpc_nodegroups %}
 # Primary network
-resource "openstack_networking_port_v2" "{{ partition.name }}" {
-  count = {{ partition.count }}
-  name = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
+resource "openstack_networking_port_v2" "{{ nodegroup.name }}" {
+  count = {{ nodegroup.count }}
+  name = "{{ cluster_name }}-compute-{{ nodegroup.name }}-${count.index}"
   network_id = "${data.openstack_networking_network_v2.cluster_network.id}"
   admin_state_up = "true"
 
@@ -305,9 +305,9 @@ resource "openstack_networking_port_v2" "{{ partition.name }}" {
 
 # Storage network
 {% if cluster_storage_network is defined %}
-resource "openstack_networking_port_v2" "{{ partition.name }}_storage" {
-  count          = {{ partition.count }}
-  name           = "{{ cluster_name }}-compute-{{ partition.name }}-storage-${count.index}"
+resource "openstack_networking_port_v2" "{{ nodegroup.name }}_storage" {
+  count          = {{ nodegroup.count }}
+  name           = "{{ cluster_name }}-compute-{{ nodegroup.name }}-storage-${count.index}"
   network_id     = data.openstack_networking_network_v2.cluster_storage.id
   admin_state_up = "true"
 
@@ -499,25 +499,25 @@ resource "openstack_compute_instance_v2" "control" {
   }
 }
 
-{% for partition in openhpc_slurm_partitions %}
-resource "openstack_compute_instance_v2" "{{ partition.name }}" {
-  count = {{ partition.count }}
+{% for nodegroup in openhpc_nodegroups %}
+resource "openstack_compute_instance_v2" "{{ nodegroup.name }}" {
+  count = {{ nodegroup.count }}
 
-  name      = "{{ cluster_name }}-compute-{{ partition.name }}-${count.index}"
+  name      = "{{ cluster_name }}-compute-{{ nodegroup.name }}-${count.index}"
   image_id  = "{{ cluster_image }}"
-  {% if 'flavor_name' in partition %}
-  flavor_name = "{{ partition.flavor_name }}"
+  {% if 'flavor_name' in nodegroup %}
+  flavor_name = "{{ nodegroup.flavor_name }}"
   {% else %}
-  flavor_id = "{{ partition.flavor }}"
+  flavor_id = "{{ nodegroup.flavor }}"
   {% endif %}
 
   network {
-    port = openstack_networking_port_v2.{{ partition.name }}[count.index].id
+    port = openstack_networking_port_v2.{{ nodegroup.name }}[count.index].id
   }
 
   {% if cluster_storage_network is defined %}
   network {
-    port = openstack_networking_port_v2.{{ partition.name }}_storage[count.index].id
+    port = openstack_networking_port_v2.{{ nodegroup.name }}_storage[count.index].id
   }
   {% endif %}
 

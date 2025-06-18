@@ -15,8 +15,21 @@ openhpc_slurmdbd_mysql_password: "{{ vault_mysql_slurm_password }}"
 openhpc_slurmdbd_mysql_username: slurm
 openhpc_slurm_control_host: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
 openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
-openhpc_slurm_partitions:
-  - name: "compute"
+openhpc_rebuild_partition: # not a role var - could actually add more indirection here for things we're expecting to be modified, e.g. groups and maxtime
+  name: rebuild
+  nodegroups: "{{ cluster_compute_groups | default([]) }}"
+  default: NO
+  maxtime: 30
+  partition_params:
+    PriorityJobFactor: 65533
+    Hidden: YES
+    RootOnly: YES
+    DisableRootJobs: NO
+    PreemptMode: 'OFF'
+    OverSubscribe: EXCLUSIVE
+openhpc_nodegroups: "{{ cluster_compute_groups | map('community.general.dict_kv', 'name') }}" # create nodegroup for each compute group
+openhpc_user_partitions: "{{ openhpc_nodegroups }}" # create partition for each nodegroup (actually role default) - this is what we'd expect to be changed
+openhpc_partitions: "{{ openhpc_user_partitions + ([openhpc_rebuild_partition] if groups['rebuild'] | length > 0 else []) }}" # auto-create rebuild partition if reqd.
 openhpc_packages_default:
   # system packages
   - podman
@@ -29,7 +42,7 @@ openhpc_packages_default:
   - apptainer
   - podman-compose
 openhpc_packages_extra: []
-openhpc_packages: "{{ openhpc_packages_default + openhpc_packages_extra }}"
+openhpc_packages: "{{ (openhpc_packages_default + openhpc_packages_extra) | select | list }}"
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_login_only_nodes: login
 openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if appliances_state_dir is defined else '/var/spool' }}"
@@ -82,3 +95,13 @@ ohpc_openhpc_repos:
 ohpc_default_extra_repos:
   "9": []
   "8": []
+
+# configure slurm database pre-upgrade backups:
+openhpc_slurm_accounting_storage_service: mysql
+openhpc_slurm_accounting_storage_backup_cmd: >-
+  openstack volume snapshot create
+  --volume {{ openhpc_cluster_name }}-state
+  --force
+  {{ openhpc_cluster_name }}-state-{{ ansible_date_time.iso8601_basic_short }}
+openhpc_slurm_accounting_storage_backup_host: localhost
+openhpc_slurm_accounting_storage_backup_become: false
