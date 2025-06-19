@@ -1,3 +1,11 @@
+- name: Ensure NHC configuration directory exists
+  ansible.builtin.file:
+    path: /etc/nhc
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwX,go= # HealthCheckProgram is run by root
+
 - name: Copy stored NHC configuration to active location
   ansible.builtin.copy:
     remote_src: true
@@ -5,4 +13,4 @@
     dest: /etc/nhc/nhc.conf
     owner: root
     group: root
-    mode: u=rw,go= # HealthCheckProgram is run by root
+    mode: u=rw,go=
