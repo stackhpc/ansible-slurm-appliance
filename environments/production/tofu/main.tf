@@ -76,24 +76,24 @@ module "cluster" {
             "eessi",
           ]
       }
-      #gpu = {
-      #    nodes: [
-      #      "gpu-00",
-      #      "gpu-01",
-      #      "gpu-02",
-      #      "gpu-03",
-      #    ]
-      #    flavor: "hpc.v2.16cpu.128ram.a100"
-      #    ignore_image_changes: true
-      #}
-      #highmem = {
-      #    nodes: [
-      #      "highmem-00",
-      #      "highmem-01",
-      #    ]
-      #    flavor: "hpc.v2.56cpu.448ram"
-      #    ignore_image_changes: true
-      #}
+      gpu = {
+          nodes: [
+            "gpu-00",
+            "gpu-01",
+            "gpu-02",
+            "gpu-03",
+          ]
+          flavor: "hpc.v2.16cpu.128ram.a100"
+          ignore_image_changes: true
+      }
+      highmem = {
+          nodes: [
+            "highmem-00",
+            "highmem-01",
+          ]
+          flavor: "hpc.v2.56cpu.448ram"
+          ignore_image_changes: true
+      }
     }
 
     login = {
