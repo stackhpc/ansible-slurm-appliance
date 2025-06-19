@@ -2,3 +2,5 @@
 os_manila_mount_shares:
   - share_name: slurm-staging-home
     mount_path: /home
+  - share_name: slurm-staging-work
+    mount_path: /work
