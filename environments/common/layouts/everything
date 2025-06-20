@@ -125,3 +125,6 @@ builder
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
 builder
+
+[sudoers]
+# Hosts to configure sudoers groups

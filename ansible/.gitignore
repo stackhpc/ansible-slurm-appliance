@@ -90,3 +90,5 @@ roles/*
 !roles/gateway/**
 !roles/alertmanager/
 !roles/alertmanager/**
+!roles/sudoers/
+!roles/sudoers/**
