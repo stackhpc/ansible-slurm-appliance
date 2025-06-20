@@ -311,7 +311,6 @@
 - hosts: ansible_init
   gather_facts: yes
   become: yes
-  environment: "{{ appliances_environment_vars }}"
   tags: linux_ansible_init
   tasks:
     - name: Install ansible-init
