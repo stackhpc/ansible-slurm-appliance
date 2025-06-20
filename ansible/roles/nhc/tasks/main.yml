@@ -1,4 +1,12 @@
 
+- name: Ensure NHC configuration directory exists
+  ansible.builtin.file:
+    path: /etc/nhc
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwX,go= # HealthCheckProgram is run by root
+
 - name: Template out NHC configuration
   ansible.builtin.template:
     src: "{{ nhc_config_template }}"
