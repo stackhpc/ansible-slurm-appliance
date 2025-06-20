@@ -1,5 +1,8 @@
 # {{ ansible_managed }}
 
+# Nodes have long FQDN hostnames but short nodenames
+* || HOSTNAME="$HOSTNAME_S"
+
 ## Filesystem checks
 {% for mount in ansible_mounts %}
 {% set mount_mode = 'rw' if 'rw' in mount.options.split(',') else 'ro' %}
