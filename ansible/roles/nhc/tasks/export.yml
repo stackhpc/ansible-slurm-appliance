@@ -1,0 +1,6 @@
+# Used for compute-init
+- name: Template out host specific NHC config
+  ansible.builtin.template:
+    src: "{{ nhc_config_template }}"
+    dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/nhc.conf"
+  delegate_to: "{{ groups['control'] | first }}"

@@ -166,3 +166,5 @@ and referenced from the `site` and `production` environments, e.g.:
   is properly tuned, again, demonstrated through testing.
 
 - Enable alertmanager if Slack is available - see [docs/alerting.md](./alerting.md).
+
+- Enable node health checks - see [ansible/roles/nhc/README.md](../ansible/roles/nhc/README.md).
