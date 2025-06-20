@@ -4,7 +4,7 @@ locals {
     [for v in data.openstack_blockstorage_volume_v3.state: v],
     [for v in data.openstack_blockstorage_volume_v3.home: v]
   )
-  nodename = templatestring(
+  control_fqdn = templatestring(
     var.cluster_nodename_template,
     {
       node = "control",
@@ -38,7 +38,7 @@ resource "openstack_networking_port_v2" "control" {
 
 resource "openstack_compute_instance_v2" "control" {
   
-  name = split(".", local.nodename)[0]
+  name = split(".", local.control_fqdn)[0]
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
@@ -80,7 +80,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${local.nodename}
+    fqdn: ${local.control_fqdn}
     
     bootcmd:
       %{for volume in local.control_volumes}

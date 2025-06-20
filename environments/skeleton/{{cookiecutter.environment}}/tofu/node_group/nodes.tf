@@ -13,8 +13,8 @@ locals {
   # Workaround for lifecycle meta-argument only taking static values
   compute_instances = var.ignore_image_changes ? openstack_compute_instance_v2.compute_fixed_image : openstack_compute_instance_v2.compute
   
-  # Define nodenames here to avoid repetition
-  nodenames = {
+  # Define fully qualified nodenames here to avoid repetition
+  fqdns = {
     for n in var.nodes: n => templatestring(
       var.nodename_template,
       {
@@ -74,7 +74,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 
   for_each = var.ignore_image_changes ? toset(var.nodes) : []
 
-  name = split(".", local.nodenames[each.key])[0]
+  name = split(".", local.fqdns[each.key])[0]
   image_id = var.image_id
   flavor_name = var.flavor
   key_pair = var.key_pair
@@ -112,7 +112,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${local.nodenames[each.key]}
+    fqdn: ${local.fqdns[each.key]}
   EOF
 
   availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
@@ -129,7 +129,7 @@ resource "openstack_compute_instance_v2" "compute" {
 
   for_each = var.ignore_image_changes ? [] : toset(var.nodes)
   
-  name = split(".", local.nodenames[each.key])[0]
+  name = split(".", local.fqdns[each.key])[0]
   image_id = var.image_id
   flavor_name = var.flavor
   key_pair = var.key_pair
@@ -167,7 +167,7 @@ resource "openstack_compute_instance_v2" "compute" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${local.nodenames[each.key]}
+    fqdn: ${local.fqdns[each.key]}
   EOF
 
   availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
@@ -183,9 +183,13 @@ resource "openstack_networking_floatingip_associate_v2" "fip" {
 }
 
 output "compute_instances" {
-    value = local.compute_instances
+  value = local.compute_instances
 }
 
 output "image_id" {
   value = var.image_id
+}
+
+output "fqdns" {
+  value = local.fqdns
 }
