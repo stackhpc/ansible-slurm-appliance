@@ -92,3 +92,5 @@ roles/*
 !roles/alertmanager/**
 !roles/slurm_recompile/**
 !roles/slurm_recompile/**
+!roles/nhc/
+!roles/nhc/**

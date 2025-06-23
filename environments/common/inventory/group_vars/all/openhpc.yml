@@ -37,6 +37,7 @@ openhpc_packages_default:
   - slurm-libpmi-ohpc # to allow intel mpi to work properly
   - ohpc-gnu12-openmpi4-perf-tools # for hpctests
   - openblas-gnu12-ohpc # for hpctests (HPL)
+  - nhc-ohpc # node health checks
   # EPEL packages:
   - apptainer
   - podman-compose
@@ -44,19 +45,43 @@ openhpc_packages_extra: []
 openhpc_packages: "{{ (openhpc_packages_default + openhpc_packages_extra) | select | list }}"
 openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
 openhpc_login_only_nodes: login
+openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if appliances_state_dir is defined else '/var/spool' }}"
+
+# additional site/environment-specific slurm.conf parameters:
+# NB: override in environments/site/inventory/group_vars/all/openhpc.yml, not here:
+openhpc_config_extra: {}
+
+# default additional slurm.conf parameters for the appliance:
 openhpc_config_default:
   SlurmctldParameters:
     - enable_configless
   TaskPlugin: task/cgroup,task/affinity
-  ReturnToService: 2 # is stackhpc.openhpc default, but templating bug means it is needed here too
+  ReturnToService: 2 # workaround for templating bug TODO: Remove once on stackhpc.openhpc v1.2.0
+
+# default additional slurm.conf parameters when "rebuild" enabled:
 openhpc_config_rebuild:
   RebootProgram: /opt/slurm-tools/bin/slurm-openstack-rebuild
   SlurmctldParameters:
     - reboot_from_controller
   ResumeTimeout: 300
-openhpc_config_extra: {}
-openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_rebuild if groups['rebuild'] | length > 0 else {}, openhpc_config_extra, list_merge='append') }}"
-openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if appliances_state_dir is defined else '/var/spool' }}"
+
+# default additional slurm.conf parameters when "nhc" enabled:
+openhpc_config_nhc:
+  HealthCheckProgram: /usr/sbin/nhc
+  HealthCheckInterval: 300
+  HealthCheckNodeState: NONDRAINED_IDLE
+
+# indirection to allow automatic construction of slurm.conf parameters:
+openhpc_config_groups:
+  - enabled: "{{ groups['rebuild'] | length > 0 }}"
+    config: "{{ openhpc_config_rebuild }}"
+  - enabled: "{{ groups['nhc'] | length > 0 }}"
+    config: "{{ openhpc_config_nhc }}"
+  - enabled: true
+    config: "{{ openhpc_config_extra }}"
+
+# constructed slurm.conf parameters for stackpc.openhpc role var:
+openhpc_config: "{{ openhpc_config_default | combine(openhpc_config_groups | selectattr('enabled') | map(attribute='config'), list_merge='append') }}"
 
 openhpc_install_type: ohpc # 'ohpc' or 'generic', see https://github.com/stackhpc/ansible-slurm-appliance/pull/326
 

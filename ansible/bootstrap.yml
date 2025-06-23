@@ -134,6 +134,7 @@
 
 - hosts: dnf_repos
   become: yes
+  tags: dnf_repos
   tasks:
   - name: Check that creds won't be leaked to users
     ansible.builtin.assert:
@@ -143,7 +144,7 @@
       - appliances_mode == 'configure'
       - not (dnf_repos_allow_insecure_creds | default(false)) # useful for development
 
-- hosts: cacerts:!builder
+- hosts: cacerts
   tags: cacerts
   gather_facts: false
   tasks:

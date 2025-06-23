@@ -5,14 +5,50 @@
 - name: Validate secrets created
   hosts: localhost
   gather_facts: false
+  tags:
+    - validate
+    - passwords
   tasks:
     - import_role:
         name: passwords
         tasks_from: validate.yml
 
+- name: Validate Ansible Galaxy installs are up to date
+  hosts: localhost
+  gather_facts: false
+  become: false
+  tags:
+    - validate
+    - galaxy
+  tasks:
+      # Can't use e.g. ansible-galaxy {role,collection} list to check installed
+      # vs desired, as git-installed collections do not provide any metadata for
+      # the actual installed version.
+      # So this compares requirements.yml against a .last version produced by a
+      # successful dev/setup-env.sh run.
+    - assert:
+        that: "{{ _requirements_current == _requirements_installed }}"
+        fail_msg: |
+          Ansible Galaxy installs are out of date:
+
+          {% for req in _requirements_installed | difference(_requirements_current) %}
+          {{ req }}
+          {% endfor %}
+          
+          Run dev/setup-env.sh to fix this.
+      vars:
+        # note difference filter requires lists, so need to rearrange yaml from files.
+        _requirements_path: "{{ appliances_repository_root }}/requirements.yml"
+        _requirements_current: "{{ (lookup('file', _requirements_path) | from_yaml).values() | flatten }}"
+        # below produced by dev/setup-env.sh - gives empty list if file is missing:
+        _requirements_installed: "{{ ((lookup('file', _requirements_path + '.last', errors='ignore') or '{}') | from_yaml ).values() | flatten }}"
+
 - name: Ensure control node is in inventory
   hosts: all
   gather_facts: false
+  tags:
+    - validate
+    - openhpc
   tasks:
     - assert:
         that: groups['control'] | length
@@ -21,7 +57,9 @@
 - name: Validate openhpc configuration
   hosts: openhpc
   gather_facts: false
-  tags: openhpc
+  tags:
+    - validate
+    - openhpc
   tasks:
     - import_role:
         name: stackhpc.openhpc
@@ -38,7 +76,9 @@
 - name: Validate filebeat configuration
   hosts: filebeat
   gather_facts: false
-  tags: filebeat
+  tags:
+    - validate
+    - filebeat
   tasks:
     - import_role:
         name: filebeat
@@ -51,6 +91,7 @@
     - grafana
   gather_facts: false
   tags:
+    - validate
     - openondemand
     - openondemand_server
     - grafana
@@ -75,7 +116,9 @@
 
 - name: Validate freeipa configuration
   hosts: freeipa
-  tags: freeipa
+  tags:
+    - validate
+    - freeipa
   tasks:
     - import_role:
         name: freeipa
@@ -83,7 +126,9 @@
 
 - name: Validate lustre configuration
   hosts: lustre
-  tags: lustre
+  tags:
+    - validate
+    - lustre
   tasks:
     - import_role:
         name: lustre

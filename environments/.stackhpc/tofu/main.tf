@@ -69,23 +69,23 @@ module "cluster" {
     control_node_flavor = var.control_node_flavor
 
     login = {
-        login: {
-            nodes: ["login-0"]
-            flavor: var.other_node_flavor
+        login = {
+            nodes = ["login-0"]
+            flavor = var.other_node_flavor
         }
     }
     compute = {
-        standard: { # NB: can't call this default!
-            nodes: ["compute-0", "compute-1"]
-            flavor: var.other_node_flavor
-            compute_init_enable: ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts"]
-            ignore_image_changes: true
+        standard = { # NB: can't call this default!
+            nodes = ["compute-0", "compute-1"]
+            flavor = var.other_node_flavor
+            compute_init_enable = ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts", "nhc"]
+            ignore_image_changes = true
         }
         # Normally-empty partition for testing:
-        extra: {
-            nodes: []
-            #nodes: ["extra-0", "extra-1"]
-            flavor: var.other_node_flavor
+        extra = {
+            nodes = []
+            #nodes = ["extra-0", "extra-1"]
+            flavor = var.other_node_flavor
         }
     }
 

@@ -20,6 +20,7 @@
     enable_eessi: "{{ os_metadata.meta.eessi | default(false) | bool }}"
     enable_chrony: "{{ os_metadata.meta.chrony | default(false) | bool }}"
     enable_vgpu: "{{ os_metadata.meta.vpgu | default(false) | bool }}"
+    enable_nhc: "{{ os_metadata.meta.nhc | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
@@ -64,12 +65,12 @@
         mode: u=rX,g=rwX,o=
 
     - name: Mount /mnt/cluster
-      mount:
+      ansible.posix.mount:
         path: /mnt/cluster
         src: "{{ server_node_ip }}:/exports/cluster"
         fstype: nfs
         opts: ro,sync
-        state: mounted
+        state: ephemeral # will be unmounted after sync, don't want it in fstab
       register: _mount_mnt_cluster
       ignore_errors: true
       # exits from playbook if this failed below, allowing ansible-init to
@@ -357,6 +358,11 @@
         enabled: true
         state: started
 
+    - name: Provide NHC configuration
+      ansible.builtin.include_role:
+        name: nhc
+        tasks_from: boot.yml
+      when: enable_nhc
 
     - name: Ensure node is resumed
       # TODO: consider if this is always safe for all job states?
