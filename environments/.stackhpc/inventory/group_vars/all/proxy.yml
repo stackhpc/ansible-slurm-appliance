@@ -1,6 +1,0 @@
-# DO NOT MERGE:
-# proxy is steveb-dev on sussex-slurm-data
-proxy_basic_user: rocky
-proxy_basic_password: "{{ vault_proxy_basic_password }}"
-proxy_http_address: "{{ hostvars[groups['squid'] | first].ansible_host }}"
-proxy_plays_only: true
