@@ -133,13 +133,3 @@
     - import_role:
         name: lustre
         tasks_from: validate.yml
-
-- name: Validate vGPU configuration
-  hosts: vgpu
-  become: yes
-  gather_facts: yes
-  tags: vgpu
-  tasks:
-    - include_role:
-        name: stackhpc.linux.vgpu
-        tasks_from: validate.yml

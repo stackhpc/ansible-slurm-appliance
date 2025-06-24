@@ -250,16 +250,6 @@
         name: cloudalchemy.grafana
         tasks_from: install.yml
 
-- name: Add support for NVIDIA GPU auto detection to Slurm
-  hosts: cuda
-  become: yes
-  tasks:
-    - name: Recompile slurm
-      import_role:
-        name: slurm_recompile
-      vars:
-        slurm_recompile_with_nvml: "{{ groups.cuda | length > 0 }}"
-
 - name: Run post.yml hook
   vars:
     appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"

@@ -48,20 +48,6 @@
         name: cuda
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'install.yml' }}"
 
-- name: Setup vGPU
-  hosts: vgpu
-  become: yes
-  gather_facts: yes
-  tags: vgpu
-  tasks:
-    - include_role:
-        name: stackhpc.linux.vgpu
-        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'install.yml' }}"
-  handlers:
-    - name: reboot
-      fail:
-        msg: Reboot handler for stackhpc.linux.vgpu role fired unexpectedly. This was supposed to be unreachable.
-
 - name: Persist hostkeys across rebuilds
   # Must be after filesystems.yml (for storage)
   # and before portal.yml (where OOD login node hostkeys are scanned)
