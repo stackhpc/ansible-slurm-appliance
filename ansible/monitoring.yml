@@ -21,6 +21,7 @@
   tasks:
     - include_role:
         name: slurm_stats
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Deploy filebeat
   hosts: filebeat

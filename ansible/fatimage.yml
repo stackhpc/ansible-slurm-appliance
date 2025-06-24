@@ -152,7 +152,11 @@
         tasks_from: install.yml
       when: "'opensearch' in group_names"
 
-    # slurm_stats - nothing to do
+    - import_role:
+      name: slurm_stats
+        tasks_from: install.yml
+      when: "'slurm_stats' in group_names"
+
     - import_role:
         name: filebeat
         tasks_from: install.yml
