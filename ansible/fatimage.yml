@@ -108,7 +108,12 @@
         tasks_from: install.yml
       when: "'mysql' in group_names"
 
-    - name: OpenHPC
+    - name: Install rebuild
+      include_role:
+        name: rebuild
+        tasks_from: install.yml
+
+    - name: Install OpenHPC
       import_role:
         name: stackhpc.openhpc
         tasks_from: install.yml
