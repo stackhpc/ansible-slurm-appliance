@@ -1,0 +1,4 @@
+---
+# Whether to link slurm against the NVIDIA management library
+slurm_recompile_with_nvml: false
+

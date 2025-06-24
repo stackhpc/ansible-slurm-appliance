@@ -19,6 +19,7 @@
     enable_basic_users: "{{ os_metadata.meta.basic_users | default(false) | bool }}"
     enable_eessi: "{{ os_metadata.meta.eessi | default(false) | bool }}"
     enable_chrony: "{{ os_metadata.meta.chrony | default(false) | bool }}"
+    enable_vgpu: "{{ os_metadata.meta.vpgu | default(false) | bool }}"
     enable_nhc: "{{ os_metadata.meta.nhc | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
@@ -295,6 +296,12 @@
           command:
             cmd: "cvmfs_config setup"
       when: enable_eessi
+
+    - name: Configure VGPUs
+      include_role:
+        name: stackhpc.linux.vgpu
+        tasks_from: 'configure.yml'
+      when: enable_vgpu
 
     # NB: don't need conditional block on enable_compute as have already exited
     # if not the case
