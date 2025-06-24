@@ -4,14 +4,8 @@
 # - https://github.com/drosskopp/squid-cache/blob/main/squid.conf
 #
 
-# Configure authentication parameters
-# NB: required before ACL definitions using them
-{{ squid_auth_param }}
-
 # Define ACLs:
-{% for acl in squid_acls %}
-{{ acl }}
-{% endfor %}
+{{ squid_acls }}
 
 acl SSL_ports port 443
 acl Safe_ports port 80		# http
