@@ -134,6 +134,7 @@
 
 - hosts: dnf_repos
   become: yes
+  tags: dnf_repos
   tasks:
   - name: Check that creds won't be leaked to users
     ansible.builtin.assert:
