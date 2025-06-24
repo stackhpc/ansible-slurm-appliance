@@ -134,7 +134,6 @@
       import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
-
       when: "'openondemand_desktop' in group_names"
 
     - name: Open Ondemand jupyter node
@@ -247,6 +246,11 @@
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
+    - import_role:
+        name: cloudalchemy.grafana
+        tasks_from: plugins.yml
+    - include_role: # done in same play so it can use handlers from cloudalchemy.grafana
+        name: grafana-dashboards
 
 - name: Run post.yml hook
   vars:

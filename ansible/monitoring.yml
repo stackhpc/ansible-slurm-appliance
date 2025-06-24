@@ -89,10 +89,13 @@
     - include_role:
         name: cloudalchemy.grafana
       vars:
-        # We use internal roles to register the dashboards as the role does not support all options that we require.
+        # Plugin installation done during fatimage:
+        grafana_plugins: "{{ if appliances_mode == 'configure' else grafana_plugins }}"
+        # Internal role used to install dashboards as cloudalchemy role does not support all required options:
         grafana_dashboards: []
-    - import_role: # done in same play so it can use handlers from cloudalchemy.grafana
+    - include_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards
+      when: "{{ appliances_mode != 'configure '}}"
 
 - name: Deploy alertmanager
   hosts: alertmanager
