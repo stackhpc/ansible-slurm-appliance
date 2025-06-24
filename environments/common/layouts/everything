@@ -125,3 +125,7 @@ builder
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
 builder
+
+[nhc:children]
+# Hosts to configure for node health checks
+compute
