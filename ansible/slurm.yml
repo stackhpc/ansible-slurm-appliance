@@ -12,7 +12,6 @@
 - name: Setup slurm-driven rebuild
   hosts: rebuild:!builder
   become: yes
-  environment: "{{ appliances_environment_vars }}"
   tags:
     - rebuild
     - openhpc

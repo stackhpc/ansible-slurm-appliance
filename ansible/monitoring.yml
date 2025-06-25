@@ -49,14 +49,13 @@
         tasks_from: exporter.yml
 
 - name: Deploy Slurm exporter
-  hosts: control
+  hosts: slurm_exporter
   become: true
   tags: slurm_exporter
   tasks:
     - include_role:
         name: slurm_exporter
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
-
 
 - name: Setup core monitoring software
   hosts: prometheus
