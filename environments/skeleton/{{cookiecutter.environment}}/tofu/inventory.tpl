@@ -66,11 +66,12 @@ compute:
 %{ for group_name in keys(additional_groups) ~}
 ${cluster_name}_${group_name}:
     hosts:
-%{ for node in additional_groups[group_name]["compute_instances"] ~}
+%{ for nodename, node in additional_groups[group_name]["compute_instances"] ~}
         ${ node.name }:
             ansible_host: ${node.access_ip_v4}
             instance_id: ${ node.id }
             networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
+            node_fqdn: ${additional_groups[group_name]["fqdns"][nodename]}
 %{ endfor ~}
 ${group_name}:
     children:
