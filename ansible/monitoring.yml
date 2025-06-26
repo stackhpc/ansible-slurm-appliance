@@ -80,19 +80,18 @@
   hosts: grafana
   tags: grafana
   tasks:
-    - assert:
-        that: vault_grafana_admin_password is defined
-        fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
+    - name: Skip plugin installation in configure mode
+      # done during fatimage - can't do this in vars block as that is recursive
+      ansible.builtin.set_fact:
+        grafana_plugins: "{{ [] if appliances_mode == 'configure' else grafana_plugins }}"
     - include_role:
         name: cloudalchemy.grafana
       vars:
-        # Plugin installation done during fatimage:
-        grafana_plugins: "{{ if appliances_mode == 'configure' else grafana_plugins }}"
         # Internal role used to install dashboards as cloudalchemy role does not support all required options:
         grafana_dashboards: []
     - include_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards
-      when: "{{ appliances_mode != 'configure '}}"
+      when: "appliances_mode != 'configure'"
 
 - name: Deploy alertmanager
   hosts: alertmanager
