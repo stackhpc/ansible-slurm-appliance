@@ -9,7 +9,6 @@
     state: present
     regexp: "{{ item.key }}=.*"
     line: "{{ item.key }}={{ item.value }}"
-  when: not proxy_plays_only | bool
   loop:
     - key: http_proxy
       value: "{{ proxy_http_proxy }}"
@@ -64,13 +63,3 @@
 - name: Reset connection to get new /etc/environment
   meta: reset_connection
   # NB: conditionals not supported
-
-- name: Add proxy vars to appliances_environment_vars
-  set_fact:
-    appliances_environment_vars: "{{ appliances_environment_vars | combine(_proxy_vars) }}"
-  vars:
-    _proxy_vars:
-      http_proxy: "{{ proxy_http_proxy }}"
-      https_proxy: "{{ proxy_https_proxy }}"
-      no_proxy: "{{ proxy_no_proxy }}"
-  when: proxy_plays_only | bool
