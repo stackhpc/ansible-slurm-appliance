@@ -6,6 +6,7 @@
       ansible.builtin.include_role:
         name: dnf_repos
         tasks_from: disable_repos.yml
+      when: not dnf_repos_enabled | default(false) | bool
 
 - name: Setup NFS export for compute_init
   hosts: compute_init:!builder
