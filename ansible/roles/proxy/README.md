@@ -17,3 +17,6 @@ Define http/s proxy configuration.
 - `proxy_systemd`: Optional bool. Whether to give processes started by systemd
   the above http, https and no_proxy configuration. **NB** Running services will
   need restarting if this is changed. Default `true`.
+- `proxy_remove`: Optional bool. Whether to remove the proxy configuration at
+  the end of the `site.yml` playbook (this is actually a variable on the play,
+  not a role variable).
