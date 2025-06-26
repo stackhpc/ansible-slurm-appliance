@@ -19,7 +19,7 @@
     - import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
-      when: "{{ appliances_mode != 'configure' }}" # is run during build
+      when: appliances_mode != 'configure' # is run during build
 
 - hosts: openondemand_jupyter
   tags:
@@ -31,4 +31,4 @@
     - import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
-      when: "{{ appliances_mode != 'configure' }}" # is run during build
+      when: appliances_mode != 'configure' # is run during build
