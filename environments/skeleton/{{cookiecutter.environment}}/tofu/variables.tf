@@ -125,9 +125,36 @@ variable "compute" {
             availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
+
+        Nodes are added to the following inventory groups:
+        - $group_name
+        - $cluster_name + '_' + $group_name - this is used for the stackhpc.openhpc role
+        - 'compute'
     EOF
 
     type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
+}
+
+variable "additional_nodegroups" {
+    default = {}
+    description = <<-EOF
+        Mapping defining homogenous groups of nodes for arbitrary purposes.
+        These nodes are not in the compute or login inventory groups so they
+        will not run slurmd.
+
+        Keys are names of groups.
+        Values are a mapping as for the "login" variable, with the addition of
+        the optional entry:
+        
+            security_group_ids: List of strings giving IDs of security groups
+                                to apply. If not specified the groups from the
+                                variable nonlogin_security_groups are applied.
+
+        Nodes are added to the following inventory groups:
+        - $group_name
+        - $cluster_name + '_' + $group_name
+        - 'additional'
+    EOF
 }
 
 variable "environment_root" {
