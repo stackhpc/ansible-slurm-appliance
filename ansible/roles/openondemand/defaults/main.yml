@@ -13,8 +13,10 @@ openondemand_oidc_remote_user_claim: preferred_username
 openondemand_oidc_scope: openid profile preferred_username
 
 # SSL Certificates
-openondemand_ssl_cert: /etc/pki/tls/certs/localhost.crt
-openondemand_ssl_cert_key: /etc/pki/tls/private/localhost.key
+openondemand_certbot: false
+openondemand_certbot_email:
+openondemand_ssl_cert: "{{ '/etc/letsencrypt/live/' + openondemand_servername + '/fullchain.pem' if openondemand_certbot | bool else '/etc/pki/tls/certs/localhost.crt' }}"
+openondemand_ssl_cert_key: "{{ '/etc/letsencrypt/live/' + openondemand_servername + '/privkey.pem' if openondemand_certbot | bool else '/etc/pki/tls/private/localhost.key' }}"
 
 # Dashboard and application config:
 openondemand_dashboard_docs_url: (undefined)

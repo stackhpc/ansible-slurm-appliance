@@ -1,0 +1,29 @@
+---
+- name: Install EPEL
+  tags: install
+  dnf:
+    name: epel-release
+
+- name: Install certbot
+  tags: install
+  dnf:
+    name:
+      - certbot
+      - python3-certbot-apache
+
+- block:
+    - name: Validate that server name is set
+      assert:
+        that:
+          - openondemand_servername | length > 0
+        fail_msg: openondemand_servername must be set
+
+    - name: Validate that email address is set
+      assert:
+        that:
+          - openondemand_certbot_email | length > 0
+        fail_msg: openondemand_certbot_email must be set
+
+    - name: Generate Let's Encrypt certificate
+      command: sudo certbot certonly --standalone -d {{ openondemand_servername }} -n -m {{ openondemand_certbot_email }} --agree-tos
+  when: appliances_mode == 'configure'
