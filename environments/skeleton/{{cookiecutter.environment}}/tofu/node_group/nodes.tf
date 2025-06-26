@@ -12,7 +12,7 @@ locals {
 
   # Workaround for lifecycle meta-argument only taking static values
   compute_instances = var.ignore_image_changes ? openstack_compute_instance_v2.compute_fixed_image : openstack_compute_instance_v2.compute
-  
+
   # Define fully qualified nodenames here to avoid repetition
   fqdns = {
     for n in var.nodes: n => templatestring(
@@ -61,7 +61,7 @@ resource "openstack_networking_port_v2" "compute" {
     subnet_id = data.openstack_networking_subnet_v2.subnet[each.value.net.network].id
     ip_address = try(var.ip_addresses[each.value.net.network][each.value.node_idx], null)
   }
-  
+
   no_security_groups = lookup(each.value.net, "no_security_groups", false)
   security_group_ids = lookup(each.value.net, "no_security_groups", false) ? [] : var.security_group_ids
 
@@ -128,7 +128,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 resource "openstack_compute_instance_v2" "compute" {
 
   for_each = var.ignore_image_changes ? [] : toset(var.nodes)
-  
+
   name = split(".", local.fqdns[each.key])[0]
   image_id = var.image_id
   flavor_name = var.flavor
@@ -146,7 +146,7 @@ resource "openstack_compute_instance_v2" "compute" {
       delete_on_termination = true
     }
   }
-  
+
   dynamic "network" {
     for_each = {for net in var.networks: net.network => net}
     content {

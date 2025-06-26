@@ -37,12 +37,12 @@ resource "openstack_networking_port_v2" "control" {
 }
 
 resource "openstack_compute_instance_v2" "control" {
-  
+
   name = split(".", local.control_fqdn)[0]
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
-  
+
   # root device:
   block_device {
       uuid = var.cluster_image_id
@@ -81,7 +81,7 @@ resource "openstack_compute_instance_v2" "control" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${local.control_fqdn}
-    
+
     bootcmd:
       %{for volume in local.control_volumes}
       - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${substr(volume.id, 0, 20)}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(reverse(split("-", volume.name))[0])} $BLKDEV

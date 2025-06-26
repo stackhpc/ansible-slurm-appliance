@@ -12,7 +12,7 @@ module "login" {
   cluster_domain_suffix = var.cluster_domain_suffix
   key_pair = var.key_pair
   environment_root = var.environment_root
-  
+
   # can be set for group, defaults to top-level value:
   image_id = lookup(each.value, "image_id", var.cluster_image_id)
   vnic_types = lookup(each.value, "vnic_types", var.vnic_types)
@@ -21,7 +21,7 @@ module "login" {
   root_volume_type = lookup(each.value, "root_volume_type", var.root_volume_type)
   gateway_ip = lookup(each.value, "gateway_ip", var.gateway_ip)
   nodename_template = lookup(each.value, "nodename_template", var.cluster_nodename_template)
-  
+
   # optionally set for group:
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
   # here null means "use module var default"
