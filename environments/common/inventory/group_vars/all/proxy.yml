@@ -1,17 +1,26 @@
-# default proxy address to hostname of first squid host, port 3128
-# if squid group non-empty, else else empty string to avoid breaking hostvars
+# If squid group is non-empty, default the proxy address to the hostname of
+# the first squid host, port 3128. Else empty string to avoid breaking hostvars
 
-# override these to provide basic_auth:
+# Any of these defaults may be overriden in e.g. environments/site/group_vars/all/proxy.yml if required.
+
+# override if basic_auth is required:
 proxy_basic_user: ''
 proxy_basic_password: ''
 
-# some indirection to make this logic easier:
-proxy_http_address: "{{ hostvars[groups['squid'].0].api_address }}"
+# hostname/address of proxy - override if not using appliance squid group/role:
+proxy_http_address: "{{ (hostvars[groups['squid'].0 | default(None)] | default({})).api_address | default('') }}"
+
+# port of proxy - override if not using appliance squid group/role:
 proxy_http_port: "{{ squid_http_port }}"
-proxy_basic_auth: "{{ proxy_basic_user }}:{{ proxy_basic_password }}@"
-proxy_http_proxy_default: >-
-  {{ 'http://' +
-     (proxy_basic_auth if proxy_basic_password != '' else '') +
-     proxy_http_address + ':' + (proxy_http_port | string)
-  }}
-proxy_http_proxy: "{{ proxy_http_proxy_default if groups['squid'] else '' }}"
+
+# full http proxy string - override if the above don't provide enough control:
+proxy_http_proxy: >-
+  {% if groups['squid'] | length > 0 %}
+  http://
+  {%- if proxy_basic_password -%}
+  {{ proxy_basic_user }}:{{ proxy_basic_password }}@
+  {%- endif -%}
+  {{ proxy_http_address }}:{{ proxy_http_port }}
+  {% else %}
+  
+  {% endif %}
