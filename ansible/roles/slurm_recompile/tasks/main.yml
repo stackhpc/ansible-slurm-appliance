@@ -12,6 +12,10 @@
   set_fact:
     slurm_package: "{{ ansible_facts.packages['slurm-slurmd-ohpc'].0 }}"
 
+- name: Install build packages
+  ansible.builtin.dnf:
+    name: "{{ slurm_recompile_build_packages }}"
+
 - name: Recompile and install slurm packages
   shell: |
     #!/bin/bash
