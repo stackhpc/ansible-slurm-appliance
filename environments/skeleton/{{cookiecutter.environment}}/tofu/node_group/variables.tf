@@ -181,7 +181,7 @@ variable "group_keys" {
       error_message = <<-EOT
         Node group '${var.group_name}' contains invalid key(s) ${
         join(", ", setsubtract(var.group_keys, var.allowed_keys))}.
-        
+
         Valid keys are ${join(", ", var.allowed_keys)}.
     EOT
     }
