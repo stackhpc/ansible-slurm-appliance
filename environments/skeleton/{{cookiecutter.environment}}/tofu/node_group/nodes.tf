@@ -120,6 +120,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
   lifecycle {
     ignore_changes = [
       image_id,
+      block_device,
     ]
   }
 
