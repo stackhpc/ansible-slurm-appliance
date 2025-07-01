@@ -23,8 +23,9 @@ However the following default features are not available:
 
    ```yaml
    # environments/site/inventory/group_vars/all/openondemand.yml:
-   ood_install_apps: {}
+   openondemand_jupyter_partition: ''
    ```
+   (This disables both the app installation and its addition to the portal.)
 
 2. The `hpl` test from the `ansible/adhoc/hpctests.yml` playbook is not
    functional and must be skipped using:
