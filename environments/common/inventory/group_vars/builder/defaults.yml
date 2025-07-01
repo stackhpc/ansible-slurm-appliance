@@ -26,3 +26,4 @@ sssd_started: false
 sssd_enabled: false
 slurm_exporter_state: stopped
 appliances_mode: build
+proxy_remove: true

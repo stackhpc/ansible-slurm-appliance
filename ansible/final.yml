@@ -27,4 +27,4 @@
         name: proxy
       vars:
         proxy_state: absent
-      when: proxy_remove | bool == true
+      when: proxy_remove | default(false) | bool == true
