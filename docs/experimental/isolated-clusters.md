@@ -1,16 +1,114 @@
 # Isolated Clusters
 
-This document explains how to create clusters which do not have outbound internet
-access by default.
+By default, the appliance assumes and requires that there is outbound internet
+access, possibly via a [proxy](../../ansible/roles/proxy/) . However it is
+possible to create clusters in more restrictive environments, with some
+limitations on functionality.
 
-The approach is to:
-- Create a squid proxy with basic authentication and add a user.
-- Configure the appliance to set proxy environment variables via Ansible's
-  [remote environment support](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_environment.html).
+## No outbound internet
 
-This means that proxy environment variables are not present on the hosts at all
-and are only injected when running Ansible, meaning the basic authentication
-credentials are not exposed to cluster users.
+A cluster can be deployed using the upstream image (or one derived from it) without any outbound internet at all.
+
+At present, this supports all roles/groups enabled:
+- Directly in the `common` environment
+- In the `environments/$ENV/inventory/groups` file created by cookiecutter for
+  a new environment (from the "everything template").
+
+plus some additional roles/groups not enabled by default listed below.
+
+However the following default features are not available:
+
+1. Configuration of the default Juptyer Notebook server app for Open Ondemand
+   is not currently supported and must be disabled:
+
+   ```yaml
+   # environments/site/inventory/group_vars/all/openondemand.yml:
+   ood_install_apps: {}
+   ```
+
+2. The `hpl` test from the `ansible/adhoc/hpctests.yml` playbook is not
+   functional and must be skipped using:
+
+   ```shell
+   ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo
+   ```
+
+The full list of supported roles/groups is below, with those marked "*" from
+the common environment or "everything template":
+- alertmanager *
+- ansible_init *
+- basic_users *
+- cacerts 
+- chrony
+- eessi *
+- etc_hosts *
+- filebeat *
+- grafana *
+- mysql *
+- nfs *
+- node_exporter *
+- openhpc *
+- opensearch *
+- podman *
+- prometheus *
+- proxy
+- rebuild
+- selinux **
+- slurm_exporter *
+- slurm_stats *
+- systemd **
+- tuned
+- fail2ban *
+- firewalld *
+- hpctests *
+- openondemand *
+- persist_hostkeys *
+- compute_init
+- nhc *
+- openondemand_desktop *
+
+Note that for this to work, all dnf repositories are disabled at the end of
+image builds, so that `ansible.builtin.dnf` tasks work when running against
+packages already installed in the image.
+
+## Outbound internet via proxy not available to cluster users
+If additional functionality is required it is possible configure Ansible to use
+an authenticated http/https proxy (e.g. [squid](https://www.squid-cache.org/)).
+The proxy credentials are not written to the cluster nodes so the proxy cannot
+be used by cluster users.
+
+To do this the proxy variables required in the remote environment must be
+defined for the Ansible variable `appliances_remote_environment_vars`. Note
+some default proxy variables are provided in `environments/common/inventory/group_vars/all/proxy.yml` so generally it will be sufficient set the proxy user, password and address and to add these to the remote environment:
+
+```yaml
+# environments/site/inventory/group_vars/all/proxy.yml:
+proxy_basic_user: my_squid_user
+proxy_basic_password: "{{ vault_proxy_basic_password }}"
+proxy_http_address: squid.mysite.org
+
+# environments/site/inventory/group_vars/all/vault_proxy.yml:
+# NB: ansible vault-encrypt this file
+vault_proxy_basic_password: super-secret-password
+
+# environments/site/inventory/group_vars/all/default.yml:
+appliances_remote_environment_vars:
+    http_proxy: "{{ proxy_http_proxy }}"
+    https_proxy: "{{ proxy_http_proxy }}"
+```
+
+TODO: Do we need to set `no_proxy`??
+
+This uses Ansible's [remote environment support](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_environment.html). Currrently this is suported for the following roles/groups:
+- eessi: TODO: is this right though??
+- manila
+
+
+Although EESSI will install with the above configuration, as there is no
+outbound internet access except for Ansible tasks, making it functional will
+require [configuring a proxy for CVMFS](https://multixscale.github.io/cvmfs-tutorial-hpc-best-practices/access/proxy/#client-system-configuration).
+
+
 
 ## Deploying Squid using the appliance
 If an external squid is not available, one can be deployed by the cluster on a
@@ -112,22 +210,17 @@ if the calculated parameters are not appropriate.
 
 ## Image build
 
-TODO: probably not currently functional!
+TODO: describe proxy setup for that
 
 ## EESSI
 
-Although EESSI will install with the above configuration, as there is no
-outbound internet access except for Ansible tasks, making it functional will
-require [configuring a proxy for CVMFS](https://multixscale.github.io/cvmfs-tutorial-hpc-best-practices/access/proxy/#client-system-configuration).
 
-## Isolation Using Security Group Rules
+## Network considerations
 
-The below shows the security groups/rules (as displayed by Horizon ) which can
-be used to "isolate" a cluster when using a network which has a subnet gateway
-provided by a router to an external network. It therefore also indicates what
-access is required for a different networking configuration.
+Note that even when outbound internet access is not required, the following
+(shown as OpenStack security groups/rules as displayed by Horizon) outbound access from nodes is still required to enable deployment
 
-Security group `isolated`:
+Assuming nodes have a security group `isolated` applied:
 
     # allow outbound DNS
     ALLOW IPv4 53/tcp to 0.0.0.0/0
@@ -141,24 +234,26 @@ Security group `isolated`:
     ALLOW IPv4 80/tcp to 169.254.169.254/32
 
     # allow hosts to reach squid proxy:
-    ALLOW IPv4 3128/tcp to 10.179.2.123/32
+    ALLOW IPv4 3128/tcp to <squid cidr>
 
-Security group `isolated-ssh-https` allows inbound ssh and https (for OpenOndemand):
+Note that DNS is required (and is configured by OpenStack if the subnet has
+a gateway) because name resolution happens on the hosts, not on the proxy.
+
+For nodes running OpenOndemand, inbound ssh and https are also required:
 
     ALLOW IPv4 443/tcp from 0.0.0.0/0
     ALLOW IPv4 22/tcp from 0.0.0.0/0
 
+Note the OpenTofu variables `login_security_groups` and
+`nonlogin_security_groups` can be used to set security groups if requried:
 
-Then OpenTofu is configured as:
-
-
-    login_security_groups = [
-        "isolated",  # allow all in-cluster services
-        "isolated-ssh-https",      # access via ssh and ondemand
-    ]
-    nonlogin_security_groups = [
-        "isolated"
-    ]
-
-Note that DNS is required (and is configured by the cloud when the subnet has
-a gateway) because name resolution happens on the hosts, not on the proxy.
+```terraform
+# environments/site/tofu/cluster.auto.tfvars:
+login_security_groups = [
+    "isolated",  # allow all in-cluster services
+    "isolated-ssh-https",      # access via ssh and ondemand
+]
+nonlogin_security_groups = [
+    "isolated"
+]
+```
