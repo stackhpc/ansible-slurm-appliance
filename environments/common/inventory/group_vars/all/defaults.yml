@@ -8,7 +8,7 @@ appliances_cockpit_state: absent # RHEL cockpit installed but not enabled in gen
 #appliances_state_dir: # define an absolute path here to use for persistent state: NB: This is defined as /var/lib/state in inventory by the default Terraform
 appliances_mode: configure
 appliances_pulp_url: https://ark.stackhpc.com
-appliances_environment_vars: {}
+appliances_remote_environment_vars: {} # Variables for remote environment - not supported on all plays
 
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.

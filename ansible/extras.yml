@@ -32,7 +32,7 @@
   hosts: eessi
   tags: eessi
   become: true
-  environment: "{{ appliances_environment_vars }}"
+  environment: "{{ appliances_remote_environment_vars }}"
   gather_facts: false
   tasks:
     - name: Install and configure EESSI

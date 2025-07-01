@@ -17,7 +17,6 @@
     - freeipa
     - freeipa_client
   gather_facts: yes
-  environment: "{{ appliances_environment_vars }}"
   become: yes
   tasks:
     - name: Install FreeIPA client

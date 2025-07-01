@@ -20,7 +20,7 @@
 - name: Setup Manila share mounts
   hosts: manila
   become: true
-  environment: "{{ appliances_environment_vars }}"
+  environment: "{{ appliances_remote_environment_vars }}"
   tags: manila
   tasks:
     - include_role:
