@@ -20,11 +20,12 @@
 - name: Setup Manila share mounts
   hosts: manila
   become: true
-  environment: "{{ appliances_remote_environment_vars }}"
   tags: manila
   tasks:
     - include_role:
         name: stackhpc.os-manila-mount
+        tasks_from: "{{ item }}"
+      loop: "{{ ['lookup.yml', 'mount.yml'] if appliances_mode == 'configure' else ['main.yml'] }}"
 
 - name: Setup Lustre clients
   hosts: lustre
