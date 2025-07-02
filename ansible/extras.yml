@@ -35,9 +35,10 @@
   environment: "{{ appliances_remote_environment_vars }}"
   gather_facts: false
   tasks:
-    - name: Install and configure EESSI
-      import_role:
+    - name: Install / configure EESSI
+      include_role:
         name: eessi
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup CUDA
   hosts: cuda
