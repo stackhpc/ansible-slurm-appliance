@@ -16,26 +16,15 @@ At present, this supports all roles/groups enabled:
 
 plus some additional roles/groups not enabled by default listed below.
 
-However the following default features are not available:
+Note that the `hpl` test from the `ansible/adhoc/hpctests.yml` playbook is not
+functional and must be skipped using:
 
-1. Configuration of the default Juptyer Notebook server app for Open Ondemand
-   is not currently supported and must be disabled:
+```shell
+ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo
+```
 
-   ```yaml
-   # environments/site/inventory/group_vars/all/openondemand.yml:
-   openondemand_jupyter_partition: ''
-   ```
-   (This disables both the app installation and its addition to the portal.)
-
-2. The `hpl` test from the `ansible/adhoc/hpctests.yml` playbook is not
-   functional and must be skipped using:
-
-   ```shell
-   ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo
-   ```
-
-The full list of supported roles/groups is below, with those marked "*" from
-the common environment or "everything template":
+The full list of supported roles/groups is below, with those marked "*"
+enabled by default in the common environment or "everything template":
 - alertmanager *
 - ansible_init *
 - basic_users *
