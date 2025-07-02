@@ -317,7 +317,7 @@
     - name: Install ansible-init
       include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
-      when: "{{ appliances_mode == 'build' }}"
+      when: "appliances_mode == 'build'"
 
 - hosts: k3s:&builder
   become: yes
