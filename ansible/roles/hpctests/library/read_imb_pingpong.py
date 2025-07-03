@@ -4,8 +4,8 @@
 # Copyright: (c) 2020, StackHPC
 # Apache 2 License
 
+
 from ansible.module_utils.basic import AnsibleModule
-import json
 
 ANSIBLE_METADATA = {
     "metadata_version": "0.1",
@@ -39,7 +39,8 @@ EXAMPLES = """
 """
 
 CONVERTERS = (int, int, float, float)
-COLUMNS = ('bytes', 'repetitions', 'latency', 'bandwidth')
+COLUMNS = ("bytes", "repetitions", "latency", "bandwidth")
+
 
 def run_module():
     module_args = dict(
@@ -48,7 +49,7 @@ def run_module():
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     result = {"changed": False}
-    
+
     path = module.params["path"]
     if module.check_mode:
         module.exit_json(**result)
@@ -56,25 +57,26 @@ def run_module():
     columns = ([], [], [], [])
     with open(path) as f:
         for line in f:
-            if line == '       #bytes #repetitions      t[usec]   Mbytes/sec\n':
+            if line == "       #bytes #repetitions      t[usec]   Mbytes/sec\n":
                 while True:
                     line = next(f).strip()
-                    if line == '':
+                    if line == "":
                         break
                     for ix, v in enumerate(line.split()):
                         columns[ix].append(CONVERTERS[ix](v))
-    
-    result['columns'] = {
-        'bytes': columns[0],
-        'repetitions': columns[1],
-        'latency': columns[2],
-        'bandwidth': columns[3],
+
+    result["columns"] = {
+        "bytes": columns[0],
+        "repetitions": columns[1],
+        "latency": columns[2],
+        "bandwidth": columns[3],
     }
     module.exit_json(**result)
 
 
 def main():
     run_module()
+
 
 if __name__ == "__main__":
     main()

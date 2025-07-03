@@ -1,2 +1,2 @@
 ---
-- import_tasks: install.yml
+- ansible.builtin.import_tasks: install.yml

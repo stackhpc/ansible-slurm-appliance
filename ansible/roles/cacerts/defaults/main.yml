@@ -1,3 +1,4 @@
-#cacerts_dest_dir: /etc/pki/ca-trust/source/anchors/
+---
+# cacerts_dest_dir: /etc/pki/ca-trust/source/anchors/
 cacerts_cert_dir: "{{ appliances_environment_root }}/cacerts"
 cacerts_update: true

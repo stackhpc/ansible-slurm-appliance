@@ -1,5 +1,6 @@
+---
 - name: Ensure host certs directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ opensearch_config_path }}/certs"
     state: directory
     owner: "{{ opensearch_podman_user }}"

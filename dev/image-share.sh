@@ -13,18 +13,18 @@ DEST=$2
 IMAGE_NAME=$3
 
 export OS_CLOUD=$SOURCE
-SOURCE_PROJECT=$(openstack project show -c id -f value $SOURCE)
+SOURCE_PROJECT=$(openstack project show -c id -f value "$SOURCE")
 export OS_CLOUD=$DEST
-DEST_PROJECT=$(openstack project show -c id -f value $DEST)
+DEST_PROJECT=$(openstack project show -c id -f value "$DEST")
 export OS_CLOUD=$SOURCE
-IMAGE=$(openstack image show -c id -f value $IMAGE_NAME)
+IMAGE=$(openstack image show -c id -f value "$IMAGE_NAME")
 
 echo "Sharing $IMAGE_NAME ($IMAGE) from $SOURCE ($SOURCE_PROJECT) ..."
-openstack image set --shared $IMAGE
+openstack image set --shared "$IMAGE"
 echo "Adding destination project $DEST ($DEST_PROJECT) ..."
-openstack image add project $IMAGE $DEST_PROJECT
+openstack image add project "$IMAGE" "$DEST_PROJECT"
 
 export OS_CLOUD=$DEST
 echo "Accepting share ..."
-openstack image set --accept $IMAGE
+openstack image set --accept "$IMAGE"
 echo "Done"

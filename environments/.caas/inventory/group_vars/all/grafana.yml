@@ -1,1 +1,2 @@
+---
 grafana_auth_anonymous: "{{ groups['openondemand'] | count > 0 }}"

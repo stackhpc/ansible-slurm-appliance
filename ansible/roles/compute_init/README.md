@@ -8,6 +8,7 @@ Allow compute nodes to rejoin the cluster after a reboot without running the
 > required configuration may change with further development.
 
 To enable this:
+
 1. Add the `compute` group (or a subset) into the `compute_init` group.
 2. Build an image which includes the `compute_init` group. This is the case
    for StackHPC-built release images.
@@ -35,65 +36,65 @@ property described above. If a role is marked as requiring a custom image then
 it also requires an image build with the role name added to the
 [Packer inventory_groups variable](../../../docs/image-build.md).
 
-| Playbook                 | Role (or functionality) | Support                         | Custom image reqd.? |
-| -------------------------|-------------------------|---------------------------------|---------------------|
-| hooks/pre.yml            | ?                       | None at present                 | n/a                 |
-| validate.yml             | n/a                     | Not relevant during boot        | n/a                 |
-| bootstrap.yml            | (wait for ansible-init) | Not relevant during boot        | n/a                 |
-| bootstrap.yml            | resolv_conf             | Fully supported                 | No                  |
-| bootstrap.yml            | etc_hosts               | Fully supported                 | No                  |
-| bootstrap.yml            | chrony                  | Fully supported                 | No                  |
-| bootstrap.yml            | proxy                   | None at present                 | No                  |
-| bootstrap.yml            | (/etc permissions)      | None required - use image build | No                  |
-| bootstrap.yml            | (ssh /home fix)         | None required - use image build | No                  |
-| bootstrap.yml            | (system users)          | None required - use image build | No                  |
-| bootstrap.yml            | systemd                 | None required - use image build | No                  |
-| bootstrap.yml            | selinux                 | None required - use image build | Maybe [1]           |
-| bootstrap.yml            | sshd                    | Fully supported                 | No                  |
-| bootstrap.yml            | dnf_repos               | None at present [2]             | -                   |
-| bootstrap.yml            | cacerts                 | Supported [3]                   | -                   |
-| bootstrap.yml            | squid                   | Not relevant for compute nodes  | n/a                 |
-| bootstrap.yml            | tuned                   | Fully supported                 | No                  |         
-| bootstrap.yml            | freeipa_server          | Not relevant for compute nodes  | n/a                 |
-| bootstrap.yml            | cockpit                 | None required - use image build | No                  |
-| bootstrap.yml            | firewalld               | Not relevant for compute nodes  | n/a                 |
-| bootstrap.yml            | fail2ban                | Not relevant for compute nodes  | n/a                 |
-| bootstrap.yml            | podman                  | Not relevant for compute nodes  | n/a                 |
-| bootstrap.yml            | update                  | Not relevant during boot        | n/a                 |
-| bootstrap.yml            | reboot                  | Not relevant for compute nodes  | n/a                 |
-| bootstrap.yml            | ofed                    | Not relevant during boot        | Yes                 |
-| bootstrap.yml            | ansible_init (install)  | Not relevant during boot        | n/a                 |
-| bootstrap.yml            | k3s (install)           | Not relevant during boot        | n/a                 |
-| hooks/post-bootstrap.yml | ?                       | None at present                 | n/a                 |
-| iam.yml                  | freeipa_client          | None at present [4]             | Yes                 |
-| iam.yml                  | freeipa_server          | Not relevant for compute nodes  | n/a                 |
-| iam.yml                  | sssd                    | Fully supported                 | No                  |
-| filesystems.yml          | block_devices           | None required - role deprecated | n/a                 |
-| filesystems.yml          | nfs                     | All client functionality        | No                  |
-| filesystems.yml          | manila                  | All functionality               | No [5]              |
-| filesystems.yml          | lustre                  | All functionality               | Yes                 |
-| extras.yml               | basic_users             | All functionality [6]           | No                  |
-| extras.yml               | eessi                   | All functionality [7]           | No                  |
-| extras.yml               | cuda                    | None required - use image build | Yes [8]             |
-| extras.yml               | persist_hostkeys        | Not relevant for compute nodes  | n/a                 |
-| extras.yml               | compute_init (export)   | Not relevant for compute nodes  | n/a                 |
-| extras.yml               | k9s (install)           | Not relevant during boot        | n/a                 |
-| extras.yml               | extra_packages          | None at present [9]             | -                   |
-| slurm.yml                | mysql                   | Not relevant for compute nodes  | n/a                 |
-| slurm.yml                | rebuild                 | Not relevant for compute nodes  | n/a                 |
-| slurm.yml                | openhpc [10]            | All slurmd functionality        | No                  |
-| slurm.yml                | (set memory limits)     | Fully supported                 | No                  |
-| slurm.yml                | (block ssh)             | Fully supported                 | No                  |
-| portal.yml               | (openondemand server)   | Not relevant for compute nodes  | n/a                 |
-| portal.yml               | (openondemand vnc desktop)  | None required - use image build | No              |
-| portal.yml               | (openondemand jupyter server) | None required - use image build | No            |
-| monitoring.yml           | node_exporter           | None required - use image build | No                  |
-| monitoring.yml           | (other  monitoring)     | Not relevant for compute nodes  | -                   |
-| disable-repos.yml        | dnf_repos               | None at present [2]             | -                   |
-| hooks/post.yml           | ?                       | None at present                 | -                   |
-
+| Playbook                 | Role (or functionality)       | Support                         | Custom image reqd.? |
+| ------------------------ | ----------------------------- | ------------------------------- | ------------------- |
+| hooks/pre.yml            | ?                             | None at present                 | n/a                 |
+| validate.yml             | n/a                           | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | (wait for ansible-init)       | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | resolv_conf                   | Fully supported                 | No                  |
+| bootstrap.yml            | etc_hosts                     | Fully supported                 | No                  |
+| bootstrap.yml            | chrony                        | Fully supported                 | No                  |
+| bootstrap.yml            | proxy                         | None at present                 | No                  |
+| bootstrap.yml            | (/etc permissions)            | None required - use image build | No                  |
+| bootstrap.yml            | (SSH /home fix)               | None required - use image build | No                  |
+| bootstrap.yml            | (system users)                | None required - use image build | No                  |
+| bootstrap.yml            | systemd                       | None required - use image build | No                  |
+| bootstrap.yml            | selinux                       | None required - use image build | Maybe [1]           |
+| bootstrap.yml            | sshd                          | Fully supported                 | No                  |
+| bootstrap.yml            | dnf_repos                     | None at present [2]             | -                   |
+| bootstrap.yml            | cacerts                       | Supported [3]                   | -                   |
+| bootstrap.yml            | squid                         | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | tuned                         | Fully supported                 | No                  |
+| bootstrap.yml            | freeipa_server                | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | cockpit                       | None required - use image build | No                  |
+| bootstrap.yml            | firewalld                     | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | fail2ban                      | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | podman                        | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | update                        | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | reboot                        | Not relevant for compute nodes  | n/a                 |
+| bootstrap.yml            | ofed                          | Not relevant during boot        | Yes                 |
+| bootstrap.yml            | ansible_init (install)        | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | k3s (install)                 | Not relevant during boot        | n/a                 |
+| hooks/post-bootstrap.yml | ?                             | None at present                 | n/a                 |
+| iam.yml                  | freeipa_client                | None at present [4]             | Yes                 |
+| iam.yml                  | freeipa_server                | Not relevant for compute nodes  | n/a                 |
+| iam.yml                  | sssd                          | Fully supported                 | No                  |
+| filesystems.yml          | block_devices                 | None required - role deprecated | n/a                 |
+| filesystems.yml          | nfs                           | All client functionality        | No                  |
+| filesystems.yml          | manila                        | All functionality               | No [5]              |
+| filesystems.yml          | lustre                        | All functionality               | Yes                 |
+| extras.yml               | basic_users                   | All functionality [6]           | No                  |
+| extras.yml               | eessi                         | All functionality [7]           | No                  |
+| extras.yml               | cuda                          | None required - use image build | Yes [8]             |
+| extras.yml               | persist_hostkeys              | Not relevant for compute nodes  | n/a                 |
+| extras.yml               | compute_init (export)         | Not relevant for compute nodes  | n/a                 |
+| extras.yml               | k9s (install)                 | Not relevant during boot        | n/a                 |
+| extras.yml               | extra_packages                | None at present [9]             | -                   |
+| slurm.yml                | MySQL                         | Not relevant for compute nodes  | n/a                 |
+| slurm.yml                | rebuild                       | Not relevant for compute nodes  | n/a                 |
+| slurm.yml                | openhpc [10]                  | All slurmd functionality        | No                  |
+| slurm.yml                | (set memory limits)           | Fully supported                 | No                  |
+| slurm.yml                | (block SSH)                   | Fully supported                 | No                  |
+| portal.yml               | (openondemand server)         | Not relevant for compute nodes  | n/a                 |
+| portal.yml               | (openondemand vnc desktop)    | None required - use image build | No                  |
+| portal.yml               | (openondemand jupyter server) | None required - use image build | No                  |
+| monitoring.yml           | node_exporter                 | None required - use image build | No                  |
+| monitoring.yml           | (other monitoring)            | Not relevant for compute nodes  | -                   |
+| disable-repos.yml        | dnf_repos                     | None at present [2]             | -                   |
+| hooks/post.yml           | ?                             | None at present                 | -                   |
 
 Notes:
+
 1. `selinux` is set to disabled in StackHPC images.
 2. Requirement for this functionality is TBD.
 3. `cacerts_cert_dir` must be the same on all nodes.
@@ -103,32 +104,32 @@ Notes:
 6. Assumes home directory already exists on shared storage.
 7. Assumes `cvmfs_config` is the same on control node and all compute nodes.
 8. If `cuda` role was run during build, the nvidia-persistenced is enabled
-  and will start during boot.
+   and will start during boot.
 9. Would require `dnf_repos`.
 10. `openhpc` does not need to be added to `compute_init_enable`, this is
     automatically enabled by adding `compute`.
 
 ## Approach
+
 This works as follows:
+
 1. During image build, an ansible-init playbook and supporting files
-(e.g. templates, filters, etc) are installed.
+   (e.g. templates, filters, etc) are installed.
 2. Cluster instances are created as usual; the above compute-init playbook does
-not run.
+   not run.
 3. The `site.yml` playbook is run as usual to configure all the instances into
-a cluster. In addition, with `compute-init` enabled, a `/exports/cluster` NFS
-share is created on the control node containing:
-    - an /etc/hosts file for the cluster
-    - Hostvars for each compute node
+   a cluster. In addition, with `compute-init` enabled, a `/exports/cluster` NFS
+   share is created on the control node containing: - an /etc/hosts file for the cluster - Hostvars for each compute node
 4. On reboot of a compute node, ansible-init runs the compute-init playbook
-which:
-    a. Checks whether the `enable_compute` metadata flag is set, and exits if
-       not.
-    b. Tries to mount the above `/exports/cluster` NFS share from the control
-       node, and exits if it cannot.
-    c. Configures itself using the exported hostvars, depending on the
-       `enable_*` flags set in metadata.
-    d. Issues an `scontrol` command to resume the node (because Slurm will
-       consider it as "unexpectedly rebooted").
+   which:
+   a. Checks whether the `enable_compute` metadata flag is set, and exits if
+   not.
+   b. Tries to mount the above `/exports/cluster` NFS share from the control
+   node, and exits if it cannot.
+   c. Configures itself using the exported hostvars, depending on the
+   `enable_*` flags set in metadata.
+   d. Issues an `scontrol` command to resume the node (because Slurm will
+   consider it as "unexpectedly rebooted").
 
 The check in 4b. above is what prevents the compute-init script from trying
 to configure the node before the services on the control node are available
@@ -145,35 +146,43 @@ a new image:
 
 2. Reimage the compute nodes:
 
-        ansible-playbook --limit compute ansible/adhoc/rebuild.yml
+```shell
+ansible-playbook --limit compute ansible/adhoc/rebuild.yml
+```
 
 3. Add metadata to a compute node e.g. via Horizon to turn on compute-init
    playbook functionality.
 
 4. Stop ansible-init from running
 
-        ansible all -ba "systemctl stop ansible-init"
+```shell
+ansible all -ba "systemctl stop ansible-init"
+```
 
 5. Fake an image build to deploy the compute-init playbook:
 
-        ansible-playbook ansible/fatimage.yml --tags compute_init
+```shell
+ansible-playbook ansible/fatimage.yml --tags compute_init
+```
 
-    NB: This will also re-export the compute hostvars, as the nodes are not
-    in the builder group, which conveniently means any changes made to that
-    play also get picked up.
+NB: This will also reexport the compute hostvars, as the nodes are not
+in the builder group, which conveniently means any changes made to that
+play also get picked up.
 
 6. Fake a reimage of compute to run ansible-init and the updated compute-init playbook:
 
-        ansible all -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
+```shell
+ansible all -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
+```
 
-    Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
+Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
 
 Steps 4/5/6 can be repeated with changes to the compute script. If required,
 reimage the compute node(s) first as in step 2 and/or add additional metadata
 as in step 3.
 
-
 ## Design notes
+
 - Duplicating code in roles into the `compute-init` script is unfortunate, but
   does allow developing this functionality without wider changes to the
   appliance.
@@ -186,7 +195,6 @@ as in step 3.
   1. Control node copies files resulting from role into cluster exports,
      compute-init copies to local disk. Only works if files are not host-specific
      Examples: etc_hosts, eessi config?
-  
   2. Re-implement the role. Works if the role vars are not too complicated,
      (else they all need to be duplicated in compute-init). Could also only
      support certain subsets of role functionality or variables
@@ -195,29 +203,29 @@ as in step 3.
 - Some variables are defined using hostvars from other nodes, which aren't
   available v the current approach:
 
-    ```
-    [root@rl9-compute-0 rocky]# grep hostvars /mnt/cluster/hostvars/rl9-compute-0/hostvars.yml
-        "grafana_address": "{{ hostvars[groups['grafana'].0].api_address }}",
-        "grafana_api_address": "{{ hostvars[groups['grafana'].0].internal_address }}",
-        "mysql_host": "{{ hostvars[groups['mysql'] | first].api_address }}",
-        "nfs_server_default": "{{ hostvars[groups['control'] | first ].internal_address }}",
-        "openhpc_slurm_control_host": "{{ hostvars[groups['control'].0].api_address }}",
-        "openondemand_address": "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}",
-        "openondemand_node_proxy_directives": "{{ _opeonondemand_unset_auth if (openondemand_auth == 'basic_pam' and 'openondemand_host_regex' and groups['grafana'] | length > 0 and hostvars[ groups['grafana']  | first]._grafana_auth_is_anonymous) else '' }}",
-        "openondemand_servername": "{{ hostvars[ groups['openondemand'] | first].ansible_host }}",
-        "prometheus_address": "{{ hostvars[groups['prometheus'].0].api_address }}",
-            "{{ hostvars[groups['freeipa_server'].0].ansible_host }}"
-    ```
+  ```text
+  [root@rl9-compute-0 rocky]# grep hostvars /mnt/cluster/hostvars/rl9-compute-0/hostvars.yml
+      "grafana_address": "{{ hostvars[groups['grafana'].0].api_address }}",
+      "grafana_api_address": "{{ hostvars[groups['grafana'].0].internal_address }}",
+      "mysql_host": "{{ hostvars[groups['mysql'] | first].api_address }}",
+      "nfs_server_default": "{{ hostvars[groups['control'] | first ].internal_address }}",
+      "openhpc_slurm_control_host": "{{ hostvars[groups['control'].0].api_address }}",
+      "openondemand_address": "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}",
+      "openondemand_node_proxy_directives": "{{ _opeonondemand_unset_auth if (openondemand_auth == 'basic_pam' and 'openondemand_host_regex' and groups['grafana'] | length > 0 and hostvars[ groups['grafana']  | first]._grafana_auth_is_anonymous) else '' }}",
+      "openondemand_servername": "{{ hostvars[ groups['openondemand'] | first].ansible_host }}",
+      "prometheus_address": "{{ hostvars[groups['prometheus'].0].api_address }}",
+          "{{ hostvars[groups['freeipa_server'].0].ansible_host }}"
+  ```
 
-    More generally, there is nothing to stop any group var depending on a
-    "{{ hostvars[] }}" interpolation ...
+  More generally, there is nothing to stop any group var depending on a
+  "{{ hostvars[] }}" interpolation ...
 
-    Only `nfs_server_default` and `openhpc_slurm_control_host` are of concern
-    for compute nodes - both of these indirect via `api_address` to
-    `inventory_hostname`. This has been worked around by replacing this with
-    "{{ groups['control'] | first }}" which does result in the control node
-    inventory hostname when templating.
+  Only `nfs_server_default` and `openhpc_slurm_control_host` are of concern
+  for compute nodes - both of these indirect via `api_address` to
+  `inventory_hostname`. This has been worked around by replacing this with
+  "{{ groups['control'] | first }}" which does result in the control node
+  inventory hostname when templating.
 
-    Note that although `groups` is defined in the templated hostvars, when
-    the hostvars are loaded using `include_vars:` is is ignored as it is a
-    "magic variable" determined by ansible itself and cannot be set.
+  Note that although `groups` is defined in the templated hostvars, when
+  the hostvars are loaded using `include_vars:` is is ignored as it is a
+  "magic variable" determined by ansible itself and cannot be set.

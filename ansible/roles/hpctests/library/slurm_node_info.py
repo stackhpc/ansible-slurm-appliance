@@ -4,8 +4,8 @@
 # Copyright: (c) 2020, StackHPC
 # Apache 2 License
 
+
 from ansible.module_utils.basic import AnsibleModule
-import json
 
 ANSIBLE_METADATA = {
     "metadata_version": "0.1",
@@ -46,23 +46,30 @@ def run_module():
     result = {"changed": False}
     if module.check_mode:
         module.exit_json(**result)
-    
-    _, stdout,_ = module.run_command("sinfo --Format All --Node", check_rc=True) # `--nodes` doesn't filter enough, other partitions are still shown
+
+    _, stdout, _ = module.run_command(
+        "sinfo --Format All --Node", check_rc=True
+    )  # `--nodes` doesn't filter enough, other partitions are still shown
     lines = stdout.splitlines()
     info = {}
-    params = [v.strip() for v in lines[0].split('|')]
-    values = [line.split('|') for line in lines[1:]]
-    nodelist_ix = params.index('NODELIST')
+    params = [v.strip() for v in lines[0].split("|")]
+    values = [line.split("|") for line in lines[1:]]
+    nodelist_ix = params.index("NODELIST")
     print(values)
     for ix, param in enumerate(params):
-        info[param] = [nodeinfo[ix].strip() for nodeinfo in values if nodeinfo[nodelist_ix].strip() in module.params['nodes']]
-    result['info'] = info
-    
+        info[param] = [
+            nodeinfo[ix].strip()
+            for nodeinfo in values
+            if nodeinfo[nodelist_ix].strip() in module.params["nodes"]
+        ]
+    result["info"] = info
+
     module.exit_json(**result)
 
 
 def main():
     run_module()
+
 
 if __name__ == "__main__":
     main()

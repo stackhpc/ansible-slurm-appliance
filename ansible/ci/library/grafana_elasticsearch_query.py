@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
 # Copyright: (c) 2022 Steve Brasier steve@stackhpc.com
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: grafana_elasticsearch_query
 
@@ -16,9 +17,9 @@ description: Returns hits from selected datasource and indices.
 
 author:
     - Steve Brasier
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Get elasticsearch hits
   grafana_elasticsearch_query:
     grafana_url: http://{{ grafana_api_address }}:{{ grafana_port }}
@@ -26,19 +27,21 @@ EXAMPLES = r'''
     grafana_password: "{{ vault_grafana_admin_password }}"
     datasource: slurmstats
     index_pattern: 'filebeat-*'
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 # These are examples of possible return values, and in general should use other names for return values.
 docs:
   description: List of dicts with the original json in each document.
   returned: always
   type: list
-'''
+"""
 
-from ansible.module_utils.basic import AnsibleModule
-import requests
 import json
+
+import requests
+from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
     module_args = dict(
@@ -49,32 +52,36 @@ def run_module():
         index_pattern=dict(type="str", required=True),
     )
 
-    result = dict(
-        changed=False,
-        jobs=[]
-    )
+    result = dict(changed=False, jobs=[])
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
-    auth=(module.params['grafana_username'], module.params['grafana_password'])
-    
+    auth = (module.params["grafana_username"], module.params["grafana_password"])
+
     # list datasources:
-    datasources_api_url = module.params["grafana_url"] + '/api/datasources'
+    datasources_api_url = module.params["grafana_url"] + "/api/datasources"
     r = requests.get(datasources_api_url, auth=auth)
     datasources = json.loads(r.text)
 
     # select required datasource:
-    ds = [s for s in datasources if s['name'] == module.params["datasource"]][0]
+    ds = [s for s in datasources if s["name"] == module.params["datasource"]][0]
 
     # get documents:
-    datasource_proxy_url = module.params["grafana_url"] + '/api/datasources/proxy/' + str(ds['id']) + '/' + module.params['index_pattern'] + '/_search'
+    datasource_proxy_url = (
+        module.params["grafana_url"]
+        + "/api/datasources/proxy/"
+        + str(ds["id"])
+        + "/"
+        + module.params["index_pattern"]
+        + "/_search"
+    )
     r = requests.get(datasource_proxy_url, auth=auth)
     search = json.loads(r.text)
     # see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html#search-api-response-body:
-    docs = [h['_source']['json'] for h in search['hits']['hits']]    
+    docs = [h["_source"]["json"] for h in search["hits"]["hits"]]
 
     result = {
-        'docs': docs,
+        "docs": docs,
     }
 
     module.exit_json(**result)
@@ -84,5 +91,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

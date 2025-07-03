@@ -4,8 +4,8 @@
 # Copyright: (c) 2020, StackHPC
 # Apache 2 License
 
+
 from ansible.module_utils.basic import AnsibleModule
-import json
 
 ANSIBLE_METADATA = {
     "metadata_version": "0.1",
@@ -36,12 +36,14 @@ EXAMPLES = """
 TODO
 """
 
+
 def factors(n):
-    """ Return a sequence of (a, b) tuples where a < b giving factors of n.
-        
-        Based on https://stackoverflow.com/a/6909532/916373
+    """Return a sequence of (a, b) tuples where a < b giving factors of n.
+
+    Based on https://stackoverflow.com/a/6909532/916373
     """
-    return [(i, n//i)  for i in range(1, int(n**0.5) + 1) if n % i == 0]
+    return [(i, n // i) for i in range(1, int(n**0.5) + 1) if n % i == 0]
+
 
 def run_module():
     module_args = dict(
@@ -52,17 +54,18 @@ def run_module():
     result = {"changed": False}
     if module.check_mode:
         module.exit_json(**result)
-    
+
     num_processes = module.params["num_processes"]
     f = factors(num_processes)
-    p, q = f[-1] # nearest to square
+    p, q = f[-1]  # nearest to square
 
-    result['grid'] = {'P':p, 'Q': q}
+    result["grid"] = {"P": p, "Q": q}
     module.exit_json(**result)
 
 
 def main():
     run_module()
+
 
 if __name__ == "__main__":
     main()

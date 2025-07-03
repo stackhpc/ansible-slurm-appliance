@@ -1,57 +1,58 @@
 ---
-
 - name: Make directory
-  file:
+  ansible.builtin.file:
     path: "{{ hpctests_rootdir }}/hpl"
     state: directory
+    mode: "0755"
 
 - name: Download HPL sources
-  unarchive:
+  ansible.builtin.unarchive:
     src: "http://www.netlib.org/benchmark/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
-    remote_src: yes
+    remote_src: true
     dest: "{{ hpctests_rootdir }}/hpl"
-    keep_newer: yes
+    keep_newer: true
 
 - name: Copy BLAS make file
-  command:
+  ansible.builtin.command:
     cmd: "cp setup/Make.Linux_PII_CBLAS Make.{{ hpctests_hpl_arch }}"
     chdir: "{{ hpctests_hpl_srcdir }}"
     creates: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
 
 - name: Modify make file
-  replace:
+  ansible.builtin.replace:
     path: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
   loop:
-    - regexp: '^TOPdir.*$'
+    - regexp: "^TOPdir.*$"
       replace: "TOPdir       = {{ hpctests_hpl_srcdir }}"
-    - regexp: '^ARCH\s+=.*$'
+    - regexp: "^ARCH\\s+=.*$"
       replace: "ARCH         = {{ hpctests_hpl_arch }}"
-    - regexp: '^MPdir.*$'
+    - regexp: "^MPdir.*$"
       replace: "MPdir        = $(MPI_DIR)"
-    - regexp: '^MPinc.*$'
+    - regexp: "^MPinc.*$"
       replace: "MPinc        = -I$(MPI_DIR)/include"
-    - regexp: '^MPlib.*$'
+    - regexp: "^MPlib.*$"
       replace: "MPlib        = $(MPI_DIR)/lib/libmpi.so"
-    - regexp: '^LAdir.*$'
+    - regexp: "^LAdir.*$"
       replace: "LAdir        = $(OPENBLAS_DIR)"
-    - regexp: '^LAinc.*$'
-      replace: "LAinc        ="  # not sure if this one is needed?
-    - regexp: '^LAlib.*$'
+    - regexp: "^LAinc.*$"
+      replace: "LAinc        =" # not sure if this one is needed?
+    - regexp: "^LAlib.*$"
       replace: "LAlib        = $(OPENBLAS_LIB)/libopenblas.so"
-    - regexp: '^CC\s+=.*$'
+    - regexp: "^CC\\s+=.*$"
       replace: "CC           = mpicc"
-    - regexp: '^LINKER\s+=.*$'
+    - regexp: "^LINKER\\s+=.*$"
       replace: "LINKER       = mpicc"
 
 - name: Create build job script
-  template:
+  ansible.builtin.template:
     src: "hpl-build.sh.j2"
     dest: "{{ hpctests_hpl_srcdir }}/hpl-build-{{ hpctests_hpl_arch }}.sh"
-  
+    mode: "0644"
+
 - name: Build HPL executable
-  shell:
+  ansible.builtin.command:
     cmd: "bash -l -c 'sbatch --wait hpl-build-{{ hpctests_hpl_arch }}.sh'" # need login shell for module command
     chdir: "{{ hpctests_hpl_srcdir }}"
     creates: "bin/{{ hpctests_hpl_arch }}/xhpl"

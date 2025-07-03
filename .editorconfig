@@ -3,6 +3,6 @@
 
 # shfmt will default to indenting shell scripts with tabs,
 # define the indent as 2 spaces
-[bin/*]
+[{.github/bin,dev}/*.sh]
 indent_style = space
 indent_size = 2

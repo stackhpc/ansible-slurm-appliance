@@ -1,9 +1,22 @@
 ---
 skip_list:
-  - var-naming[no-role-prefix]
+  - role-name
+  # Unresolved issues with parsing jinja in multiline strings
+  # https://github.com/ansible/ansible-lint/issues/3935
+  - jinja[spacing]
   - galaxy[no-changelog]
-  - galaxy[version-incorrect]
   - meta-runtime[unsupported-version]
+
+warn_list:
+  - name[missing]
+  - name[play]
+  - var-naming
+
 exclude_paths:
   - actionlint.yml
+  - .ansible/
   - .github/
+  # The following are files with syntax errors.
+  # Rule 'syntax-check' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file.
+  - ansible/roles/filebeat/tasks/runtime.yml
+  - environments/common/files/filebeat/filebeat.yml

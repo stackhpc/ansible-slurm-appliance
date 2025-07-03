@@ -1,17 +1,17 @@
 variable "cluster_name" {
-    type = string
-    description = "Name of cluster, used as part of domain name"
+  type        = string
+  description = "Name of cluster, used as part of domain name"
 }
 
 variable "cluster_domain_suffix" {
-    type = string
-    description = "Domain suffix for cluster"
-    default = "internal"
+  type        = string
+  description = "Domain suffix for cluster"
+  default     = "internal"
 }
 
 variable "cluster_networks" {
-    type = list(map(string))
-    description = <<-EOT
+  type        = list(map(string))
+  description = <<-EOT
         List of mappings defining networks. Mapping key/values:
             network: Required. Name of existing network
             subnet: Required. Name of existing subnet
@@ -20,34 +20,34 @@ variable "cluster_networks" {
 }
 
 variable "key_pair" {
-    type = string
-    description = "Name of an existing keypair in OpenStack"
+  type        = string
+  description = "Name of an existing keypair in OpenStack"
 }
 
 variable "control_ip_addresses" {
-    type        = map(string)
-    description = <<-EOT
+  type        = map(string)
+  description = <<-EOT
         Mapping of fixed IP addresses for control node, keyed by network name.
         For any networks not specified here the cloud will select an address.
 
         NB: Changing IP addresses after deployment may hit terraform provider bugs.
     EOT
-    default     = {}
-    validation {
-        # check all keys are network names in cluster_networks
-        condition = length(setsubtract(keys(var.control_ip_addresses), var.cluster_networks[*].network)) == 0
-        error_message = "Keys in var.control_ip_addresses must match network names in var.cluster_networks"
-    }
+  default     = {}
+  validation {
+    # check all keys are network names in cluster_networks
+    condition     = length(setsubtract(keys(var.control_ip_addresses), var.cluster_networks[*].network)) == 0
+    error_message = "Keys in var.control_ip_addresses must match network names in var.cluster_networks"
+  }
 }
 
 variable "control_node_flavor" {
-    type = string
-    description = "Flavor name for control node"
+  type        = string
+  description = "Flavor name for control node"
 }
 
 variable "login" {
-    default = {}
-    description = <<-EOF
+  default     = {}
+  description = <<-EOF
         Mapping defining homogenous groups of login nodes. Multiple groups may
         be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
         to define login nodes with different capabilities such as high-memory.
@@ -84,17 +84,17 @@ variable "login" {
             nodename_template: Overrides variable cluster_nodename_template
     EOF
 
-    type = any
+  type = any
 }
 
 variable "cluster_image_id" {
-    type = string
-    description = "ID of default image for the cluster"
+  type        = string
+  description = "ID of default image for the cluster"
 }
 
 variable "compute" {
-    default = {}
-    description = <<-EOF
+  default     = {}
+  description = <<-EOF
         Mapping defining homogenous groups of compute nodes. Groups are used
         in Slurm partition definitions.
 
@@ -127,36 +127,36 @@ variable "compute" {
             nodename_template: Overrides variable cluster_nodename_template
     EOF
 
-    type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
+  type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
 }
 
 variable "environment_root" {
-    type = string
-    description = "Path to environment root, automatically set by activate script"
+  type        = string
+  description = "Path to environment root, automatically set by activate script"
 }
 
 variable "state_dir" {
-    type = string
-    description = "Path to state directory on control node"
-    default = "/var/lib/state"
+  type        = string
+  description = "Path to state directory on control node"
+  default     = "/var/lib/state"
 }
 
 variable "state_volume_size" {
-    type = number
-    description = "Size of state volume on control node, in GB"
-    default = 150 # GB
+  type        = number
+  description = "Size of state volume on control node, in GB"
+  default     = 150 # GB
 }
 
 variable "state_volume_type" {
-    type = string
-    description = "Type of state volume, if not default type"
-    default = null
+  type        = string
+  description = "Type of state volume, if not default type"
+  default     = null
 }
 
 variable "state_volume_provisioning" {
-    type = string
-    default = "manage"
-    description = <<-EOT
+  type        = string
+  default     = "manage"
+  description = <<-EOT
         How to manage the state volume. Valid values are:
             "manage": (Default) OpenTofu will create a volume "$cluster_name-state"
                       and delete it when the cluster is destroyed. A volume
@@ -167,36 +167,36 @@ variable "state_volume_provisioning" {
                       intact if the cluster is destroyed. Use for production
                       environments.
         EOT
-    validation {
-      condition = contains(["manage", "attach"], var.state_volume_provisioning)
-      error_message = <<-EOT
+  validation {
+    condition     = contains(["manage", "attach"], var.state_volume_provisioning)
+    error_message = <<-EOT
         home_volume_provisioning must be "manage" or "attach"
     EOT
-    }
+  }
 }
 
 variable "home_volume_size" {
-    type = number
-    description = "Size of state volume on control node, in GB."
-    default = 100
-    validation {
-        condition = var.home_volume_provisioning == "manage" ? var.home_volume_size > 0 : true
-        error_message = <<-EOT
+  type        = number
+  description = "Size of state volume on control node, in GB."
+  default     = 100
+  validation {
+    condition     = var.home_volume_provisioning == "manage" ? var.home_volume_size > 0 : true
+    error_message = <<-EOT
             home_volume_size must be > 0 when var.home_volume_provisioning == "manage"
         EOT
-    }
+  }
 }
 
 variable "home_volume_type" {
-    type = string
-    default = null
-    description = "Type of home volume, if not default type"
+  type        = string
+  default     = null
+  description = "Type of home volume, if not default type"
 }
 
 variable "home_volume_provisioning" {
-    type = string
-    default = "manage"
-    description = <<-EOT
+  type        = string
+  default     = "manage"
+  description = <<-EOT
         How to manage the home volume. Valid values are:
             "manage": (Default) OpenTofu will create a volume "$cluster_name-home"
                       and delete it when the cluster is destroyed. A volume
@@ -209,67 +209,67 @@ variable "home_volume_provisioning" {
             "none":   No home volume is used. Use if /home is provided by
                       a parallel filesystem, e.g. manila.
         EOT
-    validation {
-      condition = contains(["manage", "attach", "none"], var.home_volume_provisioning)
-      error_message = <<-EOT
+  validation {
+    condition     = contains(["manage", "attach", "none"], var.home_volume_provisioning)
+    error_message = <<-EOT
         home_volume_provisioning must be one of "manage", "attach" or "none"
     EOT
-    }
+  }
 }
 
 variable "vnic_types" {
-    type = map(string)
-    description = <<-EOT
+  type        = map(string)
+  description = <<-EOT
         Default VNIC types, keyed by network name. See https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type
         If not given this defaults to the "normal" type.
     EOT
-    default = {}
+  default     = {}
 }
 
 variable "login_security_groups" {
-    type = list(string)
-    description = "Name of preexisting security groups to apply to login nodes"
-    default = [
-        "default",  # allow all in-cluster services
-        "SSH",      # access via ssh
-        "HTTPS",    # access OpenOndemand
-    ]
+  type        = list(string)
+  description = "Name of preexisting security groups to apply to login nodes"
+  default = [
+    "default", # allow all in-cluster services
+    "SSH",     # access via ssh
+    "HTTPS",   # access OpenOndemand
+  ]
 }
 
 variable "nonlogin_security_groups" {
-    type = list(string)
-    description = "Name of preexisting security groups to apply to non-login nodes"
-    default = [
-        "default",  # allow all in-cluster services
-    ]
+  type        = list(string)
+  description = "Name of preexisting security groups to apply to non-login nodes"
+  default = [
+    "default", # allow all in-cluster services
+  ]
 }
 
 variable "volume_backed_instances" {
-    description = "Whether to use volumes for root disks"
-    type = bool
-    default = false
+  description = "Whether to use volumes for root disks"
+  type        = bool
+  default     = false
 }
 
 variable "root_volume_size" {
-    description = "Size of volume for root volumes if using volume backed instances, in Gb"
-    type = number
-    default = 40
+  description = "Size of volume for root volumes if using volume backed instances, in Gb"
+  type        = number
+  default     = 40
 }
 
 variable "root_volume_type" {
-    description = "Type of root volume, if using volume backed instances. If unset, the target cloud default volume type is used."
-    type = string
-    default = null
+  description = "Type of root volume, if using volume backed instances. If unset, the target cloud default volume type is used."
+  type        = string
+  default     = null
 }
 
 variable "gateway_ip" {
-    description = "Address to add default route via"
-    type = string
-    default = ""
+  description = "Address to add default route via"
+  type        = string
+  default     = ""
 }
 
 variable "cluster_nodename_template" {
-    description = <<-EOT
+  description = <<-EOT
         Template for node fully-qualified names. The following interpolations
         can be used:
             $${cluster_name}: From var.cluster_name
@@ -279,6 +279,6 @@ variable "cluster_nodename_template" {
             node
             $${environment_name}: The last element of the current environment's path
     EOT
-    type = string
-    default = "$${cluster_name}-$${node}.$${cluster_name}.$${cluster_domain_suffix}"
+  type        = string
+  default     = "$${cluster_name}-$${node}.$${cluster_name}.$${cluster_domain_suffix}"
 }

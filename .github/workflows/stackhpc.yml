@@ -24,6 +24,13 @@ on:
       - '!.gitignore'
       - '!.github/workflows/'
       - '.github/workflows/stackhpc'
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+
 jobs:
   openstack:
     name: openstack-ci
@@ -48,7 +55,7 @@ jobs:
 
       - name: Find the latest release
         run: |
-          echo LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name) >> "$GITHUB_ENV"
+          echo "LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name)" >> "$GITHUB_ENV"
       
       - name: Checkout latest release
         uses: actions/checkout@v4
@@ -61,19 +68,19 @@ jobs:
         run: |
           # Iterate over the labels
           labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
-          echo $labels
+          echo "$labels"
           for label in $labels; do
              if [[ $label == CI_CLOUD=* ]]; then
               # Extract the value after 'CI_CLOUD='
               CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
-              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> $GITHUB_ENV
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
             fi
           done
 
       - name: Record debug info
         run: |
-          echo LATEST_RELEASE_TAG: $LATEST_RELEASE_TAG
-          echo CI_CLOUD: $CI_CLOUD
+          echo "LATEST_RELEASE_TAG: $LATEST_RELEASE_TAG"
+          echo "CI_CLOUD: $CI_CLOUD"
 
       - name: Setup ssh
         run: |
@@ -109,7 +116,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          echo vault_demo_user_password: "$DEMO_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
+          echo "vault_demo_user_password: $DEMO_USER_PASSWORD" > "$APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml"
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
@@ -118,14 +125,14 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd "$STACKHPC_TF_DIR"
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
 
       - name: Delete infrastructure if provisioning failed
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd "$STACKHPC_TF_DIR"
           tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
@@ -161,7 +168,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd "$STACKHPC_TF_DIR"
           tofu init
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
           
@@ -207,14 +214,14 @@ jobs:
           # load ansible variables into shell:
           ansible-playbook ansible/ci/output_vars.yml \
             -e output_vars_hosts=openondemand \
-            -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
+            -e output_vars_path="$APPLIANCES_ENVIRONMENT_ROOT/vars.txt" \
             -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
-          source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
+          source "$APPLIANCES_ENVIRONMENT_ROOT/vars.txt"
 
           # setup ssh proxying:
           sudo apt-get --yes install proxychains
           echo proxychains installed
-          ssh -v -fN -D 9050 ${bastion_user}@${bastion_ip}
+          ssh -v -fN -D 9050 "${bastion_user}@${bastion_ip}"
           echo port 9050 forwarded
 
           # check OOD server returns 200:
@@ -224,9 +231,9 @@ jobs:
             --server-response \
             --no-check-certificate \
             --http-user=demo_user \
-            --http-password=${DEMO_USER_PASSWORD} https://${openondemand_servername} \
+            --http-password="${DEMO_USER_PASSWORD}" "https://${openondemand_servername}" \
             2>&1)
-          (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
+          (echo "$statuscode" | grep "200 OK") || (echo "$statuscode"  && exit 1)
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
@@ -236,14 +243,14 @@ jobs:
           . environments/.stackhpc/activate  
           if [ -n "$SNAPSHOT" ]
           then
-              echo Deleting $SNAPSHOT
-              openstack volume snapshot delete $SNAPSHOT
+              echo "Deleting $SNAPSHOT"
+              openstack volume snapshot delete "$SNAPSHOT"
           fi
 
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd "$STACKHPC_TF_DIR"
           tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" || echo "tofu failed in $STACKHPC_TF_DIR"
         if: ${{ success() || cancelled() }}
