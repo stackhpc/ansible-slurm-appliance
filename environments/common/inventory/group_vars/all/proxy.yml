@@ -16,6 +16,7 @@ proxy_http_port: "{{ squid_http_port }}"
 # whether to remove the proxy configuration at the end of Ansible runs:
 # (useful for image build where this should not be captured in the image)
 proxy_remove: false
+# NB for the `builder` group this defaults to true
 
 # full http proxy string - override if the above don't provide enough control:
 proxy_http_proxy: >-
