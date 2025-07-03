@@ -1,68 +1,72 @@
 ---
-
 - name: Install script for attaching to pod infra containers
-  copy:
+  ansible.builtin.copy:
     src: podman-pod-infra-attach.sh
     dest: /usr/bin/
     mode: +x
   become: true
 
 - name: Create systemd unit for Zenith pod
-  template:
+  ansible.builtin.template:
     src: pod.service.j2
     dest: /etc/systemd/system/{{ zenith_proxy_service_name }}.service
+    mode: "0644"
   become: true
   register: zenith_proxy_pod_systemd_unit
 
 - name: Ensure Zenith pod is started and enabled
-  service:
+  ansible.builtin.service:
     name: "{{ zenith_proxy_service_name }}.service"
     state: "{{ 'restarted' if zenith_proxy_pod_systemd_unit is changed else 'started' }}"
-    enabled: yes
+    enabled: true
     daemon_reload: "{{ zenith_proxy_pod_systemd_unit is changed }}"
   become: true
 
-- block:
+- become: true
+  when: zenith_proxy_mitm_enabled
+
+  block:
     - name: Create systemd unit file for MITM proxy
-      template:
+      ansible.builtin.template:
         src: mitm.service.j2
         dest: /etc/systemd/system/{{ zenith_proxy_mitm_service_name }}.service
+        mode: "0644"
       register: zenith_proxy_mitm_systemd_unit
 
     - name: Ensure MITM proxy is started and enabled
-      service:
+      ansible.builtin.service:
         name: "{{ zenith_proxy_mitm_service_name }}.service"
         state: "{{ 'restarted' if zenith_proxy_mitm_systemd_unit is changed else 'started' }}"
-        enabled: yes
+        enabled: true
         daemon_reload: "{{ zenith_proxy_mitm_systemd_unit is changed }}"
-  become: true
-  when: zenith_proxy_mitm_enabled
-
 - name: Ensure Zenith config directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/zenith/{{ zenith_proxy_service_name }}
     state: directory
+    mode: "0755"
   become: true
 
 - name: Write Zenith client configuration
-  template:
+  ansible.builtin.template:
     src: zenith-client.yaml.j2
     dest: /etc/zenith/{{ zenith_proxy_service_name }}/client.yaml
+    mode: "0644"
   become: true
   register: zenith_proxy_client_config_file
 
 - name: Create directory to persist SSH key
-  file:
+  ansible.builtin.file:
     path: "{{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh"
     state: directory
     owner: "{{ zenith_proxy_podman_user }}"
     group: "{{ zenith_proxy_podman_user }}"
+    mode: "0755"
   become: true
 
 - name: Initialise Zenith client
   # Use a foreground command rather than the podman_container module as I could not
   # work out the combination of parameters that produced the desired behaviour :-(
-  command: >-
+  ansible.builtin.command: >-
     podman run
       --name {{ zenith_proxy_service_name }}-init
       --replace
@@ -79,14 +83,15 @@
     "token has already been used" not in zenith_proxy_client_init.stderr
 
 - name: Create systemd unit file for Zenith client
-  template:
+  ansible.builtin.template:
     src: client.service.j2
     dest: /etc/systemd/system/{{ zenith_proxy_client_service_name }}.service
+    mode: "0644"
   become: true
   register: zenith_proxy_client_systemd_unit
 
 - name: Ensure Zenith client is started and enabled
-  service:
+  ansible.builtin.service:
     name: "{{ zenith_proxy_client_service_name }}.service"
     state: >-
       {{
@@ -98,6 +103,6 @@
         )
         else 'started'
       }}
-    enabled: yes
+    enabled: true
     daemon_reload: "{{ zenith_proxy_client_systemd_unit is changed }}"
   become: true

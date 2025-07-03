@@ -1,12 +1,11 @@
 ---
-
 # Fail early if configuration is invalid
 
 - name: Validate secrets created
   hosts: localhost
   gather_facts: false
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: passwords
         tasks_from: validate.yml
 
@@ -14,7 +13,7 @@
   hosts: all
   gather_facts: false
   tasks:
-    - assert:
+    - ansible.builtin.assert:
         that: groups['control'] | length
         fail_msg: "no hosts found in group 'control' - has control node been deployed?"
 
@@ -23,10 +22,10 @@
   gather_facts: false
   tags: openhpc
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: stackhpc.openhpc
         tasks_from: validate.yml
-    - assert:
+    - ansible.builtin.assert: # noqa: run-once[task]
         that: "'enable_configless' in openhpc_config.SlurmctldParameters | default([])"
         fail_msg: |
           'enable_configless' not found in openhpc_config.SlurmctldParameters - is variable openhpc_config overridden?
@@ -40,7 +39,7 @@
   gather_facts: false
   tags: filebeat
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: filebeat
         tasks_from: validate.yml
       tags: validate
@@ -55,17 +54,17 @@
     - openondemand_server
     - grafana
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: validate.yml
-      # This set of tasks will run if there are grafana hosts configured. 
-      # It is a valid configuration to have a grafana group with hosts 
+      # This set of tasks will run if there are grafana hosts configured.
+      # It is a valid configuration to have a grafana group with hosts
       # when *not* deploying openondemand. This would mean that openondemand
       # vars validated in the below task are not set in a way that passes
       # this set of validation tasks. To ensure that this validation does
       # not fail with a valid config, only run these tasks when the
       # openondemand group both exists *and* contains hosts.
-      when: 
+      when:
         - "'openondemand' in groups"
         - groups['openondemand'] | length > 0
       tags:
@@ -77,7 +76,7 @@
   hosts: freeipa
   tags: freeipa
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: freeipa
         tasks_from: validate.yml
 
@@ -85,6 +84,6 @@
   hosts: lustre
   tags: lustre
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: lustre
         tasks_from: validate.yml

@@ -1,17 +1,14 @@
-rebuild
-=========
+# rebuild
 
-Enables reboot tool from https://github.com/stackhpc/slurm-openstack-tools.git
+Enables reboot tool from <https://github.com/stackhpc/slurm-openstack-tools.git>
 to be run from control node.
 
-Requirements
-------------
+## Requirements
 
 An OpenStack clouds.yaml file containing credentials for a cloud under the
 "openstack" key.
 
-Role Variables
---------------
+## Role Variables
 
 The below is only used by this role's `main.yml` task file, i.e. when running
 the `ansible/site.yml` or `ansible/slurm.yml` playbooks:

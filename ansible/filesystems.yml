@@ -1,11 +1,10 @@
 ---
-
 - name: Setup block devices
   hosts: block_devices
-  become: yes
+  become: true
   tags: block_devices
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: block_devices
 
 - name: Setup NFS
@@ -14,7 +13,7 @@
   tags:
     - nfs
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: stackhpc.nfs
 
 - name: Setup Manila share mounts
@@ -22,7 +21,7 @@
   become: true
   tags: manila
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: stackhpc.os-manila-mount
 
 - name: Setup Lustre clients
@@ -30,7 +29,7 @@
   become: true
   tags: lustre
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: lustre
         # NB install is ONLY run in builder
         tasks_from: configure.yml

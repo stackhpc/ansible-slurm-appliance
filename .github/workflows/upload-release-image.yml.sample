@@ -29,6 +29,12 @@ on:
           - openhpc-images
           # - openhpc-images-prerelease
 
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+
 jobs:
   image_upload:
     runs-on: ubuntu-22.04

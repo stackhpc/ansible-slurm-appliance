@@ -28,6 +28,13 @@ on:
   schedule:
     - cron: "0 9 * * *"
   workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+
 jobs:
   check_for_update:
     runs-on: ubuntu-22.04

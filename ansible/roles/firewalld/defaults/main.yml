@@ -1,3 +1,4 @@
-firewalld_enabled: yes
+---
+firewalld_enabled: true
 firewalld_state: started
 firewalld_configs: []

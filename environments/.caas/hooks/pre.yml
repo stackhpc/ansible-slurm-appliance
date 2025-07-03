@@ -1,8 +1,9 @@
 ---
-
 # Generate k3s token
 - name: Generate k3s token
-  # NB: Although this generates a new token on each run, the actual token set in metadata is retrieved from a set-once tofu resource, hence only the first value ever generated is relevant.
+  # NB: Although this generates a new token on each run, the actual token set in
+  #     metadata is retrieved from a set-once tofu resource, hence only the first
+  #     value ever generated is relevant.
   hosts: openstack
   tasks:
     - ansible.builtin.set_fact:
@@ -17,18 +18,18 @@
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
   hosts: control
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   roles:
     - persist_openhpc_secrets
 
 # validate.yml asserts presence of a control group which doesn't exist when
 # destroying infra, so only validate when we're not destroying
 - hosts: openstack
-  gather_facts: no
-  become: no
+  gather_facts: false
+  become: false
   tasks:
-    - set_fact:
+    - ansible.builtin.set_fact:
         appliances_validate: false
       when: "cluster_state | default('') == 'absent'"
 
@@ -40,21 +41,21 @@
   gather_facts: false
   tasks:
     - name: Set up Ansible user
-      user: "{{ (appliances_local_users_default | selectattr('user.name', 'eq', appliances_local_users_ansible_user_name))[0]['user'] }}"
-      become_method: "sudo"
+      ansible.builtin.user:
+        name: "{{ (appliances_local_users_default | selectattr('user.name', 'eq', appliances_local_users_ansible_user_name))[0]['user'] }}"
+      become_method: "ansible.builtin.sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
-      become_flags: '-i'
+      become_flags: "-i"
       become: true
 
 - hosts: cluster
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Reset persistent SSH connections
-      meta: reset_connection
-
+      ansible.builtin.meta: reset_connection
 - hosts: localhost
-  gather_facts: no
-  become: no
+  gather_facts: false
+  become: false
   tasks:
     - name: Add hosts to dnf_repos group to enable repofiles
       ansible.builtin.add_host:

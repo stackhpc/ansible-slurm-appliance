@@ -55,4 +55,3 @@ collections:
     version: 0.0.15
   - name: stackhpc.pulp
     version: 0.5.5
-...

@@ -1,20 +1,21 @@
 # ofed
 
 This role installs Mellanox OFED:
+
 - It checks that the running kernel is the latest installed one, and errors if not.
 - Installation uses the `mlnxofedinstall` command, with support for the running kernel
-and (by default) without firmware updates.
+  and (by default) without firmware updates.
 
 As OFED installation takes a long time generally this should only be used during image build,
 for example by setting:
 
-```
+```yaml
 environments/groups/<environment>/groups:
 [ofed:children]
 builder
 ```
 
-# Role variables
+## Role variables
 
 See `defaults/main.yml`
 

@@ -9,7 +9,7 @@
     - "item.state | default('present') == 'absent'"
 
 - name: Stop sssd if required
-  systemd:
+  ansible.builtin.systemd:
     name: sssd
     state: stopped
   register: _stop_sssd
@@ -18,11 +18,13 @@
     - basic_users_override_sssd | bool
 
 - name: Create groups
-  ansible.builtin.group: "{{ item }}"
-  loop:  "{{ basic_users_groups }}"
+  ansible.builtin.group:
+    name: "{{ item }}"
+  loop: "{{ basic_users_groups }}"
 
 - name: Create users
-  user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() | combine(_disable_homedir) }}"
+  ansible.builtin.user:
+    name: "{{ basic_users_userdefaults | combine(item) | filter_user_params() | combine(_disable_homedir) }}"
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
@@ -32,10 +34,11 @@
       generate_ssh_key: false
 
 - name: Write sudo rules
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/sudoers.d/80-{{ item.name }}-user
     block: "{{ item.sudo }}"
     create: true
+    mode: "0440"
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
@@ -44,10 +47,10 @@
     - "'sudo' in item"
 
 - name: Restart sssd if required
-  systemd:
+  ansible.builtin.systemd:
     name: sssd
     state: started
-  when: _stop_sssd is changed
+  when: _stop_sssd is changed # noqa: no-handler
 
 # This task runs only on the home directory server so it can handle
 # root-squashed exports
@@ -56,7 +59,7 @@
   ansible.builtin.copy:
     remote_src: true
     src: "{{ item.skeleton | default('/etc/skel/') }}"
-    dest: "{{ item.home | default( basic_users_homedir_server_path + '/' + item.name ) }}"
+    dest: "{{ item.home | default(basic_users_homedir_server_path + '/' + item.name) }}"
     owner: "{{ item.name }}"
     group: "{{ item.name }}"
     mode: u=rwX,go=
@@ -72,13 +75,13 @@
 # paths are easily constructed, becoming each user so that root-squash
 # doesn't matter
 - name: Create ~/.ssh directories
-  file:
+  ansible.builtin.file:
     state: directory
     path: ~/.ssh/
     owner: "{{ item.name }}"
     group: "{{ item.name }}"
     mode: u=rwX,go=
-  become_user: "{{ item.name }}"
+  # become_user: "{{ item.name }}" # Commenting out as become_user does not imply become: true
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
@@ -89,12 +92,12 @@
 
 - name: Generate cluster ssh key
   community.crypto.openssh_keypair:
-    path: "{{ item.ssh_key_file | default('~/.ssh/id_' + _ssh_key_type )}}" # NB: ssh_key_file is from ansible.builtin.user
+    path: "{{ item.ssh_key_file | default('~/.ssh/id_' + _ssh_key_type) }}" # NB: ssh_key_file is from ansible.builtin.user
     type: "{{ _ssh_key_type }}"
     comment: "{{ item.ssh_key_comment | default(item.name) }}"
   vars:
     _ssh_key_type: "{{ item.ssh_key_type | default('ed25519') }}"
-  become_user: "{{ item.name }}"
+  # become_user: "{{ item.name }}" # Commenting out as become_user does not imply become: true
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
@@ -111,7 +114,7 @@
     manage_dir: false
     key: "{{ item.public_key }}"
     path: ~/.ssh/authorized_keys
-  become_user: "{{ item.item.name }}"
+  # become_user: "{{ item.item.name }}" # Commenting out as become_user does not imply become: true
   loop: "{{ _cluster_ssh_keypair.results }}"
   loop_control:
     label: "{{ item.item.name }}"
@@ -128,7 +131,7 @@
     manage_dir: false
     key: "{{ item.public_key }}"
     path: ~/.ssh/authorized_keys
-  become_user: "{{ item.name }}"
+  # become_user: "{{ item.name }}" # Commenting out as become_user does not imply become: true
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"

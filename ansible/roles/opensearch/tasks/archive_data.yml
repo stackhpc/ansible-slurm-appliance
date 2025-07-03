@@ -1,8 +1,9 @@
+---
 # Remove data which was NOT indexed by Slurm Job ID
 # It will be re-ingested by filebeat from the slurmdbd, with that index
 
 - name: Ensure opensearch stopped
-  systemd:
+  ansible.builtin.systemd:
     name: opensearch
     state: stopped
   register: _opensearch_stop
@@ -15,3 +16,4 @@
     path: "{{ opensearch_data_path }}"
     dest: "{{ opensearch_data_path | dirname }}/data-{{ lookup('pipe', 'date --iso-8601=minutes') }}.tar.gz"
     remove: true
+    mode: "0644"

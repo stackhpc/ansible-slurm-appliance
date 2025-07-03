@@ -1,11 +1,12 @@
+---
 - hosts: openondemand
   tags:
     - openondemand
     - openondemand_server
-  become: yes
-  gather_facts: yes # TODO
+  become: true
+  gather_facts: true # TODO
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: main.yml
 
@@ -13,10 +14,10 @@
   tags:
     - openondemand
     - openondemand_desktop
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
 
@@ -24,9 +25,9 @@
   tags:
     - openondemand
     - openondemand_jupyter
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml

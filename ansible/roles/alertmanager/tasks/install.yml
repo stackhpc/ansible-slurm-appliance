@@ -1,3 +1,4 @@
+---
 - name: Create alertmanager system user
   ansible.builtin.user:
     name: "{{ alertmanager_system_user }}"
@@ -22,4 +23,6 @@
     group: root
     mode: u=rwx,go=rx
     remote_src: true
-    extra_opts: ['--strip-components=1', '--show-stored-names']
+    extra_opts:
+      - "--strip-components=1"
+      - "--show-stored-names"

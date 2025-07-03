@@ -1,6 +1,7 @@
 name: Build nightly image
 on:
   workflow_dispatch:
+      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
       inputs:
         ci_cloud:
           description: 'Select the CI_CLOUD'
@@ -12,6 +13,12 @@ on:
             - ARCUS
   # schedule:
   #   - cron: '0 0 * * *'  # Run at midnight on default branch
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
 
 jobs:
   openstack:
@@ -38,7 +45,7 @@ jobs:
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record settings for CI cloud
         run: |
@@ -80,8 +87,8 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
+          -on-error="${{ vars.PACKER_ON_ERROR }}" \
+          -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "image_name_version=" \
@@ -93,10 +100,10 @@ jobs:
         run: |
           . venv/bin/activate
           IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
-          while ! openstack image show -f value -c name $IMAGE_ID; do
+          while ! openstack image show -f value -c name "$IMAGE_ID"; do
             sleep 5
           done
-          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
 
@@ -141,7 +148,7 @@ jobs:
       SOURCE_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       TARGET_CLOUD: ${{ matrix.target_cloud }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record settings for CI cloud
         run: |
@@ -153,7 +160,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
 
       - name: Write clouds.yaml
         run: |

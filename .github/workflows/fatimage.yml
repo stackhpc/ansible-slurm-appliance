@@ -1,6 +1,7 @@
 name: Build fat image
 on:
   workflow_dispatch:
+      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
       inputs:
         ci_cloud:
           description: 'Select the CI_CLOUD'
@@ -15,6 +16,12 @@ on:
           type: boolean
           required: true
           default: true
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
 
 jobs:
   openstack:
@@ -41,7 +48,7 @@ jobs:
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record settings for CI cloud
         run: |
@@ -84,7 +91,7 @@ jobs:
 
           PACKER_LOG=1 packer build \
           -on-error=${{ github.event.inputs.cleanup_on_failure && 'cleanup' || 'abort' }} \
-          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
+          -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
@@ -95,14 +102,14 @@ jobs:
         run: |
           . venv/bin/activate
           IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
-          while ! openstack image show -f value -c name $IMAGE_ID; do
+          while ! openstack image show -f value -c name "$IMAGE_ID"; do
             sleep 5
           done
-          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
-          echo $IMAGE_ID > image-id.txt
-          echo $IMAGE_NAME > image-name.txt
+          echo "$IMAGE_ID" > image-id.txt
+          echo "$IMAGE_NAME" > image-name.txt
 
       - name: Make image usable for further builds
         run: |

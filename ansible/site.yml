@@ -1,5 +1,4 @@
 ---
-
 - name: Run pre.yml hook
   vars:
     # hostvars not available here, so have to recalculate environment root:
@@ -39,10 +38,8 @@
 
 - name: Clean up and shutdown Packer VM
   hosts: builder
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   tasks:
-    - import_tasks: cleanup.yml
+    - ansible.builtin.import_tasks: cleanup.yml
     - community.general.shutdown:
-
-...

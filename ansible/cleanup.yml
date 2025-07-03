@@ -1,16 +1,17 @@
+---
 # Clean up a Packer build VM
 
-- meta: flush_handlers
+- ansible.builtin.meta: flush_handlers
 
-- name: Remove dnf caches
-  command: dnf clean all
+- name: Remove dnf caches # noqa: no-changed-when
+  ansible.builtin.command: dnf clean all
 
 # If image build happens on a Neutron subnet with property dns_namservers defined, then cloud-init
 # disables NetworkManager's control of /etc/resolv.conf and appends nameservers itself.
 # We don't want network configuration during instance boot to depend on the configuration
 # of the network the builder was on, so we reset these aspects.
 - name: Delete /etc/resolv.conf
-  file:
+  ansible.builtin.file:
     path: /etc/resolv.conf
     state: absent
   when: "'resolv_conf' not in group_names" # if its been overriden, deleting it is the wrong thing to do
@@ -19,25 +20,25 @@
   # NB: This *doesn't* delete the 90-dns-none.conf file created by the resolv_conf role
   # as if nameservers are explicitly being set by that role we don't want to allow NM
   # to override it again.
-  file:
+  ansible.builtin.file:
     path: /etc/NetworkManager/conf.d/99-cloud-init.conf
     state: absent
 
 - name: Get remote environment for ansible_user
-  setup:
+  ansible.builtin.setup:
     gather_subset: env
-  become: no
+  become: false
 
 - name: Delete any injected ssh config for ansible_user
-  file:
+  ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.ssh/"
     state: absent
 
-- name: Run cloud-init cleanup
-  command: cloud-init clean --logs --seed
+- name: Run cloud-init cleanup # noqa: no-changed-when
+  ansible.builtin.command: cloud-init clean --logs --seed
 
-- name: Cleanup /tmp
-  command : rm -rf /tmp/*
+- name: Cleanup /tmp # noqa: no-changed-when
+  ansible.builtin.command: rm -rf /tmp/*
 
 - name: Delete files triggering vulnerability scans
   ansible.builtin.file:
@@ -54,10 +55,10 @@
     - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements.txt
 
 - name: Get package facts
-  package_facts:
+  ansible.builtin.package_facts:
 
 - name: Ensure image summary directory exists
-  file:
+  ansible.builtin.file:
     path: /var/lib/image/
     state: directory
     owner: root
@@ -65,9 +66,10 @@
     mode: u=rwX,go=rX
 
 - name: Write image summary
-  copy:
+  ansible.builtin.copy:
     content: "{{ image_info | to_nice_json }}"
     dest: /var/lib/image/image.json
+    mode: "0644"
   vars:
     image_info:
       branch: "{{ lookup('pipe', 'git rev-parse --abbrev-ref HEAD') }}"
@@ -76,8 +78,8 @@
       kernel: "{{ ansible_kernel }}"
       ofed: "{{ ansible_facts.packages['mlnx-ofa_kernel'].0.version | default('-') }}"
       doca: "{{ ansible_facts.packages[doca_profile | default('doca-ofed') ].0.version | default('-') }}"
-      cuda:  "{{ ansible_facts.packages['cuda'].0.version | default('-') }}"
+      cuda: "{{ ansible_facts.packages['cuda'].0.version | default('-') }}"
       slurm-ohpc: "{{ ansible_facts.packages['slurm-ohpc'].0.version | default('-') }}"
 
-- name: Show image summary
-  command: cat /var/lib/image/image.json
+- name: Show image summary # noqa: no-changed-when
+  ansible.builtin.command: cat /var/lib/image/image.json
