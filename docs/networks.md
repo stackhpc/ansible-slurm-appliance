@@ -6,9 +6,10 @@ subnets or associated infrastructure such as routers. The requirements are that:
 2. The first network defined spans all nodes, referred to as the "access network".
 3. Only one subnet per network is attached to nodes.
 4. At least one network on each node provides outbound internet access (either
-directly, or via a proxy).
+   directly, or via a proxy). In some cases this can be relaxed - see
+   [docs/experimental/isolated-clusters.md](./experimental/isolated-clusters.md).
 
-Addresses on the "access network" used as the `ansible_host` IPs.
+Addresses on the "access network" are used as the `ansible_host` IPs.
 
 It is recommended that the deploy host either has a direct connection to the
 "access network" or jumps through a host on it which is not part of the appliance.

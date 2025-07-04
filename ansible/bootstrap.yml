@@ -186,8 +186,9 @@
   become: yes
   tasks:
     - name: Install and configure tuneD
-      import_role:
+      include_role:
         name: tuned
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - hosts: freeipa_server
   # Done here as it might be providing DNS
@@ -217,31 +218,27 @@
   become: yes
   tags: firewalld
   tasks:
-    - import_role:
+    - include_role:
         name: firewalld
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - hosts: fail2ban
   gather_facts: false
   become: yes
   tags: fail2ban
   tasks:
-    - import_role:
+    - include_role:
         name: fail2ban
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup podman
   gather_facts: false
   hosts: podman
   tags: podman
   tasks:
-    - import_role:
+    - include_role:
         name: podman
-        tasks_from: prereqs.yml
-      tags: prereqs
-
-    - import_role:
-        name: podman
-        tasks_from: config.yml
-      tags: config
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - hosts: update
   gather_facts: false
@@ -317,8 +314,10 @@
   become: yes
   tags: linux_ansible_init
   tasks:
-    - include_role:
+    - name: Install ansible-init
+      include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
+      when: "appliances_mode == 'build'"
 
 - hosts: k3s:&builder
   become: yes

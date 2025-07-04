@@ -17,3 +17,14 @@
     - include_role:
         name: compute_init
         tasks_from: export.yml
+
+- hosts: proxy
+  gather_facts: false
+  tags: proxy
+  become: yes
+  tasks:
+    - include_role:
+        name: proxy
+      vars:
+        proxy_state: absent
+      when: proxy_remove | default(false) | bool == true
