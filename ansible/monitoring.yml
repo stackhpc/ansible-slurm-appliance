@@ -37,7 +37,7 @@
     - import_role:
         name: cloudalchemy.node_exporter
 
-- name: Deploy OpenOndemand exporter
+- name: Deploy Open OnDemand exporter
   hosts: openondemand
   become: true
   tags:

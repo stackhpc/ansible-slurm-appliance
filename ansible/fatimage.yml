@@ -120,7 +120,7 @@
       when: "'openhpc' in group_names"
 
     # - import_playbook: portal.yml
-    - name: Open Ondemand server (packages)
+    - name: Open OnDemand server (packages)
       include_role:
         name: osc.ood
         tasks_from: install-package.yml
@@ -128,20 +128,20 @@
       when: "'openondemand' in group_names"
     # # FUTURE: install-apps.yml - this is git clones
 
-    - name: Open Ondemand server (apps)
+    - name: Open OnDemand server (apps)
       include_role:
         name: osc.ood
         tasks_from: install-apps.yml
         vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
       when: "'openondemand' in group_names"
 
-    - name: Open Ondemand remote desktop
+    - name: Open OnDemand remote desktop
       import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
       when: "'openondemand_desktop' in group_names"
 
-    - name: Open Ondemand jupyter node
+    - name: Open OnDemand jupyter node
       import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
@@ -173,7 +173,7 @@
         name: cloudalchemy.node_exporter
       when: "'node_exporter' in group_names"
 
-    - name: openondemand exporter
+    - name: Open OnDemand Prometheus exporter
       dnf:
         name: ondemand_exporter
       when: "'openondemand' in group_names"
