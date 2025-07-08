@@ -6,10 +6,3 @@
 
 - meta: flush_handlers
 
-- name: Ensure slurm exporter state
-  systemd:
-    name: prometheus-slurm-exporter
-    state: "{{ slurm_exporter_state }}"
-    enabled: true
-  when:
-    - not ansible_check_mode

@@ -94,3 +94,5 @@ roles/*
 !roles/slurm_recompile/**
 !roles/nhc/
 !roles/nhc/**
+!roles/eessi/
+!roles/eessi/**

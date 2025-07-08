@@ -20,9 +20,10 @@
   become: yes
   tasks:
     - name: Install FreeIPA client
-      import_role:
+      include_role:
         name: freeipa
         tasks_from: client-install.yml
+      when: "appliances_mode != 'configure'"
     - name: Enrol FreeIPA client
       import_role:
         name: freeipa

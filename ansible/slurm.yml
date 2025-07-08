@@ -16,8 +16,9 @@
     - rebuild
     - openhpc
   tasks:
-    - import_role:
+    - include_role:
         name: rebuild
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Set locked memory limits on user-facing nodes
   hosts:
