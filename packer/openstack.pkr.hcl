@@ -102,6 +102,11 @@ variable "floating_ip_network" {
   default = null
 }
 
+variable "floating_ip" {
+  type = string
+  default = null
+}
+
 variable "manifest_output_path" {
   type = string
   default = "packer-manifest.json"
@@ -162,6 +167,7 @@ source "openstack" "openhpc" {
   }
   networks = var.networks
   floating_ip_network = var.floating_ip_network
+  floating_ip = var.floating_ip
   security_groups = var.security_groups
   
   # Input image:
