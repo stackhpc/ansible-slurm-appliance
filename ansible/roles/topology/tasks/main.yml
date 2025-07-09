@@ -1,0 +1,16 @@
+- name: Map instances to hosts
+  become: false
+  map_hosts:
+    compute_vms: "{{ groups['compute'] }}"
+  register: _topology
+  delegate_to: localhost
+  run_once: true
+
+- name: Template topology.conf
+  become: true
+  ansible.builtin.template:
+    src: templates/topology.conf.j2
+    dest: /etc/slurm/topology.conf
+    owner: root
+    group: root
+    mode: 0644

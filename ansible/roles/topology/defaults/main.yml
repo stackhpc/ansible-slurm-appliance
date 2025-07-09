@@ -1,0 +1,2 @@
+# If set to non-empty string, will override topology.conf file auto-detected from OpenStack project
+topology_topology_override: ""
