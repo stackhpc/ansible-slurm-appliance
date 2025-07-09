@@ -48,8 +48,14 @@ and referenced from the `site` and `production` environments, e.g.:
 
     ```
     ...
+    variable "environment_root" {
+      type = string
+      description = "Path to environment root, automatically set by activate script"
+    }
+
     module "cluster" {
         source = "../../site/tofu/"
+        environment_root = var.environment_root
 
         cluster_name = "foo"
         ...
