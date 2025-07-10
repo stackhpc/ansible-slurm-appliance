@@ -145,7 +145,7 @@ variable "additional_nodegroups" {
         Keys are names of groups.
         Values are a mapping as for the "login" variable, with the addition of
         the optional entry:
-        
+
             security_group_ids: List of strings giving IDs of security groups
                                 to apply. If not specified the groups from the
                                 variable nonlogin_security_groups are applied.
