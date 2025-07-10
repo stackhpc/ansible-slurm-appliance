@@ -35,6 +35,12 @@ login:
         ${cluster_name}_${group_name}:
 %{ endfor ~}
 
+%{ for group_name in keys(login_groups) ~}
+${group_name}:
+    children:
+        ${cluster_name}_${group_name}
+%{ endfor ~}
+
 # --- compute nodes ---
 %{ for group_name in keys(compute_groups) ~}
 ${cluster_name}_${group_name}:
