@@ -104,6 +104,7 @@ variable "floating_ip_network" {
 
 variable "floating_ip" {
   type = string
+  description = "ID of pre-existing FIP to attach. Note floating_ip_network is not required when using this"
   default = null
 }
 
