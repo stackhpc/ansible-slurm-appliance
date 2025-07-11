@@ -259,6 +259,7 @@ variable "login_security_groups" {
     default = [
         "default",  # allow all in-cluster services
         "SSH",      # access via ssh
+        "HTTP",     # HTTP-01 challenge and redirect to HTTPS
         "HTTPS",    # access OpenOndemand
     ]
 }
