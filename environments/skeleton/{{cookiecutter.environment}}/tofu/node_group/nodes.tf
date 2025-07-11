@@ -186,6 +186,10 @@ output "compute_instances" {
   value = local.compute_instances
 }
 
+output "is_baremetal" {
+  value = var.match_ironic_node
+}
+
 output "image_id" {
   value = var.image_id
 }

@@ -4,6 +4,7 @@ all:
         cluster_domain_suffix: ${cluster_domain_suffix}
         cluster_home_volume: ${cluster_home_volume}
         cluster_compute_groups: ${jsonencode(keys(compute_groups))}
+        topology_baremetal_instances: ${jsonencode(baremetal_compute_instances)}
 
 control:
     hosts:
