@@ -1,9 +1,10 @@
 - name: Validate http_proxy definition
   ansible.builtin.assert:
-    that: proxy_http_proxy != '' # this is default if squid not active
+    that: proxy_http_proxy != ''
     fail_msg: >-
       Variable proxy_http_proxy cannot be the empty string for hosts in the
-      proxy group. See environment/common/inventory/group_vars/all/proxy.yml.
+      proxy group. See environments/common/inventory/group_vars/all/proxy.yml
+      for convenience variables to set this.
 - name: Define configuration in /etc/environment
   tags: proxy
   lineinfile:
