@@ -135,3 +135,6 @@ builder
 [nhc:children]
 # Hosts to configure for node health checks
 compute
+
+[topology:children]
+compute

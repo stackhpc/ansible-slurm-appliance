@@ -1,7 +1,7 @@
 - name: Map instances to hosts
   become: false
   map_hosts:
-    compute_vms: "{{ groups['compute'] }}"
+    compute_vms: "{{ topology_topology_nodes }}"
   register: _topology
   delegate_to: localhost
   run_once: true
