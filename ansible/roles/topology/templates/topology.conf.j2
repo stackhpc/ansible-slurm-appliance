@@ -1,6 +1,6 @@
 # topology.conf
 # Switch Configuration
-{% if topology_topology_override != '' %}
+{% if topology_topology_override is defined %}
 {{ topology_topology_override }}
 {% else %}
 {% for az in _topology.topology.keys() %}
