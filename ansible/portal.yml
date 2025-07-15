@@ -36,3 +36,15 @@
         name: openondemand
         tasks_from: jupyter_compute.yml
       when: appliances_mode != 'configure' # is run during build
+
+- hosts: openondemand_rstudio
+  tags:
+    - openondemand
+    - openondemand_rstudio
+  become: yes
+  gather_facts: yes
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: rstudio_compute.yml
+      when: appliances_mode != 'configure' # is run during build

@@ -1,0 +1,4 @@
+# Should be run on compute nodes you want to run RStudio on
+# See https://osc.github.io/ood-documentation/latest/tutorials/tutorials-interactive-apps/add-rstudio.html
+# - Will already have lmod
+

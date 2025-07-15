@@ -55,6 +55,10 @@ compute
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
 compute
 
+[openondemand_rstudio:children]
+# Subset of compute to run RStudio servers on via Open Ondemand
+compute
+
 [etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
 cluster

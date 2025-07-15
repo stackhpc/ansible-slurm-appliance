@@ -14,6 +14,7 @@ openondemand_auth: basic_pam
 
 openondemand_jupyter_partition: "{{ openhpc_partitions[0]['name'] }}"
 openondemand_desktop_partition: "{{ openhpc_partitions[0]['name'] }}"
+openondemand_rstudio_partition: "{{ openhpc_partitions[0]['name'] }}"
 
 # Regex defining hosts which openondemand can proxy; the default regex is compute nodes (for apps) and grafana host,
 # e.g. if the group `compute` has hosts `compute-{0,1,2,..}` this will be '(compute-\d+)|(control)'.
@@ -47,8 +48,6 @@ openondemand_clusters:
         basic:
           script_wrapper: |
             module purge
-            export PATH=/opt/jupyter-py39/bin/:$PATH
-            %s
           set_host: host=$(hostname -s)
         vnc:
           script_wrapper: |
@@ -87,7 +86,10 @@ openondemand_install_apps_default:
   jupyter:
     repo: https://github.com/OSC/bc_example_jupyter.git
     version: master                # defaults (optional)
-openondemand_install_apps_extra: {} # mapping, values as for ansible.builtin.git: repo (required)/dest/version(default main)/umask
+openondemand_install_apps_extra:  # mapping, values as for ansible.builtin.git: repo (required)/dest/version(default main)/umask
+  rstudio:
+    repo: https://github.com/stackhpc/ood-stackhpc-rstudio.git
+    version: main
 # osc:ood role var (NB only active when not in configure):
 ood_install_apps: "{{ openondemand_install_apps_default if openondemand_jupyter_partition | default(none) else {} | combine(openondemand_install_apps_extra) }}"
 
@@ -151,6 +153,10 @@ openondemand_apps_jupyter_default:
     ---
     batch_connect:
       template: "basic"
+      script_wrapper: |
+        module purge
+        export PATH=/opt/jupyter-py39/bin/:$PATH
+        %s
     script:
       job_name: "ood-jupyter"
       native:
@@ -158,6 +164,47 @@ openondemand_apps_jupyter_default:
         - <%= "--ntasks=#{num_cores}" %>
         - <%= "--nodelist=#{node}" %>
 openondemand_apps_jupyter: "{{ {'jupyter':openondemand_apps_jupyter_default} if openondemand_jupyter_partition | default(none) else {} }}"
+
+openondemand_apps_rstudio_default:
+  title: RStudio
+  description: Request a RStudio server
+  cluster: slurm
+  form:
+    - bc_queue
+    - rstudio_module
+    - bc_num_hours
+    - num_cores
+    - node
+  attributes:
+    num_cores:
+      label: Number of cores FOO
+      value: 1
+    bc_queue:
+      value: "{{ openondemand_rstudio_partition | default(none) }}"
+    node: ""
+    rstudio_module:
+      label: RStudio module
+      required: true
+      cachable: true
+      help: Choose your RStudio module - 2023.09 is only for el8 partitions
+      widget: select
+      options:
+        - ["RStudio-Server/2022.07.2+576-foss-2022a-Java-11-R-4.2.1", "RStudio-Server/2022.07.2+576-foss-2022a-Java-11-R-4.2.1"]
+        - ["RStudio-Server/1.4.1717-foss-2021a-Java-11-R-4.1.0", "RStudio-Server/1.4.1717-foss-2021a-Java-11-R-4.1.0"]
+        - ["RStudio-Server/2023.09.1+494-foss-2023a-Java-11-R-4.3.2", "RStudio-Server/2023.09.1+494-foss-2023a-Java-11-R-4.3.2"]
+  submit: |
+    ---
+    batch_connect:
+      template: "basic"
+      conn_params:
+        - csrf_token
+    script:
+      job_name: "ood-rstudio"
+      native:
+        - <%= "--nodes=1" %>
+        - <%= "--ntasks=#{num_cores}" %>
+        - <%= "--nodelist=#{node}" %>
+openondemand_apps_rstudio: "{{ {'rstudio':openondemand_apps_rstudio_default} if openondemand_rstudio_partition | default(none) else {} }}"
 
 # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
 openondemand_dashboard_support_url: ''
