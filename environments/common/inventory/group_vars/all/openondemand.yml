@@ -82,16 +82,21 @@ openondemand_clusters_grafana:
       jobid: "jobid"
 
 # define installation of openondemand apps (see openondemand_apps_* below for configuration):
-openondemand_install_apps_default:
+openondemand_install_app_jupyter:
   jupyter:
     repo: https://github.com/OSC/bc_example_jupyter.git
     version: master                # defaults (optional)
-openondemand_install_apps_extra:  # mapping, values as for ansible.builtin.git: repo (required)/dest/version(default main)/umask
+openondemand_install_app_rstudio:  # mapping, values as for ansible.builtin.git: repo (required)/dest/version(default main)/umask
   rstudio:
     repo: https://github.com/stackhpc/ood-stackhpc-rstudio.git
     version: main
 # osc:ood role var (NB only active when not in configure):
-ood_install_apps: "{{ openondemand_install_apps_default if openondemand_jupyter_partition | default(none) else {} | combine(openondemand_install_apps_extra) }}"
+ood_install_apps: >-
+  {{
+    {}
+    | combine(openondemand_install_app_jupyter if openondemand_jupyter_partition else {})
+    | combine(openondemand_install_app_rstudio if openondemand_rstudio_partition else {})
+  }}
 
 # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
 # also https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
@@ -225,7 +230,7 @@ openondemand_apps:
       ood_brand_bg_color: "#0e6ec8"
       ood_dashboard_title: "{{ openhpc_cluster_name }}"
 
-ood_apps: "{{ openondemand_apps | combine(openondemand_apps_jupyter) | combine(openondemand_apps_desktop) }}"
+ood_apps: "{{ openondemand_apps | combine(openondemand_apps_jupyter) | combine(openondemand_apps_desktop) | combine(openondemand_apps_rstudio) }}"
 
 # Prometheus config for Open Ondemand exporter
 # https://osc.github.io/ood-documentation/latest/monitoring/prometheus.html#prometheus-configuration
