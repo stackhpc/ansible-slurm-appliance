@@ -2,30 +2,26 @@
 # See https://osc.github.io/ood-documentation/latest/tutorials/tutorials-interactive-apps/add-rstudio.html
 # - Will already have lmod
 
-- name: Install R and RStudio Server on RHEL-based system
-  hosts: all
-  become: true
-  tasks:
-    - name: Install EPEL and dependencies
-      ansible.builtin.yum:
-        name:
-          - epel-release
-          - R
-        state: present
+- name: Install EPEL and dependencies
+  ansible.builtin.yum:
+    name:
+      - epel-release
+      - R
+    state: present
 
-    - name: Download RStudio Server RPM
-      ansible.builtin.get_url:
-        url: https://download2.rstudio.org/server/centos8/x86_64/rstudio-server-rhel-2023.12.1-402-x86_64.rpm
-        dest: /tmp/rstudio-server.rpm
-        mode: '0644'
+- name: Download RStudio Server RPM
+  ansible.builtin.get_url:
+    url: https://download2.rstudio.org/server/centos8/x86_64/rstudio-server-rhel-2023.12.1-402-x86_64.rpm
+    dest: /tmp/rstudio-server.rpm
+    mode: '0644'
 
-    - name: Install RStudio Server
-      ansible.builtin.yum:
-        name: /tmp/rstudio-server.rpm
-        state: present
+- name: Install RStudio Server
+  ansible.builtin.yum:
+    name: /tmp/rstudio-server.rpm
+    state: present
 
-    - name: Ensure rstudio-server service is enabled and stopped (used only in OOD job)
-      ansible.builtin.service:
-        name: rstudio-server
-        enabled: false
-        state: stopped
+- name: Ensure rstudio-server service is disabled and stopped
+  ansible.builtin.service:
+    name: rstudio-server
+    enabled: false
+    state: stopped
