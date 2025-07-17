@@ -15,6 +15,7 @@ openondemand_auth: basic_pam
 openondemand_jupyter_partition: "{{ openhpc_partitions[0]['name'] }}"
 openondemand_desktop_partition: "{{ openhpc_partitions[0]['name'] }}"
 openondemand_rstudio_partition: "{{ openhpc_partitions[0]['name'] }}"
+openondemand_matlab_partition: "{{ openhpc_partitions[0]['name'] }}"
 
 # Regex defining hosts which openondemand can proxy; the default regex is compute nodes (for apps) and grafana host,
 # e.g. if the group `compute` has hosts `compute-{0,1,2,..}` this will be '(compute-\d+)|(control)'.
@@ -90,12 +91,17 @@ openondemand_install_app_rstudio:  # mapping, values as for ansible.builtin.git:
   rstudio:
     repo: https://github.com/stackhpc/ood-stackhpc-rstudio.git
     version: main
+openondemand_install_app_matlab:
+  matlab:
+    repo: https://github.com/stackhpc/ood-stackhpc-matlab.git
+    version: main
 # osc:ood role var (NB only active when not in configure):
 ood_install_apps: >-
   {{
     {}
     | combine(openondemand_install_app_jupyter if openondemand_jupyter_partition else {})
     | combine(openondemand_install_app_rstudio if openondemand_rstudio_partition else {})
+    | combine(openondemand_install_app_matlab if openondemand_matlab_partition else {})
   }}
 
 # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
@@ -211,6 +217,39 @@ openondemand_apps_rstudio_default:
         - <%= "--nodelist=#{node}" %>
 openondemand_apps_rstudio: "{{ {'rstudio':openondemand_apps_rstudio_default} if openondemand_rstudio_partition | default(none) else {} }}"
 
+openondemand_apps_matlab_default:
+  title: MATLAB
+  description: Request a desktop to run MATLAB.
+  cluster: slurm
+  form:
+    - desktop
+    - bc_queue
+    - bc_num_hours
+    - num_cores
+    - node
+  attributes:
+    desktop: xfce
+    # bc_account: # i.e. slurm account
+    #   value: root
+    bc_queue:
+      value: "{{ openondemand_matlab_partition | default(none) }}"
+    num_cores:
+      label: Number of cores
+      value: 1
+    node:
+      label: Node name
+      help: Select a particular node or leave empty to let Slurm pick the next available
+      value: ""
+  submit: |
+    ---
+    script:
+      job_name: "ood-matlab"
+      native:
+        - <%= "--nodes=1" %>
+        - <%= "--ntasks=#{num_cores}" %>
+        - <%= "--nodelist=#{node}" %>
+openondemand_apps_matlab: "{{ {'matlab':openondemand_apps_matlab_default} if openondemand_matlab_partition | default(none) else {} }}"
+
 # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps
 openondemand_dashboard_support_url: ''
 openondemand_dashboard_docs_url: ''
@@ -230,7 +269,7 @@ openondemand_apps:
       ood_brand_bg_color: "#0e6ec8"
       ood_dashboard_title: "{{ openhpc_cluster_name }}"
 
-ood_apps: "{{ openondemand_apps | combine(openondemand_apps_jupyter) | combine(openondemand_apps_desktop) | combine(openondemand_apps_rstudio) }}"
+ood_apps: "{{ openondemand_apps | combine(openondemand_apps_jupyter) | combine(openondemand_apps_desktop) | combine(openondemand_apps_rstudio) | combine(openondemand_apps_matlab) }}"
 
 # Prometheus config for Open Ondemand exporter
 # https://osc.github.io/ood-documentation/latest/monitoring/prometheus.html#prometheus-configuration

@@ -25,6 +25,7 @@ openondemand_filesapp_paths: []
 openondemand_jupyter_partition: ''
 openondemand_dashboard_links: []
 openondemand_rstudio_partition: ''
+openondemand_matlab_partition: ''
 
 # Monitoring:
 openondemand_exporter: true

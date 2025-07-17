@@ -48,3 +48,15 @@
         name: openondemand
         tasks_from: rstudio_compute.yml
       when: appliances_mode != 'configure' # is run during build
+
+- hosts: openondemand_matlab
+  tags:
+    - openondemand
+    - openondemand_matlab
+  become: yes
+  gather_facts: yes
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: vnc_compute.yml
+      when: appliances_mode != 'configure' # is run during build
