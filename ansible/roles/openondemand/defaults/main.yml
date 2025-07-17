@@ -24,6 +24,9 @@ openondemand_desktop_screensaver: false
 openondemand_filesapp_paths: []
 openondemand_jupyter_partition: ''
 openondemand_dashboard_links: []
+openondemand_rstudio_partition: ''
+openondemand_matlab_partition: ''
+openondemand_codeserver_partition: ''
 
 # Monitoring:
 openondemand_exporter: true
