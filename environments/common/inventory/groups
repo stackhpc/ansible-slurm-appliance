@@ -94,6 +94,9 @@ fail2ban
 [openondemand_matlab]
 # Subset of compute to run RStudio servers on via Open Ondemand
 
+[openondemand_codeserver]
+# Subset of compute to run a Codeserver VSCode instance on via Open Ondemand
+
 [etc_hosts]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
 

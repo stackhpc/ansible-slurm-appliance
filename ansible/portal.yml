@@ -60,3 +60,15 @@
         name: openondemand
         tasks_from: vnc_compute.yml
       when: appliances_mode != 'configure' # is run during build
+
+- hosts: openondemand_codeserver
+  tags:
+    - openondemand
+    - openondemand_codeserver
+  become: yes
+  gather_facts: yes
+  tasks:
+    - import_role:
+        name: openondemand
+        tasks_from: codeserver_compute.yml
+      when: appliances_mode != 'configure' # is run during build
