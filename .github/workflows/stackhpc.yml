@@ -1,29 +1,7 @@
-
+---
 name: Test deployment and reimage on OpenStack
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - '**'
-      - '!dev/**'
-      - 'dev/setup-env.sh'
-      - '!docs/**'
-      - '!README.md'
-      - '!.gitignore'
-      - '!.github/workflows/'
-      - '.github/workflows/stackhpc'
-  pull_request:
-    paths:
-      - '**'
-      - '!dev/**'
-      - 'dev/setup-env.sh'
-      - '!docs/**'
-      - '!README.md'
-      - '!.gitignore'
-      - '!.github/workflows/'
-      - '.github/workflows/stackhpc'
 
 permissions:
   contents: read
