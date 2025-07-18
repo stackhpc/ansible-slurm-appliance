@@ -68,7 +68,10 @@ jobs:
         !fromJSON(needs.files_changed.outputs.paths_result).extra.should_skip
     #uses: ./.github/workflows/extra.yml
     steps: # TEST
-      - run: echo "Running: Test extra build..." && sleep 30 # TEST
+      - name: Test extra build...
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '120s'
     runs-on: ubuntu-latest # TEST
     #secrets: inherit
 
@@ -79,7 +82,10 @@ jobs:
         !fromJSON(needs.files_changed.outputs.paths_result).stackhpc.should_skip
     #uses: ./.github/workflows/stackhpc.yml
     steps: # TEST
-      - run: echo "Running: Test deployment and reimage on OpenStack..." && sleep 30 # TEST
+      - name: Test deployment and reimage on OpenStack...
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '120s'
     runs-on: ubuntu-latest # TEST
     #secrets: inherit
 
@@ -91,6 +97,9 @@ jobs:
         !fromJSON(needs.files_changed.outputs.paths_result).trivvyscan.should_skip
     #uses: ./.github/workflows/trivvyscan.yml
     steps: # TEST
-      - run: echo "Running: Trivy scan image for vulnerabilities..." && sleep 30 # TEST
+      - name: Trivy scan image for vulnerabilities...
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '120s'
     runs-on: ubuntu-latest # TEST
     #secrets: inherit
