@@ -23,16 +23,17 @@ jobs:
           - image_name: openhpc-extra-RL8
             source_image_name_key: RL8 # key into environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
             inventory_groups: doca,cuda,lustre
-            volume_size: 30 # needed for cuda
+            volume_size: 35 # needed for cuda
           - image_name: openhpc-extra-RL9
             source_image_name_key: RL9
             inventory_groups: doca,cuda,lustre
-            volume_size: 30 # needed for cuda
+            volume_size: 35 # needed for cuda
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
+      PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +86,7 @@ jobs:
           . environments/.stackhpc/activate
           cd packer/
           packer init .
-          
+
           PACKER_LOG=1 packer build \
           -on-error=${{ vars.PACKER_ON_ERROR }} \
           -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
@@ -94,7 +95,7 @@ jobs:
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           -var "volume_size=${{ matrix.build.volume_size }}" \
           openstack.pkr.hcl
-        
+
       - name: Get created image names from manifest
         id: manifest
         run: |

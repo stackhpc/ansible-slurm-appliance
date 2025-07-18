@@ -73,12 +73,12 @@
   vars:
     image_info:
       branch: "{{ lookup('pipe', 'git rev-parse --abbrev-ref HEAD') }}"
-      build: "{{  ansible_nodename | split('.') | first }}" # hostname is image name, which contains build info
+      build: "{{ ansible_nodename | split('.') | first }}" # hostname is image name, which contains build info
       os: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
       kernel: "{{ ansible_kernel }}"
       ofed: "{{ ansible_facts.packages['mlnx-ofa_kernel'].0.version | default('-') }}"
       doca: "{{ ansible_facts.packages[doca_profile | default('doca-ofed') ].0.version | default('-') }}"
-      cuda: "{{ ansible_facts.packages['cuda'].0.version | default('-') }}"
+      cuda: "{{ ansible_facts.packages['cuda-toolkit'].0.version | default('-') }}"
       slurm-ohpc: "{{ ansible_facts.packages['slurm-ohpc'].0.version | default('-') }}"
 
 - name: Show image summary # noqa: no-changed-when

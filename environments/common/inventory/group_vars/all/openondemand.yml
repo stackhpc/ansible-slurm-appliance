@@ -82,11 +82,14 @@ openondemand_clusters_grafana:
       host: "host"
       jobid: "jobid"
 
-ood_install_apps_defaults:
+# define installation of openondemand apps (see openondemand_apps_* below for configuration):
+openondemand_install_apps_default:
   jupyter:
     repo: https://github.com/OSC/bc_example_jupyter.git
     version: master # defaults (optional)
-ood_install_apps: "{{ ood_install_apps_defaults if openondemand_jupyter_partition | default(none) else {} }}"
+openondemand_install_apps_extra: {} # mapping, values as for ansible.builtin.git: repo (required)/dest/version(default main)/umask
+# osc:ood role var (NB only active when not in configure):
+ood_install_apps: "{{ openondemand_install_apps_default if openondemand_jupyter_partition | default(none) else {} | combine(openondemand_install_apps_extra) }}"
 
 # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
 # also https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission

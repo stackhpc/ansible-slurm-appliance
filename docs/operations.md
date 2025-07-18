@@ -81,6 +81,7 @@ By default, the following utility packages are installed during the StackHPC ima
 - postfix
 - Git
 - latest python version for system (3.6 for for Rocky 8.9 and 3.12 for Rocky 9.4)
+- s-nail
 
 Additional packages can be added during image builds by:
 

@@ -1,20 +1,4 @@
 ---
-- name: Create /etc/openstack
-  ansible.builtin.file:
-    path: /etc/openstack
-    state: directory
-    owner: slurm
-    group: root
-    mode: u=rX,g=rwX
 
-- name: Copy out clouds.yaml
-  ansible.builtin.copy:
-    src: "{{ rebuild_clouds_path }}"
-    dest: /etc/openstack/clouds.yaml
-    owner: slurm
-    group: root
-    mode: u=r,g=rw
-
-- name: Setup slurm tools
-  ansible.builtin.include_role:
-    name: slurm_tools
+- ansible.builtin.include_tasks: install.yml
+- ansible.builtin.include_tasks: configure.yml

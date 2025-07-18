@@ -18,6 +18,8 @@
     enable_basic_users: "{{ os_metadata.meta.basic_users | default(false) | bool }}"
     enable_eessi: "{{ os_metadata.meta.eessi | default(false) | bool }}"
     enable_chrony: "{{ os_metadata.meta.chrony | default(false) | bool }}"
+    enable_vgpu: "{{ os_metadata.meta.vpgu | default(false) | bool }}"
+    enable_nhc: "{{ os_metadata.meta.nhc | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
@@ -66,7 +68,7 @@
         src: "{{ server_node_ip }}:/exports/cluster"
         fstype: nfs
         opts: ro,sync
-        state: mounted
+        state: ephemeral # will be unmounted after sync, don't want it in fstab
       register: _mount_mnt_cluster
       ignore_errors: true
       # exits from playbook if this failed below, allowing ansible-init to
@@ -295,6 +297,16 @@
         - name: Ensure CVMFS config is setup # noqa: no-changed-when
           ansible.builtin.command:
             cmd: "cvmfs_config setup"
+      when: enable_eessi
+
+    - name: Configure VGPUs
+      ansible.builtin.include_role:
+        name: stackhpc.linux.vgpu
+        tasks_from: 'configure.yml'
+      when: enable_vgpu
+
+    # NB: don't need conditional block on enable_compute as have already exited
+    # if not the case
     - name: Write Munge key
       ansible.builtin.copy:
         # NB: openhpc_munge_key is *binary* and may not survive json encoding
@@ -348,7 +360,13 @@
         enabled: true
         state: started
 
-    - name: Ensure node is resumed # noqa: no-changed-when
+    - name: Provide NHC configuration
+      ansible.builtin.include_role:
+        name: nhc
+        tasks_from: boot.yml
+      when: enable_nhc
+
+    - name: Ensure node is resumed
       # TODO: consider if this is always safe for all job states?
       ansible.builtin.command: scontrol update state=resume nodename={{ ansible_hostname }}
       register: _scontrol_update

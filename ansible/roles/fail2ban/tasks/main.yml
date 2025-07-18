@@ -1,26 +1,4 @@
 ---
-- name: Install EPEL repo
-  ansible.builtin.package:
-    name: epel-release
 
-- name: Install fail2ban packages
-  ansible.builtin.package:
-    name:
-      - fail2ban-server
-      - fail2ban-firewalld
-    state: present
-
-- name: Create config
-  ansible.builtin.template:
-    dest: /etc/fail2ban/jail.local
-    src: jail.local.j2
-    mode: "0644"
-  notify: Restart fail2ban
-
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
-- name: Ensure fail2ban running even if no config change
-  ansible.builtin.service:
-    name: fail2ban
-    state: started
-    enabled: true
+- ansible.builtin.import_tasks: install.yml
+- ansible.builtin.import_tasks: configure.yml

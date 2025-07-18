@@ -7,11 +7,4 @@
     disable_gpg_check: true
   notify: Restart slurm exporter
 
-- ansible.builtin.meta: flush_handlers
-- name: Ensure slurm exporter state
-  ansible.builtin.systemd:
-    name: prometheus-slurm-exporter
-    state: "{{ slurm_exporter_state }}"
-    enabled: true
-  when:
-    - not ansible_check_mode
+- meta: flush_handlers

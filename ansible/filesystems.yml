@@ -23,6 +23,8 @@
   tasks:
     - ansible.builtin.include_role:
         name: stackhpc.os-manila-mount
+        tasks_from: "{{ item }}"
+      loop: "{{ ['lookup.yml', 'mount.yml'] if appliances_mode == 'configure' else ['main.yml'] }}"
 
 - name: Setup Lustre clients
   hosts: lustre

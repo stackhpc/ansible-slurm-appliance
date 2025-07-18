@@ -52,6 +52,8 @@
       dest: roles/
     - src: ../../lustre
       dest: roles/
+    - src: ../../nhc
+      dest: roles/
 
 - name: Add filter_plugins to ansible.cfg
   ansible.builtin.lineinfile:

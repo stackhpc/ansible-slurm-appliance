@@ -50,8 +50,15 @@ production-ready deployments.
 
 ```text
 ...
+variable "environment_root" {
+  type = string
+  description = "Path to environment root, automatically set by activate script"
+}
+
 module "cluster" {
     source = "../../site/tofu/"
+    environment_root = var.environment_root
+
     cluster_name = "foo"
     ...
 }
@@ -128,22 +135,14 @@ This leaves the volume itself intact, but means OpenTofu "forgets" it. Then
 set the "attach" options and run `tofu apply` again - this should show there
 are no changes planned.
 
-- Enable `etc_hosts` templating:
-
-```yaml
-# environments/site/inventory/groups:
-[etc_hosts:children]
-cluster
-```
-
 - Configure Open OnDemand - see [specific documentation](openondemand.md).
 
 - Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
 
 - Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
-- If floating IPs are required for login nodes, modify the OpenTofu configurations
-  appropriately.
+- If floating IPs are required for login nodes, create these in OpenStack and add the IPs into
+  the OpenTofu `login` definition.
 
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
@@ -176,3 +175,5 @@ against the (un-overridable) internal OpenTofu timeout of 30 minutes
   is properly tuned, again, demonstrated through testing.
 
 - Enable alertmanager if Slack is available - see [docs/alerting.md](./alerting.md).
+
+- Enable node health checks - see [ansible/roles/nhc/README.md](../ansible/roles/nhc/README.md).

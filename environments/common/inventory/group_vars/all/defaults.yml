@@ -94,6 +94,7 @@ appliances_extra_packages_default:
   - postfix
   - git
   - "{{ 'python36' if ansible_distribution_version == '8.9' else 'python312' }}"
+  - s-nail
 
 appliances_extra_packages_other: []
 appliances_extra_packages: "{{ (appliances_extra_packages_default + appliances_extra_packages_other) | select | list }}"

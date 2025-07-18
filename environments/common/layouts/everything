@@ -22,6 +22,9 @@ control
 [slurm_stats:children]
 control
 
+[slurm_exporter:children]
+control
+
 [filebeat:children]
 slurm_stats
 
@@ -55,6 +58,9 @@ compute
 [etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
 cluster
+
+[freeipa_client]
+# Hosts to be a FreeIPA client. See ansible/roles/freeipa/README.md
 
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
@@ -125,3 +131,7 @@ builder
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
 builder
+
+[nhc:children]
+# Hosts to configure for node health checks
+compute

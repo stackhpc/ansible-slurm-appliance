@@ -135,6 +135,7 @@
 
 - hosts: dnf_repos
   become: true
+  tags: dnf_repos
   tasks:
     - name: Check that creds won't be leaked to users
       ansible.builtin.assert:
@@ -186,8 +187,9 @@
   become: true
   tasks:
     - name: Install and configure tuneD
-      ansible.builtin.import_role:
+      ansible.builtin.include_role:
         name: tuned
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - hosts: freeipa_server
   # Done here as it might be providing DNS
@@ -217,31 +219,27 @@
   become: true
   tags: firewalld
   tasks:
-    - ansible.builtin.import_role:
+    - ansible.builtin.include_role:
         name: firewalld
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - hosts: fail2ban
   gather_facts: false
   become: true
   tags: fail2ban
   tasks:
-    - ansible.builtin.import_role:
+    - ansible.builtin.include_role:
         name: fail2ban
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup podman
   gather_facts: false
   hosts: podman
   tags: podman
   tasks:
-    - ansible.builtin.import_role:
+    - ansible.builtin.include_role:
         name: podman
-        tasks_from: prereqs.yml
-      tags: prereqs
-
-    - ansible.builtin.import_role:
-        name: podman
-        tasks_from: config.yml
-      tags: config
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - hosts: update
   gather_facts: false
@@ -319,8 +317,10 @@
   become: true
   tags: linux_ansible_init
   tasks:
-    - ansible.builtin.include_role:
+    - name: Install ansible-init
+      ansible.builtin.include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
+      when: "appliances_mode == 'build'"
 
 - hosts: k3s:&builder
   become: true

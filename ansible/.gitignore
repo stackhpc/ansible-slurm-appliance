@@ -90,3 +90,9 @@ roles/*
 !roles/gateway/**
 !roles/alertmanager/
 !roles/alertmanager/**
+!roles/slurm_recompile/
+!roles/slurm_recompile/**
+!roles/nhc/
+!roles/nhc/**
+!roles/eessi/
+!roles/eessi/**

@@ -112,6 +112,9 @@ freeipa_client
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
+[vgpu]
+# Hosts where vGPU/MIG should be configured - see docs/mig.md
+
 [eessi]
 # Hosts on which EESSI stack should be configured
 
@@ -182,3 +185,6 @@ extra_packages
 
 [gateway]
 # Add builder to this group to install gateway ansible-init playbook into image
+
+[nhc]
+# Hosts to configure for node health checks - either entire 'compute' group or empty

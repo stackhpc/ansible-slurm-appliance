@@ -1,4 +1,5 @@
 ---
+
 - name: Download Cern GPG key
   # checkov:skip=CKV2_ANSIBLE_2: "Ensure that HTTPS url is used with get_url"
   ansible.builtin.get_url:
@@ -28,24 +29,9 @@
 
 # Alternative version using official repo - still no GPG key :(
 # - name: Add EESSI repo
-#   dnf:
+#   ansible.builtin.dnf:
 #     name: http://repo.eessi-infra.org/eessi/rhel/8/noarch/eessi-release-0-1.noarch.rpm
 
 # - name: Install EESSI CVMFS config
-#   dnf:
+#   ansible.builtin.dnf:
 #     name: cvmfs-config-eessi
-
-- name: Add base CVMFS config
-  community.general.ini_file:
-    dest: /etc/cvmfs/default.local
-    section:
-    option: "{{ item.key }}"
-    value: "{{ item.value }}"
-    no_extra_spaces: true
-    mode: "0644"
-  loop: "{{ cvmfs_config | dict2items }}"
-
-# NOTE: Not clear how to make this idempotent
-- name: Ensure CVMFS config is setup # noqa: no-changed-when
-  ansible.builtin.command:
-    cmd: "cvmfs_config setup"
