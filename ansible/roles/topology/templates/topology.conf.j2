@@ -6,4 +6,8 @@ SwitchName={{ instance_host }} Nodes={{ _topology.topology[az][instance_host] | 
 {% endfor %}
 SwitchName={{ az }} Switches={{ _topology.topology[az].keys() | join(",") }}
 {% endfor %}
+{% if topology_above_rack_topology == '' %}
 SwitchName=master Switches={{ _topology.topology.keys() | join(",") }}
+{% else %}
+{{ topology_above_rack_topology }}
+{% endif %}

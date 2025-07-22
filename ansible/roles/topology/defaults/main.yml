@@ -3,3 +3,6 @@ topology_topology_nodes: []
 
 # Override to use custom topology.conf template
 topology_conf_template: templates/topology.conf.j2
+
+topology_above_rack_topology: ""
+
