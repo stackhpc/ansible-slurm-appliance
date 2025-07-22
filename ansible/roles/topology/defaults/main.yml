@@ -1,5 +1,5 @@
 # Nodes to be included in topology tree, must include all Slurm compute nodes
 topology_topology_nodes: []
 
-# If set, will override topology.conf file auto-detected from OpenStack project
-# topology_topology_override:
+# Override to use custom topology.conf template
+topology_conf_template: templates/topology.conf.j2
