@@ -1,1 +1,1 @@
-topology_topology_nodes: "{{ groups['topology'] }}"
+topology_nodes: "{{ groups['topology'] }}"
