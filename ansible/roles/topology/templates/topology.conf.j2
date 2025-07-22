@@ -1,8 +1,5 @@
 # topology.conf
 # Switch Configuration
-{% if topology_topology_override is defined %}
-{{ topology_topology_override }}
-{% else %}
 {% for az in _topology.topology.keys() %}
 {% for instance_host in _topology.topology[az].keys() %}
 SwitchName={{ instance_host }} Nodes={{ _topology.topology[az][instance_host] | join(",") }}
@@ -10,4 +7,3 @@ SwitchName={{ instance_host }} Nodes={{ _topology.topology[az][instance_host] | 
 SwitchName={{ az }} Switches={{ _topology.topology[az].keys() | join(",") }}
 {% endfor %}
 SwitchName=master Switches={{ _topology.topology.keys() | join(",") }}
-{% endif %}

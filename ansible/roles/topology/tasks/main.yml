@@ -9,7 +9,7 @@
 - name: Template topology.conf
   become: true
   ansible.builtin.template:
-    src: templates/topology.conf.j2
+    src: "{{ topology_conf_template }}"
     dest: /etc/slurm/topology.conf
     owner: root
     group: root

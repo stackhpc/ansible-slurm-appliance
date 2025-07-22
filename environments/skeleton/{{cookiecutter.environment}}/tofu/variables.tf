@@ -79,8 +79,8 @@ variable "login" {
                           For any networks not specified here the cloud will
                           select addresses.
             match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
-            availability_zone: Name of availability zone"Name of availability zone. If undefined, defaults to 'nova' 
-                               if match_ironic_node is true, defered to OpenStack otherwise"
+            availability_zone: Name of availability zone. If undefined, defaults to 'nova' 
+                               if match_ironic_node is true, defered to OpenStack otherwise
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
     EOF
@@ -123,8 +123,8 @@ variable "compute" {
                           For any networks not specified here the cloud will
                           select addresses.
             match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
-            availability_zone: Name of availability zone. "Name of availability zone. If undefined, defaults to 'nova'
-                               if match_ironic_node is true, defered to OpenStack otherwise"
+            availability_zone: Name of availability zone. If undefined, defaults to 'nova'
+                               if match_ironic_node is true, defered to OpenStack otherwise
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
 
