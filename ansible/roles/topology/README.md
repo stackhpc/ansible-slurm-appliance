@@ -1,16 +1,21 @@
 topology
 ========
 
-Templates out /etc/slurm/topology.conf file based on an Openstack project for use by
+Templates out /etc/slurm/topology.conf file based on an OpenStack project for use by
 Slurm's [topology/tree plugin.](https://slurm.schedmd.com/topology.html) Models
-cluster as tree with a heirarchy of:
+cluster as tree with a hierarchy of:
 
 Top-level inter-rack Switch -> Availability Zones -> Hypervisors -> VMs
+
+Warning: This role doesn't currently trigger a restart of Slurm so will therefore not
+reconfigure an already running cluster after a `ansible/site.yml` run. You will therefore need
+to run the `ansible/adhoc/restart-slurm.yml` playbook for changes to topology.conf to be
+recognised.
 
 Role Variables
 --------------
 
-- `topology_topology_nodes:`: Required list of strs. List of inventory hostnames of nodes to include in topology tree. Must be set to include all compute nodes in Slurm cluster. Default `[]`.
+- `topology_nodes:`: Required list of strs. List of inventory hostnames of nodes to include in topology tree. Must be set to include all compute nodes in Slurm cluster. Default `[]`.
 - `topology_conf_template`: Optional str. Path to Jinja2 template of topology.conf file. Default
   `templates/topology.conf.j2`
 - `topology_above_rack_topology`: Optionally multiline str. Used to define topology above racks/AZs if 
