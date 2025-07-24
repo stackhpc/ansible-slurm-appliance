@@ -69,7 +69,7 @@ def run_module():
     for s in servers:
         az = s['availability_zone']
         host_id = s['host_id']
-        if host_id != '':
+        if host_id != '': # empty string if e.g. server is shelved
             all_host_ids.append(host_id)
             if az not in topo:
                 topo[az] = {}
@@ -83,7 +83,7 @@ def run_module():
         topo[az] = dict((k[:uuid_len], v) for (k, v) in topo[az].items())
 
     result = {
-        "changed": True, 
+        "changed": False, 
         "topology": topo,
     }
     
