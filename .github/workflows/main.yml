@@ -16,7 +16,7 @@ on:
   pull_request:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
+    group: ${{ github.workflow }}-${{ github.head_ref }}
     cancel-in-progress: true
 
 jobs:
