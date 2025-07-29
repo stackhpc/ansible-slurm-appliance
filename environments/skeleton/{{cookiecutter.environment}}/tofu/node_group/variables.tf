@@ -149,10 +149,9 @@ variable "match_ironic_node" {
 }
 
 variable "availability_zone" {
-  type        = string
-  description = "Name of availability zone - ignored unless match_ironic_node is true"
-  default     = "nova"
-  nullable    = false
+    type = string
+    description = "Name of availability zone. If undefined, defaults to 'nova' if match_ironic_node is true, deferred to OpenStack otherwise"
+    default = null
 }
 
 variable "baremetal_nodes" {
