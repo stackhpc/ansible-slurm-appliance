@@ -54,7 +54,7 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | dnf_repos                     | None at present [2]             | -                   |
 | bootstrap.yml            | cacerts                       | Supported [3]                   | -                   |
 | bootstrap.yml            | squid                         | Not relevant for compute nodes  | n/a                 |
-| bootstrap.yml            | tuned                         | Fully supported                 | No                  |         
+| bootstrap.yml            | tuned                         | Fully supported                 | No                  |
 | bootstrap.yml            | freeipa_server                | Not relevant for compute nodes  | n/a                 |
 | bootstrap.yml            | cockpit                       | None required - use image build | No                  |
 | bootstrap.yml            | firewalld                     | Not relevant for compute nodes  | n/a                 |
@@ -91,7 +91,7 @@ it also requires an image build with the role name added to the
 | portal.yml               | (openondemand vnc desktop)    | None required - use image build | No                  |
 | portal.yml               | (openondemand jupyter server) | None required - use image build | No                  |
 | monitoring.yml           | node_exporter                 | None required - use image build | No                  |
-| monitoring.yml           | (other  monitoring)           | Not relevant for compute nodes  | -                   |
+| monitoring.yml           | (other monitoring)            | Not relevant for compute nodes  | -                   |
 | disable-repos.yml        | dnf_repos                     | None at present [2]             | -                   |
 | hooks/post.yml           | ?                             | None at present                 | -                   |
 

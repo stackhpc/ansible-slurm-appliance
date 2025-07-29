@@ -28,5 +28,5 @@ proxy_http_proxy: >-
   {%- endif -%}
   {{ proxy_http_address }}:{{ proxy_http_port }}
   {% else %}
-  
+
   {% endif %}

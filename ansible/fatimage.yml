@@ -179,7 +179,7 @@
         name: ondemand_exporter
       when: "'openondemand' in group_names"
 
-    - name: slurm exporter
+    - name: Slurm exporter
       ansible.builtin.include_role:
         name: slurm_exporter
         tasks_from: install.yml
@@ -258,18 +258,18 @@
     - ansible.builtin.import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
-    - import_role:
+    - ansible.builtin.import_role:
         name: cloudalchemy.grafana
         tasks_from: plugins.yml
-    - include_role: # done in same play so it can use handlers from cloudalchemy.grafana
+    - ansible.builtin.include_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards
 
 - name: Add support for NVIDIA GPU auto detection to Slurm
   hosts: cuda
-  become: yes
+  become: true
   tasks:
     - name: Recompile slurm
-      import_role:
+      ansible.builtin.import_role:
         name: slurm_recompile
       vars:
         slurm_recompile_with_nvml: "{{ groups.cuda | length > 0 }}"

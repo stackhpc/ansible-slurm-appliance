@@ -1,6 +1,6 @@
 # tflint-ignore: terraform_required_providers
 resource "local_file" "hosts" {
-  content  = templatefile("${path.module}/inventory.tpl",
+  content = templatefile("${path.module}/inventory.tpl",
     {
       "cluster_name" : var.cluster_name,
       "cluster_domain_suffix" : var.cluster_domain_suffix

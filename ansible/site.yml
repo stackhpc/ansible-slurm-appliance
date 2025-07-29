@@ -36,4 +36,3 @@
   when: hook_path | exists
 
 - ansible.builtin.import_playbook: final.yml
-

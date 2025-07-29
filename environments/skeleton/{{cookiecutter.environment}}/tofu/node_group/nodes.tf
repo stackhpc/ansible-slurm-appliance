@@ -128,7 +128,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 resource "openstack_compute_instance_v2" "compute" {
 
   for_each = var.ignore_image_changes ? [] : toset(var.nodes)
-  
+
   name        = split(".", local.fqdns[each.key])[0]
   image_id    = var.image_id
   flavor_name = var.flavor

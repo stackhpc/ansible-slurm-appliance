@@ -135,9 +135,10 @@ variable "compute" {
   type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
 }
 
+# tflint-ignore: terraform_typed_variables
 variable "additional_nodegroups" {
-    default = {}
-    description = <<-EOF
+  default     = {}
+  description = <<-EOF
         Mapping defining homogenous groups of nodes for arbitrary purposes.
         These nodes are not in the compute or login inventory groups so they
         will not run slurmd.

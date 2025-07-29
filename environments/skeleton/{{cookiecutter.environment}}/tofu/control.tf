@@ -37,7 +37,7 @@ resource "openstack_networking_port_v2" "control" {
 }
 
 resource "openstack_compute_instance_v2" "control" {
-  
+
   name        = split(".", local.control_fqdn)[0]
   image_id    = var.cluster_image_id
   flavor_name = var.control_node_flavor

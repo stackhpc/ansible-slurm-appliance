@@ -7,4 +7,4 @@
     disable_gpg_check: true
   notify: Restart slurm exporter
 
-- meta: flush_handlers
+- ansible.builtin.meta: flush_handlers

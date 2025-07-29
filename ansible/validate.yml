@@ -25,7 +25,7 @@
       # the actual installed version.
       # So this compares requirements.yml against a .last version produced by a
       # successful dev/setup-env.sh run.
-    - assert:
+    - ansible.builtin.assert:
         that: "{{ _requirements_current == _requirements_installed }}"
         fail_msg: |
           Ansible Galaxy installs are out of date:
@@ -33,7 +33,7 @@
           {% for req in _requirements_installed | difference(_requirements_current) %}
           {{ req }}
           {% endfor %}
-          
+
           Run dev/setup-env.sh to fix this.
       vars:
         # note difference filter requires lists, so need to rearrange yaml from files.
@@ -135,10 +135,10 @@
 
 - name: Validate vGPU configuration
   hosts: vgpu
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tags: vgpu
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: stackhpc.linux.vgpu
         tasks_from: validate.yml

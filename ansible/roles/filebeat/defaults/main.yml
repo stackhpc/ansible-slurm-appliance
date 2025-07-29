@@ -1,6 +1,6 @@
 ---
 
-#filebeat_config_path: undefined # REQUIRED. Path to filebeat.yml configuration file template
+# filebeat_config_path: undefined # REQUIRED. Path to filebeat.yml configuration file template
 filebeat_debug: false
 
 # Note all the below can only be set/changed using the install.yml task file:

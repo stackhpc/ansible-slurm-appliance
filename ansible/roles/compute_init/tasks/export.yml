@@ -101,7 +101,7 @@
   when: "'sshd' in group_names"
 
 - name: Export generated NHC config
-  import_role:
+  ansible.builtin.import_role:
     name: nhc
     tasks_from: export.yml
   when: "'nhc' in group_names"

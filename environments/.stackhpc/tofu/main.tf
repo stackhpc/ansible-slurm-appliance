@@ -83,9 +83,9 @@ module "cluster" {
   }
   compute = {
     standard = { # NB: can't call this default!
-      nodes = ["compute-0", "compute-1"]
-      flavor = var.other_node_flavor
-      compute_init_enable = ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts", "nhc"]
+      nodes                = ["compute-0", "compute-1"]
+      flavor               = var.other_node_flavor
+      compute_init_enable  = ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts", "nhc"]
       ignore_image_changes = true
     }
     # Normally-empty partition for testing:

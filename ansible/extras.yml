@@ -52,16 +52,16 @@
 
 - name: Setup vGPU
   hosts: vgpu
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tags: vgpu
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: stackhpc.linux.vgpu
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'install.yml' }}"
   handlers:
-    - name: reboot
-      fail:
+    - name: reboot # noqa: name[casing]
+      ansible.builtin.fail:
         msg: Reboot handler for stackhpc.linux.vgpu role fired unexpectedly. This was supposed to be unreachable.
 
 - name: Persist hostkeys across rebuilds

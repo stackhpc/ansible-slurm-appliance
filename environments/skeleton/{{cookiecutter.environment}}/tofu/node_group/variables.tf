@@ -72,8 +72,8 @@ variable "extra_volumes" {
 }
 
 variable "security_group_ids" {
-    type = list(string)
-    nullable = false
+  type     = list(string)
+  nullable = false
 }
 
 variable "control_address" {

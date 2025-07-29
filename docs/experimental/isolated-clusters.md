@@ -15,9 +15,9 @@ network is shown in the table below. Note that:
 1. The `hpl` test from the `ansible/adhoc/hpctests.yml` playbook is not
    functional and must be skipped using:
 
-    ```shell
-    ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo
-    ```
+   ```shell
+   ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo
+   ```
 
 2. Using [EESSI](https://www.eessi.io/docs/) necessarily requires outbound
    network access for the CernVM File System. However this can be provided
@@ -28,59 +28,61 @@ network is shown in the table below. Note that:
 ## Support by feature for isolated networks
 
 See above for definition of "Default" features. In the "Isolated?" column:
+
 - "Y": Feature works without outbound internet access.
 - "N": Known not to work.
 - "?": Not investigated at present.
 
-| Inventory group/role  | Default? | Isolated? |
-| ----------------------| -------- | --------- |
-| alertmanager          | Y | Y | 
-| ansible_init          | Y | Y | 
-| basic_users           | Y | Y | 
-| block_devices         | Y | No (depreciated) | 
-| cacerts               | - | Y | 
-| chrony                | - | Y | 
-| compute_init          | - | Y | 
-| cuda                  | - | ? | 
-| eessi                 | Y | Y - see above | 
-| etc_hosts             | Y | Y | 
-| extra_packages        | - | No | 
-| fail2ban              | Y | Y | 
-| filebeat              | Y | Y | 
-| firewalld             | Y | Y | 
-| freeipa_client        | - | Y - image build required |
-| gateway               | n/a | n/a - build only | 
-| grafana               | Y | Y | 
-| hpctests              | Y | Y  - except hpl-solo, see above | 
-| k3s_agent             | - | ? | 
-| k3s_server            | - | ? | 
-| k9s                   | - | ? | 
-| lustre                | - | ? | 
-| manila                | Y | Y | 
-| mysql                 | Y | Y | 
-| nfs                   | Y | Y | 
-| nhc                   | Y | Y | 
-| node_exporter         | Y | Y | 
-| openhpc               | Y | Y | 
-| openondemand          | Y | Y | 
-| openondemand_desktop  | Y | Y | 
-| openondemand_jupyter  | Y | Y | 
-| opensearch            | Y | Y | 
-| podman                | Y | Y | 
-| persist_hostkeys      | Y | Y | 
-| prometheus            | Y | Y | 
-| proxy                 | - | Y | 
-| resolv_conf           | - | ? | 
-| slurm_exporter        | Y | Y | 
-| slurm_stats           | Y | Y | 
-| squid                 | - | ? | 
-| sshd                  | - | ? | 
-| sssd                  | - | ? | 
-| systemd               | Y | Y | 
-| tuned                 | - | Y | 
-| update                | - | No |
+| Inventory group/role | Default? | Isolated?                      |
+| -------------------- | -------- | ------------------------------ |
+| alertmanager         | Y        | Y                              |
+| ansible_init         | Y        | Y                              |
+| basic_users          | Y        | Y                              |
+| block_devices        | Y        | No (depreciated)               |
+| cacerts              | -        | Y                              |
+| chrony               | -        | Y                              |
+| compute_init         | -        | Y                              |
+| cuda                 | -        | ?                              |
+| eessi                | Y        | Y - see above                  |
+| etc_hosts            | Y        | Y                              |
+| extra_packages       | -        | No                             |
+| fail2ban             | Y        | Y                              |
+| filebeat             | Y        | Y                              |
+| firewalld            | Y        | Y                              |
+| freeipa_client       | -        | Y - image build required       |
+| gateway              | n/a      | n/a - build only               |
+| grafana              | Y        | Y                              |
+| hpctests             | Y        | Y - except hpl-solo, see above |
+| k3s_agent            | -        | ?                              |
+| k3s_server           | -        | ?                              |
+| k9s                  | -        | ?                              |
+| lustre               | -        | ?                              |
+| manila               | Y        | Y                              |
+| MySQL                | Y        | Y                              |
+| nfs                  | Y        | Y                              |
+| nhc                  | Y        | Y                              |
+| node_exporter        | Y        | Y                              |
+| openhpc              | Y        | Y                              |
+| openondemand         | Y        | Y                              |
+| openondemand_desktop | Y        | Y                              |
+| openondemand_jupyter | Y        | Y                              |
+| opensearch           | Y        | Y                              |
+| podman               | Y        | Y                              |
+| persist_hostkeys     | Y        | Y                              |
+| prometheus           | Y        | Y                              |
+| proxy                | -        | Y                              |
+| resolv_conf          | -        | ?                              |
+| slurm_exporter       | Y        | Y                              |
+| slurm_stats          | Y        | Y                              |
+| squid                | -        | ?                              |
+| sshd                 | -        | ?                              |
+| sssd                 | -        | ?                              |
+| systemd              | Y        | Y                              |
+| tuned                | -        | Y                              |
+| update               | -        | No                             |
 
 ## Image build
+
 A site image build may be required, either for features using packages not
 present in StackHPC images (e.g `freeipa_client`) or to [add additional packages](../operations.md#adding-additional-packages).
 Clearly in this case the build VM does require outbound internet access. For an
@@ -90,7 +92,7 @@ proxy is available the image build can be configured to use that, e.g.:
 
 ```yaml
 # environments/$ENV/builder.pkrvars.hcl:
-...
+---
 inventory_groups = 'proxy,freeipa_client'
 ```
 
@@ -104,7 +106,7 @@ proxy_http_address: squid.mysite.org
 ```yaml
 # environments/$ENV/group_vars/builder/vault_overrrides.yml:
 # NB: vault-encrypt this file
-vault_proxy_basic_password: 'super-secret-password'
+vault_proxy_basic_password: "super-secret-password"
 ```
 
 See [ansible/roles/proxy/README.md](../../ansible/roles/proxy/README.md) and
@@ -125,28 +127,32 @@ default security groups are less restrictive than these.
 Assuming nodes and the deploy host have a security group `isolated` applied then
 the following rules are required:
 
-    # allow outbound DNS
-    ALLOW IPv4 53/tcp to 0.0.0.0/0
-    ALLOW IPv4 53/udp to 0.0.0.0/0
-    
-    # allow everything within the cluster:
-    ALLOW IPv4 from isolated
-    ALLOW IPv4 to isolated
-    
-    # allow hosts to reach metadata server (e.g. for cloud-init keys):
-    ALLOW IPv4 80/tcp to 169.254.169.254/32
+```text
+# allow outbound DNS
+ALLOW IPv4 53/tcp to 0.0.0.0/0
+ALLOW IPv4 53/udp to 0.0.0.0/0
 
-    # optionally: allow hosts to reach squid proxy for EESSI:
-    ALLOW IPv4 3128/tcp to <squid cidr>
+# allow everything within the cluster:
+ALLOW IPv4 from isolated
+ALLOW IPv4 to isolated
+
+# allow hosts to reach metadata server (e.g. for cloud-init keys):
+ALLOW IPv4 80/tcp to 169.254.169.254/32
+
+# optionally: allow hosts to reach squid proxy for EESSI:
+ALLOW IPv4 3128/tcp to <squid cidr>
+```
 
 Note that name resolution happens on the hosts, not on the proxy, hence DNS is
 required for nodes even with a proxy.
 
-For nodes running OpenOndemand, inbound ssh and https are also required
+For nodes running OpenOndemand, inbound SSH and https are also required
 (e.g. in a security group called `isolated-ssh-https`):
 
-    ALLOW IPv4 443/tcp from 0.0.0.0/0
-    ALLOW IPv4 22/tcp from 0.0.0.0/0
+```text
+ALLOW IPv4 443/tcp from 0.0.0.0/0
+ALLOW IPv4 22/tcp from 0.0.0.0/0
+```
 
 If non-default security groups are required, then the OpenTofu variables
 `login_security_groups` and `nonlogin_security_groups` can be used to set

@@ -297,7 +297,6 @@
         - name: Ensure CVMFS config is setup # noqa: no-changed-when
           ansible.builtin.command:
             cmd: "cvmfs_config setup"
-      when: enable_eessi
 
     - name: Configure VGPUs
       ansible.builtin.include_role:
@@ -366,7 +365,7 @@
         tasks_from: boot.yml
       when: enable_nhc
 
-    - name: Ensure node is resumed
+    - name: Ensure node is resumed # noqa: no-changed-when
       # TODO: consider if this is always safe for all job states?
       ansible.builtin.command: scontrol update state=resume nodename={{ ansible_hostname }}
       register: _scontrol_update

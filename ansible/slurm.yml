@@ -67,8 +67,8 @@
 - name: Setup Node Health Checks
   # Has to be done here as it requires openhpc repos etc for installation
   hosts: nhc:!builder
-  become: yes
+  become: true
   tags: nhc
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: nhc
