@@ -194,12 +194,10 @@ openondemand_apps_rstudio_default:
       label: RStudio module
       required: true
       cachable: true
-      help: Choose your RStudio module - 2023.09 is only for el8 partitions
+      help: Choose your RStudio module
       widget: select
       options:
-        - ["RStudio-Server/2022.07.2+576-foss-2022a-Java-11-R-4.2.1", "RStudio-Server/2022.07.2+576-foss-2022a-Java-11-R-4.2.1"]
-        - ["RStudio-Server/1.4.1717-foss-2021a-Java-11-R-4.1.0", "RStudio-Server/1.4.1717-foss-2021a-Java-11-R-4.1.0"]
-        - ["RStudio-Server/2023.09.1+494-foss-2023a-Java-11-R-4.3.2", "RStudio-Server/2023.09.1+494-foss-2023a-Java-11-R-4.3.2"]
+        - ["rstudio-server/2025.05.1","rstudio-server/2025.05.1"]
     extra_modules_script:
       label: Extra modules script
       help: If you'd like to load additional modules alongside RStudio-Server, put the 'module load ...' commands into a text file (one 'module load...' per line) and specify its path here
@@ -297,21 +295,51 @@ openondemand_apps_matlab_default:
 openondemand_apps_matlab: "{{ {'matlab':openondemand_apps_matlab_default} if openondemand_matlab_partition | default(none) else {} }}"
 
 openondemand_apps_codeserver_default:
-  title: Codeserver
-  description: Request a Codeserver
+  title: Code Server
+  description: Request a Code Server
   cluster: slurm
   form:
     - bc_queue
     - bc_num_hours
-    - num_cores
-    - node
-  attributes: # TODO
-    num_cores:
-      label: Number of cores FOO
-      value: 1
+    - codeserver_module
+    - cores
+    - ram
+  attributes:
+    codeserver_module:
+      label: Code Server module
+      required: true
+      cachable: true
+      help: Choose your Code Server module
+      widget: select
+      options:
+        - ["code-server/4.102.2","code-server/4.102.2"]
     bc_queue:
       value: "{{ openondemand_codeserver_partition | default(none) }}"
-    node: ""
+    cores:
+      label: Number of CPU cores
+      help: How many CPU cores to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition.
+      widget: number_field
+      min: 1
+      max: 48
+      step: 1
+      value: 1
+      cachable: true
+    ram:
+      widget: number_field
+      label: RAM in GB
+      help: How much RAM to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition
+      min: 4
+      max:  700
+      step: 1
+      value: 4
+      cachable: true
+    bc_num_hours:
+      widget: number_field
+      help: Maximum runtime in hours for your session. NB Ensure this is within the maximum allowed by your chosen partition
+      min: 1
+      max: 240
+      step: 1
+      value: 30
   submit: |
     ---
     batch_connect:
@@ -321,9 +349,14 @@ openondemand_apps_codeserver_default:
     script:
       job_name: "ood-codeserver"
       native:
-        - <%= "--nodes=1" %>
-        - <%= "--ntasks=#{num_cores}" %>
-        - <%= "--nodelist=#{node}" %>
+        - "--partition"
+        - "<%= bc_queue %>"
+        - "--ntasks"
+        - "1"
+        - "--mem"
+        - "<%= ram.blank? ? 4 : ram.to_i %>G"
+        - "--cpus-per-task"
+        - "<%= cores.blank? ? 1 : cores.to_i %>"
 openondemand_apps_codeserver: "{{ {'codeserver':openondemand_apps_codeserver_default} if openondemand_codeserver_partition | default(none) else {} }}"
 
 # osc.ood:ood_apps - see https://github.com/OSC/ood-ansible#ood_apps

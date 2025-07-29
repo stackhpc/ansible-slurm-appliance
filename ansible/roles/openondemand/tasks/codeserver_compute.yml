@@ -1,18 +1,40 @@
-- name: Download code-server binary
-  get_url:
-    url: "https://github.com/coder/code-server/releases/download/v4.22.1/code-server-4.22.1-linux-amd64.tar.gz"
-    dest: "/tmp/code-server.tar.gz"
+- name: Download Code Server RPM
+  ansible.builtin.get_url:
+    url: "https://github.com/coder/code-server/releases/download/v{{ code_server_version }}/code-server-{{ code_server_version }}-amd64.rpm"
+    dest: /tmp/code-server.rpm
     mode: '0644'
 
-- name: Extract code-server binary
-  unarchive:
-    src: "/tmp/code-server.tar.gz"
-    dest: "/opt/"
-    remote_src: yes
+- name: Install Code Server
+  ansible.builtin.dnf:
+    name: /tmp/code-server.rpm
+    state: present
+    disable_gpg_check: yes
 
-- name: Symlink code-server to /usr/local/bin
-  file:
-    src: "/opt/code-server-4.22.1-linux-amd64/bin/code-server"
-    dest: "/usr/local/bin/code-server"
-    state: link
-    force: yes
+- name: Create module directory for Code Server
+  ansible.builtin.file:
+    path: /opt/ohpc/pub/modulefiles/code-server
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Create modulefile for code-server
+  copy:
+    dest: "/opt/ohpc/pub/modulefiles/code-server/{{ code_server_version }}"
+    mode: "0644"
+    content: |
+      #%Module1.0#####################################################################
+
+      proc ModulesHelp { } {
+          puts stderr "This module loads code-server {{ code_server_version }}."
+          puts stderr "VS Code in the browser. Visit http://127.0.0.1:8080"
+      }
+
+      module-whatis "Name: code-server"
+      module-whatis "Version: {{ code_server_version }}"
+      module-whatis "Category: IDE"
+      module-whatis "Description: Run VS Code in your browser with code-server"
+      module-whatis "URL: https://github.com/coder/code-server"
+
+      set root /usr/bin/code-server
+
+      prepend-path PATH $root

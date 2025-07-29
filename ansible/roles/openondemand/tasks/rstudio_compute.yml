@@ -2,26 +2,50 @@
 # See https://osc.github.io/ood-documentation/latest/tutorials/tutorials-interactive-apps/add-rstudio.html
 # - Will already have lmod
 
-- name: Install EPEL and dependencies
-  ansible.builtin.yum:
-    name:
-      - epel-release
-      - R
+- name: Install R from EPEL
+  ansible.builtin.dnf:
+    name: R
     state: present
 
 - name: Download RStudio Server RPM
   ansible.builtin.get_url:
-    url: https://download2.rstudio.org/server/centos8/x86_64/rstudio-server-rhel-2023.12.1-402-x86_64.rpm
+    url: "https://download2.rstudio.org/server/rhel{{ ansible_distribution_major_version }}/x86_64/rstudio-server-rhel-2025.05.1-513-x86_64.rpm"
     dest: /tmp/rstudio-server.rpm
     mode: '0644'
 
 - name: Install RStudio Server
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: /tmp/rstudio-server.rpm
     state: present
+    disable_gpg_check: yes
 
-- name: Ensure rstudio-server service is disabled and stopped
-  ansible.builtin.service:
-    name: rstudio-server
-    enabled: false
-    state: stopped
+- name: Create module directory for RStudio Server
+  ansible.builtin.file:
+    path: /opt/ohpc/pub/modulefiles/rstudio-server
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Write modulefile for RStudio Server
+  ansible.builtin.copy:
+    dest: /opt/ohpc/pub/modulefiles/rstudio-server/2025.05.1
+    mode: '0644'
+    content: |
+      #%Module1.0#####################################################################
+
+      proc ModulesHelp { } {
+          puts stderr " "
+          puts stderr "This module loads RStudio Server 2025.05.1"
+          puts stderr "\nRStudio Server provides a browser-based interface to R.\n"
+      }
+
+      module-whatis "Name: rstudio-server"
+      module-whatis "Version: 2025.05.1"
+      module-whatis "Category: IDE"
+      module-whatis "Description: RStudio Server - IDE for R"
+      module-whatis "URL: https://www.rstudio.com"
+
+      set version 2025.05.1
+      set root /usr/lib/rstudio-server
+
+      prepend-path PATH $root/bin

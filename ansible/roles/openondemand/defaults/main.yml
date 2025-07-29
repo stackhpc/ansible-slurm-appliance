@@ -103,3 +103,5 @@ openondemand_osc_ood_defaults:
   oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if (openondemand_auth | lower) == 'oidc' else none }}"
   ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
   httpd_auth: "{{ openondemand_auth_defaults[openondemand_auth | lower].httpd_auth }}"
+
+code_server_version: 4.102.2
