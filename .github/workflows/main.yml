@@ -82,7 +82,7 @@ jobs:
               - '!dev/**'
               - '!**/*.md'
               - '!.gitignore'
-              - '!.github/workflows/'
+              - '!.github/workflows/**'
 
       - name: Paths matched output
         # NOTE: This is a debug step, it prints the paths that matched the filters
