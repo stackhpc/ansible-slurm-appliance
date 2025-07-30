@@ -1,4 +1,4 @@
-# This terraform configuration uses the "skeleton" terraform, so that is checked by CI.
+# This terraform configuration uses the ./tofu terraform, so that is checked by CI.
 
 terraform {
   required_version = ">= 0.14"
@@ -59,7 +59,7 @@ data "openstack_images_image_v2" "cluster" {
 }
 
 module "cluster" {
-    source = "../../skeleton/{{cookiecutter.environment}}/tofu/"
+    source = "../../../tofu/"
 
     cluster_name = var.cluster_name
     cluster_networks = var.cluster_networks
