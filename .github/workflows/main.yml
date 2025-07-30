@@ -72,9 +72,9 @@ jobs:
 
       - name: Paths Filter Result
         run: >
-          echo 'extra_push: ${{ steps.filter.outputs.extra_push }}' | jq -r '.'
-          echo 'extra_pull_request: ${{ steps.filter.outputs.extra_pull_request }}' | jq -r '.'
-          echo 'stackhpc: ${{ steps.filter.outputs.stackhpc }}' | jq -r '.'
+          echo 'extra_push: ${{ steps.filter.outputs.extra_push }}' | jq -r '.';
+          echo 'extra_pull_request: ${{ steps.filter.outputs.extra_pull_request }}' | jq -r '.';
+          echo 'stackhpc: ${{ steps.filter.outputs.stackhpc }}' | jq -r '.';
           echo 'trivvyscan: ${{ steps.filter.outputs.trivvyscan }}' | jq -r '.'
 
   extra:
