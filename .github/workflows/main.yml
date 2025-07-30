@@ -34,7 +34,8 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
       paths_result: ${{ steps.skip_check.outputs.paths_result }}
     steps:
-      - id: skip_check
+      - name: Build paths result
+        id: skip_check
         # For security we use the commit of fkirc/skip-duplicate-actions@v5
         uses: fkirc/skip-duplicate-actions@f75f66ce1886f00957d99748a42c724f4330bdcf
         with:
@@ -68,6 +69,10 @@ jobs:
             trivvyscan:
               paths:
                 - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
+      - name: Echo paths result
+        run: >
+          echo '${{ steps.skip_check.outputs.paths_result }}'
+          | jq -r '.'
 
   extra:
     name: Test extra build
