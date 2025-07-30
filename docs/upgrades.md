@@ -63,10 +63,10 @@ git push
 Make changes as necessary.
 
 1. Identify image(s) from the relevant [Slurm appliance release](https://github.com/stackhpc/ansible-slurm-appliance/releases), and download
-   using the link on the release plus the image name, e.g. for an image `openhpc-ofed-RL8-240906-1042-32568dbb`:
+   using the link on the release plus the image name, e.g. for an image `openhpc-RL9-250708-1547-1494192e`:
 
 ```shell
-wget https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/openhpc-images/openhpc-ofed-RL8-240906-1042-32568dbb
+wget https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/openhpc-images/openhpc-RL9-250708-1547-1494192e
 ```
 
 Note that some releases may not include new images. In this case use the image from the latest previous release with new images.

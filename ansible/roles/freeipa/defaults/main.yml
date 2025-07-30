@@ -11,5 +11,5 @@ freeipa_user_defaults:
   ipa_pass: "{{ freeipa_admin_password | quote }}"
   ipa_user: admin
 freeipa_users: [] # see community.general.ipa_user
-
+freeipa_ca_cert_file: ''
 _freeipa_keytab_backup_path: "{{ hostvars[groups['control'].0].appliances_state_dir  }}/freeipa/{{ inventory_hostname }}/krb5.keytab"
