@@ -41,7 +41,7 @@ jobs:
         with:
           cancel_others: true
           skip_after_successful_duplicate: false
-          do_not_skip: '[ "pull_request", "push", "workflow_dispatch" ]'
+          #do_not_skip: '[ "pull_request", "push", "workflow_dispatch" ]'
           paths_filter: |
             extra_push:
               paths:
