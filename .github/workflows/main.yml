@@ -64,7 +64,7 @@ jobs:
             stackhpc:
               #- '**'
               #- '!dev/**'
-              - 'dev/setup-env.sh'
+              - 'dev/setup-env.sh___TMP_WILL_NOT_MATCH'
               #- '!docs/**'
               #- '!README.md'
               #- '!.gitignore'
@@ -84,7 +84,7 @@ jobs:
             stackhpc:
               - '**'
               - '!dev/**'
-              - '!**.md'
+              - '!**/*.md'
               - '!.gitignore'
               - '!.github/workflows/'
 
