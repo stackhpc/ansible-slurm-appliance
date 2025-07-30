@@ -82,7 +82,7 @@ jobs:
           list-files: 'json'
           filters: |
             stackhpc:
-              - '**'
+              - '**___TMP_WILL_NOT_MATCH'
               - '!dev/**'
               - '!**/*.md'
               - '!.gitignore'
