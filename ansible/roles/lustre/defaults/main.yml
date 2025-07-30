@@ -1,5 +1,4 @@
-lustre_repo: https://github.com/stackhpc/lustre-release.git
-lustre_version: '2.15.6/lu-18085' # Fixes https://jira.whamcloud.com/browse/LU-18085
+lustre_version: '2.15.7'
 lustre_lnet_label: tcp
 #lustre_mgs_nid:
 lustre_mounts: []
