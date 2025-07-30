@@ -40,6 +40,8 @@ jobs:
         uses: fkirc/skip-duplicate-actions@f75f66ce1886f00957d99748a42c724f4330bdcf
         with:
           cancel_others: true
+          skip_after_successful_duplicate: false
+          do_not_skip: [ "pull_request", "push", "workflow_dispatch" ]
           paths_filter: |
             extra_push:
               paths:
