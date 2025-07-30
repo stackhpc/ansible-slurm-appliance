@@ -63,7 +63,7 @@ jobs:
               - '.github/workflows/extra.yml'
             stackhpc:
               - 'dev/setup-env.sh'
-              - '.github/workflows/stackhpc'
+              - '.github/workflows/stackhpc.yml'
             trivvyscan:
               - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
 
@@ -110,13 +110,14 @@ jobs:
       github.event_name != 'pull_request' && needs.files_changed.outputs.extra_on_push == 'true' ||
       github.event_name == 'pull_request' && needs.files_changed.outputs.extra_on_pull_request == 'true'
     #uses: ./.github/workflows/extra.yml
-    steps: # TEST
+    #secrets: inherit
+    # TEST - remove from here and uncomment the above two lines
+    steps:
       - name: Test extra build...
         uses: jakejarvis/wait-action@master
         with:
           time: '120s'
-    runs-on: ubuntu-latest # TEST
-    #secrets: inherit
+    runs-on: ubuntu-latest
 
   stackhpc:
     name: Test deployment and reimage on OpenStack
@@ -124,13 +125,14 @@ jobs:
     if: |
       needs.files_changed.outputs.stackhpc == 'true'
     #uses: ./.github/workflows/stackhpc.yml
-    steps: # TEST
+    #secrets: inherit
+    # TEST - remove from here and uncomment the above two lines
+    steps:
       - name: Test deployment and reimage on OpenStack...
         uses: jakejarvis/wait-action@master
         with:
           time: '120s'
-    runs-on: ubuntu-latest # TEST
-    #secrets: inherit
+    runs-on: ubuntu-latest
 
   trivvyscan:
     name: Trivy scan image for vulnerabilities
@@ -139,10 +141,11 @@ jobs:
       github.event_name == 'pull_request' &&
       needs.files_changed.outputs.trivvyscan == 'true'
     #uses: ./.github/workflows/trivvyscan.yml
-    steps: # TEST
+    #secrets: inherit
+    # TEST - remove from here and uncomment the above two lines
+    steps:
       - name: Trivy scan image for vulnerabilities...
         uses: jakejarvis/wait-action@master
         with:
           time: '120s'
-    runs-on: ubuntu-latest # TEST
-    #secrets: inherit
+    runs-on: ubuntu-latest
