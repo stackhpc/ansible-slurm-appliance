@@ -32,6 +32,7 @@ jobs:
     outputs:
         extra_on_push: ${{ steps.filter_some.outputs.extra_on_push }}
         extra_on_pull_request: ${{ steps.filter_some.outputs.extra_on_pull_request }}
+        stackhpc: ${{ toJson(fromJson(steps.filter_some.outputs.stackhpc) || fromJson(steps.filter_every.outputs.stackhpc)) }}
         stackhpc_some: ${{ steps.filter_some.outputs.stackhpc }}
         stackhpc_every: ${{ steps.filter_every.outputs.stackhpc }}
         trivvyscan: ${{ steps.filter_some.outputs.trivvyscan }}
@@ -88,13 +89,25 @@ jobs:
               - '!.gitignore'
               - '!.github/workflows/'
 
-      - name: Paths Filter Result
+      - name: Paths matching
         run: >
           echo '{ "extra_on_push_files": ${{ steps.filter_some.outputs.extra_on_push_files }} }' | jq -r '.';
           echo '{ "extra_on_pull_request_files": ${{ steps.filter_some.outputs.extra_on_pull_request_files }} }' | jq -r '.';
-          echo '{ "stackhpc_some_files": ${{ steps.filter_some.outputs.stackhpc_some_files }} }' | jq -r '.';
-          echo '{ "stackhpc_every_files": ${{ steps.filter_every.outputs.stackhpc_every_files }} }' | jq -r '.';
+          echo '{ "stackhpc_some_files": ${{ steps.filter_some.outputs.stackhpc_files }} }' | jq -r '.';
+          echo '{ "stackhpc_every_files": ${{ steps.filter_every.outputs.stackhpc_files }} }' | jq -r '.';
           echo '{ "trivvyscan_files": ${{ steps.filter_some.outputs.trivvyscan_files }} }' | jq -r '.'
+
+  debug:
+    name: Debug paths matching
+    needs: files_changed
+    run: >
+      echo 'extra_on_push: ${{ needs.files_changed.outputs.extra_on_push }}';
+      echo 'extra_on_pull_request: ${{ needs.files_changed.outputs.extra_on_pull_request }}';
+      echo 'stackhpc: ${{ needs.files_changed.outputs.stackhpc }}';
+      echo 'stackhpc_some: ${{ needs.files_changed.outputs.stackhpc_some }}';
+      echo 'stackhpc_every: ${{ needs.files_changed.outputs.stackhpc_every }}';
+      echo 'trivvyscan: ${{ needs.files_changed.outputs.trivvyscan }}'
+    runs-on: ubuntu-latest # TEST
 
   extra:
     name: Test extra build
