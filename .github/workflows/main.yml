@@ -99,13 +99,14 @@ jobs:
   debug:
     name: Debug paths matching
     needs: files_changed
-    run: >
-      echo 'extra_on_push: ${{ needs.files_changed.outputs.extra_on_push }}';
-      echo 'extra_on_pull_request: ${{ needs.files_changed.outputs.extra_on_pull_request }}';
-      echo 'stackhpc: ${{ needs.files_changed.outputs.stackhpc }}';
-      echo 'stackhpc_some: ${{ needs.files_changed.outputs.stackhpc_some }}';
-      echo 'stackhpc_every: ${{ needs.files_changed.outputs.stackhpc_every }}';
-      echo 'trivvyscan: ${{ needs.files_changed.outputs.trivvyscan }}'
+    steps:
+      run: >
+        echo 'extra_on_push: ${{ needs.files_changed.outputs.extra_on_push }}';
+        echo 'extra_on_pull_request: ${{ needs.files_changed.outputs.extra_on_pull_request }}';
+        echo 'stackhpc: ${{ needs.files_changed.outputs.stackhpc }}';
+        echo 'stackhpc_some: ${{ needs.files_changed.outputs.stackhpc_some }}';
+        echo 'stackhpc_every: ${{ needs.files_changed.outputs.stackhpc_every }}';
+        echo 'trivvyscan: ${{ needs.files_changed.outputs.trivvyscan }}'
     runs-on: ubuntu-latest # TEST
 
   extra:
