@@ -72,11 +72,11 @@ jobs:
 
       - name: Paths Filter Result
         run: >
-          echo 'extra_push: ${{ steps.filter.outputs.extra_push }}'
-          #echo 'extra_push: ${{ steps.filter.outputs.extra_push }}' | jq -r '.';
-          #echo 'extra_pull_request: ${{ steps.filter.outputs.extra_pull_request }}' | jq -r '.';
-          #echo 'stackhpc: ${{ steps.filter.outputs.stackhpc }}' | jq -r '.';
-          #echo 'trivvyscan: ${{ steps.filter.outputs.trivvyscan }}' | jq -r '.'
+          echo 'extra_push_files: ${{ steps.filter.outputs.extra_push_files }}';
+          echo 'extra_push_files: ${{ steps.filter.outputs.extra_push_files }}' | jq -r '.';
+          #echo 'extra_pull_request_files: ${{ steps.filter.outputs.extra_pull_request_files }}' | jq -r '.';
+          #echo 'stackhpc_files: ${{ steps.filter.outputs.stackhpc_files }}' | jq -r '.';
+          #echo 'trivvyscan_files: ${{ steps.filter.outputs.trivvyscan_files }}' | jq -r '.'
 
   extra:
     name: Test extra build
