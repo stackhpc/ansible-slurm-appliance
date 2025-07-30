@@ -84,8 +84,7 @@ jobs:
             stackhpc:
               - '**'
               - '!dev/**'
-              - '!docs/**'
-              - '!README.md'
+              - '!**.md'
               - '!.gitignore'
               - '!.github/workflows/'
 
