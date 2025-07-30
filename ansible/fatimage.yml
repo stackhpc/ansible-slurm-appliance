@@ -108,7 +108,12 @@
         tasks_from: install.yml
       when: "'mysql' in group_names"
 
-    - name: OpenHPC
+    - name: Install rebuild
+      include_role:
+        name: rebuild
+        tasks_from: install.yml
+
+    - name: Install OpenHPC
       import_role:
         name: stackhpc.openhpc
         tasks_from: install.yml
@@ -134,7 +139,6 @@
       import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
-
       when: "'openondemand_desktop' in group_names"
 
     - name: Open Ondemand jupyter node
@@ -153,7 +157,11 @@
         tasks_from: install.yml
       when: "'opensearch' in group_names"
 
-    # slurm_stats - nothing to do
+    - import_role:
+        name: slurm_stats
+        tasks_from: install.yml
+      when: "'slurm_stats' in group_names"
+
     - import_role:
         name: filebeat
         tasks_from: install.yml
@@ -171,11 +179,9 @@
       when: "'openondemand' in group_names"
 
     - name: slurm exporter
-      import_role:
+      include_role:
         name: slurm_exporter
-        tasks_from: install
-      vars:
-        slurm_exporter_state: stopped
+        tasks_from: install.yml
       when: "'slurm_exporter' in group_names"
 
     - name: Install alertmanager
@@ -249,6 +255,21 @@
     - import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
+    - import_role:
+        name: cloudalchemy.grafana
+        tasks_from: plugins.yml
+    - include_role: # done in same play so it can use handlers from cloudalchemy.grafana
+        name: grafana-dashboards
+
+- name: Add support for NVIDIA GPU auto detection to Slurm
+  hosts: cuda
+  become: yes
+  tasks:
+    - name: Recompile slurm
+      import_role:
+        name: slurm_recompile
+      vars:
+        slurm_recompile_with_nvml: "{{ groups.cuda | length > 0 }}"
 
 - name: Run post.yml hook
   vars:
@@ -257,7 +278,7 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- import_playbook: disable-repos.yml
+- import_playbook: final.yml
 
 - hosts: builder
   become: yes

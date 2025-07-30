@@ -5,3 +5,5 @@ proxy_no_proxy_extras: []
 proxy_no_proxy: "{{ (proxy_no_proxy_defaults + proxy_no_proxy_extras) | unique | sort | join(',') }}"
 proxy_dnf: true
 proxy_systemd: true
+proxy_state: present
+# proxy_remove: false

@@ -24,6 +24,12 @@ openhpc
 [builder]
 # Do not add hosts here manually - used as part of Packer image build pipeline. See packer/README.md.
 
+[topology]
+# Compute nodes to be included in the Slurm topology plugin's topology tree. See ansible/roles/topology
+# Should be set to `compute` if enabled
+# Note that this feature currently assumes all compute nodes are VMs, enabling
+# when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour
+
 [podman:children]
 # Hosts running containers for below services:
 opensearch
@@ -112,6 +118,9 @@ freeipa_client
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
+[vgpu]
+# Hosts where vGPU/MIG should be configured - see docs/mig.md
+
 [eessi]
 # Hosts on which EESSI stack should be configured
 
@@ -182,3 +191,6 @@ extra_packages
 
 [gateway]
 # Add builder to this group to install gateway ansible-init playbook into image
+
+[nhc]
+# Hosts to configure for node health checks - either entire 'compute' group or empty

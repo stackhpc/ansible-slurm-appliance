@@ -48,8 +48,14 @@ and referenced from the `site` and `production` environments, e.g.:
 
     ```
     ...
+    variable "environment_root" {
+      type = string
+      description = "Path to environment root, automatically set by activate script"
+    }
+
     module "cluster" {
         source = "../../site/tofu/"
+        environment_root = var.environment_root
 
         cluster_name = "foo"
         ...
@@ -57,12 +63,13 @@ and referenced from the `site` and `production` environments, e.g.:
     ```
 
     Note that:
-        - Environment-specific variables (`cluster_name`) should be hardcoded
-          into the cluster module block.
-        - Environment-independent variables (e.g. maybe `cluster_net` if the
-          same is used for staging and production) should be set as *defaults*
-          in `environments/site/tofu/variables.tf`, and then don't need to
-          be passed in to the module.
+    
+    - Environment-specific variables (`cluster_name`) should be hardcoded
+      into the cluster module block.
+    - Environment-independent variables (e.g. maybe `cluster_net` if the
+      same is used for staging and production) should be set as *defaults*
+      in `environments/site/tofu/variables.tf`, and then don't need to
+      be passed in to the module.
 
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
@@ -120,39 +127,14 @@ and referenced from the `site` and `production` environments, e.g.:
   set the "attach" options and run `tofu apply` again - this should show there
   are no changes planned.
 
-- Enable `etc_hosts` templating:
-
-    ```yaml
-    # environments/site/inventory/groups:
-    [etc_hosts:children]
-    cluster
-    ```
-
 - Configure Open OnDemand - see [specific documentation](openondemand.md).
 
 - Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
 
 - Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
-- Modify `environments/site/tofu/nodes.tf` to provide fixed IPs for at least
-  the control node, and (if not using FIPs) the login node(s):
-
-    ```
-    resource "openstack_networking_port_v2" "control" {
-        ...
-        fixed_ip {
-            subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
-            ip_address = var.control_ip_address
-        }
-    }
-    ```
-    
-  Note the variable `control_ip_address` is new.
-
-  Using fixed IPs will require either using admin credentials or policy changes.
-
-- If floating IPs are required for login nodes, modify the OpenTofu configurations
-  appropriately.
+- If floating IPs are required for login nodes, create these in OpenStack and add the IPs into
+  the OpenTofu `login` definition.
 
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
@@ -183,3 +165,5 @@ and referenced from the `site` and `production` environments, e.g.:
   is properly tuned, again, demonstrated through testing.
 
 - Enable alertmanager if Slack is available - see [docs/alerting.md](./alerting.md).
+
+- Enable node health checks - see [ansible/roles/nhc/README.md](../ansible/roles/nhc/README.md).
