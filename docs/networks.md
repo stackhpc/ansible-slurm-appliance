@@ -6,9 +6,10 @@ subnets or associated infrastructure such as routers. The requirements are that:
 2. The first network defined spans all nodes, referred to as the "access network".
 3. Only one subnet per network is attached to nodes.
 4. At least one network on each node provides outbound internet access (either
-directly, or via a proxy).
+   directly, or via a proxy). In some cases this can be relaxed - see
+   [docs/experimental/isolated-clusters.md](./experimental/isolated-clusters.md).
 
-Addresses on the "access network" used as the `ansible_host` IPs.
+Addresses on the "access network" are used as the `ansible_host` IPs.
 
 It is recommended that the deploy host either has a direct connection to the
 "access network" or jumps through a host on it which is not part of the appliance.
@@ -156,11 +157,6 @@ compute = {
   gateway_ip =  "172.16.0.1" # Router interface
 }
 ```
-
-If there is no default route at all (either from a subnet gateway or from
-`gateway_ip`) then a dummy route is created via the access network interface to
-ensure [correct](https://docs.k3s.io/installation/airgap#default-network-route)
-`k3s` operation.
 
 When using a subnet with no default gateway, OpenStack's nameserver for the
 subnet may refuse lookups. External nameservers can be defined using the

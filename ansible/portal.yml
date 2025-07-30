@@ -5,6 +5,10 @@
   become: yes
   gather_facts: yes # TODO
   tasks:
+    - name: Skip openondemand apps installation in configure mode
+      set_fact:
+        ood_install_apps: {}
+      when: appliances_mode == 'configure'
     - import_role:
         name: openondemand
         tasks_from: main.yml
@@ -19,6 +23,7 @@
     - import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+      when: appliances_mode != 'configure' # is run during build
 
 - hosts: openondemand_jupyter
   tags:
@@ -30,3 +35,4 @@
     - import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
+      when: appliances_mode != 'configure' # is run during build

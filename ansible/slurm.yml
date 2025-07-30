@@ -16,8 +16,9 @@
     - rebuild
     - openhpc
   tasks:
-    - import_role:
+    - include_role:
         name: rebuild
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Set locked memory limits on user-facing nodes
   hosts:
@@ -61,5 +62,21 @@
     - openhpc
   tasks:
     - include_role:
+        name: topology
+      # Gated on topology group having compute nodes but role also
+      # needs to run on control and login nodes
+      when:
+        - appliances_mode == 'configure'
+        - groups['topology'] | length > 0
+    - include_role:
         name: stackhpc.openhpc
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
+
+- name: Setup Node Health Checks
+  # Has to be done here as it requires openhpc repos etc for installation
+  hosts: nhc:!builder
+  become: yes
+  tags: nhc
+  tasks:
+    - include_role:
+        name: nhc

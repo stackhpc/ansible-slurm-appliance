@@ -13,8 +13,8 @@ locals {
   # Workaround for lifecycle meta-argument only taking static values
   compute_instances = var.ignore_image_changes ? openstack_compute_instance_v2.compute_fixed_image : openstack_compute_instance_v2.compute
   
-  # Define nodenames here to avoid repetition
-  nodenames = {
+  # Define fully qualified nodenames here to avoid repetition
+  fqdns = {
     for n in var.nodes: n => templatestring(
       var.nodename_template,
       {
@@ -25,6 +25,8 @@ locals {
       }
     )
   }
+
+  baremetal_az = var.availability_zone != null ? var.availability_zone : "nova"
 }
 
 resource "openstack_blockstorage_volume_v3" "compute" {
@@ -47,22 +49,26 @@ resource "openstack_compute_volume_attach_v2" "compute" {
 resource "openstack_networking_port_v2" "compute" {
 
   for_each = {for item in setproduct(var.nodes, var.networks):
-    "${item[0]}-${item[1].network}" => item[1]
+    "${item[0]}-${item[1].network}" => {
+        node_idx = index(var.nodes, item[0])
+        net = item[1]
+      }
   }
 
   name = "${var.cluster_name}-${each.key}"
-  network_id = data.openstack_networking_network_v2.network[each.value.network].id
+  network_id = data.openstack_networking_network_v2.network[each.value.net.network].id
   admin_state_up = "true"
 
   fixed_ip {
-    subnet_id = data.openstack_networking_subnet_v2.subnet[each.value.network].id
+    subnet_id = data.openstack_networking_subnet_v2.subnet[each.value.net.network].id
+    ip_address = try(var.ip_addresses[each.value.net.network][each.value.node_idx], null)
   }
   
-  no_security_groups = lookup(each.value, "no_security_groups", false)
-  security_group_ids = lookup(each.value, "no_security_groups", false) ? [] : var.security_group_ids
+  no_security_groups = lookup(each.value.net, "no_security_groups", false)
+  security_group_ids = lookup(each.value.net, "no_security_groups", false) ? [] : var.security_group_ids
 
   binding {
-    vnic_type = lookup(var.vnic_types, each.value.network, "normal")
+    vnic_type = lookup(var.vnic_types, each.value.net.network, "normal")
   }
 }
 
@@ -70,7 +76,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 
   for_each = var.ignore_image_changes ? toset(var.nodes) : []
 
-  name = split(".", local.nodenames[each.key])[0]
+  name = split(".", local.fqdns[each.key])[0]
   image_id = var.image_id
   flavor_name = var.flavor
   key_pair = var.key_pair
@@ -82,6 +88,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
       source_type  = "image"
       destination_type = "volume"
       volume_size = var.root_volume_size
+      volume_type = var.root_volume_type
       boot_index = 0
       delete_on_termination = true
     }
@@ -107,10 +114,10 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${local.nodenames[each.key]}
+    fqdn: ${local.fqdns[each.key]}
   EOF
 
-  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
+  availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
 
   lifecycle {
     ignore_changes = [
@@ -124,7 +131,7 @@ resource "openstack_compute_instance_v2" "compute" {
 
   for_each = var.ignore_image_changes ? [] : toset(var.nodes)
   
-  name = split(".", local.nodenames[each.key])[0]
+  name = split(".", local.fqdns[each.key])[0]
   image_id = var.image_id
   flavor_name = var.flavor
   key_pair = var.key_pair
@@ -136,6 +143,7 @@ resource "openstack_compute_instance_v2" "compute" {
       source_type  = "image"
       destination_type = "volume"
       volume_size = var.root_volume_size
+      volume_type = var.root_volume_type
       boot_index = 0
       delete_on_termination = true
     }
@@ -161,10 +169,10 @@ resource "openstack_compute_instance_v2" "compute" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${local.nodenames[each.key]}
+    fqdn: ${local.fqdns[each.key]}
   EOF
 
-  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
+  availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
 
 }
 
@@ -177,9 +185,13 @@ resource "openstack_networking_floatingip_associate_v2" "fip" {
 }
 
 output "compute_instances" {
-    value = local.compute_instances
+  value = local.compute_instances
 }
 
 output "image_id" {
   value = var.image_id
+}
+
+output "fqdns" {
+  value = local.fqdns
 }

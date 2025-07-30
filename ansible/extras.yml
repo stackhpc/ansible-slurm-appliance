@@ -34,9 +34,10 @@
   become: true
   gather_facts: false
   tasks:
-    - name: Install and configure EESSI
-      import_role:
+    - name: Install / configure EESSI
+      include_role:
         name: eessi
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup CUDA
   hosts: cuda
@@ -48,6 +49,20 @@
         name: cuda
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'install.yml' }}"
 
+- name: Setup vGPU
+  hosts: vgpu
+  become: yes
+  gather_facts: yes
+  tags: vgpu
+  tasks:
+    - include_role:
+        name: stackhpc.linux.vgpu
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'install.yml' }}"
+  handlers:
+    - name: reboot
+      fail:
+        msg: Reboot handler for stackhpc.linux.vgpu role fired unexpectedly. This was supposed to be unreachable.
+
 - name: Persist hostkeys across rebuilds
   # Must be after filesystems.yml (for storage)
   # and before portal.yml (where OOD login node hostkeys are scanned)
@@ -57,17 +72,6 @@
   tasks:
     - import_role:
         name: persist_hostkeys
-
-
-- name: Setup NFS export for compute node configuration
-  hosts: compute_init:!builder
-  # NB: has to be after eeesi and os-manila-mount
-  tags: compute_init
-  become: yes
-  tasks:
-    - include_role:
-        name: compute_init
-        tasks_from: export.yml
 
 - name: Install k9s
   become: yes

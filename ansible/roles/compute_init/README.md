@@ -75,6 +75,7 @@ it also requires an image build with the role name added to the
 | extras.yml               | basic_users             | All functionality [6]           | No                  |
 | extras.yml               | eessi                   | All functionality [7]           | No                  |
 | extras.yml               | cuda                    | None required - use image build | Yes [8]             |
+| extras.yml               | vgpu                    | All functionality               | Yes                 |
 | extras.yml               | persist_hostkeys        | Not relevant for compute nodes  | n/a                 |
 | extras.yml               | compute_init (export)   | Not relevant for compute nodes  | n/a                 |
 | extras.yml               | k9s (install)           | Not relevant during boot        | n/a                 |
@@ -84,6 +85,7 @@ it also requires an image build with the role name added to the
 | slurm.yml                | openhpc [10]            | All slurmd functionality        | No                  |
 | slurm.yml                | (set memory limits)     | Fully supported                 | No                  |
 | slurm.yml                | (block ssh)             | Fully supported                 | No                  |
+| slurm.yml                | nhc                     | Fully supported                 | No                  |
 | portal.yml               | (openondemand server)   | Not relevant for compute nodes  | n/a                 |
 | portal.yml               | (openondemand vnc desktop)  | None required - use image build | No              |
 | portal.yml               | (openondemand jupyter server) | None required - use image build | No            |
