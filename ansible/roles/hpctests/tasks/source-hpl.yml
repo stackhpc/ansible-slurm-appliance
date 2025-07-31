@@ -1,0 +1,15 @@
+---
+
+- name: Make directory
+  file:
+    path: "/opt/hpl"
+    state: directory
+    mode: '0755'
+
+- name: Download HPL sources
+  unarchive:
+    src: "http://www.netlib.org/benchmark/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
+    remote_src: yes
+    dest: "/opt/hpl"
+    keep_newer: yes
+    mode: '0755'
