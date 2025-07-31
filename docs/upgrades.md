@@ -50,6 +50,10 @@ All other commands should be run on the Ansible deploy host.
    site-specific configuration. In general changes to existing functionality will aim to be
    backward compatible. Alteration of site-specific configuration will usually only be
    necessary to use new functionality or where functionality has been upstreamed as above.
+   Note that the `environments/common/layouts/everything` file contains all possible
+   groups which can be used to enable features; diff this against your e.g.
+   `environments/site/inventory/groups` file to see new features which you may
+   wish to enable in the latter file.
 
    Make changes as necessary.
 

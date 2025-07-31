@@ -24,6 +24,10 @@ production-ready deployments.
     inventory = ../common/inventory,../site/inventory,inventory
     ```
 
+  In general only the `site` environment will need an `inventory/groups` file -
+  this is templated out by cookiecutter and should be modified as required to
+  enable features for all environments at the site.
+
 - To avoid divergence of configuration all possible overrides for group/role
 vars should be placed in `environments/site/inventory/group_vars/all/*.yml`
 unless the value really is environment-specific (e.g. DNS names for
