@@ -13,7 +13,7 @@ If using the `environments/common/layout/everything` Ansible groups template (wh
 
 Note that if `appliances_state_dir` is defined, the path it gives must exist and should be owned by root. Directories will be created within this with appropriate permissions for each item of state defined above. Additionally, the systemd units for the services listed above will be modified to require `appliances_state_dir` to be mounted before service start (via the `systemd` role).
 
-A new cookiecutter-produced environment supports persistent state in the default OpenTofu (see `environments/skeleton/{{cookiecutter.environment}}/tofu/`) by:
+A new cookiecutter-produced environment supports persistent state in the default OpenTofu (see `cookiecutter/tofu` and the `./tofu` module) by:
 
 - Defining a volume with a default size of 150GB - this can be controlled by the OpenTofu variable `state_volume_size`.
 - Attaching it to the control node.

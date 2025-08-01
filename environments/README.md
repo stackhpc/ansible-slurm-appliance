@@ -35,15 +35,12 @@ Shared configuration for all environments. This is not
 intended to be used as a standalone environment, hence the README does *not* detail
 how to provision the infrastructure.
 
-### skeleton
-
-Skeleton directory that is used as a template to create a new environemnt.
-
 ## Defining an environment
 
 To define an environment using cookiecutter:
 
-    cookiecutter skeleton
+    cd environments
+    cookiecutter ../cookiecutter
 
 This will present you with a series of questions which you must answer.
 Once you have answered all questions, a new environment directory will
