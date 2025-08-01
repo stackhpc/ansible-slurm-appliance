@@ -265,8 +265,8 @@
         name: grafana-dashboards
 
 - name: Add support for NVIDIA GPU auto detection to Slurm
-  hosts: cuda
-  become: true
+  hosts: slurm_recompile
+  become: yes
   tasks:
     - name: Recompile slurm
       ansible.builtin.import_role:

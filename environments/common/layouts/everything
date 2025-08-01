@@ -65,6 +65,10 @@ cluster
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
+[slurm_recompile:children]
+# Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
+cuda
+
 [eessi:children]
 # Hosts on which EESSI stack should be configured
 openhpc
