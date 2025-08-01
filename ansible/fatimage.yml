@@ -190,6 +190,11 @@
         tasks_from: install.yml
       when: "'alertmanager' in group_names"
 
+    - name: Download HPL source
+      include_role:
+        name: hpctests
+        tasks_from: source-hpl.yml
+
 - hosts: prometheus
   become: yes
   gather_facts: yes
