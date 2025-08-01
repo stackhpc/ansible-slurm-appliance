@@ -1,16 +1,14 @@
----
-# yamllint disable-line rule:line-length
 # based on https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/installing_identity_management/assembly_installing-an-idm-client_installing-identity-management
 
 - name: Retrieve persisted keytab from previous enrolement
-  ansible.builtin.slurp:
+  slurp:
     src: "{{ _freeipa_keytab_backup_path }}"
   delegate_to: "{{ groups['control'] | first }}"
   register: _slurp_persisted_keytab
   failed_when: false
 
 - name: Write persisted keytab from previous enrolment
-  ansible.builtin.copy:
+  copy:
     content: "{{ _slurp_persisted_keytab.content | b64decode }}"
     dest: /tmp/krb5.keytab
     owner: root
@@ -35,7 +33,7 @@
   #  3. New SSH keys are generated
   #  4. ipaUniqueID is preserved
   # and ALSO that the keytab is changed!
-  ansible.builtin.command:
+  command:
     cmd: >
       ipa-client-install
         --unattended
@@ -54,7 +52,7 @@
 
 - name: Enrol with FreeIPA using random password
   # Note --password is overloaded - it's bulkpassword unless --principal or --force-join is used in which case it's admin password
-  ansible.builtin.command:
+  command:
     cmd: >
       ipa-client-install
         --unattended
@@ -77,19 +75,19 @@
   # This service is installed by nfs-utils, which attempts to start it.
   # It has ConditionPathExists=/etc/krb5.keytab which fails if host is not enroled.
   # This task avoids a reboot.
-  ansible.builtin.systemd:
+  systemd:
     name: rpc-gssd.service
     state: started
     enabled: true
 
 - name: Retrieve current keytab
-  ansible.builtin.slurp:
+  slurp:
     src: /etc/krb5.keytab
   register: _slurp_current_keytab
   failed_when: false
 
 - name: Ensure keytab backup directory exists
-  ansible.builtin.file:
+  file:
     path: "{{ _freeipa_keytab_backup_path | dirname }}"
     state: directory
     owner: root
@@ -98,8 +96,7 @@
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Persist keytab
-  ansible.builtin.copy:
+  copy:
     content: "{{ _slurp_current_keytab.content | b64decode }}"
     dest: "{{ _freeipa_keytab_backup_path }}"
-    mode: "0644"
   delegate_to: "{{ groups['control'] | first }}"

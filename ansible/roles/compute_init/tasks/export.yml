@@ -1,6 +1,5 @@
----
 - name: Ensure the /exports/cluster directory exists
-  ansible.builtin.file:
+  file:
     path: /exports/cluster
     state: directory
     owner: slurm
@@ -10,7 +9,7 @@
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Copy /etc/hosts to /exports/cluster
-  ansible.builtin.copy:
+  copy:
     src: /etc/hosts
     dest: /exports/cluster/hosts
     owner: slurm
@@ -21,7 +20,7 @@
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Create hostvars directory
-  ansible.builtin.file:
+  file:
     path: /exports/cluster/hostvars/{{ inventory_hostname }}/
     state: directory
     owner: slurm
@@ -30,7 +29,7 @@
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Template out hostvars
-  ansible.builtin.template:
+  template:
     src: hostvars.yml.j2
     dest: /exports/cluster/hostvars/{{ inventory_hostname }}/hostvars.yml
     owner: slurm
@@ -39,7 +38,7 @@
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Copy manila share info to /exports/cluster
-  ansible.builtin.copy:
+  copy:
     content: "{{ os_manila_mount_share_info_var | to_nice_yaml }}"
     dest: /exports/cluster/manila_share_info.yml
     owner: slurm
@@ -53,22 +52,22 @@
       os_manila_mount_share_info: "{{ os_manila_mount_share_info }}"
 
 - name: Ensure /exports/cluster/cvmfs directory exists
-  ansible.builtin.file:
+  file:
     path: /exports/cluster/cvmfs
     state: directory
     owner: slurm
     group: root
-    mode: "0755"
+    mode: 0755
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Copy EESSI CVMFS config to /exports/cluster
-  ansible.builtin.copy:
+  copy:
     src: /etc/cvmfs/default.local
     dest: /exports/cluster/cvmfs/default.local
     owner: slurm
     group: root
-    mode: "0644"
+    mode: 0644
     remote_src: true
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
@@ -80,7 +79,7 @@
   when: "'cacerts' in group_names"
 
 - name: Create hostconfig directory
-  ansible.builtin.file:
+  file:
     path: "/exports/cluster/hostconfig/{{ inventory_hostname }}/"
     state: directory
     owner: slurm
@@ -88,20 +87,20 @@
     mode: u=rX,g=rwX,o=
   delegate_to: "{{ groups['control'] | first }}"
 
-- name: Template sssd config
-  ansible.builtin.import_role:
+- name: Template sssd config 
+  import_role:
     name: sssd
     tasks_from: export.yml
   when: "'sssd' in group_names"
 
-- name: Template sshd config
-  ansible.builtin.import_role:
+- name: Template sshd config 
+  import_role:
     name: sshd
     tasks_from: export.yml
   when: "'sshd' in group_names"
 
 - name: Export generated NHC config
-  ansible.builtin.import_role:
+  import_role:
     name: nhc
     tasks_from: export.yml
   when: "'nhc' in group_names"

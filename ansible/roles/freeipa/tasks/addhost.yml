@@ -1,4 +1,3 @@
----
 - name: Get ipa host information
   # This uses DNS to find the ipa server, which works as this is running on the enrolled ipa server
   # It doesn't fail even if the host doesn't exist
@@ -11,7 +10,7 @@
     validate_certs: false
   delegate_to: "{{ groups['freeipa_server'].0 }}"
   register: _ipa_host_check
-  check_mode: true
+  check_mode: yes
   changed_when: false
 
 - name: Add host to IPA
@@ -30,6 +29,6 @@
   register: _ipa_host_add
 
 - name: Set fact for ipa host password
-  ansible.builtin.set_fact:
+  set_fact:
     freeipa_host_password: "{{ _ipa_host_add.host.randompassword }}"
-  when: _ipa_host_add.changed # noqa: no-handler
+  when: _ipa_host_add.changed

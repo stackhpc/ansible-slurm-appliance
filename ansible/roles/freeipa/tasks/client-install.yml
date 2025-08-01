@@ -1,4 +1,4 @@
----
+
 - name: Install FreeIPA client package
-  ansible.builtin.dnf:
+  dnf:
     name: ipa-client

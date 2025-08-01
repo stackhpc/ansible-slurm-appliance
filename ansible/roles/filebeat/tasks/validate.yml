@@ -1,5 +1,5 @@
 ---
 
 - name: Assert that filebeat_config_path is defined
-  ansible.builtin.assert:
+  assert:
     that: filebeat_config_path is defined

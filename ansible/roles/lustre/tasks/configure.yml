@@ -1,6 +1,5 @@
----
 - name: Gather Lustre interface info
-  ansible.builtin.shell:
+  shell:
     cmd: |
       ip --json r get {{ _lustre_mgs_ip }}
   changed_when: false
@@ -9,23 +8,23 @@
     _lustre_mgs_ip: "{{ lustre_mgs_nid | split('@') | first }}"
 
 - name: Set facts for Lustre interface
-  ansible.builtin.set_fact:
+  set_fact:
     _lustre_interface: "{{ _lustre_ip_r_mgs_info.dev }}"
     _lustre_ip: "{{ _lustre_ip_r_mgs_info.prefsrc }}"
   vars:
     _lustre_ip_r_mgs_info: "{{ _lustre_ip_r_mgs.stdout | from_json | first }}"
 
 - name: Write LNet configuration file
-  ansible.builtin.template:
+  template:
     src: lnet.conf.j2
-    dest: /etc/lnet.conf # exists from package install, expected by lnet service
+    dest:  /etc/lnet.conf # exists from package install, expected by lnet service
     owner: root
     group: root
     mode: u=rw,go=r # from package install
   register: _lnet_conf
 
 - name: Ensure lnet service state
-  ansible.builtin.systemd:
+  systemd:
     name: lnet
     state: "{{ 'restarted' if _lnet_conf.changed else 'started' }}"
 
@@ -33,7 +32,6 @@
   ansible.builtin.file:
     path: "{{ item.mount_point }}"
     state: directory
-    mode: "0755"
   loop: "{{ lustre_mounts }}"
   when: "(item.mount_state | default(lustre_mount_state)) != 'absent'"
 

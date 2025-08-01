@@ -1,7 +1,7 @@
 ---
 - name: Restart slurm exporter
   become: true
-  ansible.builtin.systemd:
+  systemd:
     daemon_reload: true
     name: prometheus-slurm-exporter
     state: restarted

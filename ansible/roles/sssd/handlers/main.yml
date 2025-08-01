@@ -1,6 +1,5 @@
----
 - name: Restart sssd
-  ansible.builtin.systemd:
+  systemd:
     name: sssd
     state: restarted
   when: sssd_started | bool

@@ -1,15 +1,16 @@
 ---
+
 - hosts: cluster
   gather_facts: false
-  become: true
+  become: yes
   tasks:
     - name: Check if ansible-init is installed
-      ansible.builtin.stat:
+      stat:
         path: /etc/systemd/system/ansible-init.service
       register: _stat_ansible_init_unitfile
-
+    
     - name: Wait for ansible-init to finish
-      ansible.builtin.wait_for:
+      wait_for:
         path: /var/lib/ansible-init.done
         timeout: "{{ ansible_init_wait }}" # seconds
       when: _stat_ansible_init_unitfile.stat.exists
@@ -20,7 +21,7 @@
   tags:
     - deprecated
   tasks:
-    - ansible.builtin.fail:
+    - fail:
         msg: |
           Variables prefixed secrets_openhpc_* are deprecated - run:
               $ ansible-playbook ansible/adhoc/generate-passwords.yml
@@ -28,34 +29,34 @@
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
 - hosts: resolv_conf
-  become: true
+  become: yes
   gather_facts: false
   tags: resolv_conf
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: resolv_conf
 
 - hosts: etc_hosts
   gather_facts: false
   tags: etc_hosts
-  become: true
+  become: yes
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: etc_hosts
 
 - hosts: proxy
   gather_facts: false
   tags: proxy
-  become: true
+  become: yes
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: proxy
 
 - hosts: chrony
   tags: chrony
-  become: true
+  become: yes
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: mrlesmithjr.chrony
         # skip install tasks as might not have network yet
         tasks_from: config_chrony.yml
@@ -66,55 +67,53 @@
 
 - hosts: cluster
   gather_facts: false
-  become: true
+  become: yes
   tasks:
     - name: Fix incorrect permissions on /etc in Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
       # breaks munge
-      ansible.builtin.file:
+      file:
         path: /etc
         state: directory
         owner: root
         group: root
         mode: u=rwx,go=rx # has g=rwx
     - name: Prevent ssh hanging if shared home is unavailable
-      ansible.builtin.lineinfile:
+      lineinfile:
         path: /etc/profile
         search_string: HOSTNAME=$(/usr/bin/hostnamectl --transient 2>/dev/null) || \
         state: absent
     - name: Add system user groups
-      ansible.builtin.group:
-        name: "{{ item.group }}"
+      ansible.builtin.group: "{{ item.group }}"
       loop: "{{ appliances_local_users }}"
       when:
         - item.enable | default(true) | bool
         - "'group' in item"
-      become_method: "ansible.builtin.sudo"
+      become_method: "sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
-      become_flags: "-i"
+      become_flags: '-i'
     - name: Add system users
-      ansible.builtin.user:
-        name: "{{ item.user }}"
+      ansible.builtin.user: "{{ item.user }}"
       loop: "{{ appliances_local_users }}"
       when: item.enable | default(true) | bool
-      become_method: "ansible.builtin.sudo"
+      become_method: "sudo"
       # Need to change working directory otherwise we try to switch back to non-existent directory.
-      become_flags: "-i"
+      become_flags: '-i'
     - name: Reset ssh connection to allow user changes to affect ansible_user
-      ansible.builtin.meta: reset_connection
-      become: false
+      meta: reset_connection
+      become: no
 
 - hosts: systemd
-  become: true
+  become: yes
   gather_facts: false
   tags: systemd
   tasks:
     - name: Make systemd unit modifications
-      ansible.builtin.import_role:
+      import_role:
         name: systemd
 
 - hosts: selinux
   gather_facts: false
-  become: true
+  become: yes
   tags:
     - selinux
   tasks:
@@ -126,37 +125,37 @@
 
 - hosts: sshd
   tags: sshd
-  gather_facts: false
-  become: true
+  gather_facts: no
+  become: yes
   tasks:
     - name: Configure sshd
-      ansible.builtin.import_role:
+      import_role:
         name: sshd
 
 - hosts: dnf_repos
-  become: true
+  become: yes
   tags: dnf_repos
   tasks:
-    - name: Check that creds won't be leaked to users
-      ansible.builtin.assert:
-        that: dnf_repos_password is undefined
-        fail_msg: Passwords should not be templated into repofiles during configure, unset 'dnf_repos_password'
-      when:
-        - appliances_mode == 'configure'
-        - not (dnf_repos_allow_insecure_creds | default(false)) # useful for development
+  - name: Check that creds won't be leaked to users
+    ansible.builtin.assert:
+      that: dnf_repos_password is undefined
+      fail_msg: Passwords should not be templated into repofiles during configure, unset 'dnf_repos_password'
+    when:
+      - appliances_mode == 'configure'
+      - not (dnf_repos_allow_insecure_creds | default(false)) # useful for development
 
 - hosts: cacerts
   tags: cacerts
   gather_facts: false
   tasks:
     - name: Install custom cacerts
-      ansible.builtin.import_role:
+      import_role:
         name: cacerts
 
 - hosts: squid
   tags: squid
-  gather_facts: true
-  become: true
+  gather_facts: yes
+  become: yes
   tasks:
     # - Installing squid requires working dnf repos
     # - Configuring dnf_repos itself requires working dnf repos to install epel
@@ -167,27 +166,27 @@
         tasks_from: set_repos.yml
       when: "'dnf_repos' in group_names"
     - name: Configure squid proxy
-      ansible.builtin.import_role:
+      import_role:
         name: squid
 
 - hosts: dnf_repos
   tags: dnf_repos
-  gather_facts: true
-  become: true
+  gather_facts: yes
+  become: yes
   tasks:
-    - name: Replace system repos with pulp repos
-      ansible.builtin.include_role:
-        name: dnf_repos
-        tasks_from: set_repos.yml
+  - name: Replace system repos with pulp repos 
+    ansible.builtin.include_role:
+      name: dnf_repos
+      tasks_from: set_repos.yml
 
 # --- tasks after here require general access to package repos ---
 - hosts: tuned
   tags: tuned
-  gather_facts: true
-  become: true
+  gather_facts: yes
+  become: yes
   tasks:
     - name: Install and configure tuneD
-      ansible.builtin.include_role:
+      include_role:
         name: tuned
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
@@ -196,39 +195,39 @@
   tags:
     - freeipa
     - freeipa_server
-  gather_facts: true
-  become: true
+  gather_facts: yes
+  become: yes
   tasks:
     - name: Install FreeIPA server
-      ansible.builtin.import_role:
+      import_role:
         name: freeipa
         tasks_from: server.yml
 
 - hosts: cluster
   gather_facts: false
-  become: true
+  become: yes
   tags: cockpit
   tasks:
-    - name: Remove RHEL cockpit # noqa: no-changed-when
-      ansible.builtin.command: dnf -y remove cockpit-ws
+    - name: Remove RHEL cockpit
+      command: dnf -y remove cockpit-ws # N.B. using ansible dnf module is very slow
       register: dnf_remove_output
-      ignore_errors: true # Avoid failing if a lock or other error happens
+      ignore_errors: true  # Avoid failing if a lock or other error happens
 
 - hosts: firewalld
   gather_facts: false
-  become: true
+  become: yes
   tags: firewalld
   tasks:
-    - ansible.builtin.include_role:
+    - include_role:
         name: firewalld
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - hosts: fail2ban
   gather_facts: false
-  become: true
+  become: yes
   tags: fail2ban
   tasks:
-    - ansible.builtin.include_role:
+    - include_role:
         name: fail2ban
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
@@ -237,93 +236,91 @@
   hosts: podman
   tags: podman
   tasks:
-    - ansible.builtin.include_role:
+    - include_role:
         name: podman
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - hosts: update
   gather_facts: false
-  become: true
+  become: yes
   tags:
     - update
   tasks:
-    - when: "update_enable | default('false') | bool"
+    - block:
+      - name: Update selected packages
+        yum:
+          name: "{{ update_name }}"
+          state: "{{ update_state }}"
+          exclude: "{{ update_exclude }}"
+          disablerepo: "{{ update_disablerepo }}"
+        async: "{{ 30 * 60 }}" # wait for up to 30 minutes
+        poll: 15 # check every 15 seconds
+        register: updates
+      - name: Ensure update log directory on localhost exists
+        file:
+          path: "{{ update_log_path | dirname }}"
+          state: directory
+        become: false
+        delegate_to: localhost
+        run_once: true
+      - name: Log updated packages
+        copy:
+          content: "{{ updates.results | join('\n') }}"
+          dest: "{{ update_log_path }}"
+        delegate_to: localhost
+        become: no
+      - debug:
+          msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
+      when: "update_enable | default('false') | bool"
 
-      block:
-        - name: Update selected packages
-          ansible.builtin.dnf:
-            name: "{{ update_name }}"
-            state: "{{ update_state }}"
-            exclude: "{{ update_exclude }}"
-            disablerepo: "{{ update_disablerepo }}"
-          async: "{{ 30 * 60 }}" # wait for up to 30 minutes
-          poll: 15 # check every 15 seconds
-          register: updates
-        - name: Ensure update log directory on localhost exists
-          ansible.builtin.file:
-            path: "{{ update_log_path | dirname }}"
-            state: directory
-            mode: "0755"
-          become: false
-          delegate_to: localhost
-          run_once: true # noqa: run-once[task]
-        - name: Log updated packages
-          ansible.builtin.copy:
-            content: "{{ updates.results | join('\n') }}"
-            dest: "{{ update_log_path }}"
-            mode: "0644"
-          delegate_to: localhost
-          become: false
-        - ansible.builtin.debug:
-            msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"
 - hosts:
     - selinux
     - update
   gather_facts: false
-  become: true
+  become: yes
   tags:
     - reboot
     - selinux
     - update
   tasks:
     - name: Check for pending reboot from package updates
-      ansible.builtin.command:
+      command:
         cmd: dnf needs-restarting -r
       register: update_reboot_required
       failed_when: "update_reboot_required.rc not in [0, 1]"
       changed_when: false
     - name: Reboot to cover SELinux state change or package upgrades
-      ansible.builtin.reboot:
+      reboot:
         post_reboot_delay: 30
       when: (sestatus['reboot_required'] | default(false)) or (update_reboot_required.rc == 1)
     - name: Wait for hosts to be reachable
-      ansible.builtin.wait_for_connection:
+      wait_for_connection:
         sleep: 15
     - name: Clear facts
-      ansible.builtin.meta: clear_facts
+      meta: clear_facts
     - name: Update facts
-      ansible.builtin.setup:
+      setup:
 
 - hosts: ofed
-  gather_facts: true
-  become: true
+  gather_facts: yes
+  become: yes
   tags: ofed
   tasks:
-    - ansible.builtin.include_role:
+    - include_role:
         name: ofed
 
 - hosts: ansible_init
-  gather_facts: true
-  become: true
+  gather_facts: yes
+  become: yes
   tags: linux_ansible_init
   tasks:
     - name: Install ansible-init
-      ansible.builtin.include_role:
+      include_role:
         name: azimuth_cloud.image_utils.linux_ansible_init
       when: "appliances_mode == 'build'"
 
 - hosts: k3s:&builder
-  become: true
+  become: yes
   tags: k3s
   tasks:
     - name: Install k3s

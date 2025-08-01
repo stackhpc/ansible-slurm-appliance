@@ -1,10 +1,8 @@
----
 - name: Install slurm_exporter package
-  # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
-  ansible.builtin.dnf:
-    # yamllint disable-line rule:line-length
-    name: "https://github.com/stackhpc/prometheus-slurm-exporter/releases/download/{{ slurm_exporter_version }}/prometheus-slurm-exporter-{{ slurm_exporter_version }}-{{ slurm_exporter_release }}.el8.x86_64.rpm"
-    disable_gpg_check: true
+  dnf:
+    name: "https://github.com/stackhpc/prometheus-slurm-exporter/releases/download/{{ slurm_exporter_version }}/prometheus-slurm-exporter-{{ slurm_exporter_version }}-{{slurm_exporter_release}}.el8.x86_64.rpm"
+    disable_gpg_check: yes
   notify: Restart slurm exporter
 
-- ansible.builtin.meta: flush_handlers
+- meta: flush_handlers
+

@@ -1,9 +1,8 @@
----
 - hosts: cuda
-  become: true
-  gather_facts: true
+  become: yes
+  gather_facts: yes
   tags: cuda_samples
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: cuda
         tasks_from: samples.yml

@@ -1,32 +1,32 @@
----
 # Should be run on compute nodes you want to run jupyter notebook on
 # See https://osc.github.io/ood-documentation/latest/app-development/tutorials-interactive-apps/add-jupyter/software-requirements.html
 # - Will already have openssl and lmod
 
 - name: Ensure python3.9 installed
-  ansible.builtin.dnf:
+  dnf:
     name: python39
   tags: install
 
 - name: Install jupyter venv
   # Requires separate step so that the upgraded pip is used to install packages
-  ansible.builtin.pip:
+  pip:
     name: pip
-    state: latest # noqa: package-latest
+    state: latest
     virtualenv: /opt/jupyter-py39
     virtualenv_command: python3.9 -m venv
   tags: install
 
 - name: Copy jupyter requirements file
-  ansible.builtin.copy:
+  copy:
     src: jupyter_requirements.txt
     dest: /opt/jupyter-py39/jupyter_requirements.txt
-    mode: "0644"
   tags: install
 
 - name: Install jupyter package in venv
-  ansible.builtin.pip:
+  pip:
     virtualenv: /opt/jupyter-py39
     virtualenv_command: python3.9 -m venv
     requirements: /opt/jupyter-py39/jupyter_requirements.txt
   tags: install
+
+

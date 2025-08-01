@@ -1,6 +1,6 @@
 ---
 - name: Install OS packages
-  ansible.builtin.dnf:
+  yum:
     name:
       - podman
       - python3

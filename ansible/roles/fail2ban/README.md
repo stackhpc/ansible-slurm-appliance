@@ -1,23 +1,27 @@
-# fail2ban
+fail2ban
+=========
 
 Setup fail2ban to protect SSH on a host.
 
 Note that no email alerts are set up so logs (at `/var/log/fail2ban.log`) will have to be manually reviewed if required.
 
-## Requirements
+Requirements
+------------
 
 - An EL8 system.
 - `firewalld` running.
 
-## Role Variables
+Role Variables
+--------------
+None.
+
+Dependencies
+------------
 
 None.
 
-## Dependencies
-
-None.
-
-## Example Playbook
+Example Playbook
+----------------
 
 ```yaml
 - hosts: fail2ban
@@ -30,10 +34,12 @@ None.
         name: fail2ban
 ```
 
-## License
+License
+-------
 
 Apache v2
 
-## Author Information
+Author Information
+------------------
 
 stackhpc.com

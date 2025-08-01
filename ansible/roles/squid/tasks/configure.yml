@@ -1,6 +1,5 @@
----
 - name: Ensure squid cache directory exists
-  ansible.builtin.file:
+  file:
     path: "{{ squid_cache_dir }}"
     # based on what dnf package creates:
     owner: squid
@@ -8,7 +7,7 @@
     mode: u=rwx,g=rw,o=
 
 - name: Template squid configuration
-  ansible.builtin.template:
+  template:
     src: "{{ squid_conf_template }}"
     dest: /etc/squid/squid.conf
     owner: squid
@@ -16,9 +15,10 @@
     mode: ug=rwX,go=
   notify: Restart squid
 
-- ansible.builtin.meta: flush_handlers
+- meta: flush_handlers
+
 - name: Ensure squid service state
-  ansible.builtin.systemd:
+  systemd:
     name: squid
     state: "{{ 'started' if squid_started | bool else 'stopped' }}"
     enabled: "{{ true if squid_enabled else false }}"

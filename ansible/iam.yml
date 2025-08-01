@@ -1,14 +1,13 @@
----
 - hosts: freeipa_client
   tags:
     - freeipa
     - freeipa_server # as this is only relevant if using freeipa_server
     - freeipa_host
-  gather_facts: false
-  become: true
+  gather_facts: no
+  become: yes
   tasks:
     - name: Ensure FreeIPA client hosts are added to the FreeIPA server
-      ansible.builtin.import_role:
+      import_role:
         name: freeipa
         tasks_from: addhost.yml
       when: groups['freeipa_server'] | length > 0
@@ -17,16 +16,16 @@
   tags:
     - freeipa
     - freeipa_client
-  gather_facts: true
-  become: true
+  gather_facts: yes
+  become: yes
   tasks:
     - name: Install FreeIPA client
-      ansible.builtin.include_role:
+      include_role:
         name: freeipa
         tasks_from: client-install.yml
       when: "appliances_mode != 'configure'"
     - name: Enrol FreeIPA client
-      ansible.builtin.import_role:
+      import_role:
         name: freeipa
         tasks_from: enrol.yml
 
@@ -35,19 +34,19 @@
     - freeipa
     - freeipa_server
     - users
-  gather_facts: true
-  become: true
+  gather_facts: yes
+  become: yes
   tasks:
     - name: Add FreeIPA users
-      ansible.builtin.import_role:
+      import_role:
         name: freeipa
         tasks_from: users.yml
 
 - hosts: sssd
-  become: true
-  gather_facts: false
+  become: yes
+  gather_facts: no
   tags: sssd
   tasks:
     - name: Configure sssd
-      ansible.builtin.import_role:
+      import_role:
         name: sssd

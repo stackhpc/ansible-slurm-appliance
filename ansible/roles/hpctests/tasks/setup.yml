@@ -1,36 +1,34 @@
 ---
+
 - name: Get partition information
-  ansible.builtin.command: "sinfo --format %P --noheader"
+  shell: "sinfo --format %P --noheader"
   register: _sinfo_partitions
   changed_when: false
 
 - name: Select default partition if hpctests_partition not given
-  ansible.builtin.set_fact:
-    hpctests_partition: "{{ (_sinfo_partitions.stdout_lines | select('contains', '*') | first)[:-1] }}"
+  set_fact:
+    hpctests_partition: "{{ (_sinfo_partitions.stdout_lines  | select('contains', '*') | first)[:-1] }}"
   when: hpctests_partition is not defined
 
 - name: Get info about compute nodes
-  # yamllint disable-line rule:line-length
-  ansible.builtin.command: "sinfo --Node --noheader{%if hpctests_nodes is defined %} --nodes {{hpctests_nodes}}{% endif %} --partition {{hpctests_partition}} --format
-    %N"
+  shell: "sinfo --Node --noheader{%if hpctests_nodes is defined %} --nodes {{hpctests_nodes}}{% endif %} --partition {{hpctests_partition}} --format %N"
   register: hpctests_computes
   changed_when: false
   failed_when: hpctests_computes.rc != 0
 
 - name: Check compute node selection valid
-  ansible.builtin.assert:
+  assert:
     that: hpctests_computes.stdout_lines | length > 0
     fail_msg: "No nodes selected - was variable `hpctests_nodes` set (correctly)?"
 
 - name: Create test root directory
-  ansible.builtin.file:
+  file:
     path: "{{ hpctests_rootdir }}"
     state: directory
     owner: "{{ hpctests_user }}"
     group: "{{ hpctests_group }}"
-    mode: "0755"
 
 - name: Set fact for UCX_NET_DEVICES
-  ansible.builtin.set_fact:
+  set_fact:
     hpctests_ucx_net_devices: "{{ hpctests_ucx_net_devices.get(hpctests_partition, 'all') }}"
   when: hpctests_ucx_net_devices is mapping

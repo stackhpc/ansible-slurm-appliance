@@ -1,6 +1,6 @@
 ---
 - name: Restart filewalld
-  ansible.builtin.service:
+  service:
     name: firewalld
     state: restarted
   when: firewalld_state != 'stopped'

@@ -1,4 +1,5 @@
 ---
+
 # Fail early if configuration is invalid
 
 - name: Validate secrets created
@@ -8,7 +9,7 @@
     - validate
     - passwords
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: passwords
         tasks_from: validate.yml
 
@@ -25,7 +26,7 @@
       # the actual installed version.
       # So this compares requirements.yml against a .last version produced by a
       # successful dev/setup-env.sh run.
-    - ansible.builtin.assert:
+    - assert:
         that: "{{ _requirements_current == _requirements_installed }}"
         fail_msg: |
           Ansible Galaxy installs are out of date:
@@ -33,7 +34,7 @@
           {% for req in _requirements_installed | difference(_requirements_current) %}
           {{ req }}
           {% endfor %}
-
+          
           Run dev/setup-env.sh to fix this.
       vars:
         # note difference filter requires lists, so need to rearrange yaml from files.
@@ -49,7 +50,7 @@
     - validate
     - openhpc
   tasks:
-    - ansible.builtin.assert:
+    - assert:
         that: groups['control'] | length
         fail_msg: "no hosts found in group 'control' - has control node been deployed?"
 
@@ -60,10 +61,10 @@
     - validate
     - openhpc
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: stackhpc.openhpc
         tasks_from: validate.yml
-    - ansible.builtin.assert: # noqa: run-once[task]
+    - assert:
         that: "'enable_configless' in openhpc_config.SlurmctldParameters | default([])"
         fail_msg: |
           'enable_configless' not found in openhpc_config.SlurmctldParameters - is variable openhpc_config overridden?
@@ -79,7 +80,7 @@
     - validate
     - filebeat
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: filebeat
         tasks_from: validate.yml
       tags: validate
@@ -95,17 +96,17 @@
     - openondemand_server
     - grafana
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: openondemand
         tasks_from: validate.yml
-      # This set of tasks will run if there are grafana hosts configured.
-      # It is a valid configuration to have a grafana group with hosts
+      # This set of tasks will run if there are grafana hosts configured. 
+      # It is a valid configuration to have a grafana group with hosts 
       # when *not* deploying openondemand. This would mean that openondemand
       # vars validated in the below task are not set in a way that passes
       # this set of validation tasks. To ensure that this validation does
       # not fail with a valid config, only run these tasks when the
       # openondemand group both exists *and* contains hosts.
-      when:
+      when: 
         - "'openondemand' in groups"
         - groups['openondemand'] | length > 0
       tags:
@@ -119,7 +120,7 @@
     - validate
     - freeipa
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: freeipa
         tasks_from: validate.yml
 
@@ -129,16 +130,16 @@
     - validate
     - lustre
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: lustre
         tasks_from: validate.yml
 
 - name: Validate vGPU configuration
   hosts: vgpu
-  become: true
-  gather_facts: true
+  become: yes
+  gather_facts: yes
   tags: vgpu
   tasks:
-    - ansible.builtin.include_role:
+    - include_role:
         name: stackhpc.linux.vgpu
         tasks_from: validate.yml

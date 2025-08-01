@@ -1,4 +1,5 @@
 ---
+
 - name: Replace system repos with Pulp repos
   ansible.builtin.yum_repository:
     file: "{{ item.file }}"

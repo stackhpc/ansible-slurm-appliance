@@ -1,7 +1,6 @@
----
 # Exclusively used for compute-init
 - name: Inject host specific config template
-  ansible.builtin.template:
+  template:
     src: "{{ sssd_conf_src }}"
     dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/sssd.conf"
     owner: root

@@ -1,18 +1,17 @@
----
 - name: Grab facts to determine distribution
-  ansible.builtin.setup:
+  setup:
 
 - name: Ensure drop in directory exists
-  ansible.builtin.file:
+  file:
     path: /etc/ssh/sshd_config.d/
     state: directory
     owner: root
     group: root
-    mode: "0700"
+    mode: 700
   become: true
 
 - name: Ensure drop in configuration is included
-  ansible.builtin.blockinfile:
+  blockinfile:
     dest: /etc/ssh/sshd_config
     content: |
       # To modify the system-wide sshd configuration, create <custom>.conf
@@ -33,7 +32,7 @@
   #   Include /etc/ssh/sshd_config.d/*.conf
   # early on, which is generally held to be the correct approach, so adding
   # values to the end of that file won't work
-  ansible.builtin.template:
+  template:
     src: "{{ sshd_conf_src }}"
     dest: "{{ sshd_conf_dest }}"
     owner: root

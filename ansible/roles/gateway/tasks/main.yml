@@ -1,8 +1,7 @@
----
 - name: Add gateway playbook
-  ansible.builtin.copy:
+  copy:
     src: gateway-init.yml
     dest: /etc/ansible-init/playbooks/05-gateway-init.yml
     owner: root
     group: root
-    mode: "0644"
+    mode: 0644

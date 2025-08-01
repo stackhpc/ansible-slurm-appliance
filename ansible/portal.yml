@@ -1,16 +1,15 @@
----
 - hosts: openondemand
   tags:
     - openondemand
     - openondemand_server
-  become: true
-  gather_facts: true # TODO
+  become: yes
+  gather_facts: yes # TODO
   tasks:
     - name: Skip openondemand apps installation in configure mode
-      ansible.builtin.set_fact:
+      set_fact:
         ood_install_apps: {}
       when: appliances_mode == 'configure'
-    - ansible.builtin.import_role:
+    - import_role:
         name: openondemand
         tasks_from: main.yml
 
@@ -18,10 +17,10 @@
   tags:
     - openondemand
     - openondemand_desktop
-  become: true
-  gather_facts: true
+  become: yes
+  gather_facts: yes
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
       when: appliances_mode != 'configure' # is run during build
@@ -30,10 +29,10 @@
   tags:
     - openondemand
     - openondemand_jupyter
-  become: true
-  gather_facts: true
+  become: yes
+  gather_facts: yes
   tasks:
-    - ansible.builtin.import_role:
+    - import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
       when: appliances_mode != 'configure' # is run during build

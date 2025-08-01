@@ -1,24 +1,22 @@
----
 - name: Install pip
-  ansible.builtin.dnf:
+  dnf:
     name: python3-pip
 
 - name: Install python mysql client
-  ansible.builtin.pip:
+  pip:
     name:
       - pymysql
       - cryptography
     state: present
 
 - name: Create systemd mysql container unit file
-  ansible.builtin.template:
+  template:
     dest: /etc/systemd/system/mysql.service
     src: mysql.service.j2
-    mode: "0644"
   register: _mysql_unitfile
 
 - name: Pull container image
   containers.podman.podman_image:
     name: docker.io/library/mysql
     tag: "{{ mysql_tag }}"
-  # become_user: "{{ mysql_podman_user }}" # Commenting out as become_user does not imply become: true
+  become_user: "{{ mysql_podman_user }}"

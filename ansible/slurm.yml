@@ -1,21 +1,22 @@
 ---
+
 - name: Setup DB
   hosts: mysql
   become: true
   tags:
     - mysql
   tasks:
-    - ansible.builtin.include_role:
-        name: mysql
+    - include_role:
+        name:  mysql
 
 - name: Setup slurm-driven rebuild
   hosts: rebuild:!builder
-  become: true
+  become: yes
   tags:
     - rebuild
     - openhpc
   tasks:
-    - ansible.builtin.include_role:
+    - include_role:
         name: rebuild
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
@@ -23,59 +24,59 @@
   hosts:
     - compute
     - login
-  become: true
+  become: yes
   tags:
     - openhpc
   tasks:
-    - name: Set memory limits
-      ansible.builtin.lineinfile:
+    - name: set memory limits
+      lineinfile:
         path: /etc/security/limits.conf
-        regexp: "\\* soft memlock unlimited"
+        regexp: '\* soft memlock unlimited'
         line: "* soft memlock unlimited"
 
 - name: Block ssh to compute nodes for non-privileged users without running jobs
   hosts: compute
-  become: true
+  become: yes
   tags:
     - openhpc
   tasks:
     - name: Configure sshd pam module
-      ansible.builtin.blockinfile:
+      blockinfile:
         path: /etc/pam.d/sshd
-        insertafter: "account\\s+required\\s+pam_nologin.so"
+        insertafter: 'account\s+required\s+pam_nologin.so'
         block: |
           account    sufficient   pam_access.so
           account    required     pam_slurm.so
     - name: Configure login access control
-      ansible.builtin.blockinfile:
+      blockinfile:
         path: /etc/security/access.conf
         block: |
           +:adm:ALL
           -:ALL:ALL
- # vagrant uses (deprecated) ansible_ssh_user
+      # vagrant uses (deprecated) ansible_ssh_user
 
 - name: Setup slurm
   hosts: openhpc
-  become: true
+  become: yes
   tags:
     - openhpc
   tasks:
-    - ansible.builtin.include_role:
+    - include_role:
         name: topology
       # Gated on topology group having compute nodes but role also
       # needs to run on control and login nodes
       when:
         - appliances_mode == 'configure'
         - groups['topology'] | length > 0
-    - ansible.builtin.include_role:
+    - include_role:
         name: stackhpc.openhpc
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup Node Health Checks
   # Has to be done here as it requires openhpc repos etc for installation
   hosts: nhc:!builder
-  become: true
+  become: yes
   tags: nhc
   tasks:
-    - ansible.builtin.include_role:
+    - include_role:
         name: nhc
