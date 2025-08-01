@@ -24,6 +24,10 @@ production-ready deployments.
     inventory = ../common/inventory,../site/inventory,inventory
     ```
 
+  In general only the `site` environment will need an `inventory/groups` file -
+  this is templated out by cookiecutter and should be modified as required to
+  enable features for all environments at the site.
+
 - To avoid divergence of configuration all possible overrides for group/role
 vars should be placed in `environments/site/inventory/group_vars/all/*.yml`
 unless the value really is environment-specific (e.g. DNS names for
@@ -127,7 +131,17 @@ and referenced from the `site` and `production` environments, e.g.:
   set the "attach" options and run `tofu apply` again - this should show there
   are no changes planned.
 
-- Configure Open OnDemand - see [specific documentation](openondemand.md).
+- Consider whether Prometheus storage configuration is required. By default:
+  - A 200GB state volume is provisioned (but see above)
+  - The common environment [sets](../environments/common/inventory/group_vars/all/prometheus.yml)
+    a maximum retention of 100 GB and 31 days
+  These may or may not be appropriate depending on the number of nodes, the
+  scrape interval, and other uses of the state volume (primarily the `slurmctld`
+  state and the `slurmdbd` database). See [docs/monitoring-and-logging](./monitoring-and-logging.md)
+  for more options.
+
+- Configure Open OnDemand - see [specific documentation](openondemand.md) which
+  notes specific variables required.
 
 - Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
 

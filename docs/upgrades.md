@@ -50,6 +50,10 @@ All other commands should be run on the Ansible deploy host.
    site-specific configuration. In general changes to existing functionality will aim to be
    backward compatible. Alteration of site-specific configuration will usually only be
    necessary to use new functionality or where functionality has been upstreamed as above.
+   Note that the `environments/common/layouts/everything` file contains all possible
+   groups which can be used to enable features; diff this against your e.g.
+   `environments/site/inventory/groups` file to see new features which you may
+   wish to enable in the latter file.
 
    Make changes as necessary.
 
@@ -60,7 +64,9 @@ All other commands should be run on the Ansible deploy host.
 
     Note that some releases may not include new images. In this case use the image from the latest previous release with new images.
 
-1. If required, build an "extra" image with local modifications, see [docs/image-build.md](./image-build.md).
+1. If an "extra" image build with local modifications is required, update the
+   Packer build configuration to use the above new image and run a build. See
+   [docs/image-build.md](./image-build.md).
 
 1. Modify your site-specific environment to use this image, e.g. via `cluster_image_id` in `environments/$SITE_ENV/tofu/variables.tf`.
 
