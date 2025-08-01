@@ -41,9 +41,8 @@
   gather_facts: false
   tasks:
     - name: Set up Ansible user
-      ansible.builtin.user:
-        name: "{{ (appliances_local_users_default | selectattr('user.name', 'eq', appliances_local_users_ansible_user_name))[0]['user'] }}"
-      become_method: "ansible.builtin.sudo"
+      ansible.builtin.user: "{{ (appliances_local_users_default | selectattr('user.name', 'eq', appliances_local_users_ansible_user_name))[0]['user'] }}"
+      become_method: ansible.builtin.sudo
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: "-i"
       become: true
@@ -53,6 +52,7 @@
   tasks:
     - name: Reset persistent SSH connections
       ansible.builtin.meta: reset_connection
+
 - hosts: localhost
   gather_facts: false
   become: false

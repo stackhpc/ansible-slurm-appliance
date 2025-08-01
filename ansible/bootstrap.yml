@@ -88,7 +88,7 @@
       when:
         - item.enable | default(true) | bool
         - "'group' in item"
-      become_method: "ansible.builtin.sudo"
+      become_method: ansible.builtin.sudo
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: "-i"
     - name: Add system users
@@ -96,7 +96,7 @@
         name: "{{ item.user }}"
       loop: "{{ appliances_local_users }}"
       when: item.enable | default(true) | bool
-      become_method: "ansible.builtin.sudo"
+      become_method: ansible.builtin.sudo
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: "-i"
     - name: Reset ssh connection to allow user changes to affect ansible_user
