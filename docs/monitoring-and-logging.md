@@ -39,14 +39,15 @@ Where `role_name` is the name of the internal role.
 
 ## Customising variables
 
-You should only customise the variables in `environments/common` if you are working on a feature that you intend to contribute back. Instead you should override the variables in the environment relevant to your deployment. This is possible since inventories later in the inheritance chain have greater precedence. Please see [README.md](../README.md#environments) for a more detailed explanation. This notice exists to avoid the need to need to keep repeating this point in the following sections. Where it is noted that you should customise a variable, it is implied that this change should be made to your own environment e.g `environments/production` in preference to `environments/common`, even when
+You should only customise the variables in `environments/common` if you are working on a feature that you intend to contribute back. Instead you should override the variables in the environment relevant to your deployment. This is possible since inventories later in the inheritance chain have greater precedence. Please see [README.md](../README.md#environments) for a more detailed explanation.
+This notice exists to avoid the need to need to keep repeating this point in the following sections. Where it is noted that you should customise a variable, it is implied that this change should be made to your own environment e.g `environments/production` in preference to `environments/common`, even when
 this is not explicitly stated.
 
 ## filebeat
 
 This section details the configuration of filebeat.
 
-### Defaults
+### filebeat defaults
 
 Filebeat is configured by the internal `filebeat` role which can be found here:
 
@@ -56,7 +57,7 @@ The appliance defaults for the `filebeat` role can be found at the following loc
 
 > [environments/common/inventory/group_vars/all/filebeat.yml](../environments/common/inventory/group_vars/all/filebeat.yml)
 
-### Overview
+### filebeat overview
 
 Filebeat is configured to scrape the output of slurm stats. Slurm stats produces a json log file in the following location on the host:
 
@@ -73,9 +74,9 @@ This file is configurable by the `filebeat_config_path` variable.
 It is not currently possible to partially override `filebeat.yml`. You will have to configure `filebeat_config_path` to refer to another file, copying
 the parts of the default configuration you want to keep. Pull requests are welcomed to add the functionality needed to allow for partial overrides.
 
-### Placement
+### filebeat placement
 
-The `filebeat` group controls the placement of the `filebeat` service. The default configuration scrapes the `slurm_stats` service output. This requires a `filebeat` instance to be co-located with the `slurm_stats` service.
+The `filebeat` group controls the placement of the `filebeat` service. The default configuration scrapes the `slurm_stats` service output. This requires a `filebeat` instance to be colocateed with the `slurm_stats` service.
 
 In the simplest configuration, a single host should be assigned to the `filebeat` and `slurm_stats` group. The host assigned to the `slurm_stats` group should the same host as assigned to the `filebeat` group. More advanced configurations are possible, but require overriding `filebeat_config_path` using `group` or `host` variables.
 
@@ -83,18 +84,18 @@ In the simplest configuration, a single host should be assigned to the `filebeat
 
 This section details the configuration of grafana.
 
-### Defaults
+### grafana defaults
 
 Internally, we use the [cloudalchemy.grafana](https://github.com/cloudalchemy/ansible-grafana) role. You can customise any of the variables that the role supports. For a full list, please see the
 [upstream documentation](https://github.com/cloudalchemy/ansible-grafana). The appliance defaults can be found here:
 
 > [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml)
 
-### Placement
+### grafana placement
 
 The `grafana` group controls the placement of the grafana service. Load balancing is currently unsupported so it is important that you only assign one host to this group.
 
-### Access
+### grafana access
 
 If Open OnDemand is enabled then by default this is used to proxy Grafana, otherwise Grafana is accessed through the first . See `grafana_url` in [environments/common/inventory/group_vars/all/grafana.yml](../environments/common/inventory/group_vars/all/grafana.yml). The port used (variable `grafana_port`) defaults to `3000`.
 
@@ -159,7 +160,7 @@ This can be customised with the `grafana_datasources` variable.
 
 This section details the configuration of OpenSearch.
 
-### Defaults
+### opensearch defaults
 
 The internal `opensearch` role is used to configure the service. The list of variables that can be customised can found in:
 
@@ -169,11 +170,11 @@ The appliance defaults are in the following file:
 
 > [environments/common/inventory/group_vars/all/opensearch.yml](../environments/common/inventory/group_vars/all/opensearch.yml)
 
-### Placement
+### opensearch placement
 
 The `opensearch` group determines the placement of the OpenSearch service. Load balancing is currently unsupported so it is important that you only assign one host to this group.
 
-### Access
+### opensearch access
 
 By default, OpenSearch only listens on the loopback interface. It should therefore be placed on the same node as `filebeat` and `grafana` which need to access the OpenSearch API.
 
@@ -185,9 +186,9 @@ The default set of users is defined in:
 
 This defines an the following accounts:
 
-| username      |  password                                       | purpose                                   |
-| ------------- | ------------------------------------------------|-------------------------------------------|
-| admin         | <vault_elasticsearch_admin_password>  | User of highest privilege                 |
+| username | password                             | purpose                   |
+| -------- | ------------------------------------ | ------------------------- |
+| admin    | <vault_elasticsearch_admin_password> | User of highest privilege |
 
 Where the password field refers to a variable containing the actual password. These are generated by the
 `generate-passwords.yml` adhoc playbook (see [README.md](../README.md#creating-a-slurm-appliance)).
@@ -208,7 +209,7 @@ found in:
 
 This section details the configuration of prometheus.
 
-### Defaults
+### Prometheus defaults
 
 Internally, we use the [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role. You can customise any of the variables that the role supports. For a full list, please see the
 [upstream documentation](https://github.com/cloudalchemy/ansible-prometheus). The appliance defaults can be found here:
@@ -217,19 +218,20 @@ Internally, we use the [cloudalchemy.prometheus](https://github.com/cloudalchemy
 
 Prometheus will be functional by default but the following variables should
 commonly be modified:
+
 - `prometheus_web_external_url`
 - `prometheus_storage_retention`
 - `prometheus_storage_retention_size`
 
-### Placement
+### Prometheus placement
 
 The `prometheus` group determines the placement of the prometheus service. Load balancing is currently unsupported so it is important that you only assign one host to this group.
 
-### Access
+### Prometheus access
 
 Prometheus is exposed on port `9090` on all hosts in the prometheus group. Currently, the configuration assumes a single host. Following the reference layout in `environments/common/layouts/everything`, this will be set to the slurm `control` node, prometheus would then be accessible from:
 
- > http://<control_node_ip>:9090
+> http://<control_node_ip>:9090
 
 The port can customised by overriding the `prometheus_web_external_url` variable.
 
@@ -268,7 +270,7 @@ The list can be customised by overriding the `collect[]` parameter of the `node`
 
 > [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml).
 
-Variables in this file should *not* be customised directly, but should be overridden in your `environment`. See [README.md](../README.md#environments) which details the process of overriding default variables in more detail.
+Variables in this file should _not_ be customised directly, but should be overridden in your `environment`. See [README.md](../README.md#environments) which details the process of overriding default variables in more detail.
 
 ### custom ansible filters
 
@@ -276,12 +278,13 @@ Variables in this file should *not* be customised directly, but should be overri
 
 Groups prometheus targets. Metrics from `node_exporter` hosts have two labels
 applied:
-   - `env`: This is set from the Ansible variable `prometheus_env` if present
-     (e.g. from hostvars or groupvars), defaulting to `ungrouped`. This can be
-     used to group metrics by some arbitrary "environment", e.g. rack.
-   - `group`: This refers to the "top-level" inventory group for the host and
-     is one of `control`, `login`, `compute` or `other`. This can be used to
-     define rules for specific host functionalities.
+
+- `env`: This is set from the Ansible variable `prometheus_env` if present
+  (e.g. from hostvars or groupvars), defaulting to `ungrouped`. This can be
+  used to group metrics by some arbitrary "environment", e.g. rack.
+- `group`: This refers to the "top-level" inventory group for the host and
+  is one of `control`, `login`, `compute` or `other`. This can be used to
+  define rules for specific host functionalities.
 
 ## slurm-stats
 
@@ -291,16 +294,12 @@ Slurm stats periodically queries the slurm accounting database to gather informa
 
 The polling of this data is controlled by a cron job. The default is to scrape the data every 5 minutes.
 
-### Defaults
+### slurm-stats defaults
 
-slurm-stats is configured `slurm-stats` role in the [slurm_openstack_tools collection](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools). Currently there is no customisation of this role in the common environment i.e we are just using role defaults. It is possible to override these by setting the relevant variable in your environment config. See [here](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/slurm-stats) for a list of variables that can be set.
+slurm-stats is configured `slurm-stats` role in the [slurm_openstack_tools collection](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools). Currently there is no customisation of this role in the common environment i.e we are just using role defaults.
+It is possible to override these by setting the relevant variable in your environment config. See [here](https://github.com/stackhpc/ansible_collection_slurm_openstack_tools/tree/main/roles/slurm-stats) for a list of variables that can be set.
 
-
-### Placement
+### slurm-stats placement
 
 The `slurm_stats` group controls the placement of the `slurm_stats` service.
-This should be configured to be a group with a single host. That host must be co-located on the same host as the `filebeat` service that scrapes its output.
-
-
-
-
+This should be configured to be a group with a single host. That host must be colocated on the same host as the `filebeat` service that scrapes its output.

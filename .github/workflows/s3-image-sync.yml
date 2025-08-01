@@ -10,6 +10,12 @@ env:
   S3_BUCKET: openhpc-images-prerelease
   IMAGE_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
 
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+
 jobs:
   s3_cleanup:
     runs-on: ubuntu-22.04
@@ -17,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Write s3cmd configuration
         run: |
@@ -50,7 +56,7 @@ jobs:
     outputs:
       ci_cloud: ${{ steps.ci.outputs.CI_CLOUD }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record which cloud CI is running on
         id: ci
@@ -62,7 +68,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
         shell: bash
 
       - name: Write clouds.yaml
@@ -138,7 +144,7 @@ jobs:
       OS_CLOUD: openstack
       CI_CLOUD: ${{ matrix.cloud }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record which cloud CI is running on
         run: |
@@ -149,7 +155,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
         shell: bash
 
       - name: Write clouds.yaml
@@ -175,7 +181,7 @@ jobs:
           image_hanging=$(openstack image list --name ${{ env.TARGET_IMAGE }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
           if [ -n "$image_hanging" ]; then
             echo "Cleaning up OpenStack image with ID: $image_hanging"
-            openstack image delete $image_hanging
+            openstack image delete "$image_hanging"
           else
             echo "No image ID found, skipping cleanup."
           fi

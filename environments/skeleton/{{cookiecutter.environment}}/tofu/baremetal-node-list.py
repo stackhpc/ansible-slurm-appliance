@@ -1,32 +1,33 @@
-#!/usr/bin/env python
-""" opentofu external data program to list baremetal nodes
+#!/usr/bin/env python # pylint: disable=invalid-name
+"""opentofu external data program to list baremetal nodes
 
-    Example usage:
+Example usage:
 
-        data "external" "example" {
-            program = [this_file]
-        }
+    data "external" "example" {
+        program = [this_file]
+    }
 
-    The external data resource's result attribute then contains a mapping of
-    Ironic node names to their UUIDs.
+The external data resource's result attribute then contains a mapping of
+Ironic node names to their UUIDs.
 
-    An empty list is returned if:
-    - There are no baremetal nodes
-    - The listing fails for any reason, e.g.
-        - there is no baremetal service
-        - admin credentials are required and are not provided
+An empty list is returned if:
+- There are no baremetal nodes
+- The listing fails for any reason, e.g.
+    - there is no baremetal service
+    - admin credentials are required and are not provided
 """
 
-import openstack
 import json
 
+import openstack  # pylint: disable=import-error
+
 nodes = []
-proxy = None
+proxy = None  # pylint: disable=invalid-name
 output = {}
 conn = openstack.connection.from_config()
 try:
-    proxy = getattr(conn, 'baremetal', None)
-except Exception:
+    proxy = getattr(conn, "baremetal", None)
+except Exception:  # pylint: disable=broad-exception-caught
     pass
 if proxy is not None:
     nodes = proxy.nodes()

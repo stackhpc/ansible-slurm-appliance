@@ -1,9 +1,10 @@
+---
 # Configure the Zenith clients that are required
 # Note zenith hosts are in podman group
 - hosts: grafana
   tasks:
     - name: Deploy the Zenith client for Grafana
-      include_role:
+      ansible.builtin.include_role:
         name: zenith_proxy
       vars:
         zenith_proxy_service_name: zenith-monitoring
@@ -11,7 +12,7 @@
         zenith_proxy_upstream_host: "{{ ansible_host }}" # IP
         zenith_proxy_upstream_port: "{{ grafana_port }}"
         zenith_proxy_client_token: "{{ zenith_token_monitoring }}"
-        zenith_proxy_mitm_enabled: yes
+        zenith_proxy_mitm_enabled: true
         zenith_proxy_mitm_auth_inject: basic
         zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
         zenith_proxy_mitm_auth_basic_password: "{{ grafana_security.admin_password }}"
@@ -20,7 +21,7 @@
 - hosts: openondemand
   tasks:
     - name: Deploy the Zenith client for OOD
-      include_role:
+      ansible.builtin.include_role:
         name: zenith_proxy
       vars:
         zenith_proxy_service_name: zenith-ood
@@ -29,7 +30,7 @@
         zenith_proxy_upstream_host: "{{ ansible_host }}" # IP
         zenith_proxy_upstream_port: 443
         zenith_proxy_client_token: "{{ zenith_token_ood }}"
-        zenith_proxy_mitm_enabled: yes
+        zenith_proxy_mitm_enabled: true
         zenith_proxy_mitm_auth_inject: basic
         zenith_proxy_mitm_auth_basic_username: azimuth
         zenith_proxy_mitm_auth_basic_password: "{{ vault_azimuth_user_password }}"
@@ -40,14 +41,15 @@
   become: false
   gather_facts: false
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: hpctests
       when: cluster_run_validation | default(false) | bool
 
 # Write the outputs as the final task
 - hosts: localhost
   tasks:
-    - debug: var=outputs
+    - ansible.builtin.debug:
+        var: outputs
       vars:
         # Ansible has a fit when there are two 'hostvars' evaluations in a resolution chain,
         # so we have to repeat logic here unfortunately

@@ -11,8 +11,8 @@ prometheus_db_dir: "{{ appliances_state_dir | default('/var/lib') }}/prometheus"
 
 prometheus_alertmanager_config_default:
   - static_configs:
-    - targets:
-      - "{{ alertmanager_address }}:{{ alertmanager_port }}"
+      - targets:
+          - "{{ alertmanager_address }}:{{ alertmanager_port }}"
     basic_auth:
       username: alertmanager
       # cloudalchemy.prometheus/preflight checks this config so it must be
@@ -44,37 +44,38 @@ prometheus_targets:
   other: "{{ groups.get('node_exporter', []) | difference(groups['openhpc']) | prometheus_node_exporter_targets(hostvars, 'prometheus_env', 'other') }}"
 
 prometheus_scrape_configs_default:
-- job_name: "prometheus"
-  metrics_path: "/metrics"
-  static_configs:
-  - targets:
-    - "{{ prometheus_address }}:9090"
-- job_name: "grafana"
-  static_configs:
-  - targets:
-    - "{{ grafana_api_address }}:{{ grafana_port }}"
-- job_name: "node"
-  file_sd_configs:
-  - files:
-    - /etc/prometheus/file_sd/control.yml
-    - /etc/prometheus/file_sd/login.yml
-    - /etc/prometheus/file_sd/compute.yml
-    - /etc/prometheus/file_sd/other.yml
-  relabel_configs:
-  # strip off port
-  - source_labels: ['__address__']
-    separator:     ':'
-    regex:         '(.*):.*'
-    target_label:  'instance'
-    replacement:   '${1}'
-  scrape_interval: 30s
-  scrape_timeout: 20s
+  - job_name: "prometheus"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+          - "{{ prometheus_address }}:9090"
+  - job_name: "grafana"
+    static_configs:
+      - targets:
+          - "{{ grafana_api_address }}:{{ grafana_port }}"
+  - job_name: "node"
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/file_sd/control.yml
+          - /etc/prometheus/file_sd/login.yml
+          - /etc/prometheus/file_sd/compute.yml
+          - /etc/prometheus/file_sd/other.yml
+    relabel_configs:
+      # strip off port
+      - source_labels:
+          - '__address__'
+        separator: ':'
+        regex: '(.*):.*'
+        target_label: 'instance'
+        replacement: '${1}'
+    scrape_interval: 30s
+    scrape_timeout: 20s
 
-- job_name: "slurm_exporter"
-  scrape_interval: 30s
-  scrape_timeout: 30s
-  static_configs:
-    - targets:
-      - "{{ openhpc_slurm_control_host }}:{{ slurm_exporter_port }}"
+  - job_name: "slurm_exporter"
+    scrape_interval: 30s
+    scrape_timeout: 30s
+    static_configs:
+      - targets:
+          - "{{ openhpc_slurm_control_host }}:{{ slurm_exporter_port }}"
 
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_default + (openondemand_scrape_configs if groups['openondemand'] | count > 0 else []) }}"

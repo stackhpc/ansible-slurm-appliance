@@ -1,3 +1,4 @@
+---
 ansible_init_wait: 300 # seconds
 
 ansible_init_pip_packages:
