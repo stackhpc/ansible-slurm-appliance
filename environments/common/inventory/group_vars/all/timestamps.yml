@@ -2,7 +2,7 @@ appliances_pulp_repos:
   appstream:
     '8.10':
       path: rocky/8.10/AppStream/x86_64/os
-      timestamp: 20250726T034100
+      timestamp: 20250614T013846
     '9.4':
       path: rocky/9.4/AppStream/x86_64/os
       timestamp: 20241112T003151
@@ -15,7 +15,7 @@ appliances_pulp_repos:
   baseos:
     '8.10':
       path: rocky/8.10/BaseOS/x86_64/os
-      timestamp: 20250726T034100
+      timestamp: 20250614T013846
     '9.4':
       path: rocky/9.4/BaseOS/x86_64/os
       timestamp: 20241115T011711
@@ -35,7 +35,7 @@ appliances_pulp_repos:
   crb:
     '8.10':
       path: rocky/8.10/PowerTools/x86_64/os
-      timestamp: 20250726T034100
+      timestamp: 20250614T013846
     '9.4':
       path: rocky/9.4/CRB/x86_64/os
       timestamp: 20241115T003133
@@ -48,7 +48,7 @@ appliances_pulp_repos:
   epel:
     '8':
       path: epel/8/Everything/x86_64
-      timestamp: 20250728T000757
+      timestamp: 20250615T234151
     '9':
       path: epel/9/Everything/x86_64
       timestamp: 20250729T235750
@@ -68,7 +68,7 @@ appliances_pulp_repos:
   grafana:
     '8':
       path: grafana/oss/rpm
-      timestamp: 20250730T011314
+      timestamp: 20250615T005738
     '9':
       path: grafana/oss/rpm
       timestamp: 20250730T011314
