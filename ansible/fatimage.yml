@@ -267,7 +267,7 @@
         name: grafana-dashboards
 
 - name: Add support for NVIDIA GPU auto detection to Slurm
-  hosts: cuda
+  hosts: slurm_recompile
   become: yes
   tasks:
     - name: Recompile slurm
