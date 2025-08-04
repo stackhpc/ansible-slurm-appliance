@@ -63,7 +63,7 @@ Use the `cookiecutter` template to create a new environment to hold your configu
     cd environments
     cookiecutter ../cookiecutter
 
-and follow the prompts to complete the environment name and description.
+and follow the prompts to complete the environment name and description, leaving `is_site_env` and `parent_site_env` as their defaults.
 
 **NB:** In subsequent sections this new environment is referred to as `$ENV`.
 

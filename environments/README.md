@@ -42,7 +42,8 @@ To define an environment using cookiecutter:
     cd environments
     cookiecutter ../cookiecutter
 
-This will present you with a series of questions which you must answer.
+This will present you with a series of questions which you must answer. For guidance on setting
+`is_site_env` and  `parent_site_env`, see [production docs](../docs/production.md).
 Once you have answered all questions, a new environment directory will
 be created. The directory will be named according to the answer you gave
 for `environment`.

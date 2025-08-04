@@ -15,19 +15,20 @@ production-ready deployments.
   A `dev` environment should also be created if considered required, or this
   can be left until later.
 
-  These can all be produced using the cookicutter instructions, but the
-  `production` and `staging` environments will need their
-  `environments/$ENV/ansible.cfg` file modifying so that they point to the
-  `site` environment:
-
-    ```ini
-    inventory = ../common/inventory,../site/inventory,inventory
-    ```
+  These can all be produced with cookiecutter by running
+  ```sh
+  cd environments
+  cookiecutter ../cookiecutter
+  ```
+  You should ensure that you set the `is_site_env` prompt to true for your `site` environment
+  and set the `parent_site_env` to `site` for your `production` and `staging` environments
 
 - To avoid divergence of configuration all possible overrides for group/role
 vars should be placed in `environments/site/inventory/group_vars/all/*.yml`
 unless the value really is environment-specific (e.g. DNS names for
-`openondemand_servername`).
+`openondemand_servername`). It is therefore recommended that you delete the initial
+`environments/{production/staging}/inventory/group_vars/all/*.yml` files in your `production` and
+`staging` environments.
 
 - Where possible hooks should also be placed in `environments/site/hooks/`
 and referenced from the `site` and `production` environments, e.g.:
@@ -38,38 +39,10 @@ and referenced from the `site` and `production` environments, e.g.:
       import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/pre.yml"
     ```
 
-- OpenTofu configurations should be defined in the `site` environment and used
-  as a module from the other environments. This can be done with the
-  cookie-cutter generated configurations:
-  - Delete the *contents* of the cookie-cutter generated `tofu/` directories
-    from the `production` and `staging` environments.
-  - Create a `main.tf` in those directories which uses `site/tofu/` as a
-    [module](https://opentofu.org/docs/language/modules/), e.g. :
-
-    ```
-    ...
-    variable "environment_root" {
-      type = string
-      description = "Path to environment root, automatically set by activate script"
-    }
-
-    module "cluster" {
-        source = "../../site/tofu/"
-        environment_root = var.environment_root
-
-        cluster_name = "foo"
-        ...
-    }
-    ```
-
-    Note that:
-    
-    - Environment-specific variables (`cluster_name`) should be hardcoded
-      into the cluster module block.
+- Define OpenTofu configurations
+    - Environment-specific variables (e.g `cluster_name`) should be set in `environments/$ENV/tofu/{$ENV}.tfvars`
     - Environment-independent variables (e.g. maybe `cluster_net` if the
-      same is used for staging and production) should be set as *defaults*
-      in `environments/site/tofu/variables.tf`, and then don't need to
-      be passed in to the module.
+      same is used for staging and production) should be set in `environments/site/tofu/site.auto.tfvars`
 
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
@@ -103,8 +76,8 @@ and referenced from the `site` and `production` environments, e.g.:
       state_volume_provisioning = "attach"
 
   either for a specific environment within the cluster module block in
-  `environments/$ENV/tofu/main.tf`, or as the site default by changing the
-  default in `environments/site/tofu/variables.tf`.
+  `environments/$ENV/tofu/{$ENV}.tfvars`, or as the site default by changing the
+  default in `environments/site/tofu/site.auto.tfvars`.
   
   For a development environment allowing OpenTofu to manage the volumes using
   the default value of `"manage"` for those varibles is usually appropriate, as

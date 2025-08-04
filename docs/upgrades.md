@@ -62,7 +62,8 @@ All other commands should be run on the Ansible deploy host.
 
 1. If required, build an "extra" image with local modifications, see [docs/image-build.md](./image-build.md).
 
-1. Modify your site-specific environment to use this image, e.g. via `cluster_image_id` in `environments/$SITE_ENV/tofu/variables.tf`.
+1. Modify your site-specific environment to use this image, e.g. via `cluster_image_id` in `environments/site/tofu/site.auto.tfvars` if all environments use the same image
+   or `environments/$SUB_ENV/tofu/{$SUB_ENV}.tfvars` if the image is environment-specific.
 
 1. Test this in your staging cluster.
 
@@ -101,3 +102,46 @@ playbook to reconfigure the cluster, e.g. as described in the main [README.md](.
 
 1. Tell users the cluster is available again.
 
+## Upgrading OpenTofu
+
+As of v2.3, environments now import the appliance's latest Tofu as a module, ensuring that your Tofu infrastructure is up to date
+with the configuration expected upstream. Environment defined before v2.3 must therefore be manually migrated to the new model.
+
+### Upgrading Site Environments
+
+1. Identify any custom defaults you have set in your `variables.tf` file with `diff environments/site/tofu/variables.tf tofu/variables.tf`
+
+1. Create a new `environments/site/tofu/site.auto.tfvars` file and assign any variables you previously set custom defaults for in `variables.tf` with their default value. For
+   example,
+   ```sh
+   variable "key_pair" {
+       type = string
+       description = "Name of an existing keypair in OpenStack"
+       default = "my-key"
+   }
+   ```
+   in `variables.tf` becomes
+   ```sh
+   key_pair = "my-key"
+   ```
+   in `site.auto.tfvars`
+
+1. Delete the contents of the `environments/site/tofu` except for the `site.auto.tfvars` file
+
+### Upgrading Production/Staging Environments
+
+1. In the `environments/$ENV_NAME/tofu/main.tf` file of your environment, identify any variables (other than `environment_root`) you have hardcoded as arguments to your site module
+
+1. Move these variable assignments to a new `environments/$ENV_NAME/tofu/$ENV_NAME.tfvars` file
+
+1. Delete the contents of the `environments/$ENV_NAME/tofu` directory, except for `.terraform`, `terraform.tfstate`, `.terraform.lock.hcl` and the new tfvars file
+
+1. Create a symlink from `tofu/layouts/main.tf` to `environments/$ENV_NAME/tofu/main.tf`
+
+1. Create a symlink from `tofu/variables.tf` to `environments/$ENV_NAME/tofu/main.tf`
+
+1. Create a symlink from `environments/site/tofu/site.auto.tfvars` to `environments/$ENV_NAME/tofu/site.auto.tfvars`
+
+1. Import the new module with `tofu init`
+
+1. Verify no destructive changes were made to your existing infrastructure with `tofu plan -var-file=$YOUR-TFVARS-FILE`
