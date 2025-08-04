@@ -1,0 +1,30 @@
+module "cluster" {
+    source = "../../../tofu"
+    environment_root = var.environment_root
+
+    cluster_name = var.cluster_name
+    cluster_domain_suffix = var.cluster_domain_suffix
+    cluster_networks = var.cluster_networks
+    key_pair = var.key_pair
+    control_ip_addresses = var.control_ip_addresses
+    control_node_flavor = var.control_node_flavor
+    login = var.login
+    cluster_image_id = var.cluster_image_id
+    compute = var.compute
+    additional_nodegroups = var.additional_nodegroups
+    state_dir = var.state_dir
+    state_volume_size = var.state_volume_size
+    state_volume_type = var.state_volume_type
+    state_volume_provisioning = var.state_volume_provisioning
+    home_volume_size = var.home_volume_size
+    home_volume_type = var.home_volume_type
+    home_volume_provisioning = var.home_volume_provisioning
+    vnic_types = var.vnic_types
+    login_security_groups = var.login_security_groups
+    nonlogin_security_groups = var.nonlogin_security_groups
+    volume_backed_instances = var.volume_backed_instances
+    root_volume_size = var.root_volume_size
+    root_volume_type = var.root_volume_type
+    gateway_ip = var.gateway_ip
+    cluster_nodename_template = var.cluster_nodename_template
+}

@@ -1,4 +1,6 @@
 {
     "environment": "foo",
-    "description" : "Describe the environment here"
+    "description" : "Describe the environment here",
+    "is_site_env": false,
+    "parent_site_env": "None"
 }
