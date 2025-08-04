@@ -5,20 +5,21 @@
     path: "{{ hpctests_rootdir }}/hpl"
     state: directory
 
-- name: Copy HPL sources from /opt/hpl
-  copy:
-    src: "/opt/hpl/hpl-{{ hpctests_hpl_version }}/"
-    dest: "{{ hpctests_rootdir }}/hpl/hpl-{{ hpctests_hpl_version }}/"
+- name: Unarchive HPL sources from /opt/hpl
+  unarchive:
+    src: "/opt/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
+    dest: "{{ hpctests_rootdir }}/hpl"
     remote_src: yes
     owner: "{{ hpctests_user }}"
     group: "{{ hpctests_group }}"
     mode: '0755'
+    keep_newer: yes
 
-- name: Copy BLAS make file
-  command:
-    cmd: "cp setup/Make.Linux_PII_CBLAS {{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
-    chdir: "{{ hpctests_hpl_srcdir }}"
-    creates: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
+- name: Copy BLAS makefile
+  copy:
+    src: "{{ hpctests_hpl_srcdir }}/setup/Make.Linux_PII_CBLAS"
+    dest: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
+    remote_src: yes
 
 - name: Modify make file
   replace:
