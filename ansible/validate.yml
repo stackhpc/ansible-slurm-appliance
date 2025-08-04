@@ -34,6 +34,11 @@
           {{ req }}
           {% endfor %}
 
+          _requirements_current:
+          .{{ _requirements_current }}.
+          _requirements_installed:
+          .{{ _requirements_installed }}.
+
           Run dev/setup-env.sh to fix this.
       vars:
         # note difference filter requires lists, so need to rearrange yaml from files.
