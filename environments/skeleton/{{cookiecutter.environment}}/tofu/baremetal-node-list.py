@@ -1,4 +1,5 @@
-#!/usr/bin/env python # pylint: disable=invalid-name
+#!/usr/bin/env python
+# pylint: disable=invalid-name
 """opentofu external data program to list baremetal nodes
 
 Example usage:

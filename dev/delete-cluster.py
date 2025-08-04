@@ -1,4 +1,5 @@
-#!/usr/bin/env python # pylint: disable=invalid-name
+#!/usr/bin/env python
+# pylint: disable=invalid-name
 
 """
 Delete infrastructure for a cluster without using Terraform. Useful for CI clusters.

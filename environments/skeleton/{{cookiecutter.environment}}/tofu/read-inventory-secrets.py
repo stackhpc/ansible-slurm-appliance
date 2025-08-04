@@ -1,4 +1,5 @@
-#!/usr/bin/env python # pylint: disable=invalid-name
+#!/usr/bin/env python
+# pylint: disable=invalid-name
 """opentofu external data program to load inventory string variables from
 a (possibly vault-encrypted) secrets file.
 
