@@ -50,17 +50,23 @@ All other commands should be run on the Ansible deploy host.
    site-specific configuration. In general changes to existing functionality will aim to be
    backward compatible. Alteration of site-specific configuration will usually only be
    necessary to use new functionality or where functionality has been upstreamed as above.
+   Note that the `environments/common/layouts/everything` file contains all possible
+   groups which can be used to enable features; diff this against your e.g.
+   `environments/site/inventory/groups` file to see new features which you may
+   wish to enable in the latter file.
 
    Make changes as necessary.
 
 1. Identify image(s) from the relevant [Slurm appliance release](https://github.com/stackhpc/ansible-slurm-appliance/releases), and download
-   using the link on the release plus the image name, e.g. for an image `openhpc-ofed-RL8-240906-1042-32568dbb`:
+   using the link on the release plus the image name, e.g. for an image `openhpc-RL9-250708-1547-1494192e`:
 
-        wget https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/openhpc-images/openhpc-ofed-RL8-240906-1042-32568dbb
+        wget https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/openhpc-images/openhpc-RL9-250708-1547-1494192e
 
     Note that some releases may not include new images. In this case use the image from the latest previous release with new images.
 
-1. If required, build an "extra" image with local modifications, see [docs/image-build.md](./image-build.md).
+1. If an "extra" image build with local modifications is required, update the
+   Packer build configuration to use the above new image and run a build. See
+   [docs/image-build.md](./image-build.md).
 
 1. Modify your site-specific environment to use this image, e.g. via `cluster_image_id` in `environments/$SITE_ENV/tofu/variables.tf`.
 

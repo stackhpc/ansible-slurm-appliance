@@ -1,0 +1,17 @@
+---
+
+- name: Make directory
+  file:
+    path: "/opt/hpl"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download HPL tarball
+  get_url:
+    url: "http://www.netlib.org/benchmark/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
+    dest: "/opt/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
+    owner: root
+    group: root
+    mode: '0644'
