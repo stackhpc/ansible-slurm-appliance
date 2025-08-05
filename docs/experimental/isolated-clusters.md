@@ -12,14 +12,7 @@ created by cookiecutter for a new environment.
 The full list of features and whether they are functional on such an "isolated"
 network is shown in the table below. Note that:
 
-1. The `hpl` test from the `ansible/adhoc/hpctests.yml` playbook is not
-   functional and must be skipped using:
-
-    ```shell
-    ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo
-    ```
-
-2. Using [EESSI](https://www.eessi.io/docs/) necessarily requires outbound
+-  Using [EESSI](https://www.eessi.io/docs/) necessarily requires outbound
    network access for the CernVM File System. However this can be provided
    via an authenticated proxy. While the proxy configuration on the cluster node
    is readable by all users, this proxy could be limited via acls to only provide
@@ -51,7 +44,7 @@ See above for definition of "Default" features. In the "Isolated?" column:
 | freeipa_client        | - | Y - image build required |
 | gateway               | n/a | n/a - build only | 
 | grafana               | Y | Y | 
-| hpctests              | Y | Y  - except hpl-solo, see above | 
+| hpctests              | Y | Y | 
 | k3s_agent             | - | ? | 
 | k3s_server            | - | ? | 
 | k9s                   | - | ? | 
