@@ -1,0 +1,4 @@
+# NB: Most defaults are set in
+# environments/common/inventory/group_vars/all/cvmfs_server.yml
+# as the wrapped role does not pick up defaults from here
+cvmfs_role: stratum1

@@ -1,0 +1,7 @@
+- ansible.builtin.import_role:
+    name: eessi.cvmfs
+    tasks_from: "{{ cvmfs_role }}.yml"
+  vars:
+    # from ansible-cvmfs/vars/redhat.yml
+    cvmfs_apache_service_name: httpd
+    cvmfs_apache_conf_file: /etc/httpd/conf/httpd.conf

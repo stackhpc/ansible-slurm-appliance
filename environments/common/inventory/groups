@@ -187,6 +187,7 @@ k3s_agent
 # Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` will leak Ark creds to users
 builder
 extra_packages
+cvmfs_server
 
 [pulp]
 # Add builder to this group to enable automatically syncing of pulp during image build
@@ -202,3 +203,7 @@ extra_packages
 
 [nhc]
 # Hosts to configure for node health checks - either entire 'compute' group or empty
+
+[cvmfs_server]
+# Hosts to configure as a CernVM-FS Stratum 1 replica server for EESSI.
+# See ansible/roles/cvmfs_server/README.md

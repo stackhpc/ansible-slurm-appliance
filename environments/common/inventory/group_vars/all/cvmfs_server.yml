@@ -1,0 +1,85 @@
+# See ansible/roles/cvmfs_server/README.md
+
+# cvmfs_srv_device: # block device to use for CVMFS data. /srv/cvmfs is used if not set.
+
+cvmfs_dnf_repo_protocol: https
+
+cvmfs_dnf_repos:
+  - name: cernvm
+    file: cernvm
+    baseurl: "{{ cvmfs_dnf_repo_protocol }}://cvmrepo.web.cern.ch/cvmrepo/yum/cvmfs/EL/$releasever/$basearch/"
+    description: CernVM packages
+  - name: cernvm-config
+    file: cernvm
+    baseurl: "{{ cvmfs_dnf_repo_protocol }}://cvmrepo.web.cern.ch/cvmrepo/yum/cvmfs-config/EL/$releasever/$basearch/"
+    description: CernVM-FS extra config packages
+
+cvmfs_keys:
+  - path: /etc/cvmfs/keys/eessi.io/eessi.io.pub
+    # from /cvmfs/cvmfs-config.cern.ch/etc/cvmfs/keys/eessi.io/eessi.io.pub on client
+    key: |
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyau1UFUcoiqpE5U9StON
+      W0Trc3PM02AA5kYgknrqZJdusj5PcNg7rhOnrd+SX8BIiVtVMr6mqORXsJ2FNydJ
+      lfm512GcmurM154m6Hz4I+UttcpVLe1CvlyxjjCrN0siSiPnLDONy3Ih1PWyRlA/
+      sobSaIhx3Vyn1IzC0nbjstKObAYJs2kjokS+cipX2oIXJSoxkhvXcxmiMCi2GQIs
+      KTQDT+bATs9eK+ZqY4n5x8VX87AlMBQuSCP5mA8VQPx4aCf8AjHWAn3qmPrhk3od
+      Z/Cl9vrYzoWJT1HOyumv7aEv7UlY81++3w/AwYKXLJI6ioop2AotjrUm3w2U3+k7
+      WQIDAQAB
+      -----END PUBLIC KEY-----
+
+cvmfs_stratum1_http_ports:
+  - 80
+  - 8000
+
+cvmfs_repositories:
+  - stratum0: aws-eu-west-s1-sync.eessi.science
+    stratum0_url_scheme: https
+    repository: software.eessi.io
+    key_dir: /etc/cvmfs/keys/eessi.io
+    owner: root
+
+
+# Below taken from ansible-cvmfs/vars/redhat.yml and are needed because the
+# cvmfs_server role does not run ansible-cvmfs/tasks/main.yml:
+cvmfs_dnf_repo_key:
+  content: |
+    -----BEGIN PGP PUBLIC KEY BLOCK-----
+    Version: GnuPG v2.0.14 (GNU/Linux)
+
+    mQGiBEuGP6YRBADV89cbF4uoEX89Q8uxOklIDVJhOJAFKZ33LSdzHv3iObnjo5w4
+    wbb8FiSir4oWgarAco4u0kR1yKjHJ33oVB2xmPOzW3NWoHI7aPF7tCgo7FY9hNoC
+    4NEkNycvbfSoCScsv2yY5qz2q2sY1LWGZGbUXjBvKbmASe9sJFKJV7NsmwCg76W/
+    aMazleHyDtooD8tk3ZWvpKcD/Rg51Oad+ZLc7h45wDMHpaDvOBeGoyp+k7JgQd87
+    HfXiJtg/Q6zyTwrV3vCQvMpw3GRjRkZBcPgRWb6rUk68dL8fa2cTxhISX5/DIQzc
+    mmuDa0EgCGGAKUZ4bHqaexFFnp/B+VKBPvJuxLa0cBDd6eewxNwtHJ90EaMeBzGd
+    6zU2BADO9YbXiEMqRkfVLnuvD5G31/WJZvffXCxspnSfg923DbILWa4vNW9MLMsK
+    IVHvyVr0mZF8xdyQNVPUX3/4uahKM4hwuFqdbyjuLGEIF3U73aIJ0+YDep/+I6yU
+    JGHnxy8Ex+a1XIhJ1hSI7+oalSdt+w/pE3+2MQyUfSDPSXVA3LQ+Q2VyblZNIEFk
+    bWluaXN0cmF0b3IgKGN2bWFkbWluKSA8Y2VybnZtLmFkbWluaXN0cmF0b3JAY2Vy
+    bi5jaD6IZAQTEQIAJAIbAwYLCQgHAwIDFQIDAxYCAQIeAQIXgAUCT18LigUJBbn/
+    ZAAKCRAjDTidiuRc5/BFAKCb13G8yxG75r3s63mHo5l9PNUKGwCfZpSlZrhBsVZ4
+    2DsKfLG1VQ+X8HW5Ag0ES4Y/qBAIAL3sWKXQKpbIOpwX+mNX2IV2XxNBM3KYjYOE
+    ii66i9apPo3BA39a9Wm9vh1kYIHTkh9Qqb8w53hc4ANkVT+cYzxXythGBjWoLtwC
+    zKCPrIb7RQJRc956Ot0q4qmlcUEGi5zefSIoJZR5jyR7rZS+1PNJYI05xY2+Eah1
+    u9UxrlzBH5DCsvUqTNK12WrPIibmLo8u+yIDJjwgh9O5YITC+et/g47NLfZdiAGP
+    LEjvJFRi7Ju+8ywO32dSVBPJQDktr5BC950DKZHA9n+sJ63iF3lP/aCTECpxxUqX
+    VVqioobwg5ytl60hw9I9sfwBP6z9PR90RcyT1l4giiBz9LV+KpcAAwUIAKeAxArG
+    aJxzWziKs7D8TTuE50Nw+S3RGhVzwSKy7183Z11iOEMqbm2/zwp65wFkntCKmLKD
+    nGsTgFNpstIyFwJmj34Axp7N3KGqXnTI+SIQd6VmzQ1phxfCOw8IGueOR6YI7S1G
+    YWt7DoseZKz4EWdvXCOkQAhbxq/HT2c3ihxsuxrErxz7QtNaYOFXiuLj3mYH9XaM
+    eEe8Pkl+yyRTvyUNlMIu/i79qf+QUlsi10nCUm88cSXQiKWOJ4GiUoT+jD7pN4oh
+    dALRVl0tl/EyPTw+asG3lQhPZ+solvJXp+i7KF7nwnyXDB63WNH15S1pQLMnqCuG
+    CFyegf6jnOJU0AqITwQYEQIADwIbDAUCT18MOQUJBboAEQAKCRAjDTidiuRc53P2
+    AJ9e1y70yIKwx6YmpDnwqWSE07Q6lACdEnem0DbLg9t+gkX/98driCP9Ifg=
+    =S7Dt
+    -----END PGP PUBLIC KEY BLOCK-----
+  dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
+
+cvmfs_packages:
+  stratum1-disk:
+    - httpd
+    - "{{ 'mod_wsgi' if ansible_distribution_major_version is version('8', '<') else 'python3-mod_wsgi' }}"
+    - "{{ 'squid' if cvmfs_stratum1_squid else omit }}"
+    - cvmfs-server
+    - cvmfs-config-default
