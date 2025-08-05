@@ -1,4 +1,4 @@
-name: Upload CI-tested images to Arcus S3 and sync clouds
+name: Upload CI-tested images to Leafcloud S3 and sync clouds
 on:
   workflow_dispatch:
   push:
@@ -18,11 +18,6 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
-
-      - name: Write s3cmd configuration
-        run: |
-          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
-        shell: bash
 
       - name: Install s3cmd
         run: |
@@ -69,11 +64,6 @@ jobs:
         run: |
           mkdir -p ~/.config/openstack/
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
-        shell: bash
-
-      - name: Write s3cmd configuration
-        run: |
-          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
         shell: bash
 
       - name: Install s3cmd and qemu-utils
