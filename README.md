@@ -61,7 +61,7 @@ Run the following from the repository root to activate the venv:
 Use the `cookiecutter` template to create a new environment to hold your configuration:
 
     cd environments
-    cookiecutter skeleton
+    cookiecutter ../cookiecutter
 
 and follow the prompts to complete the environment name and description.
 

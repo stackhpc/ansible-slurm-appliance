@@ -1,4 +1,4 @@
-# This terraform configuration uses the "skeleton" terraform, so that is checked by CI.
+# This terraform configuration uses the site terraform, so that is checked by CI.
 
 terraform {
   required_version = ">= 0.14"

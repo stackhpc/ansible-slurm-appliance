@@ -7,25 +7,15 @@ production-ready deployments.
 - Get it agreed up front what the cluster names will be. Changing this later
   requires instance deletion/recreation.
 
-- At least three environments should be created:
-    - `site`: site-specific base environment
+- At least two environments should be created on top of the `site` base environment:
     - `production`: production environment
     - `staging`: staging environment
 
   A `dev` environment should also be created if considered required, or this
   can be left until later.
 
-  These can all be produced using the cookicutter instructions, but the
-  `production` and `staging` environments will need their
-  `environments/$ENV/ansible.cfg` file modifying so that they point to the
-  `site` environment:
-
-    ```ini
-    inventory = ../common/inventory,../site/inventory,inventory
-    ```
-
-  In general only the `site` environment will need an `inventory/groups` file -
-  this is templated out by cookiecutter and should be modified as required to
+  In general only the `inventory/groups` file in the `site` environment is needed -
+  it can be modified as required to
   enable features for all environments at the site.
 
 - To avoid divergence of configuration all possible overrides for group/role
@@ -42,34 +32,10 @@ and referenced from the `site` and `production` environments, e.g.:
       import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/pre.yml"
     ```
 
-- OpenTofu configurations should be defined in the `site` environment and used
-  as a module from the other environments. This can be done with the
-  cookie-cutter generated configurations:
-  - Delete the *contents* of the cookie-cutter generated `tofu/` directories
-    from the `production` and `staging` environments.
-  - Create a `main.tf` in those directories which uses `site/tofu/` as a
-    [module](https://opentofu.org/docs/language/modules/), e.g. :
-
-    ```
-    ...
-    variable "environment_root" {
-      type = string
-      description = "Path to environment root, automatically set by activate script"
-    }
-
-    module "cluster" {
-        source = "../../site/tofu/"
-        environment_root = var.environment_root
-
-        cluster_name = "foo"
-        ...
-    }
-    ```
-
-    Note that:
+- When setting OpenTofu configurations:
     
     - Environment-specific variables (`cluster_name`) should be hardcoded
-      into the cluster module block.
+      as arguments into the cluster module block at `environments/$ENV/tofu/main.tf`.
     - Environment-independent variables (e.g. maybe `cluster_net` if the
       same is used for staging and production) should be set as *defaults*
       in `environments/site/tofu/variables.tf`, and then don't need to
@@ -87,7 +53,7 @@ and referenced from the `site` and `production` environments, e.g.:
   instances) it may be necessary to configure or proxy `chronyd` via an
   environment hook.
 
-- By default, the cookiecutter-provided OpenTofu configuration provisions two
+- By default, the site OpenTofu configuration provisions two
   volumes and attaches them to the control node:
     - "$cluster_name-home" for NFS-shared home directories
     - "$cluster_name-state" for monitoring and Slurm data
