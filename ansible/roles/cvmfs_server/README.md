@@ -26,6 +26,12 @@ this role by default it:
 
 Guidance on configuring a private Stratum 1 server for EESSI is provided [here](https://www.eessi.io/docs/filesystem_layer/stratum1/#requirements-for-a-stratum-1).
 
+**NB**: The initial replication will take a considerable amount of time. If
+this fails due to e.g. a network glitch you can recover it by sshing to the
+server node and running:
+
+    sudo cvmfs_server snapshot software.eessi.io
+
 # Requirements
 
 See also the example configuration below.
