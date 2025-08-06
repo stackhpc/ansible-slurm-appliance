@@ -19,6 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Write s3cmd configuration
+        run: |
+          echo "${{ secrets['LEAFCLOUD_S3_CFG'] }}" > ~/.s3cfg
+        shell: bash
+
       - name: Install s3cmd
         run: |
           sudo apt-get update
@@ -64,6 +69,11 @@ jobs:
         run: |
           mkdir -p ~/.config/openstack/
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Write s3cmd configuration
+        run: |
+          echo "${{ secrets['LEAFCLOUD_S3_CFG'] }}" > ~/.s3cfg
         shell: bash
 
       - name: Install s3cmd and qemu-utils
