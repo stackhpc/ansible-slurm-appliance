@@ -27,7 +27,7 @@ roles:
     version: v0.1.4
   - src: https://github.com/stackhpc/ansible-cvmfs.git
     name: eessi.cvmfs
-    version: stackhpc # TODO: bump to release
+    version: 2025.08.1
 
 collections:
   - name: containers.podman
