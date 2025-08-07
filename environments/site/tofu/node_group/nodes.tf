@@ -120,6 +120,8 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 
   availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
 
+  config_drive = var.config_drive
+
   lifecycle {
     ignore_changes = [
       image_id,
@@ -174,6 +176,8 @@ resource "openstack_compute_instance_v2" "compute" {
   EOF
 
   availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
+
+  config_drive = var.config_drive
 
 }
 

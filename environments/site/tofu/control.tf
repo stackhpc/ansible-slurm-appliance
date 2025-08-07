@@ -94,4 +94,6 @@ resource "openstack_compute_instance_v2" "control" {
       %{endif}
   EOF
 
+  config_drive = var.config_drive
+
 }

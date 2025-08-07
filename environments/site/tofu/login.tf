@@ -64,4 +64,7 @@ module "login" {
     "gateway_ip",
     "nodename_template",
   ]
+
+  config_drive = var.config_drive
+  
 }
