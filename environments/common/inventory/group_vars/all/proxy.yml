@@ -20,12 +20,12 @@ proxy_remove: false
 
 # full http proxy string - override if the above don't provide enough control:
 proxy_http_proxy: >-
-  {% if groups['squid'] | length > 0 %}
+  {%- if proxy_http_address != '' -%}
   http://
   {%- if proxy_basic_password -%}
   {{ proxy_basic_user }}:{{ proxy_basic_password }}@
   {%- endif -%}
   {{ proxy_http_address }}:{{ proxy_http_port }}
-  {% else %}
-  
-  {% endif %}
+  {%- else %}
+
+  {%- endif %}

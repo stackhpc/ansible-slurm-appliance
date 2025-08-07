@@ -65,6 +65,10 @@ cluster
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
+[slurm_recompile:children]
+# Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
+cuda
+
 [eessi:children]
 # Hosts on which EESSI stack should be configured
 openhpc
@@ -135,3 +139,9 @@ builder
 [nhc:children]
 # Hosts to configure for node health checks
 compute
+
+[topology]
+# Compute nodes to be included in the Slurm topology plugin's topology tree. See ansible/roles/topology
+# Should be set to `compute` if enabled
+# Note that this feature currently assumes all compute nodes are VMs, enabling
+# when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour

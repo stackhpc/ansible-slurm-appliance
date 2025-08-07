@@ -25,6 +25,8 @@ locals {
       }
     )
   }
+
+  baremetal_az = var.availability_zone != null ? var.availability_zone : "nova"
 }
 
 resource "openstack_blockstorage_volume_v3" "compute" {
@@ -115,7 +117,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
     fqdn: ${local.fqdns[each.key]}
   EOF
 
-  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
+  availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
 
   lifecycle {
     ignore_changes = [
@@ -170,7 +172,7 @@ resource "openstack_compute_instance_v2" "compute" {
     fqdn: ${local.fqdns[each.key]}
   EOF
 
-  availability_zone = var.match_ironic_node ? "${var.availability_zone}::${var.baremetal_nodes[each.key]}" : null
+  availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
 
 }
 

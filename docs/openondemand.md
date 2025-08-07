@@ -33,7 +33,13 @@ The above functionality is configured by running the `ansible/portal.yml` playbo
 See the [ansible/roles/openondemand/README.md](../ansible/roles/openondemand/README.md) for more details on the variables described below.
 
 The following variables have been given default values to allow Open OnDemand to work in a newly created environment without additional configuration, but generally should be overridden in `environments/site/inventory/group_vars/all/` with site-specific values:
-- `openondemand_servername` - this must be defined for both `openondemand` and `grafana` hosts (when Grafana is enabled). Default is `ansible_host` (i.e. the IP address) of the first host in the `openondemand` group.
+- `openondemand_servername` - this must be defined for both `openondemand` and
+  `grafana` hosts (when Grafana is enabled). The default is `ansible_host` (i.e.
+  the IP address) of the first host in the `openondemand` group. For production
+  environments this should probably be a DNS name.
+- `openondemand_ssl_cert` and `openondemand_ssl_cert_key` - by default a
+  self-signed certificate is generated, which should probably be replaced for
+  production environments.
 - `openondemand_auth` and any corresponding options. Defaults to `basic_pam`.
 - `openondemand_desktop_partition`, `openondemand_jupyter_partition`, `openondemand_rstudio_partition`, and `openondemand_codeserver_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` OpenTofu variable in `environments/$ENV/tofu`.
 
