@@ -58,7 +58,7 @@ All other commands should be run on the Ansible deploy host.
    necessary to use new functionality or where functionality has been upstreamed as above.
    Note that the upstream `environments/site/inventory/groups` file contains all possible
    groups which can be used to enable features. This will be updated when pulling changes
-   from the StackHPC repo, and any new groups should be enabled/disable as required for
+   from the StackHPC repo, and any new groups should be enabled/disabled as required for
    your site.
 
    Make changes as necessary.
