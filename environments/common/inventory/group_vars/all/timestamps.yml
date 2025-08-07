@@ -6,10 +6,12 @@
 #   WITHOUT the trailing slash
 # - timestamp is the the Ark timestamp to use
 
-# See also ansible/roles/pulp_site/defaults/main.yml
+# See also:
+# - ansible/roles/dnf_repos/defaults/main.yml
+# - ansible/roles/pulp_site/defaults/main.yml
 
 # Note that with Ark creds in the active environment all timestamps can be
-# updated to the latest avaialble using
+# updated to the latest available using
 #   ansible-playbook ansible/ci/update_timestamps.yml
 # but it doesn't check they are functional!
 
@@ -89,3 +91,17 @@ appliances_pulp_repos:
     '9':
       path: OpenHPC/3/updates/EL_9
       timestamp: 20250510T003301
+  cernvmfs_pkgs:
+    '8':
+      path: cvmfs/EL/8/x86_64
+      timestamp: 20250806T121654
+    '9':
+      path: cvmfs/EL/9/x86_64
+      timestamp: 20250806T121654
+  cernvmfs_cfg:
+    '8':
+      path: cvmfs-config/EL/8/x86_64
+      timestamp: 20250805T130249
+    '9':
+      path: cvmfs-config/EL/9/x86_64
+      timestamp: 20250805T130249

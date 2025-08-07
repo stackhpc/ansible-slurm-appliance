@@ -14,27 +14,24 @@ This feature is enabled by adding a node to the `cvmfs_server` group. The
 defaults provided are sufficent to implement the above configuration.
 
 This role wraps the [EESSI ansible-cvmfs](https://github.com/EESSI/ansible-cvmfs)
-role which provides additional functionality. Because of the intended use of
-this role by default it:
-- Uses https URLs for both dnf repositories and for the EESSI repository replication.
-- Uses the `aws-eu-west-s1-sync` EESSI server (which is the only one providing
+role, which provides additional functionality. The defaults here:
+- Use https URLs for both dnf repositories and for the EESSI repository replication.
+- Use the `aws-eu-west-s1-sync` EESSI server (which is the only one providing
   https replication).
-- Does not configure a squid proxy in front of the Stratum 1 server.
-- Does not configure a firewall (OpenStack security groups are expected to be
+- Do not configure a squid proxy in front of the Stratum 1 server.
+- Do not configure a firewall (OpenStack security groups are expected to be
   sufficent).
-- Does not configure the Geo API service.
+- Do not configure the Geo API service.
 
 Guidance on configuring a private Stratum 1 server for EESSI is provided [here](https://www.eessi.io/docs/filesystem_layer/stratum1/#requirements-for-a-stratum-1).
 
 **NB**: The initial replication will take a considerable amount of time. If
 this fails due to e.g. a network glitch you can recover it by sshing to the
-server node and running:
+`cvmfs_server` node and running:
 
     sudo cvmfs_server snapshot software.eessi.io
 
-# Requirements
-
-See also the example configuration below.
+## Requirements
 
 1. See the [EESSI Stratum 1 requirements](https://www.eessi.io/docs/filesystem_layer/stratum1/#requirements-for-a-stratum-1)
    for the server specification.
@@ -51,14 +48,14 @@ See also the example configuration below.
    Note the former will also require setting `dnf_repos_allow_insecure_creds: true`
    to allow Ark credentials to be templated into repofiles - this also requires 3.
    to avoid exposing these to cluster users.
- 
+
+See also the example configuration below.
+
 ## Role variables
 
 Any variables from the [EESSI ansible-cvmfs role](https://github.com/EESSI/ansible-cvmfs)
-may be used. Due to wrapping that role, this role's defaults are mostly in
-`environments/common/inventory/group_vars/all/cvmfs_server.yml`. The only
-override likely to be be needed is to set `cvmfs_srv_device` if CVMFS data
-should be be stored on a specific block device (e.g. a mounted volume).
+may set. Generally only `cvmfs_srv_device` is likely to be required, if CVMFS
+data should be be stored on a specific block device (e.g. a mounted volume).
 
 ## Example configuration
 
@@ -94,8 +91,8 @@ Configure the role to use the volume for CVMFS data:
 cvmfs_srv_device: /dev/vdb
 ```
 
-**NB:** Hardcoding the path is only safe if a single volume is attached, else
-the ordering of devices is not guaranteed after reboots etc.
+**NB:** Hardcoding the device path is only safe if a single volume is attached,
+else the ordering of devices is not guaranteed after reboots etc.
 
 Note Ark credentials or a local Pulp server must also be configured as referenced
 above.
