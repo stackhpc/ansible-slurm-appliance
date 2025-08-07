@@ -15,7 +15,7 @@ openondemand_auth: basic_pam
 openondemand_jupyter_partition: "{{ openhpc_partitions[0]['name'] }}"
 openondemand_desktop_partition: "{{ openhpc_partitions[0]['name'] }}"
 openondemand_rstudio_partition: "{{ openhpc_partitions[0]['name'] }}"
-openondemand_matlab_partition: "{{ openhpc_partitions[0]['name'] }}"
+openondemand_matlab_partition: null # Requires target site to already have MATLAB so set to null
 openondemand_codeserver_partition: "{{ openhpc_partitions[0]['name'] }}"
 
 # Regex defining hosts which openondemand can proxy; the default regex is compute nodes (for apps) and grafana host,
@@ -197,7 +197,7 @@ openondemand_apps_rstudio_default:
       help: Choose your RStudio module
       widget: select
       options:
-        - ["rstudio-server/2025.05.1","rstudio-server/2025.05.1"]
+        - ["rstudio-server/{{ ondemand_rstudio_version }}","RStudio v{{ ondemand_rstudio_version }}"]
     extra_modules_script:
       label: Extra modules script
       help: If you'd like to load additional modules alongside RStudio-Server, put the 'module load ...' commands into a text file (one 'module load...' per line) and specify its path here
@@ -312,7 +312,7 @@ openondemand_apps_codeserver_default:
       help: Choose your Code Server module
       widget: select
       options:
-        - ["code-server/4.102.2","code-server/4.102.2"]
+        - ["code-server/{{ ondemand_code_server_version }}","Code Server v{{ ondemand_code_server_version}}"]
     bc_queue:
       value: "{{ openondemand_codeserver_partition | default(none) }}"
     cores:

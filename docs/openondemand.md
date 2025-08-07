@@ -22,7 +22,9 @@ For examples of all of the above see the `smslabs-example` environment in this r
 # Enabling Open OnDemand
 To enable the Open OnDemand server, add single host to the `openondemand` inventory group. Generally, this should be a node in the `login` group, as Open OnDemand must be able to access Slurm commands.
 
-To enable compute nodes for virtual desktops or Jupyter notebook servers (accessed through the Open OnDemand portal), add nodes/groups to the `openondemand_desktop` and `openondemand_jupyter` inventory groups respectively. These may be all or a subset of the `compute` group.
+To enable compute nodes for virtual desktops, Jupyter notebooks, RStudio, VSCode, or MATLAB (accessed through the Open OnDemand portal), add nodes/groups to the `openondemand_desktop`, `openondemand_jupyter`, `openondemand_rstudio`, `openondemand_codeserver`, and `openondemand_matlab` inventory groups respectively. These may be all or a subset of the `compute` group.
+
+*Note* that due to licensing, the MATLAB batch connect app only works with a MATLAB distribution already installed on the target site compute nodes, as well as Lmod configured with the correct modulefiles. MATLAB app also requires the same TurboVNC and Xfce Desktop software installed for the virtual desktop, so this is included for `openondemand_matlab` groups. To enable the MATLAB app, the `openondemand_matlab_partition` must also be defined in group_vars as it is set to `null` by default.
 
 The above functionality is configured by running the `ansible/portal.yml` playbook. This is automatically run as part of `ansible/site.yml`.
 
@@ -33,7 +35,7 @@ See the [ansible/roles/openondemand/README.md](../ansible/roles/openondemand/REA
 The following variables have been given default values to allow Open OnDemand to work in a newly created environment without additional configuration, but generally should be overridden in `environments/site/inventory/group_vars/all/` with site-specific values:
 - `openondemand_servername` - this must be defined for both `openondemand` and `grafana` hosts (when Grafana is enabled). Default is `ansible_host` (i.e. the IP address) of the first host in the `openondemand` group.
 - `openondemand_auth` and any corresponding options. Defaults to `basic_pam`.
-- `openondemand_desktop_partition` and `openondemand_jupyter_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` OpenTofu variable in `environments/$ENV/tofu`.
+- `openondemand_desktop_partition`, `openondemand_jupyter_partition`, `openondemand_rstudio_partition`, and `openondemand_codeserver_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` OpenTofu variable in `environments/$ENV/tofu`.
 
 It is also recommended to set:
 - `openondemand_dashboard_support_url`

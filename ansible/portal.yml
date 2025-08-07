@@ -49,6 +49,7 @@
         tasks_from: rstudio_compute.yml
       when: appliances_mode != 'configure' # is run during build
 
+# Requires openondemand_matlab_partition to be set in group_vars, as well as MATLAB installed on target compute nodes
 - hosts: openondemand_matlab
   tags:
     - openondemand
