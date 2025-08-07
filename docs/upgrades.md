@@ -66,7 +66,7 @@ All other commands should be run on the Ansible deploy host.
 1. Identify image(s) from the relevant [Slurm appliance release](https://github.com/stackhpc/ansible-slurm-appliance/releases), and download
    using the link on the release plus the image name, e.g. for an image `openhpc-RL9-250708-1547-1494192e`:
 
-        wget https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/openhpc-images/openhpc-RL9-250708-1547-1494192e
+        wget https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images/openhpc-RL9-250708-1547-1494192e
 
     Note that some releases may not include new images. In this case use the image from the latest previous release with new images.
 
