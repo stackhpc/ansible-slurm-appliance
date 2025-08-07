@@ -60,11 +60,13 @@ variable "extra_volumes" {
         Keys are unique volume name.
         Values are a mapping with:
             size: Size of volume in GB
+            volume_type: Optional. Type of volume, or cloud default
         **NB**: The order in /dev is not guaranteed to match the mapping
         EOF
     type = map(
         object({
             size = number
+            volume_type = optional(string)
         })
     )
     default = {}

@@ -36,6 +36,7 @@ resource "openstack_blockstorage_volume_v3" "compute" {
     name = "${var.cluster_name}-${each.key}"
     description = "Compute node ${each.value.node} volume ${each.value.volume}"
     size = var.extra_volumes[each.value.volume].size
+    volume_type = var.extra_volumes[each.value.volume].volume_type
 }
 
 resource "openstack_compute_volume_attach_v2" "compute" {
