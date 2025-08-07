@@ -62,13 +62,6 @@ dnf_repos_default:
       repo_file: rocky
       pulp_path: rocky/9.6/CRB/x86_64/os
       pulp_timestamp: 20250726T040613
-  # epel:
-  #   '8':
-  #     path: epel/8/Everything/x86_64
-  #     timestamp: 20250615T234151
-  #   '9':
-  #     path: epel/9/Everything/x86_64
-  #     timestamp: 20250729T235750
   extras:
     '8.10':
       repo_file: Rocky-Extras
@@ -114,3 +107,15 @@ dnf_repos_default:
       repo_file: OpenHPC
       pulp_path: OpenHPC/3/updates/EL_9
       pulp_timestamp: 20250510T003301
+
+dnf_repos_default_epel: # as for dnf_repos_default
+  epel:
+    '8':
+      repo_file: epel
+      pulp_path: epel/8/Everything/x86_64
+      pulp_timestamp: 20250615T234151
+    '9':
+      repo_file: epel
+      pulp_path: epel/9/Everything/x86_64
+      pulp_timestamp: 20250729T235750
+

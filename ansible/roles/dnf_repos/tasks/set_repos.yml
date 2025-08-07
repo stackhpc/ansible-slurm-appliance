@@ -18,20 +18,27 @@
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
 
-- meta: end_here
-
 - name: Install epel-release
-  # done so that roles installing epel via epel-release don't over-write our changes to the epel repo
+  # So roles installing epel via epel-release don't overwrite changes to the epel repo below
   ansible.builtin.dnf:
     name: epel-release
 
-# TODO: FIXME
-- name: Use Pulp EPEL repo
+- name: Replace epel repo with Pulp repo
   ansible.builtin.yum_repository:
-    name: epel
-    file: epel
-    description: "{{ dnf_repos_epel_description }}"
-    gpgcheck: false
-    baseurl: "{{ dnf_repos_epel_baseurl }}"
+    file: "{{ repo_values.repo_file }}"
+    name: "{{ repo_name }}"
+    baseurl: "{{ repo_content_url }}/{{ repo_values.pulp_path }}/{{ repo_values.pulp_timestamp }}"
+    description: "{{ repo_name }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
+    gpgcheck: false # TODO: is this really false here and above??
+  loop: "{{ dnf_repos_default_epel | dict2items }}"
+  loop_control:
+    label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
+  vars:
+    repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
+    repo_values: "{{ item.value[repo_os] }}"
+    repo_name: "{{ repo_values.repo_name | default(item.key) }}"
+    repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
+
+- meta: end_here
