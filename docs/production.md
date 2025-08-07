@@ -118,6 +118,13 @@ and referenced from the `site` and `production` environments, e.g.:
 - If floating IPs are required for login nodes, create these in OpenStack and add the IPs into
   the OpenTofu `login` definition.
 
+- Consider enabling topology aware scheduling. This is currently only supported if your cluster does not include any baremetal nodes. This can be enabled by:
+    1. Creating Availability Zones in your OpenStack project for each physical rack
+    2. Setting the `availability_zone` fields of compute groups in your OpenTofu configuration
+    3. Adding the `compute` group as a child of `topology` in `environments/$ENV/inventory/groups`
+    4. (Optional) If you are aware of the physical topology of switches above the rack-level, override `topology_above_rack_topology` in your groups vars
+       (see [topology docs](../ansible/roles/topology/README.md) for more detail)
+
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
 
