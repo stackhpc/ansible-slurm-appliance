@@ -33,12 +33,12 @@ for usage instructions for that component.
 
 Shared configuration for all environments. This is not
 intended to be used as a standalone environment, hence the README does *not* detail
-how to provision the infrastructure. This environment generally should not be edited.
+how to provision the infrastructure. This environment should not be edited, except as part of upstreaming new features or bug fixes.
 
 ## site
 
 Provides the base configuration for all subsequent `cookiecutter` created environments,
-including configuration for provisioning infrastructure. Site specific configuration should generally
+including OpenTofu configurations for infrastructure. In general, most local customisations should be made by adding to this environment.
 be edited here, unless it is specific to a particular cookiecutter environment, in which case it should be set in
 that environment.
 

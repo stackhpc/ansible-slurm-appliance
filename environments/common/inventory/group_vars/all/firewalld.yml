@@ -3,7 +3,7 @@
 
 firewalld_configs_default:
   # A list of dicts defining firewalld rules.
-  # Using the upstream site groups firewalld is deployed on the login node to enable fail2ban.
+  # Using the default site `groups` file, firewalld is deployed on the login node to enable fail2ban.
   # However by default we rely on openstack security groups so make firewalld permissive.
   # Each dict contains:
   #   name: An arbitrary name or description

@@ -7,7 +7,7 @@ production-ready deployments.
 - Get it agreed up front what the cluster names will be. Changing this later
   requires instance deletion/recreation.
 
-- At least two environments should be created on top of the `site` base environment:
+- At least two environments should be created using cookiecutter, which will derive from the `site` base environment:
     - `production`: production environment
     - `staging`: staging environment
 
