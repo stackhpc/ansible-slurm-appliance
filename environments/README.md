@@ -39,8 +39,6 @@ how to provision the infrastructure. This environment should not be edited, exce
 
 Provides the base configuration for all subsequent `cookiecutter` created environments,
 including OpenTofu configurations for infrastructure. In general, most local customisations should be made by adding to this environment.
-be edited here, unless it is specific to a particular cookiecutter environment, in which case it should be set in
-that environment.
 
 
 ## Defining an environment

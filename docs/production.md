@@ -109,7 +109,9 @@ and referenced from the `site` and `production` environments, e.g.:
 - Configure Open OnDemand - see [specific documentation](openondemand.md) which
   notes specific variables required.
 
-- Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
+- Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`.
+  Replace the `hpctests_user` in `environments/$ENV/inventory/group_vars/all/hpctests.yml` with
+  an appropriately configured user.
 
 - Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
 

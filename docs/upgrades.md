@@ -41,6 +41,12 @@ All other commands should be run on the Ansible deploy host.
    prompts. Generally merge conflicts should only exist where functionality which was added
    for your site (not in a hook) has subsequently been merged upstream.
 
+   Note that if upgrading from a release prior to v2.3, you will likely have merge conflicts
+   with existing site OpenTofu configurations in `environments/site/tofu`. Generally
+   - Changes to `default` values in `environments/site/tofu.variables.tf` should be rejected.
+   - All other changes to the OpenTofu configuration should be accepted, unless they overwrite
+     site-specific additional resources.
+
 1. Push this branch and create a PR:
 
         git push
@@ -51,8 +57,9 @@ All other commands should be run on the Ansible deploy host.
    backward compatible. Alteration of site-specific configuration will usually only be
    necessary to use new functionality or where functionality has been upstreamed as above.
    Note that the upstream `environments/site/inventory/groups` file contains all possible
-   groups which can be used to enable features, check for new groups which have been added in the
-   latest release and remove any which are unnescessary from the `groups` file in your fork.
+   groups which can be used to enable features. This will be updated when pulling changes
+   from the StackHPC repo, and any new groups should be enabled/disable as required for
+   your site.
 
    Make changes as necessary.
 
