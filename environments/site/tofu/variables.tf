@@ -65,10 +65,11 @@ variable "login" {
             volume_backed_instances: Overrides variable volume_backed_instances
             root_volume_size: Overrides variable root_volume_size
             extra_volumes: Mapping defining additional volumes to create and attach
-                            Keys are unique volume name.
-                            Values are a mapping with:
+                           Keys are unique volume name.
+                           Values are a mapping with:
                                 size: Size of volume in GB
-                            **NB**: The order in /dev is not guaranteed to match the mapping
+                                volume_type: Optional. Type of volume, or cloud default
+                           **NB**: The order in /dev is not guaranteed to match the mapping
             fip_addresses: List of addresses of floating IPs to associate with
                            nodes, in the same order as nodes parameter. The
                            floating IPs must already be allocated to the project.
@@ -117,6 +118,7 @@ variable "compute" {
                            Keys are unique volume name.
                            Values are a mapping with:
                                 size: Size of volume in GB
+                                volume_type: Optional. Type of volume, or cloud default
                            **NB**: The order in /dev is not guaranteed to match the mapping
             ip_addresses: Mapping of list of fixed IP addresses for nodes, keyed
                           by network name, in same order as nodes parameter.
