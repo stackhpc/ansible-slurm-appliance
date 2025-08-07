@@ -146,3 +146,7 @@ compute
 # Note that this feature currently assumes all compute nodes are VMs, enabling
 # when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour
 compute
+
+[cvmfs_server]
+# Hosts to configure as a CernVM-FS Stratum 1 replica server for EESSI.
+# See ansible/roles/cvmfs_server/README.md

@@ -13,10 +13,13 @@ The full list of features and whether they are functional on such an "isolated"
 network is shown in the table below. Note that:
 
 -  Using [EESSI](https://www.eessi.io/docs/) necessarily requires outbound
-   network access for the CernVM File System. However this can be provided
-   via an authenticated proxy. While the proxy configuration on the cluster node
-   is readable by all users, this proxy could be limited via acls to only provide
-   access to EESSI's CVMFS Stratum 1 servers.
+   network access for the CernVM File System. If security groups are not
+   sufficent to restrict this:
+    a. If outbound http is available, an authenticated proxy could be used,
+       limited via acls to only provide access to EESSI's CVMFS Stratum 1 servers,
+       The proxy configuration should be via the `eessi` role variables.
+    b. If only outbound https is available, the [cvmfs_server](../../ansible/roles/cvmfs_server/README.md)
+       role can be used to provide a Stratum 1 server on the cluster network.
 
 ## Support by feature for isolated networks
 

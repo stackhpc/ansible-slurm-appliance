@@ -28,6 +28,17 @@
     - import_role:
         name: basic_users
 
+- name: Setup CernVM-FS server
+  hosts: cvmfs_server
+  tags: cvmfs_server
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Install/configure CernVM-FS server
+      ansible.builtin.include_role:
+        name: cvmfs_server
+        tasks_from: main.yml
+
 - name: Setup EESSI
   hosts: eessi
   tags: eessi

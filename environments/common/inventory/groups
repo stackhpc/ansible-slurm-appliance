@@ -17,9 +17,14 @@ compute
 # Login group to use for running mpi-based testing.
 login
 
+[additional]
+# Additional nodes to include in "cluster" group
+# Automatically populated from OpenTofu variable additional_nodegroups
+
 [cluster:children]
 # All nodes in the appliance - add e.g. service nodes not running Slurm here.
 openhpc
+additional
 
 [builder]
 # Do not add hosts here manually - used as part of Packer image build pipeline. See packer/README.md.
@@ -182,6 +187,7 @@ k3s_agent
 # Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` will leak Ark creds to users
 builder
 extra_packages
+cvmfs_server
 
 [pulp]
 # Add builder to this group to enable automatically syncing of pulp during image build
@@ -197,3 +203,7 @@ extra_packages
 
 [nhc]
 # Hosts to configure for node health checks - either entire 'compute' group or empty
+
+[cvmfs_server]
+# Hosts to configure as a CernVM-FS Stratum 1 replica server for EESSI.
+# See ansible/roles/cvmfs_server/README.md

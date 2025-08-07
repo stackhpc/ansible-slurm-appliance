@@ -8,9 +8,16 @@
     value: "{{ item.value }}"
     no_extra_spaces: true
   loop: "{{ cvmfs_config | dict2items }}"
+  register: _cvmfs_config_ini
 
 
 # NOTE: Not clear how to make this idempotent
-- name: Ensure CVMFS config is setup
+- name: Ensure CVMFS is setup
   command:
     cmd: "cvmfs_config setup"
+  when: _cvmfs_config_ini.changed | default(false)
+
+- name: Reload CVMFS config
+  command:
+    cmd: "cvmfs_config reload"
+  when: _cvmfs_config_ini.changed | default(false)

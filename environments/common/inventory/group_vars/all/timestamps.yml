@@ -1,3 +1,20 @@
+# In the below:
+# - Top-level key (e.g. appstream) is arbitrary
+# - 2nd level key (e.g. '8.10') is `distribution_version` or `distribution_major_version`
+#   as required from ansible_facts
+# - path is the base_path parameter from stackhpc-release-train/ansible/inventory/group_vars/all/package-repos
+#   WITHOUT the trailing slash
+# - timestamp is the the Ark timestamp to use
+
+# See also:
+# - ansible/roles/dnf_repos/defaults/main.yml
+# - ansible/roles/pulp_site/defaults/main.yml
+
+# Note that with Ark creds in the active environment all timestamps can be
+# updated to the latest available using
+#   ansible-playbook ansible/ci/update_timestamps.yml
+# but it doesn't check they are functional!
+
 appliances_pulp_repos:
   appstream:
     '8.10':
@@ -86,3 +103,17 @@ appliances_pulp_repos:
     '9':
       path: OpenHPC/3/updates/EL_9
       timestamp: 20250510T003301
+  cernvmfs_pkgs:
+    '8':
+      path: cvmfs/EL/8/x86_64
+      timestamp: 20250806T121654
+    '9':
+      path: cvmfs/EL/9/x86_64
+      timestamp: 20250806T121654
+  cernvmfs_cfg:
+    '8':
+      path: cvmfs-config/EL/8/x86_64
+      timestamp: 20250805T130249
+    '9':
+      path: cvmfs-config/EL/9/x86_64
+      timestamp: 20250805T130249

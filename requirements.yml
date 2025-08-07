@@ -25,6 +25,9 @@ roles:
     version: v25.3.1
   - src: mrlesmithjr.chrony
     version: v0.1.4
+  - src: https://github.com/stackhpc/ansible-cvmfs.git
+    name: eessi.cvmfs
+    version: 2025.08.1
 
 collections:
   - name: containers.podman

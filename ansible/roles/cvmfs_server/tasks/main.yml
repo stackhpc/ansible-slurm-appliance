@@ -1,0 +1,3 @@
+- ansible.builtin.import_role:
+    name: eessi.cvmfs
+    tasks_from: "{{ cvmfs_role }}.yml"

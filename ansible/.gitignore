@@ -98,3 +98,5 @@ roles/*
 !roles/eessi/**
 !roles/topology/
 !roles/topology/**
+!roles/cvmfs_server/
+!roles/cvmfs_server/**

@@ -73,6 +73,7 @@ it also requires an image build with the role name added to the
 | filesystems.yml          | manila                  | All functionality               | No [5]              |
 | filesystems.yml          | lustre                  | All functionality               | Yes                 |
 | extras.yml               | basic_users             | All functionality [6]           | No                  |
+| extras.yml               | cvmfs_server            | Not relevant for compute nodes  | n/a                 |
 | extras.yml               | eessi                   | All functionality [7]           | No                  |
 | extras.yml               | cuda                    | None required - use image build | Yes [8]             |
 | extras.yml               | vgpu                    | All functionality               | Yes                 |

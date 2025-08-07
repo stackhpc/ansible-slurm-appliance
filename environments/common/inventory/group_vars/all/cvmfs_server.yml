@@ -1,0 +1,28 @@
+# See ansible/roles/cvmfs_server/README.md
+
+# cvmfs_srv_device: # block device to use for CVMFS data. /srv/cvmfs is used if not set.
+
+cvmfs_keys:
+    # from /cvmfs/cvmfs-config.cern.ch/etc/cvmfs/keys/eessi.io/eessi.io.pub on client
+  - path: /etc/cvmfs/keys/eessi.io/eessi.io.pub
+    key: |
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyau1UFUcoiqpE5U9StON
+      W0Trc3PM02AA5kYgknrqZJdusj5PcNg7rhOnrd+SX8BIiVtVMr6mqORXsJ2FNydJ
+      lfm512GcmurM154m6Hz4I+UttcpVLe1CvlyxjjCrN0siSiPnLDONy3Ih1PWyRlA/
+      sobSaIhx3Vyn1IzC0nbjstKObAYJs2kjokS+cipX2oIXJSoxkhvXcxmiMCi2GQIs
+      KTQDT+bATs9eK+ZqY4n5x8VX87AlMBQuSCP5mA8VQPx4aCf8AjHWAn3qmPrhk3od
+      Z/Cl9vrYzoWJT1HOyumv7aEv7UlY81++3w/AwYKXLJI6ioop2AotjrUm3w2U3+k7
+      WQIDAQAB
+      -----END PUBLIC KEY-----
+
+cvmfs_stratum1_http_ports:
+  - 80
+  - 8000
+
+cvmfs_repositories:
+  - stratum0: aws-eu-west-s1-sync.eessi.science
+    stratum0_url_scheme: https
+    repository: software.eessi.io
+    key_dir: /etc/cvmfs/keys/eessi.io
+    owner: root
