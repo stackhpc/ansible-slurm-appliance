@@ -6,8 +6,7 @@ access from all nodes, possibly via a [proxy](../../ansible/roles/proxy/).
 However many features (as defined by Ansible inventory groups/roles) will work
 if the cluster network(s) provide no outbound access. Currently this includes
 all "default" features, i.e. roles/groups which are enabled either in the
-`common` environment or in the `environments/$ENV/inventory/groups` file
-created by cookiecutter for a new environment.
+`common` or `site` environments.
 
 The full list of features and whether they are functional on such an "isolated"
 network is shown in the table below. Note that:

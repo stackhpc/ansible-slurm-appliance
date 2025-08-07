@@ -11,12 +11,9 @@ Note that:
 - No Grafana dashboard for alerts is currently provided.
 
 Alertmanager is enabled by default on the `control` node in the
-[everything](../../../environments/common/layouts/everything) template which
-`cookiecutter` uses for a new environment's `inventory/groups` file.
+`site` environment's `inventory/groups` file.
 
 In general usage may only require:
-- Adding the `control` node into the `alertmanager` group in `environments/site/groups`
-  if upgrading an existing environment.
 - Enabling the Slack integration (see section below).
 - Possibly setting `alertmanager_web_external_url`.
 
