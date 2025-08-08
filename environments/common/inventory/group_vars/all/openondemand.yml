@@ -96,7 +96,7 @@ openondemand_install_app_rstudio:  # mapping, values as for ansible.builtin.git:
 openondemand_install_app_matlab:
   matlab:
     repo: https://github.com/stackhpc/ood-stackhpc-matlab.git
-    version: main
+    version: 2025.08.1
 openondemand_install_app_codeserver:
   codeserver:
     repo: https://github.com/stackhpc/bc_osc_codeserver.git
@@ -197,7 +197,7 @@ openondemand_apps_rstudio_default:
       help: Choose your RStudio module
       widget: select
       options:
-        - ["rstudio-server/{{ openondemand_rstudio_version }}","RStudio v{{ openondemand_rstudio_version }}"]
+        - ["RStudio v{{ openondemand_rstudio_version }}", "rstudio-server/{{ openondemand_rstudio_version }}}"]
     extra_modules_script:
       label: Extra modules script
       help: If you'd like to load additional modules alongside RStudio-Server, put the 'module load ...' commands into a text file (one 'module load...' per line) and specify its path here
@@ -286,7 +286,7 @@ openondemand_apps_matlab_default:
       help: Choose your MATLAB module
       widget: select
       options:
-        - ["matlab/{{ openondemand_matlab_version }}","MATLAB v{{ openondemand_matlab_version }}"]
+        - ["MATLAB v{{ openondemand_matlab_version }}", "matlab/{{ openondemand_matlab_version }}"]
     cores:
       label: Number of CPU cores
       help: How many CPU cores to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition.
@@ -346,7 +346,7 @@ openondemand_apps_codeserver_default:
       help: Choose your Code Server module
       widget: select
       options:
-        - ["code-server/{{ openondemand_code_server_version }}","Code Server v{{ openondemand_code_server_version}}"]
+        - ["Code Server v{{ openondemand_code_server_version}}", "code-server/{{ openondemand_code_server_version }}"]
     bc_queue:
       value: "{{ openondemand_codeserver_partition | default(none) }}"
     cores:
