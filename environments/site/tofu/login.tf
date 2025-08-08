@@ -21,6 +21,8 @@ module "login" {
   root_volume_type = lookup(each.value, "root_volume_type", var.root_volume_type)
   gateway_ip = lookup(each.value, "gateway_ip", var.gateway_ip)
   nodename_template = lookup(each.value, "nodename_template", var.cluster_nodename_template)
+  additional_cloud_config = lookup(each.value, "additional_cloud_config", var.additional_cloud_config)
+  additional_cloud_config_vars = lookup(each.value, "additional_cloud_config_vars", var.additional_cloud_config_vars)
   
   # optionally set for group:
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
@@ -63,8 +65,9 @@ module "login" {
     "ip_addresses",
     "gateway_ip",
     "nodename_template",
+    "additional_cloud_config",
+    "additional_cloud_config_vars"
   ]
 
   config_drive = var.config_drive
-  
 }
