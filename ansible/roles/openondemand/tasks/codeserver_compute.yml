@@ -1,6 +1,6 @@
 - name: Download Code Server RPM
   ansible.builtin.get_url:
-    url: "https://github.com/coder/code-server/releases/download/v{{ ondemand_code_server_version }}/code-server-{{ ondemand_code_server_version }}-amd64.rpm"
+    url: "https://github.com/coder/code-server/releases/download/v{{ openondemand_code_server_version }}/code-server-{{ openondemand_code_server_version }}-amd64.rpm"
     dest: /tmp/code-server.rpm
     mode: '0644'
 
@@ -19,18 +19,18 @@
 
 - name: Create modulefile for Code Server
   copy:
-    dest: "/opt/ohpc/pub/modulefiles/code-server/{{ ondemand_code_server_version }}"
+    dest: "/opt/ohpc/pub/modulefiles/code-server/{{ openondemand_code_server_version }}"
     mode: "0644"
     content: |
       #%Module1.0#####################################################################
 
       proc ModulesHelp { } {
-          puts stderr "This module loads code-server {{ ondemand_code_server_version }}."
+          puts stderr "This module loads code-server {{ openondemand_code_server_version }}."
           puts stderr "\nCode Server provides a browser-based VSCode instance.\n"
       }
 
       module-whatis "Name: code-server"
-      module-whatis "Version: {{ ondemand_code_server_version }}"
+      module-whatis "Version: {{ openondemand_code_server_version }}"
       module-whatis "Category: IDE"
       module-whatis "Description: Run VS Code in your browser with Code Server"
       module-whatis "URL: https://github.com/coder/code-server"

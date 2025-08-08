@@ -9,7 +9,7 @@
 
 - name: Download RStudio Server RPM
   ansible.builtin.get_url:
-    url: "https://download2.rstudio.org/server/rhel{{ ansible_distribution_major_version }}/x86_64/rstudio-server-rhel-{{ ondemand_rstudio_version }}-x86_64.rpm"
+    url: "https://download2.rstudio.org/server/rhel{{ ansible_distribution_major_version }}/x86_64/rstudio-server-rhel-{{ openondemand_rstudio_version }}-x86_64.rpm"
     dest: /tmp/rstudio-server.rpm
     mode: '0644'
 
@@ -28,19 +28,19 @@
 
 - name: Write modulefile for RStudio Server
   ansible.builtin.copy:
-    dest: "/opt/ohpc/pub/modulefiles/rstudio-server/{{ ondemand_rstudio_version }}"
+    dest: "/opt/ohpc/pub/modulefiles/rstudio-server/{{ openondemand_rstudio_version }}"
     mode: '0644'
     content: |
       #%Module1.0#####################################################################
 
       proc ModulesHelp { } {
           puts stderr " "
-          puts stderr "This module loads RStudio Server {{ ondemand_rstudio_version }}"
+          puts stderr "This module loads RStudio Server {{ openondemand_rstudio_version }}"
           puts stderr "\nRStudio Server provides a browser-based interface to R.\n"
       }
 
       module-whatis "Name: rstudio-server"
-      module-whatis "Version: {{ ondemand_rstudio_version }}"
+      module-whatis "Version: {{ openondemand_rstudio_version }}"
       module-whatis "Category: IDE"
       module-whatis "Description: RStudio Server - IDE for R"
       module-whatis "URL: https://www.rstudio.com"

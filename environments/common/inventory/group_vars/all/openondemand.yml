@@ -15,7 +15,7 @@ openondemand_auth: basic_pam
 openondemand_jupyter_partition: "{{ openhpc_partitions[0]['name'] }}"
 openondemand_desktop_partition: "{{ openhpc_partitions[0]['name'] }}"
 openondemand_rstudio_partition: "{{ openhpc_partitions[0]['name'] }}"
-openondemand_matlab_partition: null # Requires target site to already have MATLAB so set to null
+openondemand_matlab_partition: '' # Requires target site to already have MATLAB so set to empty
 openondemand_codeserver_partition: "{{ openhpc_partitions[0]['name'] }}"
 
 # Regex defining hosts which openondemand can proxy; the default regex is compute nodes (for apps) and grafana host,
@@ -92,7 +92,7 @@ openondemand_install_app_jupyter:
 openondemand_install_app_rstudio:  # mapping, values as for ansible.builtin.git: repo (required)/dest/version(default main)/umask
   rstudio:
     repo: https://github.com/stackhpc/ood-stackhpc-rstudio.git
-    version: main
+    version: 2025.08.1
 openondemand_install_app_matlab:
   matlab:
     repo: https://github.com/stackhpc/ood-stackhpc-matlab.git
@@ -100,7 +100,7 @@ openondemand_install_app_matlab:
 openondemand_install_app_codeserver:
   codeserver:
     repo: https://github.com/stackhpc/bc_osc_codeserver.git
-    version: master
+    version: 2025.08.1
 # osc:ood role var (NB only active when not in configure):
 ood_install_apps: >-
   {{
@@ -197,7 +197,7 @@ openondemand_apps_rstudio_default:
       help: Choose your RStudio module
       widget: select
       options:
-        - ["rstudio-server/{{ ondemand_rstudio_version }}","RStudio v{{ ondemand_rstudio_version }}"]
+        - ["rstudio-server/{{ openondemand_rstudio_version }}","RStudio v{{ openondemand_rstudio_version }}"]
     extra_modules_script:
       label: Extra modules script
       help: If you'd like to load additional modules alongside RStudio-Server, put the 'module load ...' commands into a text file (one 'module load...' per line) and specify its path here
@@ -247,6 +247,7 @@ openondemand_apps_rstudio_default:
       template: "basic"
       conn_params:
         - csrf_token
+        - rstudio_module
     script:
       native:
         - "--partition"
@@ -269,29 +270,62 @@ openondemand_apps_matlab_default:
     - desktop
     - bc_queue
     - bc_num_hours
-    - num_cores
-    - node
+    - matlab_module
+    - cores
+    - ram
   attributes:
     desktop: xfce
     # bc_account: # i.e. slurm account
     #   value: root
     bc_queue:
       value: "{{ openondemand_matlab_partition | default(none) }}"
-    num_cores:
-      label: Number of cores
+    matlab_module:
+      label: MATLAB module
+      required: true
+      cachable: true
+      help: Choose your MATLAB module
+      widget: select
+      options:
+        - ["matlab/{{ openondemand_matlab_version }}","MATLAB v{{ openondemand_matlab_version }}"]
+    cores:
+      label: Number of CPU cores
+      help: How many CPU cores to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition.
+      widget: number_field
+      min: 1
+      max: 48
+      step: 1
       value: 1
-    node:
-      label: Node name
-      help: Select a particular node or leave empty to let Slurm pick the next available
-      value: ""
+      cachable: true
+    ram:
+      widget: number_field
+      label: RAM in GB
+      help: How much RAM to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition
+      min: 4
+      max:  700
+      step: 1
+      value: 4
+      cachable: true
+    bc_num_hours:
+      widget: number_field
+      help: Maximum runtime in hours for your session. NB Ensure this is within the maximum allowed by your chosen partition
+      min: 1
+      max: 240
+      step: 1
+      value: 30
+      cachable: true
   submit: |
     ---
     script:
       job_name: "ood-matlab"
       native:
-        - <%= "--nodes=1" %>
-        - <%= "--ntasks=#{num_cores}" %>
-        - <%= "--nodelist=#{node}" %>
+        - "--partition"
+        - "<%= bc_queue %>"
+        - "--ntasks"
+        - "1"
+        - "--mem"
+        - "<%= ram.blank? ? 4 : ram.to_i %>G"
+        - "--cpus-per-task"
+        - "<%= cores.blank? ? 1 : cores.to_i %>"
 openondemand_apps_matlab: "{{ {'matlab':openondemand_apps_matlab_default} if openondemand_matlab_partition | default(none) else {} }}"
 
 openondemand_apps_codeserver_default:
@@ -312,7 +346,7 @@ openondemand_apps_codeserver_default:
       help: Choose your Code Server module
       widget: select
       options:
-        - ["code-server/{{ ondemand_code_server_version }}","Code Server v{{ ondemand_code_server_version}}"]
+        - ["code-server/{{ openondemand_code_server_version }}","Code Server v{{ openondemand_code_server_version}}"]
     bc_queue:
       value: "{{ openondemand_codeserver_partition | default(none) }}"
     cores:
@@ -345,7 +379,7 @@ openondemand_apps_codeserver_default:
     batch_connect:
       template: "basic"
       conn_params:
-        - code_server_version
+        - codeserver_module
     script:
       job_name: "ood-codeserver"
       native:
