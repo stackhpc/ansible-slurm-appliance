@@ -1,0 +1,50 @@
+# Should be run on compute nodes you want to run RStudio on
+# See https://osc.github.io/ood-documentation/latest/tutorials/tutorials-interactive-apps/add-rstudio.html
+# - Will already have lmod
+
+- name: Install R from EPEL
+  ansible.builtin.dnf:
+    name: R
+    state: present
+
+- name: Download RStudio Server RPM
+  ansible.builtin.get_url:
+    url: "https://download2.rstudio.org/server/rhel{{ ansible_distribution_major_version }}/x86_64/rstudio-server-rhel-{{ openondemand_rstudio_version }}-x86_64.rpm"
+    dest: /tmp/rstudio-server.rpm
+    mode: '0644'
+
+- name: Install RStudio Server
+  ansible.builtin.dnf:
+    name: /tmp/rstudio-server.rpm
+    state: present
+    disable_gpg_check: yes
+
+- name: Create module directory for RStudio Server
+  ansible.builtin.file:
+    path: /opt/ohpc/pub/modulefiles/rstudio-server
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Write modulefile for RStudio Server
+  ansible.builtin.copy:
+    dest: "/opt/ohpc/pub/modulefiles/rstudio-server/{{ openondemand_rstudio_version }}"
+    mode: '0644'
+    content: |
+      #%Module1.0#####################################################################
+
+      proc ModulesHelp { } {
+          puts stderr " "
+          puts stderr "This module loads RStudio Server {{ openondemand_rstudio_version }}"
+          puts stderr "\nRStudio Server provides a browser-based interface to R.\n"
+      }
+
+      module-whatis "Name: rstudio-server"
+      module-whatis "Version: {{ openondemand_rstudio_version }}"
+      module-whatis "Category: IDE"
+      module-whatis "Description: RStudio Server - IDE for R"
+      module-whatis "URL: https://www.rstudio.com"
+
+      set root /usr/lib/rstudio-server
+
+      prepend-path PATH $root/bin
