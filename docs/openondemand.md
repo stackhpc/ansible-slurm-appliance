@@ -24,9 +24,14 @@ To enable the Open OnDemand server, add single host to the `openondemand` invent
 
 To enable compute nodes for virtual desktops, Jupyter notebooks, RStudio, VSCode, or MATLAB (accessed through the Open OnDemand portal), add nodes/groups to the `openondemand_desktop`, `openondemand_jupyter`, `openondemand_rstudio`, `openondemand_codeserver`, and `openondemand_matlab` inventory groups respectively. These may be all or a subset of the `compute` group.
 
-*Note* that due to licensing, the MATLAB batch connect app only works with a MATLAB distribution already installed on the target site compute nodes, as well as Lmod configured with a module file for the software. See the compute node prerequisite software installation (e.g.`roles/openondemand/tasks/rstudio_compute.yml`) for where these modulefiles are written to. We append them to the `/opt/ohpc/pub/modulefiles` directory on the compute node for simplicity. MATLAB app also requires the same TurboVNC and Xfce Desktop software installed for the virtual desktop, so this is included for `openondemand_matlab` groups. To enable the MATLAB app, the `openondemand_matlab_partition` must also be defined in group_vars as it is set to `''` by default.
-
 The above functionality is configured by running the `ansible/portal.yml` playbook. This is automatically run as part of `ansible/site.yml`.
+
+## MATLAB
+*NB* Due to licensing, the MATLAB batch connect app requires a MATLAB intallation to be present on the relevant compute nodes. The MATLAB app is therefore disabled by default, and must be enabled by setting `openondemand_matlab_partition` in e.g. `environments/site/inventory/group_vars/all/openondemand.yml` to the name of the partition where MATLAB is available. The MATLAB app is therefore disabled by default, and must be enabled by setting `openondemand_matlab_partition` in e.g. `environments/site/inventory/group_vars/all/openondemand.yml` to the name of the partition where MATLAB is available.
+
+An Lmod modulefile also needs to be available on compute nodes - this is not provided by the appliance. See e.g.`roles/openondemand/tasks/rstudio_compute.yml` for an example modulefile. The path of the modulefile needs to adhere to a convention to work with the common environemnt's default batch connect form. The modulefile must be created as `matlab/< MATLAB_VERSION >`, where the version should match the `openondemand_matlab_version` variable. This variable is set to empty in the role default so must be defined in `environments/site/inventory/group_vars/all/openondemand.yml`.
+
+As MATLAB requires a remote desktop, the TurboVNC and Xfce Desktop packages and configuration from the  "openondemand_desktop" app will be automatically applied to nodes where the MATLAB app is enabled.
 
 # Default configuration
 
@@ -41,7 +46,7 @@ The following variables have been given default values to allow Open OnDemand to
   self-signed certificate is generated, which should probably be replaced for
   production environments.
 - `openondemand_auth` and any corresponding options. Defaults to `basic_pam`.
-- `openondemand_desktop_partition`, `openondemand_jupyter_partition`, `openondemand_rstudio_partition`, and `openondemand_codeserver_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` OpenTofu variable in `environments/$ENV/tofu`.
+- `openondemand_desktop_partition`, `openondemand_jupyter_partition`, `openondemand_rstudio_partition`, and `openondemand_codeserver_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` OpenTofu variable in `environments/$ENV/tofu`. Note `openondemand_matlab_partition` is not set due to the additional requirements discussed above.
 
 It is also recommended to set:
 - `openondemand_dashboard_support_url`
