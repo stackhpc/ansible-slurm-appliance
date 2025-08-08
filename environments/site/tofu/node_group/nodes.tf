@@ -116,6 +116,10 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${local.fqdns[each.key]}
+
+    %{if var.additional_cloud_config != ""}
+    ${templatestring(var.additional_cloud_config, var.additional_cloud_config_vars)}
+    %{endif}
   EOF
 
   availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
@@ -173,6 +177,10 @@ resource "openstack_compute_instance_v2" "compute" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${local.fqdns[each.key]}
+
+    %{if var.additional_cloud_config != ""}
+    ${templatestring(var.additional_cloud_config, var.additional_cloud_config_vars)}
+    %{endif}
   EOF
 
   availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone

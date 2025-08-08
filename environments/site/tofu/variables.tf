@@ -322,3 +322,22 @@ variable "config_drive" {
     type = bool
     default = false
 }
+
+variable "additional_cloud_config" {
+    description = <<-EOT
+        Multiline string to be appended to the node's cloud-init cloud-config user-data.
+        Must be in yaml format and not include the #cloud-config or any other user-data headers.
+        See https://cloudinit.readthedocs.io/en/latest/explanation/format.html#cloud-config-data.
+        Can be a templatestring parameterised by `additional_cloud_config_vars`
+        Can't set the `boot-cmd`, `fqdn` or `mounts` variables here
+    EOT
+    type = string
+    default = ""
+}
+
+variable "additional_cloud_config_vars" {
+    description = "Map of values passed to the `additional_cloud_config` templatestring"
+    type = map(any)
+    default = {}
+}
+
