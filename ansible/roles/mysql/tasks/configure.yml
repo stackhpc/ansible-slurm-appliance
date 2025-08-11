@@ -30,11 +30,9 @@
       delay: 2
 
     - name: Ensure mysql databases created
-      community.mysql.mysql_db:
-        name: "{{ item }}"
+      community.mysql.mysql_db: "{{ item }}"
       loop: "{{ mysql_databases}}"
 
     - name: Ensure mysql users present
-      community.mysql.mysql_user:
-        name: "{{ item }}"
+      community.mysql.mysql_user: "{{ item }}"
       loop: "{{ mysql_users }}"
