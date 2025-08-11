@@ -46,6 +46,7 @@
         _requirements_current: "{{ (lookup('file', _requirements_path) | from_yaml).values() | flatten }}"
         # below produced by dev/setup-env.sh - gives empty list if file is missing:
         _requirements_installed: "{{ ((lookup('file', _requirements_path + '.last', errors='ignore') or '{}') | from_yaml ).values() | flatten }}"
+      when: 0 > 1
 
 - name: Ensure control node is in inventory
   hosts: all
