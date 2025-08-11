@@ -18,13 +18,11 @@
     - basic_users_override_sssd | bool
 
 - name: Create groups
-  ansible.builtin.group:
-    name: "{{ item }}"
+  ansible.builtin.group: "{{ item }}"
   loop: "{{ basic_users_groups }}"
 
 - name: Create users
-  ansible.builtin.user:
-    name: "{{ basic_users_userdefaults | combine(item) | filter_user_params() | combine(_disable_homedir) }}"
+  ansible.builtin.user: "{{ basic_users_userdefaults | combine(item) | filter_user_params() | combine(_disable_homedir) }}"
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"

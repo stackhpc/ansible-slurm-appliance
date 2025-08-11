@@ -82,8 +82,7 @@
         search_string: HOSTNAME=$(/usr/bin/hostnamectl --transient 2>/dev/null) || \
         state: absent
     - name: Add system user groups
-      ansible.builtin.group:
-        name: "{{ item.group }}"
+      ansible.builtin.group: "{{ item.group }}"
       loop: "{{ appliances_local_users }}"
       when:
         - item.enable | default(true) | bool
@@ -92,8 +91,7 @@
       # Need to change working directory otherwise we try to switch back to non-existent directory.
       become_flags: "-i"
     - name: Add system users
-      ansible.builtin.user:
-        name: "{{ item.user }}"
+      ansible.builtin.user: "{{ item.user }}"
       loop: "{{ appliances_local_users }}"
       when: item.enable | default(true) | bool
       become_method: ansible.builtin.sudo

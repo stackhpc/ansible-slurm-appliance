@@ -202,8 +202,7 @@
     # can't run cloudalchemy.prometheus/tasks/install.yml as it triggers a unit start
     # so below is a partial extraction of this:
     - name: Create prometheus system group
-      ansible.builtin.group:
-        name: prometheus
+      ansible.builtin.group: prometheus
         system: true
         state: present
 

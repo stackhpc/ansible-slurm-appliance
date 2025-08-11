@@ -1,7 +1,6 @@
 ---
 - name: Create alertmanager system user
-  ansible.builtin.user:
-    name: "{{ alertmanager_system_user }}"
+  ansible.builtin.user: "{{ alertmanager_system_user }}"
     system: true
     create_home: false
 
