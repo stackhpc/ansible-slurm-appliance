@@ -12,6 +12,7 @@ module "compute" {
   cluster_domain_suffix = var.cluster_domain_suffix
   key_pair = var.key_pair
   environment_root = var.environment_root
+  config_drive = var.config_drive
   
   # can be set for group, defaults to top-level value:
   image_id = lookup(each.value, "image_id", var.cluster_image_id)
@@ -64,7 +65,5 @@ module "compute" {
     "additional_cloud_config",
     "additional_cloud_config_vars"
   ]
-
-  config_drive = var.config_drive
   
 }
