@@ -313,3 +313,12 @@ variable "cluster_nodename_template" {
     type = string
     default = "$${cluster_name}-$${node}.$${cluster_name}.$${cluster_domain_suffix}"
 }
+
+variable "config_drive" {
+    description = <<-EOT
+        Whether to enable Nova config drives on all nodes, which will attach a drive containing
+        information usually provided through the metadata service.
+    EOT
+    type = bool
+    default = null
+}

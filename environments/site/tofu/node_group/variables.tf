@@ -192,3 +192,7 @@ variable "allowed_keys" {
     type = list
     # don't provide a default here as allowed keys may depend on module use
 }
+
+variable "config_drive" {
+    type = bool
+}
