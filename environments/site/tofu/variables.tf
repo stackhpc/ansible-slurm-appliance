@@ -316,8 +316,8 @@ variable "cluster_nodename_template" {
 
 variable "config_drive" {
     description = <<-EOT
-        Whether to enable Nova config drives on all nodes, which will mount a drive containing
-        information that would usually be available through the metadata service.
+        Whether to enable Nova config drives on all nodes, which will attach a drive containing
+        information usually provided through the metadata service.
     EOT
     type = bool
     default = false
