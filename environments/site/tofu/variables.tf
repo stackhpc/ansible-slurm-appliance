@@ -320,5 +320,5 @@ variable "config_drive" {
         information usually provided through the metadata service.
     EOT
     type = bool
-    default = false
+    default = null
 }

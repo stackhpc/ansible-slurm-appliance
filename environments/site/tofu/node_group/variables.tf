@@ -194,10 +194,5 @@ variable "allowed_keys" {
 }
 
 variable "config_drive" {
-    description = <<-EOT
-        Whether to enable Nova config drives on all nodes, which will mount a drive containing
-        information that would usually be available through the metadata service.
-    EOT
     type = bool
-    default = false
 }
