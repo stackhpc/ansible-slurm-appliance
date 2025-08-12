@@ -196,3 +196,15 @@ variable "allowed_keys" {
 variable "config_drive" {
     type = bool
 }
+
+variable "additional_cloud_config" {
+    type = string
+    default = ""
+    nullable = false
+}
+
+variable "additional_cloud_config_vars" {
+    type = map(any)
+    default = {}
+    nullable = false
+}

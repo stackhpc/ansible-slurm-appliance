@@ -33,6 +33,8 @@ module "additional" {
   availability_zone = lookup(each.value, "availability_zone", null)
   ip_addresses = lookup(each.value, "ip_addresses", null)
   security_group_ids = lookup(each.value, "security_group_ids", [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id])
+  additional_cloud_config = lookup(each.value, "additional_cloud_config", var.additional_cloud_config)
+  additional_cloud_config_vars = lookup(each.value, "additional_cloud_config_vars", var.additional_cloud_config_vars)
 
   # can't be set for additional nodes
   compute_init_enable = []
@@ -65,5 +67,7 @@ module "additional" {
     "gateway_ip",
     "nodename_template",
     "security_group_ids",
+    "additional_cloud_config",
+    "additional_cloud_config_vars"
   ]
 }
