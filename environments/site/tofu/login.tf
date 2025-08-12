@@ -40,7 +40,7 @@ module "login" {
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
   # updates to node metadata on deletion/recreation of the control node:
   control_address = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]
-  security_group_ids = [for o in data.openstack_networking_secgroup_v2.login: o.id]
+  security_group_ids = lookup(each.value, "security_group_ids", [for o in data.openstack_networking_secgroup_v2.login: o.id])
   baremetal_nodes = data.external.baremetal_nodes.result
 
   # input dict validation:
@@ -63,5 +63,6 @@ module "login" {
     "ip_addresses",
     "gateway_ip",
     "nodename_template",
+    "security_group_ids"
   ]
 }

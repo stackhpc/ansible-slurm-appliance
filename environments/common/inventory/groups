@@ -17,9 +17,14 @@ compute
 # Login group to use for running mpi-based testing.
 login
 
+[additional]
+# Additional nodes to include in "cluster" group
+# Automatically populated from OpenTofu variable additional_nodegroups
+
 [cluster:children]
 # All nodes in the appliance - add e.g. service nodes not running Slurm here.
 openhpc
+additional
 
 [builder]
 # Do not add hosts here manually - used as part of Packer image build pipeline. See packer/README.md.
