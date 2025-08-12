@@ -79,7 +79,8 @@
     owner: "{{ item.name }}"
     group: "{{ item.name }}"
     mode: u=rwX,go=
-  # become_user: "{{ item.name }}" # Commenting out as become_user does not imply become: true
+  become: true
+  become_user: "{{ item.name }}"
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
@@ -95,7 +96,8 @@
     comment: "{{ item.ssh_key_comment | default(item.name) }}"
   vars:
     _ssh_key_type: "{{ item.ssh_key_type | default('ed25519') }}"
-  # become_user: "{{ item.name }}" # Commenting out as become_user does not imply become: true
+  become: true
+  become_user: "{{ item.name }}"
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
@@ -112,7 +114,8 @@
     manage_dir: false
     key: "{{ item.public_key }}"
     path: ~/.ssh/authorized_keys
-  # become_user: "{{ item.item.name }}" # Commenting out as become_user does not imply become: true
+  become: true
+  become_user: "{{ item.item.name }}"
   loop: "{{ _cluster_ssh_keypair.results }}"
   loop_control:
     label: "{{ item.item.name }}"
@@ -129,7 +132,8 @@
     manage_dir: false
     key: "{{ item.public_key }}"
     path: ~/.ssh/authorized_keys
-  # become_user: "{{ item.name }}" # Commenting out as become_user does not imply become: true
+  become: true
+  become_user: "{{ item.name }}"
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"

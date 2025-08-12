@@ -21,4 +21,5 @@
   containers.podman.podman_image:
     name: docker.io/library/mysql
     tag: "{{ mysql_tag }}"
-  # become_user: "{{ mysql_podman_user }}" # Commenting out as become_user does not imply become: true
+  become: true
+  become_user: "{{ mysql_podman_user }}"

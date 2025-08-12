@@ -11,7 +11,8 @@
   containers.podman.podman_image:
     name: "docker.elastic.co/beats/filebeat-oss"
     tag: "{{ filebeat_version }}"
-  # become_user: "{{ filebeat_podman_user }}" # Commenting out as become_user does not imply become: true
+  become: true
+  become_user: "{{ filebeat_podman_user }}"
 
 - name: Reload filebeat unit file # noqa: no-changed-when
   ansible.builtin.command: systemctl daemon-reload # noqa: command-instead-of-module

@@ -84,7 +84,8 @@
 
         - ansible.builtin.meta: end_play
     - name: Check if hostvars exist
-      # become_user: slurm # Commenting out as become_user does not imply become: true
+      become: true
+      become_user: slurm
       ansible.builtin.stat:
         path: "/mnt/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
       register: hostvars_stat
@@ -99,7 +100,8 @@
 
         - ansible.builtin.meta: end_play
     - name: Sync /mnt/cluster to /var/tmp
-      # become_user: slurm # Commenting out as become_user does not imply become: true
+      become: true
+      become_user: slurm
       ansible.posix.synchronize:
         src: "/mnt/cluster/"
         dest: "/var/tmp/cluster/"
