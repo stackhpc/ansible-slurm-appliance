@@ -41,7 +41,7 @@
   ansible.builtin.copy:
     content: "{{ item.content | b64decode }}"
     dest: "/etc/ssh/{{ item.source | regex_search('[^/]+$') }}"
-    mode: "0644"
+    mode: "preserve"
   loop: "{{ _slurp_keys.results }}"
 
 - ansible.builtin.meta: reset_connection
