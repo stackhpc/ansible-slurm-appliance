@@ -24,19 +24,31 @@ For examples of all of the above see the `smslabs-example` environment in this r
 
 To enable the Open OnDemand server, add single host to the `openondemand` inventory group. Generally, this should be a node in the `login` group, as Open OnDemand must be able to access Slurm commands.
 
-To enable compute nodes for virtual desktops or Jupyter notebook servers (accessed through the Open OnDemand portal), add nodes/groups to the `openondemand_desktop` and `openondemand_jupyter` inventory groups respectively. These may be all or a subset of the `compute` group.
+To enable compute nodes for virtual desktops, Jupyter notebooks, RStudio, VSCode, or MATLAB (accessed through the Open OnDemand portal), add nodes/groups to the `openondemand_desktop`, `openondemand_jupyter`, `openondemand_rstudio`, `openondemand_codeserver`, and `openondemand_matlab` inventory groups respectively. These may be all or a subset of the `compute` group.
 
 The above functionality is configured by running the `ansible/portal.yml` playbook. This is automatically run as part of `ansible/site.yml`.
 
-## Default configuration
+## MATLAB
+*NB* Due to licensing, the MATLAB batch connect app requires a MATLAB intallation to be present on the relevant compute nodes. The MATLAB app is therefore disabled by default, and must be enabled by setting `openondemand_matlab_partition` in e.g. `environments/site/inventory/group_vars/all/openondemand.yml` to the name of the partition where MATLAB is available.
+
+An Lmod modulefile also needs to be available on compute nodes - this is not provided by the appliance. See e.g.`roles/openondemand/tasks/rstudio_compute.yml` for an example. The modulefile must be named `matlab/$MATLAB_VERSION`, where the version matches thes `openondemand_matlab_version` variable. This variable is set to empty in the role default so must be defined in `environments/site/inventory/group_vars/all/openondemand.yml`.
+
+As MATLAB requires a remote desktop, the TurboVNC and Xfce Desktop packages and configuration from the  "openondemand_desktop" app will be automatically applied to nodes where the MATLAB app is enabled.
+
+# Default configuration
 
 See the [ansible/roles/openondemand/README.md](../ansible/roles/openondemand/README.md) for more details on the variables described below.
 
 The following variables have been given default values to allow Open OnDemand to work in a newly created environment without additional configuration, but generally should be overridden in `environments/site/inventory/group_vars/all/` with site-specific values:
-
-- `openondemand_servername` - this must be defined for both `openondemand` and `grafana` hosts (when Grafana is enabled). Default is `ansible_host` (i.e. the IP address) of the first host in the `openondemand` group.
+- `openondemand_servername` - this must be defined for both `openondemand` and
+  `grafana` hosts (when Grafana is enabled). The default is `ansible_host` (i.e.
+  the IP address) of the first host in the `openondemand` group. For production
+  environments this should probably be a DNS name.
+- `openondemand_ssl_cert` and `openondemand_ssl_cert_key` - by default a
+  self-signed certificate is generated, which should probably be replaced for
+  production environments.
 - `openondemand_auth` and any corresponding options. Defaults to `basic_pam`.
-- `openondemand_desktop_partition` and `openondemand_jupyter_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` OpenTofu variable in `environments/$ENV/tofu`.
+- `openondemand_desktop_partition`, `openondemand_jupyter_partition`, `openondemand_rstudio_partition`, and `openondemand_codeserver_partition` if the corresponding inventory groups are defined. Defaults to the first compute group defined in the `compute` OpenTofu variable in `environments/$ENV/tofu`. Note `openondemand_matlab_partition` is not set due to the additional requirements discussed above.
 
 It is also recommended to set:
 

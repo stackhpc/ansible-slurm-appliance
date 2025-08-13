@@ -33,9 +33,10 @@ resource "openstack_blockstorage_volume_v3" "compute" {
 
   for_each = local.all_compute_volumes
 
-  name        = "${var.cluster_name}-${each.key}"
-  description = "Compute node ${each.value.node} volume ${each.value.volume}"
-  size        = var.extra_volumes[each.value.volume].size
+    name        = "${var.cluster_name}-${each.key}"
+    description = "Compute node ${each.value.node} volume ${each.value.volume}"
+    size        = var.extra_volumes[each.value.volume].size
+    volume_type = var.extra_volumes[each.value.volume].volume_type
 }
 
 resource "openstack_compute_volume_attach_v2" "compute" {
@@ -115,9 +116,15 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${local.fqdns[each.key]}
+
+    %{if var.additional_cloud_config != ""}
+    ${templatestring(var.additional_cloud_config, var.additional_cloud_config_vars)}
+    %{endif}
   EOF
 
   availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
+
+  config_drive = var.config_drive
 
   lifecycle {
     ignore_changes = [
@@ -170,9 +177,15 @@ resource "openstack_compute_instance_v2" "compute" {
   user_data = <<-EOF
     #cloud-config
     fqdn: ${local.fqdns[each.key]}
+
+    %{if var.additional_cloud_config != ""}
+    ${templatestring(var.additional_cloud_config, var.additional_cloud_config_vars)}
+    %{endif}
   EOF
 
   availability_zone = var.match_ironic_node ? "${local.baremetal_az}::${var.baremetal_nodes[each.key]}" : var.availability_zone
+
+  config_drive = var.config_drive
 
 }
 

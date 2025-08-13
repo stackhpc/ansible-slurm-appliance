@@ -48,6 +48,12 @@ It is possible this will introduce merge conflicts; fix these following the usua
 prompts. Generally merge conflicts should only exist where functionality which was added
 for your site (not in a hook) has subsequently been merged upstream.
 
+   Note that if upgrading from a release prior to v2.3, you will likely have merge conflicts
+   with existing site OpenTofu configurations in `environments/site/tofu`. Generally
+   - Changes to `default` values in `environments/site/tofu.variables.tf` should be rejected.
+   - All other changes to the OpenTofu configuration should be accepted, unless they overwrite
+     site-specific additional resources.
+
 1. Push this branch and create a PR:
 
 ```shell
@@ -59,6 +65,10 @@ git push
    site-specific configuration. In general changes to existing functionality will aim to be
    backward compatible. Alteration of site-specific configuration will usually only be
    necessary to use new functionality or where functionality has been upstreamed as above.
+   Note that the upstream `environments/site/inventory/groups` file contains all possible
+   groups which can be used to enable features. This will be updated when pulling changes
+   from the StackHPC repo, and any new groups should be enabled/disabled as required for
+   your site.
 
 Make changes as necessary.
 
@@ -66,12 +76,14 @@ Make changes as necessary.
    using the link on the release plus the image name, e.g. for an image `openhpc-RL9-250708-1547-1494192e`:
 
 ```shell
-wget https://object.arcus.openstack.hpc.cam.ac.uk/swift/v1/AUTH_3a06571936a0424bb40bc5c672c4ccb1/openhpc-images/openhpc-RL9-250708-1547-1494192e
+wget https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images/openhpc-RL9-250708-1547-1494192e
 ```
 
 Note that some releases may not include new images. In this case use the image from the latest previous release with new images.
 
-1. If required, build an "extra" image with local modifications, see [docs/image-build.md](./image-build.md).
+1. If an "extra" image build with local modifications is required, update the
+   Packer build configuration to use the above new image and run a build. See
+   [docs/image-build.md](./image-build.md).
 
 1. Modify your site-specific environment to use this image, e.g. via `cluster_image_id` in `environments/$SITE_ENV/tofu/variables.tf`.
 

@@ -23,6 +23,10 @@ openondemand_desktop_screensaver: false
 openondemand_filesapp_paths: []
 openondemand_jupyter_partition: ""
 openondemand_dashboard_links: []
+openondemand_rstudio_partition: ''
+openondemand_matlab_partition: ''
+openondemand_codeserver_partition: ''
+
 # Monitoring:
 openondemand_exporter: true
 
@@ -63,7 +67,7 @@ openondemand_auth_defaults:
       - "AuthPAMService ood"
       - "Require valid-user"
       - "ProxyPreserveHost On" # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
-    user_map_cmd:
+    user_map_cmd: null
     user_map_match: ".*"
 
 # The below mapping is used to override osc.ood defaults. Keys are osc.ood variable names.
@@ -97,3 +101,7 @@ openondemand_osc_ood_defaults:
   oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if (openondemand_auth | lower) == 'oidc' else none }}"
   ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
   httpd_auth: "{{ openondemand_auth_defaults[openondemand_auth | lower].httpd_auth }}"
+
+openondemand_code_server_version: 4.102.2
+openondemand_rstudio_version: 2025.05.1-513
+openondemand_matlab_version: ''

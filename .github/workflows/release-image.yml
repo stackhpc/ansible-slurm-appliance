@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Write s3cmd configuration
-        run: echo "${{ secrets.ARCUS_S3_CFG }}" > ~/.s3cfg
+        run: echo "${{ secrets.LEAFCLOUD_S3_CFG }}" > ~/.s3cfg
 
       - name: Install s3cmd
         run: |

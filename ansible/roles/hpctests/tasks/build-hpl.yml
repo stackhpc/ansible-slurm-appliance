@@ -5,18 +5,21 @@
     state: directory
     mode: "0755"
 
-- name: Download HPL sources
+- name: Unarchive HPL sources from /opt/hpl
   ansible.builtin.unarchive:
-    src: "http://www.netlib.org/benchmark/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
-    remote_src: true
+    src: "/opt/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
     dest: "{{ hpctests_rootdir }}/hpl"
+    remote_src: true
+    owner: "{{ hpctests_user }}"
+    group: "{{ hpctests_group }}"
+    mode: "0755"
     keep_newer: true
 
-- name: Copy BLAS make file
-  ansible.builtin.command:
-    cmd: "cp setup/Make.Linux_PII_CBLAS Make.{{ hpctests_hpl_arch }}"
-    chdir: "{{ hpctests_hpl_srcdir }}"
-    creates: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
+- name: Copy BLAS makefile
+  ansible.builtin.copy:
+    src: "{{ hpctests_hpl_srcdir }}/setup/Make.Linux_PII_CBLAS"
+    dest: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
+    remote_src: true
 
 - name: Modify make file
   ansible.builtin.replace:

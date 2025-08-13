@@ -20,8 +20,8 @@ must be configured to generate notifications.
 
 ## Enabling alertmanager
 
-1. Ensure both the `prometheus` and `alertmanager` servers are deployed on the control node - for new environments the `cookiecutter` tool will have done
-   this:
+1. Ensure both the `prometheus` and `alertmanager` servers are deployed on the
+control node  - these are deployed by default in the site environment's groups:
 
 ```ini
 # environments/site/groups:

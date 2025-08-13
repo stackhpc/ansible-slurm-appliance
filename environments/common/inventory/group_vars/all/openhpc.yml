@@ -44,7 +44,7 @@ openhpc_packages_default:
   - podman-compose
 openhpc_packages_extra: []
 openhpc_packages: "{{ (openhpc_packages_default + openhpc_packages_extra) | select | list }}"
-openhpc_munge_key: "{{ vault_openhpc_mungekey | b64decode }}"
+openhpc_munge_key_b64: "{{ vault_openhpc_mungekey }}"
 openhpc_login_only_nodes: login
 openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if appliances_state_dir is defined else '/var/spool' }}"
 
@@ -52,26 +52,27 @@ openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if applianc
 # NB: override in environments/site/inventory/group_vars/all/openhpc.yml, not here:
 openhpc_config_extra: {}
 
-# default additional slurm.conf parameters for the appliance:
+# additional default slurm.conf parameters for the appliance:
 openhpc_config_default:
-  SlurmctldParameters:
-    - enable_configless
   TaskPlugin: task/cgroup,task/affinity
   ReturnToService: 2 # workaround for templating bug TODO: Remove once on stackhpc.openhpc v1.2.0
-  TopologyPlugin: "topology/{{ 'tree' if (topology_nodes | length) > 0 else 'flat' }}"
 
-# default additional slurm.conf parameters when "rebuild" enabled:
+# additional default slurm.conf parameters when "rebuild" enabled:
 openhpc_config_rebuild:
   RebootProgram: /opt/slurm-tools/bin/slurm-openstack-rebuild
   SlurmctldParameters:
     - reboot_from_controller
   ResumeTimeout: 300
 
-# default additional slurm.conf parameters when "nhc" enabled:
+# additional default slurm.conf parameters when "nhc" enabled:
 openhpc_config_nhc:
   HealthCheckProgram: /usr/sbin/nhc
   HealthCheckInterval: 300
   HealthCheckNodeState: NONDRAINED_IDLE
+
+# additional default slurm.conf parameters when "topology" enabled:
+openhpc_config_topology:
+  TopologyPlugin: topology/tree
 
 # indirection to allow automatic construction of slurm.conf parameters:
 openhpc_config_groups:
@@ -79,6 +80,8 @@ openhpc_config_groups:
     config: "{{ openhpc_config_rebuild }}"
   - enabled: "{{ groups['nhc'] | length > 0 }}"
     config: "{{ openhpc_config_nhc }}"
+  - enabled: "{{ groups['topology'] | length > 0 }}"
+    config: "{{ openhpc_config_topology }}"
   - enabled: true
     config: "{{ openhpc_config_extra }}"
 

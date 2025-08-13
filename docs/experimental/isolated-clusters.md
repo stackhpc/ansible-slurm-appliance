@@ -6,20 +6,12 @@ access from all nodes, possibly via a [proxy](../../ansible/roles/proxy/).
 However many features (as defined by Ansible inventory groups/roles) will work
 if the cluster network(s) provide no outbound access. Currently this includes
 all "default" features, i.e. roles/groups which are enabled either in the
-`common` environment or in the `environments/$ENV/inventory/groups` file
-created by cookiecutter for a new environment.
+`common` or `site` environments.
 
 The full list of features and whether they are functional on such an "isolated"
 network is shown in the table below. Note that:
 
-1. The `hpl` test from the `ansible/adhoc/hpctests.yml` playbook is not
-   functional and must be skipped using:
-
-   ```shell
-   ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo
-   ```
-
-2. Using [EESSI](https://www.eessi.io/docs/) necessarily requires outbound
+-  Using [EESSI](https://www.eessi.io/docs/) necessarily requires outbound
    network access for the CernVM File System. However this can be provided
    via an authenticated proxy. While the proxy configuration on the cluster node
    is readable by all users, this proxy could be limited via acls to only provide
@@ -33,53 +25,53 @@ See above for definition of "Default" features. In the "Isolated?" column:
 - "N": Known not to work.
 - "?": Not investigated at present.
 
-| Inventory group/role | Default? | Isolated?                      |
-| -------------------- | -------- | ------------------------------ |
-| alertmanager         | Y        | Y                              |
-| ansible_init         | Y        | Y                              |
-| basic_users          | Y        | Y                              |
-| block_devices        | Y        | No (depreciated)               |
-| cacerts              | -        | Y                              |
-| chrony               | -        | Y                              |
-| compute_init         | -        | Y                              |
-| cuda                 | -        | ?                              |
-| eessi                | Y        | Y - see above                  |
-| etc_hosts            | Y        | Y                              |
-| extra_packages       | -        | No                             |
-| fail2ban             | Y        | Y                              |
-| filebeat             | Y        | Y                              |
-| firewalld            | Y        | Y                              |
-| freeipa_client       | -        | Y - image build required       |
-| gateway              | n/a      | n/a - build only               |
-| grafana              | Y        | Y                              |
-| hpctests             | Y        | Y - except hpl-solo, see above |
-| k3s_agent            | -        | ?                              |
-| k3s_server           | -        | ?                              |
-| k9s                  | -        | ?                              |
-| lustre               | -        | ?                              |
-| manila               | Y        | Y                              |
-| MySQL                | Y        | Y                              |
-| nfs                  | Y        | Y                              |
-| nhc                  | Y        | Y                              |
-| node_exporter        | Y        | Y                              |
-| openhpc              | Y        | Y                              |
-| openondemand         | Y        | Y                              |
-| openondemand_desktop | Y        | Y                              |
-| openondemand_jupyter | Y        | Y                              |
-| opensearch           | Y        | Y                              |
-| podman               | Y        | Y                              |
-| persist_hostkeys     | Y        | Y                              |
-| prometheus           | Y        | Y                              |
-| proxy                | -        | Y                              |
-| resolv_conf          | -        | ?                              |
-| slurm_exporter       | Y        | Y                              |
-| slurm_stats          | Y        | Y                              |
-| squid                | -        | ?                              |
-| sshd                 | -        | ?                              |
-| sssd                 | -        | ?                              |
-| systemd              | Y        | Y                              |
-| tuned                | -        | Y                              |
-| update               | -        | No                             |
+| Inventory group/role  | Default? | Isolated?                |
+| ----------------------| -------- | ------------------------ |
+| alertmanager          | Y        | Y                        | 
+| ansible_init          | Y        | Y                        | 
+| basic_users           | Y        | Y                        | 
+| block_devices         | Y        | No (depreciated)         | 
+| cacerts               | -        | Y                        | 
+| chrony                | -        | Y                        | 
+| compute_init          | -        | Y                        | 
+| cuda                  | -        | ?                        | 
+| eessi                 | Y        | Y - see above            | 
+| etc_hosts             | Y        | Y                        | 
+| extra_packages        | -        | No                       | 
+| fail2ban              | Y        | Y                        | 
+| filebeat              | Y        | Y                        | 
+| firewalld             | Y        | Y                        | 
+| freeipa_client        | -        | Y - image build required |
+| gateway               | n/a      | n/a - build only         | 
+| grafana               | Y        | Y                        | 
+| hpctests              | Y        | Y                        | 
+| k3s_agent             | -        | ?                        | 
+| k3s_server            | -        | ?                        | 
+| k9s                   | -        | ?                        | 
+| lustre                | -        | ?                        | 
+| manila                | Y        | Y                        | 
+| MySQL                 | Y        | Y                        | 
+| nfs                   | Y        | Y                        | 
+| nhc                   | Y        | Y                        | 
+| node_exporter         | Y        | Y                        | 
+| openhpc               | Y        | Y                        | 
+| openondemand          | Y        | Y                        | 
+| openondemand_desktop  | Y        | Y                        | 
+| openondemand_jupyter  | Y        | Y                        | 
+| opensearch            | Y        | Y                        | 
+| podman                | Y        | Y                        | 
+| persist_hostkeys      | Y        | Y                        | 
+| prometheus            | Y        | Y                        | 
+| proxy                 | -        | Y                        | 
+| resolv_conf           | -        | ?                        | 
+| slurm_exporter        | Y        | Y                        | 
+| slurm_stats           | Y        | Y                        | 
+| squid                 | -        | ?                        | 
+| sshd                  | -        | ?                        | 
+| sssd                  | -        | ?                        | 
+| systemd               | Y        | Y                        | 
+| tuned                 | -        | Y                        | 
+| update                | -        | No                       |
 
 ## Image build
 

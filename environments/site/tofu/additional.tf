@@ -12,7 +12,8 @@ module "additional" {
   cluster_domain_suffix = var.cluster_domain_suffix
   key_pair              = var.key_pair
   environment_root      = var.environment_root
-
+  config_drive          = var.config_drive
+  
   # can be set for group, defaults to top-level value:
   image_id                = lookup(each.value, "image_id", var.cluster_image_id)
   vnic_types              = lookup(each.value, "vnic_types", var.vnic_types)
@@ -25,13 +26,15 @@ module "additional" {
   # optionally set for group:
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
   # here null means "use module var default"
-  extra_volumes      = lookup(each.value, "extra_volumes", null)
-  fip_addresses      = lookup(each.value, "fip_addresses", null)
-  fip_network        = lookup(each.value, "fip_network", null)
-  match_ironic_node  = lookup(each.value, "match_ironic_node", null)
-  availability_zone  = lookup(each.value, "availability_zone", null)
-  ip_addresses       = lookup(each.value, "ip_addresses", null)
-  security_group_ids = lookup(each.value, "security_group_ids", [for o in data.openstack_networking_secgroup_v2.nonlogin : o.id])
+  extra_volumes                = lookup(each.value, "extra_volumes", null)
+  fip_addresses                = lookup(each.value, "fip_addresses", null)
+  fip_network                  = lookup(each.value, "fip_network", null)
+  match_ironic_node            = lookup(each.value, "match_ironic_node", null)
+  availability_zone            = lookup(each.value, "availability_zone", null)
+  ip_addresses                 = lookup(each.value, "ip_addresses", null)
+  security_group_ids           = lookup(each.value, "security_group_ids", [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id])
+  additional_cloud_config      = lookup(each.value, "additional_cloud_config", var.additional_cloud_config)
+  additional_cloud_config_vars = lookup(each.value, "additional_cloud_config_vars", var.additional_cloud_config_vars)
 
   # can't be set for additional nodes
   compute_init_enable  = []
@@ -64,5 +67,7 @@ module "additional" {
     "gateway_ip",
     "nodename_template",
     "security_group_ids",
+    "additional_cloud_config",
+    "additional_cloud_config_vars"
   ]
 }

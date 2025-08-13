@@ -7,7 +7,7 @@ Support FreeIPA in the appliance. In production use it is expected the FreeIPA s
 ### FreeIPA Client Usage
 
 - Add hosts to the `freeipa_client` group and run (at a minimum) the `ansible/iam.yml` playbook.
-- Hostnames must match the domain name. By default (using the skeleton OpenTofu) hostnames are of the form `nodename.cluster_name.cluster_domain_suffix` where `cluster_name` and `cluster_domain_suffix` are OpenTofu variables.
+- Hostnames must match the domain name. By default (using the site OpenTofu) hostnames are of the form `nodename.cluster_name.cluster_domain_suffix` where `cluster_name` and `cluster_domain_suffix` are OpenTofu variables.
 - Hosts discover the FreeIPA server FQDN (and their own domain) from DNS records. If DNS servers are not set this is not set from DHCP, then use the `resolv_conf` role to configure this. For example when using the in-appliance FreeIPA development server:
 
   ```ini
@@ -30,7 +30,7 @@ Support FreeIPA in the appliance. In production use it is expected the FreeIPA s
   This approach means the appliance does not require the FreeIPA administrator password.
 - For development use with the in-appliance FreeIPA server, `freeipa_host_password` will be automatically generated in memory.
 - The `control` host must define `appliances_state_dir` (on persistent storage). This is used to back-up keytabs to allow FreeIPA clients to automatically re-enrol after e.g. reimaging. Note that:
-  - This is implemented when using the skeleton OpenTofu; on the control node `appliances_state_dir` defaults to `/var/lib/state` which is mounted from a volume.
+  - This is implemented when using the site OpenTofu; on the control node `appliances_state_dir` defaults to `/var/lib/state` which is mounted from a volume.
   - Nodes are not re-enroled by a [Slurm-driven reimage](../../collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md) (as that does not run this role).
   - If both a backed-up keytab and `freeipa_host_password` exist, the former is used.
 

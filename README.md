@@ -69,7 +69,7 @@ Use the `cookiecutter` template to create a new environment to hold your configu
 
 ```shell
 cd environments
-cookiecutter skeleton
+cookiecutter ../cookiecutter
 ```
 
 and follow the prompts to complete the environment name and description.

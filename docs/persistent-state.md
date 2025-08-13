@@ -10,11 +10,11 @@ At present this will affect the following:
 - Grafana data
 - OpenDistro/elasticsearch data
 
-If using the `environments/common/layout/everything` Ansible groups template (which is the default for a new cookiecutter-produced environment) then these services will all be on the `control` node and hence only this node requires persistent storage.
+If using the upstream defaults in the `site` environments `inventory/groups` file then these services will all be on the `control` node and hence only this node requires persistent storage.
 
 Note that if `appliances_state_dir` is defined, the path it gives must exist and should be owned by root. Directories will be created within this with appropriate permissions for each item of state defined above. Additionally, the systemd units for the services listed above will be modified to require `appliances_state_dir` to be mounted before service start (via the `systemd` role).
 
-A new cookiecutter-produced environment supports persistent state in the default OpenTofu (see `environments/skeleton/{{cookiecutter.environment}}/tofu/`) by:
+The `site` environment supports persistent state in the default OpenTofu (see `environments/site/tofu/`) by:
 
 - Defining a volume with a default size of 150GB - this can be controlled by the OpenTofu variable `state_volume_size`.
 - Attaching it to the control node.

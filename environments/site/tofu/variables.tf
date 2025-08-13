@@ -65,10 +65,11 @@ variable "login" {
             volume_backed_instances: Overrides variable volume_backed_instances
             root_volume_size: Overrides variable root_volume_size
             extra_volumes: Mapping defining additional volumes to create and attach
-                            Keys are unique volume name.
-                            Values are a mapping with:
+                           Keys are unique volume name.
+                           Values are a mapping with:
                                 size: Size of volume in GB
-                            **NB**: The order in /dev is not guaranteed to match the mapping
+                                volume_type: Optional. Type of volume, or cloud default
+                           **NB**: The order in /dev is not guaranteed to match the mapping
             fip_addresses: List of addresses of floating IPs to associate with
                            nodes, in the same order as nodes parameter. The
                            floating IPs must already be allocated to the project.
@@ -117,6 +118,7 @@ variable "compute" {
                            Keys are unique volume name.
                            Values are a mapping with:
                                 size: Size of volume in GB
+                                volume_type: Optional. Type of volume, or cloud default
                            **NB**: The order in /dev is not guaranteed to match the mapping
             ip_addresses: Mapping of list of fixed IP addresses for nodes, keyed
                           by network name, in same order as nodes parameter.
@@ -311,4 +313,31 @@ variable "cluster_nodename_template" {
     EOT
   type        = string
   default     = "$${cluster_name}-$${node}.$${cluster_name}.$${cluster_domain_suffix}"
+}
+
+variable "config_drive" {
+    description = <<-EOT
+        Whether to enable Nova config drives on all nodes, which will attach a drive containing
+        information usually provided through the metadata service.
+    EOT
+    type = bool
+    default = null
+}
+
+variable "additional_cloud_config" {
+    description = <<-EOT
+        Multiline string to be appended to the node's cloud-init cloud-config user-data.
+        Must be in yaml format and not include the #cloud-config or any other user-data headers.
+        See https://cloudinit.readthedocs.io/en/latest/explanation/format.html#cloud-config-data.
+        Can be a templatestring parameterised by `additional_cloud_config_vars`.
+        The `boot-cmd`, `fqdn` and `mounts` modules must not be specified.
+    EOT
+    type = string
+    default = ""
+}
+
+variable "additional_cloud_config_vars" {
+    description = "Map of values passed to the `additional_cloud_config` templatestring"
+    type = map(any)
+    default = {}
 }
