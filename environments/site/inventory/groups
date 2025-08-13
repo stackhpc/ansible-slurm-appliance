@@ -55,6 +55,18 @@ compute
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
 compute
 
+[openondemand_rstudio:children]
+# Subset of compute to run RStudio servers on via Open Ondemand
+compute
+
+[openondemand_matlab:children]
+# Subset of compute to run a MATLAB interactive desktop on via Open Ondemand
+compute
+
+[openondemand_codeserver:children]
+# Subset of compute to run a Codeserver VSCode instance on via Open Ondemand
+compute
+
 [etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
 cluster
@@ -140,9 +152,8 @@ builder
 # Hosts to configure for node health checks
 compute
 
-[topology:children]
+[topology]
 # Compute nodes to be included in the Slurm topology plugin's topology tree. See ansible/roles/topology
 # Should be set to `compute` if enabled
 # Note that this feature currently assumes all compute nodes are VMs, enabling
 # when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour
-compute

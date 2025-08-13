@@ -227,7 +227,7 @@ The `prometheus` group determines the placement of the prometheus service. Load 
 
 ### Access
 
-Prometheus is exposed on port `9090` on all hosts in the prometheus group. Currently, the configuration assumes a single host. Following the reference layout in `environments/common/layouts/everything`, this will be set to the slurm `control` node, prometheus would then be accessible from:
+Prometheus is exposed on port `9090` on all hosts in the prometheus group. Currently, the configuration assumes a single host. Following the reference layout in `environments/site/inventory/groups`, this will be set to the slurm `control` node, prometheus would then be accessible from:
 
  > http://<control_node_ip>:9090
 
