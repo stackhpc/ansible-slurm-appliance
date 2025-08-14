@@ -1,13 +1,15 @@
+---
 # Should be run on compute nodes you want to run the graphical desktop on
 - name: Enable TurboVNC repo
   tags: install
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/TurboVNC/repo/main/TurboVNC.repo
     dest: /etc/yum.repos.d/TurboVNC.repo
+    mode: "0644"
 
 - name: Install EPEL
   tags: install
-  yum:
+  ansible.builtin.dnf:
     name: epel-release
 
 - name: Check /etc/init.d
@@ -28,7 +30,7 @@
 
 - name: Install VNC-related packages
   tags: install
-  dnf:
+  ansible.builtin.dnf:
     name:
       - turbovnc-3.0.1
       - nmap-ncat
@@ -37,7 +39,7 @@
 
 - name: Stop turbovnc service
   # This is not actually required
-  systemd:
+  ansible.builtin.systemd:
     name: tvncserver
     state: stopped
     enabled: false
@@ -47,16 +49,18 @@
     src: /etc/init.d.orig/ # trailing / to get contents
     dest: /etc/init.d
     remote_src: true
+    directory_mode: "0755"
+    mode: "0644"
   when:
     - init_d.stat.exists
     - not init_d.stat.islnk
 
 - name: Install Xfce desktop
   tags: install
-  yum:
-    name: '@Xfce'
+  ansible.builtin.dnf:
+    name: "@Xfce"
   when: appliances_mode != 'configure' # dnf group/module installs aren't idempotent so only run during build
-  
+
 # - name: Ensure python3.9 installed
 #   dnf:
 #     name: python39
@@ -64,22 +68,23 @@
 
 - name: Install websockify venv
   # Requires separate step so that the upgraded pip is used to install packages
-  pip:
+  ansible.builtin.pip:
     name: pip
-    state: latest
+    state: latest # noqa: package-latest
     virtualenv: /opt/websockify-py39
     virtualenv_command: python3.9 -m venv
   tags: install
 
 - name: Install websockify package in venv
-  pip:
+  ansible.builtin.pip:
     name: websockify
     virtualenv: /opt/websockify-py39
     virtualenv_command: python3 -m venv
   tags: install
 
 - name: Symlink websockify to where Open Ondemand expects
-  file: "{{ item }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
   loop:
     - path: /opt/websockify
       state: directory
@@ -87,7 +92,7 @@
       dest: /opt/websockify/run
       state: link
 - name: Disable screensaver # as users might not have passwords
-  yum:
+  ansible.builtin.dnf:
     name: xfce4-screensaver
     state: absent
   when: not (openondemand_desktop_screensaver | bool)

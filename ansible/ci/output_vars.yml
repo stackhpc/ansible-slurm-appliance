@@ -1,7 +1,8 @@
+---
 # Output specific hostvars to a file in a form which can be sourced by bash
 # NB: obviously the keys and values for the hostvars need to be suitable bash variables
-- hosts: "{{ output_vars_hosts }}"
-  gather_facts: no
+- hosts: "{{ output_vars_hosts }}" # noqa: syntax-check[specific]
+  gather_facts: false
   tasks:
     - copy:
         dest: "{{ output_vars_path }}"

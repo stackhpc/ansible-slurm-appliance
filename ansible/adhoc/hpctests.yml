@@ -3,10 +3,9 @@
 # Relies on installed packages in appliance defaults - see openhpc variables.
 
 ---
-
 - hosts: hpctests[0] # TODO: might want to make which node is used selectable?
   become: false
   gather_facts: false
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: hpctests

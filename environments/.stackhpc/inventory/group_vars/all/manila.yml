@@ -1,3 +1,4 @@
+---
 os_manila_mount_shares_arcus:
   - share_name: slurm-v2-home
     mount_path: /project

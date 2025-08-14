@@ -1,3 +1,4 @@
+---
 basic_users_users:
   - name: azimuth
     # Hash the password with a salt that is different for each host

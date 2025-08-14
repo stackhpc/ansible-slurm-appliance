@@ -1,25 +1,26 @@
+---
 - name: Install lustre build prerequisites
   ansible.builtin.dnf:
     name: "{{ lustre_build_packages }}"
   register: _lustre_dnf_build_packages
- 
+
 - name: Clone lustre git repo
   ansible.builtin.git:
     repo: "{{ lustre_repo }}"
     dest: "{{ lustre_build_dir }}"
     version: "{{ lustre_version }}"
 
-- name: Prepare for lustre configuration
+- name: Prepare for lustre configuration # noqa: no-changed-when
   ansible.builtin.command:
     cmd: sh ./autogen.sh
     chdir: "{{ lustre_build_dir }}"
 
-- name: Configure lustre build
+- name: Configure lustre build # noqa: no-changed-when
   ansible.builtin.command:
     cmd: "./configure {{ lustre_configure_opts | join(' ') }}"
     chdir: "{{ lustre_build_dir }}"
 
-- name: Build lustre
+- name: Build lustre # noqa: no-changed-when
   ansible.builtin.command:
     cmd: make rpms
     chdir: "{{ lustre_build_dir }}"
@@ -32,17 +33,18 @@
   register: _lustre_find_rpms
 
 - name: Check rpms found
-  assert:
+  ansible.builtin.assert:
     that: _lustre_find_rpms.files | length
     fail_msg: "No lustre repos found with lustre_rpm_globs = {{ lustre_rpm_globs }}"
 
 - name: Install lustre rpms
+  # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
   ansible.builtin.dnf:
-    name: "{{ _lustre_find_rpms.files | map(attribute='path')}}"
-    disable_gpg_check: yes
+    name: "{{ _lustre_find_rpms.files | map(attribute='path') }}"
+    disable_gpg_check: true
 
 - name: Delete lustre build dir
-  file:
+  ansible.builtin.file:
     path: "{{ lustre_build_dir }}"
     state: absent
   when: lustre_build_cleanup | bool

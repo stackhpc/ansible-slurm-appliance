@@ -1,1 +1,2 @@
+---
 sshd_password_authentication: "{{ sssd_install_ldap | default(false) | bool }}"

@@ -1,5 +1,6 @@
+---
 - name: Ensure NVIDIA Persistence Daemon state
-  systemd:
+  ansible.builtin.systemd:
     name: nvidia-persistenced
     enabled: true
     state: "{{ cuda_persistenced_state }}"

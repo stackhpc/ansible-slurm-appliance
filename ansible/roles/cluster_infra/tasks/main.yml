@@ -1,4 +1,5 @@
-- debug:
+---
+- ansible.builtin.debug:
     msg: |
       terraform_backend_type: {{ terraform_backend_type }}
       terraform_state: {{ terraform_state }}
@@ -8,55 +9,58 @@
 # if we we have cluster_floating_ip, otherwise assume that we're
 # assigning the FIP in Terraform and that it will be available in
 # outputs.cluster_gateway_ip.
-- block:
-    - name: Look up floating IP
-      azimuth_cloud.terraform.os_floating_ip_info:
-         floating_ip: "{{ cluster_floating_ip }}"
-      register: cluster_floating_ip_info
-
-    - name: Set floating IP address fact
-      set_fact:
-        cluster_floating_ip_address: "{{ cluster_floating_ip_info.floating_ip.floating_ip_address }}"
-  when:
+- when:
     - cluster_floating_ip is defined
     - cluster_floating_ip
 
+  block:
+    - name: Look up floating IP
+      azimuth_cloud.terraform.os_floating_ip_info:
+        floating_ip: "{{ cluster_floating_ip }}"
+      register: cluster_floating_ip_info
+
+    - name: Set floating IP address fact
+      ansible.builtin.set_fact:
+        cluster_floating_ip_address: "{{ cluster_floating_ip_info.floating_ip.floating_ip_address }}"
 - name: Install Terraform binary
-  include_role:
+  ansible.builtin.include_role:
     name: azimuth_cloud.terraform.install
 
 - name: Make Terraform project directory
-  file:
+  ansible.builtin.file:
     path: "{{ terraform_project_path }}"
     state: directory
+    mode: "0755"
 
 - name: Write backend configuration
-  copy:
+  ansible.builtin.copy:
     content: |
       terraform {
         backend "{{ terraform_backend_type }}" { }
       }
     dest: "{{ terraform_project_path }}/backend.tf"
+    mode: "0644"
 
 - name: Template Terraform files into project directory
-  template:
+  ansible.builtin.template:
     src: >-
-      {{ 
+      {{
         "{}{}.j2".format(
           (
-             cluster_terraform_template_dir ~ "/" 
-             if cluster_terraform_template_dir is defined 
+             cluster_terraform_template_dir ~ "/"
+             if cluster_terraform_template_dir is defined
              else ""
           ),
           item
         )
       }}
     dest: "{{ terraform_project_path }}/{{ item }}"
+    mode: "0644"
   loop:
     - outputs.tf
     - providers.tf
     - resources.tf
 
 - name: Provision infrastructure
-  include_role:
+  ansible.builtin.include_role:
     name: azimuth_cloud.terraform.infra

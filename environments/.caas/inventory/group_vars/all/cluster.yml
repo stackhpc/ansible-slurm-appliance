@@ -1,3 +1,4 @@
+---
 # Account for the fact we are running outside of the expected environment system:
 caas_inventory: "{{ ansible_inventory_sources | last }}" # ansible_inventory_sources is absolute
 appliances_environment_root: "{{ caas_inventory | dirname }}"

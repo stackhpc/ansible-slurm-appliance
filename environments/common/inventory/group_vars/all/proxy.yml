@@ -1,3 +1,4 @@
+---
 # If squid group is non-empty, default the proxy address to the hostname of
 # the first squid host, port 3128. Else empty string to avoid breaking hostvars
 

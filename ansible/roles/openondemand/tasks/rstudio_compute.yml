@@ -9,22 +9,23 @@
 
 - name: Download RStudio Server RPM
   ansible.builtin.get_url:
-    url: "https://download2.rstudio.org/server/rhel{{ ansible_distribution_major_version }}/x86_64/rstudio-server-rhel-{{ openondemand_rstudio_version }}-x86_64.rpm"
+    url: "https://download2.rstudio.org/server/rhel{{ ansible_distribution_major_version }}/x86_64/rstudio-server-rhel-{{ openondemand_rstudio_version }}-x86_64.rpm" # noqa: yaml[line-length]
     dest: /tmp/rstudio-server.rpm
     mode: '0644'
 
 - name: Install RStudio Server
+  # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
   ansible.builtin.dnf:
     name: /tmp/rstudio-server.rpm
     state: present
-    disable_gpg_check: yes
+    disable_gpg_check: true
 
 - name: Create module directory for RStudio Server
   ansible.builtin.file:
     path: /opt/ohpc/pub/modulefiles/rstudio-server
     state: directory
     mode: '0755'
-    recurse: yes
+    recurse: true
 
 - name: Write modulefile for RStudio Server
   ansible.builtin.copy:

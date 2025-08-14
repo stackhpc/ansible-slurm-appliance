@@ -1,8 +1,8 @@
 ---
-
 - name: Template passwords
-  template:
+  ansible.builtin.template:
     src: passwords.yml
     dest: "{{ openhpc_passwords_output_path }}"
+    mode: "0644"
   delegate_to: localhost
   run_once: true

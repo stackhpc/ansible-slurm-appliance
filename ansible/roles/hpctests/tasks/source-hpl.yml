@@ -1,7 +1,7 @@
 ---
 
 - name: Make directory
-  file:
+  ansible.builtin.file:
     path: "/opt/hpl"
     state: directory
     owner: root
@@ -9,7 +9,8 @@
     mode: '0755'
 
 - name: Download HPL tarball
-  get_url:
+  # checkov:skip=CKV2_ANSIBLE_2: "Ensure that HTTPS url is used with get_url"
+  ansible.builtin.get_url:
     url: "http://www.netlib.org/benchmark/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
     dest: "/opt/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
     owner: root
