@@ -65,11 +65,11 @@ variable "extra_volumes" {
         EOF
   type = map(
     object({
-      size = number
+      size        = number
       volume_type = optional(string)
     })
   )
-  default = {}
+  default  = {}
   nullable = false
 }
 
@@ -195,17 +195,17 @@ variable "allowed_keys" {
 }
 
 variable "config_drive" {
-    type = bool
+  type = bool
 }
 
 variable "additional_cloud_config" {
-    type = string
-    default = ""
-    nullable = false
+  type     = string
+  default  = ""
+  nullable = false
 }
 
 variable "additional_cloud_config_vars" {
-    type = map(any)
-    default = {}
-    nullable = false
+  type     = map(any)
+  default  = {}
+  nullable = false
 }

@@ -21,8 +21,9 @@ The following variables control configuration of Lustre clients.
 - `lustre_mount_options`. Optional default mount options. Default values are systemd defaults from [Lustre client docs](http://wiki.lustre.org/Mounting_a_Lustre_File_System_on_Client_Nodes).
 
 The following variables control the package build and and install:
+
 - `lustre_version`: Optional str. Version of lustre to build, default `2.15.7`
-- `lustre_repo`: Optional str. URL for Lustre repo. Default is `git://git.whamcloud.com/fs/lustre-release`.git.
+- `lustre_repo`: Optional str. URL for Lustre repository. Default is `git://git.whamcloud.com/fs/lustre-release`.git.
 - `lustre_build_packages`: Optional list. Prerequisite packages required to build Lustre. See `defaults/main.yml`.
 - `lustre_build_dir`: Optional str. Path to build lustre at, default `/tmp/lustre-release`.
 - `lustre_configure_opts`: Optional list. Options to `./configure` command. Default builds client rpms supporting Mellanox OFED, without support for GSS keys.

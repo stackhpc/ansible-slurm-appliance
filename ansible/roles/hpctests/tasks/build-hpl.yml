@@ -20,6 +20,7 @@
     src: "{{ hpctests_hpl_srcdir }}/setup/Make.Linux_PII_CBLAS"
     dest: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
     remote_src: true
+    mode: "0644"
 
 - name: Modify make file
   ansible.builtin.replace:

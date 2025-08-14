@@ -316,28 +316,28 @@ variable "cluster_nodename_template" {
 }
 
 variable "config_drive" {
-    description = <<-EOT
+  description = <<-EOT
         Whether to enable Nova config drives on all nodes, which will attach a drive containing
         information usually provided through the metadata service.
     EOT
-    type = bool
-    default = null
+  type        = bool
+  default     = null
 }
 
 variable "additional_cloud_config" {
-    description = <<-EOT
+  description = <<-EOT
         Multiline string to be appended to the node's cloud-init cloud-config user-data.
         Must be in yaml format and not include the #cloud-config or any other user-data headers.
         See https://cloudinit.readthedocs.io/en/latest/explanation/format.html#cloud-config-data.
         Can be a templatestring parameterised by `additional_cloud_config_vars`.
         The `boot-cmd`, `fqdn` and `mounts` modules must not be specified.
     EOT
-    type = string
-    default = ""
+  type        = string
+  default     = ""
 }
 
 variable "additional_cloud_config_vars" {
-    description = "Map of values passed to the `additional_cloud_config` templatestring"
-    type = map(any)
-    default = {}
+  description = "Map of values passed to the `additional_cloud_config` templatestring"
+  type        = map(any)
+  default     = {}
 }

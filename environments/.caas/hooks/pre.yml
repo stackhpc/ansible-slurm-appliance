@@ -40,7 +40,7 @@
 - hosts: login
   gather_facts: false
   tasks:
-    - name: Set up Ansible user
+    - name: Set up Ansible user # noqa: args[module]
       ansible.builtin.user: "{{ (appliances_local_users_default | selectattr('user.name', 'eq', appliances_local_users_ansible_user_name))[0]['user'] }}"
       become_method: ansible.builtin.sudo
       # Need to change working directory otherwise we try to switch back to non-existent directory.

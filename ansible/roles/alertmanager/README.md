@@ -15,6 +15,7 @@ Alertmanager is enabled by default on the `control` node in the
 `site` environment's `inventory/groups` file.
 
 In general usage may only require:
+
 - Enabling the Slack integration (see section below).
 - Possibly setting `alertmanager_web_external_url`.
 

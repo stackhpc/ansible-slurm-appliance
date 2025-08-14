@@ -32,14 +32,13 @@ for usage instructions for that component.
 ### common
 
 Shared configuration for all environments. This is not
-intended to be used as a standalone environment, hence the README does *not* detail
-how to provision the infrastructure. This environment should not be edited, except as part of upstreaming new features or bug fixes.
+intended to be used as a standalone environment, hence the readme does _not_ detail
+how to provision the infrastructure. This environment should not be edited, except as part of upstreaming new features or bugfixes.
 
 ## site
 
 Provides the base configuration for all subsequent `cookiecutter` created environments,
 including OpenTofu configurations for infrastructure. In general, most local customisations should be made by adding to this environment.
-
 
 ## Defining an environment
 

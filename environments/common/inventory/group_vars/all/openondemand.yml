@@ -189,7 +189,7 @@ openondemand_apps_rstudio_default:
   description: Request a RStudio server
   cluster: slurm
   attributes:
-    bc_queue: 
+    bc_queue:
       value: "{{ openondemand_rstudio_partition | default(none) }}"
     rstudio_module:
       label: RStudio module
@@ -198,10 +198,11 @@ openondemand_apps_rstudio_default:
       help: Choose your RStudio module
       widget: select
       options:
-        - ["RStudio v{{ openondemand_rstudio_version }}", "rstudio-server/{{ openondemand_rstudio_version }}}"]
+        - "RStudio v{{ openondemand_rstudio_version }}"
+        - "rstudio-server/{{ openondemand_rstudio_version }}}"
     extra_modules_script:
       label: Extra modules script
-      help: If you'd like to load additional modules alongside RStudio-Server, put the 'module load ...' commands into a text file (one 'module load...' per line) and specify its path here
+      help: If you'd like to load additional modules alongside RStudio-Server, put the 'module load ...' commands into a text file (one 'module load...' per line) and specify its path here # noqa: yaml[line-length]
       widget: text_field
       required: false
     cores:
@@ -218,7 +219,7 @@ openondemand_apps_rstudio_default:
       label: RAM in GB
       help: How much RAM to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition
       min: 4
-      max:  700
+      max: 700
       step: 1
       value: 4
       cachable: true
@@ -287,7 +288,8 @@ openondemand_apps_matlab_default:
       help: Choose your MATLAB module
       widget: select
       options:
-        - ["MATLAB v{{ openondemand_matlab_version }}", "matlab/{{ openondemand_matlab_version }}"]
+        - "MATLAB v{{ openondemand_matlab_version }}"
+        - "matlab/{{ openondemand_matlab_version }}"
     cores:
       label: Number of CPU cores
       help: How many CPU cores to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition.
@@ -302,7 +304,7 @@ openondemand_apps_matlab_default:
       label: RAM in GB
       help: How much RAM to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition
       min: 4
-      max:  700
+      max: 700
       step: 1
       value: 4
       cachable: true
@@ -347,7 +349,8 @@ openondemand_apps_codeserver_default:
       help: Choose your Code Server module
       widget: select
       options:
-        - ["Code Server v{{ openondemand_code_server_version}}", "code-server/{{ openondemand_code_server_version }}"]
+        - "Code Server v{{ openondemand_code_server_version}}"
+        - "code-server/{{ openondemand_code_server_version }}"
     bc_queue:
       value: "{{ openondemand_codeserver_partition | default(none) }}"
     cores:
@@ -364,7 +367,7 @@ openondemand_apps_codeserver_default:
       label: RAM in GB
       help: How much RAM to reserve for your session. NB Ensure this is within the maximum allowed by your chosen partition
       min: 4
-      max:  700
+      max: 700
       step: 1
       value: 4
       cachable: true

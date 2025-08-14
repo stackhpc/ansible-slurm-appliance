@@ -8,8 +8,9 @@ production-ready deployments.
   requires instance deletion/recreation.
 
 - At least two environments should be created using cookiecutter, which will derive from the `site` base environment:
-    - `production`: production environment
-    - `staging`: staging environment
+
+  - `production`: production environment
+  - `staging`: staging environment
 
   A `dev` environment should also be created if considered required, or this
   can be left until later.
@@ -27,19 +28,19 @@ production-ready deployments.
   and referenced from the `site` and `production` environments, e.g.:
 
 ```yaml
-    # environments/production/hooks/pre.yml:
-    - name: Import parent hook
-      import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/pre.yml"
+# environments/production/hooks/pre.yml:
+- name: Import parent hook
+  import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/pre.yml"
 ```
 
 - When setting OpenTofu configurations:
-    
-    - Environment-specific variables (`cluster_name`) should be hardcoded
-      as arguments into the cluster module block at `environments/$ENV/tofu/main.tf`.
-    - Environment-independent variables (e.g. maybe `cluster_net` if the
-      same is used for staging and production) should be set as *defaults*
-      in `environments/site/tofu/variables.tf`, and then don't need to
-      be passed in to the module.
+
+  - Environment-specific variables (`cluster_name`) should be hardcoded
+    as arguments into the cluster module block at `environments/$ENV/tofu/main.tf`.
+  - Environment-independent variables (e.g. maybe `cluster_net` if the
+    same is used for staging and production) should be set as _defaults_
+    in `environments/site/tofu/variables.tf`, and then don't need to
+    be passed in to the module.
 
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
@@ -107,13 +108,14 @@ set the "attach" options and run `tofu apply` again - this should show there
 are no changes planned.
 
 - Consider whether Prometheus storage configuration is required. By default:
+
   - A 200GB state volume is provisioned (but see above)
   - The common environment [sets](../environments/common/inventory/group_vars/all/prometheus.yml)
     a maximum retention of 100 GB and 31 days
-  These may or may not be appropriate depending on the number of nodes, the
-  scrape interval, and other uses of the state volume (primarily the `slurmctld`
-  state and the `slurmdbd` database). See [docs/monitoring-and-logging](./monitoring-and-logging.md)
-  for more options.
+    These may or may not be appropriate depending on the number of nodes, the
+    scrape interval, and other uses of the state volume (primarily the `slurmctld`
+    state and the `slurmdbd` database). See [docs/monitoring-and-logging](./monitoring-and-logging.md)
+    for more options.
 
 - Configure Open OnDemand - see [specific documentation](openondemand.md) which
   notes specific variables required.
@@ -128,11 +130,12 @@ are no changes planned.
   the OpenTofu `login` definition.
 
 - Consider enabling topology aware scheduling. This is currently only supported if your cluster does not include any baremetal nodes. This can be enabled by:
-    1. Creating Availability Zones in your OpenStack project for each physical rack
-    2. Setting the `availability_zone` fields of compute groups in your OpenTofu configuration
-    3. Adding the `compute` group as a child of `topology` in `environments/$ENV/inventory/groups`
-    4. (Optional) If you are aware of the physical topology of switches above the rack-level, override `topology_above_rack_topology` in your groups vars
-       (see [topology docs](../ansible/roles/topology/README.md) for more detail)
+
+  1. Creating Availability Zones in your OpenStack project for each physical rack
+  2. Setting the `availability_zone` fields of compute groups in your OpenTofu configuration
+  3. Adding the `compute` group as a child of `topology` in `environments/$ENV/inventory/groups`
+  4. (Optional) If you are aware of the physical topology of switches above the rack-level, override `topology_above_rack_topology` in your groups vars
+     (see [topology docs](../ansible/roles/topology/README.md) for more detail)
 
 - Consider whether mapping of baremetal nodes to ironic nodes is required. See
   [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).

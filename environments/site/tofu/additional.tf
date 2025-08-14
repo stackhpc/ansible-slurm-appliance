@@ -13,7 +13,7 @@ module "additional" {
   key_pair              = var.key_pair
   environment_root      = var.environment_root
   config_drive          = var.config_drive
-  
+
   # can be set for group, defaults to top-level value:
   image_id                = lookup(each.value, "image_id", var.cluster_image_id)
   vnic_types              = lookup(each.value, "vnic_types", var.vnic_types)
@@ -32,7 +32,7 @@ module "additional" {
   match_ironic_node            = lookup(each.value, "match_ironic_node", null)
   availability_zone            = lookup(each.value, "availability_zone", null)
   ip_addresses                 = lookup(each.value, "ip_addresses", null)
-  security_group_ids           = lookup(each.value, "security_group_ids", [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id])
+  security_group_ids           = lookup(each.value, "security_group_ids", [for o in data.openstack_networking_secgroup_v2.nonlogin : o.id])
   additional_cloud_config      = lookup(each.value, "additional_cloud_config", var.additional_cloud_config)
   additional_cloud_config_vars = lookup(each.value, "additional_cloud_config_vars", var.additional_cloud_config_vars)
 

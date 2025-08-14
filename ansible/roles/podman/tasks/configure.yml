@@ -39,7 +39,7 @@
 - name: Reset ssh connection to allow user changes to affect 'current login user'
   ansible.builtin.meta: reset_connection
 - name: Ensure podman users exist
-  ansible.builtin.user: "{{ item }}"
+  ansible.builtin.user: "{{ item }}" # noqa: args[module]
   with_items: "{{ podman_users }}"
   register: podman_user_info
   become: true

@@ -192,7 +192,7 @@
       when: "'alertmanager' in group_names"
 
     - name: Download HPL source
-      include_role:
+      ansible.builtin.include_role:
         name: hpctests
         tasks_from: source-hpl.yml
 
@@ -207,7 +207,8 @@
     # can't run cloudalchemy.prometheus/tasks/install.yml as it triggers a unit start
     # so below is a partial extraction of this:
     - name: Create prometheus system group
-      ansible.builtin.group: prometheus
+      ansible.builtin.group:
+        name: prometheus
         system: true
         state: present
 
@@ -270,7 +271,7 @@
 
 - name: Add support for NVIDIA GPU auto detection to Slurm
   hosts: slurm_recompile
-  become: yes
+  become: true
   tasks:
     - name: Recompile slurm
       ansible.builtin.import_role:

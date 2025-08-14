@@ -48,11 +48,12 @@ It is possible this will introduce merge conflicts; fix these following the usua
 prompts. Generally merge conflicts should only exist where functionality which was added
 for your site (not in a hook) has subsequently been merged upstream.
 
-   Note that if upgrading from a release prior to v2.3, you will likely have merge conflicts
-   with existing site OpenTofu configurations in `environments/site/tofu`. Generally
-   - Changes to `default` values in `environments/site/tofu.variables.tf` should be rejected.
-   - All other changes to the OpenTofu configuration should be accepted, unless they overwrite
-     site-specific additional resources.
+Note that if upgrading from a release prior to v2.3, you will likely have merge conflicts
+with existing site OpenTofu configurations in `environments/site/tofu`. Generally
+
+- Changes to `default` values in `environments/site/tofu.variables.tf` should be rejected.
+- All other changes to the OpenTofu configuration should be accepted, unless they overwrite
+  site-specific additional resources.
 
 1. Push this branch and create a PR:
 
@@ -67,7 +68,7 @@ git push
    necessary to use new functionality or where functionality has been upstreamed as above.
    Note that the upstream `environments/site/inventory/groups` file contains all possible
    groups which can be used to enable features. This will be updated when pulling changes
-   from the StackHPC repo, and any new groups should be enabled/disabled as required for
+   from the StackHPC repository, and any new groups should be enabled/disabled as required for
    your site.
 
 Make changes as necessary.

@@ -43,10 +43,10 @@
   tags:
     - openondemand
     - openondemand_rstudio
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: rstudio_compute.yml
       when: appliances_mode != 'configure' # is run during build
@@ -55,10 +55,10 @@
   tags:
     - openondemand
     - openondemand_codeserver
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: codeserver_compute.yml
       when: appliances_mode != 'configure' # is run during build
