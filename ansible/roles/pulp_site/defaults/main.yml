@@ -14,12 +14,10 @@ pulp_site_rpm_repo_defaults:
   remote_username: "{{ pulp_site_upstream_username }}"
   remote_password: "{{ pulp_site_upstream_password }}"
   policy: on_demand
-  state: present
 
 pulp_site_rpm_info: |
   {{
-    dnf_repos_default |
-    combine(dnf_repos_default_epel, dnf_repos_extra) |
+    dnf_repos_all |
     select_repos(pulp_site_target_distribution_version)
   }}
 pulp_site_rpm_repos: |
@@ -28,5 +26,5 @@ pulp_site_rpm_repos: |
     to_rpm_repos(pulp_site_upstream_content_url, pulp_site_rpm_repo_defaults)
   }}
 
-pulp_site_rpm_publications: "{{ _pulp_site_rpm_info_all | to_rpm_pubs }}"
-pulp_site_rpm_distributions: "{{ _pulp_site_rpm_info_all | to_rpm_distros }}"
+pulp_site_rpm_publications: "{{ pulp_site_rpm_info | to_rpm_pubs }}"
+pulp_site_rpm_distributions: "{{ pulp_site_rpm_info | to_rpm_distros }}"

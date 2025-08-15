@@ -1,5 +1,7 @@
 dnf_repos_default: {} # see environments/common/inventory/group_vars/all/timestamps.yml
 dnf_repos_extra: {}
+dnf_repos_no_epel: {}
+dnf_repos_all: {}
 dnf_repos_default_epel: {}
 dnf_repos_pulp_content_url: "{{ appliances_pulp_url }}/pulp/content"
 dnf_repos_username: "{{ omit }}"
