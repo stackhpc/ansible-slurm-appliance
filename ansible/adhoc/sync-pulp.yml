@@ -6,4 +6,4 @@
       vars:
         pulp_site_target_arch: "x86_64"
         pulp_site_target_distribution: "rocky"
-        pulp_site_target_distribution_version: "9.5" # TODO: how can we automatically make this the latest??
+        pulp_site_target_distribution_version: "9.6" # TODO: how can we automatically make this the latest??

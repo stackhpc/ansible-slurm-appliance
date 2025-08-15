@@ -211,3 +211,6 @@ extra_packages
 
 [nhc]
 # Hosts to configure for node health checks - either entire 'compute' group or empty
+
+[pulp_server]
+

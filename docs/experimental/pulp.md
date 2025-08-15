@@ -8,7 +8,7 @@ In order to ensure reproducible builds, the appliance can build images using rep
 A playbook is provided to install and configure a Pulp server on a given host. Admin credentials for this server are automatically generated through the `ansible/adhoc/generate-passwords.yml` playbook. To use this, create an inventory file defining a group `pulp_server` containing a single host. The hostvar `ansible_host` should be defined, giving the IP address Ansible should use for ssh.
 
 **TODO: should be RL9 (or RL8?)**
-**TODO: add size required**
+**TODO: add size required (2 vCPUs, 4GB RAM)**
 **TODO: example inventory file**
 
 Once complete, it will print a message giving a value to set for `appliances_pulp_url`, assuming the `ansible_host` address is also the address the cluster
