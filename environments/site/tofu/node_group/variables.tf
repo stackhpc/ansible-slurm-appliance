@@ -60,11 +60,13 @@ variable "extra_volumes" {
         Keys are unique volume name.
         Values are a mapping with:
             size: Size of volume in GB
+            volume_type: Optional. Type of volume, or cloud default
         **NB**: The order in /dev is not guaranteed to match the mapping
         EOF
     type = map(
         object({
             size = number
+            volume_type = optional(string)
         })
     )
     default = {}
@@ -189,4 +191,20 @@ variable "group_keys" {
 variable "allowed_keys" {
     type = list
     # don't provide a default here as allowed keys may depend on module use
+}
+
+variable "config_drive" {
+    type = bool
+}
+
+variable "additional_cloud_config" {
+    type = string
+    default = ""
+    nullable = false
+}
+
+variable "additional_cloud_config_vars" {
+    type = map(any)
+    default = {}
+    nullable = false
 }

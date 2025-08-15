@@ -92,6 +92,12 @@ resource "openstack_compute_instance_v2" "control" {
       %{if var.home_volume_provisioning != "none"}
       - [LABEL=home, /exports/home]
       %{endif}
+
+    %{if var.additional_cloud_config != ""}
+    ${templatestring(var.additional_cloud_config, var.additional_cloud_config_vars)}
+    %{endif}
   EOF
+
+  config_drive = var.config_drive
 
 }
