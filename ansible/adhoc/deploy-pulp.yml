@@ -2,7 +2,7 @@
 
 - name: Install pulp on server
   become: yes
-  hosts: pulp_server # TODO: add this to common/groups
+  hosts: pulp_server
   tasks:
   - name: Install pulp
     ansible.builtin.include_role:

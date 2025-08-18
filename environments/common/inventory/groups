@@ -213,4 +213,8 @@ extra_packages
 # Hosts to configure for node health checks - either entire 'compute' group or empty
 
 [pulp_server]
+# Host to deploy a Pulp server on and sync with mirrors of upstream Ark repositories. Should be a group containing a single VM provisioned
+# separately from the appliance. e.g
+# pulp_host ansible_host=<VM-ip-address>
+# Note the host name can't conflict with group names i.e can't be called `pulp` or `pulp_server`
 
