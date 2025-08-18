@@ -19,7 +19,6 @@ Note access to this server's content isn't authenticated so this assumes the `pu
 
 **TODO: You can actually do this using additional_nodes now, how would we make the pulp store persistant?**
 **TODO: don't advise that, we want single server for all environments**
-**TODO: Add a systemd unit to run pulp!**
 
 ### Using an existing Pulp server
 An existing Pulp server can be used to host Ark repos by overriding `pulp_site_password` and `appliances_pulp_url` in the target environment. Note that this assumes the same configuration as the appliance deployed Pulp i.e no content authentication.

@@ -32,7 +32,21 @@
     - "{{ pulp_site_install_dir }}/containers:/var/lib/containers{{ pulp_site_selinux_suffix }}"
     device: /dev/fuse
     image: docker.io/pulp/pulp:3.68.1
+    state: present
 
+- name: Create systemd file
+  copy:
+    src: pulp.service
+    dest: /etc/systemd/system/pulp.service
+  register: _pulp_service
+  
+- name: Start Pulp service
+  systemd:
+    name: pulp
+    state: "{{ 'started' if _pulp_service.changed else 'restarted' }}"
+    daemon_reload: "{{ _pulp_service.changed }}"
+    enabled: true
+  
 - name: Reset admin password once container has initialised
   no_log: true
   ansible.builtin.shell:

@@ -1,0 +1,12 @@
+# Adapted from https://grimoire.carcano.ch/blog/installing-pulp3-as-a-container/
+[Unit]
+Description=Pulp
+Wants=syslog.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/podman start -a pulp
+ExecStop=/usr/bin/podman stop -t 15 pulp
+
+[Install]
+WantedBy=multi-user.target
