@@ -1,0 +1,17 @@
+dnf_repos_all: "{{ dnf_repos_no_epel | combine(dnf_repos_default_epel) }}" #see timestamps.yml
+dnf_repos_no_epel: |
+  {{ dnf_repos_default['base'] 
+    | combine(dnf_repos_default['ohpc'] if (openhpc_install_type | default('ohpc')) == 'ohpc' else {}) 
+    | combine(dnf_repos_extra) }}
+dnf_repos_default_epel: "{{ dnf_repos_default['epel'] }}"
+dnf_repos_extra: {}
+# dnf_repos_default:
+#   base:                                 # top level keys for internal indexing only, see `dnf_repos_all` and `dnf_repos_no_epel`
+#     appstream:                          # yum_repository:name
+#       '8.10':                           # ansible_distribution_version or ansible_distribution_major_version
+#         repo_file: Rocky-AppStream      # yum_repository: file
+#         # repo_name:                    # optional, override yum_repository:name
+#         pulp_path: rocky/8.10/AppStream/x86_64/os
+#         pulp_timestamp: 20250614T013846
+#         # pulp_content_url:             # optional, dnf_repos_pulp_content_url
+#         pulp_repo_name: appstream       # pulp repository name
