@@ -3,143 +3,117 @@ dnf_repos_default:
     Ceph:
       '8':
         pulp_path: centos/8-stream/storage/x86_64/ceph-quincy
-        pulp_repo_name: ceph
         pulp_timestamp: 20231104T015751
         repo_file: ceph
       '9':
         pulp_path: centos/9-stream/storage/x86_64/ceph-reef
-        pulp_repo_name: ceph
         pulp_timestamp: 20250617T023108
         repo_file: ceph
     appstream:
       '8.10':
         pulp_path: rocky/8.10/AppStream/x86_64/os
-        pulp_repo_name: appstream
         pulp_timestamp: 20250614T013846
         repo_file: Rocky-AppStream
       '9.4':
         pulp_path: rocky/9.4/AppStream/x86_64/os
-        pulp_repo_name: appstream
         pulp_timestamp: 20241112T003151
         repo_file: rocky
       '9.5':
         pulp_path: rocky/9.5/AppStream/x86_64/os
-        pulp_repo_name: appstream
         pulp_timestamp: 20250514T014704
         repo_file: rocky
       '9.6':
         pulp_path: rocky/9.6/AppStream/x86_64/os
-        pulp_repo_name: appstream
         pulp_timestamp: 20250816T020215
         repo_file: rocky
     baseos:
       '8.10':
         pulp_path: rocky/8.10/BaseOS/x86_64/os
-        pulp_repo_name: baseos
         pulp_timestamp: 20250614T013846
         repo_file: Rocky-BaseOS
       '9.4':
         pulp_path: rocky/9.4/BaseOS/x86_64/os
-        pulp_repo_name: baseos
         pulp_timestamp: 20241115T011711
         repo_file: rocky
       '9.5':
         pulp_path: rocky/9.5/BaseOS/x86_64/os
-        pulp_repo_name: baseos
         pulp_timestamp: 20250513T031844
         repo_file: rocky
       '9.6':
         pulp_path: rocky/9.6/BaseOS/x86_64/os
-        pulp_repo_name: baseos
         pulp_timestamp: 20250815T050653
         repo_file: rocky
     crb:
       '8.10':
         pulp_path: rocky/8.10/PowerTools/x86_64/os
-        pulp_repo_name: crb
         pulp_timestamp: 20250614T013846
         repo_file: Rocky-PowerTools
         repo_name: powertools
       '9.4':
         pulp_path: rocky/9.4/CRB/x86_64/os
-        pulp_repo_name: crb
         pulp_timestamp: 20241115T003133
         repo_file: rocky
       '9.5':
         pulp_path: rocky/9.5/CRB/x86_64/os
-        pulp_repo_name: crb
         pulp_timestamp: 20250514T014704
         repo_file: rocky
       '9.6':
         pulp_path: rocky/9.6/CRB/x86_64/os
-        pulp_repo_name: crb
         pulp_timestamp: 20250815T034418
         repo_file: rocky
     extras:
       '8.10':
         pulp_path: rocky/8.10/extras/x86_64/os
-        pulp_repo_name: extras
         pulp_timestamp: 20250510T032327
         repo_file: Rocky-Extras
       '9.4':
         pulp_path: rocky/9.4/extras/x86_64/os
-        pulp_repo_name: extras
         pulp_timestamp: 20241118T002802
         repo_file: rocky-extras
       '9.5':
         pulp_path: rocky/9.5/extras/x86_64/os
-        pulp_repo_name: extras
         pulp_timestamp: 20250506T032818
         repo_file: rocky-extras
       '9.6':
         pulp_path: rocky/9.6/extras/x86_64/os
-        pulp_repo_name: extras
         pulp_timestamp: 20250726T040613
         repo_file: rocky-extras
     grafana:
       '8':
         pulp_path: grafana/oss/rpm
-        pulp_repo_name: grafana
         pulp_timestamp: 20250730T011314
         repo_file: grafana
         timestamp: 20250615T005738
       '9':
         pulp_path: grafana/oss/rpm
-        pulp_repo_name: grafana
         pulp_timestamp: 20250730T011314
         repo_file: grafana
   epel:
     epel:
       '8':
         pulp_path: epel/8/Everything/x86_64
-        pulp_repo_name: epel
         pulp_timestamp: 20250615T234151
         repo_file: epel
       '9':
         pulp_path: epel/9/Everything/x86_64
-        pulp_repo_name: epel
         pulp_timestamp: 20250817T000753
         repo_file: epel
   ohpc:
     OpenHPC:
       '8':
         pulp_path: OpenHPC/2/EL_8
-        pulp_repo_name: ohpc
         pulp_timestamp: 20241218T154614
         repo_file: OpenHPC
       '9':
         pulp_path: OpenHPC/3/EL_9
-        pulp_repo_name: ohpc
         pulp_timestamp: 20241218T154614
         repo_file: OpenHPC
     OpenHPC-updates:
       '8':
         pulp_path: OpenHPC/2/updates/EL_8
-        pulp_repo_name: ohpc-updates
         pulp_timestamp: 20250512T003315
         repo_file: OpenHPC
       '9':
         pulp_path: OpenHPC/3/updates/EL_9
-        pulp_repo_name: ohpc-updates
         pulp_timestamp: 20250510T003301
         repo_file: OpenHPC

@@ -9,7 +9,7 @@ class FilterModule(object):
     
     def select_repos(self, dnf_repos, target_distro_ver): #TODO: why does baseos get a major and minor version?
         """ Filter dnf_repos to only those for a relevant distribution version (M.m or M). Returns a list of dicts.
-            TODO: note this adds distro_ver as a key
+            TODO: note this adds distro_ver and pulp_repo_name as a key
         """
     
         target_distro_ver_major = target_distro_ver.split('.')[0]
@@ -25,6 +25,7 @@ class FilterModule(object):
                 raise ValueError(f'No key matching {target_distro_ver_major} or {target_distro_ver} found in f{repokey}')
             repo_data = dnf_repos[repokey][selected_ver]
             repo_data['distro_ver'] = selected_ver
+            repo_data['pulp_repo_name'] = repokey
             rpm_repos.append(repo_data)
         return rpm_repos
 
