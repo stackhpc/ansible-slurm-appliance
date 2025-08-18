@@ -117,7 +117,7 @@ dnf_repos_default:
         pulp_timestamp: 20250730T011314
         pulp_repo_name: grafana
   ohpc:
-    openhpc_base:
+    OpenHPC:
       '8':
         repo_file: OpenHPC
         pulp_path: OpenHPC/2/EL_8
@@ -128,7 +128,7 @@ dnf_repos_default:
         pulp_path: OpenHPC/3/EL_9
         pulp_timestamp: 20241218T154614
         pulp_repo_name: ohpc
-    openhpc_updates:
+    OpenHPC-updates:
       '8':
         repo_file: OpenHPC
         pulp_path: OpenHPC/2/updates/EL_8

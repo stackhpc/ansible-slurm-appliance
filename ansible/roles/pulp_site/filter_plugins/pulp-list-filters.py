@@ -49,7 +49,7 @@ class FilterModule(object):
         distro_list = map(lambda x: {
             'name': x['pulp_repo_name'],
             'repository': get_repo_name(x),
-            'base_path': x['pulp_path'],
+            'base_path': '/'.join([x['pulp_path'],x['pulp_timestamp']]),
             'state': 'present' }, list)
         return distro_list
 
