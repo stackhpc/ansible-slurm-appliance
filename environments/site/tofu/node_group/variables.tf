@@ -128,6 +128,10 @@ variable "gateway_ip" {
     default = ""
 }
 
+variable "nodename_template" {
+    type = string
+    default = ""
+}
 variable "server_group_id" {
     type = string
     default = ""
