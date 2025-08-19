@@ -28,7 +28,7 @@ variable "key_pair" {
 variable "control_node_flavor" {
     type = string
     description = "Flavor name for control node"
-    default = "hpc.v2.16cpu.64ram"
+    default = "hpc.v1.16cpu.64ram"
 }
 
 variable "login" {
@@ -69,7 +69,7 @@ variable "login" {
       # Arbitrary group name for these login nodes
       interactive = {
           nodes: ["login-0"]
-          flavor: "hpc.v2.16cpu.64ram"
+          flavor: "hpc.v1.16cpu.64ram"
           root_volume_size = 100
       }
   }
@@ -115,7 +115,7 @@ variable "compute" {
       # Group name used for compute node partition definition
       general = {
           nodes: ["compute-0", "compute-1"]
-          flavor: "hpc.v2.32cpu.128ram"
+          flavor: "hpc.v1.32cpu.128ram"
       }
   }
 }
@@ -140,7 +140,7 @@ variable "state_volume_size" {
 variable "state_volume_type" {
     type = string
     description = "Type of state volume, if not default type"
-    default = null
+    default = "iops"
 }
 
 variable "home_volume_size" {
