@@ -220,3 +220,8 @@ variable "control_server_group_id" {
     type = string
     default = ""
 }
+
+variable "control_node_hypervisor_hostname" {
+    type = string
+    default = ""
+}

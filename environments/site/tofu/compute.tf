@@ -28,6 +28,7 @@ module "compute" {
   ignore_image_changes = lookup(each.value, "ignore_image_changes", false)
   match_ironic_node = lookup(each.value, "match_ironic_node", false)
   availability_zone = lookup(each.value, "availability_zone", "nova")
+  hypervisor_hostname = lookup(each.value, "hypervisor_hostname", "")
 
   # computed
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid

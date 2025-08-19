@@ -38,7 +38,7 @@ resource "openstack_compute_instance_v2" "control" {
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
-  
+  hypervisor_hostname = var.control_node_hypervisor_hostname 
   # root device:
   block_device {
       uuid = var.cluster_image_id

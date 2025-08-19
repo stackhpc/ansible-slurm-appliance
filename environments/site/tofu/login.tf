@@ -29,6 +29,7 @@ module "login" {
   match_ironic_node = lookup(each.value, "match_ironic_node", false)
   availability_zone = lookup(each.value, "availability_zone", "nova")
   server_group_id = lookup(each.value, "server_group_id", "")
+  hypervisor_hostname = lookup(each.value, "hypervisor_hostname", "")
 
   # can't be set for login
   compute_init_enable = []
