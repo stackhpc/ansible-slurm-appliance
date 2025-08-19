@@ -2,3 +2,7 @@
 
 appliances_extra_packages_other:
   - patch
+  - perftest
+  - libibverbs-utils
+  - autoconf
+  - automake
