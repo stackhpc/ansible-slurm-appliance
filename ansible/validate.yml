@@ -64,14 +64,6 @@
     - import_role:
         name: stackhpc.openhpc
         tasks_from: validate.yml
-    - assert:
-        that: "'enable_configless' in openhpc_config.SlurmctldParameters | default([])"
-        fail_msg: |
-          'enable_configless' not found in openhpc_config.SlurmctldParameters - is variable openhpc_config overridden?
-          Additional slurm.conf parameters should be provided using variable openhpc_config_extra.
-        success_msg: Checked Slurm will be configured for configless operation
-      delegate_to: localhost
-      run_once: true
 
 - name: Validate filebeat configuration
   hosts: filebeat
@@ -132,4 +124,14 @@
   tasks:
     - import_role:
         name: lustre
+        tasks_from: validate.yml
+
+- name: Validate vGPU configuration
+  hosts: vgpu
+  become: yes
+  gather_facts: yes
+  tags: vgpu
+  tasks:
+    - include_role:
+        name: stackhpc.linux.vgpu
         tasks_from: validate.yml

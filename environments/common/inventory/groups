@@ -17,12 +17,23 @@ compute
 # Login group to use for running mpi-based testing.
 login
 
+[additional]
+# Additional nodes to include in "cluster" group
+# Automatically populated from OpenTofu variable additional_nodegroups
+
 [cluster:children]
 # All nodes in the appliance - add e.g. service nodes not running Slurm here.
 openhpc
+additional
 
 [builder]
 # Do not add hosts here manually - used as part of Packer image build pipeline. See packer/README.md.
+
+[topology]
+# Compute nodes to be included in the Slurm topology plugin's topology tree. See ansible/roles/topology
+# Should be set to `compute` if enabled
+# Note that this feature currently assumes all compute nodes are VMs, enabling
+# when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour
 
 [podman:children]
 # Hosts running containers for below services:
@@ -88,6 +99,15 @@ fail2ban
 [openondemand_jupyter]
 # Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
 
+[openondemand_rstudio]
+# Subset of compute to run RStudio servers on via Open Ondemand
+
+[openondemand_matlab]
+# Subset of compute to run RStudio servers on via Open Ondemand
+
+[openondemand_codeserver]
+# Subset of compute to run a Codeserver VSCode instance on via Open Ondemand
+
 [etc_hosts]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
 
@@ -111,6 +131,12 @@ freeipa_client
 
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
+
+[slurm_recompile]
+# Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
+
+[vgpu]
+# Hosts where vGPU/MIG should be configured - see docs/mig.md
 
 [eessi]
 # Hosts on which EESSI stack should be configured
@@ -182,3 +208,6 @@ extra_packages
 
 [gateway]
 # Add builder to this group to install gateway ansible-init playbook into image
+
+[nhc]
+# Hosts to configure for node health checks - either entire 'compute' group or empty

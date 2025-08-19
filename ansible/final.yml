@@ -1,0 +1,30 @@
+- hosts: dnf_repos
+  become: yes
+  tags: dnf_repos
+  tasks:
+    - name: Disable pulp repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: disable_repos.yml
+      when: not dnf_repos_enabled | default(false) | bool
+
+- name: Setup NFS export for compute_init
+  hosts: compute_init:!builder
+  # NB: done last so other roles can prepare configuration etc
+  tags: compute_init
+  become: yes
+  tasks:
+    - include_role:
+        name: compute_init
+        tasks_from: export.yml
+
+- hosts: proxy
+  gather_facts: false
+  tags: proxy
+  become: yes
+  tasks:
+    - include_role:
+        name: proxy
+      vars:
+        proxy_state: absent
+      when: proxy_remove | default(false) | bool == true

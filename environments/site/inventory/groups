@@ -1,0 +1,159 @@
+[nfs:children]
+openhpc
+
+[mysql:children]
+control
+
+[prometheus:children]
+control
+
+[grafana:children]
+control
+
+[alertmanager:children]
+control
+
+[node_exporter:children]
+cluster
+
+[opensearch:children]
+control
+
+[slurm_stats:children]
+control
+
+[slurm_exporter:children]
+control
+
+[filebeat:children]
+slurm_stats
+
+# NB: [rebuild] not defined here as likely to need features not currently supported
+
+[update:children]
+
+[fail2ban:children]
+# Hosts to install fail2ban on to protect SSH
+login
+
+[block_devices:children]
+# Environment-specific so not defined here
+
+[basic_users:children]
+# Add `openhpc` group to add Slurm users via creation of users on each node.
+openhpc
+
+[openondemand:children]
+# Host to run Open Ondemand server on - subset of login
+login
+
+[openondemand_desktop:children]
+# Subset of compute to run a interactive desktops on via Open Ondemand
+compute
+
+[openondemand_jupyter:children]
+# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+compute
+
+[openondemand_rstudio:children]
+# Subset of compute to run RStudio servers on via Open Ondemand
+compute
+
+[openondemand_matlab:children]
+# Subset of compute to run a MATLAB interactive desktop on via Open Ondemand
+compute
+
+[openondemand_codeserver:children]
+# Subset of compute to run a Codeserver VSCode instance on via Open Ondemand
+compute
+
+[etc_hosts:children]
+# Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
+cluster
+
+[freeipa_client]
+# Hosts to be a FreeIPA client. See ansible/roles/freeipa/README.md
+
+[cuda]
+# Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
+
+[slurm_recompile:children]
+# Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
+cuda
+
+[eessi:children]
+# Hosts on which EESSI stack should be configured
+openhpc
+
+[resolv_conf]
+# Allows defining nameservers in /etc/resolv.conf - see ansible/roles/resolv_conf/README.md
+
+[proxy]
+# Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
+
+[manila]
+# Hosts to configure for manila fileshares
+
+[persist_hostkeys:children]
+# Hosts to use common set of hostkeys which persist across reimaging.
+login
+openondemand
+
+[squid]
+# Hosts to run squid proxy
+
+[tuned:children]
+# Hosts to run TuneD configuration
+
+[ansible_init:children]
+# Hosts to run linux-ansible-init
+cluster
+
+[sssd]
+# Hosts to configure sssd on
+
+[sshd]
+# Hosts where the OpenSSH server daemon should be configured
+
+[compute_init]
+# EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
+
+[k3s_server:children]
+# Hosts to run k3s server (should only be single node i.e control node)
+#control
+
+[k3s_agent:children]
+# Hosts to run k3s agent
+#compute
+#login
+
+[k9s:children]
+# Hosts to install k9s on
+#control
+
+[lustre]
+# Hosts to run lustre client
+
+[extra_packages:children]
+# Hosts to install specified additional packages on
+builder
+
+[cacerts]
+# Hosts to configure CA certificates and trusts on
+
+[chrony]
+# Hosts where crony configuration is applied. See docs/chrony.md for more details.
+
+[gateway:children]
+# Add builder to this group to install gateway ansible-init playbook into image
+builder
+
+[nhc:children]
+# Hosts to configure for node health checks
+compute
+
+[topology]
+# Compute nodes to be included in the Slurm topology plugin's topology tree. See ansible/roles/topology
+# Should be set to `compute` if enabled
+# Note that this feature currently assumes all compute nodes are VMs, enabling
+# when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour

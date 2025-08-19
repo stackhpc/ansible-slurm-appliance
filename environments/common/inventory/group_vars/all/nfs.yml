@@ -18,7 +18,7 @@ nfs_configuration_home_volume: # volume-backed home directories
         # Don't mount share on control node:
         clients: "{{ inventory_hostname in groups['cluster'] and inventory_hostname not in groups['control'] }}"
     nfs_server: "{{ nfs_server_default }}"
-    nfs_export: "/exports/home" # assumes skeleton TF is being used
+    nfs_export: "/exports/home" # assumes default site TF is being used
     nfs_client_mnt_point: "/home"
     # prevent tunnelling and setuid binaries:
     # NB: this is stackhpc.nfs role defaults but are set here to prevent being

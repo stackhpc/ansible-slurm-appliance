@@ -1,5 +1,10 @@
 # ofed
 
+> [!IMPORTANT]
+> This role is deprecated - it is not regularly maintained and StackHPC CI
+> does not test that it works. Consider using [ansible/roles/doca](../doca/README.md)
+> instead.
+
 This role installs Mellanox OFED:
 - It checks that the running kernel is the latest installed one, and errors if not.
 - Installation uses the `mlnxofedinstall` command, with support for the running kernel

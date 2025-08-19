@@ -1,4 +1,4 @@
-# This terraform configuration uses the "skeleton" terraform, so that is checked by CI.
+# This terraform configuration uses the site terraform, so that is checked by CI.
 
 terraform {
   required_version = ">= 0.14"
@@ -59,7 +59,7 @@ data "openstack_images_image_v2" "cluster" {
 }
 
 module "cluster" {
-    source = "../../skeleton/{{cookiecutter.environment}}/tofu/"
+    source = "../../site/tofu/"
 
     cluster_name = var.cluster_name
     cluster_networks = var.cluster_networks
@@ -78,7 +78,7 @@ module "cluster" {
         standard = { # NB: can't call this default!
             nodes = ["compute-0", "compute-1"]
             flavor = var.other_node_flavor
-            compute_init_enable = ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts"]
+            compute_init_enable = ["compute", "chrony", "etc_hosts", "nfs", "basic_users", "eessi", "tuned", "cacerts", "nhc"]
             ignore_image_changes = true
         }
         # Normally-empty partition for testing:
