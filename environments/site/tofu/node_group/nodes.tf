@@ -65,6 +65,10 @@ resource "openstack_networking_port_v2" "compute" {
   binding {
     vnic_type = lookup(var.vnic_types, each.value.network, "normal")
   }
+
+  lifecycle {
+    ignore_changes = [ binding ]
+  }
 }
 
 resource "openstack_compute_instance_v2" "compute_fixed_image" {
