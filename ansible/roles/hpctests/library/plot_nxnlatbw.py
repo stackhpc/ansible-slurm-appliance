@@ -81,9 +81,9 @@ def html_rows(rankAs, rankBs, nodes, data):
     rows = []
     for rankA in rankAs: # row
         if nodes:
-            outrow = ['<tr><td>%s [%s]</td>' % (nodes[rankA], rankA)]
+            outrow = ['<tr><td style=font-family: monospace>%s [%s]</td>' % (nodes[rankA], rankA)]
         else:
-            outrow = ['<tr><td>%s</td>' % rankA]
+            outrow = ['<tr><td style=font-family: monospace>%s</td>' % rankA]
         for rankB in rankBs:
             val = data.get((rankA, rankB))
             if val is not None:
@@ -91,7 +91,7 @@ def html_rows(rankAs, rankBs, nodes, data):
                     lightness = 50 + (50 - 50 * ((val - minv) / (maxv - minv))) # want value in range LOW = 100 (white) -> HIGH 50(red)
                 except ZeroDivisionError: # no min-max spread
                     lightness = 100
-                outrow += ['<td style="background-color:hsl(0, 100%%, %i%%);">%.1f</td>' % (lightness, val)]
+                outrow += ['<td style="font-family: monospace;background-color:hsl(0, 100%%, %i%%);">%.1f</td>' % (lightness, val)]
             else:
                 outrow += ['<td>-</td>']
         outrow += ['</tr>']
@@ -129,7 +129,11 @@ def run_module():
             if len(vals) != 4:
                 print('warning: skipping line %i (%i values)' % (ln, len(vals)))
                 continue
-            rankA, rankB, lat, bw = int(vals[0]), int(vals[1]), float(vals[2]), float(vals[3])
+            try:
+                rankA, rankB, lat, bw = int(vals[0]), int(vals[1]), float(vals[2]), float(vals[3])
+            except ValueError:
+                print('warning: skipping line %i - parse failure' % (ln))
+                continue
             latencies[rankA, rankB] = lat
             bandwidths[rankA, rankB] = bw
     
