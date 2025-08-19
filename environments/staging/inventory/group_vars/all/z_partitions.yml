@@ -1,0 +1,16 @@
+openhpc_slurm_partitions:
+    - name: general-gen2
+      groups:
+        - name: general-gen2-rack6
+    - name: rebuild
+      groups:
+        - name: general-gen2-rack6
+      default: NO
+      maxtime: 30
+      partition_params:
+        PriorityJobFactor: 65533
+        Hidden: YES
+        RootOnly: YES
+        DisableRootJobs: NO
+        PreemptMode: 'OFF'
+        OverSubscribe: EXCLUSIVE
