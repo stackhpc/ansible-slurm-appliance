@@ -14,7 +14,7 @@
     file: epel
     description: "{{ dnf_repos_epel_description }}"
     baseurl: "{{ dnf_repos_epel_baseurl }}"
-    gpgcheck: true
+    gpgcheck: false
     enabled: false
 
 - name: Get all repo files
