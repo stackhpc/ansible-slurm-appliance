@@ -15,7 +15,6 @@ dnf_repos_default_epel: "{{ dnf_repos_default['epel'] }}"
 #         pulp_path: rocky/8.10/AppStream/x86_64/os
 #         pulp_timestamp: 20250614T013846
 #         # pulp_content_url:             # optional, dnf_repos_pulp_content_url
-#         pulp_repo_name: appstream       # pulp repository name
 
 # Should be in same format as dnf_repos_default, except without the top level indexing keys e.g
 # dnf_repos_extra:
