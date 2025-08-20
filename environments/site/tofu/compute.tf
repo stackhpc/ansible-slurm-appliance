@@ -19,7 +19,8 @@ module "compute" {
   volume_backed_instances = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size = lookup(each.value, "root_volume_size", var.root_volume_size)
   gateway_ip = lookup(each.value, "gateway_ip", var.gateway_ip)
-  
+  nodename_template = lookup(each.value, "nodename_template", var.cluster_nodename_template) 
+
   # optionally set for group:
   networks = concat(var.cluster_networks, lookup(each.value, "extra_networks", []))
   extra_volumes = lookup(each.value, "extra_volumes", {})
@@ -27,6 +28,7 @@ module "compute" {
   ignore_image_changes = lookup(each.value, "ignore_image_changes", false)
   match_ironic_node = lookup(each.value, "match_ironic_node", false)
   availability_zone = lookup(each.value, "availability_zone", "nova")
+  hypervisor_hostname = lookup(each.value, "hypervisor_hostname", "")
 
   # computed
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid

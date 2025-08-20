@@ -1,6 +1,15 @@
 locals {
   # control_volumes = concat([openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
   control_volumes = concat([data.openstack_blockstorage_volume_v3.state], var.home_volume_size > 0 ? [openstack_blockstorage_volume_v3.home][0] : [])
+  nodename = templatestring(
+    var.cluster_nodename_template,
+    {
+      node = "control",
+      cluster_name = var.cluster_name,
+      cluster_domain_suffix = var.cluster_domain_suffix,
+      environment_name = basename(var.environment_root)
+    }
+  )
 }
 
 resource "openstack_networking_port_v2" "control" {
@@ -17,19 +26,23 @@ resource "openstack_networking_port_v2" "control" {
 
   no_security_groups = lookup(each.value, "no_security_groups", false)
   security_group_ids = lookup(each.value, "no_security_groups", false) ? [] : [for o in data.openstack_networking_secgroup_v2.nonlogin: o.id]
-  # port_security_enabled = lookup(each.value, "port_security_enabled", true)
+
   binding {
     vnic_type = lookup(var.vnic_types, each.key, "normal")
+  }
+
+  lifecycle {
+    ignore_changes = [ binding ]
   }
 }
 
 resource "openstack_compute_instance_v2" "control" {
   
-  name = "${var.cluster_name}-control"
+  name = split(".", local.nodename)[0]
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
-  
+  hypervisor_hostname = var.control_node_hypervisor_hostname 
   # root device:
   block_device {
       uuid = var.cluster_image_id
@@ -66,7 +79,7 @@ resource "openstack_compute_instance_v2" "control" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${var.cluster_name}-control.${var.cluster_name}.${var.cluster_domain_suffix}
+    fqdn: ${local.nodename}
     
     bootcmd:
       %{for volume in local.control_volumes}

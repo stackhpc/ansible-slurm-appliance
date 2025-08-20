@@ -39,30 +39,37 @@ variable "login" {
     Keys are names of groups.
     Values are a mapping as follows:
 
-    Required:
-        nodes: List of node names
-        flavor: String flavor name
-    Optional:
-        image_id: Overrides variable cluster_image_id
-        extra_networks: List of mappings in same format as cluster_networks
-        vnic_types: Overrides variable vnic_types
-        volume_backed_instances: Overrides variable volume_backed_instances
-        root_volume_size: Overrides variable root_volume_size
-        extra_volumes: Mapping defining additional volumes to create and attach
-                        Keys are unique volume name.
-                        Values are a mapping with:
-                            size: Size of volume in GB
-                        **NB**: The order in /dev is not guaranteed to match the mapping
-        fip_addresses: List of addresses of floating IPs to associate with nodes,
-                       in the same order as nodes parameter. The floating IPs
-                       must already be allocated to the project.
-        fip_network: Name of network containing ports to attach FIPs to. Only
-                     required if multiple networks are defined.
-        match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
-        availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
-        gateway_ip: Address to add default route via
-        nodename_template: Overrides variable cluster_nodename_template
-  EOF
+        Required:
+            nodes: List of node names
+            flavor: String flavor name
+        Optional:
+            image_id: Overrides variable cluster_image_id
+            extra_networks: List of mappings in same format as cluster_networks
+            vnic_types: Overrides variable vnic_types
+            volume_backed_instances: Overrides variable volume_backed_instances
+            root_volume_size: Overrides variable root_volume_size
+            extra_volumes: Mapping defining additional volumes to create and attach
+                            Keys are unique volume name.
+                            Values are a mapping with:
+                                size: Size of volume in GB
+                            **NB**: The order in /dev is not guaranteed to match the mapping
+            fip_addresses: List of addresses of floating IPs to associate with
+                           nodes, in the same order as nodes parameter. The
+                           floating IPs must already be allocated to the project.
+            fip_network: Name of network containing ports to attach FIPs to. Only
+                        required if multiple networks are defined.
+            ip_addresses: Mapping of list of fixed IP addresses for nodes, keyed
+                          by network name, in same order as nodes parameter.
+                          For any networks not specified here the cloud will
+                          select addresses.
+            match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
+            availability_zone: Name of availability zone. If undefined, defaults to 'nova' 
+                               if match_ironic_node is true, defered to OpenStack otherwise
+            gateway_ip: Address to add default route via
+            nodename_template: Overrides variable cluster_nodename_template
+    EOF
+
+    type = any
 }
 
 variable "cluster_image_id" {
@@ -96,7 +103,8 @@ variable "compute" {
                                 size: Size of volume in GB
                            **NB**: The order in /dev is not guaranteed to match the mapping
             match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
-            availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
+            availability_zone: Name of availability zone. If undefined, defaults to 'nova'
+                               if match_ironic_node is true, defered to OpenStack otherwise
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
     EOF

@@ -35,7 +35,10 @@ openhpc_config_default:
   SlurmctldParameters:
     - enable_configless
   TaskPlugin: task/cgroup,task/affinity
-  ReturnToService: 2 # is stackhpc.openhpc default, but templating bug means it is needed here too
+  ReturnToService: 2 # workaround for templating bug TODO: Remove once on stackhpc.openhpc v1.2.0
+  TopologyPlugin: "topology/{{ 'tree' if (topology_nodes | length) > 0 else 'flat' }}"
+
+# default additional slurm.conf parameters when "rebuild" enabled:
 openhpc_config_rebuild:
   RebootProgram: /opt/slurm-tools/bin/slurm-openstack-rebuild
   SlurmctldParameters:

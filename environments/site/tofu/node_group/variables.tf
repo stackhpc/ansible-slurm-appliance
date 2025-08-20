@@ -118,6 +118,12 @@ variable "availability_zone" {
     default = "nova"
 }
 
+variable "hypervisor_hostname" {
+    type = string
+    description = "Name of hypervisor to launch server on"
+    default = ""
+}
+
 variable "baremetal_nodes" {
     type = map(string)
     default = {}
@@ -128,6 +134,10 @@ variable "gateway_ip" {
     default = ""
 }
 
+variable "nodename_template" {
+    type = string
+    default = ""
+}
 variable "server_group_id" {
     type = string
     default = ""
