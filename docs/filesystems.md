@@ -1,5 +1,15 @@
 # Overview
 
+The Slurm appliance supports multiple ways of configuring shared filesystems, including:
+
+- Configuring the control node as an NFS server. (Default)
+
+- CephFS via Manila
+
+- Lustre
+
+# Manila
+
 The Slurm appliance supports mounting shared filesystems using [CephFS](https://docs.ceph.com/en/latest/cephfs/) via [OpenStack Manila](https://docs.openstack.org/manila/latest/). This section explains:
 
 - How to create the shares in OpenStack Manila.
