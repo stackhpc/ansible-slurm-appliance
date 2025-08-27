@@ -52,21 +52,17 @@ def run_module():
     )
 
     timestamps = dict(module.params['repos_dict'])
-    for index in timestamps:
-        for repo in timestamps[index]:
-            for version in timestamps[index][repo]:
+    for repo in timestamps:
+        for version in timestamps[repo]:
 
-                html_txt = requests.get(
-                        url= module.params['content_url'] + '/' + timestamps[index][repo][version]['pulp_path']
-                    ).text
-                timestamp_link_list = BeautifulSoup(html_txt,features="html.parser").body.find('pre').find_all() # getting raw list of timestamps from html
-                timestamp_link_list = map(lambda x: x.string,timestamp_link_list) # stripping xml tags
-                latest_timestamp = list(timestamp_link_list)[-1][:-1] # last timestamp in list with trailing / removed
-                timestamps[index][repo][version]['pulp_timestamp'] = latest_timestamp
-        # timestamps[index] = dict(sorted(timestamps[index]))
-            
-    
-    result['timestamps'] = timestamps
+            html_txt = requests.get(
+                    url= module.params['content_url'] + '/' + timestamps[repo][version]['pulp_path']
+                ).text
+            timestamp_link_list = BeautifulSoup(html_txt,features="html.parser").body.find('pre').find_all() # getting raw list of timestamps from html
+            timestamp_link_list = map(lambda x: x.string,timestamp_link_list) # stripping xml tags
+            latest_timestamp = list(timestamp_link_list)[-1][:-1] # last timestamp in list with trailing / removed
+            timestamps[repo][version]['pulp_timestamp'] = latest_timestamp
+    result['timestamps'] = dict(sorted(timestamps.items()))
 
     module.exit_json(**result)
 
