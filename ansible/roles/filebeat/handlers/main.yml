@@ -1,9 +1,8 @@
 ---
-
 - name: Restart filebeat container
-  systemd:
+  ansible.builtin.systemd:
     name: filebeat.service
     state: restarted
-    enabled: yes
-    daemon_reload: yes
+    enabled: true
+    daemon_reload: true
   become: true

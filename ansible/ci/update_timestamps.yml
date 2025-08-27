@@ -1,6 +1,7 @@
+---
 - hosts: localhost
   tasks:
-    - name: Get latest timestamps from sources
+    - name: Get latest timestamps from sources # noqa: syntax-check[unknown-module] # ansible/library/latest_timestamps.py
       latest_timestamps:
         repos_dict: "{{ appliances_pulp_repos }}"
         content_url: "https://ark.stackhpc.com/pulp/content"

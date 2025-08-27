@@ -1,24 +1,25 @@
 - name: Download Code Server RPM
   ansible.builtin.get_url:
-    url: "https://github.com/coder/code-server/releases/download/v{{ openondemand_code_server_version }}/code-server-{{ openondemand_code_server_version }}-amd64.rpm"
+    url: "https://github.com/coder/code-server/releases/download/v{{ openondemand_code_server_version }}/code-server-{{ openondemand_code_server_version }}-amd64.rpm" # noqa: yaml[line-length]
     dest: /tmp/code-server.rpm
     mode: '0644'
 
 - name: Install Code Server
+  # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
   ansible.builtin.dnf:
     name: /tmp/code-server.rpm
     state: present
-    disable_gpg_check: yes
+    disable_gpg_check: true
 
 - name: Create module directory for Code Server
   ansible.builtin.file:
     path: /opt/ohpc/pub/modulefiles/code-server
     state: directory
     mode: '0755'
-    recurse: yes
+    recurse: true
 
 - name: Create modulefile for Code Server
-  copy:
+  ansible.builtin.copy:
     dest: "/opt/ohpc/pub/modulefiles/code-server/{{ openondemand_code_server_version }}"
     mode: "0644"
     content: |

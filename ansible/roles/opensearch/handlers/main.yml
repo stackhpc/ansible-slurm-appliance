@@ -1,7 +1,6 @@
 ---
-
 - name: Restart opensearch service
-  systemd:
+  ansible.builtin.systemd:
     name: opensearch.service
     state: "{{ 'restarted' if 'started' in opensearch_state else opensearch_state }}"
     enabled: "{{ opensearch_systemd_service_enabled }}"

@@ -17,7 +17,7 @@ mysql_datadir: "{{ appliances_state_dir | default('/var/lib') }}/mysql"
 
 mysql_databases:
   - name: slurm_acct_db
-    config_file: ''
+    config_file: ""
     login_user: root
     login_password: "{{ mysql_root_password }}"
     login_host: "{{ mysql_host }}"

@@ -1,9 +1,9 @@
-block_devices
-=============
+# block_devices
 
 Manage filesystems on block devices (such as OpenStack volumes), including creating partitions, creating filesystems and mounting filesystems.
 
 This is a convenience wrapper around the ansible modules:
+
 - community.general.parted
 - community.general.filesystem
 - ansible.buildin.file
@@ -15,13 +15,11 @@ To avoid issues with device names changing after e.g. reboots, devices are ident
 
 [^1]: See `environments/common/inventory/group_vars/builder/defaults.yml`
 
-Requirements
-------------
+## Requirements
 
 N/A.
 
-Role Variables
---------------
+## Role Variables
 
 - `block_devices_partition_state`: Optional. Partition state, 'present' or 'absent' (as for parted) or 'skip'. Defaults to 'present'.
 - `block_devices_serial`: Required. Serial number of block device. For an OpenStack volume this is the volume ID.
@@ -36,20 +34,18 @@ Role Variables
 
 Multiple NFS client/server configurations may be provided by defining `block_devices_configurations`. This should be a list of mappings with keys/values are as per the variables above without the `block_devices_` prefix. Omitted keys/values are filled from the corresponding variable.
 
-Dependencies
-------------
+## Dependencies
 
 See top of page.
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```yaml
 - hosts: servers
   become: true
   tasks:
-  - include_role:
-    name: block_devices
+    - include_role:
+      name: block_devices
 ```
 
 The example variables below create an `ext4` partition on `/dev/sdb1` and mount it as `/mnt/files` with the default owner/group:
@@ -71,12 +67,10 @@ block_devices_configurations:
     path: /mnt/files
 ```
 
-License
--------
+## License
 
 Apache V2
 
-Author Information
-------------------
+## Author Information
 
 stackhpc.com

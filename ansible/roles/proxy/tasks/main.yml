@@ -7,9 +7,9 @@
       for convenience variables to set this.
 - name: Define configuration in /etc/environment
   tags: proxy
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "/etc/environment"
-    create: yes
+    create: true
     owner: root
     group: root
     mode: o=rw,go=r
@@ -25,7 +25,7 @@
       value: "{{ proxy_no_proxy }}"
 
 - name: Define dnf proxy
-  ini_file:
+  community.general.ini_file:
     path: /etc/dnf/dnf.conf
     section: main
     option: "proxy"
@@ -38,7 +38,7 @@
   when: proxy_dnf | bool
 
 - name: Create systemd configuration directory
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system.conf.d/
     state: directory
     owner: root
@@ -52,9 +52,9 @@
     section: Manager
     option: DefaultEnvironment
     value: >-
-        "http_proxy={{ proxy_http_proxy }}"
-        "https_proxy={{ proxy_http_proxy }}"
-        "no_proxy={{ proxy_no_proxy }}"
+      "http_proxy={{ proxy_http_proxy }}"
+      "https_proxy={{ proxy_http_proxy }}"
+      "no_proxy={{ proxy_no_proxy }}"
     no_extra_spaces: true
     state: "{{ proxy_state }}"
     owner: root
@@ -63,12 +63,11 @@
   register: _copy_systemd_proxy
   when: proxy_systemd | bool
 
-- name: Restart systemd
-  command: systemctl daemon-reexec
-  when: 
+- name: Restart systemd # noqa: no-changed-when
+  ansible.builtin.command: systemctl daemon-reexec # noqa: command-instead-of-module
+  when:
     - proxy_systemd | bool
     - _copy_systemd_proxy.changed | default(false)
 
 - name: Reset connection to get new /etc/environment
-  meta: reset_connection
-  # NB: conditionals not supported
+  ansible.builtin.meta: reset_connection

@@ -44,7 +44,7 @@ if git show-branch "remotes/origin/$BRANCH_NAME" >/dev/null 2>&1; then
 fi
 
 echo "[INFO] Merging release tag - $RELEASE_TAG"
-git merge --strategy recursive -X theirs --no-commit $RELEASE_TAG
+git merge --strategy recursive -X theirs --no-commit "$RELEASE_TAG"
 
 # Check if the merge resulted in any changes being staged
 if [ -n "$(git status --short)" ]; then
@@ -54,7 +54,7 @@ if [ -n "$(git status --short)" ]; then
   # NOTE(scott): The GitHub create-pull-request action does
   # the commiting for us, so we only need to make branches
   # and commits if running outside of GitHub actions.
-  if [ ! $GITHUB_ACTIONS ]; then
+  if [ ! "$GITHUB_ACTIONS" ]; then
     echo "[INFO] Checking out temporary branch '$BRANCH_NAME'..."
     git checkout -b "$BRANCH_NAME"
 
@@ -74,8 +74,8 @@ if [ -n "$(git status --short)" ]; then
 
   # Write a file containing the branch name and tag
   # for automatic PR or MR creation that follows
-  echo "BRANCH_NAME=\"$BRANCH_NAME\"" > .mergeenv
-  echo "RELEASE_TAG=\"$RELEASE_TAG\"" >> .mergeenv
+  echo "BRANCH_NAME=\"$BRANCH_NAME\"" >.mergeenv
+  echo "RELEASE_TAG=\"$RELEASE_TAG\"" >>.mergeenv
 else
   echo "[INFO] Merge resulted in no changes"
 fi

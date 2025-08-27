@@ -10,9 +10,9 @@ This page details how to configure Multi Instance GPU (MIG) in Slurm.
 
 ## Inventory
 
-Add relevant hosts to the ``vgpu`` group, for example in `environments/$ENV/inventory/groups`:
+Add relevant hosts to the `vgpu` group, for example in `environments/$ENV/inventory/groups`:
 
-```
+```yaml
 [vgpu:children]
 cuda
 ```
@@ -23,24 +23,24 @@ Use variables from the [stackhpc.linux.vgpu](https://github.com/stackhpc/ansible
 
 For example in: `environments/<environment>/inventory/group_vars/all/vgpu`:
 
-```
+```yaml
 ---
 vgpu_definitions:
-    - pci_address: "0000:17:00.0"
-      mig_devices:
-        "1g.10gb": 4
-        "4g.40gb": 1
-    - pci_address: "0000:81:00.0"
-      mig_devices:
-        "1g.10gb": 4
-        "4g.40gb": 1
+  - pci_address: "0000:17:00.0"
+    mig_devices:
+      "1g.10gb": 4
+      "4g.40gb": 1
+  - pci_address: "0000:81:00.0"
+    mig_devices:
+      "1g.10gb": 4
+      "4g.40gb": 1
 ```
 
-The appliance will use the driver installed via the ``cuda`` role. 
+The appliance will use the driver installed via the `cuda` role.
 
-Use ``lspci`` to determine the PCI addresses e.g:
+Use `lspci` to determine the PCI addresses e.g:
 
-```
+```text
 [root@io-io-gpu-02 ~]# lspci -nn | grep -i nvidia
 06:00.0 3D controller [0302]: NVIDIA Corporation GH100 [H100 SXM5 80GB] [10de:2330] (rev a1)
 0c:00.0 3D controller [0302]: NVIDIA Corporation GH100 [H100 SXM5 80GB] [10de:2330] (rev a1)
@@ -51,7 +51,7 @@ Use ``lspci`` to determine the PCI addresses e.g:
 The supported profiles can be discovered by consulting the [NVIDIA documentation](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html#supported-mig-profiles)
 or interactively by running the following on one of the compute nodes with GPU resources:
 
-```
+```text
 [rocky@io-io-gpu-05 ~]$ sudo nvidia-smi -i 0 -mig 1
 Enabled MIG Mode for GPU 00000000:06:00.0
 All done.
@@ -150,7 +150,7 @@ All done.
 ## compute_init configuration for slurm triggered rebuild (optional)
 
 You only need to configure this if you are using the slurm triggered rebuild
-feature.  Use the ``vgpu`` metadata option to enable creation of mig devices on
+feature. Use the `vgpu` metadata option to enable creation of mig devices on
 rebuild.
 
 ## GRES configuration
@@ -160,19 +160,19 @@ do this you need to determine the names of the GPU types as detected by slurm. F
 deploy slurm with the default nodegroup definitions to get a working cluster. Make a temporary
 copy of slurm.conf:
 
-```
+```text
 cp /var/spool/slurm/conf-cache/slurm.conf /tmp/
 ```
 
 Then create a `/tmp/gres.conf` which enables autodetection:
 
-```
+```text
 AutoDetect=nvml
 ```
 
 You will then be able to run: `sudo slurmd -f /tmp/slurm.conf -G` on a compute node where GPU resources exist. An example is shown below:
 
-```
+```text
 [rocky@io-io-gpu-02 ~]$ sudo slurmd -f /tmp/slurm.conf -G
 slurmd-io-io-gpu-02: Gres Name=gpu Type=nvidia_h100_80gb_hbm3 Count=1 Index=0 ID=7696487 File=/dev/nvidia0 Links=(null) Flags=HAS_FILE,HAS_TYPE,ENV_NVML,ENV_RSMI,ENV_ONEAPI
 ,ENV_OPENCL,ENV_DEFAULT
@@ -201,24 +201,23 @@ NOTE: If you have configured a Gres= line in slurm.conf already. You may have to
 GRES resources can then be configured manually. An example is shown below
 (`environments/<environment>/inventory/group_vars/all/openhpc.yml`):
 
-```
+```yaml
 openhpc_partitions:
   - name: cpu
   - name: gpu
 
 openhpc_nodegroups:
-    - name: cpu
-    - name: gpu
-      gres_autodetect: nvml
-      gres:
-        - conf: "gpu:nvidia_h100_80gb_hbm3:2"
-        - conf: "gpu:nvidia_h100_80gb_hbm3_4g.40gb:2"
-        - conf: "gpu:nvidia_h100_80gb_hbm3_1g.10gb:6"
+  - name: cpu
+  - name: gpu
+    gres_autodetect: nvml
+    gres:
+      - conf: "gpu:nvidia_h100_80gb_hbm3:2"
+      - conf: "gpu:nvidia_h100_80gb_hbm3_4g.40gb:2"
+      - conf: "gpu:nvidia_h100_80gb_hbm3_1g.10gb:6"
 
 openhpc_config:
   GresTypes:
     - gpu
-
 ```
 
 Making sure the types (the identifier after `gpu:`) match those collected with `slurmd -G`. Substrings

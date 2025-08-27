@@ -3,4 +3,5 @@
   ansible.builtin.template:
     src: "{{ nhc_config_template }}"
     dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/nhc.conf"
+    mode: "0644"
   delegate_to: "{{ groups['control'] | first }}"
