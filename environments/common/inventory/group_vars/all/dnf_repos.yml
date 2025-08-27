@@ -1,24 +1,8 @@
-dnf_repos_all: "{{ dnf_repos_no_epel | combine(dnf_repos_default_epel) }}"
-dnf_repos_no_epel: |
-  {{ dnf_repos_default['base'] 
-    | combine(dnf_repos_default['ohpc'] if (openhpc_install_type | default('ohpc')) == 'ohpc' else {}) 
-    | combine(dnf_repos_extra) }}
-dnf_repos_default_epel: "{{ dnf_repos_default['epel'] }}"
+# dnf_repos_default: see timestamps.yml
 
-# see timestamps.yml for dnf_repos_default definition, default repos should be in format
-# dnf_repos_default:
-#   base:                                 # top level keys for internal indexing only, see `dnf_repos_all` and `dnf_repos_no_epel`
-#     appstream:                          # yum_repository:name
-#       '8.10':                           # ansible_distribution_version or ansible_distribution_major_version
-#         repo_file: Rocky-AppStream      # yum_repository: file
-#         # repo_name:                    # optional, override yum_repository:name
-#         pulp_path: rocky/8.10/AppStream/x86_64/os
-#         pulp_timestamp: 20250614T013846
-#         # pulp_content_url:             # optional, dnf_repos_pulp_content_url
-
-# Should be in same format as dnf_repos_default, except without the top level indexing keys e.g
-# dnf_repos_extra:
-#   appstream:
-#     8.10:
-#       ...
+# override this in environments/site/inventory/group_vars/dnf_repos.yml to add repos:
 dnf_repos_extra: {}
+
+# indirection to skip openhpc repos if using alternative slurm:
+dnf_repos_skip: "{{ [] if ((openhpc_install_type | default('ohpc') == 'ohpc')) else ['OpenHPC', 'OpenHPC-updates'] }}"
+dnf_repos_repos: "{{ dnf_repos_default | combine(dnf_repos_extra) | dict2items | rejectattr('key', 'in', dnf_repos_skip) | items2dict }}"
