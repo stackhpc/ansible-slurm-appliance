@@ -30,7 +30,8 @@ Once this exists, create a share using credentials for the Slurm project. An acc
 To mount shares onto hosts in a group, add them to the `manila` group.
 
   ```ini
-  [manila:children]
+  # environments/site/inventory/groups:
+  [manila:children]:
   login
   compute
   ```
@@ -38,14 +39,16 @@ To mount shares onto hosts in a group, add them to the `manila` group.
 Set the version of Ceph which is running on the system.
 
   ```yaml
+  # environments/site/inventory/group_vars/manila.yml:
   os_manila_mount_ceph_version: "18.2.4"
   ```
 
-Define the list of shares to be mounted, and the paths to mount them to. See the [stackhpc.os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount) for further configuration options.
+Define the list of shares to be mounted, and the paths to mount them to. The example below parameterises the share name using the environment name. See the [stackhpc.os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount) for further configuration options.
 
   ```yaml
+  # environments/site/inventory/group_vars/manila.yml:
   os_manila_mount_shares:
-    - share_name: slurm-production-scratch
+    - share_name: "slurm-{{ appliances_environment_name }}-scratch"
       mount_path: /scratch
   ```
 
@@ -53,9 +56,10 @@ Define the list of shares to be mounted, and the paths to mount them to. See the
 
 By default, the Slurm appliance configures the control node as an NFS server and exports a directory which is mounted on the other cluster nodes as `/home`. When using Manila + CephFS for the home directory instead, this will need to be disabled. To do this, set the tf var `home_volume_provisioning` to `None`. 
 
-The `basic_users_homedir_server_path` home directory will need to be updated to point to this new shared directory.
+Some `basic_users_homedir_*` parameters need overriding as the provided defaults are only satisfactory for the default root-squashed NFS share:
 
   ```yaml
+  # environments/site/inventory/group_vars/all/basic_users.yml:
   basic_users_homedir_server: "{{ groups['login'] | first }}" # if not mounting /home on control node
   basic_users_homedir_server_path: /home
   ```
@@ -63,9 +67,10 @@ The `basic_users_homedir_server_path` home directory will need to be updated to 
 Finally, add the home directory to the list of shares (the share should be already created in OpenStack).
 
   ```yaml
+  # environments/site/inventory/group_vars/all/manila.yml:
   os_manila_mount_shares:
-    - share_name: slurm-production-scratch
+    - share_name: "slurm-{{ appliances_environment_name }}-scratch"
       mount_path: /scratch
-    - share_name: slurm-production-home
+    - share_name: "slurm-{{ appliances_environment_name }}-home"
       mount_path: /home
   ```
