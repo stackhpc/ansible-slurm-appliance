@@ -46,7 +46,7 @@ To mount shares onto hosts in a group, add them to the `manila` group.
   compute
   ```
 
-If you are running a different version of Ceph from the defaults in the i[os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount/blob/master/defaults/main.yml), you will need to update the package version by setting the following.
+If you are running a different version of Ceph from the defaults in the [os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount/blob/master/defaults/main.yml), you will need to update the package version by setting:
 
   ```yaml
   # environments/site/inventory/group_vars/manila.yml:
