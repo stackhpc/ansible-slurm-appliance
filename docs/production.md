@@ -98,7 +98,7 @@ environment, wherever possible group/role vars should be placed in
 environment-specific (e.g. DNS names for `openondemand_servername`).
 
 Where possible hooks should also be placed in `environments/site/hooks/`
-and referenced from the `site` and `production` environments, e.g.:
+and referenced from the `production` and `staging` environments, e.g.:
 
   ```yaml
   # environments/production/hooks/pre.yml:
