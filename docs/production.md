@@ -313,22 +313,9 @@ The value chosen should be the highest value demonstrated during testing. Note
 that any time spent blocked due to this parallelism limit does not count
 against the (un-overridable) internal OpenTofu timeout of 30 minutes
 
-### Configure appliance
+## Configure appliance
 
-To configure the appliance, ensure the venv and the environment are
-[activated](#create-a-new-environment) and run:
-
-  ```bash
-  ansible-playbook ansible/site.yml
-  ```
-
-Once it completes you can log in to the cluster using:
-
-  ```bash
-  ./dev/ansible-ssh login
-  ```
-
-## Production further configuration
+### Production configuration to consider
 
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
@@ -353,8 +340,6 @@ Once it completes you can log in to the cluster using:
 - Configure Open OnDemand - see [specific documentation](openondemand.md) which
   notes specific variables required.
 
-- Configure Open OnDemand - see [specific documentation](openondemand.md).
-
 - Remove the `demo_user` user from
   `environments/$ENV/inventory/group_vars/all/basic_users.yml`. Replace the
   `hpctests_user` in `environments/$ENV/inventory/group_vars/all/hpctests.yml`
@@ -367,7 +352,7 @@ Once it completes you can log in to the cluster using:
 - See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
   raising `hpctests_hpl_mem_frac` during tests.
 
-- By default, OpenStack Nova also
+- By default, OpenStack Nova
   [limits](https://docs.openstack.org/nova/latest/configuration/config.html#DEFAULT.max_concurrent_builds)
   the number of concurrent instance builds to 10. This is per Nova controller,
   so 10x virtual machines per hypervisor. For baremetal nodes it is 10 per
@@ -380,7 +365,8 @@ Once it completes you can log in to the cluster using:
 - Enable alertmanager if Slack is available - see
   [docs/alerting.md](./alerting.md).
 
-- Enable node health checks - see [ansible/roles/nhc/README.md](../ansible/roles/nhc/README.md).
+- Enable node health checks - see
+  [ansible/roles/nhc/README.md](../ansible/roles/nhc/README.md).
 
 - By default, the appliance uses a built-in NFS share backed by an OpenStack
   volume for the cluster home directories. You may find that you want to change
@@ -393,6 +379,21 @@ Once it completes you can log in to the cluster using:
   [CUDA](../roles/cuda/README.md), you will need to build a custom image. It is
   recommended that you build this on top of the latest existing openhpc image.
   See the [image-build docs](image-build.md) for details.
+
+### Applying configuration
+
+To configure the appliance, ensure the venv and the environment are
+[activated](#create-a-new-environment) and run:
+
+  ```bash
+  ansible-playbook ansible/site.yml
+  ```
+
+Once it completes you can log in to the cluster using:
+
+  ```bash
+  ./dev/ansible-ssh login
+  ```
 
 For further information, including additional configuration guides and
 operations instructions, see the [docs](README.md) directory.
