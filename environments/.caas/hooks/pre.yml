@@ -63,3 +63,14 @@
           - dnf_repos
       loop: "{{ groups['cluster'] }}"
       when: dnf_repos_enabled | default(false) | bool
+
+# Workaround for setup-env.sh not running in CaaS CI, so:
+# https://github.com/stackhpc/ansible-slurm-appliance/blob/ba9699267449fba58cd9c04c451759a914fd7144/ansible/validate.yml#L16
+# doesn't break CI
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Prepare requirements.yml.last for galaxy validation
+      copy:
+        src: "{{ appliances_repository_root }}/requirements.yml"
+        dest: "{{ appliances_repository_root }}/requirements.yml.last"
