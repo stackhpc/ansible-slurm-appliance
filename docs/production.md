@@ -60,14 +60,30 @@ You will also need to install
 A production deployment should be set up under version control, so you should
 create a fork of this repo.
 
-To start, you should use the [latest tagged
-release](https://github.com/stackhpc/ansible-slurm-appliance/releases). v1.161
-has been used as an example here, make sure to channge this. Do not use the
-default main branch, as this may have features that are still works in
-progress. The steps below show how to create a site-specific branch.
+First make an empty Git repository using your service of choice (e.g. GitHub or
+GitLab), then execute the following commands to turn the new empty repository
+into a copy of the ansible-slurm-appliance repository.
 
   ```bash
-  git clone https://github.com/your-fork/ansible-slurm-appliance
+  git clone https://github.com/stackhpc/ansible-slurm-appliance.git
+  cd ansible-slurm-appliance
+  ```
+
+Maintain the existing origin remote as upstream, and create a new origin remote
+for the repository location.
+
+  ```bash
+  git remote rename origin upstream
+  git remote add origin git@<repo location>/ansible-slurm-appliance.git
+  ```
+
+You should use the [latest tagged
+release](https://github.com/stackhpc/ansible-slurm-appliance/releases). v1.161
+has been used as an example here, make sure to change this. Do not use the
+default main branch, as this may have features that are still works in
+progress.
+
+  ```bash
   git checkout v1.161
   git checkout -b site/main
   git push -u origin site/main
