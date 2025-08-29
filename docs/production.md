@@ -381,10 +381,7 @@ Once it completes you can log in to the cluster using:
   volume for the cluster home directories. You may find that you want to change
   this. The following alternatives are supported:
 
-  - External NFS
-  <!--- External NFS docs TODO --->
-  - CephFS via OpenStack Manila
-  <!--- filesystems docs TODO --->
+  - [CephFS via OpenStack Manila](./filesystems.md)
   - [Lustre](../roles/lustre/README.md)
 
 - For some features, such as installing [DOCA-OFED](../roles/doca/README.md) or
