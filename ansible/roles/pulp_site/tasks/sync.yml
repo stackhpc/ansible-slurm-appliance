@@ -3,17 +3,7 @@
 - ansible.builtin.assert:
     that: pulp_site_upstream_password != ''
     quiet: true
-    fail_msg: "Upstream password not set. Either set env var ARK_PASSWORD or override pulp_site_upstream_password."
-
-- name: Wait for Pulp server
-  pulp.squeezer.status:
-    pulp_url: "{{ pulp_site_url }}"
-    username: "{{ pulp_site_username }}"
-    password: "{{ pulp_site_password }}"
-  register: _pulp_status
-  until: _pulp_status.failed == false
-  retries: 30
-  delay: 20
+    fail_msg: "Upstream password not set. Ensure `pulp_site_upstream_username` and `pulp_site_upstream_password` are overriden to your Ark credentials."
 
 - name: Ensure Pulp CLI config directory exists
   ansible.builtin.file:
@@ -26,6 +16,16 @@
     src: cli.toml.j2
     dest: ~/.config/pulp/cli.toml
     mode: '0644'
+
+- name: Wait for Pulp server
+  pulp.squeezer.status:
+    pulp_url: "{{ pulp_site_url }}"
+    username: "{{ pulp_site_username }}"
+    password: "{{ pulp_site_password }}"
+  register: _pulp_status
+  until: _pulp_status.failed == false
+  retries: 30
+  delay: 20
 
 - block:
   - name: Ensure squeezer cache exists
