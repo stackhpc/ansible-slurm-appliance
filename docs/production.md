@@ -127,16 +127,6 @@ as a module by the site-specific cookie-cutter generated configurations. This
 will have been generated for you already under
 ``environments/$ENV/tofu/main.tf``.
 
-Note that:
-
-  - Environment-specific variables (`cluster_name`) should be hardcoded into
-    the cluster module block.
-
-  - Environment-independent variables (e.g. maybe `cluster_net` if the same
-    is used for staging and production) should be set as *defaults* in
-    `environments/site/tofu/variables.tf`, and then don't need to be passed
-    in to the module.
-
 ### Cookiecutter instructions
 
 - Run the following from the repository root to activate the venv:
@@ -206,6 +196,16 @@ Variables marked `*` refer to OpenStack resources which must already exist.
 
 The above is a minimal configuration - for all variables and descriptions see
 `environments/site/tofu/variables.tf`.
+
+Note that:
+
+  - Environment-specific variables (`cluster_name`) should be hardcoded into
+    the cluster module block.
+
+  - Environment-independent variables (e.g. maybe `cluster_net` if the same
+    is used for staging and production) should be set as *defaults* in
+    `environments/site/tofu/variables.tf`, and then don't need to be passed
+    in to the module.
 
 The cluster image used should match the release which you are deploying with.
 Published images are described in the release notes
