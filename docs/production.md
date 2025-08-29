@@ -123,23 +123,9 @@ and referenced from the `production` and `staging` environments, e.g.:
   ```
 
 OpenTofu configurations are defined in the `site` environment and referenced
-as a module by the site-specific
-cookie-cutter generated configurations:
-
-  - Delete the *contents* of the cookie-cutter generated `tofu/` directories
-    from the `production` and `staging` environments.
-
-  - Create a `main.tf` in those directories which uses `site/tofu/` as a
-    [module](https://opentofu.org/docs/language/modules/), e.g. :
-
-  ```
-  ...
-  module "cluster" {
-      source = "../../site/tofu/"
-      cluster_name = "foo"
-      ...
-  }
-  ```
+as a module by the site-specific cookie-cutter generated configurations. This
+will have been generated for you already under
+``environments/$ENV/tofu/main.tf``.
 
 Note that:
 
