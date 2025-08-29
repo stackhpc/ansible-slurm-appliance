@@ -29,6 +29,11 @@ Before starting ensure that:
     communication, ``SSH`` allowing external access via SSH and ``HTTPS``
     allowing access for Open OnDemand.
 
+  - Usually, you'll want to deploy the Slurm Appliance into its own dedicated
+    project. It's recommended that your OpenStack credentials are defined in a
+    [clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml)
+    file in a default location with the default cloud name of `openstack`.
+
 ### Setup deploy host
 
 The following operating systems are supported for the deploy host:
@@ -73,39 +78,6 @@ progress. The steps below show how to create a site-specific branch.
 Get it agreed up front what the cluster names will be. Changing this later
 requires instance deletion/recreation.
 
-### Cookiecutter instructions
-
-- Run the following from the repository root to activate the venv:
-
-  ```bash
-  . venv/bin/activate
-  ```
-
-- Use the `cookiecutter` template to create a new environment to hold your
-  configuration:
-
-  ```bash
-  cd environments
-  cookiecutter ../cookiecutter
-  ```
-
-  and follow the prompts to complete the environment name and description.
-
-  **NB:** In subsequent sections this new environment is referred to as `$ENV`.
-
-- Go back to the root folder and activate the new environment:
-
-  ```bash
-  cd ..
-  . environments/$ENV/activate
-  ```
-
-  And generate secrets for it:
-
-  ```bash
-  ansible-playbook ansible/adhoc/generate-passwords.yml
-  ```
-
 ### Environments structure
 
 At least two environments should be created using cookiecutter, which will
@@ -116,14 +88,14 @@ derive from the `site` base environment:
 A `dev` environment should also be created if considered required, or this can
 be left until later.
 
-In general only the `inventory/groups` file in the `site` environment is needed
-- it can be modified as required to enable features for all environments at the
-site.
+In general only the `inventory/groups` file in the `site` environment is
+needed; it can be modified as required to enable features for all environments
+at the site.
 
-To ensure the `staging` environment provides a good test of the `production` environment, wherever possible group/role
-vars should be placed in `environments/site/inventory/group_vars/all/*.yml`
-unless the value really is environment-specific (e.g. DNS names for
-`openondemand_servername`).
+To ensure the `staging` environment provides a good test of the `production`
+environment, wherever possible group/role vars should be placed in
+`environments/site/inventory/group_vars/all/*.yml` unless the value really is
+environment-specific (e.g. DNS names for `openondemand_servername`).
 
 Where possible hooks should also be placed in `environments/site/hooks/`
 and referenced from the `site` and `production` environments, e.g.:
@@ -162,6 +134,39 @@ Note that:
     is used for staging and production) should be set as *defaults* in
     `environments/site/tofu/variables.tf`, and then don't need to be passed
     in to the module.
+
+### Cookiecutter instructions
+
+- Run the following from the repository root to activate the venv:
+
+  ```bash
+  . venv/bin/activate
+  ```
+
+- Use the `cookiecutter` template to create a new environment to hold your
+  configuration:
+
+  ```bash
+  cd environments
+  cookiecutter ../cookiecutter
+  ```
+
+  and follow the prompts to complete the environment name and description.
+
+  **NB:** In subsequent sections this new environment is referred to as `$ENV`.
+
+- Go back to the root folder and activate the new environment:
+
+  ```bash
+  cd ..
+  . environments/$ENV/activate
+  ```
+
+  And generate secrets for it:
+
+  ```bash
+  ansible-playbook ansible/adhoc/generate-passwords.yml
+  ```
 
 ## Define and deploy infrastructure
 
@@ -238,11 +243,9 @@ Once it completes you can log in to the cluster using:
 
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
-  To ensure staging environments are a good model for production this should
-  generally be moved into the `site` environment. It should be encrypted
-  using [Ansible
-  vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
-  and then committed to the repository.
+  These should be created for each environment, and then be encrypted using
+  [Ansible vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
+  and committed to the repository.
 
 - Ensure created instances have accurate/synchronised time. For VM instances
   this is usually provided by the hypervisor, but if not (or for bare metal
