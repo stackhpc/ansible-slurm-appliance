@@ -120,7 +120,7 @@ In general only the `inventory/groups` file in the `site` environment is needed
 - it can be modified as required to enable features for all environments at the
 site.
 
-To avoid divergence of configuration all possible overrides for group/role
+To ensure the `staging` environment provides a good test of the `production` environment, wherever possible group/role
 vars should be placed in `environments/site/inventory/group_vars/all/*.yml`
 unless the value really is environment-specific (e.g. DNS names for
 `openondemand_servername`).
@@ -134,8 +134,8 @@ and referenced from the `site` and `production` environments, e.g.:
     import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/pre.yml"
   ```
 
-OpenTofu configurations should be defined in the `site` environment and used
-as a module from the other environments. This can be done with the
+OpenTofu configurations are defined in the `site` environment and referenced
+as a module by the site-specific
 cookie-cutter generated configurations:
 
   - Delete the *contents* of the cookie-cutter generated `tofu/` directories
@@ -198,10 +198,10 @@ Create an OpenTofu variables file to define the required infrastructure, e.g.:
 Variables marked `*` refer to OpenStack resources which must already exist.
 
 The above is a minimal configuration - for all variables and descriptions see
-`environments/$ENV/tofu/variables.tf`.
+`environments/site/tofu/variables.tf`.
 
 The cluster image used should match the release which you are deploying with.
-Images are published alongside the release tags
+Published images are described in the release notes
 [here](https://github.com/stackhpc/ansible-slurm-appliance/releases). 
 
 To deploy this infrastructure, ensure the venv and the environment are
