@@ -53,15 +53,7 @@ If you are running a different version of Ceph from the defaults in the [os-mani
   os_manila_mount_ceph_version: "18.2.4"
   ```
 
-This will need to be included in the `builder` group to be installed in the host image.
-
-  ```ini
-  # environments/site/inventory/groups:
-  [manila:children]:
-  login
-  compute
-  builder
-  ```
+A [site-specific image](image-build.md) should be built which includes this package; add ``manila`` to the Packer ``inventory_groups`` variable.
 
 Define the list of shares to be mounted, and the paths to mount them to. The example below parameterises the share name using the environment name. See the [stackhpc.os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount) for further configuration options.
 
