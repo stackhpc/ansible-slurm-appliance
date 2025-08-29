@@ -211,6 +211,79 @@ The cluster image used should match the release which you are deploying with.
 Published images are described in the release notes
 [here](https://github.com/stackhpc/ansible-slurm-appliance/releases). 
 
+By default, the site OpenTofu configuration provisions two volumes and attaches
+them to the control node:
+  - "$cluster_name-home" for NFS-shared home directories
+  - "$cluster_name-state" for monitoring and Slurm data
+The volumes mean this data is persisted when the control node is rebuilt.
+However if the cluster is destroyed with `tofu destroy` then the volumes will
+also be deleted. This is undesirable for production environments and usually
+also for staging environments. Therefore the volumes should be manually
+created, e.g. via the CLI:
+
+  ```
+  openstack volume create --size 200 mycluster-home # size in GB
+  openstack volume create --size 100 mycluster-state
+  ```
+
+and OpenTofu configured to use those volumes instead of managing them itself by
+setting:
+
+  ```
+  home_volume_provisioning = "attach"
+  state_volume_provisioning = "attach"
+  ```
+
+either for a specific environment within the cluster module block in
+`environments/$ENV/tofu/main.tf`, or as the site default by changing the
+default in `environments/site/tofu/variables.tf`.
+
+For a development environment allowing OpenTofu to manage the volumes using the
+default value of `"manage"` for those varibles is usually appropriate, as it
+allows for multiple clusters to be created with this environment.
+
+If no home volume at all is required because the home directories are provided
+by a parallel filesystem (e.g. Manila) set
+
+  ```
+  home_volume_provisioning = "none"
+  ```
+
+In this case the NFS share for home directories is automatically disabled.
+
+**NB:** To apply "attach" options to existing clusters, first remove the
+volume(s) from the tofu state, e.g.:
+
+  ```
+  tofu state list # find the volume(s)
+  tofu state rm 'module.cluster.openstack_blockstorage_volume_v3.state[0]'
+  ```
+
+This leaves the volume itself intact, but means OpenTofu "forgets" it. Then set
+the "attach" options and run `tofu apply` again - this should show there are no
+changes planned.
+
+A production deployment may have a more complex networking requirements than
+just a simple network. See the [networks docs](networks.md) for details.
+
+If floating IPs are required for login nodes, create these in OpenStack and add
+the IPs into the OpenTofu `login` definition.
+
+Consider enabling topology aware scheduling. This is currently only supported
+if your cluster does not include any baremetal nodes. This can be enabled by:
+  1. Creating Availability Zones in your OpenStack project for each physical
+     rack
+  2. Setting the `availability_zone` fields of compute groups in your OpenTofu
+     configuration
+  3. Adding the `compute` group as a child of `topology` in
+     `environments/$ENV/inventory/groups`
+  4. (Optional) If you are aware of the physical topology of switches above the
+     rack-level, override `topology_above_rack_topology` in your groups vars
+     (see [topology docs](../ansible/roles/topology/README.md) for more detail)
+
+Consider whether mapping of baremetal nodes to ironic nodes is required. See
+[PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
+
 To deploy this infrastructure, ensure the venv and the environment are
 [activated](#cookiecutter-instructions) and run:
 
@@ -225,6 +298,20 @@ and follow the prompts. Note the OS_CLOUD environment variable assumes that
 OpenStack credentials are defined using a
 [clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml)
 file in a default location with the default cloud name of `openstack`.
+
+By default, OpenTofu (and Terraform)
+[limits](https://opentofu.org/docs/cli/commands/apply/#apply-options) the
+number of concurrent operations to 10. This means that for example only 10
+ports or 10 instances can be deployed at once. This should be raised by
+modifying `environments/$ENV/activate` to add a line like:
+
+  ```bash
+  export TF_CLI_ARGS_apply="-parallelism=25"
+  ```
+
+The value chosen should be the highest value demonstrated during testing. Note
+that any time spent blocked due to this parallelism limit does not count
+against the (un-overridable) internal OpenTofu timeout of 30 minutes
 
 ### Configure appliance
 
@@ -251,52 +338,7 @@ Once it completes you can log in to the cluster using:
 
 - Ensure created instances have accurate/synchronised time. For VM instances
   this is usually provided by the hypervisor, but if not (or for bare metal
-  instances) it may be necessary to configure or proxy `chronyd` via an
-  environment hook.
-
-- By default, the site OpenTofu configuration provisions two
-  volumes and attaches them to the control node:
-    - "$cluster_name-home" for NFS-shared home directories
-    - "$cluster_name-state" for monitoring and Slurm data
-  The volumes mean this data is persisted when the control node is rebuilt.
-  However if the cluster is destroyed with `tofu destroy` then the volumes will
-  also be deleted. This is undesirable for production environments and usually
-  also for staging environments. Therefore the volumes should be manually
-  created, e.g. via the CLI:
-
-      openstack volume create --size 200 mycluster-home # size in GB
-      openstack volume create --size 100 mycluster-state
-
-  and OpenTofu configured to use those volumes instead of managing them itself
-  by setting:
-
-      home_volume_provisioning = "attach"
-      state_volume_provisioning = "attach"
-
-  either for a specific environment within the cluster module block in
-  `environments/$ENV/tofu/main.tf`, or as the site default by changing the
-  default in `environments/site/tofu/variables.tf`.
-
-  For a development environment allowing OpenTofu to manage the volumes using
-  the default value of `"manage"` for those varibles is usually appropriate, as
-  it allows for multiple clusters to be created with this environment.
-
-  If no home volume at all is required because the home directories are
-  provided by a parallel filesystem (e.g. manila) set
-
-      home_volume_provisioning = "none"
-
-  In this case the NFS share for home directories is automatically disabled.
-
-  **NB:** To apply "attach" options to existing clusters, first remove the
-    volume(s) from the tofu state, e.g.:
-
-      tofu state list # find the volume(s)
-      tofu state rm 'module.cluster.openstack_blockstorage_volume_v3.state[0]'
-  
-  This leaves the volume itself intact, but means OpenTofu "forgets" it. Then
-  set the "attach" options and run `tofu apply` again - this should show there
-  are no changes planned.
+  instances) it may be necessary to [configure chrony](./chrony.md).
 
 - Consider whether Prometheus storage configuration is required. By default:
   - A 200GB state volume is provisioned (but see above)
@@ -322,45 +364,8 @@ Once it completes you can log in to the cluster using:
   not, remove `grafana_auth_anonymous` in
   `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
-- A production deployment may have a more complex networking requirements than
-  just a simple network. See the [networks docs](networks.md) for details.
-
-- If floating IPs are required for login nodes, create these in OpenStack and
-  add the IPs into the OpenTofu `login` definition.
-
-- Consider enabling topology aware scheduling. This is currently only supported
-  if your cluster does not include any baremetal nodes. This can be enabled by:
-    1. Creating Availability Zones in your OpenStack project for each physical
-       rack
-    2. Setting the `availability_zone` fields of compute groups in your
-       OpenTofu configuration
-    3. Adding the `compute` group as a child of `topology` in
-       `environments/$ENV/inventory/groups`
-    4. (Optional) If you are aware of the physical topology of switches above
-       the rack-level, override `topology_above_rack_topology` in your groups
-       vars (see [topology docs](../ansible/roles/topology/README.md) for more
-       detail)
-
-- Consider whether mapping of baremetal nodes to ironic nodes is required. See
-  [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
-
-- Note [PR 473](https://github.com/stackhpc/ansible-slurm-appliance/pull/473)
-  may help identify any site-specific configuration. 
-
 - See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
   raising `hpctests_hpl_mem_frac` during tests.
-
-- By default, OpenTofu (and Terraform)
-  [limits](https://opentofu.org/docs/cli/commands/apply/#apply-options) the
-  number of concurrent operations to 10. This means that for example only 10
-  ports or 10 instances can be deployed at once. This should be raised by
-  modifying `environments/$ENV/activate` to add a line like:
-
-      export TF_CLI_ARGS_apply="-parallelism=25"
-
-  The value chosen should be the highest value demonstrated during testing.
-  Note that any time spent blocked due to this parallelism limit does not count
-  against the (un-overridable) internal OpenTofu timeout of 30 minutes
 
 - By default, OpenStack Nova also
   [limits](https://docs.openstack.org/nova/latest/configuration/config.html#DEFAULT.max_concurrent_builds)
