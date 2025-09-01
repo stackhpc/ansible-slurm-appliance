@@ -17,7 +17,7 @@ Variables in this role are also required by `pulp_site` so set in
 - `dnf_repos_all`: Dict of dicts containing information to construct URLs for timestamped repos from Ark for each Rocky version. For example:
     ```
     dnf_repos_all:
-        appstream:                          # yum_repository:name
+        appstream:                          # ansible.builtin.yum_repository:name
             '8.10':                           # ansible_distribution_version or ansible_distribution_major_version
                 repo_file: Rocky-AppStream      # yum_repository: file
                 # repo_name:                    # optional, override yum_repository:name
@@ -38,8 +38,7 @@ Variables in this role are also required by `pulp_site` so set in
 - `dnf_repos_default_epel`: Dict of repos objects following same format as `dnf_repos_all` but only 
    including `epel` repo. 
 - `dnf_repos_pulp_content_url`: Optional str. Content URL of Pulp server to use Ark snapshots from. 
-  Should be overriden if using local Pulp server instead of upstream Ark Pulp (See
-  `ansible/roles/pulp_site`). Defaults to `{{ appliances_pulp_url }}/pulp/content`
+  Defaults to `{{ appliances_pulp_url }}/pulp/content`
 - `dnf_repos_username`: Optional str. Username for Ark. Should be set if using upstream StackHPC Ark
   Pulp server, but omitted if using local Pulp server (see `ansible/roles/pulp_site`)
 - `dnf_repos_password`: Optional str. Password for Ark. Should be set if using upstream StackHPC Ark
