@@ -197,7 +197,7 @@ k3s_agent
 builder
 extra_packages
 
-[pulp]
+[pulp_site]
 # Add builder to this group to enable automatically syncing of pulp during image build
 
 [cacerts]

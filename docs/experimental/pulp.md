@@ -35,6 +35,7 @@ Content can also be synced by running `ansible/adhoc/sync-pulp.yml`. By default 
 ## Example config in site variables
 
 ```
+# environments/site/inventory/group_vars/all/pulp_site.yml:
 appliances_pulp_url: "http://<pulp-host-ip>:8080"
 pulp_site_upstream_username: <Ark-username>
 pulp_site_upstream_password: <Ark-password>
