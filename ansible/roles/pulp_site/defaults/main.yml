@@ -18,7 +18,7 @@ pulp_site_rpm_repo_defaults:
 
 _pulp_site_rpm_info: |
   {{
-    dnf_repos_all |
+    dnf_repos_repos |
     select_repos(pulp_site_target_distribution_version)
   }}
 pulp_site_rpm_repos: |

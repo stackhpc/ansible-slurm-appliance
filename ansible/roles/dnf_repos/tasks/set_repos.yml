@@ -1,6 +1,6 @@
 ---
 
-- name: Replace system repos with Pulp repos
+- name: Replace non-epel repos with Pulp repos
   ansible.builtin.yum_repository:
     file: "{{ repo_values.repo_file }}"
     name: "{{ repo_name }}"
@@ -9,9 +9,10 @@
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
     gpgcheck: false
-  loop: "{{ dnf_repos_no_epel | dict2items }}"
+  loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
+  when: repo_name != 'epel'
   vars:
     repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
     repo_values: "{{ item.value[repo_os] }}"
@@ -32,9 +33,10 @@
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
     gpgcheck: false
-  loop: "{{ dnf_repos_default_epel | dict2items }}"
+  loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
+  when: repo_name == 'epel'
   vars:
     repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
     repo_values: "{{ item.value[repo_os] }}"
