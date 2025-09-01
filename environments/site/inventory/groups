@@ -105,6 +105,10 @@ cuda
 [vgpu]
 # Hosts where vGPU/MIG should be configured - see docs/mig.md
 
+[journald:childen]
+# Hosts where journald should be configured. See ansible/roles/journald/README.md.
+cluster
+
 [eessi:children]
 # Hosts on which EESSI stack should be configured
 openhpc
