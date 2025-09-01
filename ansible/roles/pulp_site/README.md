@@ -8,7 +8,8 @@ Requirements
 ------------
 
 Requires Ark credentials. The VM you are deploying Pulp on must allow ingress on `pulp_site_port`
-and not be externally accessible (as the Pulp server's content is unauthenticated).
+and not be externally accessible (as the Pulp server's content is unauthenticated). Rocky Linux 9 has been
+tested as the target VM for deploying Pulp.
 
 Role Variables
 --------------

@@ -1,5 +1,3 @@
-# Usage: ansible-playbook ansible/adhoc/deploy-pulp.yml -e "pulp_server=<pulp server hostname>"
-
 - name: Install pulp on server
   become: yes
   hosts: pulp_server

@@ -7,7 +7,7 @@ class FilterModule(object):
             'select_repos': self.select_repos,
         }
     
-    def select_repos(self, dnf_repos, target_distro_ver): #TODO: why does baseos get a major and minor version?
+    def select_repos(self, dnf_repos, target_distro_ver):
         """ Filter dnf_repos to only those for a relevant distribution version (M.m or M). Returns a list of dicts.
             Also adds pulp_repo_name field to give the repository a unique name in Pulp to be referenced by subsequent
             filters
