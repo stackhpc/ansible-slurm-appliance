@@ -16,7 +16,7 @@ pulp_host ansible_host=<VM-ip-address>
 ```
 
 > [!WARNING] 
-> The inventory hostname cannot conflict with group names i.e can't be called `pulp` or `pulp_server`.
+> The inventory hostname cannot conflict with group names i.e can't be called `pulp_site` or `pulp_server`.
 
 Once complete, it will print a message giving a value to set for `appliances_pulp_url` (see example config below), assuming the `ansible_host` address is also the address the cluster
 should use to reach the Pulp server.
@@ -28,7 +28,7 @@ An existing Pulp server can be used to host Ark repos by overriding `pulp_site_p
 
 ## Syncing Pulp content with Ark
 
-If the `pulp` group is added to the Packer build groups, the local Pulp server will be synced with Ark on build. You must authenticate with Ark by overriding `pulp_site_upstream_username` and `pulp_site_upstream_password` with your vault encrypted Ark dev credentials. `dnf_repos_username` and `dnf_repos_password` must remain unset to access content from the local Pulp.
+If the `pulp_site` group is added to the Packer build groups, the local Pulp server will be synced with Ark on build. You must authenticate with Ark by overriding `pulp_site_upstream_username` and `pulp_site_upstream_password` with your vault encrypted Ark dev credentials. `dnf_repos_username` and `dnf_repos_password` must remain unset to access content from the local Pulp.
 
 Content can also be synced by running `ansible/adhoc/sync-pulp.yml`. By default this syncs repositories for the latest version of Rocky supported by the appliance but this can be overridden by setting extra variables for `pulp_site_target_arch`, `pulp_site_target_distribution` and `pulp_site_target_distribution_version`.
 
@@ -39,4 +39,13 @@ Content can also be synced by running `ansible/adhoc/sync-pulp.yml`. By default 
 appliances_pulp_url: "http://<pulp-host-ip>:8080"
 pulp_site_upstream_username: <Ark-username>
 pulp_site_upstream_password: <Ark-password>
+```
+
+## Installing packages from Pulp at runtime
+By default, system repos are overwritten to point at Pulp repos during [image builds,](../image-build.md) so using a site Pulp server will require a new fatimage. If you instead wish to install packages at runtime,
+you will need to add all host groups on which you will be installing packages to the `dnf_repos` group in `environments/site/inventory/groups` e.g:
+
+```
+[dnf_repos:children]
+cluster
 ```
