@@ -1,4 +1,4 @@
-# dnf_repos_default: see role ansible/roles/dnf_repos/README.md for format and timestamps.yml for default definition
+# dnf_repos_default: see role ansible/roles/dnf_repos/README.md for format and dnf_repo_timestamps.yml for default definition
 
 # override this in environments/site/inventory/group_vars/dnf_repos.yml to add repos:
 dnf_repos_extra: {}

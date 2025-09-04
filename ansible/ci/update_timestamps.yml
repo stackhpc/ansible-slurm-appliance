@@ -8,7 +8,7 @@
 
     - name: Overwrite repo timestamps with latest
       ansible.builtin.copy:
-        dest: "{{ appliances_repository_root }}/environments/common/inventory/group_vars/all/timestamps.yml"
+        dest: "{{ appliances_repository_root }}/environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml"
         content: "{{ repo_template | to_nice_yaml(indent=2) }}"
         backup: true
       vars:

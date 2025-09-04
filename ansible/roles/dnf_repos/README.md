@@ -29,7 +29,7 @@ Variables in this role are also required by `pulp_site` so set in
                 ...
     ```
 - `dnf_repos_default`: Appliance default repos to use Ark snapshots for. Following same format as `dnf_repos_repos`.
-  See for appliance default repo list `environments/common/inventory/group_vars/all/timestamps.yml`.
+  See for appliance default repo list `environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml`.
 - `dnf_repos_extra`: Additional repos to use Ark snapshots for. Follows same format as
   `dnf_repos_repos`. Defaults to `{}`
 - `dnf_repos_pulp_content_url`: Optional str. Content URL of Pulp server to use Ark snapshots from. 
