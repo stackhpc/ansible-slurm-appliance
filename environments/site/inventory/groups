@@ -157,3 +157,12 @@ compute
 # Should be set to `compute` if enabled
 # Note that this feature currently assumes all compute nodes are VMs, enabling
 # when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour
+
+[pulp_site]
+# Add builder to this group to automatically sync pulp during image build
+
+[pulp_server]
+# Host to deploy a Pulp server on and sync with mirrors of upstream Ark repositories. Should be a group containing a single VM provisioned
+# separately from the appliance. e.g
+# pulp_host ansible_host=<VM-ip-address>
+# Note inventory host name cannot conflict with group names i.e can't be called `pulp` or `pulp_server`.
