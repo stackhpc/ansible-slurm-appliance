@@ -159,7 +159,7 @@ compute
 # when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour
 
 [pulp_site]
-# Add builder to this group to enable automatically syncing of pulp during image build
+# Add builder to this group to automatically sync pulp during image build
 
 [pulp_server]
 # Host to deploy a Pulp server on and sync with mirrors of upstream Ark repositories. Should be a group containing a single VM provisioned

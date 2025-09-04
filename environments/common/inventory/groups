@@ -198,7 +198,7 @@ builder
 extra_packages
 
 [pulp_site]
-# Add builder to this group to enable automatically syncing of pulp during image build
+# Add builder to this group to automatically sync pulp during image build
 
 [cacerts]
 # Hosts to configure CA certificates and trusts on
