@@ -208,3 +208,8 @@ variable "additional_cloud_config_vars" {
     default = {}
     nullable = false
 }
+
+variable "server_group_id" {
+    type = string
+    default = null
+}
