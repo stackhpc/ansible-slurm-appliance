@@ -103,6 +103,13 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
     }
   }
 
+  dynamic "scheduler_hints" {
+    for_each = var.server_group_id != null ? [true] : []
+    content {
+      group = var.server_group_id
+    }
+  }
+
   metadata = merge(
     {
         environment_root = var.environment_root
@@ -161,6 +168,13 @@ resource "openstack_compute_instance_v2" "compute" {
     content {
       port = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
       access_network = network.key == var.networks[0].network
+    }
+  }
+
+  dynamic "scheduler_hints" {
+    for_each = var.server_group_id != null ? [true] : []
+    content {
+      group = var.server_group_id
     }
   }
 
