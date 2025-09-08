@@ -2,15 +2,15 @@
   tasks:
     - name: Get latest timestamps from sources
       latest_timestamps:
-        repos_dict: "{{ appliances_pulp_repos }}"
+        repos_dict: "{{ dnf_repos_default }}"
         content_url: "https://ark.stackhpc.com/pulp/content"
       register: _result
 
     - name: Overwrite repo timestamps with latest
       ansible.builtin.copy:
-        dest: "{{ appliances_repository_root }}/environments/common/inventory/group_vars/all/timestamps.yml"
+        dest: "{{ appliances_repository_root }}/environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml"
         content: "{{ repo_template | to_nice_yaml(indent=2) }}"
         backup: true
       vars:
         repo_template:
-          appliances_pulp_repos: "{{ _result.timestamps }}"
+          dnf_repos_default: "{{ _result.timestamps }}"
