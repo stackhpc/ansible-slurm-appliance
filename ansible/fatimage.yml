@@ -19,7 +19,7 @@
   when: hook_path | exists
 
 - name: Sync pulp repos with upstream
-  hosts: pulp
+  hosts: pulp_site
   tasks:
     - ansible.builtin.include_role:
         name: pulp_site

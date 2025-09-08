@@ -165,17 +165,21 @@ def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
                 )
                 continue
             # pylint: disable=invalid-name
-            (
-                rankA,
-                rankB,
-                lat,
-                bw,
-            ) = (
-                int(vals[0]),
-                int(vals[1]),
-                float(vals[2]),
-                float(vals[3]),
-            )
+            try:
+                (
+                    rankA,
+                    rankB,
+                    lat,
+                    bw,
+                ) = (
+                    int(vals[0]),
+                    int(vals[1]),
+                    float(vals[2]),
+                    float(vals[3]),
+                )
+            except ValueError:
+                print('warning: skipping line %i (%s) - parse failure' % (ln, line))
+                continue
             latencies[rankA, rankB] = lat
             bandwidths[rankA, rankB] = bw
             # pylint: enable=invalid-name

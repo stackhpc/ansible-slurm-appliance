@@ -1,11 +1,11 @@
 variable "nodes" {
   type        = list(string)
-  description = "list of node names for partition"
+  description = "List of node names for node group"
 }
 
 variable "flavor" {
-  type        = string
-  description = "Name of flavor for partition"
+  type = string
+  description = "Name of flavor for node group"
 }
 
 variable "cluster_name" {
@@ -23,8 +23,8 @@ variable "key_pair" {
 }
 
 variable "image_id" {
-  type        = string
-  description = "ID of image for the partition"
+  type = string
+  description = "ID of image for the node group"
 }
 
 variable "environment_root" {

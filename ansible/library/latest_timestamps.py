@@ -63,24 +63,13 @@ def run_module():  # pylint: disable=missing-function-docstring
         for version in timestamps[repo]:
 
             html_txt = requests.get(
-                url=module.params["content_url"]
-                + "/"
-                + timestamps[repo][version]["path"]
-            ).text
-            timestamp_link_list = (
-                BeautifulSoup(html_txt, features="html.parser")
-                .body.find("pre")
-                .find_all()
-            )  # getting raw list of timestamps from html
-            timestamp_link_list = map(
-                lambda x: x.string, timestamp_link_list
-            )  # stripping xml tags
-            latest_timestamp = list(timestamp_link_list)[-1][
-                :-1
-            ]  # last timestamp in list with trailing / removed
-            timestamps[repo][version]["timestamp"] = latest_timestamp
-
-    result["timestamps"] = dict(sorted(timestamps.items()))
+                    url= module.params['content_url'] + '/' + timestamps[repo][version]['pulp_path']
+                ).text
+            timestamp_link_list = BeautifulSoup(html_txt,features="html.parser").body.find('pre').find_all() # getting raw list of timestamps from html
+            timestamp_link_list = map(lambda x: x.string,timestamp_link_list) # stripping xml tags
+            latest_timestamp = list(timestamp_link_list)[-1][:-1] # last timestamp in list with trailing / removed
+            timestamps[repo][version]['pulp_timestamp'] = latest_timestamp
+    result['timestamps'] = dict(sorted(timestamps.items()))
 
     module.exit_json(**result)
 

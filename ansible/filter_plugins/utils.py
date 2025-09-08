@@ -56,21 +56,13 @@ def to_ood_regex(items):
 
     # There's a python bug which means re.sub() can't use '\d' in the replacement so
     # have to do replacement in two stages:
-    r = [re.sub(r"\d+", "XBACKSLASHX", v) for v in items]
-    r = [v.replace("XBACKSLASHX", "\\d+") for v in set(r)]
-    r = ["(%s)" % v for v in r]  # pylint: disable=consider-using-f-string
-    return "|".join(r)
+    r = [re.sub(r"\d+", 'XBACKSLASHX', v) for v in items]
+    r = [v.replace('XBACKSLASHX', '\d+') for v in set(r)]
+    r = ['(%s)' % v for v in r]
+    return '|'.join(r)
 
-
-def appliances_repo_to_subpath(repo_entry):
-    """Take an element from appliances_pulp_repos and convert it to a pulp path.
-    This assumes that the remote and local pulp structures are the same
-    """
-    return repo_entry["path"] + "/" + repo_entry["timestamp"]
-
-
-class FilterModule(object):  # pylint: disable=useless-object-inheritance
-    """Ansible core jinja2 filters"""
+class FilterModule(object):
+    ''' Ansible core jinja2 filters '''
 
     # pylint: disable=missing-function-docstring
     def warn(self, message, **kwargs):  # pylint: disable=unused-argument
@@ -80,10 +72,9 @@ class FilterModule(object):  # pylint: disable=useless-object-inheritance
     def filters(self):  # pylint: disable=missing-function-docstring
         return {
             # jinja2 overrides
-            "readfile": readfile,
-            "prometheus_node_exporter_targets": prometheus_node_exporter_targets,
-            "exists": exists,
-            "warn": self.warn,
-            "to_ood_regex": to_ood_regex,
-            "appliances_repo_to_subpath": appliances_repo_to_subpath,
+            'readfile': readfile,
+            'prometheus_node_exporter_targets': prometheus_node_exporter_targets,
+            'exists': exists,
+            'warn': self.warn,
+            'to_ood_regex': to_ood_regex,
         }

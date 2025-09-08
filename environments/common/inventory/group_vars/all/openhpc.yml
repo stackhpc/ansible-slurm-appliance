@@ -55,7 +55,8 @@ openhpc_config_extra: {}
 # additional default slurm.conf parameters for the appliance:
 openhpc_config_default:
   TaskPlugin: task/cgroup,task/affinity
-  ReturnToService: 2 # workaround for templating bug TODO: Remove once on stackhpc.openhpc v1.2.0
+  ProctrackType: proctrack/cgroup
+  JobAcctGatherType: jobacct_gather/cgroup
 
 # additional default slurm.conf parameters when "rebuild" enabled:
 openhpc_config_rebuild:
