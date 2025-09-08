@@ -49,8 +49,8 @@
     src: /etc/init.d.orig/ # trailing / to get contents
     dest: /etc/init.d
     remote_src: true
-    directory_mode: "0755"
-    mode: "0644"
+    directory_mode: "preserve"
+    mode: "preserve"
   when:
     - init_d.stat.exists
     - not init_d.stat.islnk
@@ -82,9 +82,8 @@
     virtualenv_command: python3 -m venv
   tags: install
 
-- name: Symlink websockify to where Open Ondemand expects
-  ansible.builtin.file:
-    path: "{{ item }}"
+- name: Symlink websockify to where Open Ondemand expects # noqa: args[module]
+  ansible.builtin.file: "{{ item }}"
   loop:
     - path: /opt/websockify
       state: directory

@@ -34,7 +34,7 @@
       when: "cluster_state | default('') == 'absent'"
 
 # TODO: FIXME: maybe by doing the user move in cloud-init?
-# The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
+# The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
 # This can disrupt the SSH connection, particularly because we use the login host as a jump host
 # So we move the home directory on the login node and reset the connections first
 - hosts: login
@@ -69,9 +69,10 @@
 # https://github.com/stackhpc/ansible-slurm-appliance/blob/ba9699267449fba58cd9c04c451759a914fd7144/ansible/validate.yml#L16
 # doesn't break CaaS platforms
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Prepare requirements.yml.last for galaxy validation
-      copy:
+      ansible.builtin.copy:
         src: "{{ appliances_repository_root }}/requirements.yml"
         dest: "{{ appliances_repository_root }}/requirements.yml.last"
+        mode: "0644"

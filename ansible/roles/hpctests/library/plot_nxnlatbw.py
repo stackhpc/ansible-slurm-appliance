@@ -178,7 +178,7 @@ def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
                     float(vals[3]),
                 )
             except ValueError:
-                print('warning: skipping line %i (%s) - parse failure' % (ln, line))
+                print(f"warning: skipping line {ln} ({line}) - parse failure")
                 continue
             latencies[rankA, rankB] = lat
             bandwidths[rankA, rankB] = bw
@@ -193,7 +193,7 @@ def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
         module.fail_json(
             "Results contained %i ranks but %i node names provided"  # pylint: disable=consider-using-f-string
             % (len(rankAs), len(nodes)),
-            **result
+            **result,
         )
 
     # find min values:

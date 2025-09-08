@@ -4,7 +4,7 @@ variable "nodes" {
 }
 
 variable "flavor" {
-  type = string
+  type        = string
   description = "Name of flavor for node group"
 }
 
@@ -23,7 +23,7 @@ variable "key_pair" {
 }
 
 variable "image_id" {
-  type = string
+  type        = string
   description = "ID of image for the node group"
 }
 

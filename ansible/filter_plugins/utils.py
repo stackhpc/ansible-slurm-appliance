@@ -56,25 +56,28 @@ def to_ood_regex(items):
 
     # There's a python bug which means re.sub() can't use '\d' in the replacement so
     # have to do replacement in two stages:
-    r = [re.sub(r"\d+", 'XBACKSLASHX', v) for v in items]
-    r = [v.replace('XBACKSLASHX', '\d+') for v in set(r)]
-    r = ['(%s)' % v for v in r]
-    return '|'.join(r)
+    r = [re.sub(r"\d+", "XBACKSLASHX", v) for v in items]
+    r = [v.replace("XBACKSLASHX", r"\d+") for v in set(r)]
+    r = [f"({v})" for v in r]
+    return "|".join(r)
 
+
+# pylint: disable=useless-object-inheritance
 class FilterModule(object):
-    ''' Ansible core jinja2 filters '''
+    """Ansible core jinja2 filters"""
 
     # pylint: disable=missing-function-docstring
     def warn(self, message, **kwargs):  # pylint: disable=unused-argument
         Display().warning(message)
         return message
 
-    def filters(self):  # pylint: disable=missing-function-docstring
+    # pylint: disable=missing-function-docstring
+    def filters(self):
         return {
             # jinja2 overrides
-            'readfile': readfile,
-            'prometheus_node_exporter_targets': prometheus_node_exporter_targets,
-            'exists': exists,
-            'warn': self.warn,
-            'to_ood_regex': to_ood_regex,
+            "readfile": readfile,
+            "prometheus_node_exporter_targets": prometheus_node_exporter_targets,
+            "exists": exists,
+            "warn": self.warn,
+            "to_ood_regex": to_ood_regex,
         }

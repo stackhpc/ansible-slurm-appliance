@@ -67,9 +67,9 @@ This is a usually a two-step process:
 
 Deploying the additional nodes and applying these changes requires rerunning both OpenTofu and the Ansible site.yml playbook - follow [Deploying a Cluster](#deploying-a-cluster).
 
-## Adding Additional Packages
+## Package Repositories
 
-```
+```yaml
 [squid:children]
 # Hosts to run squid proxy
 login
@@ -83,7 +83,8 @@ disabled during runtime to prevent Ark credentials from being leaked. To enable 
 
 In both cases, Ark credentials will be required.
 
-# Adding Additional Packages
+=# Adding Additional Packages
+
 By default, the following utility packages are installed during the StackHPC image build:
 
 - htop
@@ -105,12 +106,12 @@ Additional packages can be added during image builds by:
 - defining a list of packages in `appliances_extra_packages_other` in e.g.
   `environments/$SITE_ENV/inventory/group_vars/all/defaults.yml`. For example:
 
-      ```yaml
-          # environments/foo-base/inventory/group_vars/all/defaults.yml:
-          appliances_extra_packages_other:
-          - somepackage
-          - anotherpackage
-      ```
+```yaml
+# environments/foo-base/inventory/group_vars/all/defaults.yml:
+appliances_extra_packages_other:
+  - somepackage
+  - anotherpackage
+```
 
 For packages which come from repositories mirrored by StackHPC's "Ark" Pulp server
 (including rocky, EPEL and OpenHPC repositories), this will require either [Ark
@@ -141,7 +142,9 @@ The packages to be installed from that repository could also be defined in that 
 
 Adding these repos/packages to the cluster/image would then require running:
 
-    ansible-playbook environments/$SITE_ENV/hooks/{pre,post}.yml
+```shell
+ansible-playbook environments/$SITE_ENV/hooks/{pre,post}.yml
+```
 
 as appropriate.
 
@@ -151,7 +154,9 @@ TODO: improve description about adding these to extra images.
 
 At a minimum run:
 
-    ansible-playbook ansible/slurm.yml --tags openhpc
+```shell
+ansible-playbook ansible/slurm.yml --tags openhpc
+```
 
 **NB:** This will restart all daemons if the `slurm.conf` has any changes, even if technically only a `scontrol reconfigure` is required.
 
@@ -159,18 +164,24 @@ At a minimum run:
 
 See [ansible/roles/hpctests/README.md](ansible/roles/hpctests/README.md) for a description of these. They can be run using
 
-    ansible-playbook ansible/adhoc/hpctests.yml
+```shell
+ansible-playbook ansible/adhoc/hpctests.yml
+```
 
 Note that:
 
 - The above role provides variables to select specific partitions, nodes and interfaces which may be required. If not set in inventory, these can be passed as extravars:
 
-        ansible-playbook ansible/adhoc/hpctests.yml -e hpctests_myvar=foo
+```shell
+ansible-playbook ansible/adhoc/hpctests.yml -e hpctests_myvar=foo
+```
 
 - The HPL-based test is only reasonably optimised on Intel processors due the libraries and default parallelisation scheme used. For AMD processors it is recommended this
   is skipped using:
 
-          ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo.
+```shell
+ansible-playbook ansible/adhoc/hpctests.yml --skip-tags hpl-solo.
+```
 
 Review any [site-specific documentation](site/README.md) for more details.
 
@@ -179,7 +190,9 @@ Review any [site-specific documentation](site/README.md) for more details.
 This uses the [cuda-samples](https://github.com/NVIDIA/cuda-samples/) utilities "deviceQuery" and "bandwidthTest" to test GPU functionality. It automatically runs on any
 host in the `cuda` inventory group:
 
-    ansible-playbook ansible/adhoc/cudatests.yml
+```shell
+ansible-playbook ansible/adhoc/cudatests.yml
+```
 
 **NB:** This test is not launched through Slurm, so confirm nodes are free/out of service or use `--limit` appropriately.
 
@@ -187,7 +200,9 @@ host in the `cuda` inventory group:
 
 A set of utility playbooks for managing a running appliance are provided in `ansible/adhoc` - run these by activating the environment and using:
 
-        ansible-playbook ansible/adhoc/$PLAYBOOK
+```shell
+ansible-playbook ansible/adhoc/$PLAYBOOK
+```
 
 Currently they include the following (see each playbook for links to documentation):
 
@@ -198,6 +213,8 @@ Currently they include the following (see each playbook for links to documentati
 
 The `ansible` binary [can be used](https://docs.ansible.com/ansible/latest/command_guide/intro_adhoc.html) to run arbitrary shell commands against inventory groups or hosts, for example:
 
-    ansible [--become] <group/host> -m shell -a "<shell command>"
+```shell
+ansible [--become] <group/host> -m shell -a "<shell command>"
+```
 
 This can be useful for debugging and development but any modifications made this way will be lost if nodes are rebuilt/reimaged.
