@@ -211,6 +211,6 @@ variable "additional_cloud_config_vars" {
 }
 
 variable "server_group_id" {
-    type = string
-    default = null
+  type    = string
+  default = null
 }

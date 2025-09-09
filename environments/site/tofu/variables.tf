@@ -345,7 +345,7 @@ variable "additional_cloud_config_vars" {
 }
 
 variable "control_server_group_id" {
-    description = "ID of server group to use for control node scheduler hint"
-    type = string
-    default = null
+  description = "ID of server group to use for control node scheduler hint"
+  type        = string
+  default     = null
 }
