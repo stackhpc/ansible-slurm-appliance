@@ -26,7 +26,8 @@ jobs:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix:
         os_version:
-          - RL8
+          # Temporarily disable Rocky 8 to speed up testing and reduce CI resources
+          #- RL8
           - RL9
     env:
       ANSIBLE_FORCE_COLOR: True

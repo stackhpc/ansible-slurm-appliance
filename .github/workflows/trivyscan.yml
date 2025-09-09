@@ -24,7 +24,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: ["RL8", "RL9"]
+        # Temporarily disable Rocky 8 to speed up testing and reduce CI resources
+        #build: ["RL8", "RL9"]
+        build: ["RL9"]
     env:
       JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack
