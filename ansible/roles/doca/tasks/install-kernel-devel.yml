@@ -14,11 +14,10 @@
     that: _ofed_kernel_current == _ofed_dnf_kernels_newest
     fail_msg: "Kernel {{ _ofed_loaded_kernel.stdout }} is loaded but newer {{ _ofed_dnf_kernels_newest }} is installed: consider rebooting?"
   vars:
+    # yamllint disable rule:line-length
     _ofed_kernel_current: >-
       {{ _ofed_loaded_kernel.stdout | regex_replace('\.(?:.(?!\.))+$', '') | regex_replace('\.(?:.(?!\.))+$', '') }}
-    # yamllint disable rule:line-length
     _ofed_dnf_kernels_newest: >-
-      # yamllint disable-line rule:line-length
       {{ _ofed_dnf_kernels.stdout_lines[1:] | map('split') | map(attribute=1) | map('regex_replace', '\.(?:.(?!\.))+$', '') | community.general.version_sort | last }}
     # yamllint enable rule:line-length
  # dnf line format e.g. "kernel.x86_64  4.18.0-513.18.1.el8_9   @baseos  "
