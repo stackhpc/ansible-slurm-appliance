@@ -6,6 +6,7 @@
 
 name: Test extra build
 on:
+  workflow_call:
   workflow_dispatch:
 
 permissions:

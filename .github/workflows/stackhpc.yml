@@ -6,6 +6,7 @@
 
 name: Test deployment and reimage on OpenStack
 on:
+  workflow_call:
   workflow_dispatch:
 
 permissions:

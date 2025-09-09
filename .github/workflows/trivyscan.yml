@@ -6,6 +6,7 @@
 
 name: Trivy scan image for vulnerabilities
 on:
+  workflow_call:
   workflow_dispatch:
 
 permissions:
