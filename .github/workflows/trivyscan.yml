@@ -1,4 +1,9 @@
 ---
+
+# Scan the built image for vulnerabilities using Trivy.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
+
 name: Trivy scan image for vulnerabilities
 on:
   workflow_dispatch:

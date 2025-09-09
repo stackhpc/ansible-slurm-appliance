@@ -1,4 +1,9 @@
 ---
+
+# Test building extra images on OpenStack.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
+
 name: Test extra build
 on:
   workflow_dispatch:

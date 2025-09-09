@@ -1,4 +1,9 @@
 ---
+
+# Test deployment and reimage on OpenStack.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
+
 name: Test deployment and reimage on OpenStack
 on:
   workflow_dispatch:
