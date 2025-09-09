@@ -72,6 +72,13 @@ resource "openstack_compute_instance_v2" "control" {
     }
   }
 
+  dynamic "scheduler_hints" {
+    for_each = var.control_server_group_id != null ? [true] : []
+    content {
+      group = var.control_server_group_id
+    }
+  }
+
   metadata = {
     environment_root = var.environment_root
     access_ip        = openstack_networking_port_v2.control[var.cluster_networks[0].network].all_fixed_ips[0]

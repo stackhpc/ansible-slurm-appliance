@@ -34,6 +34,7 @@ module "compute" {
   match_ironic_node    = lookup(each.value, "match_ironic_node", null)
   availability_zone    = lookup(each.value, "availability_zone", null)
   ip_addresses         = lookup(each.value, "ip_addresses", null)
+  server_group_id      = lookup(each.value, "server_group_id", null)
 
   # computed
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
@@ -63,7 +64,8 @@ module "compute" {
     "gateway_ip",
     "nodename_template",
     "additional_cloud_config",
-    "additional_cloud_config_vars"
+    "additional_cloud_config_vars",
+    "server_group_id"
   ]
 
 }

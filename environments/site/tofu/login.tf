@@ -34,6 +34,7 @@ module "login" {
   match_ironic_node = lookup(each.value, "match_ironic_node", null)
   availability_zone = lookup(each.value, "availability_zone", null)
   ip_addresses      = lookup(each.value, "ip_addresses", null)
+  server_group_id   = lookup(each.value, "server_group_id", null)
 
   # can't be set for login
   compute_init_enable  = []
@@ -68,7 +69,8 @@ module "login" {
     "nodename_template",
     "additional_cloud_config",
     "additional_cloud_config_vars",
-    "security_group_ids"
+    "security_group_ids",
+    "server_group_id"
   ]
 
 }

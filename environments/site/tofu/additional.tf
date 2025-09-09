@@ -35,6 +35,7 @@ module "additional" {
   security_group_ids           = lookup(each.value, "security_group_ids", [for o in data.openstack_networking_secgroup_v2.nonlogin : o.id])
   additional_cloud_config      = lookup(each.value, "additional_cloud_config", var.additional_cloud_config)
   additional_cloud_config_vars = lookup(each.value, "additional_cloud_config_vars", var.additional_cloud_config_vars)
+  server_group_id = lookup(each.value, "server_group_id", null)
 
   # can't be set for additional nodes
   compute_init_enable  = []
@@ -68,6 +69,7 @@ module "additional" {
     "nodename_template",
     "security_group_ids",
     "additional_cloud_config",
-    "additional_cloud_config_vars"
+    "additional_cloud_config_vars",
+    "server_group_id"
   ]
 }

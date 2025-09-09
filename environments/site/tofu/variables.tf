@@ -84,6 +84,7 @@ variable "login" {
                                if match_ironic_node is true, defered to OpenStack otherwise
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
+            server_group_id: String ID of server group to use for scheduler hint
     EOF
 
   type = any
@@ -129,6 +130,7 @@ variable "compute" {
                                if match_ironic_node is true, defered to OpenStack otherwise
             gateway_ip: Address to add default route via
             nodename_template: Overrides variable cluster_nodename_template
+            server_group_id: String ID of server group to use for scheduler hint
 
         Nodes are added to the following inventory groups:
         - $group_name
@@ -340,4 +342,10 @@ variable "additional_cloud_config_vars" {
   description = "Map of values passed to the `additional_cloud_config` templatestring"
   type        = map(any)
   default     = {}
+}
+
+variable "control_server_group_id" {
+    description = "ID of server group to use for control node scheduler hint"
+    type = string
+    default = null
 }
