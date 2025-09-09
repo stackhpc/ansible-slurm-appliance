@@ -16,7 +16,9 @@ exclude_paths:
   - actionlint.yml
   - .ansible/
   - .github/
-  # The following are files with syntax errors.
-  # Rule 'syntax-check' is unskippable, you cannot use it in 'skip_list' or 'warn_list'. Still, you could exclude the file.
+  # Rule 'syntax-check' is unskippable, you cannot use it in 'skip_list' or 'warn_list'.
+  # It breaks the parser which takes place before the linter, the only option is to exclude the file.
   - ansible/roles/filebeat/tasks/runtime.yml
   - environments/common/files/filebeat/filebeat.yml
+  # Rule 'load-failure[filenotfounderror]' is also unskippable
+  - ansible/roles/compute_init/files/compute-init.yml

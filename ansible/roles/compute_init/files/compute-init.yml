@@ -178,7 +178,7 @@
       when: enable_sshd
 
     - name: Configure tuned
-      ansible.builtin.include_tasks: ansible/roles/tuned/tasks/main.yml
+      ansible.builtin.include_tasks: tasks/tuned.yml
       when: enable_tuned
 
     - name: Configure sssd
