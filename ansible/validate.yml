@@ -57,7 +57,10 @@
         that:
           - item in groups
           - groups[item] | length > 0
-        fail_msg: "Expected inventory group '{{ item }}' is missing or empty: is OpenTofu inventory template up to date?"
+        fail_msg: >
+          Expected inventory group '{{ item }}' is missing or empty:
+          - Check OpenTofu inventory template is up to date
+          - Check OpenTofu configuration defines 'login' and 'compute' variables properly
       loop:
         - control
         - compute
