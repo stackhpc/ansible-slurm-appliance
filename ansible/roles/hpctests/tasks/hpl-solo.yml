@@ -44,10 +44,11 @@
     hpctests_hplsolo_N: "{{ ((((((hpctests_nodeinfo.info['MEMORY'][0] | int) * (hpctests_hpl_mem_frac | float) * 1024 * 1024 * 1) / 8) | root) / hpctests_hpl_NB)
       | int) * hpctests_hpl_NB }}"
 - ansible.builtin.debug:
-    # yamllint disable-line rule:line-length
+    # yamllint disable rule:line-length
     msg: "Using {{ hpctests_hplsolo_ntasks }} process per node with P={{ hpctests_hplsolo_pq.grid.P }}, Q={{ hpctests_hplsolo_pq.grid.Q }} targeting {{ (hpctests_hpl_mem_frac
       | float) * 100 }}% of {{ hpctests_nodeinfo.info['MEMORY'][0] }} MB memory per node, block size (NB) = {{ hpctests_hpl_NB }}, problem size (N) = {{ hpctests_hplsolo_N
       }}"
+    # yamllint enable rule:line-length
 
 - name: Get all nodes in partition
   ansible.builtin.command: "sinfo --Node --noheader --format %N --partition={{ hpctests_partition }}"
