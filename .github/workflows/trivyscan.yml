@@ -17,9 +17,9 @@ permissions:
 
 jobs:
   scan:
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + build
-      cancel-in-progress: true
+    #concurrency:
+    #  group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + build
+    #  cancel-in-progress: true
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
