@@ -13,8 +13,8 @@
 
 - name: Run pingpong
   block:
-    - name: Submit jobscript # noqa: no-changed-when
-      ansible.builtin.command: bash -l -c 'sbatch --wait pingpong.sh'
+    - name: Submit jobscript # noqa: command-instead-of-shell no-changed-when
+      ansible.builtin.shell: bash -l -c 'sbatch --wait pingpong.sh' # need login shell for module command
       args:
         chdir: "{{ hpctests_rootdir }}/pingpong"
       register: hpctests_pingpong_sbatch
