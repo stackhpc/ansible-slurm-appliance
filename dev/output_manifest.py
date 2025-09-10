@@ -1,4 +1,5 @@
-#!/usr/bin/env python # pylint: disable=missing-module-docstring
+#!/usr/bin/env python
+# pylint: disable=missing-module-docstring
 # pylint: disable=line-too-long
 # Set github workflow output parameters defining image IDs from a packer manifest.
 # Usage:

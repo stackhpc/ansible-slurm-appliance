@@ -1,4 +1,5 @@
-#!/usr/bin/python # pylint: disable=missing-module-docstring
+#!/usr/bin/python
+# pylint: disable=missing-module-docstring
 
 # Copyright: (c) 2022 Steve Brasier steve@stackhpc.com
 from __future__ import absolute_import, division, print_function

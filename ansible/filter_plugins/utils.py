@@ -1,4 +1,5 @@
-#!/usr/bin/python # pylint: disable=missing-module-docstring
+#!/usr/bin/python
+# pylint: disable=missing-module-docstring
 
 # Copyright: (c) 2020, StackHPC
 # Apache 2 License
