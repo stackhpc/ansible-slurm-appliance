@@ -18,9 +18,6 @@ permissions:
 jobs:
   openstack:
     name: openstack-ci
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }} # to branch/PR + OS
-      cancel-in-progress: true
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
