@@ -58,7 +58,6 @@
   ansible.builtin.debug:
     # yamllint disable rule:line-length
     msg: |
-      # yamllint disable-line rule:line-length
       Summary for pingmatrix pairwise over {{ slurm_names.stdout_lines | length }} nodes in '{{ hpctests_partition }}' partition, job ID {{ hpctests_pingmatrix_sbatch.stdout.split()[-1] }}, device '{{ hpctests_ucx_net_devices }}':
 
       {{ nxnlatbw['stats'] | to_nice_yaml }}
