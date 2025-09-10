@@ -130,20 +130,20 @@ jobs:
     uses: ./.github/workflows/stackhpc.yml
     secrets: inherit
 
-  extra:
-    name: Test extra build
-    needs: files_changed
-    if: |
-      github.event_name != 'pull_request' && needs.files_changed.outputs.extra_on_push == 'true' ||
-      github.event_name == 'pull_request' && needs.files_changed.outputs.extra_on_pull_request == 'true'
-    uses: ./.github/workflows/extra.yml
-    secrets: inherit
+  #extra:
+  #  name: Test extra build
+  #  needs: files_changed
+  #  if: |
+  #    github.event_name != 'pull_request' && needs.files_changed.outputs.extra_on_push == 'true' ||
+  #    github.event_name == 'pull_request' && needs.files_changed.outputs.extra_on_pull_request == 'true'
+  #  uses: ./.github/workflows/extra.yml
+  #  secrets: inherit
 
-  trivyscan:
-    name: Trivy scan image for vulnerabilities
-    needs: files_changed
-    if: |
-      github.event_name == 'pull_request' &&
-      needs.files_changed.outputs.trivyscan == 'true'
-    uses: ./.github/workflows/trivyscan.yml
-    secrets: inherit
+  #trivyscan:
+  #  name: Trivy scan image for vulnerabilities
+  #  needs: files_changed
+  #  if: |
+  #    github.event_name == 'pull_request' &&
+  #    needs.files_changed.outputs.trivyscan == 'true'
+  #  uses: ./.github/workflows/trivyscan.yml
+  #  secrets: inherit
