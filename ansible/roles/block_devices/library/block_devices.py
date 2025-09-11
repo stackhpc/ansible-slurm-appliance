@@ -1,9 +1,14 @@
 #!/usr/bin/python
+# pylint: disable=missing-module-docstring
 
 # Copyright: (c) 2021, StackHPC
 # Apache 2 License
 
-DOCUMENTATION = r'''
+import json
+
+from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
+
+DOCUMENTATION = r"""
 ---
 module: block_devices
 
@@ -13,32 +18,30 @@ options: (none)
 
 author:
     - Steve Brasier (@sjpb)
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 devices:
     description: dict with device serial numbers as keys and full paths (e.g. /dev/sdb) as values
     type: dict
     return: always
-'''
+"""
 
-import json
 
-from ansible.module_utils.basic import AnsibleModule
-
-def run_module():
-    module_args = dict()
+def run_module():  # pylint: disable=missing-function-docstring
+    module_args = {}
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     result = {"changed": False}
     _, stdout, _ = module.run_command("lsblk --paths --json -O", check_rc=True)
-    
-    device_info = json.loads(stdout)['blockdevices']
-    result['devices'] = dict((item['serial'], item['name']) for item in device_info)
+
+    device_info = json.loads(stdout)["blockdevices"]
+    result["devices"] = dict((item["serial"], item["name"]) for item in device_info)
     module.exit_json(**result)
 
-def main():
+
+def main():  # pylint: disable=missing-function-docstring
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

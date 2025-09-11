@@ -1,13 +1,14 @@
+---
 # Builder version of site.yml just installing binaries
 
 - hosts: builder
-  become: no
-  gather_facts: no
+  become: false
+  gather_facts: false
   tasks:
     - name: Report hostname (= final image name)
-      command: hostname
+      ansible.builtin.command: hostname # noqa: no-changed-when
     - name: Report inventory groups
-      debug:
+      ansible.builtin.debug:
         var: group_names
 
 - name: Run pre.yml hook
@@ -20,21 +21,21 @@
 - name: Sync pulp repos with upstream
   hosts: pulp_site
   tasks:
-  - ansible.builtin.include_role:
-      name: pulp_site
-      tasks_from: sync.yml
-      apply:
-        delegate_to: localhost
-    when: appliances_mode != 'configure'
+    - ansible.builtin.include_role:
+        name: pulp_site
+        tasks_from: sync.yml
+        apply:
+          delegate_to: localhost
+      when: appliances_mode != 'configure'
 
 - import_playbook: bootstrap.yml
 
 - hosts: doca
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
     - name: Install NVIDIA DOCA
-      import_role:
+      ansible.builtin.import_role:
         name: doca
 
 - name: Run post-bootstrap.yml hook
@@ -45,33 +46,33 @@
   when: hook_path | exists
 
 - hosts: builder
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
     # - import_playbook: iam.yml
     - name: Install FreeIPA client
-      import_role:
+      ansible.builtin.import_role:
         name: freeipa
         tasks_from: client-install.yml
       when: "'freeipa_client' in group_names"
     - name: Install sssd
-      import_role:
+      ansible.builtin.import_role:
         name: sssd
         tasks_from: install.yml
       when: "'sssd' in group_names"
 
     # - import_playbook: filesystems.yml:
     - name: Install nfs packages
-      dnf:
+      ansible.builtin.dnf:
         name: nfs-utils
       when: "'nfs' in group_names"
     - name: Install Manila client packages
-      include_role:
+      ansible.builtin.include_role:
         name: stackhpc.os-manila-mount
         tasks_from: install.yml
       when: "'manila' in group_names"
     - name: Install Lustre packages
-      include_role:
+      ansible.builtin.include_role:
         name: lustre
         tasks_from: install.yml
       when: "'lustre' in group_names"
@@ -82,46 +83,46 @@
 - name: Install compute_init playbook
   hosts: compute_init
   tags: compute_init # tagged to allow running on cluster instances for dev
-  become: yes
+  become: true
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: compute_init
         tasks_from: install.yml
 
 - name: Install gateway playbook
   hosts: gateway
   tags: gateway
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: gateway
 
 - hosts: builder
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
     # - import_playbook: slurm.yml:
     - name: Setup DB
-      include_role:
+      ansible.builtin.include_role:
         name: mysql
         tasks_from: install.yml
       when: "'mysql' in group_names"
 
     - name: Install rebuild
-      include_role:
+      ansible.builtin.include_role:
         name: rebuild
         tasks_from: install.yml
 
     - name: Install OpenHPC
-      import_role:
+      ansible.builtin.import_role:
         name: stackhpc.openhpc
         tasks_from: install.yml
       when: "'openhpc' in group_names"
 
     # - import_playbook: portal.yml
     - name: Open Ondemand server (packages)
-      include_role:
+      ansible.builtin.include_role:
         name: osc.ood
         tasks_from: install-package.yml
         vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
@@ -129,90 +130,90 @@
     # # FUTURE: install-apps.yml - this is git clones
 
     - name: Open Ondemand server (apps)
-      include_role:
+      ansible.builtin.include_role:
         name: osc.ood
         tasks_from: install-apps.yml
         vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
       when: "'openondemand' in group_names"
 
     - name: Open Ondemand remote desktop
-      import_role:
+      ansible.builtin.import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
       when: "'openondemand_desktop' in group_names"
 
     - name: Open Ondemand jupyter node
-      import_role:
+      ansible.builtin.import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
       when: "'openondemand_jupyter' in group_names"
 
     - name: Install Apache PAM module # Extracted from start of roles/openondemand/tasks/pam_auth.yml to ensure only installed during build
-      yum:
+      ansible.builtin.dnf:
         name: mod_authnz_pam
 
     # - import_playbook: monitoring.yml:
-    - import_role:
+    - ansible.builtin.import_role:
         name: opensearch
         tasks_from: install.yml
       when: "'opensearch' in group_names"
 
-    - import_role:
+    - ansible.builtin.import_role:
         name: slurm_stats
         tasks_from: install.yml
       when: "'slurm_stats' in group_names"
 
-    - import_role:
+    - ansible.builtin.import_role:
         name: filebeat
         tasks_from: install.yml
       when: "'filebeat' in group_names"
 
-    - import_role:
-      # can't only run cloudalchemy.node_exporter/tasks/install.yml as needs vars from preflight.yml and triggers service start
-      # however starting node exporter is ok
+    - ansible.builtin.import_role:
+        # can't only run cloudalchemy.node_exporter/tasks/install.yml as needs vars from preflight.yml and triggers service start
+        # however starting node exporter is ok
         name: cloudalchemy.node_exporter
       when: "'node_exporter' in group_names"
 
-    - name: openondemand exporter
-      dnf:
+    - name: Openondemand exporter
+      ansible.builtin.dnf:
         name: ondemand_exporter
       when: "'openondemand' in group_names"
 
-    - name: slurm exporter
-      include_role:
+    - name: Slurm exporter
+      ansible.builtin.include_role:
         name: slurm_exporter
         tasks_from: install.yml
       when: "'slurm_exporter' in group_names"
 
     - name: Install alertmanager
-      include_role:
+      ansible.builtin.include_role:
         name: alertmanager
         tasks_from: install.yml
       when: "'alertmanager' in group_names"
 
     - name: Download HPL source
-      include_role:
+      ansible.builtin.include_role:
         name: hpctests
         tasks_from: source-hpl.yml
 
 - hosts: prometheus
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: cloudalchemy.prometheus
         tasks_from: preflight.yml
 
     # can't run cloudalchemy.prometheus/tasks/install.yml as it triggers a unit start
     # so below is a partial extraction of this:
-    - name: create prometheus system group
-      group:
+    - name: Create prometheus system group
+      ansible.builtin.group:
         name: prometheus
         system: true
         state: present
 
-    - name: create prometheus system user
-      user:
+    - name: Create prometheus system user
+      ansible.builtin.user:
         name: prometheus
         system: true
         shell: "/usr/sbin/nologin"
@@ -220,31 +221,33 @@
         createhome: false
         home: "{{ prometheus_db_dir }}"
 
-    - name: download prometheus binary to local folder
+    - name: Download prometheus binary to local folder
       become: false
-      get_url:
+      ansible.builtin.get_url:
+        # yamllint disable-line rule:line-length
         url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
         dest: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
         checksum: "sha256:{{ __prometheus_checksum }}"
+        mode: "0644"
       register: _download_archive
       until: _download_archive is succeeded
       retries: 5
       delay: 2
 
-    - name: unpack prometheus binaries
+    - name: Unpack prometheus binaries
       become: false
-      unarchive:
-        remote_src: yes
+      ansible.builtin.unarchive:
+        remote_src: true
         src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
         dest: "/tmp"
         creates: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/prometheus"
 
-    - name: propagate official prometheus and promtool binaries
-      copy:
-        remote_src: yes
+    - name: Propagate official prometheus and promtool binaries
+      ansible.builtin.copy:
+        remote_src: true
         src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}"
         dest: "{{ _prometheus_binary_install_dir }}/{{ item }}"
-        mode: 0755
+        mode: "0755"
         owner: root
         group: root
       with_items:
@@ -252,26 +255,26 @@
         - promtool
 
 - hosts: grafana
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
     - name: Include distribution variables for cloudalchemy.grafana
-      include_vars: "{{ appliances_repository_root }}/ansible/roles/cloudalchemy.grafana/vars/redhat.yml"
-    - import_role:
+      ansible.builtin.include_vars: "{{ appliances_repository_root }}/ansible/roles/cloudalchemy.grafana/vars/redhat.yml"
+    - ansible.builtin.import_role:
         name: cloudalchemy.grafana
         tasks_from: install.yml
-    - import_role:
+    - ansible.builtin.import_role:
         name: cloudalchemy.grafana
         tasks_from: plugins.yml
-    - include_role: # done in same play so it can use handlers from cloudalchemy.grafana
+    - ansible.builtin.include_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards
 
 - name: Add support for NVIDIA GPU auto detection to Slurm
   hosts: slurm_recompile
-  become: yes
+  become: true
   tasks:
     - name: Recompile slurm
-      import_role:
+      ansible.builtin.import_role:
         name: slurm_recompile
       vars:
         slurm_recompile_with_nvml: "{{ groups.cuda | length > 0 }}"
@@ -286,12 +289,11 @@
 - import_playbook: final.yml
 
 - hosts: builder
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tags: finalise
   tasks:
     - name: Cleanup image
-      import_tasks: cleanup.yml
-
+      ansible.builtin.import_tasks: cleanup.yml
     - name: Shutdown Packer VM
       community.general.shutdown:

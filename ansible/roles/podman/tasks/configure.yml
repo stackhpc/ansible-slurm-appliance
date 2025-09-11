@@ -1,7 +1,6 @@
 ---
-
 - name: Up default resource limits
-  copy:
+  ansible.builtin.copy:
     content: |
       # WARNING: This file is managed by ansible, do not modify.
       # This is so non-root containers can use more resources. This is useful
@@ -11,6 +10,7 @@
       * soft nofile 65536
       * hard nofile 65536
     dest: /etc/security/limits.d/custom.conf
+    mode: "0644"
   become: true
 
 - name: Up number of non-root kernel keys permitted per user
@@ -36,17 +36,16 @@
     value: '"cgroupfs"'
   become: true
 
-- name: reset ssh connection to allow user changes to affect 'current login user'
-  meta: reset_connection
-
+- name: Reset ssh connection to allow user changes to affect 'current login user'
+  ansible.builtin.meta: reset_connection
 - name: Ensure podman users exist
-  user: "{{ item }}"
+  ansible.builtin.user: "{{ item }}" # noqa: args[module]
   with_items: "{{ podman_users }}"
   register: podman_user_info
-  become: yes
+  become: true
 
 - name: Clear up podman temporary files on startup
-  copy:
+  ansible.builtin.copy:
     content: |
       # Created by ansible
       # Delete ephemeral podman files to avoid issues where /tmp is not of type tmpfs and persists across reboots.
@@ -59,5 +58,5 @@
     dest: /etc/tmpfiles.d/podman-local.conf
     owner: root
     group: root
-    mode: 0660
+    mode: "0660"
   become: true

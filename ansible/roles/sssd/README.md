@@ -2,7 +2,6 @@
 
 Install and configure [sssd](https://sssd.io/docs/introduction.html).
 
-
 ## Role variables
 
 The only required configuration is to create a [sssd.conf](https://www.mankier.com/5/sssd.conf) template at the location specified by `sssd_conf_src`.

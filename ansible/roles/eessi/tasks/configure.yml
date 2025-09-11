@@ -7,10 +7,11 @@
     option: "{{ item.key }}"
     value: "{{ item.value }}"
     no_extra_spaces: true
+    mode: "0644"
   loop: "{{ cvmfs_config | dict2items }}"
 
 
 # NOTE: Not clear how to make this idempotent
-- name: Ensure CVMFS config is setup
-  command:
+- name: Ensure CVMFS config is setup # noqa: no-changed-when
+  ansible.builtin.command:
     cmd: "cvmfs_config setup"

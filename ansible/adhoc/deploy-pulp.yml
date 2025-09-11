@@ -1,17 +1,19 @@
+---
+
 - name: Install pulp on server
-  become: yes
+  become: true
   hosts: pulp_server
   tasks:
-  - name: Install pulp
-    ansible.builtin.include_role:
-      name: pulp_site
-      tasks_from: install.yml
-      public: true
+    - name: Install pulp
+      ansible.builtin.include_role:
+        name: pulp_site
+        tasks_from: install.yml
+        public: true
 
-  - name: Print Pulp endpoint
-    become: no
-    debug:
-      msg: | 
-        Server configured, override 'appliances_pulp_url' with
+    - name: Print Pulp endpoint
+      become: false
+      ansible.builtin.debug:
+        msg: |
+          Server configured, override 'appliances_pulp_url' with
           appliances_pulp_url: "http://{{ hostvars[groups['pulp_server'] | first].ansible_host }}:{{ pulp_site_port }}"
-        (or the correct IP if multi-homed) in your environments
+          (or the correct IP if multi-homed) in your environments

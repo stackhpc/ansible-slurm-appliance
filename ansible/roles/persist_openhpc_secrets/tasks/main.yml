@@ -1,16 +1,16 @@
 ---
 
 - name: Check if OpenHPC secrets exist in persistent storage
-  stat:
+  ansible.builtin.stat:
     path: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
   register: openhpc_secrets_stat
 
 - name: Ensure Ansible facts directories exist
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: root
-    mode: 0600
+    mode: "0600"
   loop:
     - "{{ appliances_state_dir }}/ansible.facts.d"
     - "/etc/ansible/facts.d"
@@ -21,19 +21,19 @@
   when: openhpc_secrets_stat.stat.exists
 
 - name: Write OpenHPC secrets
-  template:
+  ansible.builtin.template:
     src: openhpc_secrets.fact
     dest: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
     owner: root
-    mode: 0600
+    mode: "0600"
 
 - name: Symlink persistent facts to facts_path
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
     dest: /etc/ansible/facts.d/openhpc_secrets.fact
     owner: root
-    
+
 - name: Refresh facts to pick up any new secrets
   ansible.builtin.setup:
     filter: ansible_local

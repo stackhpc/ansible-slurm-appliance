@@ -35,5 +35,5 @@ Where noted these map to squid parameters of the same name without the `squid_` 
         http_access allow localhost
         # Finally deny all other access to this proxy
         http_access deny all
-        
+
   See squid parameter.

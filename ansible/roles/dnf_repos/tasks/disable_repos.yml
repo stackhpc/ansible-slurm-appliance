@@ -27,5 +27,5 @@
     path: "{{ item.path }}"
     regexp: '^enabled\ ?=\ ?1'
     replace: 'enabled=0'
-    backup: yes
+    backup: true
   loop: "{{ _dnf_repo_files.files }}"

@@ -1,3 +1,4 @@
+---
 dnf_repos_repos: {} # see environments/common/inventory/group_vars/all/{dnf_repos,timestamps}.yml
 dnf_repos_pulp_content_url: "{{ appliances_pulp_url }}/pulp/content"
 dnf_repos_username: "{{ omit }}"

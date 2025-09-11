@@ -1,40 +1,44 @@
 ---
-
 - name: Make directory
-  file:
+  ansible.builtin.file:
     path: "{{ hpctests_rootdir }}/pingmatrix"
     state: directory
+    mode: "0755"
 
 - name: Copy source
-  copy:
+  ansible.builtin.copy:
     src: mpi_nxnlatbw.c
     dest: "{{ hpctests_rootdir }}/pingmatrix/mpi_nxnlatbw.c"
+    mode: "0644"
 
 - name: Create sbatch script
-  template:
+  ansible.builtin.template:
     src: pingmatrix.sh.j2
     dest: "{{ hpctests_rootdir }}/pingmatrix/pingmatrix.sh"
+    mode: "0755"
 
-- name: Run ping matrix
-  shell: bash -l -c 'sbatch --wait pingmatrix.sh' # need login shell for module command
+- name: Run ping matrix # noqa: no-changed-when
+  ansible.builtin.command: bash -l -c 'sbatch --wait pingmatrix.sh'
   args:
     chdir: "{{ hpctests_rootdir }}/pingmatrix"
   register: hpctests_pingmatrix_sbatch
 
-# nxnlatbw outputs ranks, not nodenames which would be more useful for finding issues. The sbatch manpage says nodes provided via --nodelist are sorted, but doesn't specify how.
-# Some testing using a "helloworld" program showed it is NOT sorted the same as python's sorted(), it's lexicographical. So we use scontrol to guarantee the same sort order.
+# nxnlatbw outputs ranks, not nodenames which would be more useful for finding issues.
+# The sbatch manpage says nodes provided via --nodelist are sorted, but doesn't specify how.
+# Some testing using a "helloworld" program showed it is NOT sorted the same as python's sorted(),
+# it's lexicographical. So we use scontrol to guarantee the same sort order.
 # Note this still doesn't fix any non-unique names but we should get a length mis-match at least with that.
 # although this looks a bit crazy:
-- name: Expand node list
-  shell: "scontrol show hostnames {{ hpctests_nodes if hpctests_nodes is defined else (hpctests_computes.stdout_lines | join(',')) }}"
+- name: Expand node list # noqa: no-changed-when
+  ansible.builtin.command: "scontrol show hostnames {{ hpctests_nodes if hpctests_nodes is defined else (hpctests_computes.stdout_lines | join(',')) }}"
   register: scontrol_hostnames
 
-- name: Create sorted node expression
-  shell: "scontrol show hostlistsorted {{ scontrol_hostnames.stdout_lines | join(',') }}"
+- name: Create sorted node expression # noqa: no-changed-when
+  ansible.builtin.command: "scontrol show hostlistsorted {{ scontrol_hostnames.stdout_lines | join(',') }}"
   register: scontrol_hostlistsorted
 
-- name: Expand node list again
-  shell: "scontrol show hostnames {{ scontrol_hostlistsorted.stdout_lines | join(',') }}"
+- name: Expand node list again # noqa: no-changed-when
+  ansible.builtin.command: "scontrol show hostnames {{ scontrol_hostlistsorted.stdout_lines | join(',') }}"
   register: slurm_names
 
 - name: Process output
@@ -45,16 +49,18 @@
   register: nxnlatbw
 
 - name: Fetch html results table to ansible control host
-  fetch:
+  ansible.builtin.fetch:
     src: "{{ hpctests_rootdir }}/pingmatrix/pingmatrix.html"
     dest: "{{ hpctests_outdir }}/pingmatrix.html"
-    flat: yes
+    flat: true
 
 - name: Summarise results
-  debug:
+  ansible.builtin.debug:
+    # yamllint disable rule:line-length
     msg: |
       Summary for pingmatrix pairwise over {{ slurm_names.stdout_lines | length }} nodes in '{{ hpctests_partition }}' partition, job ID {{ hpctests_pingmatrix_sbatch.stdout.split()[-1] }}, device '{{ hpctests_ucx_net_devices }}':
-      
+
       {{ nxnlatbw['stats'] | to_nice_yaml }}
-      
+
       Tabular output on ansible control host at {{ hpctests_outdir }}/pingmatrix.html
+    # yamllint enable rule:line-length

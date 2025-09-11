@@ -1,5 +1,5 @@
-- import_tasks: install-kernel-devel.yml
-
+---
+- ansible.builtin.import_tasks: install-kernel-devel.yml
 - name: Install DOCA repo
   ansible.builtin.yum_repository:
     name: doca
@@ -13,21 +13,21 @@
   ansible.builtin.dnf:
     name: doca-extra
 
-- name: Build DOCA kernel modules
-  ansible.builtin.shell:
+- name: Build DOCA kernel modules # noqa: no-changed-when
+  ansible.builtin.command:
     cmd: /opt/mellanox/doca/tools/doca-kernel-support
   register: _doca_kernel_build
 
-
 - name: Find generated doca-kernel-repo
-  ansible.builtin.shell: 'find /tmp/DOCA.* -name doca-kernel-repo-*'
+  ansible.builtin.shell: "find /tmp/DOCA.* -name doca-kernel-repo-*"
   register: _doca_kernel_repo # e.g. /tmp/DOCA.WVMchs2QWo/doca-kernel-repo-24.10.1.1.4.0-1.kver.5.14.0.427.31.1.el9.4.x86.64.x86_64.rpm
   changed_when: false
 
-- name: Create dnf cache
+- name: Create dnf cache # noqa: no-changed-when
   ansible.builtin.command: dnf makecache
 
 - name: Install DOCA repository package
+  # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
   ansible.builtin.dnf:
     name: "{{ _doca_kernel_repo.stdout }}"
     disable_gpg_check: true
@@ -41,11 +41,11 @@
     state: absent
     path: "{{ (_doca_kernel_repo.stdout | split('/'))[:3] | join('/') }}" # leading / means 1st element of split list is ''
 
-- name: Update initramfs
+- name: Update initramfs # noqa: no-changed-when
   ansible.builtin.command:
     cmd: dracut -f
   register: _doca_dracut
   failed_when: _doca_dracut.stderr != '' # appears rc is always 0
 
-- name: Load the new driver
+- name: Load the new driver # noqa: no-changed-when
   ansible.builtin.command: /etc/init.d/openibd restart

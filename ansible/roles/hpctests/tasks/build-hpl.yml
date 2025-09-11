@@ -1,60 +1,62 @@
 ---
-
 - name: Make directory
-  file:
+  ansible.builtin.file:
     path: "{{ hpctests_rootdir }}/hpl"
     state: directory
+    mode: "0755"
 
 - name: Unarchive HPL sources from /opt/hpl
-  unarchive:
+  ansible.builtin.unarchive:
     src: "/opt/hpl/hpl-{{ hpctests_hpl_version }}.tar.gz"
     dest: "{{ hpctests_rootdir }}/hpl"
-    remote_src: yes
+    remote_src: true
     owner: "{{ hpctests_user }}"
     group: "{{ hpctests_group }}"
-    mode: '0755'
-    keep_newer: yes
+    mode: "0755"
+    keep_newer: true
 
 - name: Copy BLAS makefile
-  copy:
+  ansible.builtin.copy:
     src: "{{ hpctests_hpl_srcdir }}/setup/Make.Linux_PII_CBLAS"
     dest: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
-    remote_src: yes
+    remote_src: true
+    mode: "0644"
 
 - name: Modify make file
-  replace:
+  ansible.builtin.replace:
     path: "{{ hpctests_hpl_srcdir }}/Make.{{ hpctests_hpl_arch }}"
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
   loop:
-    - regexp: '^TOPdir.*$'
+    - regexp: "^TOPdir.*$"
       replace: "TOPdir       = {{ hpctests_hpl_srcdir }}"
-    - regexp: '^ARCH\s+=.*$'
+    - regexp: "^ARCH\\s+=.*$"
       replace: "ARCH         = {{ hpctests_hpl_arch }}"
-    - regexp: '^MPdir.*$'
+    - regexp: "^MPdir.*$"
       replace: "MPdir        = $(MPI_DIR)"
-    - regexp: '^MPinc.*$'
+    - regexp: "^MPinc.*$"
       replace: "MPinc        = -I$(MPI_DIR)/include"
-    - regexp: '^MPlib.*$'
+    - regexp: "^MPlib.*$"
       replace: "MPlib        = $(MPI_DIR)/lib/libmpi.so"
-    - regexp: '^LAdir.*$'
+    - regexp: "^LAdir.*$"
       replace: "LAdir        = $(OPENBLAS_DIR)"
-    - regexp: '^LAinc.*$'
-      replace: "LAinc        ="  # not sure if this one is needed?
-    - regexp: '^LAlib.*$'
+    - regexp: "^LAinc.*$"
+      replace: "LAinc        =" # not sure if this one is needed?
+    - regexp: "^LAlib.*$"
       replace: "LAlib        = $(OPENBLAS_LIB)/libopenblas.so"
-    - regexp: '^CC\s+=.*$'
+    - regexp: "^CC\\s+=.*$"
       replace: "CC           = mpicc"
-    - regexp: '^LINKER\s+=.*$'
+    - regexp: "^LINKER\\s+=.*$"
       replace: "LINKER       = mpicc"
 
 - name: Create build job script
-  template:
+  ansible.builtin.template:
     src: "hpl-build.sh.j2"
     dest: "{{ hpctests_hpl_srcdir }}/hpl-build-{{ hpctests_hpl_arch }}.sh"
-  
+    mode: "0644"
+
 - name: Build HPL executable
-  shell:
+  ansible.builtin.command:
     cmd: "bash -l -c 'sbatch --wait hpl-build-{{ hpctests_hpl_arch }}.sh'" # need login shell for module command
     chdir: "{{ hpctests_hpl_srcdir }}"
     creates: "bin/{{ hpctests_hpl_arch }}/xhpl"

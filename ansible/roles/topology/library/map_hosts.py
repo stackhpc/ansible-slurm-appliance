@@ -1,10 +1,11 @@
 #!/usr/bin/python
+# pylint: disable=missing-module-docstring
 
 # Copyright: (c) 2025, StackHPC
 # Apache 2 License
 
-from ansible.module_utils.basic import AnsibleModule
-import openstack
+import openstack  # pylint: disable=import-error
+from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
 
 DOCUMENTATION = """
 ---
@@ -47,35 +48,39 @@ EXAMPLES = """
       - mycluster-compute-1
 """
 
+
 def min_prefix(uuids, start=4):
-    """ Take a list of uuids and return the smallest length >= start which keeps them unique """
+    """Take a list of uuids and return the smallest length >= start which keeps them unique"""
     for length in range(start, len(uuids[0])):
         prefixes = set(uuid[:length] for uuid in uuids)
         if len(prefixes) == len(uuids):
             return length
+    # Fallback to returning the full length
+    return len(uuids[0])
 
-def run_module():
-    module_args = dict(
-        compute_vms=dict(type='list', elements='str', required=True)
-    )
+
+def run_module():  # pylint: disable=missing-function-docstring
+    module_args = {"compute_vms": {"type": "list", "elements": "str", "required": True}}
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
     conn = openstack.connection.from_config()
 
-    servers = [s for s in conn.compute.servers() if s["name"] in module.params["compute_vms"]]
+    servers = [
+        s for s in conn.compute.servers() if s["name"] in module.params["compute_vms"]
+    ]
 
     topo = {}
     all_host_ids = []
     for s in servers:
-        az = s['availability_zone']
-        host_id = s['host_id']
-        if host_id != '': # empty string if e.g. server is shelved
+        az = s["availability_zone"]
+        host_id = s["host_id"]
+        if host_id != "":  # empty string if e.g. server is shelved
             all_host_ids.append(host_id)
             if az not in topo:
                 topo[az] = {}
             if host_id not in topo[az]:
                 topo[az][host_id] = []
-            topo[az][host_id].append(s['name'])
+            topo[az][host_id].append(s["name"])
 
     uuid_len = min_prefix(list(set(all_host_ids)))
 
@@ -83,14 +88,14 @@ def run_module():
         topo[az] = dict((k[:uuid_len], v) for (k, v) in topo[az].items())
 
     result = {
-        "changed": False, 
+        "changed": False,
         "topology": topo,
     }
-    
+
     module.exit_json(**result)
 
 
-def main():
+def main():  # pylint: disable=missing-function-docstring
     run_module()
 
 
