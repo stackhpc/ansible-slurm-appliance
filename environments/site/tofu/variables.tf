@@ -203,7 +203,7 @@ variable "state_volume_provisioning" {
     validation {
       condition = contains(["manage", "attach"], var.state_volume_provisioning)
       error_message = <<-EOT
-        home_volume_provisioning must be "manage" or "attach"
+        state_volume_provisioning must be "manage" or "attach"
     EOT
     }
 }
