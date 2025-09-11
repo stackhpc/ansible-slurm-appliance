@@ -81,6 +81,10 @@ cluster
 # Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
 cuda
 
+[journald:childen]
+# Hosts where journald should be configured. See ansible/roles/journald/README.md.
+cluster
+
 [eessi:children]
 # Hosts on which EESSI stack should be configured
 openhpc
