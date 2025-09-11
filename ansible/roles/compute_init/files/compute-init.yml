@@ -46,7 +46,6 @@
 
   tasks:
     - when: not enable_compute
-
       block:
         - name: Report skipping initialization if not compute node
           # meta: end_play produces no output
@@ -75,7 +74,6 @@
       # finish, which allows site.yml to continue on initial deploy
 
     - when: _mount_mnt_cluster.failed
-
       block:
         - name: Report skipping initialization if cannot mount nfs
           # meta: end_play produces no output
@@ -91,7 +89,6 @@
       register: hostvars_stat
 
     - when: not hostvars_stat.stat.exists
-
       block:
         - name: Report skipping initialization if host vars does not exist
           # meta: end_play produces no output
@@ -130,7 +127,6 @@
 
     - name: Configure resolve.conf
       when: enable_resolv_conf
-
       block:
         - name: Set nameservers in /etc/resolv.conf
           ansible.builtin.template:
@@ -203,7 +199,6 @@
       when:
         - enable_manila
         - os_manila_mount_shares | length > 0
-
       block:
         - name: Read manila share info from nfs file
           ansible.builtin.include_vars:
@@ -284,7 +279,6 @@
 
     - name: EESSI
       when: enable_eessi
-
       # NB: don't need conditional block on enable_compute as have already exited
       # if not the case
       block:

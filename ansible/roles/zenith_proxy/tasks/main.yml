@@ -24,7 +24,6 @@
 
 - become: true
   when: zenith_proxy_mitm_enabled
-
   block:
     - name: Create systemd unit file for MITM proxy
       ansible.builtin.template:

@@ -12,7 +12,6 @@
 - when:
     - cluster_floating_ip is defined
     - cluster_floating_ip
-
   block:
     - name: Look up floating IP
       azimuth_cloud.terraform.os_floating_ip_info:

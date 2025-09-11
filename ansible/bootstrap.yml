@@ -246,7 +246,6 @@
     - update
   tasks:
     - when: "update_enable | default('false') | bool"
-
       block:
         - name: Update selected packages
           ansible.builtin.dnf:
