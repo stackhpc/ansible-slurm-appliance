@@ -12,8 +12,6 @@ roles:
   - src: https://github.com/cloudalchemy/ansible-prometheus.git
     version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
     name: cloudalchemy.prometheus
-  - src: cloudalchemy.alertmanager
-    version: 0.19.1
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
     version: stackhpc-0.19.0 # fix grafana install
