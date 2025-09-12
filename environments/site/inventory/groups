@@ -120,6 +120,7 @@ compute
 [extra_packages:children]
 # Hosts to install specified additional packages on
 builder
+cluster
 
 [cacerts]
 # Hosts to configure CA certificates and trusts on
@@ -130,3 +131,6 @@ builder
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
 builder
+
+[topology:children]
+compute

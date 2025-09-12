@@ -9,18 +9,20 @@ module "cluster" {
     cluster_name = "slurm-production"
     cluster_networks = [
       {
-        network = "slurm-production"
-        subnet = "slurm-production"
+        network = "slurm-production-control-net"
+        subnet = "slurm-production-control-subnet"
+      },
+      {
+        network = "slurm-production-rdma-net"
+        subnet = "slurm-production-rdma-subnet"
+        no_security_groups: true
+        port_security_enabled: false
       },
       {
         network = "external-ceph"
         subnet = "external-ceph"
       }
     ]
-    vnic_types = {
-      "slurm-production" = "direct"
-      "external-ceph" = "direct"
-    }
     compute = {
       # Group name used for compute node partition definition
       general-compute1 = {
@@ -1262,6 +1264,7 @@ module "cluster" {
     }
 
     control_server_group_id = openstack_compute_servergroup_v2.control.id
+    control_node_hypervisor_hostname = "compute6"
 
     environment_root = var.environment_root
 }

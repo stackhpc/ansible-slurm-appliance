@@ -9,54 +9,74 @@ module "cluster" {
     cluster_name = "slurm-staging"
     cluster_networks = [
       {
-        network = "slurm-staging"
-        subnet = "slurm-staging"
+        network = "slurm-staging-control-net"
+        subnet = "slurm-staging-control-subnet"
+        no_security_groups: true
+        port_security_enabled: false
+      },
+      {
+        network = "slurm-staging-rdma-net"
+        subnet = "slurm-staging-rdma-subnet"
+        no_security_groups: true
+        port_security_enabled: false
       },
       {
         network = "external-ceph"
         subnet = "external-ceph"
       }
     ]
-    vnic_types = {
-      "slurm-staging" = "normal"
-      "external-ceph" = "normal"
-    }
     compute = {
-      # Group name used for compute node partition definition
-      general = {
+      general-gen2-rack6 = {
           nodes: [
-            "compute-0",
-            "compute-1",
-            "compute-2",
-            "compute-3",
-            "compute-4",
-            "compute-5",
-            "compute-6",
-            "compute-7",
-            "compute-8",
-            "compute-9",
-            "compute-10",
-            "compute-11",
-            "compute-12",
-            "compute-13"
+		"stagingcompute000",
+		"stagingcompute001",
+                "stagingcompute002",
+                "stagingcompute003",
+                "stagingcompute004",
+                "stagingcompute005",
+                "stagingcompute006",
+                "stagingcompute007",
+	  ]
+          flavor: "hpc.v2.32cpu.128ram" # TODO: make this a 32cpu gen1 once there's space
+          availability_zone = "DL-Rack-6"
+          vnic_types = {
+            "slurm-staging-control-net": "normal"
+            "slurm-staging-rdma-net": "direct"
+            "external-ceph": "direct"
+          }
+          ignore_image_changes: true
+          compute_init_enable = [
+            "compute",
+            "etc_hosts",
+            "tuned",
+            "nfs",
+            "manila",
+            "basic_users",
+            "eessi",
           ]
-          flavor: "hpc.v2.32cpu.128ram"
       }
-      # gpu = {
-      #     nodes: [
-      #       "gpu-0",
-      #       "gpu-1",
-      #     ]
-      #     flavor: "hpc.v2.16cpu.128ram.a100"
-      # }
-      # highmem = {
-      #     nodes: [
-      #       "highmem-0",
-      #       "highmem-1",
-      #     ]
-      #     flavor: "hpc.v2.60cpu.480ram"
-      # }
-  }
+    }
+
+    login = {
+        interactive = {
+            nodes: ["staginglogin"]
+            flavor: "hpc.v2.32cpu.128ram" # TODO: make this a 16cpu gen1 once there's space
+            vnic_types = {
+              "slurm-staging-control-net": "normal"
+              "slurm-staging-rdma-net": "direct"
+              "external-ceph": "direct"
+            }
+            root_volume_size = 100
+            server_group_id = openstack_compute_servergroup_v2.control.id
+            fip_addresses:  ["10.129.31.150"]
+            fip_network: "slurm-staging-control-net"
+        }
+    }
+  
+
+    control_server_group_id = openstack_compute_servergroup_v2.control.id
+
+    control_node_flavor = "hpc.v2.32cpu.128ram" # TODO: make this a 16cpu gen1 once there's space (remove this one and rely on site)
 
     environment_root = var.environment_root
 }

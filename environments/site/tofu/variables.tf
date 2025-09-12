@@ -28,7 +28,7 @@ variable "key_pair" {
 variable "control_node_flavor" {
     type = string
     description = "Flavor name for control node"
-    default = "hpc.v2.16cpu.64ram"
+    default = "hpc.v1.16cpu.64ram"
 }
 
 variable "login" {
@@ -47,7 +47,7 @@ variable "login" {
     Optional:
         image_id: Overrides variable cluster_image_id
         extra_networks: List of mappings in same format as cluster_networks
-        vnic_type: Overrides variable vnic_type
+        vnic_types: Overrides variable vnic_types
         volume_backed_instances: Overrides variable volume_backed_instances
         root_volume_size: Overrides variable root_volume_size
         extra_volumes: Mapping defining additional volumes to create and attach
@@ -63,12 +63,13 @@ variable "login" {
         match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
         availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
         gateway_ip: Address to add default route via
+        nodename_template: Overrides variable cluster_nodename_template
   EOF
   default = {
       # Arbitrary group name for these login nodes
       interactive = {
           nodes: ["login-0"]
-          flavor: "hpc.v2.16cpu.64ram"
+          flavor: "hpc.v1.16cpu.64ram"
           root_volume_size = 100
       }
   }
@@ -95,7 +96,7 @@ variable "compute" {
         Optional:
             image_id: Overrides variable cluster_image_id
             extra_networks: List of mappings in same format as cluster_networks
-            vnic_type: Overrides variable vnic_type
+            vnic_types: Overrides variable vnic_types
             compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
             ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
             volume_backed_instances: Overrides variable volume_backed_instances
@@ -108,12 +109,13 @@ variable "compute" {
             match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
             availability_zone: Name of availability zone - ignored unless match_ironic_node is true (default: "nova")
             gateway_ip: Address to add default route via
+            nodename_template: Overrides variable cluster_nodename_template
     EOF
     default = {
       # Group name used for compute node partition definition
       general = {
           nodes: ["compute-0", "compute-1"]
-          flavor: "hpc.v2.32cpu.128ram"
+          flavor: "hpc.v1.32cpu.128ram"
       }
   }
 }
@@ -138,7 +140,7 @@ variable "state_volume_size" {
 variable "state_volume_type" {
     type = string
     description = "Type of state volume, if not default type"
-    default = null
+    default = "iops"
 }
 
 variable "home_volume_size" {
@@ -199,7 +201,27 @@ variable "gateway_ip" {
     default = ""
 }
 
+variable "cluster_nodename_template" {
+    description = <<-EOT
+        Template for node fully-qualified names. The following interpolations
+        can be used:
+            $${cluster_name}: From var.cluster_name
+            $${cluster_domain_suffix}: From var.cluster_domain_suffix
+            $${node}: The current entry in the "nodes" parameter for nodes
+            defined by var.compute and var.login, or "control" for the control
+            node
+            $${environment_name}: The last element of the current environment's path
+    EOT
+    type = string
+    default = "$${node}"
+}
+
 variable "control_server_group_id" {
+    type = string
+    default = ""
+}
+
+variable "control_node_hypervisor_hostname" {
     type = string
     default = ""
 }

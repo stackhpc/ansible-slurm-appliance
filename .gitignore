@@ -5,3 +5,7 @@ venv
 *.pyc
 packer/openhpc2
 .vscode
+environments/production/inventory/hosts.yml
+environments/staging/inventory/hosts.yml
+environments/production/tofu/.terraforn.lock.hcl
+environments/staging/tofu/.terraform.lock.hcl

@@ -1,6 +1,7 @@
 basic_users_users:
   - name: demo_user
     password: "{{ vault_demo_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
+    create_home: false
     uid: 1005
 
 basic_users_homedir_server: "{{ groups['login'] | first }}"
