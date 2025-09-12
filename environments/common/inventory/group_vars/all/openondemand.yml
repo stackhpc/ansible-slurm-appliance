@@ -197,7 +197,7 @@ openondemand_apps_rstudio_default:
       help: Choose your RStudio module
       widget: select
       options:
-        - ["RStudio v{{ openondemand_rstudio_version }}", "rstudio-server/{{ openondemand_rstudio_version }}}"]
+        - ["RStudio v{{ openondemand_rstudio_version }}", "rstudio-server/{{ openondemand_rstudio_version }}"]
     extra_modules_script:
       label: Extra modules script
       help: If you'd like to load additional modules alongside RStudio-Server, put the 'module load ...' commands into a text file (one 'module load...' per line) and specify its path here
