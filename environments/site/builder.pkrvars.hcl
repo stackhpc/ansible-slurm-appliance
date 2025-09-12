@@ -1,6 +1,11 @@
-flavor = "hpc.v2.16cpu.128ram"                           # VM flavor to use for builder VMs
-networks = ["d21d2d5c-58dc-43a8-954c-8ebd4da7e198"]   # List of network UUIDs to attach the VM to
-source_image_name = "openhpc-RL9-250513-1046-ca44f898"   # Name of image to create VM with, i.e. starting image
-inventory_groups = "doca,cuda"            # Additional inventory groups to add build VM to
-volume_size= "30"            # Larger volume to fit DOCA install
+flavor = "std.v1.16cpu.128ram"                          # VM flavor to use for builder VMs
+networks = ["0d3bf7a7-269a-4c36-8c83-6150306e7e06"]     # List of network UUIDs to attach the VM to
+#source_image_name = "openhpc-250910-1024-f605b7d8"  # Name of image to create VM with, i.e. starting image
+source_image_name = "openhpc-RL9-250514-1502-5a923b2c-new-2"  # Name of image to create VM with, i.e. starting image
+security_groups = ["SSH"]
+inventory_groups = "doca,extra_packages"           # Additional inventory groups to add build VM to
+#inventory_groups = "doca,cuda,extra_packages"           # Additional inventory groups to add build VM to
+volume_size = "30"                                      # Larger volume to fit DOCA install
 image_disk_format = "raw"
+ssh_keypair_name = "dl-ansible-01"                      # Temporary, for access to the build VM
+ssh_private_key_file = "/home/ubuntu/.ssh/id_rsa"       # Temporary, for access to the build VM
