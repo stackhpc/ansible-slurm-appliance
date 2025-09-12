@@ -316,6 +316,9 @@ The value chosen should be the highest value demonstrated during testing. Note
 that any time spent blocked due to this parallelism limit does not count
 against the (un-overridable) internal OpenTofu timeout of 30 minutes
 
+Consider configuring [OpenTofu remote state](./opentofu-remote-state.md) for any
+environments which should be unique, e.g. production and staging.
+
 ## Configure appliance
 
 ### Production configuration to consider
