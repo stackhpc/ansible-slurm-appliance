@@ -1,0 +1,14 @@
+---
+
+- name: Configure Slurm MPI
+  hosts: control
+  become: true
+  tags: openhpc
+  tasks:
+    - name: Template mpi.conf
+      ansible.builtin.template:
+        src: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/templates/mpi.conf.j2"
+        dest: /etc/slurm/mpi.conf
+        owner: root
+        group: root
+        mode: 0644

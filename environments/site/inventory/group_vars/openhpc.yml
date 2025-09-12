@@ -1,0 +1,5 @@
+---
+
+# Defaults to simplify job submission parameters
+openhpc_config_extra:
+  MpiDefault: pmix
