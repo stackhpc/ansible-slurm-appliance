@@ -1,15 +1,6 @@
-# Usage: ansible-playbook ansible/adhoc/deploy-pulp.yml -e "pulp_server=<pulp server hostname>"
-
-- name: Add temporary pulp server host
-  hosts: localhost
-  tasks:
-  - ansible.builtin.add_host:
-      name: "{{ pulp_server }}"
-      group: "_pulp_host"
-
-- name: Install pulp on server and add to config
+- name: Install pulp on server
   become: yes
-  hosts: _pulp_host
+  hosts: pulp_server
   tasks:
   - name: Install pulp
     ansible.builtin.include_role:
@@ -22,5 +13,5 @@
     debug:
       msg: | 
         Server configured, override 'appliances_pulp_url' with
-          appliances_pulp_url: "http://{{ pulp_server }}:{{ pulp_site_port }}"
-        in your environments
+          appliances_pulp_url: "http://{{ hostvars[groups['pulp_server'] | first].ansible_host }}:{{ pulp_site_port }}"
+        (or the correct IP if multi-homed) in your environments

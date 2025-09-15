@@ -9,7 +9,7 @@ All subsequent sections assume that:
 - Appropriate OpenStack credentials are available.
 - Any non-appliance controlled infrastructure is available (e.g. networks, volumes, etc.).
 - `$ENV` is your current, activated environment, as defined by e.g. `environments/production/`.
-- `$SITE_ENV` is the base site-specific environment, as defined by e.g. `environments/mysite/`.
+- `$SITE_ENV` is the base site-specific environment, as defined by `environments/site/`.
 - A string `some/path/to/file.yml:myvar` defines a path relative to the repository root and an Ansible variable in that file.
 - Configuration is generally common to all environments at a site, i.e. is made in `environments/$SITE_ENV` not `environments/$ENV`.
 
@@ -61,6 +61,24 @@ This is a usually a two-step process:
 - Add a new partition to the partition configuration as described under [Modifying Slurm Partition-specific Configuration](#Modifying-Slurm-Partition-specific-Configuration).
 
 Deploying the additional nodes and applying these changes requires rerunning both OpenTofu and the Ansible site.yml playbook - follow [Deploying a Cluster](#Deploying-a-Cluster).
+
+# Enabling additional functionality
+Roles in the appliance which are disabled by default can be enabled by adding the appropriate groups as children of the role's corresponding group in `environments/site/inventory/groups`. For example,
+to install a Squid proxy on nodes in the login group, you would modify the `squid` group definition in `environments/site/inventory/groups` to:
+
+```
+[squid:children]
+# Hosts to run squid proxy
+login
+```
+
+Note that many non-default roles include package installations from repositories which the appliance overwrites to point at snapshotted mirrors on a Pulp server (by default StackHPC's Ark server), which are
+disabled during runtime to prevent Ark credentials from being leaked. To enable this functionality, you must therefore either:
+
+- Create a site-specific fatimage (see [image build docs](image-build.md)) with the appropriate group added to the `inventory_groups` Packer variables.
+- If you instead wish roles to perform their installations during runtime, deploy a site Pulp server and sync it with with mirrors of the snapshots from the upstream Ark server (see [Pulp docs](experimental/pulp.md)).
+
+In both cases, Ark credentials will be required.
 
 # Adding Additional Packages
 By default, the following utility packages are installed during the StackHPC image build:
