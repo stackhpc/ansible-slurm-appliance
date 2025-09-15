@@ -301,6 +301,9 @@ slurm-stats is configured `slurm-stats` role in the [slurm_openstack_tools colle
 The `slurm_stats` group controls the placement of the `slurm_stats` service.
 This should be configured to be a group with a single host. That host must be co-located on the same host as the `filebeat` service that scrapes its output.
 
+## Logging configuration
 
+### Journald
 
-
+The [journald](../ansible/roles/journald/README.md) role is used to customise
+journald configuration.
