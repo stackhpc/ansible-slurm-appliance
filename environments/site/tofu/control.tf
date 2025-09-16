@@ -36,7 +36,10 @@ resource "openstack_networking_port_v2" "control" {
   }
 
   lifecycle {
-    ignore_changes = [ binding ]
+    ignore_changes = [
+      binding, # fixes running as admin
+      extra_dhcp_option # required for networking-mlnx neutron plugin
+    ]
   }
 }
 
