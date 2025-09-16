@@ -218,3 +218,5 @@ extra_packages
 # pulp_host ansible_host=<VM-ip-address>
 # Note the host name can't conflict with group names i.e can't be called `pulp` or `pulp_server`
 
+[raid]
+# Add `builder` to configure image for software raid

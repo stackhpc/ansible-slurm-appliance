@@ -166,3 +166,6 @@ compute
 # separately from the appliance. e.g
 # pulp_host ansible_host=<VM-ip-address>
 # Note inventory host name cannot conflict with group names i.e can't be called `pulp` or `pulp_server`.
+
+[raid]
+# Add `builder` to configure image for software raid
