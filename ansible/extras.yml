@@ -1,3 +1,12 @@
+- hosts: raid
+  become: yes
+  gather_facts: no
+  tags: raid
+  name: Configure image for baremetal software raid root disks
+  tasks:
+    - include_role:
+        name: raid
+
 - hosts: k3s_server:!builder
   become: yes
   tags: k3s

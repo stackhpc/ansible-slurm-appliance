@@ -50,3 +50,7 @@ cluster
 
 [compute_init:children]
 compute
+
+[raid:children]
+# Configure fatimage for raid
+builder

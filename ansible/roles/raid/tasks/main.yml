@@ -1,0 +1,13 @@
+- name: Enable autoassembly of mdraid devices
+  # adds rd.auto=1 - see `man dracut.cmdline`
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((?:(?!rd.auto=1).)*?)"$'
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 rd.auto=1"'
+    backup: true
+    backrefs: true
+  register: update_grub
+  
+- name: Update GRUB configuration file
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg --update-bls-cmdline
+  when: update_grub.changed
