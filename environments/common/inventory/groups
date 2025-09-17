@@ -129,6 +129,9 @@ prometheus
 freeipa_server
 freeipa_client
 
+[doca]
+# Add `builder` to install NVIDIA DOCA during image build
+
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
@@ -195,6 +198,8 @@ k3s_agent
 # Hosts to replace system repos with Pulp repos
 # Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` will leak Ark creds to users
 extra_packages
+cuda
+doca
 
 [pulp_site]
 # Add builder to this group to automatically sync pulp during image build
