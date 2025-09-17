@@ -1,3 +1,15 @@
+[login:children]
+# All Slurm login nodes. Combined control/login nodes are not supported.
+fatimage
+
+[control:children]
+# A single Slurm control node. Multiple (high availability) control nodes are not supported.
+fatimage
+
+[compute:children]
+# All Slurm compute nodes (in all partitions).
+fatimage
+
 [nfs:children]
 openhpc
 
@@ -31,6 +43,7 @@ slurm_stats
 # NB: [rebuild] not defined here as likely to need features not currently supported
 
 [update:children]
+fatimage
 
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH
@@ -102,18 +115,21 @@ openhpc
 login
 openondemand
 
-[squid]
+[squid:children]
 # Hosts to run squid proxy
+fatimage
 
 [tuned:children]
 # Hosts to run TuneD configuration
+fatimage
 
 [ansible_init:children]
 # Hosts to run linux-ansible-init
 cluster
 
-[sssd]
+[sssd:children]
 # Hosts to configure sssd on
+fatimage
 
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
@@ -151,6 +167,7 @@ cluster
 
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
+fatimage
 
 [nhc:children]
 # Hosts to configure for node health checks
@@ -171,14 +188,6 @@ compute
 # pulp_host ansible_host=<VM-ip-address>
 # Note inventory host name cannot conflict with group names i.e can't be called `pulp` or `pulp_server`.
 
-[raid]
+[raid:children]
 # Add `builder` to configure image for software raid
-
-[fatimage:children]
-# Standard additional functionality for fat image build, as used by StackHPC CI images:
-gateway
-raid
-squid
-sssd
-tuned
-update
+fatimage

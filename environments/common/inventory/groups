@@ -224,8 +224,5 @@ doca
 [raid]
 # Add `builder` to configure image for software raid
 
-[fatimage:children]
-# Minimal configuration for fat image build
-control
-login
-compute
+[fatimage]
+# Add build VM into this group to enable all features with this as child
