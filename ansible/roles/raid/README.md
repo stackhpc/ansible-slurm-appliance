@@ -10,4 +10,8 @@ hence this role does not support extending this.
 This role changes the command line for the current kernel. It does not reboot
 the instance so generally is only useful during image builds.
 
+Note that the `rootfs_uuid` image property described in the [Ironic raid documentation](https://docs.openstack.org/ironic/latest/admin/raid.html#image-requirements)
+is not required; the root partition is the first (non-boot) partition and this
+is sufficent for Ironic to find the root file system.
+
 [^1]: As shown by `lsinitrd /boot/initramfs-$(uname -r).img | grep raid`
