@@ -44,27 +44,27 @@ login
 openhpc
 
 [openondemand:children]
-# Host to run Open Ondemand server on - subset of login
+# Host to run Open OnDemand server on - subset of login
 login
 
 [openondemand_desktop:children]
-# Subset of compute to run a interactive desktops on via Open Ondemand
+# Subset of compute to run a interactive desktops on via Open OnDemand
 compute
 
 [openondemand_jupyter:children]
-# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+# Subset of compute to run a Jupyter Notebook servers on via Open OnDemand
 compute
 
 [openondemand_rstudio:children]
-# Subset of compute to run RStudio servers on via Open Ondemand
+# Subset of compute to run RStudio servers on via Open OnDemand
 compute
 
 [openondemand_matlab:children]
-# Subset of compute to run a MATLAB interactive desktop on via Open Ondemand
+# Subset of compute to run a MATLAB interactive desktop on via Open OnDemand
 compute
 
 [openondemand_codeserver:children]
-# Subset of compute to run a Codeserver VSCode instance on via Open Ondemand
+# Subset of compute to run a Codeserver VSCode instance on via Open OnDemand
 compute
 
 [etc_hosts:children]
