@@ -172,5 +172,9 @@ docker run --rm \
 ```
 
 ```shell
-ansible-lint -c .ansible-lint.yml ansible/
+ANSIBLE_COLLECTIONS_PATH=.ansible/collections \
+    ansible-lint -c .ansible-lint.yml
 ```
+
+Specifying `ANSIBLE_COLLECTIONS_PATH` ensures `ansible-lint` downloads collections and roles under the `.ansible` directory, separating them from our own roles under the `ansible` directory.
+We exclude these downloaded files from linting by listing `.ansible` under `exclude_paths` in `.ansible-lint.yml`.

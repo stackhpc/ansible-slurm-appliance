@@ -30,6 +30,8 @@ jobs:
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v25.4.0
+        env:
+          ANSIBLE_COLLECTIONS_PATH: .ansible/collections
 
       - name: Load super-linter configuration
         # Use grep inverse matching to exclude eventual comments in the .env file
