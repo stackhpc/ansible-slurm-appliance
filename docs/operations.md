@@ -95,22 +95,29 @@ By default, the following utility packages are installed during the StackHPC ima
 - s-nail
 
 Additional packages can be added during image builds by:
-- adding the `extra_packages` group to the build `inventory_groups` (see
-[docs/image-build.md](./image-build.md))
-- defining a list of packages in `appliances_extra_packages_other` in e.g.
-`environments/$SITE_ENV/inventory/group_vars/all/defaults.yml`. For example:
+
+1. Configuring an [docs/image-build.md](./image-build.md) to enable the
+   `extra_packages` group:
+
+
+    ```terraform
+    # environments/site/builder.pkrvars.hcl:
+    ...
+    inventory_groups = "extra_packages"
+    ...
+    ```
+
+2. Defining a list of packages in `appliances_extra_packages_other`, for example:
 
     ```yaml
-        # environments/foo-base/inventory/group_vars/all/defaults.yml:
+        # environments/site/inventory/group_vars/all/defaults.yml:
         appliances_extra_packages_other:
         - somepackage
         - anotherpackage
     ```
 
-For packages which come from repositories mirrored by StackHPC's "Ark" Pulp server
-(including rocky, EPEL and OpenHPC repositories), this will require either [Ark
-credentials](./image-build.md)) or a [local Pulp mirror](./experimental/pulp.md)
-to be configured. This includes rocky, EPEL and OpenHPC repos.
+3. Either adding [Ark credentials](./image-build.md) or a [local Pulp mirror](./experimental/pulp.md)
+  to provide access to the required [repository snapshots](../environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml).
 
 The packages available from the OpenHPC repos are described in Appendix E of
 the OpenHPC installation guide (linked from the
@@ -137,8 +144,6 @@ Adding these repos/packages to the cluster/image would then require running:
     ansible-playbook environments/$SITE_ENV/hooks/{pre,post}.yml
 
 as appropriate.
-
-TODO: improve description about adding these to extra images.
 
 
 # Reconfiguring Slurm

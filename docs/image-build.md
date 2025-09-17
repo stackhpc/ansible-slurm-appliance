@@ -1,47 +1,103 @@
 # Packer-based image build
 
-The appliance contains code and configuration to use [Packer](https://developer.hashicorp.com/packer) with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack) to build images.
+The appliance contains configuration to use [Packer](https://developer.hashicorp.com/packer)
+with the [OpenStack builder](https://www.packer.io/plugins/builders/openstack)
+to build images. Using images:
+- Enables the image to be tested in a `staging` environment before deployment
+  to the `production` environment.
+- Ensures re-deployment of the cluster or deployment of additional nodes is
+  repeatable.
+- Improves deployment speed by reducing the number of package installation.
 
-The Packer configuration defined here builds "fat images" which contain packages, binaries and container images but no cluster-specific configuration. Using these:
-- Enables the image to be tested in CI before production use.
-- Ensures re-deployment of the cluster or deployment of additional nodes can be completed even if packages are changed in upstream repositories (e.g. due to RockyLinux or OpenHPC updates).
-- Improves deployment speed by reducing the number of package downloads to improve deployment speed.
-
-The fat images StackHPC builds and tests in CI are available from [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases). However with some additional configuration it is also possible to:
-1. Build site-specific fat images from scratch.
-2. Extend an existing fat image with additional functionality.
-
+The Packer configuration here can be used to build two types of images:
+1. "Fat images" which contain packages, binaries and container images but no
+   cluster-specific configuration. These start from a RockyLinux GenericCloud
+   (or compatible) image. The fat images StackHPC builds and tests in CI are
+   available from [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases).
+   However site-specific fat images can also be built from a different source
+   image e.g. if a different partition layout is required.
+2. "Extra-build" images which extend a StackHPC fat image to create a site-specific
+   image with with additional packages or functionality. For example the NVIDIA
+   `cuda` packages cannot be redistributed hence require an "extra" build.
 
 # Usage
 
-To build either a site-specific fat image from scratch, or to extend an existing StackHPC fat image:
+For either a site-specific fat-image build or an extra-build:
 
-1. Ensure the current OpenStack credentials have sufficient authorisation to upload images (this may or may not require the `member` role for an application credential, depending on your OpenStack configuration).
-2. The provided dev credentials for StackHPC's "Ark" Pulp server must be added to the target environments. This is done by overriding `dnf_repos_username` and `dnf_repos_password` with your vault encrypted credentials in `environments/<base_environment>/inventory/group_vars/all/pulp.yml`. See the [experimental docs](experimental/pulp.md) if you wish instead wish to use a local Pulp server.
-3. Create a Packer [variable definition file](https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#assigning-values-to-input-variables) at e.g. `environments/<environment>/builder.pkrvars.hcl` containing at a minimum:
+1. Ensure the current OpenStack credentials have sufficient authorisation to
+   upload images (this may or may not require the `member` role for an
+   application credential, depending on your OpenStack configuration).
+2. If package installs are required, add the provided dev credentials for
+   StackHPC's "Ark" Pulp server to the `site` environment:
+
+    ```yaml
+    # environments/site/inventory/group_vars/all/dnf_repos.yml:
+    dnf_repos_username: your-ark-username
+    dnf_repos_password: "{{ vault_dnf_repos_password }}"
+    ```
+    ```yaml
+    # environments/site/inventory/group_vars/all/dnf_repos.yml:
+    dnf_repos_password: 'your-ark-password'
+    ```
+    > [!IMPORTANT]
+    > The latter file should be vault-encrypted.
+
+    Alternatively, configure a [local Pulp mirror](experimental/pulp.md).
+
+3. Create a Packer [variable definition file](https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#assigning-values-to-input-variables) containing at a minimum e.g.:
   
     ```hcl
+    # environments/site/builder.pkrvars.hcl:
     flavor = "general.v1.small"                           # VM flavor to use for builder VMs
     networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
     source_image_name = "Rocky-9-GenericCloud-Base-9.4"   # Name of image to create VM with, i.e. starting image
-    inventory_groups = "control,login,compute"            # Additional inventory groups to add build VM to
+    inventory_groups = "cuda"            # Additional inventory groups to add build VM to
 
     ```
 
     Note that:
-    - The network used for the Packer VM must provide outbound internet access but does not need to provide access to resources which the final cluster nodes require (e.g. Slurm control node, network filesystem servers etc.).
-    - The flavor used must have sufficent memory for the build tasks, but otherwise does not need to match the final cluster nodes. Usually 8GB is sufficent. By default, the build VM is volume-backed to allow control of the root disk size (and hence final image size) so the flavor disk size does not matter.
-    - The source image should be either a RockyLinux GenericCloud image for a site-specific image build from scratch, or a StackHPC fat image if extending an existing image.
-    - The `inventory_groups` variable takes a comma-separated list of Ansible inventory groups to add the build VM to. This is in addition to the `builder` group which it is always added to. This controls which Ansible roles and functionality run during build, and hence what gets added to the image. All possible groups are listed in `environments/common/groups` but common options for this variable will be:
-      - `update,control,login,compute`: The resultant image has all packages in the source image updated, and then packages for all types of nodes in the cluster are added. When using a GenericCloud image for `source_image_name` this builds a site-specific fat image from scratch.
-      - One or more specific groups which are not enabled in the appliance by default, e.g. `lustre`. When using a StackHPC fat image for `source_image_name` this extends the image with just this additional functionality.
+    - Normally the network must provide outbound internet access. However it
+      does not need to provide access to resources used by the actual cluster
+      nodes (e.g. Slurm control node, network filesystem servers etc.).
+    - The flavor used must have sufficent memory for the build tasks (usually
+      8GB), but otherwise does not need to match the actual cluster node
+      flavor(s).
+    - By default, the build VM is volume-backed to allow control of the root
+      disk size (and hence final image size), so the flavor's disk size does not
+      matter. The default volume size is not sufficent if enabling `cuda` and/or
+      `doca` and should be increased:
+        ```terraform
+        volume_size = 35 # GB
+        ```
+    - The source image should be either:
+      - For a site-specific fatimage build: A RockyLinux GenericCloud or
+        compatible image.
+      - For an extra-build image: The appropriate StackHPC fat image, as defined
+        in `environments/.stackhpc/tofu/cluster_image.auto.tfvars.json`. See the
+        [GitHub release page](https://github.com/stackhpc/ansible-slurm-appliance/releases)
+        for download links.
+    - The `inventory_groups` variable takes a comma-separated list of Ansible
+      inventory groups to add the build VM to (in addition to the `builder`
+      group which is it always in). This controls which Ansible roles and
+      functionality run during build, and hence what gets added to the image.
+      All possible groups are listed in `environments/common/groups` but common
+      options for this variable will be:
+      - For a fatimage build: `fatimage`: This is defined in `enviroments/{common,site}/inventory/groups`
+        and results in an update of all packages in the source image, plus
+        installation of packages for default control, login and compute nodes.
+      - For an extra-built image, one or more specific groups e.g. `cuda` or
+        `doca,lustre`. This extends the source image with just this additional
+        functionality.
+
+      See the top of [packer/openstack.pkr.hcl](../packer/openstack.pkr.hcl)
+      for all possible variables which can be set.
 
 4. Activate the venv and the relevant environment.
 
 5. Build images using the relevant variable definition file, e.g.:
 
         cd packer/
-        PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=$PKR_VAR_environment_root/builder.pkrvars.hcl openstack.pkr.hcl
+        PACKER_LOG=1 /usr/bin/packer build -on-error=ask -var-file=../environments/site/builder.pkrvars.hcl openstack.pkr.hcl
 
     **NB:** If the build fails while creating the volume, check if the source image has the `signature_verified` property:
 
@@ -53,7 +109,9 @@ To build either a site-specific fat image from scratch, or to extend an existing
 
       then delete the failed volume, select cancelling the build when Packer queries, and then retry. This is [OpenStack bug 1823445](https://bugs.launchpad.net/cinder/+bug/1823445).
 
-6. The built image will be automatically uploaded to OpenStack with a name prefixed `openhpc` and including a timestamp and a shortened git hash.
+6. The built image will be automatically uploaded to OpenStack. By default it
+   will have a name prefixed `openhpc` and including a timestamp and a shortened
+   git hash.
 
 # Build Process
 
