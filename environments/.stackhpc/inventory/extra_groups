@@ -54,3 +54,7 @@ compute
 [raid:children]
 # Configure fatimage for raid
 builder
+
+[gateway:children]
+# Install gateway ansible-init playbook into image
+builder

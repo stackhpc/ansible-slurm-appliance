@@ -136,7 +136,11 @@ cluster
 
 [extra_packages:children]
 # Hosts to install specified additional packages on
-builder
+
+[dnf_repos:children]
+# Hosts to replace system repos with Pulp repos
+# Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` will leak Ark creds to users
+extra_packages
 
 [cacerts]
 # Hosts to configure CA certificates and trusts on
@@ -146,7 +150,6 @@ builder
 
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
-builder
 
 [nhc:children]
 # Hosts to configure for node health checks

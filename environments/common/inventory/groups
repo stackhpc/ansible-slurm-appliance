@@ -194,7 +194,6 @@ k3s_agent
 [dnf_repos:children]
 # Hosts to replace system repos with Pulp repos
 # Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` will leak Ark creds to users
-builder
 extra_packages
 
 [pulp_site]
