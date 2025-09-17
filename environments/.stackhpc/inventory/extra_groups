@@ -28,19 +28,8 @@ compute
 cluster
 
 [tuned:children]
-# Install tuned into fat image
-# NB: builder has tuned_enabled and tuned_started false so does not configure it
-builder
-# Also test tuned during site playbook
+# Test tuned during site playbook
 cluster
-
-[squid:children]
-# Install squid into fat image
-builder
-
-[sssd:children]
-# Install sssd into fat image
-builder
 
 [rebuild:children]
 control
@@ -50,10 +39,6 @@ cluster
 
 [compute_init:children]
 compute
-
-[raid:children]
-# Configure fatimage for raid
-builder
 
 [gateway:children]
 # Install gateway ansible-init playbook into image
