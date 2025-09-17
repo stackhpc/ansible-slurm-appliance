@@ -16,7 +16,7 @@ The Packer configuration here can be used to build two types of images:
    available from [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases).
    However site-specific fat images can also be built from a different source
    image e.g. if a different partition layout is required.
-2. "Extra-build" images which extend a StackHPC fat image to create a site-specific
+2. "Extra-build" images which extend a fat image to create a site-specific
    image with with additional packages or functionality. For example the NVIDIA
    `cuda` packages cannot be redistributed hence require an "extra" build.
 
@@ -39,8 +39,8 @@ For either a site-specific fat-image build or an extra-build:
     # environments/site/inventory/group_vars/all/dnf_repos.yml:
     dnf_repos_password: 'your-ark-password'
     ```
-    > [!IMPORTANT]
-    > The latter file should be vault-encrypted.
+   > [!IMPORTANT]
+   > The latter file should be vault-encrypted.
 
     Alternatively, configure a [local Pulp mirror](experimental/pulp.md).
 
@@ -72,10 +72,12 @@ For either a site-specific fat-image build or an extra-build:
     - The source image should be either:
       - For a site-specific fatimage build: A RockyLinux GenericCloud or
         compatible image.
-      - For an extra-build image: The appropriate StackHPC fat image, as defined
-        in `environments/.stackhpc/tofu/cluster_image.auto.tfvars.json`. See the
-        [GitHub release page](https://github.com/stackhpc/ansible-slurm-appliance/releases)
-        for download links.
+      - For an extra-build image: Usually the appropriate StackHPC fat image,
+        as defined in `environments/.stackhpc/tofu/cluster_image.auto.tfvars.json` at the
+        checkout's current commit. See the [GitHub release page](https://github.com/stackhpc/ansible-slurm-appliance/releases)
+        for download links. In some cases extra builds may be chained, e.g.
+        one extra build adds a Lustre client, and the resulting image is used
+        as the source image for an extra build adding GPU support.
     - The `inventory_groups` variable takes a comma-separated list of Ansible
       inventory groups to add the build VM to (in addition to the `builder`
       group which is it always in). This controls which Ansible roles and
