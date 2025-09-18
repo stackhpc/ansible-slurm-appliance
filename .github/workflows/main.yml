@@ -127,10 +127,13 @@ jobs:
     needs: files_changed
     if: |
       needs.files_changed.outputs.stackhpc == 'true'
-    runs-on: ubuntu-latest
+    #uses: ./.github/workflows/stackhpc-trigger.yml
+    # TEST - remove from here and uncomment the above
     steps:
-      # No-op job to trigger workflow 'stackhpc.yml' via workflow_run
-      - uses: mattdesl/no-op@32ec85ff176f761f607087006bda993440da5fe4
+      - uses: jakejarvis/wait-action@master
+        with:
+          time: '1s'
+    runs-on: ubuntu-latest
 
   extra:
     name: Test extra build
@@ -138,10 +141,13 @@ jobs:
     if: |
       github.event_name != 'pull_request' && needs.files_changed.outputs.extra_on_push == 'true' ||
       github.event_name == 'pull_request' && needs.files_changed.outputs.extra_on_pull_request == 'true'
-    runs-on: ubuntu-latest
+    #uses: ./.github/workflows/extra-trigger.yml
+    # TEST - remove from here and uncomment the above
     steps:
-      # No-op job to trigger workflow 'extra.yml' via workflow_run
-      - uses: mattdesl/no-op@32ec85ff176f761f607087006bda993440da5fe4
+      - uses: jakejarvis/wait-action@master
+        with:
+          time: '1s'
+    runs-on: ubuntu-latest
 
   trivyscan:
     name: Trivy scan image for vulnerabilities
@@ -149,7 +155,10 @@ jobs:
     if: |
       github.event_name == 'pull_request' &&
       needs.files_changed.outputs.trivyscan == 'true'
-    runs-on: ubuntu-latest
+    #uses: ./.github/workflows/trivyscan-trigger.yml
+    # TEST - remove from here and uncomment the above
     steps:
-      # No-op job to trigger workflow 'trivyscan.yml' via workflow_run
-      - uses: mattdesl/no-op@32ec85ff176f761f607087006bda993440da5fe4
+      - uses: jakejarvis/wait-action@master
+        with:
+          time: '1s'
+    runs-on: ubuntu-latest

@@ -7,10 +7,13 @@
 name: Test deployment and reimage on OpenStack
 on:
   workflow_dispatch:
+  #workflow_run:
+  #  workflows: ["Trigger - Test deployment and reimage on OpenStack"]
+  #  types: [completed,requested]
   workflow_run:
-    workflows: ["stackhpc"]
-    types:
-      - completed
+    workflows: ["Test on push and pull request"]
+    #types: [completed,requested]
+    types: [completed]
 
 permissions:
   contents: read
@@ -19,6 +22,12 @@ permissions:
   statuses: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "event name is:" ${{ github.event_name }} 
+      - run: echo "event type is:" ${{ github.event.action }} 
+
   openstack:
     name: openstack-ci
     runs-on: ubuntu-22.04
