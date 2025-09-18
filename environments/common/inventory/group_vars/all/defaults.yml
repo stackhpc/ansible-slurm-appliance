@@ -5,7 +5,7 @@ appliances_repository_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') }}"
 appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
 appliances_environment_name: "{{ appliances_environment_root | basename | regex_replace('\\W+', '') }}" # [a-zA-Z0-9_] only
 appliances_cockpit_state: absent # RHEL cockpit installed but not enabled in genericcloud images; appliance defaults to removing it
-#appliances_state_dir: # define an absolute path here to use for persistent state: NB: This is defined as /var/lib/state in inventory by the default Terraform
+# appliances_state_dir: # define an absolute path here to use for persistent state: NB: This is defined as /var/lib/state in inventory by the default Terraform
 appliances_mode: configure
 appliances_pulp_url: https://ark.stackhpc.com
 
@@ -29,53 +29,53 @@ alertmanager_address: "{{ hostvars[groups['alertmanager'].0].api_address }}"
 appliances_local_users_ansible_user_name: "{{ ansible_ssh_user | default(ansible_user) }}"
 appliances_local_users_podman_uid: 1001 # UID for podman user - normally next UID after default user
 appliances_local_users_podman: # also used in environments/common/inventory/group_vars/all/podman.yml:podman_users
-    name: podman
-    comment: Used for running all containers
-    # Would like to set subuid so that we that we know what will appear in /etc/subuid
-    # See: https://github.com/ansible/ansible/issues/68199
-    home: /var/lib/podman
-    uid: "{{ appliances_local_users_podman_uid }}"
+  name: podman
+  comment: Used for running all containers
+  # Would like to set subuid so that we that we know what will appear in /etc/subuid
+  # See: https://github.com/ansible/ansible/issues/68199
+  home: /var/lib/podman
+  uid: "{{ appliances_local_users_podman_uid }}"
 
 appliances_local_users_default:
-    - user:
-        name: "{{ appliances_local_users_ansible_user_name }}"
-        home: /var/lib/{{ appliances_local_users_ansible_user_name }}
-        move_home: true
-        local: true
+  - user:
+      name: "{{ appliances_local_users_ansible_user_name }}"
+      home: /var/lib/{{ appliances_local_users_ansible_user_name }}
+      move_home: true
+      local: true
 
-    - user: "{{ appliances_local_users_podman }}"
-      enable: "{{ 'podman' in group_names }}"
+  - user: "{{ appliances_local_users_podman }}"
+    enable: "{{ 'podman' in group_names }}"
 
-    - user:
-        name: slurm
-        comment: SLURM resource manager
-        home: /etc/slurm
-        shell: /sbin/nologin
-        uid: 202
-        system: true
+  - user:
+      name: slurm
+      comment: SLURM resource manager
+      home: /etc/slurm
+      shell: /sbin/nologin
+      uid: 202
+      system: true
 
-    - group:
-        name: prometheus
-        gid: 976
-      user:
-        name: prometheus
-        uid: 981
-        home: "{{ prometheus_db_dir }}"
-        shell: /usr/sbin/nologin
-        system: true
-      enable: "{{ 'prometheus' in group_names }}"
+  - group:
+      name: prometheus
+      gid: 976
+    user:
+      name: prometheus
+      uid: 981
+      home: "{{ prometheus_db_dir }}"
+      shell: /usr/sbin/nologin
+      system: true
+    enable: "{{ 'prometheus' in group_names }}"
 
-    - group:
-        name: grafana
-        gid: 979
-      user:
-        name: grafana
-        comment: grafana user
-        uid: 984
-        home: /usr/share/grafana
-        shell: /sbin/nologin
-        system: true
-      enable: "{{ 'grafana' in group_names }}"
+  - group:
+      name: grafana
+      gid: 979
+    user:
+      name: grafana
+      comment: grafana user
+      uid: 984
+      home: /usr/share/grafana
+      shell: /sbin/nologin
+      system: true
+    enable: "{{ 'grafana' in group_names }}"
 
 # Overide this to add extra users whilst keeping the defaults.
 appliances_local_users_extra: [] # see format of appliances_local_users_default above
@@ -84,18 +84,17 @@ appliances_local_users: "{{ (appliances_local_users_default + appliances_local_u
 ################## bootstrap: extra package installs ######################################
 
 appliances_extra_packages_default:
- - htop
- - nano
- - screen
- - tmux
- - wget
- - bind-utils
- - net-tools
- - postfix
- - git
- - "{{ 'python36' if ansible_distribution_version == '8.9' else 'python312' }}"
- - s-nail
+  - htop
+  - nano
+  - screen
+  - tmux
+  - wget
+  - bind-utils
+  - net-tools
+  - postfix
+  - git
+  - "{{ 'python36' if ansible_distribution_version == '8.9' else 'python312' }}"
+  - s-nail
 
 appliances_extra_packages_other: []
-
 appliances_extra_packages: "{{ (appliances_extra_packages_default + appliances_extra_packages_other) | select | list }}"

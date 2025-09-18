@@ -27,6 +27,11 @@ ${cluster_name}_${group_name}:
             networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
             node_fqdn: ${login_groups[group_name]["fqdns"][nodename]}
 %{ endfor ~}
+
+${group_name}:
+    children:
+        ${cluster_name}_${group_name}:
+
 %{ endfor ~}
 
 login:

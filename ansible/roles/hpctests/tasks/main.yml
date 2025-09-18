@@ -1,38 +1,39 @@
-- name: setup
-  block:
-    - include_tasks: setup.yml
+---
+- name: Setup
   become: true
   become_user: "{{ hpctests_user }}"
   tags: always
 
-- name: pingpong
   block:
-    - include_tasks: pingpong.yml
-      when: hpctests_computes.stdout_lines | length > 1
+    - ansible.builtin.include_tasks: setup.yml
+- name: Pingpong
   become: true
   become_user: "{{ hpctests_user }}"
   tags: pingpong
 
-- name: pingmatrix
   block:
-    - include_tasks: pingmatrix.yml
+    - ansible.builtin.include_tasks: pingpong.yml
       when: hpctests_computes.stdout_lines | length > 1
+- name: Pingmatrix
   become: true
   become_user: "{{ hpctests_user }}"
   tags: pingmatrix
 
-- name: build HPL
   block:
-    - include_tasks: build-hpl.yml
+    - ansible.builtin.include_tasks: pingmatrix.yml
+      when: hpctests_computes.stdout_lines | length > 1
+- name: Build HPL
   become: true
   become_user: "{{ hpctests_user }}"
   tags:
     - hpl-solo
 
-- name: run HPL on individual nodes
   block:
-    - include_tasks: hpl-solo.yml
+    - ansible.builtin.include_tasks: build-hpl.yml
+- name: Run HPL on individual nodes
   become: true
   become_user: "{{ hpctests_user }}"
   tags:
     - hpl-solo
+  block:
+    - ansible.builtin.include_tasks: hpl-solo.yml

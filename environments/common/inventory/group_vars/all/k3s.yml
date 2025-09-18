@@ -1,1 +1,2 @@
+---
 k3s_bootstrap_token: "{{ hostvars[groups['k3s_server'] | first].k3s_bootstrap_token | default('') }}"
