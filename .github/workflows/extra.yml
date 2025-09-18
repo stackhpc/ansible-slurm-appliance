@@ -6,8 +6,11 @@
 
 name: Test extra build
 on:
-  workflow_call:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["extra"]
+    types:
+      - completed
 
 permissions:
   contents: read

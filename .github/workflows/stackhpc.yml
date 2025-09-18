@@ -6,8 +6,11 @@
 
 name: Test deployment and reimage on OpenStack
 on:
-  workflow_call:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["stackhpc"]
+    types:
+      - completed
 
 permissions:
   contents: read
