@@ -35,7 +35,7 @@ but includes some missing details and is modified for common appliance workflows
     cp environments/site/tofu/example-backends/gitlab.tf environments/$ENV/tofu
     ```
 
-2. Modify `environments/$ENV/tofu/gitlab.tf` file to set the default for the
+2. Modify `environments/$ENV/tofu/gitlab.tf` to set the default for the
    project ID. This can be found by clicking the 3-dot menu at the top right of
    the GitLab project page.
 
@@ -103,80 +103,76 @@ If the project token expires repeat the per-checkout configuration, but using
 ## S3
 
 For clouds with S3-compatible object storage (e.g. Ceph with [radosgw](https://docs.ceph.com/en/latest/radosgw/))
-the S3 backend can be used. This approach uses a bucket per environment.
+the S3 backend can be used. This approach uses a bucket per environment and
+derives credentials from OpenStack credentials, meaning no backend-specific
+per-checkout configuration is required.
 
-With the environment activated:
+### Initial setup
 
-1. Create a bucket:
+1. Create an S3 bucket matching the current environment name:
 
     ```shell
-    export TF_STATE_NAME="$(basename $APPLIANCES_ENVIRONMENT_ROOT)"
-    openstack container create $TF_STATE_NAME
+    openstack container create $(basename $APPLIANCES_ENVIRONMENT_ROOT)
+    ```
 
-2. Create credentials:
+2. Create `ec2` credentials:
 
     ```shell
     openstack ec2 credentials create
     ```
+    
+    and make a note of the `access` field returned.
 
-    From the returned values, set:
+3. Create the backend file:
+
+    ```shell
+    cp environments/site/tofu/example-backends/s3.tf environments/$ENV/tofu
+    ```
+
+4. Modify `environments/$ENV/tofu/s3.tf` to set the default for `s3_backend_endpoint`.
+   This is the radosgw address. If not known it can be determined by creating a
+   public bucket, and then getting the URL using
+    Project > Containers > (your public bucket) > Link
+   which provides an URL of the form `https://$ENDPOINT/swift/...`.
+
+5. Add the following to `environments/$ENV/activate`:
+
+    ```bash
+    export AWS_ACCESS_KEY_ID=$EC2_CREDENTIALS_ACCESS
+    export AWS_SECRET_ACCESS_KEY=$(openstack ec2 credentials show $AWS_ACCESS_KEY_ID -f value -c secret)
+    ```
+  
+    replacing `$EC2_CREDENTIALS_ACCESS` with the `access` field of the created
+    credentials.
+
+    This avoids these credentials being persisted in local files.
+
+6. Copy the lines above into your shell to set them for your current shell.
+
+7. With the environment activated, initialise OpenTofu.
+
+    If no local state exists run:
     
     ```shell
-    export AWS_ACCESS_KEY_ID= # "access" value
-    export AWS_SECRET_ACCESS_KEY= # "secret" value
-    ```
-
-    Note these are available any time by running:
-
-    ```shell
-    openstack ec2 credentials list
-    ```
-
-    TODO: Think about automating these into the activate script??
-
-3. Create a backend file and commit it, for example:
-
-    ```terraform
-    # environments/$ENV/tofu/backend.tf:
-    terraform {
-        backend "s3" {
-            endpoint = "leafcloud.store"
-            bucket = "$ENV" # ** replace with environment name **
-            key    = "environment.tfstate"
-            region = "dummy"
-            
-            skip_region_validation = true
-            skip_credentials_validation = true
-            force_path_style = true
-        }
-    }
-    ```
-
-    Note that:
-    - `endpoint` is the radosgw address. If not known this can be determined by
-      creating a public bucket, and then getting the URL using
-      Project > Containers > (your public container) > Link, which provides an
-      URL of the form `https://$ENDPOINT/swift/...`.
-      `/swift`.
-    - `region` is required but not used in radosgw, hence `skip_region_validation`.
-    - `key` is an arbitrary state file name
-    - `skip_credentials_validation`: Disables STS - this may or may not be
-      required depending on the radosgw configuration.
-    - `force_path_style`: May or may not be required depending on the radosgw
-      configuration.
-      
-4. Run:
-
-    ```shell
+    cd environments/$ENV/tofu/
     tofu init
     ```
+  
+    otherwise append `-migrate-state` to the `init` command to attempt to copy
+    local state to the new backend.
 
-    OpenTofu is now configured to use the cloud's S3 to store state for this
-    environment.
+8. If this fails, try setting `use_path_style = true` in `environments/$ENV/tofu/s3.tf`.
 
+9. Once it works, commit `environments/$ENV/tofu/s3.tf` and `environments/$ENV/activate`.
 
-TODO: consider bucket versioning??
-TODO: consider whether we should use a single bucket for both stg and prd to make
-testing better??
+OpenTofu is now configured to use the cloud's S3-compatible storage to store
+state for this environment. 
 
-TODO: understand -reconfigure vs -migrate-state?
+Repeat for each environment needing remote state.
+
+For more configuration options, see the OpenTofu [s3 backend docs](https://opentofu.org/docs/language/settings/backends/s3/).
+
+### Per-checkout configuration
+
+The ec2 credentials will automatically be loaded when activating the environment.
+For a new checkout simply initialise OpenTofu as normal as described in step 7 above.
