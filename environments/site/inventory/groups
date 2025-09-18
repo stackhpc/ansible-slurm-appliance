@@ -81,6 +81,9 @@ cluster
 # Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
 cuda
 
+[vgpu]
+# Hosts where vGPU/MIG should be configured - see docs/mig.md
+
 [eessi:children]
 # Hosts on which EESSI stack should be configured
 openhpc
