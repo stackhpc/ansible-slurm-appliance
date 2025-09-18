@@ -1,9 +1,10 @@
+---
 # required:
 # mysql_root_password: # TODO: make it possible to CHANGE root password
 
 mysql_tag: 8.0.30
-mysql_systemd_service_enabled: yes
-#mysql_state: # default is started or restarted as required
+mysql_systemd_service_enabled: true
+# mysql_state: # default is started or restarted as required
 mysql_podman_user: "{{ ansible_user }}"
 mysql_datadir: /var/lib/mysql
 mysql_mysqld_options: [] # list of str options to mysqld, see `run -it --rm mysql:tag --verbose --help`

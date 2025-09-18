@@ -1,5 +1,5 @@
 - name: Ensure slurm exporter state
-  systemd:
+  ansible.builtin.systemd:
     name: prometheus-slurm-exporter
     state: "{{ slurm_exporter_state }}"
     enabled: true

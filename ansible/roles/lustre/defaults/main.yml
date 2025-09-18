@@ -1,9 +1,10 @@
+---
 lustre_version: '2.15.7'
 lustre_lnet_label: tcp
-#lustre_mgs_nid:
+# lustre_mgs_nid:
 lustre_mounts: []
 lustre_mount_state: mounted
-lustre_mount_options: 'defaults,_netdev,noauto,x-systemd.automount,x-systemd.requires=lnet.service,nosuid,nodev'
+lustre_mount_options: "defaults,_netdev,noauto,x-systemd.automount,x-systemd.requires=lnet.service,nosuid,nodev"
 
 # below variables are for build and should not generally require changes
 lustre_repo: "https://github.com/lustre/lustre-release.git"

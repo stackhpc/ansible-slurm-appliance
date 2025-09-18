@@ -1,10 +1,11 @@
-
+---
 # Based on https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/
 
 - name: Install cuda repo
-  get_url:
+  ansible.builtin.get_url:
     dest: "/etc/yum.repos.d/cuda-rhel{{ ansible_distribution_major_version }}.repo"
     url: "{{ cuda_repo_url }}"
+    mode: "0644"
 
 - name: Check if nvidia driver module is enabled
   ansible.builtin.command: dnf module list --enabled nvidia-driver
@@ -24,7 +25,7 @@
   register: _cuda_driver_install
 
 - name: Check kernel has not been modified
-  assert:
+  ansible.builtin.assert:
     that: "'kernel ' not in _cuda_driver_install.stdout | default('')" # space ensures we don't flag e.g. kernel-devel-matched
     fail_msg: "{{ _cuda_driver_install.stdout_lines | default([]) | select('search', 'kernel ') }}"
 
@@ -37,13 +38,13 @@
   register: cuda_package_install
 
 - name: Add cuda binaries to path
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/profile.d/sh.local
-    line: 'export PATH=$PATH:$(ls -1d /usr/local/cuda-* | sort -V | tail -1)/bin'
+    line: "export PATH=$PATH:$(ls -1d /usr/local/cuda-* | sort -V | tail -1)/bin"
   when: cuda_package_version != 'none'
 
 - name: Enable NVIDIA Persistence Daemon
-  systemd:
+  ansible.builtin.systemd:
     name: nvidia-persistenced
     enabled: true
     state: "{{ cuda_persistenced_state }}"
@@ -51,9 +52,9 @@
 - name: Reboot
   ansible.builtin.reboot:
     post_reboot_delay: 30
-  when: cuda_package_install.changed
+  when: cuda_package_install.changed # noqa: no-handler
 
 - name: Wait for hosts to be reachable
-  wait_for_connection:
+  ansible.builtin.wait_for_connection:
     sleep: 15
-  when: cuda_package_install.changed
+  when: cuda_package_install.changed # noqa: no-handler

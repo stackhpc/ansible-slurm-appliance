@@ -5,4 +5,3 @@ topology_nodes: []
 topology_conf_template: templates/topology.conf.j2
 
 topology_above_rack_topology: ""
-

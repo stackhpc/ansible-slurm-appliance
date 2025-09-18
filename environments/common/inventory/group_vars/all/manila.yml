@@ -1,3 +1,4 @@
+---
 # Default configuration for manila file shares, see
 # https://github.com/stackhpc/ansible-role-os-manila-mount
 # for all variable definitions, and override in your environment.

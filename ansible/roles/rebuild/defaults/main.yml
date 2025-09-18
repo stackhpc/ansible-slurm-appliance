@@ -4,9 +4,9 @@ rebuild_clouds_path: ~/.config/openstack/clouds.yaml
 
 rebuild_job_partitions: rebuild
 rebuild_job_name: "rebuild-{{ item }}" # item is nodename
-rebuild_job_command: 'sleep 5'
+rebuild_job_command: "sleep 5"
 rebuild_job_reboot: true
-rebuild_job_options: ''
+rebuild_job_options: ""
 rebuild_job_user: root
 rebuild_job_template: >-
   sbatch
@@ -20,4 +20,4 @@ rebuild_job_template: >-
   --output=/dev/null
   --wrap="{{ rebuild_job_command }}"
   {{ rebuild_job_options }}
-#rebuild_job_hostlist:
+# rebuild_job_hostlist:

@@ -1,8 +1,9 @@
+---
 - name: Template out /etc/hosts
-  template:
+  ansible.builtin.template:
     src: "{{ etc_hosts_template }}"
     dest: /etc/hosts
     owner: root
     group: root
-    mode: 0644
-  become: yes
+    mode: "0644"
+  become: true

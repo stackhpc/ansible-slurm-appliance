@@ -1,2 +1,3 @@
+---
 podman_users:
   - name: "{{ ansible_user }}"

@@ -1,10 +1,11 @@
+---
 - name: Install ondemand prometheus exporter
-  yum:
+  ansible.builtin.dnf:
     name: ondemand_exporter
   when: openondemand_exporter
 
 - name: Start and enable ondemand prometheus exporter
-  service:
+  ansible.builtin.service:
     name: ondemand_exporter
     enabled: true
     state: started

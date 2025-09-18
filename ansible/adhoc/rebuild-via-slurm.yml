@@ -1,3 +1,4 @@
+---
 # Rebuild compute nodes via slurm.
 # Nodes will be rebuilt if `image_id` in inventory is different to the
 # currently-provisioned image. Otherwise they are rebooted.
@@ -9,9 +10,9 @@
 
 - hosts: login
   run_once: true
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Run slurm-controlled rebuild
-      import_role:
+      ansible.builtin.import_role:
         name: rebuild
         tasks_from: rebuild.yml
