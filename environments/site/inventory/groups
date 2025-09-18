@@ -156,8 +156,11 @@ fatimage
 [extra_packages:children]
 # Hosts to install specified additional packages on
 
-[dnf_repos]
+[dnf_repos:children]
 # Hosts to replace system repos with Pulp repos
+# Some roles do installs when in install mode/on build VM only:
+fatimage
+builder
 
 [cacerts]
 # Hosts to configure CA certificates and trusts on

@@ -1,3 +1,5 @@
+# Unless noted otherwise features enabled here are tested by CI site.yml playbook
+
 [basic_users:children]
 cluster
 
@@ -20,7 +22,7 @@ cluster
 # --- end of FreeIPA example ---
 
 [manila:children]
-# Allows demo; also installs manila client in fat image
+# Not actully tested but allows demo using this environment
 login
 compute
 
@@ -28,7 +30,6 @@ compute
 cluster
 
 [tuned:children]
-# Test tuned during site playbook
 cluster
 
 [rebuild:children]
@@ -39,7 +40,3 @@ cluster
 
 [compute_init:children]
 compute
-
-[gateway:children]
-# Install gateway ansible-init playbook into image
-builder

@@ -1,3 +1,12 @@
+# This file
+# 1. Ensures all groups in the appliance are always defined - even if empty
+# 2. Defines dependencies between groups - child groups require & enables parent
+#
+# IMPORTANT
+# ---------
+# All groups and child groups here MUST be empty, as other environments cannot
+# remove hosts/groups.
+
 [login]
 # All Slurm login nodes. Combined control/login nodes are not supported.
 
@@ -196,9 +205,11 @@ k3s_agent
 
 [dnf_repos:children]
 # Hosts to replace system repos with Pulp repos
+# Roles/groups listed here *always* do installs:
 extra_packages
-cuda
 doca
+
+# what we want to say is if cuda and build, add dnf_repos
 
 [pulp_site]
 # Add builder to this group to automatically sync pulp during image build
