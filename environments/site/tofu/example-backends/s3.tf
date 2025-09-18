@@ -4,12 +4,10 @@ variable "s3_backend_endpoint" {
     default = # Set this here
 }
 
-variable "s3"
-
 terraform {
     backend "s3" {
         endpoint = var.s3_backend_endpoint
-        bucket = basename(var.environment_root)
+        bucket = "${var.cluster_name}-${basename(var.environment_root)}-tfstate"
         key    = "environment.tfstate"
         
         # Reginon is required but not used in radosgw:

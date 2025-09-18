@@ -109,10 +109,15 @@ per-checkout configuration is required.
 
 ### Initial setup
 
-1. Create an S3 bucket matching the current environment name:
+1. Create an S3 bucket with a name `${cluster_name}-${environment_name}-tfstate`
+   where:
+    - `CLUSTER_NAME` is defined in `environments/$ENV/tofu/main.tf`
+    - `$ENVIRONMENT_NAME` is the name of the environment directory
+
+    e.g.
 
     ```shell
-    openstack container create $(basename $APPLIANCES_ENVIRONMENT_ROOT)
+    openstack container create research-staging-tfstate
     ```
 
 2. Create `ec2` credentials:
