@@ -125,7 +125,7 @@ per-checkout configuration is required.
     ```shell
     openstack ec2 credentials create
     ```
-    
+
     and make a note of the `access` field returned.
 
 3. Create the backend file:
@@ -157,7 +157,7 @@ per-checkout configuration is required.
 7. With the environment activated, initialise OpenTofu.
 
     If no local state exists run:
-    
+
     ```shell
     cd environments/$ENV/tofu/
     tofu init
@@ -171,7 +171,7 @@ per-checkout configuration is required.
 9. Once it works, commit `environments/$ENV/tofu/s3.tf` and `environments/$ENV/activate`.
 
 OpenTofu is now configured to use the cloud's S3-compatible storage to store
-state for this environment. 
+state for this environment.
 
 Repeat for each environment needing remote state.
 
