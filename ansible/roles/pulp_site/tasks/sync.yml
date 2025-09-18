@@ -1,5 +1,4 @@
 ---
-
 - ansible.builtin.assert:
     that: pulp_site_upstream_password != ''
     quiet: true
@@ -9,13 +8,14 @@
   ansible.builtin.file:
     path: ~/.config/pulp
     state: directory
+    mode: "0755"
 
 - name: Create config file
   no_log: true
   ansible.builtin.template:
     src: cli.toml.j2
     dest: ~/.config/pulp/cli.toml
-    mode: '0644'
+    mode: "0644"
 
 - name: Wait for Pulp server
   pulp.squeezer.status:
@@ -27,25 +27,28 @@
   retries: 30
   delay: 20
 
-- block:
-  - name: Ensure squeezer cache exists
-    ansible.builtin.file:
-      path: "{{ _cache_dir }}"
-      state: directory
+- vars:
+    _cache_dir: "~/.cache/squeezer/{{ pulp_site_url | regex_replace(':|/', '_') }}"
 
-  - name: Check if squeezer cache is populated
-    ansible.builtin.stat:
-      path: "{{ _cache_dir }}/api.json"
-    register: _cache_stat
+  block:
+    - name: Ensure squeezer cache exists
+      ansible.builtin.file:
+        path: "{{ _cache_dir }}"
+        state: directory
+        mode: "0755"
 
-  - name: Prepopulate squeezer cache # workaround for race on the cache
-    ansible.builtin.get_url:
-      url: "{{ pulp_site_url }}/pulp/api/v3/docs/api.json"
-      dest: "{{ _cache_dir }}/api.json"
-      timeout: 40
-    when: not _cache_stat.stat.exists
-  vars:
-    _cache_dir: "~/.cache/squeezer/{{ pulp_site_url | regex_replace( ':|/' , '_' ) }}"
+    - name: Check if squeezer cache is populated
+      ansible.builtin.stat:
+        path: "{{ _cache_dir }}/api.json"
+      register: _cache_stat
+
+    - name: Prepopulate squeezer cache # workaround for race on the cache
+      ansible.builtin.get_url:
+        url: "{{ pulp_site_url }}/pulp/api/v3/docs/api.json"
+        dest: "{{ _cache_dir }}/api.json"
+        mode: "0644"
+        timeout: 40
+      when: not _cache_stat.stat.exists
 
 - name: Get Pulp repos from release train
   ansible.builtin.include_role:

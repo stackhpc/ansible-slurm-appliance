@@ -12,5 +12,6 @@
     path: /usr/lib/tuned/hpc-compute/tuned.conf
     section: sysctl
     option: vm.min_free_kbytes
-    value: '>135168'
+    value: ">135168"
     no_extra_spaces: true
+    mode: "0644"

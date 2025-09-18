@@ -1,3 +1,4 @@
+---
 caas_manila_home:
   share_name: "{{ cluster_name }}-home"
   mount_path: /home
@@ -14,4 +15,6 @@ caas_manila_project:
   mount_group: root
   mount_mode: ugo=rwX
 
-os_manila_mount_shares: "{{ ([caas_manila_home] if cluster_home_manila_share | bool else []) + ([caas_manila_project] if cluster_project_manila_share | bool else []) }}"
+# yamllint disable-line rule:line-length
+os_manila_mount_shares: "{{ ([caas_manila_home] if cluster_home_manila_share | bool else []) + ([caas_manila_project] if cluster_project_manila_share | bool else
+  []) }}"

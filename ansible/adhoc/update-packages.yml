@@ -1,18 +1,20 @@
+---
 - hosts: update
-  become: yes
+  become: true
   gather_facts: false
   tasks:
     - name: Update selected packages
-      yum:
+      ansible.builtin.dnf:
         name: "{{ update_name }}"
         state: "{{ update_state }}"
         exclude: "{{ update_exclude }}"
         disablerepo: "{{ update_disablerepo }}"
       register: updates
     - name: Log updated packages
-      copy:
+      ansible.builtin.copy:
         content: "{{ updates.results | join('\n') }}"
         dest: "{{ update_log_path }}"
+        mode: "0644"
       delegate_to: localhost
-    - debug:
+    - ansible.builtin.debug:
         msg: "{{ updates.results | length }} changes to packages - see {{ update_log_path }} for details"

@@ -1,3 +1,4 @@
+---
 openhpc_cluster_name: "{{ cluster_name }}"
 
 # Provision a single "standard" compute nodegroup using the supplied

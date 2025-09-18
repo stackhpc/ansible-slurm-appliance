@@ -1,9 +1,10 @@
+---
 - hosts: login:!builder # won't have a slurm control daemon when in build
-  become: no
+  become: false
   gather_facts: false
   tasks:
     - name: Run sinfo
-      shell: 'sinfo --noheader --format="%N %P %a %l %D %t" | sort' # using --format ensures we control whitespace: Partition,partition_state,max_jobtime,num_nodes,node_state,node_name
+      ansible.builtin.shell: 'sinfo --noheader --format="%N %P %a %l %D %t" | sort' # noqa: risky-shell-pipe
       register: sinfo
       changed_when: false
       until: sinfo.stdout_lines == expected_sinfo

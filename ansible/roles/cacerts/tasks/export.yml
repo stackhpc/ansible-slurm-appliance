@@ -1,10 +1,11 @@
+---
 - name: Copy cacerts from deploy host to /exports/cluster/cacerts/
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: /exports/cluster/cacerts/
     owner: slurm
     group: root
-    mode: 0644
+    mode: "0644"
   with_fileglob:
     - "{{ cacerts_cert_dir }}/*"
   delegate_to: "{{ groups['control'] | first }}"

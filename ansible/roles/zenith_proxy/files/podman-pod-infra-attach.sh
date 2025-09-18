@@ -14,4 +14,4 @@ echo "[INFO] Finding infra container for pod '$1'"
 INFRA_CONTAINER_ID="$(podman pod inspect --format '{{.InfraContainerID}}' "$1")"
 
 echo "[INFO] Attaching to infra container '${INFRA_CONTAINER_ID}'"
-exec podman container attach --no-stdin ${INFRA_CONTAINER_ID}
+exec podman container attach --no-stdin "${INFRA_CONTAINER_ID}"

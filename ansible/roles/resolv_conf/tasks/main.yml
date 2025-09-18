@@ -1,3 +1,4 @@
+---
 - name: Read nameservers from /etc/resolv.conf
   ansible.builtin.slurp:
     src: /etc/resolv.conf
@@ -27,4 +28,4 @@
   ansible.builtin.systemd:
     name: NetworkManager
     state: reloaded
-  when: _copy_nm_config.changed | default(false)
+  when: _copy_nm_config.changed | default(false) # noqa: no-handler

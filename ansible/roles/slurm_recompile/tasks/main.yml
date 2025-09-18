@@ -1,6 +1,6 @@
 ---
 - name: Get facts about CUDA installation
-  import_role:
+  ansible.builtin.import_role:
     name: cuda
     tasks_from: facts.yml
 
@@ -9,15 +9,16 @@
     manager: auto
 
 - name: Set fact containing slurm package facts
-  set_fact:
+  ansible.builtin.set_fact:
     slurm_package: "{{ ansible_facts.packages['slurm-slurmd-ohpc'].0 }}"
 
 - name: Install build packages
   ansible.builtin.dnf:
     name: "{{ slurm_recompile_build_packages }}"
 
-- name: Recompile and install slurm packages
-  shell: |
+- name: Recompile and install slurm packages # noqa: no-changed-when
+  # yamllint disable rule:line-length
+  ansible.builtin.shell: |
     #!/bin/bash
     source /etc/profile
     set -eux
@@ -27,17 +28,18 @@
     dnf builddep -y slurm.spec
     rpmbuild -bb{% if slurm_recompile_with_nvml | bool %} -D "_with_nvml --with-nvml=/usr/local/cuda-{{ cuda_facts_version_short }}/targets/x86_64-linux/"{% endif %} slurm.spec
     dnf reinstall -y /root/rpmbuild/RPMS/x86_64/*.rpm
+  # yamllint enable rule:line-length
   become: true
 
 - name: Workaround missing symlink
   # Workaround path issue: https://groups.google.com/g/slurm-users/c/cvGb4JnK8BY
-  command: ln -s /lib64/libnvidia-ml.so.1 /lib64/libnvidia-ml.so
+  ansible.builtin.command: ln -s /lib64/libnvidia-ml.so.1 /lib64/libnvidia-ml.so
   args:
     creates: /lib64/libnvidia-ml.so
   when: slurm_recompile_with_nvml | bool
 
-- name: Cleanup Dependencies
-  shell: |
+- name: Cleanup Dependencies # noqa: no-changed-when
+  ansible.builtin.shell: |
     #!/bin/bash
     set -eux
     set -o pipefail

@@ -1,7 +1,9 @@
 ---
 
 slurm_appliance_secrets:
+  # yamllint disable-line rule:line-length
   vault_grafana_admin_password: "{{ secrets_openhpc_grafana_admin_password | default(vault_grafana_admin_password | default(lookup('password', '/dev/null'))) }}"
+  # yamllint disable-line rule:line-length
   vault_elasticsearch_admin_password: "{{ secrets_openhpc_elasticsearch_admin_password | default(vault_elasticsearch_admin_password | default(lookup('password', '/dev/null'))) }}"
   vault_mysql_root_password: "{{ secrets_openhpc_mysql_root_password | default(vault_mysql_root_password | default(lookup('password', '/dev/null'))) }}"
   vault_mysql_slurm_password: "{{ secrets_openhpc_mysql_slurm_password | default(vault_mysql_slurm_password | default(lookup('password', '/dev/null'))) }}"
@@ -16,4 +18,5 @@ slurm_appliance_secrets:
 secrets_openhpc_mungekey_default:
   content: "{{ lookup('pipe', 'dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64') }}"
 
+# yamllint disable-line rule:line-length
 openhpc_passwords_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') | default(undefined, true) | mandatory('You must define the APPLIANCES_ENVIRONMENT_ROOT environment variable') }}/inventory/group_vars/all/secrets.yml"

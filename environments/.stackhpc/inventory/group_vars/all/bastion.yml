@@ -1,3 +1,4 @@
+---
 ci_cloud: "{{ lookup('env', 'CI_CLOUD') }}"
 bastion_config:
   ARCUS:

@@ -9,7 +9,7 @@ openhpc_enable:
   database: "{{ inventory_hostname in groups['control'] }}"
   runtime: true
 openhpc_slurm_service_enabled: true
-openhpc_slurm_accounting_storage_type: 'accounting_storage/slurmdbd'
+openhpc_slurm_accounting_storage_type: "accounting_storage/slurmdbd"
 openhpc_slurmdbd_mysql_database: slurm_acct_db
 openhpc_slurmdbd_mysql_password: "{{ vault_mysql_slurm_password }}"
 openhpc_slurmdbd_mysql_username: slurm
@@ -18,17 +18,18 @@ openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
 openhpc_rebuild_partition: # not a role var - could actually add more indirection here for things we're expecting to be modified, e.g. groups and maxtime
   name: rebuild
   nodegroups: "{{ cluster_compute_groups | default([]) }}"
-  default: NO
+  default: false
   maxtime: 30
   partition_params:
     PriorityJobFactor: 65533
-    Hidden: YES
-    RootOnly: YES
-    DisableRootJobs: NO
-    PreemptMode: 'OFF'
+    Hidden: true
+    RootOnly: true
+    DisableRootJobs: false
+    PreemptMode: "OFF"
     OverSubscribe: EXCLUSIVE
 openhpc_nodegroups: "{{ cluster_compute_groups | map('community.general.dict_kv', 'name') }}" # create nodegroup for each compute group
 openhpc_user_partitions: "{{ openhpc_nodegroups }}" # create partition for each nodegroup (actually role default) - this is what we'd expect to be changed
+# yamllint disable-line rule:line-length
 openhpc_partitions: "{{ openhpc_user_partitions + ([openhpc_rebuild_partition] if groups['rebuild'] | length > 0 else []) }}" # auto-create rebuild partition if reqd.
 openhpc_packages_default:
   # system packages
