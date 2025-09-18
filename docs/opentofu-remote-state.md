@@ -61,7 +61,7 @@ but includes some missing details and is modified for common appliance workflows
    b. Otherwise create a personal access token via
       User profile > Preferences > Access tokens.
       The token must have `api` scope.
-    
+
    Copy the generated secret and set an environment variable:
 
    ```shell
@@ -77,7 +77,7 @@ but includes some missing details and is modified for common appliance workflows
 4. With the environment activated, initialise OpenTofu.
 
     If no local state exists run:
-    
+
     ```shell
     cd environments/$ENV/tofu/
     tofu init
@@ -138,7 +138,7 @@ per-checkout configuration is required.
    This is the radosgw address. If not known it can be determined by creating a
    public bucket, and then getting the URL using
     Project > Containers > (your public bucket) > Link
-   which provides an URL of the form `https://$ENDPOINT/swift/...`.
+   which provides a URL of the form `https://$ENDPOINT/swift/...`.
 
 5. Add the following to `environments/$ENV/activate`:
 

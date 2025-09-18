@@ -1,7 +1,7 @@
 variable "s3_backend_endpoint" {
     type = string
     description = "radosgw address without protocol or path e.g. leafcloud.store"
-    default = # Set this here
+    #default = # add here
 }
 
 terraform {

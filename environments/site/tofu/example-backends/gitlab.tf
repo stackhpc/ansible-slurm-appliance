@@ -18,7 +18,7 @@ variable "gitlab_access_token" {
 variable "gitlab_project_id" {
     type = string
     description = "GitLab project ID - click 3-dot menu at the top right of project page"
-    default = # Set this here
+    #default = # add here
 }
 
 locals {
