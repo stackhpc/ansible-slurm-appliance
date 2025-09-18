@@ -9,17 +9,35 @@ deployments.
 Using remote state is therefore strongly recommended for  environments which
 should only be instantiated once, e.g. `production` and `staging`.
 
-This page provides some guidance for configuring remote states using
-commonly-available backends.
+This page provides guidance for configuring remote states using backends
+commonly available on OpenStack deployments.
 
 > [!IMPORTANT]
 > In the below replace `$ENV` with the relevant environment name.
 
 ## GitLab
 
-With the environment activated:
+GitLab can be used with the [http backend](https://opentofu.org/docs/language/settings/backends/http/)
+to store separate states for each environment within the GitLab project.
+Access is protected by GitLab access tokens, which in the approach below are
+persisted to local files. Therefore each repository checkout will need to
+authenticate separately, using either a separate token or a shared token from
+some external secret store.
 
-1. Create a backend file and commit it:
+The below is based on the [official docs](https://docs.gitlab.com/user/infrastructure/iac/terraform_state/)
+but includes some missing details and is modified for common appliance workflows.
+
+### Initial setup
+
+1. Create the backend file:
+
+    ```shell
+    cp environments/site/tofu/example-backends/gitlab.tf environments/$ENV/tofu
+    ```
+
+2. Modify `environments/$ENV/tofu/gitlab.tf` file to set the default for the
+   project ID. This can be found by clicking the 3-dot menu at the top right of
+   the GitLab project page.
 
     ```terraform
     # environments/$ENV/tofu/backend.tf:
@@ -28,62 +46,59 @@ With the environment activated:
     }
     ```
 
-2. Create a personal access token with API access (note Project tokens do not
-   appear to work):
-   
-   TODO: appears maybe the do with `project_$ID_bot` as the username
-   
-   - In GitLab, click on your user button at top left and select 'Preferences'.
-   - Select 'Access tokens', 'Add new token'.
-   - Optionally set an expiry date, select 'API' scope and click 'Create token'.
-   - Copy the generated secret and set an environment variable in your terminal
-        ```shell
-        export TF_PASSWORD=$SECRET
-        ```
+3. Commit it.
 
-    TODO: how does this get persisted??
+4. Follow the per-checkout steps below.
 
-3. Create this script and commit it:
+### Per-checkout configuration
 
-    ```shell
-    # environments/$ENV/tofu/init-gitlab-backend.sh
-    PROJECT_ID="<gitlab-project-id>"
-    TF_USERNAME="<gitlab-username>"
-    TF_STATE_NAME="$(basename $APPLIANCES_ENVIRONMENT_ROOT)"
-    TF_ADDRESS="https://gitlab.com/api/v4/projects/${PROJECT_ID}/terraform/state/${TF_STATE_NAME}"
+1. Create an access token in the GitLab UI, using either:
 
-    tofu init \
-    -backend-config=address=${TF_ADDRESS} \
-    -backend-config=lock_address=${TF_ADDRESS}/lock \
-    -backend-config=unlock_address=${TF_ADDRESS}/lock \
-    -backend-config=username=${TF_USERNAME} \
-    -backend-config=password=${TF_PASSWORD} \
-    -backend-config=lock_method=POST \
-    -backend-config=unlock_method=DELETE \
-    -backend-config=retry_wait_min=5
-    ```
+   a. If project access tokens are available, create one via
+      Project > Settings > Access tokens.
+      The token must have `Maintainer` role and `api` scope.
 
-    The project id can be found by clicking the 3-dot menu at the top right of
-    the GitLab project page.
+   b. Otherwise create a personal access token via
+      User profile > Preferences > Access tokens.
+      The token must have `api` scope.
+    
+   Copy the generated secret and set an environment variable:
 
-4. Run the script:
+   ```shell
+   export TF_VAR_gitlab_access_token=$secret
+   ```
 
+2. If using a personal access token, set the GitLab username as an environment variable:
+
+   ```shell
+   export TF_VAR_gitlab_username=$your_username
+   ```
+
+4. With the environment activated, initialise OpenTofu.
+
+    If no local state exists run:
+    
     ```shell
     cd environments/$ENV/tofu/
-    source init-gitlab-backend.sh
+    tofu init
     ```
-    
+  
+    otherwise append `-migrate-state` to the `init` command to attempt to copy
+    local state to the new backend.
+
 OpenTofu is now configured to use GitLab to store state for this environment.
 
 Repeat for each environment needing remote state.
-
-If the project token expires repeat the above but with the option `-reconfigure`
-added to the script.
 
 > [!CAUTION]
 > The GitLab credentials are [persisted](https://opentofu.org/docs/language/settings/backends/configuration/#credentials-and-sensitive-data)
 > into a file `environments/$ENV/tofu/.terraform/terraform.tfstate` and any
 > plan files. These should therefore not be committed.
+
+### Token expiry
+
+If the project token expires repeat the per-checkout configuration, but using
+`opentofu init -reconfigure` instead.
 
 ## S3
 
