@@ -17,7 +17,7 @@ roles:
     version: stackhpc-0.19.0 # fix grafana install
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
-    version: v3.1.5
+    version: v4.0.1
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
     version: v25.3.1

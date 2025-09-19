@@ -3,7 +3,7 @@ extends: default
 
 rules:
   brackets:
-    forbid: non-empty
+    forbid: false
   comments:
     # https://github.com/prettier/prettier/issues/6780
     min-spaces-from-content: 1
