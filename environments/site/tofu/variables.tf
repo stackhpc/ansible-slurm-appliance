@@ -91,7 +91,7 @@ variable "login" {
   validation {
     condition = length(setintersection(keys(var.login), ["login", "compute", "control"])) == 0
     error_message = <<-EOF
-      Login nodegroup names cannot be 'login', 'compute' or 'control'. Invalid var.login keys: ${join(", ", setintersection(keys(var.login), ["login", "compute", "control"]))}.
+      Login nodegroup names cannot be 'login', 'compute' or 'control'. Invalid var.login key(s): ${join(", ", setintersection(keys(var.login), ["login", "compute", "control"]))}.
     EOF
   }
 }
@@ -148,7 +148,13 @@ variable "compute" {
   validation {
     condition = length(setintersection(keys(var.compute), ["login", "compute", "control", "default"])) == 0
     error_message = <<-EOF
-      Compute nodegroup names cannot be 'compute', 'default', 'login' or 'control'. Invalid var.compute keys: ${join(", ", setintersection(keys(var.compute), ["login", "compute", "control", "default"]))}.
+      Compute nodegroup names cannot be 'compute', 'default', 'login' or 'control'. Invalid var.compute key(s): ${join(", ", setintersection(keys(var.compute), ["login", "compute", "control", "default"]))}.
+    EOF
+  }
+  validation {
+    condition = length(setintersection(keys(var.compute), keys(var.login))) == 0
+    error_message = <<-EOF
+      Compute and login nodegroups cannot have the same name. Invalid var.compute/var.login key(s): ${join(", ", setintersection(keys(var.compute), keys(var.login)))}
     EOF
   }
 }
