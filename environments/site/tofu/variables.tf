@@ -52,7 +52,7 @@ variable "login" {
     be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
     to define login nodes with different capabilities such as high-memory.
 
-    Keys are names of groups.
+    Keys are names of groups. Keys cannot be 'login', 'compute', or 'control'.
     Values are a mapping as follows:
 
     Required:
@@ -88,6 +88,12 @@ variable "login" {
   EOF
 
   type = any
+  validation {
+    condition = length(setintersection(keys(var.login), ["login", "compute", "control"])) == 0
+    error_message = <<-EOF
+      Login nodegroup names cannot be 'login', 'compute' or 'control'. Invalid var.login keys: ${join(", ", setintersection(keys(var.login), ["login", "compute", "control"]))}.
+    EOF
+  }
 }
 
 variable "cluster_image_id" {
@@ -101,7 +107,7 @@ variable "compute" {
     Mapping defining homogenous groups of compute nodes. Groups are used
     in Slurm partition definitions.
 
-    Keys are names of groups.
+    Keys are names of groups. Keys cannot be 'compute', 'login', 'control' or 'default'.
     Values are a mapping as follows:
 
     Required:
@@ -139,6 +145,12 @@ variable "compute" {
   EOF
 
   type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
+  validation {
+    condition = length(setintersection(keys(var.compute), ["login", "compute", "control", "default"])) == 0
+    error_message = <<-EOF
+      Compute nodegroup names cannot be 'compute', 'default', 'login' or 'control'. Invalid var.compute keys: ${join(", ", setintersection(keys(var.compute), ["login", "compute", "control", "default"]))}.
+    EOF
+  }
 }
 
 # tflint-ignore: terraform_typed_variables
