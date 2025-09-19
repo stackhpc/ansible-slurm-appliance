@@ -161,7 +161,7 @@ openondemand_apps_jupyter_default:
     - node
   attributes: # TODO
     num_cores:
-      label: Number of cores FOO
+      label: Number of cores
       value: 1
     modules: ""
     extra_jupyter_args: ""

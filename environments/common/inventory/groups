@@ -91,22 +91,22 @@ fail2ban
 # Add `openhpc` group to add slurm users via creation of users on each node.
 
 [openondemand]
-# Host to run Open Ondemand server on - subset of login
+# Host to run Open OnDemand server on - subset of login
 
 [openondemand_desktop]
-# Subset of compute to run a interactive desktops on via Open Ondemand
+# Subset of compute to run a interactive desktops on via Open OnDemand
 
 [openondemand_jupyter]
-# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+# Subset of compute to run a Jupyter Notebook servers on via Open OnDemand
 
 [openondemand_rstudio]
-# Subset of compute to run RStudio servers on via Open Ondemand
+# Subset of compute to run RStudio servers on via Open OnDemand
 
 [openondemand_matlab]
-# Subset of compute to run RStudio servers on via Open Ondemand
+# Subset of compute to run a MATLAB interactive desktop on via Open OnDemand
 
 [openondemand_codeserver]
-# Subset of compute to run a Codeserver VSCode instance on via Open Ondemand
+# Subset of compute to run a Codeserver VSCode instance on via Open OnDemand
 
 [etc_hosts]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
@@ -217,4 +217,3 @@ extra_packages
 # separately from the appliance. e.g
 # pulp_host ansible_host=<VM-ip-address>
 # Note the host name can't conflict with group names i.e can't be called `pulp` or `pulp_server`
-

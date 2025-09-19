@@ -34,6 +34,13 @@ resource "openstack_networking_port_v2" "control" {
   binding {
     vnic_type = lookup(var.vnic_types, each.key, "normal")
   }
+
+  lifecycle {
+    ignore_changes = [
+      binding,          # fixes running as admin
+      extra_dhcp_option # required for networking-mlnx neutron plugin
+    ]
+  }
 }
 
 resource "openstack_compute_instance_v2" "control" {

@@ -44,27 +44,27 @@ login
 openhpc
 
 [openondemand:children]
-# Host to run Open Ondemand server on - subset of login
+# Host to run Open OnDemand server on - subset of login
 login
 
 [openondemand_desktop:children]
-# Subset of compute to run a interactive desktops on via Open Ondemand
+# Subset of compute to run a interactive desktops on via Open OnDemand
 compute
 
 [openondemand_jupyter:children]
-# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+# Subset of compute to run a Jupyter Notebook servers on via Open OnDemand
 compute
 
 [openondemand_rstudio:children]
-# Subset of compute to run RStudio servers on via Open Ondemand
+# Subset of compute to run RStudio servers on via Open OnDemand
 compute
 
 [openondemand_matlab:children]
-# Subset of compute to run a MATLAB interactive desktop on via Open Ondemand
+# Subset of compute to run a MATLAB interactive desktop on via Open OnDemand
 compute
 
 [openondemand_codeserver:children]
-# Subset of compute to run a Codeserver VSCode instance on via Open Ondemand
+# Subset of compute to run a Codeserver VSCode instance on via Open OnDemand
 compute
 
 [etc_hosts:children]
@@ -80,6 +80,9 @@ cluster
 [slurm_recompile:children]
 # Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
 cuda
+
+[vgpu]
+# Hosts where vGPU/MIG should be configured - see docs/mig.md
 
 [eessi:children]
 # Hosts on which EESSI stack should be configured
