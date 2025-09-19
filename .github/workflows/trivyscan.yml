@@ -6,8 +6,14 @@
 
 name: Trivy scan image for vulnerabilities
 on:
-  workflow_call:
   workflow_dispatch:
+  #workflow_run:
+  #  workflows: ["Trigger - Trivy scan image for vulnerabilities"]
+  #  types: [completed,requested]
+  workflow_run:
+    workflows: ["Test on push and pull request"]
+    #types: [completed,requested]
+    types: [completed]
 
 permissions:
   contents: read
@@ -16,6 +22,12 @@ permissions:
   statuses: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "event name is:" ${{ github.event_name }} 
+      - run: echo "event type is:" ${{ github.event.action }} 
+
   scan:
     runs-on: ubuntu-latest
     strategy:
