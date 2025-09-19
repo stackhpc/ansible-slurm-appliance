@@ -107,7 +107,8 @@ variable "compute" {
     Mapping defining homogenous groups of compute nodes. Groups are used
     in Slurm partition definitions.
 
-    Keys are names of groups. Keys cannot be 'compute', 'login', 'control' or 'default'.
+    Keys are names of groups. Keys cannot be 'compute', 'login', 'control' or 'default'
+    or be the same as keys in the login variable.
     Values are a mapping as follows:
 
     Required:
