@@ -21,7 +21,7 @@ To enable node health checks, ensure the `nhc` group contains the `compute` grou
 compute
 ```
 
-When the `anisble/site.yml` playbook is run this will automatically:
+When the `ansible/site.yml` playbook is run this will automatically:
 
 1. Add NHC-related configuration to the `slurm.conf` Slurm configuration file.
    The default configuration is defined in `openhpc_config_nhc`
