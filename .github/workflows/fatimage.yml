@@ -54,6 +54,7 @@ jobs:
       - name: Record settings for CI cloud
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo cleanup_on_failure: ${{ github.event.inputs.cleanup_on_failure  }}
 
       - name: Setup ssh
         run: |
@@ -91,7 +92,7 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ github.event.inputs.cleanup_on_failure && 'cleanup' || 'abort' }} \
+          -on-error=${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }} \
           -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
