@@ -29,7 +29,7 @@ dnf_repos_default:
   appstream:
     '8.10':
       pulp_path: rocky/8.10/AppStream/x86_64/os
-      pulp_timestamp: 20250918T034501
+      pulp_timestamp: 20250923T022841
       repo_file: Rocky-AppStream
     '9.4':
       pulp_path: rocky/9.4/AppStream/x86_64/os
@@ -41,16 +41,16 @@ dnf_repos_default:
       repo_file: rocky
     '9.6':
       pulp_path: rocky/9.6/AppStream/x86_64/os
-      pulp_timestamp: 20250910T025857
+      pulp_timestamp: 20250923T031638
       repo_file: rocky
   appstream-source:
     '8.10':
       pulp_path: rocky/8.10/AppStream/source/os
-      pulp_timestamp: 20250918T040529
+      pulp_timestamp: 20250923T024945
       repo_file: Rocky-AppStream
     '9.6':
       pulp_path: rocky/9.6/AppStream/source/os
-      pulp_timestamp: 20250910T035252
+      pulp_timestamp: 20250923T043546
       repo_file: rocky
   baseos:
     '8.10':
@@ -67,7 +67,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.6':
       pulp_path: rocky/9.6/BaseOS/x86_64/os
-      pulp_timestamp: 20250910T041629
+      pulp_timestamp: 20250923T045903
       repo_file: rocky
   baseos-source:
     '8.10':
@@ -76,7 +76,7 @@ dnf_repos_default:
       repo_file: Rocky-BaseOS
     '9.6':
       pulp_path: rocky/9.6/BaseOS/source/os/
-      pulp_timestamp: 20250910T035252
+      pulp_timestamp: 20250923T043546
       repo_file: rocky
   crb:
     '8.10':
@@ -94,30 +94,30 @@ dnf_repos_default:
       repo_file: rocky
     '9.6':
       pulp_path: rocky/9.6/CRB/x86_64/os
-      pulp_timestamp: 20250910T025857
+      pulp_timestamp: 20250923T031638
       repo_file: rocky
   crb-source:
     '9.6':
       pulp_path: rocky/9.6/CRB/source/os
-      pulp_timestamp: 20250910T035252
+      pulp_timestamp: 20250923T043546
       repo_file: rocky
   epel:
     '8':
       pulp_path: epel/8/Everything/x86_64
-      pulp_timestamp: 20250919T001943
+      pulp_timestamp: 20250923T001717
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/x86_64
-      pulp_timestamp: 20250919T001943
+      pulp_timestamp: 20250923T001717
       repo_file: epel
   epel-source:
     '8':
       pulp_path: epel/8/Everything/source
-      pulp_timestamp: 20250919T001943
+      pulp_timestamp: 20250923T001717
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/source
-      pulp_timestamp: 20250919T001943
+      pulp_timestamp: 20250923T001717
       repo_file: epel
   extras:
     '8.10':
