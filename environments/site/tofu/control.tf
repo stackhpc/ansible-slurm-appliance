@@ -31,6 +31,8 @@ resource "openstack_networking_port_v2" "control" {
     vnic_type = lookup(var.vnic_types, each.key, "normal")
   }
 
+  dns_name = lookup(each.value, "set_dns_name", false) ? split(".", local.nodename)[0] : null
+
   lifecycle {
     ignore_changes = [ binding ]
   }

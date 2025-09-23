@@ -11,6 +11,7 @@ module "cluster" {
       {
         network = "slurm-production-control-net"
         subnet = "slurm-production-control-subnet"
+        set_dns_name = true
       },
       {
         network = "slurm-production-rdma-net"
