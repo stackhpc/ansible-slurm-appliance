@@ -1,1 +1,7 @@
 resolv_conf_nameservers: []
+
+resolv_conf_search: "{{ resolv_conf_search_default + resolv_conf_search_extra }}"
+
+resolv_conf_search_default: "{{ [openhpc_cluster_name + '.' + cluster_domain_suffix] if cluster_domain_suffix is defined else [] }}"
+
+resolv_conf_search_extra: []

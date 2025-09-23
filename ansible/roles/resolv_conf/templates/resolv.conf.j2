@@ -1,6 +1,6 @@
 # Created by slurm appliance ansible/roles/resolv_conf
-{% if cluster_domain_suffix is defined %}
-search {{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}
+{% if resolv_conf_search is defined and resolv_conf_search | length > 0 %}
+search {{ resolv_conf_search | join(' ') }}
 {% endif %}
 
 {% for ns in resolv_conf_nameservers[0:3] %}
