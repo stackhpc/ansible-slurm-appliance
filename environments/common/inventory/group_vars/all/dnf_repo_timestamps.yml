@@ -99,7 +99,7 @@ dnf_repos_default:
   crb-source:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/source/tree
-      pulp_timestamp: 0
+      pulp_timestamp: 20250923T125600
       repo_file: Rocky-Sources
       repo_name: powertools-source
     '9.6':
