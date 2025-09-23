@@ -125,7 +125,7 @@ variable "volume_type" {
 
 variable "volume_size" {
   type = number
-  default = 15
+  default = 18
 }
 
 variable "image_disk_format" {
