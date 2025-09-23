@@ -52,7 +52,8 @@ variable "login" {
     be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
     to define login nodes with different capabilities such as high-memory.
 
-    Keys are names of groups. Keys cannot be 'login', 'compute', or 'control'.
+    Keys are names of groups, and cannot be 'login', 'compute', 'control', or
+    keys in the compute or additional_nodegroups variables.
     Values are a mapping as follows:
 
     Required:
@@ -107,8 +108,8 @@ variable "compute" {
     Mapping defining homogenous groups of compute nodes. Groups are used
     in Slurm partition definitions.
 
-    Keys are names of groups. Keys cannot be 'compute', 'login', 'control' or 'default'
-    or be the same as keys in the login variable.
+    Keys are names of groups, and cannot be 'compute', 'login', 'control', 'default'
+    or keys in the login or additional_nodegroups variables.
     Values are a mapping as follows:
 
     Required:
@@ -153,9 +154,9 @@ variable "compute" {
     EOF
   }
   validation {
-    condition     = length(setintersection(keys(var.compute), keys(var.login))) == 0
+    condition     = length(setintersection(keys(var.login), keys(var.compute))) == 0
     error_message = <<-EOF
-      Compute and login nodegroups cannot have the same name. Invalid var.compute/var.login key(s): ${join(", ", setintersection(keys(var.compute), keys(var.login)))}
+      Compute and additional nodegroups cannot have the same name - var.compute and var.additional_nodegroups have the same keys(s): ${join(", ", setintersection(keys(var.compute), keys(var.additional_nodegroups)))}
     EOF
   }
 }
@@ -168,7 +169,8 @@ variable "additional_nodegroups" {
     These nodes are not in the compute or login inventory groups so they
     will not run slurmd.
 
-    Keys are names of groups.
+    Keys are names of groups and cannot be 'login', 'compute, 'control', or
+    keys in the login or additional_nodegroups variables.
     Values are a mapping as for the "login" variable, with the addition of
     the optional entry:
         
@@ -181,6 +183,19 @@ variable "additional_nodegroups" {
     - $cluster_name + '_' + $group_name
     - 'additional'
   EOF
+  type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
+  validation {
+    condition     = length(setintersection(keys(var.additional_nodegroups), ["login", "compute", "control"])) == 0
+    error_message = <<-EOF
+      Additional nodegroup names cannot be 'compute', 'login' or 'control'. Invalid var.additional_nodegroups key(s): ${join(", ", setintersection(keys(var.compute), ["login", "compute", "control"]))}.
+    EOF
+  }
+  validation {
+    condition     = length(setintersection(keys(var.login), keys(var.compute))) == 0
+    error_message = <<-EOF
+      Additional and login nodegroups cannot have the same name - var.additional_nodegroups and var.login have the same keys(s): ${join(", ", setintersection(keys(var.additional_nodegroups), keys(var.login)))}
+    EOF
+  }
 }
 
 variable "environment_root" {
