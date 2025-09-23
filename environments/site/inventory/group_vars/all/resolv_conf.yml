@@ -1,0 +1,8 @@
+---
+resolv_conf_nameservers:
+  - "137.222.0.39"
+  - "137.222.0.36"
+
+resolv_conf_search_extra:
+  - "internal.dl.bris.ac.uk"
+  - "novalocal"
