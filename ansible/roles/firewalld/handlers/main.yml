@@ -1,5 +1,5 @@
 ---
-- name: Restart filewalld
+- name: Restart firewalld
   ansible.builtin.service:
     name: firewalld
     state: restarted

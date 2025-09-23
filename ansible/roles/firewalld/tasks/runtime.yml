@@ -1,11 +1,11 @@
 ---
-- name: Apply filewalld configs # noqa: args[module]
+- name: Apply firewalld configs # noqa: args[module]
   ansible.posix.firewalld: "{{ item }}"
-  notify: Restart filewalld
+  notify: Restart firewalld
   loop: "{{ firewalld_configs }}"
 
 - ansible.builtin.meta: flush_handlers
-- name: Ensure filewalld state
+- name: Ensure firewalld state
   ansible.builtin.systemd:
     name: firewalld
     state: "{{ firewalld_state }}"
