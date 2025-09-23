@@ -97,6 +97,11 @@ dnf_repos_default:
       pulp_timestamp: 20250923T031638
       repo_file: rocky
   crb-source:
+    '8.10':
+      pulp_path: rocky/8.10/PowerTools/source/tree
+      pulp_timestamp: 0
+      repo_file: Rocky-Sources
+      repo_name: powertools-source
     '9.6':
       pulp_path: rocky/9.6/CRB/source/os
       pulp_timestamp: 20250923T043546
