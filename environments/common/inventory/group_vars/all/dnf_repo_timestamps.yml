@@ -71,11 +71,11 @@ dnf_repos_default:
       repo_file: rocky
   baseos-source:
     '8.10':
-      pulp_path: rocky/8.10/BaseOS/source/os/
+      pulp_path: rocky/8.10/BaseOS/source/os
       pulp_timestamp: 20250918T040529
       repo_file: Rocky-BaseOS
     '9.6':
-      pulp_path: rocky/9.6/BaseOS/source/os/
+      pulp_path: rocky/9.6/BaseOS/source/os
       pulp_timestamp: 20250923T043546
       repo_file: rocky
   crb:
