@@ -183,7 +183,7 @@ variable "additional_nodegroups" {
     - $cluster_name + '_' + $group_name
     - 'additional'
   EOF
-  type = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
+  type        = any # can't do any better; TF type constraints can't cope with heterogeneous inner mappings
   validation {
     condition     = length(setintersection(keys(var.additional_nodegroups), ["login", "compute", "control"])) == 0
     error_message = <<-EOF
