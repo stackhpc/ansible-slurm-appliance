@@ -96,10 +96,8 @@ variable "login" {
     EOF
   }
   validation {
-    condition     = length(setintersection(keys(var.login), keys(var.compute))) == 0
-    error_message = <<-EOF
-      Login and compute nodegroups cannot have the same name - var.login and var.compute have the same keys(s): ${join(", ", setintersection(keys(var.login), keys(var.compute)))}
-    EOF
+    condition     = length(distinct(concat(keys(var.login), keys(var.compute), keys(var.additional_nodegroups)))) == length(concat(keys(var.login), keys(var.compute), keys(var.additional_nodegroups)))
+    error_message = "Nodegroup names must be unique - variables login, compute and additional nodegroups have one or more keys in common"
   }
 }
 
@@ -159,12 +157,6 @@ variable "compute" {
       Compute nodegroup names cannot be 'compute', 'default', 'login' or 'control'. Invalid var.compute key(s): ${join(", ", setintersection(keys(var.compute), ["login", "compute", "control", "default"]))}.
     EOF
   }
-  validation {
-    condition     = length(setintersection(keys(var.compute), keys(var.additional_nodegroups))) == 0
-    error_message = <<-EOF
-      Compute and additional nodegroups cannot have the same name - var.compute and var.additional_nodegroups have the same keys(s): ${join(", ", setintersection(keys(var.compute), keys(var.additional_nodegroups)))}
-    EOF
-  }
 }
 
 # tflint-ignore: terraform_typed_variables
@@ -193,13 +185,7 @@ variable "additional_nodegroups" {
   validation {
     condition     = length(setintersection(keys(var.additional_nodegroups), ["login", "compute", "control"])) == 0
     error_message = <<-EOF
-      Additional nodegroup names cannot be 'compute', 'login' or 'control'. Invalid var.additional_nodegroups key(s): ${join(", ", setintersection(keys(var.compute), ["login", "compute", "control"]))}.
-    EOF
-  }
-  validation {
-    condition     = length(setintersection(keys(var.additional_nodegroups), keys(var.login))) == 0
-    error_message = <<-EOF
-      Additional and login nodegroups cannot have the same name - var.additional_nodegroups and var.login have the same keys(s): ${join(", ", setintersection(keys(var.additional_nodegroups), keys(var.login)))}
+      Additional nodegroup names cannot be 'compute', 'login' or 'control'. Invalid var.additional_nodegroups key(s): ${join(", ", setintersection(keys(var.additional_nodegroups), ["login", "compute", "control"]))}.
     EOF
   }
 }
