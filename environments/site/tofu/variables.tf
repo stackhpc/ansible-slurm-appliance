@@ -96,9 +96,18 @@ variable "login" {
     EOF
   }
   validation {
-    condition     = length(distinct(concat(keys(var.login), keys(var.compute), keys(var.additional_nodegroups)))) == length(concat(keys(var.login), keys(var.compute), keys(var.additional_nodegroups)))
-    error_message = "Nodegroup names must be unique - variables login, compute and additional nodegroups have one or more keys in common"
+    condition = length(distinct(concat(keys(var.login), keys(var.compute), keys(var.additional_nodegroups)))) == length(concat(keys(var.login), keys(var.compute), keys(var.additional_nodegroups)))
+    error_message = <<-EOF
+      Nodegroup names must be unique. Shared key(s) found in variables login, compute and/or additional_nodegroups: ${
+    join(", ", setunion(
+      setintersection(keys(var.login), keys(var.compute)),
+      setintersection(keys(var.compute), keys(var.additional_nodegroups)),
+      setintersection(keys(var.additional_nodegroups), keys(var.login))
+    ))
   }
+    EOF
+
+}
 }
 
 variable "cluster_image_id" {
