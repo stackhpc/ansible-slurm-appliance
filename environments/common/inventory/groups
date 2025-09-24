@@ -84,7 +84,7 @@ cluster
 # https://www.fail2ban.org/wiki/index.php/Main_Page
 
 [firewalld:children]
-# Hosts to install firewalld on - see ansible/roles/filewalld
+# Hosts to install firewalld on - see ansible/roles/firewalld
 fail2ban
 
 [basic_users]

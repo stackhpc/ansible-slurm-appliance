@@ -8,7 +8,7 @@ This sequence applies to both:
   control,login,compute inventory groups to install all packages, e.g. StackHPC
   CI builds
 - "extra" builds, starting from StackHPC images and using selected inventory
-  groups to add specfic features for a site-specific image.
+  groups to add specific features for a site-specific image.
 
 Note that a generic Pulp server is shown in the below diagram. This may be
 StackHPC's Ark server or a local Pulp mirroring Ark. It is assumed a local Pulp

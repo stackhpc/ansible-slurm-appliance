@@ -76,7 +76,7 @@ module "cluster" {
   control_node_flavor = var.control_node_flavor
 
   login = {
-    login = {
+    head = {
       nodes  = ["login-0"]
       flavor = var.other_node_flavor
     }
