@@ -2,12 +2,18 @@
   # adds rd.auto=1 - see `man dracut.cmdline`
   ansible.builtin.lineinfile:
     path: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((?:(?!rd.auto=1).)*?)"$'
-    line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 rd.auto=1"'
+    regexp: >
+      ^{{ grub_cmdline_var[ansible_distribution_major_version] }}="((?:(?!rd.auto=1).)*?)"$
+    line: >
+      {{ grub_cmdline_var[ansible_distribution_major_version] }}="\1 rd.auto=1"
     backup: true
     backrefs: true
   register: update_grub
-  
+  vars:
+    grub_cmdline_var:
+      '8': GRUB_CMDLINE_LINUX
+      '9': GRUB_CMDLINE_LINUX_DEFAULT
+
 - name: Update GRUB configuration file
   command: grub2-mkconfig -o /boot/grub2/grub.cfg --update-bls-cmdline
   when: update_grub.changed
