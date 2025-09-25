@@ -1,0 +1,7 @@
+# Configuration file for shellcheck
+# https://github.com/koalaman/shellcheck/blob/master/shellcheck.1.md#rc-files
+
+# Unable to exclude *.sh.j2 files and the ansible parentheses upset shellcheck a lot.
+# Lines can be address individually with # shellcheck disable=SCxxxx but this gets quite prolific.
+# Disabling globally as we have more sh.j2 files than .sh
+disable=SC1009,SC1054,SC1064,SC1065,SC1072,SC1073,SC1083

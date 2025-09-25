@@ -1,16 +1,15 @@
 ---
-
 - name: Copy all certificates
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: /etc/pki/ca-trust/source/anchors/
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   with_fileglob:
     - "{{ cacerts_cert_dir }}/*"
   become: true
 
-- name: Update trust store
-  command: update-ca-trust extract
+- name: Update trust store # noqa: no-changed-when
+  ansible.builtin.command: update-ca-trust extract
   become: true

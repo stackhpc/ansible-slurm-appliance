@@ -1,41 +1,38 @@
 ---
-
 - name: Run pre.yml hook
   vars:
     # hostvars not available here, so have to recalculate environment root:
     appliances_environment_root: "{{ ansible_inventory_sources | last | dirname }}"
     hook_path: "{{ appliances_environment_root }}/hooks/pre.yml"
-  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
+  ansible.builtin.import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- import_playbook: validate.yml
+- ansible.builtin.import_playbook: validate.yml
   when: appliances_validate | default(true)
 
-- import_playbook: bootstrap.yml
+- ansible.builtin.import_playbook: bootstrap.yml
 
 - name: Run post-bootstrap.yml hook
   vars:
     # hostvars not available here, so have to recalculate environment root:
     appliances_environment_root: "{{ ansible_inventory_sources | last | dirname }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post-bootstrap.yml"
-  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
+  ansible.builtin.import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- import_playbook: iam.yml
-- import_playbook: filesystems.yml
-- import_playbook: extras.yml
-- import_playbook: slurm.yml
-- import_playbook: portal.yml
-- import_playbook: monitoring.yml
+- ansible.builtin.import_playbook: iam.yml
+- ansible.builtin.import_playbook: filesystems.yml
+- ansible.builtin.import_playbook: extras.yml
+- ansible.builtin.import_playbook: slurm.yml
+- ansible.builtin.import_playbook: portal.yml
+- ansible.builtin.import_playbook: monitoring.yml
 
 - name: Run post.yml hook
   vars:
     # hostvars not available here, so have to recalculate environment root:
     appliances_environment_root: "{{ ansible_inventory_sources | last | dirname }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post.yml"
-  import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
+  ansible.builtin.import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
-- import_playbook: final.yml
-
-...
+- ansible.builtin.import_playbook: final.yml

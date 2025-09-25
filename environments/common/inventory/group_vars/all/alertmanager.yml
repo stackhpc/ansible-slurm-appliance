@@ -1,5 +1,5 @@
-
-alertmanager_port: '9093' # defined here as required for prometheus
+---
+alertmanager_port: "9093" # defined here as required for prometheus
 
 alertmanager_slack_receiver_name: slack-receiver
 alertmanager_slack_receiver_send_resolved: true

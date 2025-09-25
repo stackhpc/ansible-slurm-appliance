@@ -1,3 +1,4 @@
+---
 - name: Install firewalld package
-  dnf:
+  ansible.builtin.dnf:
     name: firewalld

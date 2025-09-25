@@ -4,7 +4,7 @@ Use variables from the [mrlesmithjr.chrony](https://github.com/mrlesmithjr/ansib
 
 For example in: `environments/<environment>/inventory/group_vars/all/chrony`:
 
-```
+```yaml
 ---
 chrony_ntp_servers:
   - server: ntp-0.example.org
@@ -17,5 +17,4 @@ chrony_ntp_servers:
       - option: iburst
       - option: minpoll
         val: 8
-
 ```

@@ -1,15 +1,14 @@
 # Slurm Appliance Sequences
 
-
-
 ## Image build
 
 This sequence applies to both:
+
 - "fatimage" builds, starting from GenericCloud images and using
   control,login,compute inventory groups to install all packages, e.g. StackHPC
   CI builds
 - "extra" builds, starting from StackHPC images and using selected inventory
-  groups to add specfic features for a site-specific image.
+  groups to add specific features for a site-specific image.
 
 Note that a generic Pulp server is shown in the below diagram. This may be
 StackHPC's Ark server or a local Pulp mirroring Ark. It is assumed a local Pulp
@@ -86,9 +85,10 @@ sequenceDiagram
 
 This sequence applies to active clusters, after running the `site.yml` playbook
 for the first time. Slurm controlled rebuild requires that:
+
 - Compute groups in the OpenTofu `compute` variable have:
-    - `ignore_image_changes: true`
-    - `compute_init_enable: ['compute', ... ]`
+  - `ignore_image_changes: true`
+  - `compute_init_enable: ['compute', ... ]`
 - The Ansible `rebuild` inventory group contains the `control` group.
 
 TODO: should also document how compute-init does NOT run if the `site.yml`
@@ -126,8 +126,9 @@ sequenceDiagram
     end
     nodes->>nodes: srun task completes
 ```
+
 Notes:
+
 1. And/or login/compute group overrides
 2. Running on control node
 3. On hosts targeted by job
-

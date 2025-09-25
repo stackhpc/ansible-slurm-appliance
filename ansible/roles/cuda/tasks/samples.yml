@@ -1,13 +1,15 @@
+---
 - name: Ensure cuda_samples_path exists
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ cuda_samples_path }}"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
+    mode: "0755"
 
 - name: Download CUDA samples release
-  unarchive:
-    remote_src: yes
+  ansible.builtin.unarchive:
+    remote_src: true
     src: "{{ cuda_samples_release_url }}"
     dest: "{{ cuda_samples_path }}"
     owner: "{{ ansible_user }}"
@@ -15,12 +17,13 @@
     creates: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}"
 
 - name: Create CUDA samples build directory
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build"
+    mode: "0755"
 
 - name: Build CUDA samples
-  shell:
+  ansible.builtin.shell:
     # We need to source /etc/profile.d/sh.local to add CUDA to the PATH
     cmd: . /etc/profile.d/sh.local && cmake .. && make -j {{ ansible_processor_vcpus }}
     chdir: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build"

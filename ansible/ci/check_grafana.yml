@@ -1,15 +1,16 @@
+---
 # Checks Slurm jobs from hpctests are shown in Grafana.
 # Can't actually check the dashboard programatically so this queries the datasource used by the dashboard instead.
 
 - hosts: control # so proxying etc is irrelevant
-  gather_facts: no
-  become: no
+  gather_facts: false
+  become: false
   tasks:
     - name: Wait for slurm-stats file to exist (run by cron)
       ansible.builtin.wait_for:
         path: /var/log/slurm-stats/finished_jobs.json
         timeout: 315 # slurm stats cron job runs every 5 mins
-      
+
     - name: Query grafana for expected hpctests jobs
       grafana_elasticsearch_query:
         grafana_url: http://{{ grafana_api_address }}:{{ grafana_port }}
@@ -23,4 +24,5 @@
       delay: 5
       vars:
         _found_jobs: "{{ _slurm_stats_jobs.docs | map(attribute='JobName', default='(json error in slurmstats data)') }}"
-        _expected_jobs: ['pingpong.sh']
+        _expected_jobs:
+          - "pingpong.sh"
