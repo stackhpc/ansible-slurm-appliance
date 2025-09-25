@@ -9,11 +9,9 @@
     backup: true
     backrefs: true
   register: update_grub
+  notify:
+    - Update GRUB configuration file
   vars:
     grub_cmdline_var:
       '8': GRUB_CMDLINE_LINUX
       '9': GRUB_CMDLINE_LINUX_DEFAULT
-
-- name: Update GRUB configuration file
-  ansible.builtin.command: grub2-mkconfig -o /boot/grub2/grub.cfg --update-bls-cmdline
-  when: update_grub.changed
