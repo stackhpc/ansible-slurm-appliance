@@ -1,4 +1,11 @@
----
+- hosts: raid
+  become: true
+  tags: raid
+  gather_facts: true
+  tasks:
+    - ansible.builtin.include_role:
+        name: raid
+
 - hosts: k3s_server:!builder
   become: true
   tags: k3s
