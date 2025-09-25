@@ -1,10 +1,9 @@
 - hosts: raid
   become: true
-  gather_facts: true
   tags: raid
-  name: Configure image for baremetal software raid root disks
+  gather_facts: true
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: raid
 
 - hosts: k3s_server:!builder

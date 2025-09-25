@@ -15,5 +15,5 @@
       '9': GRUB_CMDLINE_LINUX_DEFAULT
 
 - name: Update GRUB configuration file
-  command: grub2-mkconfig -o /boot/grub2/grub.cfg --update-bls-cmdline
+  ansible.builtin.command: grub2-mkconfig -o /boot/grub2/grub.cfg --update-bls-cmdline
   when: update_grub.changed
