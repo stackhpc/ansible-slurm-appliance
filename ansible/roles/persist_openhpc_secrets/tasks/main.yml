@@ -15,10 +15,26 @@
     - "{{ appliances_state_dir }}/ansible.facts.d"
     - "/etc/ansible/facts.d"
 
+- name: Before
+  debug:
+    var: ansible_local
+
+- name: Before 2
+  debug:
+    var: vault_mysql_root_password
+
 - name: Load existing OpenHPC secrets if present
   ansible.builtin.setup:
     filter: ansible_local
   when: openhpc_secrets_stat.stat.exists
+
+- name: After
+  debug:
+    var: ansible_local
+
+- name: After 2
+  debug:
+    var: vault_mysql_root_password
 
 - name: Write OpenHPC secrets
   ansible.builtin.template:
@@ -37,3 +53,11 @@
 - name: Refresh facts to pick up any new secrets
   ansible.builtin.setup:
     filter: ansible_local
+
+- name: After refresh
+  debug:
+    var: ansible_local
+
+- name: After refresh 2
+  debug:
+    var: vault_mysql_root_password
