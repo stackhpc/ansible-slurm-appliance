@@ -15,6 +15,14 @@
     - "{{ appliances_state_dir }}/ansible.facts.d"
     - "/etc/ansible/facts.d"
 
+- name: Symlink persistent facts to facts_path
+  ansible.builtin.file:
+    state: link
+    src: "{{ appliances_state_dir }}/ansible.facts.d/openhpc_secrets.fact"
+    dest: /etc/ansible/facts.d/openhpc_secrets.fact
+    owner: root
+  when: openhpc_secrets_stat.stat.exists
+
 - name: Before
   debug:
     var: ansible_local
