@@ -3,3 +3,6 @@
 # Defaults to simplify job submission parameters
 openhpc_config_extra:
   MpiDefault: pmix
+  AccountingStorageEnforce: 'associations,limits,qos,safe'
+
+openhpc_job_maxtime: '1-0'
