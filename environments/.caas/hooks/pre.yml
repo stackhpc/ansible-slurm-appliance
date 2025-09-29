@@ -20,8 +20,10 @@
   hosts: control
   gather_facts: false
   become: true
-  roles:
-    - persist_openhpc_secrets
+  tasks:
+    - name: Tesing dynamic include
+      ansible.builtin.include_role:
+        name: persist_openhpc_secrets
 
 # validate.yml asserts presence of a control group which doesn't exist when
 # destroying infra, so only validate when we're not destroying
