@@ -67,11 +67,11 @@ dnf_repos_default:
       repo_file: rocky
   appstream-source:
     '8.10':
-      pulp_path: rocky/8.10/AppStream/source/os
+      pulp_path: rocky/8.10/AppStream/source/tree
       pulp_timestamp: 20251009T082406
       repo_file: Rocky-Sources
     '9.6':
-      pulp_path: rocky/9.6/AppStream/source/os
+      pulp_path: rocky/9.6/AppStream/source/tree
       pulp_timestamp: 20251009T121903
       repo_file: rocky
     '9.7':
@@ -101,11 +101,11 @@ dnf_repos_default:
       repo_file: rocky
   baseos-source:
     '8.10':
-      pulp_path: rocky/8.10/BaseOS/source/os
+      pulp_path: rocky/8.10/BaseOS/source/tree
       pulp_timestamp: 20251009T082406
       repo_file: Rocky-Sources
     '9.6':
-      pulp_path: rocky/9.6/BaseOS/source/os
+      pulp_path: rocky/9.6/BaseOS/source/tree
       pulp_timestamp: 20251009T121903
       repo_file: rocky
     '9.7':
@@ -159,7 +159,7 @@ dnf_repos_default:
       repo_file: Rocky-Sources
       repo_name: powertools-source
     '9.6':
-      pulp_path: rocky/9.6/CRB/source/os
+      pulp_path: rocky/9.6/CRB/source/tree
       pulp_timestamp: 20251006T044455
       repo_file: rocky
     '9.7':
@@ -212,11 +212,11 @@ dnf_repos_default:
       repo_file: rocky-extras
   extras-source:
     '8.10':
-      pulp_path: rocky/8.10/extras/source/os
+      pulp_path: rocky/8.10/extras/source/tree
       pulp_timestamp: 20250828T161842
       repo_file: Rocky-Sources
     '9.6':
-      pulp_path: rocky/9.6/extras/source/os
+      pulp_path: rocky/9.6/extras/source/tree
       pulp_timestamp: 20250828T161842
       repo_file: rocky-extras
     '9.7':
