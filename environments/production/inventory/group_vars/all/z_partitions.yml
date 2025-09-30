@@ -1,5 +1,6 @@
 openhpc_slurm_partitions:
     - name: general
+      default: YES
       groups:
         - name: general-compute1
         - name: general-compute2
@@ -7,8 +8,6 @@ openhpc_slurm_partitions:
         - name: general-compute4
         - name: general-compute5
         - name: general-compute6
-    - name: general-gen2
-      groups:
         - name: general-gen2-compute9
         - name: general-gen2-compute10
         - name: general-gen2-compute11
@@ -40,10 +39,12 @@ openhpc_slurm_partitions:
         - name: general-gen2-compute37
         - name: general-gen2-compute38
     - name: highmem
+      default: NO
       groups:
         - name: highmem-compute7
         - name: highmem-compute8
     - name: gpu
+      default: NO
       groups:
         - name: gpu-gpu1
         - name: gpu-gpu2
