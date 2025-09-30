@@ -1,1 +1,1 @@
-appliances_caas_skip_validate_vars: true
+appliances_validate_tofu_vars: false

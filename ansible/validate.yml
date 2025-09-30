@@ -77,7 +77,7 @@
           - cluster_home_volume is defined
           - cluster_compute_groups is defined
         fail_msg: "One or more expected variables are missing: is OpenTofu inventory template up to date?"
-      when: not appliances_caas_skip_validate_vars
+      when: appliances_validate_tofu_vars | bool
 
 - name: Ensure control node is in inventory
   hosts: all
