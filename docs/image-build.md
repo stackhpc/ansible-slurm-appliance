@@ -44,15 +44,15 @@ For either a site-specific fat-image build or an extra-build:
 
     Alternatively, configure a [local Pulp mirror](experimental/pulp.md).
 
-3. Create a Packer [variable definition file](https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#assigning-values-to-input-variables) containing at a minimum e.g.:
+3. Create a Packer [variable definition file](https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#assigning-values-to-input-variables). It must specify at least the
+   the following variables:
   
     ```hcl
     # environments/site/builder.pkrvars.hcl:
     flavor = "general.v1.small"                           # VM flavor to use for builder VMs
     networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
     source_image_name = "Rocky-9-GenericCloud-Base-9.4"   # Name of image to create VM with, i.e. starting image
-    inventory_groups = "cuda"            # Additional inventory groups to add build VM to
-
+    inventory_groups = "cuda"                             # Build VM inventory groups => functionality to add to image
     ```
 
     Note that:
