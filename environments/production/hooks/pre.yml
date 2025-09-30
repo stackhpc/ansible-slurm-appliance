@@ -1,0 +1,5 @@
+---
+
+# environments/site/hooks/pre.yml:
+- name: Import parent hook
+  import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/pre.yml"
