@@ -9,6 +9,7 @@ on:
 env:
   S3_BUCKET: openhpc-images-prerelease
   IMAGE_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+  RUNNER_IMAGE_DIR: /mnt/images
 
 permissions:
   contents: read
@@ -93,33 +94,26 @@ jobs:
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
         shell: bash
 
-      - name: Clear up some space on runner
-        run: |
-          df -h
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          sudo apt-get clean
-          df -h
-
       - name: Download image to runner
         run: |
           . venv/bin/activate
-          openstack image save --file "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
+          df -h
+          sudo mkdir ${{ env.RUNNER_IMAGE_DIR }}
+          sudo chmod ugo=rwX ${{ env.RUNNER_IMAGE_DIR }}
+          openstack image save --file "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
           df -h
         shell: bash
 
       - name: Convert image to QCOW2
         run: |
           . venv/bin/activate
-          qemu-img convert -f raw -O qcow2 -c "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
+          qemu-img convert -f raw -O qcow2 -c "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}.raw" "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}"
         shell: bash
 
       - name: Upload Image to S3
         run: |
           echo "Uploading Image: ${{ env.TARGET_IMAGE }} to S3..."
-          s3cmd --multipart-chunk-size-mb=150 put ${{ env.TARGET_IMAGE }} s3://${{ env.S3_BUCKET }}
+          s3cmd --multipart-chunk-size-mb=150 put "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}" s3://${{ env.S3_BUCKET }}
         shell: bash
 
   image_sync:
