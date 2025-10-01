@@ -1,17 +1,22 @@
+---
+
+# Scan the built image for vulnerabilities using Trivy.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
+
 name: Trivy scan image for vulnerabilities
 on:
+  workflow_call:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
 
 jobs:
   scan:
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + build
-      cancel-in-progress: true
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -23,19 +28,19 @@ jobs:
       CI_CLOUD: ${{ vars.CI_CLOUD }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           # Iterate over the labels
           labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
-          echo $labels
+          echo "$labels"
           for label in $labels; do
              if [[ $label == CI_CLOUD=* ]]; then
               # Extract the value after 'CI_CLOUD='
               CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
-              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> $GITHUB_ENV
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
             fi
           done
 
@@ -60,7 +65,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
         shell: bash
 
       - name: Write clouds.yaml

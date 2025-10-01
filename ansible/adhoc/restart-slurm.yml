@@ -1,3 +1,4 @@
+---
 # Restart all slurm daemons e.g. after changing configuration. Note that:
 # - `scontrol reconfigure` will handle most reconfiguration - see https://slurm.schedmd.com/scontrol.html#OPT_reconfigure
 #   for which options need a restart
@@ -5,25 +6,25 @@
 #   restart daemons as required.
 
 - hosts: compute,login
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
-    - service:
+    - ansible.builtin.service:
         name: slurmd
         state: stopped
 
 - hosts: control
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
-    - service:
+    - ansible.builtin.service:
         name: slurmctld
         state: restarted
 
 - hosts: compute,login
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
-    - service:
+    - ansible.builtin.service:
         name: slurmd
         state: started

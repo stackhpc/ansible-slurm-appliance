@@ -6,4 +6,3 @@ openondemand_desktop_partition: "{{ openhpc_partitions[0]['name'] }}"
 httpd_listen_addr_port:
   - 80
   - 443
-

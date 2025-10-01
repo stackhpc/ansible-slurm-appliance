@@ -1,25 +1,28 @@
+---
 # safe to use during build
 
 - name: Increase maximum number of virtual memory maps
   # see https://opensearch.org/docs/2.0/opensearch/install/important-settings/
   ansible.posix.sysctl:
     name: vm.max_map_count
-    value: '262144'
+    value: "262144"
     state: present
-    reload: yes
+    reload: true
 
 - name: Create systemd unit file
-  template:
+  ansible.builtin.template:
     dest: /etc/systemd/system/opensearch.service
     src: opensearch.service.j2
+    mode: "0644"
   register: _opensearch_unit
 
 - name: Pull container image
   containers.podman.podman_image:
     name: docker.io/opensearchproject/opensearch
     tag: "{{ opensearch_version }}"
+  become: true
   become_user: "{{ opensearch_podman_user }}"
 
-- name: Reload opensearch unit file
-  command: systemctl daemon-reload
-  when: _opensearch_unit.changed
+- name: Reload opensearch unit file # noqa: no-changed-when
+  ansible.builtin.command: systemctl daemon-reload # noqa: command-instead-of-module
+  when: _opensearch_unit.changed # noqa: no-handler

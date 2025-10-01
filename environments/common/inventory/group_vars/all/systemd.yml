@@ -1,3 +1,4 @@
+---
 _systemd_requiresmount_statedir: |
   {% if appliances_state_dir is defined %}
   [Unit]

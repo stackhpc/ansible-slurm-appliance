@@ -1,17 +1,19 @@
+---
 - hosts: podman:!builder
-  become: yes
+  become: true
   gather_facts: false
   tags: podman
   tasks:
     - name: Configure container image registry to avoid docker.io ratelimits
-      copy:
+      ansible.builtin.copy:
         dest: /etc/containers/registries.conf.d/003-arcus-mirror.conf
         content: |
           [[registry]]
           location="docker.io/library/"
           prefix="docker.io/library/"
-          
+
           [[registry.mirror]]
           location = "{{ podman_registry_address }}"
           insecure = true
+        mode: "0644"
       when: "ci_cloud == 'ARCUS'"

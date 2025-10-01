@@ -1,5 +1,5 @@
 ---
 
 - name: Setup slurm tools
-  include_role:
+  ansible.builtin.include_role:
     name: slurm_tools
