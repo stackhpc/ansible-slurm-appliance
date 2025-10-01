@@ -346,7 +346,7 @@
       ansible.builtin.blockinfile:
         path: /etc/security/access.conf
         block: |
-          +:adm:ALL
+          +:(adm):ALL
           -:ALL:ALL
 
     - name: Ensure slurmd service state
