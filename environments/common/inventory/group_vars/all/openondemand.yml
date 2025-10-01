@@ -100,7 +100,7 @@ openondemand_install_app_matlab:
 openondemand_install_app_codeserver:
   codeserver:
     repo: https://github.com/stackhpc/bc_osc_codeserver.git
-    version: 2025.08.1
+    version: 2025.09.1
 # osc:ood role var (NB only active when not in configure):
 ood_install_apps: >-
   {{
