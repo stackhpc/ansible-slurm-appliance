@@ -73,6 +73,6 @@
     regexp: '^{{ autofs_mount_point | regex_escape() }}\s+.*$'
     line: "{{(line_var) | trim}}"
     state: present
-    create: true # Creates the map file if it does not exist.
+    create: true
     mode: '0644'
   notify: restart autofs

@@ -21,4 +21,4 @@
       ([ 'conf=/etc/ceph/' ~ ceph_item.value.credentials.ceph_conf ] if ceph_item.value.credentials.ceph_conf is defined else []) +
       ([ 'mon_host=' ~ ceph_item.value.monitor_hosts ] if ceph_item.value.monitor_hosts is defined else []) +
       ([ ceph_item.value.mount_opts ] if ceph_item.value.mount_opts is defined else [])
-    ) | join(',') | trim }}"
+      ) | join(',') | trim }}"
