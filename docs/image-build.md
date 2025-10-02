@@ -63,6 +63,7 @@ For either a site-specific fat-image build or an extra-build:
    for all possible variables which can be set.
 
    Note that:
+
    - Normally the network must provide outbound internet access. However it
      does not need to provide access to resources used by the actual cluster
      nodes (e.g. Slurm control node, network filesystem servers etc.).
@@ -91,9 +92,11 @@ For either a site-specific fat-image build or an extra-build:
      functionality run during build, and hence what gets added to the image.
      All possible groups are listed in `environments/common/groups` but common
      options for this variable will be:
-     - For a fatimage build: `fatimage`: This is defined in `enviroments/{common,site}/inventory/groups`
+
+     - For a fatimage build: `fatimage`: This is defined in `enviroments/site/inventory/groups`
        and results in an update of all packages in the source image, plus
        installation of packages for default control, login and compute nodes.
+
      - For an extra-built image, one or more specific groups. This extends the
        source image with just this additional functionality. The example above
        installs NVIDIA DOCA network drivers, NVIDIA GPU drivers/Cuda packages
