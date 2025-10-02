@@ -208,8 +208,7 @@ k3s_agent
 # Roles/groups listed here *always* do installs:
 extra_packages
 doca
-
-# what we want to say is if cuda and build, add dnf_repos
+# TODO: can't express: if cuda and builder, enable dnf_repos
 
 [pulp_site]
 # Add builder to this group to automatically sync pulp during image build

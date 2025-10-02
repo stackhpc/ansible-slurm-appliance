@@ -156,7 +156,7 @@ fatimage
 [lustre]
 # Hosts to run lustre client
 
-[extra_packages:children]
+[extra_packages]
 # Hosts to install specified additional packages on
 
 [dnf_repos:children]
