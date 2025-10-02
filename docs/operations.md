@@ -83,7 +83,7 @@ disabled during runtime to prevent Ark credentials from being leaked. To enable 
 
 In both cases, Ark credentials will be required.
 
-=# Adding Additional Packages
+## Adding Additional Packages
 
 By default, the following utility packages are installed during the StackHPC image build:
 

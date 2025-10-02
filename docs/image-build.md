@@ -56,8 +56,11 @@ For either a site-specific fat-image build or an extra-build:
    flavor = "general.v1.small"                           # VM flavor to use for builder VMs
    networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
    source_image_name = "Rocky-9-GenericCloud-Base-9.4"   # Name of image to create VM with, i.e. starting image
-   inventory_groups = "doca,cuda"                        # Build VM inventory groups => functionality to add to image
+   inventory_groups = "doca,cuda,extra_packages"         # Build VM inventory groups => functionality to add to image
    ```
+
+   See the top of [packer/openstack.pkr.hcl](../packer/openstack.pkr.hcl)
+   for all possible variables which can be set.
 
    Note that:
 
@@ -90,15 +93,16 @@ For either a site-specific fat-image build or an extra-build:
      All possible groups are listed in `environments/common/groups` but common
      options for this variable will be:
 
-     - For a fatimage build: `fatimage`: This is defined in `enviroments/{common,site}/inventory/groups`
+     - For a fatimage build: `fatimage`: This is defined in `enviroments/site/inventory/groups`
        and results in an update of all packages in the source image, plus
        installation of packages for default control, login and compute nodes.
-     - For an extra-built image, one or more specific groups e.g. `lustre` or
-       `doca,cuda`. This extends the source image with just this additional
-       functionality.
 
-     See the top of [packer/openstack.pkr.hcl](../packer/openstack.pkr.hcl)
-     for all possible variables which can be set.
+     - For an extra-built image, one or more specific groups. This extends the
+       source image with just this additional functionality. The example above
+       installs NVIDIA DOCA network drivers, NVIDIA GPU drivers/Cuda packages
+       and also enables installation of packages defined in the
+       `appliances_extra_packages_other` variable (see
+       [docs/operations.md](./operations.md#adding-additional-packages)).
 
 4. Activate the venv and the relevant environment.
 
