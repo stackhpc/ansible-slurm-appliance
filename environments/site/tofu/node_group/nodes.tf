@@ -26,7 +26,7 @@ locals {
     )
   }
   # Map node names to floating IPs from the list var.fip_addresses by index
-    fip_address = {
+  fip_address = {
     for idx, n in var.nodes :
     n => length(var.fip_addresses) > idx ? var.fip_addresses[idx] : ""
   }
@@ -233,4 +233,8 @@ output "image_id" {
 
 output "fqdns" {
   value = local.fqdns
+}
+
+output "fip_address" {
+  value = local.fip_address
 }
