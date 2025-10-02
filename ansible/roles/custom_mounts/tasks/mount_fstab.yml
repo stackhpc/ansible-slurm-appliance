@@ -1,0 +1,67 @@
+---
+
+
+- name: "{{ abs_mount_point }} - Include cifs/smb client setup"
+  ansible.builtin.include_tasks: "cifs_setup.yml"
+  when: mount_item.value.type in ["cifs"]
+  vars:
+    cifs_item: "{{ mount_item }}"
+
+- name: "{{ abs_mount_point }} - Include ceph client setup"
+  ansible.builtin.include_tasks: "ceph_setup.yml"
+  when: mount_item.value.type in ["cephfs", "ceph_rbd"]
+  vars:
+    ceph_item: "{{ mount_item }}"
+
+# - name: Debug mount with message
+#   debug:
+#     msg: "{{ ceph_mount_opts | to_nice_json }}"
+#   when: mount_item.value.type in ["cephfs", "ceph_rbd"]
+
+- name: "{{ abs_mount_point }} - Include ceph_rbd setup including mounting"
+  ansible.builtin.include_tasks: "ceph_rbd_setup.yml"
+  when: mount_item.value.type in ["ceph_rbd"]
+  vars:
+    ceph_rbd_item: "{{ mount_item }}"
+
+- name: "{{ abs_mount_point }} - Ensure mount directories exist"
+  become: true
+  ansible.builtin.file:
+    path: "{{ mount_item.value.mount_point }}"
+    state: directory
+    owner: "{{ mount_item.value.mount_owner | default(omit) }}"
+    group: "{{ mount_item.value.mount_group | default(omit) }}"
+    mode: "{{ mount_item.value.mount_mode | default(omit) }}"
+
+- name: "{{ abs_mount_point }} - Mount nfs or cifs"
+  become: true
+  vars:
+    mount_opts: >-
+      {{
+        (
+          ([ 'credentials=' + mount_item.value.credentials.file_path ] if mount_item.value.credentials.file_path is defined else [])
+          +
+          ([ mount_item.value.mount_opts ] if mount_item.value.mount_opts | length > 0 else [])
+        ) | join(',') | trim
+      }}
+  mount:
+    path: "{{ mount_item.value.mount_point }}"
+    src: "{{ mount_item.value.fs_path }}"
+    fstype: "{{ mount_item.value.type }}"
+    state: "{{ mount_item.value.state | default('mounted') }}"
+    dump: "{{ mount_item.value.dump | default(omit, true) }}"
+    passno: "{{ mount_item.value.passno | default(omit, true) }}"
+    opts: "{{ mount_opts | default(omit, true) }}"
+  when: mount_item.value.type not in ["cephfs", "ceph_rbd"]
+
+- name: "{{ abs_mount_point }} - Mount CephFS using suid-style mount source"
+  become: true
+  ansible.posix.mount:
+    src: "{{ mount_item.value.credentials.client_name }}@.{{ mount_item.value.fs_name }}{{ '=' ~ mount_item.value.fs_path if mount_item.value.fs_path is defined else '=/' }}"
+    opts: "{{ ceph_mount_opts }}"
+    path: "{{ mount_item.value.mount_point }}"
+    fstype: "ceph"
+    state: "{{ mount_item.value.state | default('mounted') }}"
+    dump: "{{ mount_item.value.dump | default(omit) }}"
+    passno: "{{ mount_item.value.passno | default(omit) }}"
+  when: mount_item.value.type in ["cephfs"]

@@ -1,0 +1,78 @@
+---
+
+- name: "{{ abs_mount_point }} - Warn and fail if ceph_rbd is used with autofs"
+  ansible.builtin.fail:
+    msg: >
+      Ceph volumes (type=ceph_rbd or cephfs) should not be mounted using autofs.
+      Please use method=fstab instead.
+  when: autofs_item.value.type == "ceph_rbd"
+
+
+# - name: "{{ abs_mount_point }} - Include ceph client setup"
+#   ansible.builtin.include_tasks: "ceph_setup.yml"
+#   when: autofs_item.value.type in ["cephfs"]
+#   vars:
+#     ceph_item: "{{ autofs_item }}"
+
+
+- name: "{{ abs_mount_point }} - Include cifs/smb client setup"
+  ansible.builtin.include_tasks: "cifs_setup.yml"
+  when: autofs_item.value.type in ["cifs"]
+  vars:
+    cifs_item: "{{ autofs_item }}"
+  
+
+- name: "{{ abs_mount_point }} - Set autofs mount point variables"
+  set_fact:
+    autofs_master_mount_point: >-
+      {{ (autofs_item.value.master_mount_point
+          if autofs_item.value.master_mount_point is defined
+          else (autofs_item.value.mount_point | dirname) | default('/-', true)
+        ) | trim }}
+    autofs_mount_point: "{{ (autofs_item.value.mount_point | basename) | trim }}" # not a path 
+    autofs_master_mount_point_slug: >-
+      {{ (
+          autofs_item.value.master_mount_point
+          if autofs_item.value.master_mount_point is defined
+          else (autofs_item.value.mount_point | dirname) | default('fileroot', true)
+        ) | regex_replace('^/', '') | replace('/', '-') | trim }}
+
+
+- name: "{{ abs_mount_point }} - Ensure mount directories exist"
+  become: true
+  ansible.builtin.file:
+    path: "{{ autofs_master_mount_point }}"
+    state: directory
+    owner: "{{ item.value.mount_owner | default(omit) }}"
+    group: "{{ item.value.mount_group | default(omit) }}"
+    mode: "{{ item.value.mount_mode | default(omit) }}"
+
+
+- name: "{{ abs_mount_point }} - Ensure autofs master map fragment is correct"
+  become: true
+  ansible.builtin.lineinfile:
+    path: "/etc/auto.master.d/{{ autofs_master_mount_point_slug }}.autofs"
+    line: "{{ autofs_master_mount_point }} /etc/auto.{{ autofs_master_mount_point_slug }} {{ (autofs_item.value.autofs_options | default('')) | trim }}"
+    regexp: '^{{ autofs_master_mount_point | regex_escape() }}\s+.*$'
+    state: present
+    create: true # Creates the file if it does not exist.
+    mode: '0644'
+  notify: restart autofs
+
+- name: "{{ abs_mount_point }} - Ensure autofs map file entry is correct"
+  become: true
+  vars:
+    line_var: >-
+      {% if autofs_item.value.type == 'cifs' %}
+      {{ autofs_mount_point }} -fstype=cifs,{{ autofs_item.value.mount_opts }},credentials={{ autofs_item.value.credentials.file_path }} :{{ autofs_item.value.fs_path }}
+      {% elif autofs_item.value.type == 'nfs' %}
+      {{ autofs_mount_point }} -fstype=nfs,{{ autofs_item.value.mount_opts }} {{ autofs_item.value.fs_path }}
+      {% endif %}
+  ansible.builtin.lineinfile:
+    path: "/etc/auto.{{ autofs_master_mount_point_slug }}"
+    regexp: '^{{ autofs_mount_point | regex_escape() }}\s+.*$'
+    line: "{{(line_var) | trim}}"
+    state: present
+    create: true # Creates the map file if it does not exist.
+    mode: '0644'
+  notify: restart autofs

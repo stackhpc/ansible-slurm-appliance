@@ -1,0 +1,24 @@
+---
+
+- name: "{{ abs_mount_point }} - Deploy ceph keyring file"
+  become: true
+  ansible.builtin.template:
+    src: ceph.client.client_name.keyring.j2
+    dest: "/etc/ceph/{{ (ceph_item.value.credentials.ceph_conf | default('ceph')) | regex_replace('\\.conf$', '') }}.client.{{ ceph_item.value.credentials.client_name }}.keyring"
+    mode: '600'
+
+- name: "{{ abs_mount_point }} - Copy ceph.conf (if defined)"
+  become: true
+  ansible.builtin.copy:
+    src: "{{ ceph_mt_conf_src_dir }}/{{ ceph_item.value.credentials.ceph_conf }}"
+    dest: "/etc/ceph/{{ ceph_item.value.credentials.ceph_conf }}"
+    mode: '0644'
+  when: ceph_item.value.credentials.ceph_conf is defined
+
+- name: "{{ abs_mount_point }} - Build dynamic mount options"
+  ansible.builtin.set_fact:
+    ceph_mount_opts: "{{ (
+      ([ 'conf=/etc/ceph/' ~ ceph_item.value.credentials.ceph_conf ] if ceph_item.value.credentials.ceph_conf is defined else []) +
+      ([ 'mon_host=' ~ ceph_item.value.monitor_hosts ] if ceph_item.value.monitor_hosts is defined else []) +
+      ([ ceph_item.value.mount_opts ] if ceph_item.value.mount_opts is defined else [])
+    ) | join(',') | trim }}"

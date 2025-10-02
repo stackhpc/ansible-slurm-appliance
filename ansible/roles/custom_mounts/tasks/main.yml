@@ -1,0 +1,30 @@
+---
+
+- name: Check packages installed
+  ansible.builtin.include_tasks: install_packages.yml
+
+
+- name: Include autofs setup per mount point
+  ansible.builtin.include_tasks: autofs_main.yml
+  when: item.value.method == "autofs"
+  loop: "{{ query('dict', custom_mounts) }}"
+  loop_control:
+    label: "{{ abs_mount_point }}"
+  vars:
+    autofs_item: "{{ item }}"
+    abs_mount_point: >-
+      {{ (
+        item.value.master_mount_point ~ '/' ~ item.value.mount_point
+        if item.value.master_mount_point is defined
+        else item.value.mount_point
+      ) | regex_replace('//+', '/') | trim }}
+
+- name: Include mount/fstab setup per mount point
+  ansible.builtin.include_tasks: mount_fstab.yml
+  when: item.value.method == "fstab"
+  loop: "{{ query('dict', custom_mounts) }}"
+  loop_control:
+    label: "{{ abs_mount_point }}"
+  vars:
+    mount_item: "{{ item }}"
+    abs_mount_point: "{{ item.value.mount_point }}"

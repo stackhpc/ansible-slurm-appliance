@@ -1,0 +1,56 @@
+---
+
+- name: Common Ceph setup block
+  vars:
+    has_ceph_mount: >-
+      {{ custom_mounts | dict2items | selectattr('value.type', 'in', ['cephfs', 'ceph_rbd']) | list | length > 0 }}
+  when: has_ceph_mount
+  become: true
+  block:
+    - name: Gather installed package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Install epel-release and Ceph repo if ceph-common is not installed
+      ansible.builtin.dnf:
+        name:
+          - epel-release
+          - "centos-release-ceph-{{ ceph_repo_release }}"
+        state: present
+      when: "'ceph-common' not in ansible_facts.packages"
+
+    - name: Ensure ceph-common is installed if not already present
+      ansible.builtin.package:
+        name: "{{ 'ceph-common-' + ceph_common_version if ceph_common_version else 'ceph-common' }}"
+        state: present
+      when: "'ceph-common' not in ansible_facts.packages"
+
+    - name: Ensure /etc/ceph exists
+      ansible.builtin.file:
+        path: /etc/ceph
+        state: directory
+        mode: '0755'
+
+- name: Common CIFS setup block
+  vars:
+    has_cifs_mount: >-
+      {{ custom_mounts | dict2items | selectattr('value.type', 'equalto', 'cifs') | list | length > 0 }}
+  when: has_cifs_mount
+  become: true
+  block:
+    - name: Install cifs-utils package
+      ansible.builtin.package:
+        name: cifs-utils
+        state: present
+
+- name: Common autofs setup block
+  vars:
+    has_autofs_mount: >-
+      {{ custom_mounts | dict2items | selectattr('value.method', 'equalto', 'autofs') | list | length > 0 }}
+  when: has_autofs_mount
+  become: true
+  block:
+    - name: Install autofs package
+      ansible.builtin.package:
+        name: autofs
+        state: present
