@@ -56,7 +56,7 @@ For either a site-specific fat-image build or an extra-build:
    flavor = "general.v1.small"                           # VM flavor to use for builder VMs
    networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
    source_image_name = "Rocky-9-GenericCloud-Base-9.4"   # Name of image to create VM with, i.e. starting image
-   inventory_groups = "cuda"                             # Build VM inventory groups => functionality to add to image
+   inventory_groups = "doca,cuda"                        # Build VM inventory groups => functionality to add to image
    ```
 
    Note that:
@@ -93,8 +93,8 @@ For either a site-specific fat-image build or an extra-build:
      - For a fatimage build: `fatimage`: This is defined in `enviroments/{common,site}/inventory/groups`
        and results in an update of all packages in the source image, plus
        installation of packages for default control, login and compute nodes.
-     - For an extra-built image, one or more specific groups e.g. `cuda` or
-       `doca,lustre`. This extends the source image with just this additional
+     - For an extra-built image, one or more specific groups e.g. `lustre` or
+       `doca,cuda`. This extends the source image with just this additional
        functionality.
 
      See the top of [packer/openstack.pkr.hcl](../packer/openstack.pkr.hcl)
