@@ -104,25 +104,24 @@ Additional packages can be added during image builds by:
 1. Configuring an [image build](./image-build.md) to enable the
    `extra_packages` group:
 
-
-    ```terraform
-    # environments/site/builder.pkrvars.hcl:
-    ...
-    inventory_groups = "extra_packages"
-    ...
-    ```
+   ```terraform
+   # environments/site/builder.pkrvars.hcl:
+   ...
+   inventory_groups = "extra_packages"
+   ...
+   ```
 
 2. Defining a list of packages in `appliances_extra_packages_other`, for example:
 
-    ```yaml
-        # environments/site/inventory/group_vars/all/defaults.yml:
-        appliances_extra_packages_other:
-        - somepackage
-        - anotherpackage
-    ```
+   ```yaml
+   # environments/site/inventory/group_vars/all/defaults.yml:
+   appliances_extra_packages_other:
+     - somepackage
+     - anotherpackage
+   ```
 
 3. Either adding [Ark credentials](./image-build.md) or a [local Pulp mirror](./experimental/pulp.md)
-  to provide access to the required [repository snapshots](../environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml).
+   to provide access to the required [repository snapshots](../environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml).
 
 The packages available from the OpenHPC repos are described in Appendix E of
 the OpenHPC installation guide (linked from the
