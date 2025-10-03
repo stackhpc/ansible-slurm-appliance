@@ -83,7 +83,7 @@ disabled during runtime to prevent Ark credentials from being leaked. To enable 
 
 In both cases, Ark credentials will be required.
 
-=# Adding Additional Packages
+## Adding Additional Packages
 
 By default, the following utility packages are installed during the StackHPC image build:
 
@@ -101,22 +101,27 @@ By default, the following utility packages are installed during the StackHPC ima
 
 Additional packages can be added during image builds by:
 
-- adding the `extra_packages` group to the build `inventory_groups` (see
-  [docs/image-build.md](./image-build.md))
-- defining a list of packages in `appliances_extra_packages_other` in e.g.
-  `environments/$SITE_ENV/inventory/group_vars/all/defaults.yml`. For example:
+1. Configuring an [image build](./image-build.md) to enable the
+   `extra_packages` group:
 
-```yaml
-# environments/foo-base/inventory/group_vars/all/defaults.yml:
-appliances_extra_packages_other:
-  - somepackage
-  - anotherpackage
-```
+   ```terraform
+   # environments/site/builder.pkrvars.hcl:
+   ...
+   inventory_groups = "extra_packages"
+   ...
+   ```
 
-For packages which come from repositories mirrored by StackHPC's "Ark" Pulp server
-(including rocky, EPEL and OpenHPC repositories), this will require either [Ark
-credentials](./image-build.md)) or a [local Pulp mirror](./experimental/pulp.md)
-to be configured. This includes rocky, EPEL and OpenHPC repos.
+2. Defining a list of packages in `appliances_extra_packages_other`, for example:
+
+   ```yaml
+   # environments/site/inventory/group_vars/all/defaults.yml:
+   appliances_extra_packages_other:
+     - somepackage
+     - anotherpackage
+   ```
+
+3. Either adding [Ark credentials](./image-build.md) or a [local Pulp mirror](./experimental/pulp.md)
+   to provide access to the required [repository snapshots](../environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml).
 
 The packages available from the OpenHPC repos are described in Appendix E of
 the OpenHPC installation guide (linked from the
@@ -125,9 +130,9 @@ the OpenHPC installation guide (linked from the
 corresponding `lmod` modules.
 
 Packages _may_ also be installed during the site.yml, by adding the `cluster`
-group into the `extra_packages` group. An error will occur if Ark credentials
-are defined in this case, as they are readable by unprivileged users in the
-`.repo` files and a local Pulp mirror must be used instead.
+group as a child of the `extra_packages` group. An error will occur if Ark
+credential are defined in this case, as they are readable by unprivileged users
+in the `.repo` files and a local Pulp mirror must be used instead.
 
 If additional repositories are required, these could be added/enabled as necessary in a play added to `environments/$SITE_ENV/hooks/{pre,post}.yml` as appropriate.
 Note such a play should NOT exclude the builder group, so that the repositories are also added to built images.
@@ -147,8 +152,6 @@ ansible-playbook environments/$SITE_ENV/hooks/{pre,post}.yml
 ```
 
 as appropriate.
-
-TODO: improve description about adding these to extra images.
 
 ## Reconfiguring Slurm
 
