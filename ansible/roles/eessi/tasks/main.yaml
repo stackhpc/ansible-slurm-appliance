@@ -9,7 +9,7 @@
 
 - name: Add CVMFS repo
   dnf:
-    name: https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
+    name: https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-6-2.noarch.rpm
 
 - name: Install CVMFS
   dnf:
