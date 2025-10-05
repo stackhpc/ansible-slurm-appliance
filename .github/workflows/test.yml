@@ -1,0 +1,26 @@
+---
+name: Test
+
+# This is a test workflow to see if we can introduce a new workflow (outside of the default branch)
+# and have it trigger from the main CI.
+# If it triggers, what will github.event_name be set to?
+# Ideally we want to know whether we've triggered downstream from a push or a pull request.
+
+on:
+  workflow_call:
+  workflow_run:
+    workflows: ["Test on push and pull request"]
+    types: [completed,requested]
+
+permissions:
+  contents: read
+  packages: read
+  # To report GitHub Actions status checks
+  statuses: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "event name is:" ${{ github.event_name }} 
+      - run: echo "event type is:" ${{ github.event.action }} 
