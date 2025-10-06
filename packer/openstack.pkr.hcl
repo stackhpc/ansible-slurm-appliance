@@ -128,6 +128,11 @@ variable "volume_size" {
   default = 15
 }
 
+variable "volume_name" {
+  type = string
+  default = null
+}
+
 variable "image_disk_format" {
   type = string
   default = "raw"
@@ -162,6 +167,7 @@ source "openstack" "openhpc" {
   use_blockstorage_volume = var.use_blockstorage_volume
   volume_type = var.volume_type
   volume_size = var.volume_size
+  volume_name = "${var.image_name}${local.image_name_version}"
   metadata = var.metadata
   instance_metadata = {
     ansible_init_disable = "true"

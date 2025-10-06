@@ -54,3 +54,12 @@ jobs:
             openstack server delete $build_vm
           done
         shell: bash
+
+      - name: Delete all CI build volumes
+        run: |
+          . venv/bin/activate
+          for build_vol in $(openstack volume list -c Name -f value | grep openhpc-extra-RL)
+          do
+            openstack volume delete $build_vol
+          done
+        shell: bash
