@@ -1,3 +1,5 @@
 ---
 ansible_init_collections: []
 ansible_init_playbooks: []
+
+cluster_infra_ood_zenith_volume_size: 1

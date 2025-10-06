@@ -1,0 +1,29 @@
+---
+- name: Check task being called for correct service
+  ansible.builtin.assert:
+    that: zenith_proxy_service_name == 'zenith-ood'
+
+- name: Check for legacy Zenith OOD state
+  ansible.builtin.stat:
+    path: "{{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh"
+  register: _ood_zenith_stat
+  
+- name: Migrate releases <=2.6.1 to new Zenith state directory
+  become: true
+  block:
+  - name: Ensure new SSH directory
+    ansible.builtin.file:
+      path: "{{ zenith_proxy_state_dir }}"
+      state: directory
+      owner: "{{ zenith_proxy_podman_user }}"
+      group: "{{ zenith_proxy_podman_user }}"
+      mode: "0755"
+    become: true
+  - ansible.builtin.copy:
+      src: "{{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh/{{ item }}"
+      dest: "{{ caas_ood_zenith_dir }}/{{ zenith_proxy_service_name }}-ssh/{{ item }}"
+      remote_src: true
+    loop:
+      - id_zenith
+      - id_zenith.pub
+  when: _ood_zenith_stat.stat.exists

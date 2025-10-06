@@ -55,14 +55,12 @@
 
 - name: Create directory to persist SSH key
   ansible.builtin.file:
-    path: "{{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh"
+    path: "{{ zenith_proxy_state_dir }}"
     state: directory
     owner: "{{ zenith_proxy_podman_user }}"
     group: "{{ zenith_proxy_podman_user }}"
     mode: "0755"
   become: true
-  delegate_to: "{{ groups['control'] | first }}"
-  run_once: true
 
 - name: Initialise Zenith client
   # Use a foreground command rather than the podman_container module as I could not
@@ -72,7 +70,7 @@
       --name {{ zenith_proxy_service_name }}-init
       --replace
       --volume /etc/zenith/{{ zenith_proxy_service_name }}:/etc/zenith:ro
-      --volume {{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh:/home/zenith/.ssh
+      --volume {{ zenith_proxy_state_dir }}:/home/zenith/.ssh
       {{ zenith_proxy_client_image }}
       zenith-client init
   become: true

@@ -16,10 +16,19 @@
         zenith_proxy_mitm_auth_inject: basic
         zenith_proxy_mitm_auth_basic_username: "{{ grafana_security.admin_user }}"
         zenith_proxy_mitm_auth_basic_password: "{{ grafana_security.admin_password }}"
+        zenith_proxy_state_dir: "{{ appliances_state_dir }}/{{ zenith_proxy_service_name }}-ssh"
       when: zenith_subdomain_monitoring is defined
 
 - hosts: openondemand
   tasks:
+    - name: Migrate legacy Zenith OOD state
+      ansible.builtin.include_role:
+        name: zenith_proxy
+        tasks_from: migrate-ood.yml
+      vars:
+        zenith_proxy_service_name: zenith-ood
+        zenith_proxy_state_dir: "{{ caas_ood_zenith_dir }}/{{ zenith_proxy_service_name }}-ssh"
+      
     - name: Deploy the Zenith client for OOD
       ansible.builtin.include_role:
         name: zenith_proxy
@@ -34,6 +43,7 @@
         zenith_proxy_mitm_auth_inject: basic
         zenith_proxy_mitm_auth_basic_username: azimuth
         zenith_proxy_mitm_auth_basic_password: "{{ vault_azimuth_user_password }}"
+        zenith_proxy_state_dir: "{{ caas_ood_zenith_dir }}/{{ zenith_proxy_service_name }}-ssh"
       when: zenith_subdomain_ood is defined
 
 # Run hpctests if set in UI
