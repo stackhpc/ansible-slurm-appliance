@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 21 * * *'  # Run at 9PM - image sync runs at midnight
 
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+
 jobs:
   ci_cleanup:
     name: ci-cleanup
@@ -20,7 +26,7 @@ jobs:
       OS_CLOUD: openstack
       CI_CLOUD: ${{ matrix.cloud }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record which cloud CI is running on
         run: |
@@ -31,7 +37,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
         shell: bash
 
       - name: Write clouds.yaml

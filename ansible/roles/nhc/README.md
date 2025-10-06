@@ -21,7 +21,8 @@ To enable node health checks, ensure the `nhc` group contains the `compute` grou
 compute
 ```
 
-When the `anisble/site.yml` playbook is run this will automatically:
+When the `ansible/site.yml` playbook is run this will automatically:
+
 1. Add NHC-related configuration to the `slurm.conf` Slurm configuration file.
    The default configuration is defined in `openhpc_config_nhc`
    (see [environments/common/inventory/group_vars/all/openhpc.yml](../../../environments/common/inventory/group_vars/all/openhpc.yml)).
@@ -33,10 +34,11 @@ When the `anisble/site.yml` playbook is run this will automatically:
 
 2. Template out node health check rules using Ansible facts for each compute
    node. Currently these check:
-    - Filesystem mounts
-    - Ethernet interfaces
 
-    See `/etc/nhc/nhc.conf` on a compute node for the full configuration.
+   - Filesystem mounts
+   - Ethernet interfaces
+
+   See `/etc/nhc/nhc.conf` on a compute node for the full configuration.
 
 If a node healthcheck run fails, Slurm will mark the node `DOWN`. With the
 default [alerting configuration](../../../docs/alerting.md) this will trigger
@@ -52,15 +54,17 @@ an alert.
 ## Structure
 
 This role contains 3x task files, which run at different times:
+
 - `main.yml`: Runs from `site.yml` -> `slurm.yml`. Templates health check
   configuration to nodes.
 - `export.yml`: Runs from `site.yml` -> `final.yml` via role `compute_init`
   tasks `export.yml`. Templates health check configuration to the cluster NFS
-  share for compute-init. 
+  share for compute-init.
 - `boot.yml`: Runs on boot via `compute_init/files/compute-init.yml`. Copies
   the node's generated health check configuration from the cluster share to
   local disk.
 
 Note that the `stackhpc.openhpc` role:
+
 - Installs the required package
 - Configures slurm.conf parameterss

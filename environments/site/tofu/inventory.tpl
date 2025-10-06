@@ -26,7 +26,13 @@ ${cluster_name}_${group_name}:
             image_id: ${ node.image_id }
             networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
             node_fqdn: ${login_groups[group_name]["fqdns"][nodename]}
+            node_fip: ${login_groups[group_name]["nodegroup_fips"][nodename]}
 %{ endfor ~}
+
+${group_name}:
+    children:
+        ${cluster_name}_${group_name}:
+
 %{ endfor ~}
 
 login:
@@ -72,6 +78,7 @@ ${cluster_name}_${group_name}:
             instance_id: ${ node.id }
             networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
             node_fqdn: ${additional_groups[group_name]["fqdns"][nodename]}
+            node_fip: ${additional_groups[group_name]["nodegroup_fips"][nodename]}
 %{ endfor ~}
 ${group_name}:
     children:

@@ -1,3 +1,4 @@
+---
 - name: Create alertmanager directories
   ansible.builtin.file:
     path: "{{ item }}"
@@ -11,7 +12,7 @@
     - "{{ alertmanager_storage_path }}"
 
 - name: Create alertmanager service file with immutable options
-  template:
+  ansible.builtin.template:
     src: alertmanager.service.j2
     dest: /usr/lib/systemd/system/alertmanager.service
     owner: root
@@ -38,10 +39,9 @@
     mode: u=rw,go=
   notify: Restart alertmanager
 
-- meta: flush_handlers
-
+- ansible.builtin.meta: flush_handlers
 - name: Ensure alertmanager service state
-  systemd:
+  ansible.builtin.systemd:
     name: alertmanager
     state: "{{ 'started' if alertmanager_started | bool else 'stopped' }}"
     enabled: "{{ alertmanager_enabled | bool }}"

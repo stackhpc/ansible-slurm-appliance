@@ -1,3 +1,15 @@
+[login:children]
+# All Slurm login nodes. Combined control/login nodes are not supported.
+fatimage
+
+[control:children]
+# A single Slurm control node. Multiple (high availability) control nodes are not supported.
+fatimage
+
+[compute:children]
+# All Slurm compute nodes (in all partitions).
+fatimage
+
 [nfs:children]
 openhpc
 
@@ -31,6 +43,7 @@ slurm_stats
 # NB: [rebuild] not defined here as likely to need features not currently supported
 
 [update:children]
+fatimage
 
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH
@@ -44,27 +57,27 @@ login
 openhpc
 
 [openondemand:children]
-# Host to run Open Ondemand server on - subset of login
+# Host to run Open OnDemand server on - subset of login
 login
 
 [openondemand_desktop:children]
-# Subset of compute to run a interactive desktops on via Open Ondemand
+# Subset of compute to run a interactive desktops on via Open OnDemand
 compute
 
 [openondemand_jupyter:children]
-# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+# Subset of compute to run a Jupyter Notebook servers on via Open OnDemand
 compute
 
 [openondemand_rstudio:children]
-# Subset of compute to run RStudio servers on via Open Ondemand
+# Subset of compute to run RStudio servers on via Open OnDemand
 compute
 
 [openondemand_matlab:children]
-# Subset of compute to run a MATLAB interactive desktop on via Open Ondemand
+# Subset of compute to run a MATLAB interactive desktop on via Open OnDemand
 compute
 
 [openondemand_codeserver:children]
-# Subset of compute to run a Codeserver VSCode instance on via Open Ondemand
+# Subset of compute to run a Codeserver VSCode instance on via Open OnDemand
 compute
 
 [etc_hosts:children]
@@ -74,12 +87,18 @@ cluster
 [freeipa_client]
 # Hosts to be a FreeIPA client. See ansible/roles/freeipa/README.md
 
+[doca]
+# Add `builder` to install NVIDIA DOCA during image build
+
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
 [slurm_recompile:children]
 # Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
 cuda
+
+[vgpu]
+# Hosts where vGPU/MIG should be configured - see docs/mig.md
 
 [eessi:children]
 # Hosts on which EESSI stack should be configured
@@ -99,18 +118,21 @@ openhpc
 login
 openondemand
 
-[squid]
+[squid:children]
 # Hosts to run squid proxy
+fatimage
 
 [tuned:children]
 # Hosts to run TuneD configuration
+fatimage
 
 [ansible_init:children]
 # Hosts to run linux-ansible-init
 cluster
 
-[sssd]
+[sssd:children]
 # Hosts to configure sssd on
+fatimage
 
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
@@ -134,8 +156,13 @@ cluster
 [lustre]
 # Hosts to run lustre client
 
-[extra_packages:children]
+[extra_packages]
 # Hosts to install specified additional packages on
+
+[dnf_repos:children]
+# Hosts to replace system repos with Pulp repos
+# Some roles do installs when in install mode/on build VM only:
+fatimage
 builder
 
 [cacerts]
@@ -146,7 +173,7 @@ builder
 
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
-builder
+fatimage
 
 [nhc:children]
 # Hosts to configure for node health checks
@@ -166,3 +193,7 @@ compute
 # separately from the appliance. e.g
 # pulp_host ansible_host=<VM-ip-address>
 # Note inventory host name cannot conflict with group names i.e can't be called `pulp` or `pulp_server`.
+
+[raid:children]
+# Add `builder` to configure image for software raid
+fatimage

@@ -1,4 +1,4 @@
 {
-    "environment": "foo",
-    "description" : "Describe the environment here"
+  "environment": "foo",
+  "description": "Describe the environment here"
 }
