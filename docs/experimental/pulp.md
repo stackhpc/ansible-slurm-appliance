@@ -105,7 +105,5 @@ server will be synced with Ark during image builds.
     By default this method syncs repositories for the latest version of RockyLinux
     supported by the appliance. This can be overridden by setting
     `pulp_site_target_distribution_version` to e.g. `'8.10'`, i.e the `Major.minor`
-    version of RockyLinux the site clusters are using.
-
-    > [!IMPORTANT]
-    > This value must be quoted to avoid an incorrect conversion to float.
+    version of RockyLinux the site clusters are using. **NB:** This value
+    must be quoted to avoid an incorrect conversion to float.
