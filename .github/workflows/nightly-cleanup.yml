@@ -52,20 +52,14 @@ jobs:
           ./dev/delete-cluster.py slurmci-RL --force
         shell: bash
 
-      - name: Delete all CI build VMs
+      - name: Delete all CI extra build VMs and volumes
         run: |
           . venv/bin/activate
-          for build_vm in $(openstack server list -c Name -f value | grep openhpc-extra-RL)
-          do
-            openstack server delete $build_vm
-          done
+          ./dev/delete-cluster.py openhpc-extra-RL --force
         shell: bash
 
-      - name: Delete all CI build volumes
+      - name: Delete all fatimage build VMs and volumes
         run: |
           . venv/bin/activate
-          for build_vol in $(openstack volume list -c Name -f value | grep openhpc-extra-RL)
-          do
-            openstack volume delete $build_vol
-          done
+          ./dev/delete-cluster.py openhpc-RL --force
         shell: bash
