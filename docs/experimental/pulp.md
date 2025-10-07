@@ -3,7 +3,7 @@
 In order to ensure reproducibility, by default image builds use mirrors of DNF
 repositories hosted on StackHPC's "Ark" Pulp server. This page describes how to
 use a local Pulp server instead of Ark, which reduces network traffic and speeds
-up builds. The repositories on this local Pulp sever are sychronised to Ark so
+up builds. The repositories on this local Pulp server are synchronised to Ark so
 that builds still use the same package snapshots.
 
 It is also possible to use a local Pulp server to install packages during the
@@ -23,7 +23,7 @@ reachable.
 
 1.  Define the host in a group `pulp_server` within the `site` inventory. This
     means clusters in all environments use the same Pulp server, and the synced
-    dnf repository snapshots are tested in staging before use in production. E.g.:
+    DNF repository snapshots are tested in staging before use in production. E.g.:
 
     ```ini
     # environments/site/inventory/pulp:
@@ -105,7 +105,7 @@ server will be synced with Ark during image builds.
     By default this method syncs repositories for the latest version of RockyLinux
     supported by the appliance. This can be overridden by setting
     `pulp_site_target_distribution_version` to e.g. `'8.10'`, i.e the `Major.minor`
-    versino of RockyLinux the site clusters are using.
+    version of RockyLinux the site clusters are using.
 
     > [!IMPORTANT]
     > This value must be quoted to avoid an incorrect conversion to float.

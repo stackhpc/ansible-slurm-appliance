@@ -67,12 +67,12 @@ For either a site-specific fat-image build or an extra-build:
    - Normally the network must provide outbound internet access. However it
      does not need to provide access to resources used by the actual cluster
      nodes (e.g. Slurm control node, network filesystem servers etc.).
-   - The flavor used must have sufficent memory for the build tasks (usually
+   - The flavor used must have sufficient memory for the build tasks (usually
      8GB), but otherwise does not need to match the actual cluster node
      flavor(s).
    - By default, the build VM is volume-backed to allow control of the root
      disk size (and hence final image size), so the flavor's disk size does not
-     matter. The default volume size is not sufficent if enabling `cuda` and/or
+     matter. The default volume size is not sufficient if enabling `cuda` and/or
      `doca` and should be increased:
      ```terraform
      volume_size = 35 # GB
@@ -93,7 +93,7 @@ For either a site-specific fat-image build or an extra-build:
      All possible groups are listed in `environments/common/groups` but common
      options for this variable will be:
 
-     - For a fatimage build: `fatimage`: This is defined in `enviroments/site/inventory/groups`
+     - For a fatimage build: `fatimage`: This is defined in `environments/site/inventory/groups`
        and results in an update of all packages in the source image, plus
        installation of packages for default control, login and compute nodes.
 
@@ -137,15 +137,15 @@ For either a site-specific fat-image build or an extra-build:
 In summary, Packer creates an OpenStack VM, runs Ansible on that, shuts it down, then creates an image from the root disk.
 
 Many of the Packer variables defined in `openstack.pkr.hcl` control the definition of the build VM and how to SSH to it to run Ansible. These are generic OpenStack builder options
-and are not specific to the Slurm Appliance. Packer varibles can be set in a file at any convenient path; the build example above
-shows the use of the environment variable `$PKR_VAR_environment_root` (which itself sets the Packer variable
+and are not specific to the Slurm Appliance. Packer variables can be set in a file at any convenient path; the build example above
+shows the use of the environment variable `$PKT_VAR_environment_root` (which itself sets the Packer variable
 `environment_root`) to automatically select a variable file from the current environment, but for site-specific builds
 using a path in a "parent" environment is likely to be more appropriate (as builds should not be environment-specific to allow testing before deployment to a production environment).
 
 What is Slurm Appliance-specific are the details of how Ansible is run:
 
 - The build VM is always added to the `builder` inventory group, which differentiates it from nodes in a cluster. This allows
-  Ansible variables to be set differently during Packer builds, e.g. to prevent services starting. The defaults for this are in `environments/common/inventory/group_vars/builder/`, which could be extended or overriden for site-specific fat image builds using `builder` groupvars for the relevant environment. It also runs some builder-specific code (e.g. to clean up the image).
+  Ansible variables to be set differently during Packer builds, e.g. to prevent services starting. The defaults for this are in `environments/common/inventory/group_vars/builder/`, which could be extended or overridden for site-specific fat image builds using `builder` groupvars for the relevant environment. It also runs some builder-specific code (e.g. to clean up the image).
 - The default fat image builds also add the build VM to the "top-level" `compute`, `control` and `login` groups. This ensures
   the Ansible specific to all of these types of nodes run. Note other inventory groups are constructed from these by `environments/common/inventory/groups file` - this is not builder-specific.
 - As noted above, for "extra" builds the additional groups can be specified directly. In this way an existing image can be extended with site-specific Ansible, without modifying the

@@ -113,7 +113,7 @@ the OpenHPC installation guide (linked from the
 "user-facing" OpenHPC packages such as compilers, MPI libraries etc. include
 corresponding `lmod` modules.
 
-Packages _may_ also be installed during the `site.yml` plabook, by adding the
+Packages _may_ also be installed during the `site.yml` playbook, by adding the
 `cluster` group as a child of the `extra_packages` group. An error will occur if Ark
 credential are defined in this case, as they are readable by unprivileged users
 in the `.repo` files and a local Pulp mirror must be used instead.
@@ -194,7 +194,7 @@ ansible-playbook ansible/adhoc/$PLAYBOOK
 Currently they include the following (see each playbook for links to documentation):
 
 - `hpctests.yml`: MPI-based cluster tests for latency, bandwidth and floating point performance.
-- `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for reimaging nodes on an in-production cluster).
+- `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for re-imaging nodes on an in-production cluster).
 - `restart-slurm.yml`: Restart all Slurm daemons in the correct order.
 - `update-packages.yml`: Update specified packages on cluster nodes (NB: not recommended for routine use).
 
@@ -204,4 +204,4 @@ The `ansible` binary [can be used](https://docs.ansible.com/ansible/latest/comma
 ansible [--become] <group/host> -m shell -a "<shell command>"
 ```
 
-This can be useful for debugging and development but any modifications made this way will be lost if nodes are rebuilt/reimaged.
+This can be useful for debugging and development but any modifications made this way will be lost if nodes are rebuilt/re-imaged.
