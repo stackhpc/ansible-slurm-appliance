@@ -25,58 +25,58 @@ reachable.
    means clusters in all environments use the same Pulp server, and the synced
    DNF repository snapshots are tested in staging before use in production. E.g.:
 
-    ```ini
-    # environments/site/inventory/pulp:
-    [pulp_server]
-    pulp_host ansible_host=<VM-ip-address>
-    ```
+   ```ini
+   # environments/site/inventory/pulp:
+   [pulp_server]
+   pulp_host ansible_host=<VM-ip-address>
+   ```
 
-    **NB:** The inventory hostname must not conflict with group names, i.e. it
-    cannot be `pulp_site` or `pulp_server`.
+   **NB:** The inventory hostname must not conflict with group names, i.e. it
+   cannot be `pulp_site` or `pulp_server`.
 
 2. If adding Pulp to an existing deployment, ensure Pulp admin credentials
    exist:
 
-    ```shell
-    ansible-vault decrypt ansible/adhoc/generate-passwords.yml
-    ansible-playbook ansible/adhoc/generate-passwords.yml
-    ansible-vault encrypt ansible/adhoc/generate-passwords.yml
-    ```
+   ```shell
+   ansible-vault decrypt ansible/adhoc/generate-passwords.yml
+   ansible-playbook ansible/adhoc/generate-passwords.yml
+   ansible-vault encrypt ansible/adhoc/generate-passwords.yml
+   ```
 
 3. Run the adhoc playbook to install and configure Pulp:
 
-    ```shell
-    ansible-playbook ansible/adhoc/deploy-pulp.yml
-    ```
+   ```shell
+   ansible-playbook ansible/adhoc/deploy-pulp.yml
+   ```
 
-    Once complete, it will print a message giving a value to set for
-    `appliances_pulp_url`, assuming the inventory `ansible_host` address is
-    also the address the cluster should use to reach the Pulp server.
+   Once complete, it will print a message giving a value to set for
+   `appliances_pulp_url`, assuming the inventory `ansible_host` address is
+   also the address the cluster should use to reach the Pulp server.
 
 4. Create group vars files defining `appliances_pulp_url` and dev credentials
    for StackHPC's "Ark" Pulp server:
 
-    ```yaml
-    # environments/site/inventory/group_vars/all/pulp.yml:
-    appliances_pulp_url: "http://<pulp-host-ip>:8080"
-    pulp_site_upstream_username: your-ark-username
-    pulp_site_upstream_password: "{{ vault_pulp_site_upstream_password }}"
-    ```
+   ```yaml
+   # environments/site/inventory/group_vars/all/pulp.yml:
+   appliances_pulp_url: "http://<pulp-host-ip>:8080"
+   pulp_site_upstream_username: your-ark-username
+   pulp_site_upstream_password: "{{ vault_pulp_site_upstream_password }}"
+   ```
 
-    ```yaml
-    # environments/site/inventory/group_vars/all/vault_pulp.yml:
-    vault_pulp_site_upstream_password: your-ark-password
-    ```
+   ```yaml
+   # environments/site/inventory/group_vars/all/vault_pulp.yml:
+   vault_pulp_site_upstream_password: your-ark-password
+   ```
 
-    and vault-encrypt the latter:
+   and vault-encrypt the latter:
 
-    ```shell
-    ansible-vault encrypt environments/site/inventory/group_vars/all/vault_pulp.yml
-    ```
+   ```shell
+   ansible-vault encrypt environments/site/inventory/group_vars/all/vault_pulp.yml
+   ```
 
-    If previously using Ark credentials directly e.g. for image builds, ensure
-    the variables `dnf_repos_username` and `dnf_repos_password` are no longer
-    set in any environment.
+   If previously using Ark credentials directly e.g. for image builds, ensure
+   the variables `dnf_repos_username` and `dnf_repos_password` are no longer
+   set in any environment.
 
 5. Commit changes.
 
@@ -97,12 +97,12 @@ two ways:
 
 2. The sync can be manually be triggered by running:
 
-    ```shell
-    ansible-playbook ansible/adhoc/sync-pulp.yml
-    ```
+   ```shell
+   ansible-playbook ansible/adhoc/sync-pulp.yml
+   ```
 
-    By default this method syncs repositories for the latest version of RockyLinux
-    supported by the appliance. This can be overridden by setting
-    `pulp_site_target_distribution_version` to e.g. `'8.10'`, i.e the `Major.minor`
-    version of RockyLinux the site clusters are using. **NB:** This value
-    must be quoted to avoid an incorrect conversion to float.
+   By default this method syncs repositories for the latest version of RockyLinux
+   supported by the appliance. This can be overridden by setting
+   `pulp_site_target_distribution_version` to e.g. `'8.10'`, i.e the `Major.minor`
+   version of RockyLinux the site clusters are using. **NB:** This value
+   must be quoted to avoid an incorrect conversion to float.
