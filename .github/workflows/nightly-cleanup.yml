@@ -46,53 +46,20 @@ jobs:
           echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
         shell: bash
 
-      - name: Find CI clusters
+      - name: Delete all CI clusters
         run: |
           . venv/bin/activate
-          CI_CLUSTERS=$(openstack server list | grep --only-matching 'slurmci-RL.-[0-9]\+'  | sort | uniq || true)
-          echo "DEBUG: Raw CI clusters: $CI_CLUSTERS"
-      
-          if [[ -z "$CI_CLUSTERS" ]]; then
-            echo "No matching CI clusters found."
-          else
-            # Flatten multiline value so can be passed as env var
-            CI_CLUSTERS_FORMATTED=$(echo "$CI_CLUSTERS" | tr '\n' ' ' | sed 's/ $//')
-            echo "DEBUG: Formatted CI clusters: $CI_CLUSTERS_FORMATTED"
-            echo "ci_clusters=$CI_CLUSTERS_FORMATTED" >> "$GITHUB_ENV"
-          fi
+          ./dev/delete-cluster.py slurmci-RL --force
         shell: bash
-      
-      - name: Delete CI clusters
+
+      - name: Delete all CI extra build VMs and volumes
         run: |
           . venv/bin/activate
-          if [[ -z ${ci_clusters} ]]; then
-            echo "No clusters to delete."
-            exit 0
-          fi
+          ./dev/delete-cluster.py openhpc-extra-RL --force
+        shell: bash
 
-          for cluster_prefix in ${ci_clusters}
-          do
-            echo "Processing cluster: $cluster_prefix"
-
-            # Get all servers with the matching name for control node
-            CONTROL_SERVERS=$(openstack server list --name "${cluster_prefix}-control" --format json)
-
-            # Get unique server names to avoid duplicate cleanup
-            UNIQUE_NAMES=$(echo "$CONTROL_SERVERS" | jq -r '.[].Name' | sort | uniq)
-            for name in $UNIQUE_NAMES; do
-              echo "Deleting cluster with control node: $name"
-
-              # Get the first matching server ID by name
-              server=$(echo "$CONTROL_SERVERS" | jq -r '.[] | select(.Name=="'"$name"'") | .ID' | head -n1)
-
-              # Make sure server still exists (wasn't deleted earlier)
-              if ! openstack server show "$server" &>/dev/null; then
-                echo "Server $server no longer exists, skipping $name."
-                continue
-              fi
-
-              echo "Deleting cluster $cluster_prefix (server $server)..."
-              ./dev/delete-cluster.py "$cluster_prefix" --force
-            done
-          done
+      - name: Delete all fatimage build VMs and volumes
+        run: |
+          . venv/bin/activate
+          ./dev/delete-cluster.py openhpc-RL --force
         shell: bash
