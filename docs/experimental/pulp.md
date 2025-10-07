@@ -21,9 +21,9 @@ reachable.
 > Commands below should be run with the `staging` environment active, as all
 > Pulp syncs will be done from there.
 
-1.  Define the host in a group `pulp_server` within the `site` inventory. This
-    means clusters in all environments use the same Pulp server, and the synced
-    DNF repository snapshots are tested in staging before use in production. E.g.:
+1. Define the host in a group `pulp_server` within the `site` inventory. This
+   means clusters in all environments use the same Pulp server, and the synced
+   DNF repository snapshots are tested in staging before use in production. E.g.:
 
     ```ini
     # environments/site/inventory/pulp:
@@ -31,12 +31,11 @@ reachable.
     pulp_host ansible_host=<VM-ip-address>
     ```
 
-    > [!WARNING]
-    > The inventory hostname cannot conflict with group names, i.e it cannot be
-    > `pulp_site` or `pulp_server`.
+    **NB:** The inventory hostname must not conflict with group names, i.e. it
+    cannot be `pulp_site` or `pulp_server`.
 
-2.  If adding Pulp to an existing deployment, ensure Pulp admin credentials
-    exist:
+2. If adding Pulp to an existing deployment, ensure Pulp admin credentials
+   exist:
 
     ```shell
     ansible-vault decrypt ansible/adhoc/generate-passwords.yml
@@ -44,7 +43,7 @@ reachable.
     ansible-vault encrypt ansible/adhoc/generate-passwords.yml
     ```
 
-3.  Run the adhoc playbook to install and configure Pulp:
+3. Run the adhoc playbook to install and configure Pulp:
 
     ```shell
     ansible-playbook ansible/adhoc/deploy-pulp.yml
@@ -54,8 +53,8 @@ reachable.
     `appliances_pulp_url`, assuming the inventory `ansible_host` address is
     also the address the cluster should use to reach the Pulp server.
 
-4.  Create group vars files defining `appliances_pulp_url` and dev credentials
-    for StackHPC's "Ark" Pulp server:
+4. Create group vars files defining `appliances_pulp_url` and dev credentials
+   for StackHPC's "Ark" Pulp server:
 
     ```yaml
     # environments/site/inventory/group_vars/all/pulp.yml:
@@ -79,7 +78,7 @@ reachable.
     the variables `dnf_repos_username` and `dnf_repos_password` are no longer
     set in any environment.
 
-5.  Commit changes.
+5. Commit changes.
 
 ## Using an existing Pulp server
 
@@ -93,10 +92,10 @@ As above, the `dnf_repos_` variables must not be set in this configuration.
 The appliance can synchronise repositories on local Pulp server from Ark in
 two ways:
 
-1.  If the `pulp_site` group is added to the Packer build groups, the local Pulp
-    server will be synced with Ark during image builds.
+1. If the `pulp_site` group is added to the Packer build groups, the local Pulp
+   server will be synced with Ark during image builds.
 
-2.  The sync can be manually be triggered by running:
+2. The sync can be manually be triggered by running:
 
     ```shell
     ansible-playbook ansible/adhoc/sync-pulp.yml
