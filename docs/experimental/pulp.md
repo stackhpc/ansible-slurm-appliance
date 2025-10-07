@@ -33,7 +33,7 @@ reachable.
 
     > [!WARNING]
     > The inventory hostname cannot conflict with group names, i.e it cannot be
-    `pulp_site` or `pulp_server`.
+    > `pulp_site` or `pulp_server`.
 
 2.  If adding Pulp to an existing deployment, ensure Pulp admin credentials
     exist:
@@ -74,7 +74,7 @@ reachable.
     ```shell
     ansible-vault encrypt environments/site/inventory/group_vars/all/vault_pulp.yml
     ```
-    
+
     If previously using Ark credentials directly e.g. for image builds, ensure
     the variables `dnf_repos_username` and `dnf_repos_password` are no longer
     set in any environment.
@@ -94,9 +94,9 @@ The appliance can synchronise repositories on local Pulp server from Ark in
 two ways:
 
 1.  If the `pulp_site` group is added to the Packer build groups, the local Pulp
-server will be synced with Ark during image builds.
+    server will be synced with Ark during image builds.
 
-2. The sync can be manually be triggered by running:
+2.  The sync can be manually be triggered by running:
 
     ```shell
     ansible-playbook ansible/adhoc/sync-pulp.yml
