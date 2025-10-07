@@ -67,22 +67,6 @@ This is a usually a two-step process:
 
 Deploying the additional nodes and applying these changes requires rerunning both OpenTofu and the Ansible site.yml playbook - follow [Deploying a Cluster](#deploying-a-cluster).
 
-## Package Repositories
-
-```yaml
-[squid:children]
-# Hosts to run squid proxy
-login
-```
-
-Note that many non-default roles include package installations from repositories which the appliance overwrites to point at snapshotted mirrors on a Pulp server (by default StackHPC's Ark server), which are
-disabled during runtime to prevent Ark credentials from being leaked. To enable this functionality, you must therefore either:
-
-- Create a site-specific fatimage (see [image build docs](image-build.md)) with the appropriate group added to the `inventory_groups` Packer variables.
-- If you instead wish roles to perform their installations during runtime, deploy a site Pulp server and sync it with with mirrors of the snapshots from the upstream Ark server (see [Pulp docs](experimental/pulp.md)).
-
-In both cases, Ark credentials will be required.
-
 ## Adding Additional Packages
 
 By default, the following utility packages are installed during the StackHPC image build:
@@ -129,8 +113,8 @@ the OpenHPC installation guide (linked from the
 "user-facing" OpenHPC packages such as compilers, MPI libraries etc. include
 corresponding `lmod` modules.
 
-Packages _may_ also be installed during the site.yml, by adding the `cluster`
-group as a child of the `extra_packages` group. An error will occur if Ark
+Packages _may_ also be installed during the `site.yml` plabook, by adding the
+`cluster` group as a child of the `extra_packages` group. An error will occur if Ark
 credential are defined in this case, as they are readable by unprivileged users
 in the `.repo` files and a local Pulp mirror must be used instead.
 

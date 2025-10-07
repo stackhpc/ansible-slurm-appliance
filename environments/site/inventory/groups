@@ -192,7 +192,7 @@ compute
 # Host to deploy a Pulp server on and sync with mirrors of upstream Ark repositories. Should be a group containing a single VM provisioned
 # separately from the appliance. e.g
 # pulp_host ansible_host=<VM-ip-address>
-# Note inventory host name cannot conflict with group names i.e can't be called `pulp` or `pulp_server`.
+# Note inventory host name cannot conflict with group names i.e can't be called `pulp_site` or `pulp_server`.
 
 [raid:children]
 # Add `builder` to configure image for software raid
