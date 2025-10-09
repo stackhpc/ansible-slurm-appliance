@@ -61,6 +61,8 @@
     group: "{{ zenith_proxy_podman_user }}"
     mode: "0755"
   become: true
+  delegate_to: "{{ groups['control'] | first }}"
+  run_once: true
 
 - name: Initialise Zenith client
   # Use a foreground command rather than the podman_container module as I could not
