@@ -117,7 +117,7 @@
     - name: Install OpenHPC
       ansible.builtin.import_role:
         name: stackhpc.openhpc
-        tasks_from: install-ohpc.yml
+        tasks_from: install.yml
       when: "'openhpc' in group_names"
 
     # - import_playbook: portal.yml
