@@ -1,0 +1,10 @@
+---
+
+- name: "{{ abs_mount_point }} - Template CIFS credentials file"
+  become: true
+  template:
+    src: cifs_credentials.j2
+    dest: "{{ cifs_item.value.credentials.file_path }}"
+    mode: 0600
+
+
