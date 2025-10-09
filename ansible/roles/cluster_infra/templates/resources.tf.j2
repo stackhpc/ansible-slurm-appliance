@@ -120,6 +120,12 @@ resource "openstack_blockstorage_volume_v3" "home" {
 }
 {% endif %}
 
+resource "openstack_blockstorage_volume_v3" "ood_zenith" {
+    name = "{{ cluster_name }}-ood-zenith"
+    description = "State for Open OnDemand Zenith client"
+    size = "{{ cluster_infra_ood_zenith_volume_size }}"
+}
+
 ######
 ###### Cluster network
 ######
@@ -419,6 +425,13 @@ resource "openstack_compute_instance_v2" "login" {
       delete_on_termination = true
   }
 
+  block_device {
+      destination_type = "volume"
+      source_type  = "volume"
+      boot_index = -1
+      uuid = openstack_blockstorage_volume_v3.ood_zenith.id
+  }
+
   # Use cloud-init to inject the SSH keys
   user_data = <<-EOF
     #cloud-config
@@ -429,6 +442,12 @@ resource "openstack_compute_instance_v2" "login" {
     {%- if cluster_ssh_private_key_file is not defined %}
       - "${openstack_compute_keypair_v2.cluster_keypair.public_key}"
     {%- endif %}
+    bootcmd:
+    %{for volume in [openstack_blockstorage_volume_v3.ood_zenith] }
+    - BLKDEV=$(readlink -f $(ls /dev/disk/by-id/*${replace(substr(volume.id, 0, 20), "-", "*")}* | head -n1 )); blkid -o value -s TYPE $BLKDEV ||  mke2fs -t ext4 -L ${lower(split(" ", volume.description)[0])} $BLKDEV
+    %{endfor}
+    mounts:
+        - [LABEL=ood_zenith, {{ caas_ood_zenith_dir }}, auto]
   EOF
 
   metadata = {

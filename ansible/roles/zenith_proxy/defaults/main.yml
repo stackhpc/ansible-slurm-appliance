@@ -23,6 +23,8 @@ zenith_proxy_client_image: "{{ zenith_proxy_client_image_repository }}:{{ zenith
 zenith_proxy_mitm_image_repository: ghcr.io/azimuth-cloud/zenith-proxy
 zenith_proxy_mitm_image: "{{ zenith_proxy_mitm_image_repository }}:{{ zenith_proxy_image_tag }}"
 
+zenith_proxy_state_dir: "{{ undef(hint = 'zenith_proxy_state_dir is required') }}"
+
 zenith_proxy_upstream_scheme: http
 zenith_proxy_upstream_host: "{{ undef(hint = 'zenith_proxy_upstream_host is required') }}"
 zenith_proxy_upstream_port: "{{ undef(hint = 'zenith_proxy_upstream_port is required') }}"
