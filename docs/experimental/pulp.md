@@ -38,9 +38,9 @@ reachable.
    exist:
 
    ```shell
-   ansible-vault decrypt ansible/adhoc/generate-passwords.yml
+   ansible-vault decrypt environments/staging/inventory/group_vars/all/secrets.yml
    ansible-playbook ansible/adhoc/generate-passwords.yml
-   ansible-vault encrypt ansible/adhoc/generate-passwords.yml
+   ansible-vault encrypt environments/staging/inventory/group_vars/all/secrets.yml
    ```
 
 3. Run the adhoc playbook to install and configure Pulp:

@@ -69,7 +69,21 @@ Deploying the additional nodes and applying these changes requires rerunning bot
 
 ## Adding Additional Packages
 
-By default, the following utility packages are installed during the StackHPC image build:
+The StackHPC images provided via [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases)
+have all DNF repositories disabled, because for reproducibility these images are
+build using (authenticated) mirrors hosted on StackHPC's "Ark" Pulp server and
+the credentials are not provided as part of the appliance.
+
+This means that when running the `site.yml` playbook, by default:
+- Features which are not enabled by default, e.g., `freeipa_client`, cannot
+  install the packages they require.
+- It is not possible to install arbitrary packages using e.g. an `ansible.builtin.dnf`
+  task in a hook.
+
+The recommended way to resolve both of these issues is by carrying out a
+site-specific [image build](./image-build.md).
+
+By default, the following utility packages are installed in StackHPC images:
 
 - htop
 - nano
@@ -85,7 +99,7 @@ By default, the following utility packages are installed during the StackHPC ima
 
 Additional packages can be added during image builds by:
 
-1. Configuring an [image build](./image-build.md) to enable the
+1. Configuring the [image build](./image-build.md) to enable the
    `extra_packages` group:
 
    ```terraform
@@ -113,10 +127,13 @@ the OpenHPC installation guide (linked from the
 "user-facing" OpenHPC packages such as compilers, MPI libraries etc. include
 corresponding `lmod` modules.
 
-Packages _may_ also be installed during the `site.yml` playbook, by adding the
-`cluster` group as a child of the `extra_packages` group. An error will occur if Ark
-credential are defined in this case, as they are readable by unprivileged users
-in the `.repo` files and a local Pulp mirror must be used instead.
+If a site-specific image build and cluster reimage is not possible (e.g. for
+an urgent patch), it is possible to install packages directly during the
+`site.yml` playbook by adding the `cluster` group as a child of the
+`extra_packages` group. An error will occur if Ark credentials are defined in
+this case, as they are readable by unprivileged users in the `.repo` files. A
+local Pulp mirror must be used instead, which also has the advantage of making
+this approach more reproducable.
 
 If additional repositories are required, these could be added/enabled as necessary in a play added to `environments/$SITE_ENV/hooks/{pre,post}.yml` as appropriate.
 Note such a play should NOT exclude the builder group, so that the repositories are also added to built images.

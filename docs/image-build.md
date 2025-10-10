@@ -138,7 +138,7 @@ In summary, Packer creates an OpenStack VM, runs Ansible on that, shuts it down,
 
 Many of the Packer variables defined in `openstack.pkr.hcl` control the definition of the build VM and how to SSH to it to run Ansible. These are generic OpenStack builder options
 and are not specific to the Slurm Appliance. Packer variables can be set in a file at any convenient path; the build example above
-shows the use of the environment variable `$PKT_VAR_environment_root` (which itself sets the Packer variable
+shows the use of the environment variable `$PKR_VAR_environment_root` (which itself sets the Packer variable
 `environment_root`) to automatically select a variable file from the current environment, but for site-specific builds
 using a path in a "parent" environment is likely to be more appropriate (as builds should not be environment-specific to allow testing before deployment to a production environment).
 
