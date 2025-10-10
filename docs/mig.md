@@ -215,9 +215,6 @@ openhpc_nodegroups:
       - conf: "gpu:nvidia_h100_80gb_hbm3_4g.40gb:2"
       - conf: "gpu:nvidia_h100_80gb_hbm3_1g.10gb:6"
 
-openhpc_config:
-  GresTypes:
-    - gpu
 ```
 
 Making sure the types (the identifier after `gpu:`) match those collected with `slurmd -G`. Substrings
