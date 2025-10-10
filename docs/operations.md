@@ -75,6 +75,7 @@ build using (authenticated) mirrors hosted on StackHPC's "Ark" Pulp server and
 the credentials are not provided as part of the appliance.
 
 This means that when running the `site.yml` playbook, by default:
+
 - Features which are not enabled by default, e.g., `freeipa_client`, cannot
   install the packages they require.
 - It is not possible to install arbitrary packages using e.g. an `ansible.builtin.dnf`
