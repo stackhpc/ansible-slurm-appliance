@@ -1,3 +1,12 @@
+# This file
+# 1. Ensures all groups in the appliance are always defined - even if empty
+# 2. Defines dependencies between groups - child groups require & enables parent
+#
+# IMPORTANT
+# ---------
+# All groups and child groups here MUST be empty, as other environments cannot
+# remove hosts/groups.
+
 [login]
 # All Slurm login nodes. Combined control/login nodes are not supported.
 
@@ -129,6 +138,9 @@ prometheus
 freeipa_server
 freeipa_client
 
+[doca]
+# Add `builder` to install NVIDIA DOCA during image build
+
 [cuda]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
 
@@ -193,9 +205,10 @@ k3s_agent
 
 [dnf_repos:children]
 # Hosts to replace system repos with Pulp repos
-# Warning: when using Ark directly rather than a local Pulp server, adding hosts other than `builder` will leak Ark creds to users
-builder
+# Roles/groups listed here *always* do installs:
 extra_packages
+doca
+# TODO: can't express: if cuda and builder, enable dnf_repos
 
 [pulp_site]
 # Add builder to this group to automatically sync pulp during image build
@@ -216,7 +229,10 @@ extra_packages
 # Host to deploy a Pulp server on and sync with mirrors of upstream Ark repositories. Should be a group containing a single VM provisioned
 # separately from the appliance. e.g
 # pulp_host ansible_host=<VM-ip-address>
-# Note the host name can't conflict with group names i.e can't be called `pulp` or `pulp_server`
+# Note the host name can't conflict with group names i.e can't be called `pulp_site` or `pulp_server`
 
 [raid]
 # Add `builder` to configure image for software raid
+
+[fatimage]
+# Add build VM into this group to enable all features with this as child
