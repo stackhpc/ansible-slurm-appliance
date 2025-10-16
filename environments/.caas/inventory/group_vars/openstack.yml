@@ -19,8 +19,12 @@ cluster_ssh_user: rocky
 
 # Provision a single "standard" compute nodegroup using the supplied
 # node count and flavor
-openhpc_nodegroups:
+openhpc_nodegroups_default:
   - name: "standard"
     count: "{{ compute_count }}"
     flavor: "{{ compute_flavor }}"
     default: "YES"
+
+# Can supply same format via extravars to override/supplement properties:
+openhpc_nodegroups_override: [] # same format, must contain `name` to match
+openhpc_nodegroups: "{{ openhpc_nodegroups_default | community.general.lists_mergeby(openhpc_nodegroups_override, 'name') }}"
