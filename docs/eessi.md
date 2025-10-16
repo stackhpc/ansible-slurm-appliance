@@ -1,57 +1,66 @@
 # EESSI Guide
 
-## How to load EESSI
-Loading an EESSI environment module:
-```[bash]
-source /cvmfs/software.eessi.io/versions/2023.06/init/lmod/bash
-```
-Activating EESSI environment:
+## How to Load EESSI
+EESSI can be initialised using the following method.
+
+The EESSI environment is sourced (in a non-reversible way) by running:
 ```[bash]
 source /cvmfs/software.eessi.io/versions/2023.06/init/bash
 ```
 
-## GPU Support with EESI
-To enable GPU support you need a site-specific build that has `cuda` enabled. For guide to do this please refer to `docs/image-build`. This is
-because CUDA-drivers are host specific and EESSI can not ship NVIDIA drivers due to licensing + kernel specific constraints. This means that the
-host must provide the drivers in a known location (`host_injections`).
+This is non-reversible because it:
+- Changes your `$PATH`, `$MODULEPATH`, `$LD_LIBRARY_PATH`, and other critical environment variables.
+- Sets EESSI-specific variables such as `EESSI_ROOT`.
+
+This is the recommended method because it:
+- Detects your CPU architecture and OS.
+- Detects and configures GPU support.
+- Prepares the full EESSI software stack.
+- Sets up Lmod (environment module system).
+
+The [EESSI docs](https://www.eessi.io/docs/using_eessi/setting_up_environment/) offer another method to load EESSI, in addition to one above. The alternative method only initialises the Lmod module system and does not load a platform-specific setup. For these reasons, it is recommened to use the method detailed above.
+
+Successful environment setup will show `{EESSI 2023.06}` at the start of your CLI.
+
+To deactivate your EESSI environment you can either restart your shell using `exec bash` or exit the shell by `exit`.
+
+## GPU Support with EESSI
+To enable GPU support, you need a site-specific build that has CUDA enabled. For a guide on how to do this, please refer to [docs/image-build.md](../image-build.md).
 
 ### Using GPUs
-All CUDA-enabled software in EESSI expects CUDA drivers in a specific `host_injections` subdirectory.<br>
-```[bash]
-ls -l /cvmfs/software.eessi.io/versions/2023.06/software/linux/x86_64/amd/zen3/software/CUDA/12.1.1/bin/nvcc
-```
-The output of this should show a symlink to the EESSI `host_injections` dir like so:
-```[bash]
-lrwxrwxrwx 1 cvmfs cvmfs 109 May  6  2024 /cvmfs/software.eessi.io/versions/2023.06/software/linux/x86_64/amd/zen3/software/CUDA/12.1.1/bin/nvcc
--> /cvmfs/software.eessi.io/host_injections/2023.06/software/linux/x86_64/amd/zen3/software/CUDA/12.1.1/bin/nvcc
-```
-To expose the Nvidia GPU drivers.
+All CUDA-enabled software in EESSI expects CUDA drivers in a specific `host_injections` directory.
+
+#### To expose the NVIDIA GPU drivers:
+Use the `link_nvidia_host_libraries.sh` script, provided by EESSI, to symlink your GPU drivers into `host_injections`.
 ```[bash]
 /cvmfs/software.eessi.io/versions/2023.06/scripts/gpu_support/nvidia/link_nvidia_host_libraries.sh
 ```
+Rerun this script when your NVIDIA GPU drivers are updated. It is also safe to rerun at any time as the script will detect if the driver versions have already been symlinked.
 
-### Buidling with GPUs
+### Building with GPUs
 
-Checking `nvcc --version` and `which nvcc` to see if `CUDA` compiler is found.<br>
-<br>
-If `nvcc` not found run:<br>
+Run `which nvcc` to confirm that the CUDA compiler is found.
+
+If `nvcc` is not found, add the CUDA path to your environment:
 ```[bash]
-export PATH=/usr/local/cuda-13.0/bin:$PATH
+export PATH=/usr/local/cuda/bin:$PATH
 ```
-(with your specific cuda version)<br>
-`which nvcc` should now show path to compiler.<br>
-<br>
-Running `which gcc` will give path `.../2023.06/compat...`<br>
-Loading EESSI module (It is important to load a `gcc` that is compatible with the host's CUDA version.):<br>
+
+`which nvcc` should now show the path to the CUDA compiler.
+
+#### Loading EESSI module for the GCC compiler
+
+Running `which gcc` with EESSI initialised should initially show a path `.../2023.06/compat...` which points to the compatibility compiler.
+It is important to load a `gcc` version that is compatible with the host's CUDA version:
 ```[bash]
 module load GCC/12.3.0
 ```
-Now running `which gcc` will give path `.../2023.06/software...`<br>
-<br>
-Now you can run `cmake` and `make` to compile `CUDA` using EESSI's `gcc`.<br>
+Running `which gcc` will now give a path `.../2023.06/software...` which is the full compiler provided by EESSI. This is what we want for CUDA builds.
 
-#### Test setup: Compile deviceQuery from CUDA-Samples
-To test that your EESSI set up can compile `CUDA`, try compiling deviceQuery from CUDA-Samples with the following steps:<br>
+Now you can run `cmake` and `make` to compile CUDA using EESSI's `gcc`.
+
+#### Test: Compile deviceQuery from CUDA-Samples
+To test that your EESSI setup can compile CUDA, try compiling `deviceQuery` from CUDA-Samples with the following steps:
 ```[bash]
 git clone https://github.com/NVIDIA/cuda-samples.git
 cd cuda-samples/Samples/1_Utilities/deviceQuery
