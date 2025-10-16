@@ -330,7 +330,7 @@ resource "openstack_networking_port_v2" "{{ nodegroup.name }}" {
   ]
 
   binding {
-    vnic_type = "{{ cluster_vnic_type | default('normal') }}"
+    vnic_type = "{{ nodegroup.vnic_type | default(cluster_vnic_type | default('normal')) }}"
   }
 
   lifecycle {
@@ -355,7 +355,7 @@ resource "openstack_networking_port_v2" "{{ nodegroup.name }}_storage" {
   ]
 
   binding {
-    vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
+    vnic_type = "{{ nodegroup.vnic_type | default(cluster_vnic_type | default('normal')) }}"
   }
 
   lifecycle {
