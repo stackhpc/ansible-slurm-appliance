@@ -4,7 +4,7 @@ set -euo pipefail
 
 image=${1?param missing - image name or ID}
 echo getting image format ...
-format=$(openstack image show -c disk_format -f value ${image})
+format=$(openstack image show -c disk_format -f value "${image}")
 
 echo setting constant properties ...
 set -x
@@ -16,7 +16,7 @@ openstack image set \
 --property os_distro=rocky \
 --property os_type=linux \
 --property os_admin_user=rocky \
-$image
+"$image"
 
 set +x
 if [[ "$format" = raw ]]; then
@@ -25,7 +25,7 @@ if [[ "$format" = raw ]]; then
     openstack image set \
     --property hw_scsi_model=virtio-scsi \
     --property hw_disk_bus=scsi \
-    $image
+    "$image"
 else
     echo setting qcow2 properties
     set -x
@@ -33,5 +33,5 @@ else
     --property hw_scsi_model=virtio-scsi \
     --property hw_disk_bus=scsi \
     --property hw_scsi_model=virtio \
-    $image
+    "$image"
 fi
