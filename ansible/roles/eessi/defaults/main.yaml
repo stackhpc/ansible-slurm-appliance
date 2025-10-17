@@ -1,4 +1,6 @@
 ---
+cvmfs_release_version: "6-3"
+
 # Default to 10GB
 cvmfs_quota_limit_mb: 10000
 
@@ -9,4 +11,4 @@ cvmfs_config_default:
 cvmfs_config_overrides: {}
 cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
 
-cvmfs_gpg_checksum: "sha256:4ac81adff957565277cfa6a4a330cdc2ce5a8fdd73b8760d1a5a32bef71c4bd6"
+cvmfs_gpg_checksum: "sha256:5c60679d307a96524204c127250e8ebdda66a459659faa1718bdf32dde1d7069"
