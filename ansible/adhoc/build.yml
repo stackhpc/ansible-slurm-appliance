@@ -35,6 +35,7 @@
         name: "openhpc-test-{{ appliances_version }}"
         packer_template: "{{ packer_dir }}/openstack.pkr.hcl"
         packer_vars:
+          image_name_version: '' # disable appending timestamp/git hash # TODO: do properly!
           inventory_groups: extra_packages
           source_image_name: "{{ community_images_default.stackhpc_RL9.name }}" # TODO: we can only use the reference here b/c its in community_images_default - is that a problem for stackhpc->site->gpu for example?
           flavor: ec1.large
@@ -54,8 +55,8 @@
         chdir: "{{ packer_dir }}"
       register: _packer_init
       changed_when: _packer_init.stdout != ''
-    # NB: passing non-strings via CLI only works if vars have types defined
-    # we could use a json file instead and serialise?
+      # TODO: really, only when at least one build defines packer_template
+    
     - name: Write variables file
       # Required to avoid issues with serialising e.g. strings as 'foo' which isn't allowed for hcl
       # TODO: probably needs to be a template to get full expansion
@@ -65,8 +66,19 @@
         dest: "{{ packer_dir }}/{{ item.key }}.pkrvars.json"
       loop: "{{ community_images_default | combine(community_images_extra) | dict2items }}"
       when: "'packer_template' in item.value"
-    # TODO: make this idempotent!
-    - command:
+    
+    # TODO: there is existing logic for this, this is just to get idempotency here
+    - name: List existing images
+      command:
+        cmd: openstack image list --format json
+      changed_when: false
+      register: _build_openstack_images
+    - name: Set fact for existing image names
+      set_fact:
+        _build_openstack_image_names: "{{ _build_openstack_images.stdout | from_json  | map(attribute='Name') }}"
+
+    - name: Run packer builds
+      command:
         cmd: >-
           {{ packer_binary }} build
           -on-error={{ packer_on_error }}
@@ -75,9 +87,11 @@
           {{ item.value.packer_template }}
         chdir: "{{ packer_dir }}"
       environment:
-        PACKER_LOG: 1
+        PACKER_LOG: 1 # TODO: if we don't set this do we still get normal logs?
         PACKER_LOG_PATH: "{{ packer_dir }}/{{ item.key }}.log"
       loop: "{{ community_images_default | combine(community_images_extra) | dict2items }}"
-      when: "'packer_template' in item.value"
-        
-
+      loop_control:
+        label: "{{ item.value.name }}"
+      when:
+        - "'packer_template' in item.value"
+        - "item.value.name not in _build_openstack_image_names"
