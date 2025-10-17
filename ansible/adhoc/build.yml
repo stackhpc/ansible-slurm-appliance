@@ -1,0 +1,83 @@
+# Test of running builds from ansible
+
+# NB: Comment out dnf_repos_username, dnf_repos_password in environments/.stackhpc/inventory/group_vars/builder.yml
+# and provide them yourself!
+
+- hosts: localhost
+  become: false
+  gather_facts: false
+  vars:
+    # role defaults:
+    packer_binary: /usr/bin/packer
+    #packer_on_error: cleanup
+    packer_on_error: ask
+    # tested: with 'ask', ctrl-C-ing ansible still runs packer cleanup, yay
+    # although I don't think it waits for it to finish necessarily boo
+    # and something about this screws up the terminal, you need to run `reset`
+    # after ctrl-C-ing out of it
+
+    packer_dir: "{{ appliances_repository_root }}/packer"
+
+    # build specific:
+    appliances_extra_packages_other:
+      - emacs
+    
+    # environments/common/inventory_group_vars/all/:
+    appliances_version: PR999
+    community_images_default:
+      stackhpc_RL9:
+        name: openhpc-RL9-251014-1152-20aa2a49 # from environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+
+    # environments/site/inventory/group_vars/all/
+    # TODO: maybe want to merge in a packer_vars_defaults to minimise per-image config?
+    community_images_extra:
+      openhpc_test:
+        name: "openhpc-test-{{ appliances_version }}"
+        packer_template: "{{ packer_dir }}/openstack.pkr.hcl"
+        packer_vars:
+          inventory_groups: extra_packages
+          source_image_name: "{{ community_images_default.stackhpc_RL9.name }}" # TODO: we can only use the reference here b/c its in community_images_default - is that a problem for stackhpc->site->gpu for example?
+          flavor: ec1.large
+          volume_type: unencrypted
+          networks:
+            - "00b07263-ed53-4104-8357-969cb57363d0" # stackhpc-dev
+          # TODO: FIXME the above gets serialised with single quotes, which doesn't work!
+          ssh_keypair_name: slurm-app-ci
+          ssh_private_key_file: ~/.ssh/id_ed25519
+          security_groups:
+            - default
+            - SSH
+  tasks:
+    - name: Init packer
+      command:
+        cmd: "{{ packer_binary }} init ."
+        chdir: "{{ packer_dir }}"
+      register: _packer_init
+      changed_when: _packer_init.stdout != ''
+    # NB: passing non-strings via CLI only works if vars have types defined
+    # we could use a json file instead and serialise?
+    - name: Write variables file
+      # Required to avoid issues with serialising e.g. strings as 'foo' which isn't allowed for hcl
+      # TODO: probably needs to be a template to get full expansion
+      copy:
+        content: |
+          {{ {'image_name': item.value.name} | combine(item.value.get('packer_vars', {})) | to_nice_json }}
+        dest: "{{ packer_dir }}/{{ item.key }}.pkrvars.json"
+      loop: "{{ community_images_default | combine(community_images_extra) | dict2items }}"
+      when: "'packer_template' in item.value"
+    # TODO: make this idempotent!
+    - command:
+        cmd: >-
+          {{ packer_binary }} build
+          -on-error={{ packer_on_error }}
+          -color=false
+          -var-file="{{ packer_dir }}/{{ item.key }}.pkrvars.json"
+          {{ item.value.packer_template }}
+        chdir: "{{ packer_dir }}"
+      environment:
+        PACKER_LOG: 1
+        PACKER_LOG_PATH: "{{ packer_dir }}/{{ item.key }}.log"
+      loop: "{{ community_images_default | combine(community_images_extra) | dict2items }}"
+      when: "'packer_template' in item.value"
+        
+
