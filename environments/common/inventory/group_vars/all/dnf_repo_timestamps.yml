@@ -45,11 +45,11 @@ dnf_repos_default:
       repo_file: rocky
   appstream-source:
     '8.10':
-      pulp_path: rocky/8.10/AppStream/source/os
+      pulp_path: rocky/8.10/AppStream/source/tree
       pulp_timestamp: 20250923T024945
       repo_file: Rocky-Sources
     '9.6':
-      pulp_path: rocky/9.6/AppStream/source/os
+      pulp_path: rocky/9.6/AppStream/source/tree
       pulp_timestamp: 20250923T043546
       repo_file: rocky
   baseos:
@@ -71,11 +71,11 @@ dnf_repos_default:
       repo_file: rocky
   baseos-source:
     '8.10':
-      pulp_path: rocky/8.10/BaseOS/source/os
+      pulp_path: rocky/8.10/BaseOS/source/tree
       pulp_timestamp: 20250918T040529
       repo_file: Rocky-Sources
     '9.6':
-      pulp_path: rocky/9.6/BaseOS/source/os
+      pulp_path: rocky/9.6/BaseOS/source/tree
       pulp_timestamp: 20250923T043546
       repo_file: rocky
   crb:
@@ -103,7 +103,7 @@ dnf_repos_default:
       repo_file: Rocky-Sources
       repo_name: powertools-source
     '9.6':
-      pulp_path: rocky/9.6/CRB/source/os
+      pulp_path: rocky/9.6/CRB/source/tree
       pulp_timestamp: 20250923T043546
       repo_file: rocky
   epel:
@@ -117,11 +117,11 @@ dnf_repos_default:
       repo_file: epel
   epel-source:
     '8':
-      pulp_path: epel/8/Everything/source
+      pulp_path: epel/8/Everything/source/tree
       pulp_timestamp: 20250923T001717
       repo_file: epel
     '9':
-      pulp_path: epel/9/Everything/source
+      pulp_path: epel/9/Everything/source/tree
       pulp_timestamp: 20250923T001717
       repo_file: epel
   extras:
@@ -143,11 +143,11 @@ dnf_repos_default:
       repo_file: rocky-extras
   extras-source:
     '8.10':
-      pulp_path: rocky/8.10/extras/source/os
+      pulp_path: rocky/8.10/extras/source/tree
       pulp_timestamp: 20250828T161842
       repo_file: Rocky-Sources
     '9.6':
-      pulp_path: rocky/9.6/extras/source/os
+      pulp_path: rocky/9.6/extras/source/tree
       pulp_timestamp: 20250828T161842
       repo_file: rocky-extras
   grafana:
