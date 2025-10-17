@@ -135,11 +135,11 @@ variable "ip_addresses" {
   nullable    = false
   validation {
     condition     = length(setsubtract(keys(var.ip_addresses), var.networks[*].network)) == 0
-    error_message = "Keys in ip_addresses for nodegroup \"${var.group_name}\" must match network names in var.cluster_networks"
+    error_message = "Keys in ip_addresses for nodegroup \"${var.group_name}\" must match network names"
   }
   validation {
-    condition     = alltrue([for v in values(var.ip_addresses) : length(v) == length(var.nodes)])
-    error_message = "Values in ip_addresses for nodegroup \"${var.group_name}\" must be a list of the same length as var.nodes"
+    condition     = alltrue([for v in values(var.ip_addresses) : length(v) >= length(var.nodes)])
+    error_message = "Lists in ip_addresses for nodegroup \"${var.group_name}\" must be at least as long as the nodes list"
   }
 }
 
