@@ -6,8 +6,6 @@ skip_list:
   - jinja[spacing]
   - galaxy[no-changelog]
   - meta-runtime[unsupported-version]
-
-warn_list:
   - name[missing]
   - name[play]
   - var-naming
