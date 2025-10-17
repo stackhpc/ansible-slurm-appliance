@@ -1,4 +1,8 @@
 #!/usr/bin/bash
+# Set image properties correctly for Slurm Appliance images
+#
+# Usage:
+#   dev/image-set-properties.sh $IMAGE_NAME_OR_ID
 
 set -euo pipefail
 
