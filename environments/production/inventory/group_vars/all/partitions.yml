@@ -6,6 +6,7 @@ openhpc_slurm_partitions:
     - name: general-compute4
     - name: general-compute5
     - name: general-compute6
+    - name: general-gen2-compute10
     - name: general-gen2-compute11
     - name: general-gen2-compute12
     - name: general-gen2-compute13

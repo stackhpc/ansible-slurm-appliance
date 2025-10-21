@@ -6,3 +6,5 @@ appliances_extra_packages_other:
   - libibverbs-utils
   - autoconf
   - automake
+  - vim-enhanced
+  - emacs

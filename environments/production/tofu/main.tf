@@ -11,6 +11,7 @@ module "cluster" {
       {
         network = "slurm-production-control-net"
         subnet = "slurm-production-control-subnet"
+        set_dns_name = true
       },
       {
         network = "slurm-production-rdma-net"
@@ -231,39 +232,39 @@ module "cluster" {
             "eessi",
           ]
       }
-#      general-gen2-compute10 = {
-#          nodes: [
-#           "vcompute052",
-#           "vcompute053",
-#           "vcompute054",
-#           "vcompute055",
-#           "vcompute056",
-#           "vcompute057",
-#           "vcompute058",
-#           "vcompute059",
-#           "vcompute060",
-#           "vcompute061",
-#           "vcompute062",
-#          ]
-#          hypervisor_hostname: "compute10"
-#          flavor: "hpc.v2.32cpu.128ram"
-#          availability_zone = "DL-Rack-6"
-#          vnic_types = {
-#            "slurm-production-control-net": "normal"
-#            "slurm-production-rdma-net": "direct"
-#            "external-ceph": "direct"
-#          }
-#          ignore_image_changes: true
-#          compute_init_enable = [
-#            "compute",
-#            "etc_hosts",
-#            "tuned",
-#            "nfs",
-#            "manila",
-#            "basic_users",
-#            "eessi",
-#          ]
-#      }
+      general-gen2-compute10 = {
+          nodes: [
+           "vcompute052",
+           "vcompute053",
+           "vcompute054",
+           "vcompute055",
+           "vcompute056",
+           "vcompute057",
+           "vcompute058",
+           "vcompute059",
+           "vcompute060",
+           "vcompute061",
+           "vcompute062",
+          ]
+          hypervisor_hostname: "compute10"
+          flavor: "hpc.v2.32cpu.128ram"
+          availability_zone = "DL-Rack-6"
+          vnic_types = {
+            "slurm-production-control-net": "normal"
+            "slurm-production-rdma-net": "direct"
+            "external-ceph": "direct"
+          }
+          ignore_image_changes: true
+          compute_init_enable = [
+            "compute",
+            "etc_hosts",
+            "tuned",
+            "nfs",
+            "manila",
+            "basic_users",
+            "eessi",
+          ]
+      }
       general-gen2-compute11 = {
           nodes: [
            "vcompute063",
@@ -1248,7 +1249,7 @@ module "cluster" {
 
     login = {
         interactive = {
-            nodes: ["login"]
+            nodes: ["bc5-login01"]
             flavor: "hpc.v1.16cpu.64ram"
             vnic_types = {
               "slurm-production-control-net": "normal"
@@ -1258,7 +1259,7 @@ module "cluster" {
             hypervisor_hostname = "compute6"
             root_volume_size = 100
             server_group_id = openstack_compute_servergroup_v2.control.id
-            fip_addresses:  ["10.129.31.194"]
+            fip_addresses:  ["10.3.0.89"]
             fip_network: "slurm-production-control-net"
         }
     }

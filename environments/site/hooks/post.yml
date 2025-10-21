@@ -1,0 +1,10 @@
+---
+- name: Configure timezone
+  hosts: cluster
+  become: true
+  tags: timezone
+  tasks:
+    - import_role:
+        name: stackhpc.timezone
+      vars:
+        timezone: "{{ cluster_timezone }}"

@@ -31,6 +31,8 @@ resource "openstack_networking_port_v2" "control" {
     vnic_type = lookup(var.vnic_types, each.key, "normal")
   }
 
+  dns_name = lookup(each.value, "set_dns_name", false) ? split(".", local.nodename)[0] : null
+
   lifecycle {
     ignore_changes = [ binding ]
   }
@@ -42,7 +44,9 @@ resource "openstack_compute_instance_v2" "control" {
   image_id = var.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair = var.key_pair
+  config_drive = true
   hypervisor_hostname = var.control_node_hypervisor_hostname 
+
   # root device:
   block_device {
       uuid = var.cluster_image_id
