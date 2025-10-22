@@ -128,9 +128,21 @@ For either a site-specific fat-image build or an extra-build:
    then delete the failed volume, select cancelling the build when Packer asks,
    and then retry. This is [OpenStack bug 1823445](https://bugs.launchpad.net/cinder/+bug/1823445).
 
+   The image name and UUID will be output near the end of a build, e.g.:
+
+   ```shell
+   ==> openstack.openhpc: Waiting for image openhpc-251017-1156-046b6133 (image id: 86ac2073-0a86-4fbf-935c-f1b6e6392e90) to become ready...
+   ```
+
 6. The built image will be automatically uploaded to OpenStack. By default it
    will have a name prefixed `openhpc` and including a timestamp and a shortened
    Git hash.
+
+7. Set the image properties. From the repository root run:
+
+   ```shell
+   dev/image-set-properties.sh $IMAGE_NAME_OR_ID
+   ```
 
 ## Build Process
 
