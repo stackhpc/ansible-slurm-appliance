@@ -14,6 +14,7 @@ This is non-reversible because it:
 - Sets EESSI-specific variables such as `EESSI_ROOT`.
 
 However, it is the recommended method because it:
+
 - Detects system CPU architecture and OS.
 - Detects and configures GPU support.
 - Prepares the full EESSI software stack.
@@ -26,6 +27,7 @@ Successful environment setup will show `{EESSI 2023.06}` at the start of your CL
 To deactivate your EESSI environment you can either restart your shell using `exec bash` or exit the shell by running `exit`.
 
 ## GPU Support with EESSI
+
 To enable GPU support, the cluster must be running a site-specific image build that has CUDA enabled. For a guide on how to do this, please refer to [docs/image-build.md](../image-build.md).
 
 ### Using GPUs
