@@ -1,0 +1,56 @@
+---
+- name: Ensure cuda_bandwidth_path exists
+  ansible.builtin.file:
+    state: directory
+    path: "{{ cuda_bandwidth_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Download CUDA bandwith test release
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "{{ cuda_bandwidth_release_url }}"
+    dest: "{{ cuda_bandwidth_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    creates: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8"
+
+- name: Creates CUDA bandwidth test build directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8/build"
+    mode: "0755"
+
+- name: Ensure cudatests directory exists
+  ansible.builtin.file:
+    path: "{{ appliances_environment_root }}/cudatests"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+
+- name: Build CUDA bandwidth test
+  ansible.builtin.shell:
+    cmd: |
+      source /cvmfs/software.eessi.io/versions/2023.06/init/bash &&
+      module load Boost/1.82.0-GCC-12.3.0 &&
+      . /etc/profile.d/sh.local && cmake .. &&
+      make -j {{ ansible_processor_vcpus }}
+    chdir: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8/build"
+    creates: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8/build/nvbandwidth"
+
+- name: Run CUDA bandwidth test
+  ansible.builtin.shell: |
+    export LD_LIBRARY_PATH=/cvmfs/software.eessi.io/versions/2023.06/software/linux/x86_64/amd/zen4/software/GCCcore/12.3.0/lib64:\
+    /cvmfs/software.eessi.io/versions/2023.06/software/linux/x86_64/amd/zen4/software/Boost/1.82.0-GCC-12.3.0/lib
+    ./nvbandwidth
+  args:
+    chdir: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8/build/"
+  register: cuda_bandwidth_output
+
+- name: Save CUDA bandwidth output to bandwidth_results.txt
+  ansible.builtin.copy:
+    content: "{{ cuda_bandwidth_output.stdout }}"
+    dest: "{{ appliances_environment_root }}/cudatests/bandwidth_results.txt"
+    mode: '0644'
+  delegate_to: localhost

@@ -7,3 +7,8 @@
     - ansible.builtin.import_role:
         name: cuda
         tasks_from: samples.yml
+
+    - name: Run CUDA bandwidth tasks
+      ansible.builtin.import_role:
+        name: cuda
+        tasks_from: bandwidth.yml
