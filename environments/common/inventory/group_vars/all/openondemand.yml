@@ -274,6 +274,7 @@ openondemand_apps_matlab_default:
     - matlab_module
     - cores
     - ram
+    - gpus
   attributes:
     desktop: xfce
     # bc_account: # i.e. slurm account
@@ -314,6 +315,11 @@ openondemand_apps_matlab_default:
       step: 1
       value: 30
       cachable: true
+    gpus:
+      label: GPU(s) required
+      help: A Slurm GRES specification to get access to GPUs
+      #options: TODO: be nice to provide options based on the selected partition->nodegroup->gres.
+      # Not sure there is any way to do that though, especially given user will want to modify count.
   submit: |
     ---
     script:
@@ -327,6 +333,8 @@ openondemand_apps_matlab_default:
         - "<%= ram.blank? ? 4 : ram.to_i %>G"
         - "--cpus-per-task"
         - "<%= cores.blank? ? 1 : cores.to_i %>"
+        - "--gres"
+        - "<%= gpus %>"
 openondemand_apps_matlab: "{{ {'matlab':openondemand_apps_matlab_default} if openondemand_matlab_partition | default(none) else {} }}"
 
 openondemand_apps_codeserver_default:
