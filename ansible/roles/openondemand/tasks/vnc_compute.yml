@@ -7,6 +7,13 @@
     dest: /etc/yum.repos.d/TurboVNC.repo
     mode: "0644"
 
+- name: Enable VirtualGL repo
+  tags: install
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/VirtualGL/repo/main/VirtualGL.repo
+    dest: /etc/yum.repos.d/VirtualGL.repo
+    mode: "0644"
+
 - name: Install EPEL
   tags: install
   ansible.builtin.dnf:
@@ -32,10 +39,13 @@
   tags: install
   ansible.builtin.dnf:
     name:
-      - turbovnc-3.0.1
+      - "turbovnc-{{ openondemand_turbovnc_version }}"
       - nmap-ncat
       - python3.9
       - dbus-x11
+      - "VirtualGL-{{ openondemand_virtualgl_version }}"
+  # TODO: really we only want to do this when we've got cuda
+  # but that would mean re-running this during cuda builds ...
 
 - name: Stop turbovnc service
   # This is not actually required
@@ -95,3 +105,11 @@
     name: xfce4-screensaver
     state: absent
   when: not (openondemand_desktop_screensaver | bool)
+
+- name: Configure TurboVNC to use VirtualGL by default
+  # See https://turbovnc.org/Documentation/Compatibility30#threedwm
+  ansible.builin.lineinfile:
+    path: /etc/turbovncserver.conf
+    regexp: '^#? \$useVGL = '
+    line: '$useVGL=1;'
+  # TODO: make conditional?

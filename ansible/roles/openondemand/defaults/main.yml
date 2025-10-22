@@ -105,3 +105,5 @@ openondemand_osc_ood_defaults:
 openondemand_code_server_version: 4.102.2
 openondemand_rstudio_version: 2025.05.1-513
 openondemand_matlab_version: ''
+openondemand_turbovnc_version: '3.0.1'
+openondemand_virtualgl_version: '3.1.4-20251007'
