@@ -72,7 +72,7 @@ To find your cuda version run `nvcc --version`
 | CUDA 11.4 – 11.8 | no matching GCC module in EESSI 2023.06                 |
 | CUDA < 11.4      | not supported                                           |
 
-To load correct ESSI module run, substituing x for the compatible GCC version:
+To load correct ESSI module run, substituting x for the compatible GCC version:
 
 ```[bash]
 module load GCC/12.x.0
