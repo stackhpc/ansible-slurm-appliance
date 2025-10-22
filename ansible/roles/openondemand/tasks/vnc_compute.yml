@@ -108,7 +108,7 @@
 
 - name: Configure TurboVNC to use VirtualGL by default
   # See https://turbovnc.org/Documentation/Compatibility30#threedwm
-  ansible.builin.lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/turbovncserver.conf
     regexp: '^#? \$useVGL = '
     line: '$useVGL=1;'
