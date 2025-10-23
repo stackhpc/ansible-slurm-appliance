@@ -43,11 +43,6 @@
   command:
     cmd: sinfo --noheader --format "%R %G" # can't use , or : as separator
   register: _openondemand_sinfo_gres
-  # partition_name gres
-  # e.g.
-  # gpu gpu:H200:8(S:0-1)
-  # normal (null)
-  # no_smi (null)
 
 - ansible.builtin.include_role:
     name: osc.ood

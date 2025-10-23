@@ -204,7 +204,6 @@ openondemand_apps_jupyter_default:
     extra_jupyter_args: ""
     bc_queue:
       value: "{{ openondemand_jupyter_partition | default(none) }}"
-    node: ""
   submit: |
     ---
     batch_connect:
