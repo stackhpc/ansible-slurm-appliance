@@ -14,10 +14,10 @@
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
   when:
     - repo_name != 'epel'
-    - repo_os in item.value
+    - repo_values | length > 0
   vars:
     repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
-    repo_values: "{{ item.value[repo_os] | default({}) }}"
+    repo_values: "{{ item.value.get(repo_os, {}) }}"
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
 
@@ -40,9 +40,9 @@
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
   when:
     - repo_name == 'epel'
-    - repo_os in item.value
+    - repo_values | length > 0
   vars:
     repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
-    repo_values: "{{ item.value[repo_os] | default({}) }}"
+    repo_values: "{{ item.value.get(repo_os, {}) }}"
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
