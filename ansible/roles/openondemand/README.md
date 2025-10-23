@@ -73,7 +73,11 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 - `openondemand_desktop_screensaver`: Optional. Whether to enable screen locking/screensaver. **NB:** Users must have passwords if this is enabled. Bool, default `false`.
 - `openondemand_filesapp_paths`: List of paths (in addition to $HOME, which is always added) to include shortcuts to within the Files dashboard app.
 - `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers. Requires a corresponding group named "openondemand_jupyter" and entry in openhpc_partitions.
-
+- `openondemand_gres_options`: Optional. A list of `[label, value]` items used
+  to provide a drop-down for resource/GRES selection in application forms. The
+  default constructs a list from all GRES definitions in the cluster. See the
+  `option` attribute of the Select Field [form widget](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/form-widgets.html#form-widgets).
+  
 ### Monitoring
 
 - `openondemand_exporter`: Optional. Install the Prometheus [ondemand_exporter](https://github.com/OSC/ondemand_exporter) on the `openondemand` node to export metrics about Open Ondemand itself. Default `true`.
