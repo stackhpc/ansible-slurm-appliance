@@ -126,7 +126,7 @@ dnf_repos_default:
       repo_file: epel
   epel-cisco:
     '9':
-      pulp_path: openh264/epel/9/x86_64/os/
+      pulp_path: openh264/epel/9/x86_64/os
       pulp_timestamp: 20250925T130153
       repo_file: openh264
   extras:
@@ -167,28 +167,28 @@ dnf_repos_default:
       repo_file: grafana
   ondemand-web:
     '8':
-      pulp_path: ondemand/4.0/web/el8/x86_64/
+      pulp_path: ondemand/4.0/web/el8/x86_64
       pulp_timestamp: 20250925T130153
       repo_file: ondemand-web
     '9':
-      pulp_path: ondemand/4.0/web/el9/x86_64/
+      pulp_path: ondemand/4.0/web/el9/x86_64
       pulp_timestamp: 20250925T130153
       repo_file: ondemand-web
   TurboVNC:
     '8':
-      pulp_path: turbovnc/x86_64/
+      pulp_path: turbovnc/x86_64
       pulp_timestamp: 20251009T091906
       repo_file: TurboVNC
     '9':
-      pulp_path: turbovnc/x86_64/
+      pulp_path: turbovnc/x86_64
       pulp_timestamp: 20251009T091906
       repo_file: TurboVNC
   TurboVNC-source:
     '8':
-      pulp_path: turbovnc/srpms/
+      pulp_path: turbovnc/srpms
       pulp_timestamp: 20251009T091906
       repo_file: TurboVNC
     '9':
-      pulp_path: turbovnc/srpms/
+      pulp_path: turbovnc/srpms
       pulp_timestamp: 20251009T091906
       repo_file: TurboVNC
