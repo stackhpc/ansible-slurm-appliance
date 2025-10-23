@@ -175,10 +175,20 @@ dnf_repos_default:
       pulp_timestamp: 20250925T130153
       repo_file: ondemand-web
   TurboVNC:
-    pulp_path: turbovnc/x86_64/
-    pulp_timestamp: 20251009T091906
-    repo_file: TurboVNC
+    '8':
+      pulp_path: turbovnc/x86_64/
+      pulp_timestamp: 20251009T091906
+      repo_file: TurboVNC
+    '9':
+      pulp_path: turbovnc/x86_64/
+      pulp_timestamp: 20251009T091906
+      repo_file: TurboVNC
   TurboVNC-source:
-    pulp_path: turbovnc/srpms/
-    pulp_timestamp: 20251009T091906
-    repo_file: TurboVNC
+    '8':
+      pulp_path: turbovnc/srpms/
+      pulp_timestamp: 20251009T091906
+      repo_file: TurboVNC
+    '9':
+      pulp_path: turbovnc/srpms/
+      pulp_timestamp: 20251009T091906
+      repo_file: TurboVNC
