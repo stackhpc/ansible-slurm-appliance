@@ -12,7 +12,9 @@
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
-  when: repo_name != 'epel'
+  when:
+    - repo_name != 'epel'
+    - repo_os in item.value
   vars:
     repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
     repo_values: "{{ item.value[repo_os] }}"
@@ -36,7 +38,9 @@
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
-  when: repo_name == 'epel'
+  when:
+    - repo_name != 'epel'
+    - repo_os in item.value
   vars:
     repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
     repo_values: "{{ item.value[repo_os] }}"
