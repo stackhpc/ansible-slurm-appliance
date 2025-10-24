@@ -40,8 +40,9 @@
     public: true
 
 - name: Get GRES information
-  command:
+  ansible.builtin.command:
     cmd: sinfo --noheader --format "%R %G" # can't use , or : as separator
+  changed_when: true
   register: _openondemand_sinfo_gres
 
 - ansible.builtin.include_role:
