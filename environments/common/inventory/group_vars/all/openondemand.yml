@@ -122,16 +122,30 @@ openondemand_apps_desktop_default:
     - bc_queue
     - bc_num_hours
     - num_cores
+    - gres
+    - gres_count
     - node
   attributes:
     desktop: xfce
-    # bc_account: # i.e. slurm account
-    #   value: root
     bc_queue:
       value: "{{ openondemand_desktop_partition | default(none) }}"
     num_cores:
       label: Number of cores
       value: 1
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
     node:
       label: Node name
       help: Select a particular node or leave empty to let Slurm pick the next available
@@ -144,6 +158,9 @@ openondemand_apps_desktop_default:
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
         - <%= "--nodelist=#{node}" %>
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 openondemand_apps_desktop: "{{ {'bc_desktop':openondemand_apps_desktop_default} if openondemand_desktop_partition | default(none) else {} }}"
 
 # yamllint disable-line rule:line-length
@@ -158,16 +175,35 @@ openondemand_apps_jupyter_default:
     - bc_queue
     - bc_num_hours
     - num_cores
+    - gres
+    - gres_count
     - node
   attributes: # TODO
     num_cores:
       label: Number of cores
       value: 1
     modules: ""
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
+    node:
+      label: Node name
+      help: Select a particular node or leave empty to let Slurm pick the next available
+      value: ""
     extra_jupyter_args: ""
     bc_queue:
       value: "{{ openondemand_jupyter_partition | default(none) }}"
-    node: ""
   submit: |
     ---
     batch_connect:
@@ -182,6 +218,9 @@ openondemand_apps_jupyter_default:
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
         - <%= "--nodelist=#{node}" %>
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 openondemand_apps_jupyter: "{{ {'jupyter':openondemand_apps_jupyter_default} if openondemand_jupyter_partition | default(none) else {} }}"
 
 openondemand_apps_rstudio_default:
@@ -233,6 +272,20 @@ openondemand_apps_rstudio_default:
     bc_email_on_started: false
     auto_modules_RStudio-Server:
       default: false
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
   form:
     - bc_queue
     - rstudio_module
@@ -242,6 +295,8 @@ openondemand_apps_rstudio_default:
     - ram
     - bc_num_hours
     - bc_email_on_started
+    - gres
+    - gres_count
   submit: |
     ---
     batch_connect:
@@ -261,6 +316,9 @@ openondemand_apps_rstudio_default:
         - "<%= cores.blank? ? 1 : cores.to_i %>"<% if auto_queues.start_with?("gpu") %>
         - "--gpus-per-task"
         - "1"<% end %>
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 openondemand_apps_rstudio: "{{ {'rstudio':openondemand_apps_rstudio_default} if openondemand_rstudio_partition | default(none) else {} }}"
 
 openondemand_apps_matlab_default:
@@ -274,6 +332,8 @@ openondemand_apps_matlab_default:
     - matlab_module
     - cores
     - ram
+    - gres
+    - gres_count
   attributes:
     desktop: xfce
     # bc_account: # i.e. slurm account
@@ -314,6 +374,20 @@ openondemand_apps_matlab_default:
       step: 1
       value: 30
       cachable: true
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
   submit: |
     ---
     script:
@@ -327,6 +401,9 @@ openondemand_apps_matlab_default:
         - "<%= ram.blank? ? 4 : ram.to_i %>G"
         - "--cpus-per-task"
         - "<%= cores.blank? ? 1 : cores.to_i %>"
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 openondemand_apps_matlab: "{{ {'matlab':openondemand_apps_matlab_default} if openondemand_matlab_partition | default(none) else {} }}"
 
 openondemand_apps_codeserver_default:
