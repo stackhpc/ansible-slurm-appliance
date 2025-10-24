@@ -27,14 +27,15 @@ def to_gres_options(stdout):
 
     [1] https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/form-widgets.html#form-widgets
     [2] https://slurm.schedmd.com/srun.html#OPT_gres
-    """
-    gres_data = (
-        {}
-    )  # k=gres_opt, v=[label, max_count] # where gres_opt is what would be passed to --gres
+    """  # noqa: E501 pylint: disable=line-too-long
+
+    gres_data = {}
+    # key=gres_opt, what would be passed to --gres
+    # value=[label, max_count]
     gres_data["none"] = ["None", 0]
 
     for line in stdout.splitlines():
-        partition, gres_definitions = (
+        partition, gres_definitions = (  # pylint: disable=unused-variable
             line.split()
         )  # e.g. 'part1 gpu:H200:8(S:0-1),test:foo:1', or 'part2 (null)'
         for gres in gres_definitions.split(","):
@@ -58,7 +59,7 @@ def to_gres_options(stdout):
                     gres_data[gres_opt][1] = gres_count
 
     gres_options = []
-    for gres_opt in gres_data:
+    for gres_opt in gres_data:  # pylint: disable=consider-using-dict-items
         max_count = gres_data[gres_opt][1]
         label = gres_data[gres_opt][0]
         if gres_opt != "none":
@@ -68,6 +69,7 @@ def to_gres_options(stdout):
 
 
 # pylint: disable=useless-object-inheritance
+# pylint: disable=too-few-public-methods
 class FilterModule(object):
     """Ansible core jinja2 filters"""
 
