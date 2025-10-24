@@ -16,3 +16,6 @@ cuda_samples_programs:
   - bandwidthTest
 # cuda_devices: # discovered from deviceQuery run
 cuda_persistenced_state: started
+# variables for nvbandwidth (for bandwidth.yml tasks run in cudatests.yml)
+cuda_bandwidth_path: "/var/lib/{{ ansible_user }}/cuda_bandwidth"
+cuda_bandwidth_release_url: "https://github.com/NVIDIA/nvbandwidth/archive/refs/tags/v0.8.tar.gz"
