@@ -140,7 +140,7 @@ openondemand_apps_desktop_default:
       options: "{{ openondemand_gres_options }}"
     gres_count:
       label: Resource count
-      help: Count of GPU or other resources
+      help: Count of GPU or other Slurm GRES resources
       required: false
       widget: number_field
       value: 1
@@ -191,7 +191,7 @@ openondemand_apps_jupyter_default:
       options: "{{ openondemand_gres_options }}"
     gres_count:
       label: Resource count
-      help: Count of GPU or other resources
+      help: Count of GPU or other Slurm GRES resources
       required: false
       widget: number_field
       value: 1
@@ -280,7 +280,7 @@ openondemand_apps_rstudio_default:
       options: "{{ openondemand_gres_options }}"
     gres_count:
       label: Resource count
-      help: Count of GPU or other resources
+      help: Count of GPU or other Slurm GRES resources
       required: false
       widget: number_field
       value: 1
@@ -382,7 +382,7 @@ openondemand_apps_matlab_default:
       options: "{{ openondemand_gres_options }}"
     gres_count:
       label: Resource count
-      help: Count of GPU or other resources
+      help: Count of GPU or other Slurm GRES resources
       required: false
       widget: number_field
       value: 1
