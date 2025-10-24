@@ -67,25 +67,24 @@ This is a usually a two-step process:
 
 Deploying the additional nodes and applying these changes requires rerunning both OpenTofu and the Ansible site.yml playbook - follow [Deploying a Cluster](#deploying-a-cluster).
 
-## Package Repositories
-
-```yaml
-[squid:children]
-# Hosts to run squid proxy
-login
-```
-
-Note that many non-default roles include package installations from repositories which the appliance overwrites to point at snapshotted mirrors on a Pulp server (by default StackHPC's Ark server), which are
-disabled during runtime to prevent Ark credentials from being leaked. To enable this functionality, you must therefore either:
-
-- Create a site-specific fatimage (see [image build docs](image-build.md)) with the appropriate group added to the `inventory_groups` Packer variables.
-- If you instead wish roles to perform their installations during runtime, deploy a site Pulp server and sync it with with mirrors of the snapshots from the upstream Ark server (see [Pulp docs](experimental/pulp.md)).
-
-In both cases, Ark credentials will be required.
-
 ## Adding Additional Packages
 
-By default, the following utility packages are installed during the StackHPC image build:
+The StackHPC images provided via [GitHub releases](https://github.com/stackhpc/ansible-slurm-appliance/releases)
+have all DNF repositories disabled, because for reproducibility these images are
+build using (authenticated) mirrors hosted on StackHPC's "Ark" Pulp server and
+the credentials are not provided as part of the appliance.
+
+This means that when running the `site.yml` playbook, by default:
+
+- Features which are not enabled by default, e.g., `freeipa_client`, cannot
+  install the packages they require.
+- It is not possible to install arbitrary packages using e.g. an `ansible.builtin.dnf`
+  task in a hook.
+
+The recommended way to resolve both of these issues is by carrying out a
+site-specific [image build](./image-build.md).
+
+By default, the following utility packages are installed in StackHPC images:
 
 - htop
 - nano
@@ -101,7 +100,7 @@ By default, the following utility packages are installed during the StackHPC ima
 
 Additional packages can be added during image builds by:
 
-1. Configuring an [image build](./image-build.md) to enable the
+1. Configuring the [image build](./image-build.md) to enable the
    `extra_packages` group:
 
    ```terraform
@@ -129,10 +128,13 @@ the OpenHPC installation guide (linked from the
 "user-facing" OpenHPC packages such as compilers, MPI libraries etc. include
 corresponding `lmod` modules.
 
-Packages _may_ also be installed during the site.yml, by adding the `cluster`
-group as a child of the `extra_packages` group. An error will occur if Ark
-credential are defined in this case, as they are readable by unprivileged users
-in the `.repo` files and a local Pulp mirror must be used instead.
+If a site-specific image build and cluster reimage is not possible (e.g. for
+an urgent patch), it is possible to install packages directly during the
+`site.yml` playbook by adding the `cluster` group as a child of the
+`extra_packages` group. An error will occur if Ark credentials are defined in
+this case, as they are readable by unprivileged users in the `.repo` files. A
+local Pulp mirror must be used instead, which also has the advantage of making
+this approach more reproducable.
 
 If additional repositories are required, these could be added/enabled as necessary in a play added to `environments/$SITE_ENV/hooks/{pre,post}.yml` as appropriate.
 Note such a play should NOT exclude the builder group, so that the repositories are also added to built images.
@@ -210,7 +212,7 @@ ansible-playbook ansible/adhoc/$PLAYBOOK
 Currently they include the following (see each playbook for links to documentation):
 
 - `hpctests.yml`: MPI-based cluster tests for latency, bandwidth and floating point performance.
-- `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for reimaging nodes on an in-production cluster).
+- `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for re-imaging nodes on an in-production cluster).
 - `restart-slurm.yml`: Restart all Slurm daemons in the correct order.
 - `update-packages.yml`: Update specified packages on cluster nodes (NB: not recommended for routine use).
 
@@ -220,4 +222,4 @@ The `ansible` binary [can be used](https://docs.ansible.com/ansible/latest/comma
 ansible [--become] <group/host> -m shell -a "<shell command>"
 ```
 
-This can be useful for debugging and development but any modifications made this way will be lost if nodes are rebuilt/reimaged.
+This can be useful for debugging and development but any modifications made this way will be lost if nodes are rebuilt/re-imaged.
