@@ -37,6 +37,7 @@ When the `ansible/site.yml` playbook is run this will automatically:
 
    - Filesystem mounts
    - Ethernet interfaces
+   - InfiniBand interfaces
 
    See `/etc/nhc/nhc.conf` on a compute node for the full configuration.
 
