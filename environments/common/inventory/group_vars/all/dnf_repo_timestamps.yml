@@ -124,11 +124,11 @@ dnf_repos_default:
       pulp_path: epel/9/Everything/source
       pulp_timestamp: 20250923T001717
       repo_file: epel
-  epel-cisco:
+  epel-cisco-openh264:
     '9':
       pulp_path: openh264/epel/9/x86_64/os
       pulp_timestamp: 20250925T130153
-      repo_file: openh264
+      repo_file: epel-cisco-openh264
   extras:
     '8.10':
       pulp_path: rocky/8.10/extras/x86_64/os
