@@ -77,7 +77,7 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
   to provide a drop-down for resource/GRES selection in application forms. The
   default constructs a list from all GRES definitions in the cluster. See the
   `option` attribute of the Select Field [form widget](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/form-widgets.html#form-widgets).
-  
+
 ### Monitoring
 
 - `openondemand_exporter`: Optional. Install the Prometheus [ondemand_exporter](https://github.com/OSC/ondemand_exporter) on the `openondemand` node to export metrics about Open Ondemand itself. Default `true`.
