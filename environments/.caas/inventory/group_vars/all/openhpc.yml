@@ -4,3 +4,6 @@ openhpc_cluster_name: "{{ cluster_name }}"
 # Provision a single "standard" compute nodegroup using the supplied
 # node count and flavor
 openhpc_nodegroups: "{{ hostvars[groups['openstack'][0]]['openhpc_nodegroups'] }}"
+
+# Enable autoconfiguration of NVIDIA GPUs, if using a suitable (`cuda`) image:
+openhpc_gres_autodetect: nvml
