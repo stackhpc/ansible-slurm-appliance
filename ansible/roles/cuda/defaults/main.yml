@@ -20,5 +20,4 @@ cuda_samples_programs:
   - bandwidthTest
 # cuda_devices: # discovered from deviceQuery run
 cuda_persistenced_state: started
-# option whether or not to install nvidia-fabricmanager default false
 cuda_install_nvidiafabricmanger: false
