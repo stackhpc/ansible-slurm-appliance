@@ -8,3 +8,5 @@ appliances_extra_packages_other:
   - automake
   - vim-enhanced
   - emacs
+
+openhpc_ram_multiplier: 0.9
