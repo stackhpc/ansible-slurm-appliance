@@ -29,6 +29,13 @@ grafana_dashboards_default:
       - placeholder: DS_ELASTICSEARCH
         replacement: slurmstats
     revision_id: 1
+  # NEW node exporter slurm:
+  - dashboard_file: nodeexporter-slurm-upgraded.json
+    replacements:
+      - placeholder: DS_PROMETHEUS
+        replacement: prometheus
+      - placeholder: DS_ELASTICSEARCH
+        replacement: slurmstats
   # openhpc slurm:
   - dashboard_file: openhpc-slurm.json
     replacements:
