@@ -166,3 +166,12 @@
     path: "{{ item }}"
     state: absent
   with_items: "{{ _dashboards_pre_list | difference( _dashboards_post_list ) }}"
+
+- name: Configure default dashboard
+  become: true
+  community.general.ini_file:
+    path: /etc/grafana/grafana.ini
+    section: dashboards
+    option: default_home_dashboard_path
+    value: "{{ grafana_data_dir }}/dashboards/{{ grafana_dashboard_default }}"
+  notify: restart grafana

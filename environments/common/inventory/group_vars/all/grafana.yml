@@ -50,6 +50,7 @@ grafana_dashboards_default:
     revision_id: 3
 
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
+grafana_dashboard_default: slurm-jobs.json
 
 grafana_security:
   admin_user: grafana
