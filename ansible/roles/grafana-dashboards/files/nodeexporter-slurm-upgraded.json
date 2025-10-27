@@ -2,7 +2,7 @@
   "annotations": {
     "list": [
       {
-        "datasource": "${DS_ELASTICSEARCH",
+        "datasource": "${DS_ELASTICSEARCH}",
         "enable": false,
         "hide": false,
         "iconColor": "rgba(255, 96, 96, 1)",
@@ -19868,7 +19868,7 @@
       "type": "row"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 1,
@@ -20479,7 +20479,7 @@
       "type": "timeseries"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 1,
@@ -21865,7 +21865,7 @@
       "type": "timeseries"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 1,
