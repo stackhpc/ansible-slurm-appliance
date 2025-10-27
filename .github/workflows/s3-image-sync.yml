@@ -180,3 +180,8 @@ jobs:
             echo "No image ID found, skipping cleanup."
           fi
         shell: bash
+
+      - name: Set Glance image properties correctly for Slurm images
+        run: |
+          . venv/bin/activate
+          . dev/image-set-properties.sh "${{ env.TARGET_IMAGE }}"
