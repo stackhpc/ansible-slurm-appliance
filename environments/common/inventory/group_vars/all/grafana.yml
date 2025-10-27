@@ -22,7 +22,7 @@ grafana_serve_from_sub_path: "{{ groups['openondemand'] | count > 0 }}"
 
 grafana_dashboards_default:
   # node exporter slurm:
-  - dashboard_id: 13427
+  - dashboard_file: nodeexporter-slurm.json
     replacements:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
