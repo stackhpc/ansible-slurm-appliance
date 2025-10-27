@@ -194,19 +194,19 @@ dnf_repos_default:
       repo_file: TurboVNC
   cernvmfs_pkgs:
     '8':
-      path: cvmfs/EL/8/x86_64
-      timestamp: 20250816T005446
+      pulp_path: cvmfs/EL/8/x86_64
+      pulp_timestamp: 20250816T005446
       repo_file: cvmfs
     '9':
-      path: cvmfs/EL/9/x86_64
-      timestamp: 20250816T005446
+      pulp_path: cvmfs/EL/9/x86_64
+      pulp_timestamp: 20250816T005446
       repo_file: cvmfs
   cernvmfs_cfg:
     '8':
-      path: cvmfs-config/EL/8/x86_64
-      timestamp: 20250805T130249
+      pulp_path: cvmfs-config/EL/8/x86_64
+      pulp_timestamp: 20250805T130249
       repo_file: cvmfs
     '9':
-      path: cvmfs-config/EL/9/x86_64
-      timestamp: 20250805T130249
+      pulp_path: cvmfs-config/EL/9/x86_64
+      pulp_timestamp: 20250805T130249
       repo_file: cvmfs
