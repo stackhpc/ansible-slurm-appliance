@@ -1,5 +1,5 @@
 ---
-- name: Ensure cuda_bandwidth_path exists
+- name: Ensure CUDA bandwidth path exists
   ansible.builtin.file:
     state: directory
     path: "{{ cuda_bandwidth_path }}"
@@ -14,12 +14,12 @@
     dest: "{{ cuda_bandwidth_path }}"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-    creates: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8"
+    creates: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}"
 
 - name: Creates CUDA bandwidth test build directory
   ansible.builtin.file:
     state: directory
-    path: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8/build"
+    path: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}/build"
     mode: "0755"
 
 - name: Ensure cudatests directory exists
@@ -31,26 +31,27 @@
 
 - name: Build CUDA bandwidth test
   ansible.builtin.shell:
-    cmd: |
+    cmd: >
       source /cvmfs/software.eessi.io/versions/2023.06/init/bash &&
+      module load buildenv/default-foss-2023b &&
       module load Boost/1.82.0-GCC-12.3.0 &&
-      . /etc/profile.d/sh.local && cmake .. &&
+      . /etc/profile.d/sh.local &&
+      cmake .. &&
       make -j {{ ansible_processor_vcpus }}
-    chdir: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8/build"
-    creates: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8/build/nvbandwidth"
+    chdir: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}/build"
+    creates: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}/build/nvbandwidth"
 
 - name: Run CUDA bandwidth test
   ansible.builtin.shell: |
-    export LD_LIBRARY_PATH=/cvmfs/software.eessi.io/versions/2023.06/software/linux/x86_64/amd/zen4/software/GCCcore/12.3.0/lib64:\
-    /cvmfs/software.eessi.io/versions/2023.06/software/linux/x86_64/amd/zen4/software/Boost/1.82.0-GCC-12.3.0/lib
     ./nvbandwidth
   args:
-    chdir: "{{ cuda_bandwidth_path }}/nvbandwidth-0.8/build/"
+    chdir: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}/build/"
   register: cuda_bandwidth_output
+  changed_when: true
 
 - name: Save CUDA bandwidth output to bandwidth_results.txt
   ansible.builtin.copy:
     content: "{{ cuda_bandwidth_output.stdout }}"
-    dest: "{{ appliances_environment_root }}/cudatests/bandwidth_results.txt"
+    dest: "{{ appliances_environment_root }}/cudatests/{{ inventory_hostname }}bandwidth_results.txt"
     mode: '0644'
   delegate_to: localhost
