@@ -442,7 +442,7 @@ openondemand_dashboard:
     replacements:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
-    revision_id: 1
+    revision_id: 2
 
 _opeonondemand_unset_auth: "    RequestHeader unset Authorization"
 
