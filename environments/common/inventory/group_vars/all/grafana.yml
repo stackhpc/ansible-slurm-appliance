@@ -49,7 +49,7 @@ grafana_dashboards_default:
         replacement: prometheus
 
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
-grafana_dashboard_default: slurm-jobs.json
+grafana_dashboard_default: /var/lib/grafana/dashboards/slurm-jobs.json
 
 grafana_security:
   admin_user: grafana
