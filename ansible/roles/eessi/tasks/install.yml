@@ -11,9 +11,7 @@
 - name: Import downloaded GPG key # noqa: no-changed-when
   ansible.builtin.command: rpm --import cvmfs-key.gpg # noqa: command-instead-of-module
 
-- name: Add CVMFS repo
-  ansible.builtin.dnf:
-    name: "https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-{{ cvmfs_release_version }}.noarch.rpm"
+# cvmfs repo provided by dnf_repos role
 
 - name: Install CVMFS
   ansible.builtin.dnf:

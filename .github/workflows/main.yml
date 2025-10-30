@@ -143,7 +143,6 @@ jobs:
     name: Trivy scan image for vulnerabilities
     needs: files_changed
     if: |
-      github.event_name == 'pull_request' &&
       needs.files_changed.outputs.trivyscan == 'true'
     uses: ./.github/workflows/trivyscan.yml
     secrets: inherit
