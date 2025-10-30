@@ -7,11 +7,15 @@
         "hide": false,
         "iconColor": "rgba(255, 96, 96, 1)",
         "limit": 100,
+        "mappings": {},
         "name": "All slurm jobs on node",
-        "query": "json.AllNodes:( \"$instance\")",
         "showIn": 0,
         "tags": [],
         "tagsField": "json.AllNodes",
+        "target": {
+          "query": "json.AllNodes:( \"$instance\")",
+          "refId": "annotation_query"
+        },
         "textField": "json.JobID",
         "timeEndField": "event.end",
         "timeField": "event.start",
@@ -35,11 +39,15 @@
         "hide": false,
         "iconColor": "rgba(255, 96, 96, 1)",
         "limit": 100,
+        "mappings": {},
         "name": "Slurm job",
-        "query": "json.JobID:$job_id",
         "showIn": 0,
         "tags": [],
         "tagsField": "json.AllNodes",
+        "target": {
+          "query": "json.JobID:$job_id",
+          "refId": "annotation_query"
+        },
         "textField": "json.JobID",
         "timeEndField": "event.end",
         "timeField": "event.start",
