@@ -102,6 +102,10 @@
     - ansible.builtin.include_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards
       when: "appliances_mode != 'configure'"
+    - ansible.builtin.include_role:
+        name: grafana-dashboards
+        tasks_from: default-dashboard.yml
+      when: "appliances_mode != 'build'"
 
 - name: Deploy alertmanager
   hosts: alertmanager

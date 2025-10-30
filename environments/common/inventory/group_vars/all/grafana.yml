@@ -2,7 +2,7 @@
 
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
-grafana_version: "10.4.18"
+grafana_version: '10.4.19^security_01-1'
 
 # need to copy some role defaults here so we can use in inventory:
 grafana_port: 3000
@@ -22,13 +22,12 @@ grafana_serve_from_sub_path: "{{ groups['openondemand'] | count > 0 }}"
 
 grafana_dashboards_default:
   # node exporter slurm:
-  - dashboard_id: 13427
+  - dashboard_file: nodeexporter-slurm.json
     replacements:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
       - placeholder: DS_ELASTICSEARCH
         replacement: slurmstats
-    revision_id: 1
   # openhpc slurm:
   - dashboard_file: openhpc-slurm.json
     replacements:
@@ -44,13 +43,13 @@ grafana_dashboards_default:
       - placeholder: DS_SLURMSTATS
         replacement: slurmstats
   # slurm exporter
-  - dashboard_id: 4323
+  - dashboard_file: slurm-exporter.json
     replacements:
       - placeholder: DS_PROMETHEUS
         replacement: prometheus
-    revision_id: 3
 
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
+grafana_dashboard_default: /var/lib/grafana/dashboards/slurm-jobs.json
 
 grafana_security:
   admin_user: grafana
