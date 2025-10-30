@@ -102,7 +102,7 @@ jobs:
         run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           scan-type: fs
           scan-ref: "${{ steps.manifest.outputs.image-name }}"
@@ -116,13 +116,13 @@ jobs:
           TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
           category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           scan-type: fs
           scan-ref: "${{ steps.manifest.outputs.image-name }}"
@@ -132,6 +132,8 @@ jobs:
           severity: 'CRITICAL'
           ignore-unfixed: true
           timeout: 15m
+          # On a subsequent call to the action we know trivy is already installed so can skip this
+          skip-setup-trivy: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
