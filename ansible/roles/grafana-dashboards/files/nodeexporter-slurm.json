@@ -672,7 +672,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^node_memory_MemTotal_bytes{env=\"demo\", instance=\"wjs-ohpc-compute-0\", job=\"node\"}$/",
+          "fields": "",
           "values": false
         },
         "showPercentChange": false,
@@ -746,7 +746,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^node_memory_SwapTotal_bytes{env=\"demo\", instance=\"wjs-ohpc-compute-0\", job=\"node\"}$/",
+          "fields": "",
           "values": false
         },
         "showPercentChange": false,
@@ -824,7 +824,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^node_filesystem_size_bytes{device=\"/dev/vda1\", env=\"demo\", fstype=\"xfs\", instance=\"wjs-ohpc-compute-0\", job=\"node\", mountpoint=\"/\"}$/",
+          "fields": "",
           "values": false
         },
         "showPercentChange": false,
@@ -901,7 +901,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^{env=\"demo\", instance=\"wjs-ohpc-compute-0\", job=\"node\"}$/",
+          "fields": "",
           "values": false
         },
         "showPercentChange": false,
