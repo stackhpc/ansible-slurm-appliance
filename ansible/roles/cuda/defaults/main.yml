@@ -2,13 +2,17 @@
 # yamllint disable-line rule:line-length
 cuda_repo_url: "https://developer.download.nvidia.com/compute/cuda/repos/rhel{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/cuda-rhel{{ ansible_distribution_major_version }}.repo"
 cuda_nvidia_driver_stream: '580-open'
-cuda_nvidia_driver_pkg: "nvidia-open-3:580.82.07-1.el{{ ansible_distribution_major_version }}"
+cuda_nvidia_driver_version: '580.82.07-1'
+cuda_nvidia_driver_pkg: "nvidia-open-3:{{ cuda_nvidia_driver_version }}.el{{ ansible_distribution_major_version }}"
 cuda_package_version: '13.0.1-1'
 cuda_version_short: "{{ (cuda_package_version | split('.'))[0:2] | join('.') }}" # major.minor
-cuda_packages:
+cuda_packages_default:
   - "cuda-toolkit-{{ cuda_package_version }}"
   - nvidia-gds
   - cmake
+cuda_packages_fabricmanager:
+  - "nvidia-fabricmanager-{{ cuda_nvidia_driver_version }}"
+cuda_packages: "{{ cuda_packages_default + ( cuda_packages_fabricmanager if cuda_install_nvidiafabricmanger | bool else [] ) }}"
 cuda_samples_release_url: "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v{{ cuda_version_short }}.tar.gz"
 cuda_samples_path: "/var/lib/{{ ansible_user }}/cuda_samples"
 cuda_samples_programs:
