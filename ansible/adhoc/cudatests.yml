@@ -2,8 +2,9 @@
 - hosts: cuda
   become: true
   gather_facts: true
-  tags: cuda_samples
+  tags: cuda_bandwidth
   tasks:
-    - ansible.builtin.import_role:
+    - name: Run CUDA bandwidth tasks
+      ansible.builtin.import_role:
         name: cuda
-        tasks_from: samples.yml
+        tasks_from: bandwidth.yml
