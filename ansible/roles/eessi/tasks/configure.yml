@@ -17,12 +17,12 @@
     cmd: "cvmfs_config setup"
 
 # configure gpus
-- name: Check for NVIDIA driver
+- name: Check for NVIDIA GPU
   ansible.builtin.stat:
     path: /dev/nvidia0
   register: nvidia_driver
 
-- name: Set fact if NVIDIA driver is present
+- name: Set fact if NVIDIA GPU is present
   ansible.builtin.set_fact:
     has_nvidia_driver: "{{ nvidia_driver.stat.exists | default(false) }}"
 
