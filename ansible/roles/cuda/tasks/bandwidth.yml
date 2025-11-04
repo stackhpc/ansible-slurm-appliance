@@ -52,6 +52,6 @@
 - name: Save CUDA bandwidth output to bandwidth_results.txt
   ansible.builtin.copy:
     content: "{{ cuda_bandwidth_output.stdout }}"
-    dest: "{{ appliances_environment_root }}/cudatests/{{ inventory_hostname }}bandwidth_results.txt"
+    dest: "{{ appliances_environment_root }}/cudatests/nvbandwidth-{{ inventory_hostname }}.txt"
     mode: '0644'
   delegate_to: localhost
