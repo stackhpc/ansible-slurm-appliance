@@ -3,6 +3,9 @@
 - hosts: localhost
   gather_facts: no
   become: no
+  vars:
+    protected_environments:
+      - prd
   tasks:
     - name: Confirm continuing if using production environment
       ansible.builtin.pause:
