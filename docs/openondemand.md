@@ -63,6 +63,10 @@ The appliance automatically configures Open OnDemand to proxy Grafana and adds a
 
 [^1]: Note that if `openondemand_auth` is `basic_pam` and anonymous Grafana login is enabled, the appliance will (by default) configure Open OnDemand's Apache server to remove the Authorisation header from proxying of all `node/` addresses. This is done as otherwise Grafana tries to use this header to authenticate, which fails with the default configuration where only the admin Grafana user `grafana` is created. Note that the removal of this header in this configuration means it cannot be used to authenticate proxied interactive applications - however the appliance-deployed remote desktop and Jupyter Notebook server applications use other authentication methods. An alternative if using `basic_pam` is not to enable anonymous Grafana login and to create Grafana users matching the local users (e.g. in `environments/<env>/hooks/post.yml`).
 
+## Image Build
+
+For local site image builds, the preferred method of installing ood apps in the image is by toggling the `openondemand_<app_name>_partition` variables in `environments/common/inventory/group_vars/all/builder/defaults.yml`. In this case the variables are not strings and are instead simply truthy i.e. they do not describe cluster partition groups but just whether those apps will be installed in the image or not.
+
 ## Access
 
 By default the appliance authenticates against OOD with basic auth through PAM. When creating a new environment, a new user with username `demo_user` will be created.
