@@ -25,6 +25,11 @@ locals {
       }
     )
   }
+  # Map node names to floating IPs from the list var.fip_addresses by index
+  nodegroup_fips = {
+    for idx, n in var.nodes :
+    n => length(var.fip_addresses) > idx ? var.fip_addresses[idx] : ""
+  }
 
   baremetal_az = var.availability_zone != null ? var.availability_zone : "nova"
 }
@@ -228,4 +233,8 @@ output "image_id" {
 
 output "fqdns" {
   value = local.fqdns
+}
+
+output "nodegroup_fips" {
+  value = local.nodegroup_fips
 }
