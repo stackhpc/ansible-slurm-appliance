@@ -117,7 +117,7 @@
     - name: Install OpenHPC
       ansible.builtin.import_role:
         name: stackhpc.openhpc
-        tasks_from: install.yml
+        tasks_from: install-ohpc.yml
       when: "'openhpc' in group_names"
 
     # - import_playbook: portal.yml
@@ -206,6 +206,7 @@
       ansible.builtin.include_role:
         name: hpctests
         tasks_from: source-hpl.yml
+      when: "'hpctests' in group_names"
 
 - hosts: prometheus
   become: true
