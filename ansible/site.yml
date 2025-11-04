@@ -1,4 +1,10 @@
 ---
+- name: Lock all instances
+  vars:
+    server_action: lock
+    target_hosts: all
+  ansible.builtin.import_playbook: adhoc/lock_unlock_instances.yml
+
 - name: Run pre.yml hook
   vars:
     # hostvars not available here, so have to recalculate environment root:

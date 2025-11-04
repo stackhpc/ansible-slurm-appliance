@@ -8,6 +8,16 @@
 
 # See docs/slurm-controlled-rebuild.md.
 
+- hosts: localhost
+  gather_facts: false
+  vars:
+    server_action: unlock
+    target_hosts: compute
+  tasks:
+    - name: Unlock compute instances for rebuild
+      ansible.builtin.include_playbook:
+        file: adhoc/lock_unlock_instances.yml
+
 - hosts: login
   run_once: true
   gather_facts: false
