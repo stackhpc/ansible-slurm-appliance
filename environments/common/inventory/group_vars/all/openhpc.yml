@@ -15,6 +15,7 @@ openhpc_slurmdbd_mysql_password: "{{ vault_mysql_slurm_password }}"
 openhpc_slurmdbd_mysql_username: slurm
 openhpc_slurm_control_host: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
 openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
+cluster_compute_groups: [] # without any nodes deployed/inventory file we get empty openhpc_nodegroups and empty openhpc_partitions.
 openhpc_rebuild_partition: # not a role var - could actually add more indirection here for things we're expecting to be modified, e.g. groups and maxtime
   name: rebuild
   nodegroups: "{{ cluster_compute_groups | default([]) }}"
