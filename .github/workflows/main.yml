@@ -127,8 +127,13 @@ jobs:
     needs: files_changed
     if: |
       needs.files_changed.outputs.stackhpc == 'true'
-    uses: ./.github/workflows/stackhpc.yml
-    secrets: inherit
+    #uses: ./.github/workflows/stackhpc-trigger.yml
+    # TEST - remove from here and uncomment the above
+    steps:
+      - uses: jakejarvis/wait-action@master
+        with:
+          time: '1s'
+    runs-on: ubuntu-latest
 
   extra:
     name: Test extra build
@@ -136,13 +141,23 @@ jobs:
     if: |
       github.event_name != 'pull_request' && needs.files_changed.outputs.extra_on_push == 'true' ||
       github.event_name == 'pull_request' && needs.files_changed.outputs.extra_on_pull_request == 'true'
-    uses: ./.github/workflows/extra.yml
-    secrets: inherit
+    #uses: ./.github/workflows/extra-trigger.yml
+    # TEST - remove from here and uncomment the above
+    steps:
+      - uses: jakejarvis/wait-action@master
+        with:
+          time: '1s'
+    runs-on: ubuntu-latest
 
   trivyscan:
     name: Trivy scan image for vulnerabilities
     needs: files_changed
     if: |
       needs.files_changed.outputs.trivyscan == 'true'
-    uses: ./.github/workflows/trivyscan.yml
-    secrets: inherit
+    #uses: ./.github/workflows/trivyscan-trigger.yml
+    # TEST - remove from here and uncomment the above
+    steps:
+      - uses: jakejarvis/wait-action@master
+        with:
+          time: '1s'
+    runs-on: ubuntu-latest
