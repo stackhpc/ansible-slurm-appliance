@@ -277,38 +277,11 @@
         name: basic_users
       when: enable_basic_users
 
-    - name: EESSI
-      when: enable_eessi
       # NB: don't need conditional block on enable_compute as have already exited
       # if not the case
-      block:
-        - name: Copy cvmfs config
-          ansible.builtin.copy:
-            src: /var/tmp/cluster/cvmfs/default.local
-            dest: /etc/cvmfs/default.local
-            owner: root
-            group: root
-            mode: "0644"
-
-        - name: Ensure CVMFS config is setup # noqa: no-changed-when
-          ansible.builtin.command:
-            cmd: "cvmfs_config setup"
-
-        # configure gpus
-        - name: Check for NVIDIA driver
-          ansible.builtin.stat:
-            path: /dev/nvidia0
-          register: nvidia_driver
-
-        - name: Set fact if NVIDIA driver is present
-          ansible.builtin.set_fact:
-            has_nvidia_driver: "{{ nvidia_driver.stat.exists | default(false) }}"
-
-        - name: Expose GPU drivers
-          ansible.builtin.shell: |
-            source /cvmfs/software.eessi.io/versions/2023.06/init/bash
-            /cvmfs/software.eessi.io/versions/2023.06/scripts/gpu_support/nvidia/link_nvidia_host_libraries.sh
-          when: has_nvidia_driver
+    - name: Configure EESSI
+      ansible.builtin.include_tasks: tasks/eessi.yml
+      when: enable_eessi
 
     - name: Configure VGPUs
       ansible.builtin.include_role:
