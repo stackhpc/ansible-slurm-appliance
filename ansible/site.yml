@@ -1,4 +1,7 @@
 ---
+
+- ansible.builtin.import_playbook: safe-env.yml
+
 - name: Lock all instances
   vars:
     server_action: lock

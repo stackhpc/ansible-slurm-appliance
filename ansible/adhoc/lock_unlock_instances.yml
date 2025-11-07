@@ -8,3 +8,4 @@
       openstack.cloud.server_action:
         action: "{{ server_action | default('lock') }}"
         server: "{{ inventory_hostname }}"
+      delegate_to: localhost
