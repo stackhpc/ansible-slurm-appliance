@@ -21,8 +21,7 @@ def _optional_arg(prototype, *values):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         msg = (
-            f"Usage: {
-                sys.argv[0]} <inventory_hostname> [args to pass to ssh]")
+            f"Usage: {sys.argv[0]} <inventory_hostname> [args to pass to ssh]")
         print(msg, file=sys.stderr)
         sys.exit(-1)
 

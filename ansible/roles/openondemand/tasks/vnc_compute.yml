@@ -1,16 +1,7 @@
 ---
 # Should be run on compute nodes you want to run the graphical desktop on
-- name: Enable TurboVNC repo
-  tags: install
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/TurboVNC/repo/main/TurboVNC.repo
-    dest: /etc/yum.repos.d/TurboVNC.repo
-    mode: "0644"
 
-- name: Install EPEL
-  tags: install
-  ansible.builtin.dnf:
-    name: epel-release
+# EPEL and TurboVNC repos are provided by dnf_repos role
 
 - name: Check /etc/init.d
   ansible.builtin.stat:

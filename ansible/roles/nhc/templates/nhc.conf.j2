@@ -8,7 +8,7 @@
 {# /efi is mounted both directly and via systemd1 autofs, which NHC can't cope with #}
 {# use `awk '{print $5 " " $10 " " $4 " " $9}' /proc/self/mountinfo | sort -k1` to check that is the only case #}
 {% set mount_mode = 'rw' if 'rw' in mount.options.split(',') else 'ro' %}
-{{ ansible_fqdn }} || check_fs_mount_{{ mount_mode }} -t "{{ mount.fstype }}" -s "{{ mount.device }}" -f "{{ mount.mount }}"
+{{ ansible_fqdn }} || check_fs_mount_{{ mount_mode }} -t "{{ mount.fstype }}" -s "{{ mount.device | replace(' ', '\\040') }}" -f "{{ mount.mount }}"
 {% endfor %}
 
 ## Ethernet interface checks

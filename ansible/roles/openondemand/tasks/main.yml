@@ -39,6 +39,12 @@
     vars_from: main.yml
     public: true
 
+- name: Get GRES information
+  ansible.builtin.command:
+    cmd: sinfo --noheader --format "%R %G" # can't use , or : as separator
+  changed_when: true
+  register: _openondemand_sinfo_gres
+
 - ansible.builtin.include_role:
     name: osc.ood
     tasks_from: install-apps.yml

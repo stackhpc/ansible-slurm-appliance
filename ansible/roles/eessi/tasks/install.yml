@@ -3,18 +3,15 @@
 - name: Download Cern GPG key
   # checkov:skip=CKV2_ANSIBLE_2: "Ensure that HTTPS url is used with get_url"
   ansible.builtin.get_url:
-    url: http://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM
+    url: https://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM-2048
     dest: ./cvmfs-key.gpg
     checksum: "{{ cvmfs_gpg_checksum }}"
     mode: "0644"
 
 - name: Import downloaded GPG key # noqa: no-changed-when
   ansible.builtin.command: rpm --import cvmfs-key.gpg # noqa: command-instead-of-module
-- name: Add CVMFS repo
-  # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
-  ansible.builtin.dnf:
-    name: https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
-    disable_gpg_check: true
+
+# cvmfs repo provided by dnf_repos role
 
 - name: Install CVMFS
   ansible.builtin.dnf:
