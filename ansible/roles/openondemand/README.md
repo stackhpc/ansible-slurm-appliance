@@ -69,10 +69,10 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
   - `new_window`: Optional. Whether to open link in new window. Bool, default `false`.
   - `app_name`: Optional. Unique name for app appended to `/var/www/ood/apps/sys/`. Default is `name`, useful if that is not unique or not suitable as a path component.
 - `openondemand_dashboard_support_url`: Optional. URL or email etc to show as support contact under Help in dashboard. Default `(undefined)`.
-- `openondemand_desktop_partition`: Optional. Name of Slurm partition to use for remote desktops, by default supplied with `openhpc_partitions` entry. During image build, with `openondemand` group, setting this partition as a boolean determines if app installed in image.
+- `openondemand_desktop_partition`: Optional. Name of Slurm partition to use for remote desktops, by default supplied with `openhpc_partitions` entry. During open ondemand config the string is used to provide a default partition in the UX. During image build, with `openondemand` group, setting this partition as a boolean determines if app installed in image.
 - `openondemand_desktop_screensaver`: Optional. Whether to enable screen locking/screensaver. **NB:** Users must have passwords if this is enabled. Bool, default `false`.
 - `openondemand_filesapp_paths`: List of paths (in addition to $HOME, which is always added) to include shortcuts to within the Files dashboard app.
-- `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers, by default supplied with `openhpc_partitions` entry. During image build, with `openondemand` group, setting this partition as a boolean determines if app installed in image.
+- `openondemand_jupyter_partition`: Required. Name of Slurm partition to use for Jupyter Notebook servers, by default supplied with `openhpc_partitions` entry. During open ondemand config the string is used to provide a default partition in the UX. During image build, with `openondemand` group, setting this partition as a boolean determines if app installed in image.
 - `openondemand_gres_options`: Optional. A list of `[label, value]` items used
   to provide a drop-down for resource/GRES selection in application forms. The
   default constructs a list from all GRES definitions in the cluster. See the
