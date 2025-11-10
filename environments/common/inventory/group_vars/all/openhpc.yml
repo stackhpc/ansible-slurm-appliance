@@ -15,10 +15,10 @@ openhpc_slurmdbd_mysql_password: "{{ vault_mysql_slurm_password }}"
 openhpc_slurmdbd_mysql_username: slurm
 openhpc_slurm_control_host: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
 openhpc_slurmdbd_host: "{{ openhpc_slurm_control_host }}"
-cluster_compute_groups: [] # without any nodes deployed/inventory file we get empty openhpc_nodegroups and empty openhpc_partitions.
+_cluster_compute_groups_safe: "{{ cluster_compute_groups | default([]) }}" # Safe default for undefined cluster_compute_groups in site-image builds
 openhpc_rebuild_partition: # not a role var - could actually add more indirection here for things we're expecting to be modified, e.g. groups and maxtime
   name: rebuild
-  nodegroups: "{{ cluster_compute_groups | default([]) }}"
+  nodegroups: "{{ _cluster_compute_groups_safe }}"
   default: false
   maxtime: 30
   partition_params:
@@ -28,7 +28,7 @@ openhpc_rebuild_partition: # not a role var - could actually add more indirectio
     DisableRootJobs: false
     PreemptMode: "OFF"
     OverSubscribe: EXCLUSIVE
-openhpc_nodegroups: "{{ cluster_compute_groups | map('community.general.dict_kv', 'name') }}" # create nodegroup for each compute group
+openhpc_nodegroups: "{{ _cluster_compute_groups_safe | map('community.general.dict_kv', 'name') }}" # create nodegroup for each compute group
 openhpc_user_partitions: "{{ openhpc_nodegroups }}" # create partition for each nodegroup (actually role default) - this is what we'd expect to be changed
 # yamllint disable-line rule:line-length
 openhpc_partitions: "{{ openhpc_user_partitions + ([openhpc_rebuild_partition] if groups['rebuild'] | length > 0 else []) }}" # auto-create rebuild partition if reqd.
