@@ -10,9 +10,8 @@
 
 - name: Unlock compute instances for rebuild
   vars:
-    server_action: unlock
-    target_hosts: compute
-  ansible.builtin.import_playbook: lock_unlock_instances.yml
+    appliances_server_action: unlock
+  ansible.builtin.command: ansible-playbook --limit compute adhoc/lock_unlock_instances.yml
 
 - hosts: login
   run_once: true
