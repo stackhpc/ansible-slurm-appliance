@@ -12,8 +12,8 @@ In summary, the way this functionality works is as follows:
 
 1. The image references(s) are manually updated in the OpenTofu configuration
    in the normal way.
-2. `ansible-playbook lock_unlock_instances.yml --limit control,login -e "appliances_server_action=unlock"`
-   is run to unlock the control and login nodes for reimaging.
+2. The `lock_unlock_instances.yml` playbook is run against control and login with
+   `unlock` to allow for reimaging the nodes.
 3. `tofu apply` is run which rebuilds the login and control nodes to the new
    image(s). The new image reference for compute nodes is ignored, but is
    written into the hosts inventory file (and is therefore available as an
