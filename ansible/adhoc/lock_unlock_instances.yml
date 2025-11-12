@@ -1,6 +1,6 @@
 ---
 
-- hosts: cluster
+- hosts: "{{ target_hosts | default('cluster') }}"
   gather_facts: false
   become: false
   tasks:
