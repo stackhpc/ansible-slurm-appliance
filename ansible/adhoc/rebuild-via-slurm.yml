@@ -12,7 +12,7 @@
   vars:
     appliances_server_action: unlock
     target_hosts: compute
-  ansible.builtin.import_playbook: adhoc/lock_unlock_instances.yml
+  ansible.builtin.import_playbook: lock_unlock_instances.yml
 
 - hosts: login
   run_once: true
