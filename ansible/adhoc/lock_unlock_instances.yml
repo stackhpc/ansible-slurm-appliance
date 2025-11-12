@@ -1,8 +1,8 @@
 ---
 
 - hosts: cluster
-  gather_facts: no
-  become: no
+  gather_facts: false
+  become: false
   tasks:
     - name: Lock/Unlock instances
       openstack.cloud.server_action:

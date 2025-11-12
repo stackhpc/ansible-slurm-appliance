@@ -2,8 +2,12 @@
 
 - ansible.builtin.import_playbook: safe-env.yml
 
-- name: Lock cluster instances
-  ansible.builtin.command: ansible-playbook adhoc/lock_unlock_instances.yml
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Lock all cluster instances
+      ansible.builtin.command:
+        cmd: ansible-playbook adhoc/lock_unlock_instances.yml
 
 - name: Run pre.yml hook
   vars:

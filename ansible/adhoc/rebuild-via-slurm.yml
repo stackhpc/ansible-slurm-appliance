@@ -8,10 +8,12 @@
 
 # See docs/slurm-controlled-rebuild.md.
 
-- name: Unlock compute instances for rebuild
-  vars:
-    appliances_server_action: unlock
-  ansible.builtin.command: ansible-playbook --limit compute adhoc/lock_unlock_instances.yml
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Unlock compute nodes to ready rebuild
+      ansible.builtin.command: 
+        cmd: ansible-playbook --limit compute adhoc/lock_unlock_instances.yml -e "appliances_server_action=unlock"
 
 - hosts: login
   run_once: true
