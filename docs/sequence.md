@@ -100,6 +100,7 @@ sequenceDiagram
     participant cloud as Cloud
     participant nodes as Cluster Instances
     note over ansible: Update OpenTofu cluster_image variable [1]
+    ansible->>cloud: Unlock control and and login nodes
     rect rgb(204, 232, 250)
     note over ansible: $ tofu apply ....
     ansible<<->>cloud: Check login/compute current vs desired images

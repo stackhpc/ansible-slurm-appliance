@@ -22,7 +22,7 @@ login and control nodes. The process follows
 1. Compute nodes are reimaged:
 
 ```shell
-ansible-playbook -v --limit compute ansible/adhoc/rebuild.yml
+ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
 ```
 
 2. Ansible-init runs against newly reimaged compute nodes

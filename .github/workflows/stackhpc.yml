@@ -154,6 +154,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
+          ansible-playbook --limit login,control ansible/adhoc/lock_unlock_instances.yml -e "appliances_server_action=unlock"
           cd "$STACKHPC_TF_DIR"
           tofu init
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
