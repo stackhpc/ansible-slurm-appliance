@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
-  gather_facts: no
-  become: no
+  gather_facts: false
+  become: false
   tasks:
     - name: Confirm continuing if using production environment
       ansible.builtin.pause:
