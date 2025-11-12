@@ -12,15 +12,13 @@ In summary, the way this functionality works is as follows:
 
 1. The image references(s) are manually updated in the OpenTofu configuration
    in the normal way.
-2. ``` ansible-playbook lock_unlock_instances.yml
-       --limit control,login -e "appliances_server_action=unlock"
-   ```
+2. `ansible-playbook lock_unlock_instances.yml --limit control,login -e "appliances_server_action=unlock"`
    is run to unlock the control and login nodes for reimaging.
-2. `tofu apply` is run which rebuilds the login and control nodes to the new
+3. `tofu apply` is run which rebuilds the login and control nodes to the new
    image(s). The new image reference for compute nodes is ignored, but is
    written into the hosts inventory file (and is therefore available as an
    Ansible hostvar).
-3. The `site.yml` playbook is run which locks the instances again and reconfigures
+4. The `site.yml` playbook is run which locks the instances again and reconfigures
    the cluster as normal. At this point the cluster is functional, but using a new
    image for the login and control nodes and the old image for the compute nodes.
    This playbook also:
@@ -28,22 +26,22 @@ In summary, the way this functionality works is as follows:
      [compute_init](../../ansible/roles/compute_init/README.md) role.
    - Configures an application credential and helper programs on the control
      node, using the [rebuild](../../ansible/roles/rebuild/README.md) role.
-4. An admin submits Slurm jobs, one for each node, to a special "rebuild"
+5. An admin submits Slurm jobs, one for each node, to a special "rebuild"
    partition using an Ansible playbook. Because this partition has higher
    priority than the partitions normal users can use, these rebuild jobs become
    the next job in the queue for every node (although any jobs currently
    running will complete as normal).
-5. Because these rebuild jobs have the `--reboot` flag set, before launching them
+6. Because these rebuild jobs have the `--reboot` flag set, before launching them
    the Slurm control node runs a [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram)
    which compares the current image for the node to the one in the cluster
    configuration, and if it does not match, uses OpenStack to rebuild the
    node to the desired (updated) image.
    TODO: Describe the logic if they DO match
-6. After a rebuild, the compute node runs various Ansible tasks during boot,
+7. After a rebuild, the compute node runs various Ansible tasks during boot,
    controlled by the [compute_init](../../ansible/roles/compute_init/README.md)
    role, to fully configure the node again. It retrieves the required cluster
    configuration information from the control node via an NFS mount.
-7. Once the `slurmd` daemon starts on a compute node, the slurm controller
+8. Once the `slurmd` daemon starts on a compute node, the slurm controller
    registers the node as having finished rebooting. It then launches the actual
    job, which does not do anything.
 
