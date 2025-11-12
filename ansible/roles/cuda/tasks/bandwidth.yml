@@ -1,0 +1,57 @@
+---
+- name: Ensure CUDA bandwidth path exists
+  ansible.builtin.file:
+    state: directory
+    path: "{{ cuda_bandwidth_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Download CUDA bandwith test release
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "{{ cuda_bandwidth_release_url }}"
+    dest: "{{ cuda_bandwidth_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    creates: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}"
+
+- name: Creates CUDA bandwidth test build directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}/build"
+    mode: "0755"
+
+- name: Ensure cudatests directory exists
+  ansible.builtin.file:
+    path: "{{ appliances_environment_root }}/cudatests"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+
+- name: Build CUDA bandwidth test
+  ansible.builtin.shell:
+    cmd: >
+      source /cvmfs/software.eessi.io/versions/2023.06/init/bash &&
+      module load buildenv/default-foss-2023b &&
+      module load Boost/1.82.0-GCC-12.3.0 &&
+      . /etc/profile.d/sh.local &&
+      cmake .. &&
+      make -j {{ ansible_processor_vcpus }}
+    chdir: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}/build"
+    creates: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}/build/nvbandwidth"
+
+- name: Run CUDA bandwidth test
+  ansible.builtin.shell: |
+    ./nvbandwidth
+  args:
+    chdir: "{{ cuda_bandwidth_path }}/nvbandwidth-{{ cuda_bandwidth_version }}/build/"
+  register: cuda_bandwidth_output
+  changed_when: true
+
+- name: Save CUDA bandwidth output to bandwidth_results.txt
+  ansible.builtin.copy:
+    content: "{{ cuda_bandwidth_output.stdout }}"
+    dest: "{{ appliances_environment_root }}/cudatests/nvbandwidth-{{ inventory_hostname }}.txt"
+    mode: '0644'
+  delegate_to: localhost
