@@ -5,7 +5,8 @@ variable "environment_root" {
 
 module "cluster" {
     source = "../../site/tofu/"
-
+    
+    cluster_image_id = "48325752-dec3-475c-a6c5-cf41b6c009d0"   # openhpc-251111-0940-93ad86a2
     cluster_name = "slurm-staging"
     cluster_networks = [
       {
@@ -30,15 +31,15 @@ module "cluster" {
           nodes: [
 		"stagingcompute000",
 		"stagingcompute001",
-                "stagingcompute002",
-                "stagingcompute003",
-                "stagingcompute004",
-                "stagingcompute005",
-                "stagingcompute006",
-                "stagingcompute007",
+                #"stagingcompute002",
+                #"stagingcompute003",
+                #"stagingcompute004",
+                #"stagingcompute005",
+                #"stagingcompute006",
+                #"stagingcompute007",
 	  ]
           flavor: "hpc.v2.32cpu.128ram" # TODO: make this a 32cpu gen1 once there's space
-          availability_zone = "DL-Rack-6"
+          availability_zone = "nova" # TODO: move to a rack AZ once compute14 can be cleared
           vnic_types = {
             "slurm-staging-control-net": "normal"
             "slurm-staging-rdma-net": "direct"
@@ -68,7 +69,7 @@ module "cluster" {
             }
             root_volume_size = 100
             server_group_id = openstack_compute_servergroup_v2.control.id
-            fip_addresses:  ["10.129.31.150"]
+            fip_addresses:  ["10.3.0.159"]
             fip_network: "slurm-staging-control-net"
         }
     }
