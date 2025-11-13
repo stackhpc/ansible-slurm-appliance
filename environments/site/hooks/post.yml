@@ -1,6 +1,6 @@
 ---
 - name: Configure timezone
-  hosts: cluster
+  hosts: builder
   become: true
   tags: timezone
   tasks:
