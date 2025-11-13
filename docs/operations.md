@@ -214,7 +214,7 @@ Currently they include the following (see each playbook for links to documentati
 - `hpctests.yml`: MPI-based cluster tests for latency, bandwidth and floating point performance.
 - `lock-unlock-instances.yml`: Lock cluster instances for preventing tofu changes, or unlock to allow changes.
 - `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for re-imaging nodes on an in-production cluster).
-Requires `lock-unlock-instances.yml` be run first.
+  Requires `lock-unlock-instances.yml` be run first.
 - `restart-slurm.yml`: Restart all Slurm daemons in the correct order.
 - `update-packages.yml`: Update specified packages on cluster nodes (NB: not recommended for routine use).
 

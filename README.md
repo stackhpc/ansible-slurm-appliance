@@ -141,8 +141,8 @@ To configure the appliance, ensure the venv and the environment are [activated](
 ```shell
 ansible-playbook ansible/site.yml
 ```
-To prevent the cluster instances from being changed or `tofu destroy`ed, this playbook begins by locking the OpenStack instances. Any subsequent desired changes to the OpenTofu state require
-running an unlocking playbook as detailed in the adhoc command section of [docs/operations.md](docs/operations.md)
+
+To prevent the cluster instances from being changed or `tofu destroy` running, this playbook begins by locking the OpenStack instances. Any subsequent desired changes to the OpenTofu state require running an unlocking playbook as detailed in the adhoc command section of [docs/operations.md](docs/operations.md).
 
 Once `site.yml` completes you can log in to the cluster using:
 
