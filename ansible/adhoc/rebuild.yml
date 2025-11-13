@@ -5,6 +5,10 @@
 # Use --limit to control which hosts to rebuild (either specific hosts or the <cluster_name>_<partition_name> groups defining partitions).
 # Optionally, supply `-e rebuild_image=<image_name_or_id>` to define a specific image, otherwise the current image is reused.
 #
+# After running site.yml, all instances are locked, so to run the rebuild.yml, the unlock playbook must be run:
+#   ansible-playbook ansible/adhoc/lock-unlock-instances.yml -e "lock_unlock_action=unlock"
+# Similarly to rebuild, --limit can be used to control which hosts to unlock.
+#
 # NOTE: If a hostvar `instance_id` is defined this is used to select hosts.
 #       Otherwise the hostname is used and this must be unique, which may not be the case e.g. if using identically-named staging and production hosts.
 #

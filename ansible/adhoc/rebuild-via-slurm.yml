@@ -10,9 +10,9 @@
 
 - name: Unlock compute instances for rebuild
   vars:
-    appliances_server_action: unlock
-    target_hosts: compute
-  ansible.builtin.import_playbook: lock_unlock_instances.yml
+    lock_unlock_action: unlock
+    lock_unlock_hosts: compute
+  ansible.builtin.import_playbook: lock-unlock-instances.yml
 
 - hosts: login
   run_once: true
