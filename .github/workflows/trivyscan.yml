@@ -102,7 +102,7 @@ jobs:
         run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: fs
           scan-ref: "${{ steps.manifest.outputs.image-name }}"
@@ -122,7 +122,7 @@ jobs:
           category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: fs
           scan-ref: "${{ steps.manifest.outputs.image-name }}"
