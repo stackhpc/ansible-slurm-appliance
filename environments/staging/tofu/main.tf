@@ -39,7 +39,7 @@ module "cluster" {
                 #"stagingcompute007",
 	  ]
           flavor: "hpc.v2.32cpu.128ram" # TODO: make this a 32cpu gen1 once there's space
-          availability_zone = "nova" # TODO: move to a rack AZ once compute14 can be cleared
+          availability_zone = "DL-Rack-6"
           vnic_types = {
             "slurm-staging-control-net": "normal"
             "slurm-staging-rdma-net": "direct"
@@ -62,6 +62,7 @@ module "cluster" {
         interactive = {
             nodes: ["staginglogin"]
             flavor: "hpc.v2.32cpu.128ram" # TODO: make this a 16cpu gen1 once there's space
+            availability_zone = "DL-Rack-6"
             vnic_types = {
               "slurm-staging-control-net": "normal"
               "slurm-staging-rdma-net": "direct"
