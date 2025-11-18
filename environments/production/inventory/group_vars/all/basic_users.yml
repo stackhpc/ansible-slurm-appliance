@@ -3,4 +3,3 @@ basic_users_users:
     password: "{{ vault_demo_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}" # idempotent
     uid: 1005
     create_home: false
-    sudo: demo_user ALL=(ALL) NOPASSWD:ALL
