@@ -62,17 +62,6 @@
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
 
-- name: Copy EESSI CVMFS config to /exports/cluster
-  ansible.builtin.copy:
-    src: /etc/cvmfs/default.local
-    dest: /exports/cluster/cvmfs/default.local
-    owner: slurm
-    group: root
-    mode: "0644"
-    remote_src: true
-  run_once: true
-  delegate_to: "{{ groups['control'] | first }}"
-
 - name: Export cacerts
   ansible.builtin.include_role:
     name: cacerts
