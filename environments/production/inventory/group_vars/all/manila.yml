@@ -2,5 +2,9 @@
 os_manila_mount_shares:
   - share_name: slurm-production-home
     mount_path: /home
-  - share_name: slurm-production-work
-    mount_path: /work
+  - share_name: slurm-production-scratch
+    mount_path: /scratch
+  - share_name: slurm-production-projects
+    mount_path: /projects
+  - share_name: slurm-production-tools
+    mount_path: /tools

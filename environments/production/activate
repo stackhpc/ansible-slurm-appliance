@@ -19,4 +19,9 @@ if [ -f "$APPLIANCES_ENVIRONMENT_ROOT/ansible.cfg" ]; then
    export ANSIBLE_CONFIG=$APPLIANCES_ENVIRONMENT_ROOT/ansible.cfg
 fi
 
-
+if [ -f "$APPLIANCES_ENVIRONMENT_ROOT/env.secret" ]; then
+  echo "Including envvars from $APPLIANCES_ENVIRONMENT_ROOT/env.secret"
+  set -a
+  export $(ansible-vault view "$APPLIANCES_ENVIRONMENT_ROOT/env.secret" | xargs) || return 1
+  set +a
+fi
