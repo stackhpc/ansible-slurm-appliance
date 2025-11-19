@@ -6,7 +6,7 @@ variable "environment_root" {
 module "cluster" {
     source = "../../site/tofu/"
     
-    cluster_image_id = "48325752-dec3-475c-a6c5-cf41b6c009d0"   # openhpc-251111-0940-93ad86a2
+    cluster_image_id = "f26edd3c-b729-48d9-b68b-e6b9f4c92a51"   # openhpc-251119-1138-35c8e869
     cluster_name = "slurm-staging"
     cluster_networks = [
       {
