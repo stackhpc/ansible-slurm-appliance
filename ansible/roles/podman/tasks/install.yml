@@ -1,0 +1,8 @@
+---
+- name: Install OS packages
+  ansible.builtin.dnf:
+    name:
+      - podman
+      - python3
+    state: installed
+  become: true

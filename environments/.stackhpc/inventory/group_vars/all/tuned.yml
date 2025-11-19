@@ -1,0 +1,3 @@
+---
+# Set profile which is not default (on VMs) for testing
+tuned_profile: hpc-compute

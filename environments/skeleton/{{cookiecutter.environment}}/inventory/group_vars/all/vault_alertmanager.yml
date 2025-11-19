@@ -1,3 +1,0 @@
-# Add a bot token here THEN VAULT-ENCRYPT this file!
-
-#vault_alertmanager_slack_integration_app_creds: '<bot_token>'

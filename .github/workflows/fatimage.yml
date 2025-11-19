@@ -1,6 +1,7 @@
 name: Build fat image
 on:
   workflow_dispatch:
+      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
       inputs:
         ci_cloud:
           description: 'Select the CI_CLOUD'
@@ -16,6 +17,12 @@ on:
           required: true
           default: true
 
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+
 jobs:
   openstack:
     name: openstack-imagebuild
@@ -29,23 +36,25 @@ jobs:
         build:
           - image_name: openhpc-RL8
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.raw
-            inventory_groups: control,compute,login,update
+            inventory_groups: fatimage
           - image_name: openhpc-RL9
-            source_image_name: Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.raw
-            inventory_groups: control,compute,login,update
+            source_image_name: Rocky-9-GenericCloud-Base-9.6-20250531.0.x86_64.qcow2
+            inventory_groups: fatimage
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
+      PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record settings for CI cloud
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo cleanup_on_failure: ${{ github.event.inputs.cleanup_on_failure  }}
 
       - name: Setup ssh
         run: |
@@ -83,8 +92,8 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ github.event.inputs.cleanup_on_failure && 'cleanup' || 'abort' }} \
-          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
+          -on-error=${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }} \
+          -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
@@ -95,14 +104,14 @@ jobs:
         run: |
           . venv/bin/activate
           IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
-          while ! openstack image show -f value -c name $IMAGE_ID; do
+          while ! openstack image show -f value -c name "$IMAGE_ID"; do
             sleep 5
           done
-          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
-          echo $IMAGE_ID > image-id.txt
-          echo $IMAGE_NAME > image-name.txt
+          echo "$IMAGE_ID" > image-id.txt
+          echo "$IMAGE_NAME" > image-name.txt
 
       - name: Make image usable for further builds
         run: |

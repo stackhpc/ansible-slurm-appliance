@@ -3,7 +3,6 @@
 # Authentication:
 openondemand_auth: # "oidc" or "basic_pam"
 openondemand_mapping_users: []
-
 ## Variables for `openondemand_auth=oidc` :
 openondemand_oidc_client_id:
 openondemand_oidc_client_secret:
@@ -19,22 +18,24 @@ openondemand_ssl_cert_key: /etc/pki/tls/private/localhost.key
 # Dashboard and application config:
 openondemand_dashboard_docs_url: (undefined)
 openondemand_dashboard_support_url: (undefined)
-openondemand_desktop_partition: ''
+openondemand_desktop_partition: ""
 openondemand_desktop_screensaver: false
 openondemand_filesapp_paths: []
-openondemand_jupyter_partition: ''
+openondemand_jupyter_partition: ""
 openondemand_dashboard_links: []
+openondemand_rstudio_partition: ''
+openondemand_matlab_partition: ''
+openondemand_codeserver_partition: ''
 
 # Monitoring:
 openondemand_exporter: true
 
 # Synonyms for osc:ood role vars:
 openondemand_clusters: {} # synonym for osc.ood:clusters
-openondemand_servername: ''
+openondemand_servername: ""
 openondemand_host_regex:
-
 # Other:
-openondemand_node_proxy_directives: '' # Added to Apache directives for `node_uri` forwarding.
+openondemand_node_proxy_directives: "" # Added to Apache directives for `node_uri` forwarding.
 
 openondemand_auth_defaults:
   # Defaults for OIDC auth - keys are osc.ood vars & can be overriden using the osc.ood var name in inventory
@@ -51,23 +52,23 @@ openondemand_auth_defaults:
       OIDCScope: "{{ openondemand_oidc_scope }}"
       OIDCRemoteUserClaim: "{{ openondemand_oidc_remote_user_claim }}"
     httpd_auth: # ood_portal.yml.j2
-      - 'AuthType openid-connect'
-      - 'Require valid-user'
-      - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
+      - "AuthType openid-connect"
+      - "Require valid-user"
+      - "ProxyPreserveHost On" # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
     user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
     user_map_match: none
-  
+
   # Defaults for basic/PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
   basic_pam:
     httpd_auth: # ood_portal.yml.j2
-      - 'AuthType Basic'
+      - "AuthType Basic"
       - 'AuthName "Open OnDemand"'
-      - 'AuthBasicProvider PAM'
-      - 'AuthPAMService ood'
-      - 'Require valid-user'
-      - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
+      - "AuthBasicProvider PAM"
+      - "AuthPAMService ood"
+      - "Require valid-user"
+      - "ProxyPreserveHost On" # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
     user_map_cmd: null
-    user_map_match: '.*'
+    user_map_match: ".*"
 
 # The below mapping is used to override osc.ood defaults. Keys are osc.ood variable names.
 # If you need to override *these* defaults (i.e. this role's vars are not sufficent) just set the corresponding osc.ood var as normal.
@@ -91,7 +92,7 @@ openondemand_osc_ood_defaults:
     - SSLHonorCipherOrder On
     - SSLCompression off
     - SSLSessionTickets Off
-  
+
   # User mapping:
   user_map_cmd: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_cmd }}"
   user_map_match: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_match }}"
@@ -100,3 +101,7 @@ openondemand_osc_ood_defaults:
   oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if (openondemand_auth | lower) == 'oidc' else none }}"
   ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
   httpd_auth: "{{ openondemand_auth_defaults[openondemand_auth | lower].httpd_auth }}"
+
+openondemand_code_server_version: 4.102.2
+openondemand_rstudio_version: 2025.05.1-513
+openondemand_matlab_version: ''

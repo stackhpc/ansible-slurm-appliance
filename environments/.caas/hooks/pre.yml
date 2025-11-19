@@ -1,8 +1,9 @@
 ---
-
 # Generate k3s token
 - name: Generate k3s token
-  # NB: Although this generates a new token on each run, the actual token set in metadata is retrieved from a set-once tofu resource, hence only the first value ever generated is relevant.
+  # NB: Although this generates a new token on each run, the actual token set in
+  #     metadata is retrieved from a set-once tofu resource, hence only the first
+  #     value ever generated is relevant.
   hosts: openstack
   tasks:
     - ansible.builtin.set_fact:
@@ -17,44 +18,44 @@
 # Ensure that the secrets are generated and persisted on the control host
 - name: Generate and persist secrets
   hosts: control
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   roles:
     - persist_openhpc_secrets
 
 # validate.yml asserts presence of a control group which doesn't exist when
 # destroying infra, so only validate when we're not destroying
 - hosts: openstack
-  gather_facts: no
-  become: no
+  gather_facts: false
+  become: false
   tasks:
-    - set_fact:
+    - ansible.builtin.set_fact:
         appliances_validate: false
       when: "cluster_state | default('') == 'absent'"
 
 # TODO: FIXME: maybe by doing the user move in cloud-init?
-# The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
+# The first task in the bootstrap playbook causes the home directory of the rocky user to be moved on the first run
 # This can disrupt the SSH connection, particularly because we use the login host as a jump host
 # So we move the home directory on the login node and reset the connections first
 - hosts: login
   gather_facts: false
   tasks:
-    - name: Set up Ansible user
-      user: "{{ (appliances_local_users_default | selectattr('user.name', 'eq', appliances_local_users_ansible_user_name))[0]['user'] }}"
-      become_method: "sudo"
+    - name: Set up Ansible user # noqa: args[module]
+      ansible.builtin.user: "{{ (appliances_local_users_default | selectattr('user.name', 'eq', appliances_local_users_ansible_user_name))[0]['user'] }}"
+      become_method: ansible.builtin.sudo
       # Need to change working directory otherwise we try to switch back to non-existent directory.
-      become_flags: '-i'
+      become_flags: "-i"
       become: true
 
 - hosts: cluster
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Reset persistent SSH connections
-      meta: reset_connection
+      ansible.builtin.meta: reset_connection
 
 - hosts: localhost
-  gather_facts: no
-  become: no
+  gather_facts: false
+  become: false
   tasks:
     - name: Add hosts to dnf_repos group to enable repofiles
       ansible.builtin.add_host:
@@ -63,3 +64,15 @@
           - dnf_repos
       loop: "{{ groups['cluster'] }}"
       when: dnf_repos_enabled | default(false) | bool
+
+# Workaround for setup-env.sh not running in CaaS environment, so:
+# https://github.com/stackhpc/ansible-slurm-appliance/blob/ba9699267449fba58cd9c04c451759a914fd7144/ansible/validate.yml#L16
+# doesn't break CaaS platforms
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Prepare requirements.yml.last for galaxy validation
+      ansible.builtin.copy:
+        src: "{{ appliances_repository_root }}/requirements.yml"
+        dest: "{{ appliances_repository_root }}/requirements.yml.last"
+        mode: "0644"

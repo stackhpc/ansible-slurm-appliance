@@ -1,0 +1,4 @@
+---
+- name: Set cuda_facts_version_short
+  ansible.builtin.set_fact:
+    cuda_facts_version_short: "{{ cuda_version_short }}"

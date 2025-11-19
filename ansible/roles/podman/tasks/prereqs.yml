@@ -1,8 +1,0 @@
----
-- name: Install OS packages
-  yum:
-    name:
-      - podman
-      - python3
-    state: installed
-  become: true

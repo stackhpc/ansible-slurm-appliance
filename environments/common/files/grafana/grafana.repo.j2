@@ -1,6 +1,6 @@
 {{ ansible_managed | comment }}
 [grafana]
-baseurl = {{ appliances_pulp_url }}/pulp/content/{{ appliances_pulp_repos.grafana[ansible_distribution_major_version] | appliances_repo_to_subpath }}
+baseurl = {{ appliances_pulp_url }}/pulp/content/{{ dnf_repos_repos['grafana'][ansible_distribution_major_version]['pulp_path'] }}/{{ dnf_repos_repos['grafana'][ansible_distribution_major_version]['pulp_timestamp'] }}
 enabled = 0
 name = grafana
 async = 1
