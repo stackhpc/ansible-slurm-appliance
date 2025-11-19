@@ -280,7 +280,9 @@
       # NB: don't need conditional block on enable_compute as have already exited
       # if not the case
     - name: Configure EESSI
-      ansible.builtin.include_tasks: tasks/eessi.yml
+      ansible.builtin.include_role:
+        name: eessi
+        tasks_from: configure.yml
       when: enable_eessi
 
     - name: Configure VGPUs

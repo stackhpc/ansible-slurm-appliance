@@ -54,8 +54,8 @@
       dest: roles/
     - src: ../../nhc
       dest: roles/
-    - src: ../../eessi/tasks/configure.yml
-      dest: tasks/eessi.yml
+    - src: ../../eessi
+      dest: roles/
 
 - name: Add filter_plugins to ansible.cfg
   ansible.builtin.lineinfile:
