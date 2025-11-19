@@ -113,7 +113,7 @@ openhpc
 [proxy]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
 
-[manila]
+[manila:children]
 # Hosts to configure for manila fileshares
 login
 compute
@@ -143,9 +143,10 @@ fatimage
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
 
-[compute_init]
+[compute_init:children]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
 compute
+builder
 
 [k3s_server:children]
 # Hosts to run k3s server (should only be single node i.e control node)
@@ -187,7 +188,7 @@ fatimage
 # Hosts to configure for node health checks
 compute
 
-[topology]
+[topology:children]
 # Compute nodes to be included in the Slurm topology plugin's topology tree. See ansible/roles/topology
 # Should be set to `compute` if enabled
 # Note that this feature currently assumes all compute nodes are VMs, enabling
