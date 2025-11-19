@@ -134,9 +134,9 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
 
   user_data = <<-EOF
     #cloud-config
-    fqdn: ${local.fqdns[each.key]}
+    fqdn: ${local.fqdns[each.key]}%{if var.additional_cloud_config != ""}
 
-    %{if var.additional_cloud_config != ""}
+
     ${templatestring(var.additional_cloud_config, var.additional_cloud_config_vars)}
     %{endif}
   EOF
