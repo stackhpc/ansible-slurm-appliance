@@ -1,0 +1,35 @@
+name: Workflow Cleanup
+on:
+  workflow_dispatch:
+      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
+      inputs:
+        ci_cloud:
+          description: 'Select the CI_CLOUD'
+          required: true
+          type: choice
+          options:
+            - LEAFCLOUD
+            - SMS
+            - ARCUS
+        cluster_name:
+          description: 'Cluster to delete'
+          type: string
+          required: true
+
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+
+jobs:
+  dummy:
+    name: dummy-job1
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: print hellow
+        run: |
+          print hello
+        shell: bash
