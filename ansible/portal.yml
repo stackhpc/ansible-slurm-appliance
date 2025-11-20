@@ -1,32 +1,64 @@
+---
 - hosts: openondemand
   tags:
     - openondemand
     - openondemand_server
-  become: yes
-  gather_facts: yes # TODO
+  become: true
+  gather_facts: true # TODO
   tasks:
-    - import_role:
+    - name: Skip openondemand apps installation in configure mode
+      ansible.builtin.set_fact:
+        ood_install_apps: {}
+      when: appliances_mode == 'configure'
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: main.yml
 
-- hosts: openondemand_desktop
+- hosts: openondemand_desktop:openondemand_matlab
   tags:
     - openondemand
     - openondemand_desktop
-  become: yes
-  gather_facts: yes
+    - openondemand_matlab
+  become: true
+  gather_facts: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: vnc_compute.yml
+      when: appliances_mode != 'configure' # is run during build
 
 - hosts: openondemand_jupyter
   tags:
     - openondemand
     - openondemand_jupyter
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
+      when: appliances_mode != 'configure' # is run during build
+
+- hosts: openondemand_rstudio
+  tags:
+    - openondemand
+    - openondemand_rstudio
+  become: true
+  gather_facts: true
+  tasks:
+    - ansible.builtin.import_role:
+        name: openondemand
+        tasks_from: rstudio_compute.yml
+      when: appliances_mode != 'configure' # is run during build
+
+- hosts: openondemand_codeserver
+  tags:
+    - openondemand
+    - openondemand_codeserver
+  become: true
+  gather_facts: true
+  tasks:
+    - ansible.builtin.import_role:
+        name: openondemand
+        tasks_from: codeserver_compute.yml
+      when: appliances_mode != 'configure' # is run during build

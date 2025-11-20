@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
 
 # This tool allows you to ssh into a host using the ansible inventory.
-# Example: ansible-ssh compute[0] -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
+# Example: ansible-ssh compute[0] -o GlobalKnownHostsFile=/dev/null -o
+# UserKnownHostsFile=/dev/null
 
-import sys
-import subprocess
-import shlex
 import json
 import os
+import shlex
+import subprocess
+import sys
 from collections import defaultdict
+
 
 def _optional_arg(prototype, *values):
     # returns empty string if any of the values are falsey
     filtered = [value for value in values if value]
     return prototype.format(*values) if len(values) == len(filtered) else ""
 
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        msg = (f"Usage: {sys.argv[0]} <inventory_hostname> [args to pass to ssh]")
+        msg = (
+            f"Usage: {sys.argv[0]} <inventory_hostname> [args to pass to ssh]")
         print(msg, file=sys.stderr)
         sys.exit(-1)
 
@@ -25,7 +29,8 @@ if __name__ == "__main__":
     host = shlex.quote(sys.argv[1])
 
     try:
-        output = subprocess.check_output(f'ansible-inventory --host { host }', shell=True)
+        output = subprocess.check_output(
+            f'ansible-inventory --host {host}', shell=True)
     except (subprocess.CalledProcessError) as e:
         msg = (f"[ERROR]: Is {host} missing from the inventory?")
         print(msg, file=sys.stderr)
@@ -56,7 +61,5 @@ if __name__ == "__main__":
     base = shlex.split(f'ssh {port} {identity} {opts}')
     extras = sys.argv[2:]
     cmd = base + extras + [host]
-    print(f"[INFO]: Running: { subprocess.list2cmdline(cmd) }")
-    os.execvp(cmd[0],cmd)
-
-
+    print(f"[INFO]: Running: {subprocess.list2cmdline(cmd)}")
+    os.execvp(cmd[0], cmd)

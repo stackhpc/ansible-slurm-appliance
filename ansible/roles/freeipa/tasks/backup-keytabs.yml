@@ -1,5 +1,6 @@
+---
 - name: Retrieve keytabs to localhost
-  fetch:
+  ansible.builtin.fetch:
     src: "{{ _freeipa_keytab_backup_path }}"
     dest: "{{ appliances_environment_root }}/keytabs/{{ inventory_hostname }}/"
     flat: true
@@ -7,8 +8,9 @@
   tags: retrieve
 
 - name: Copy keytabs back to control node
-  copy:
+  ansible.builtin.copy:
     src: "{{ appliances_environment_root }}/keytabs/{{ inventory_hostname }}/"
     dest: "{{ _freeipa_keytab_backup_path | dirname }}"
+    mode: "0644"
   delegate_to: "{{ groups['control'].0 }}"
   tags: deploy

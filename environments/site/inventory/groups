@@ -1,3 +1,15 @@
+[login:children]
+# All Slurm login nodes. Combined control/login nodes are not supported.
+fatimage
+
+[control:children]
+# A single Slurm control node. Multiple (high availability) control nodes are not supported.
+fatimage
+
+[compute:children]
+# All Slurm compute nodes (in all partitions).
+fatimage
+
 [nfs:children]
 openhpc
 
@@ -22,6 +34,9 @@ control
 [slurm_stats:children]
 control
 
+[slurm_exporter:children]
+control
+
 [filebeat:children]
 slurm_stats
 
@@ -29,6 +44,7 @@ slurm_stats
 control
 
 [update:children]
+fatimage
 
 [fail2ban:children]
 # Hosts to install fail2ban on to protect SSH
@@ -41,24 +57,51 @@ login
 # Add `openhpc` group to add Slurm users via creation of users on each node.
 openhpc
 
-#[openondemand:children]
-# Host to run Open Ondemand server on - subset of login
+[openondemand:children]
+# Host to run Open OnDemand server on - subset of login
 #login
 
-#[openondemand_desktop:children]
-# Subset of compute to run a interactive desktops on via Open Ondemand
+[openondemand_desktop:children]
+# Subset of compute to run a interactive desktops on via Open OnDemand
 #compute
 
-#[openondemand_jupyter:children]
-# Subset of compute to run a Jupyter Notebook servers on via Open Ondemand
+[openondemand_jupyter:children]
+# Subset of compute to run a Jupyter Notebook servers on via Open OnDemand
+#compute
+
+[openondemand_rstudio:children]
+# Subset of compute to run RStudio servers on via Open OnDemand
+#compute
+
+[openondemand_matlab:children]
+# Subset of compute to run a MATLAB interactive desktop on via Open OnDemand
+#compute
+
+[openondemand_codeserver:children]
+# Subset of compute to run a Codeserver VSCode instance on via Open OnDemand
 #compute
 
 [etc_hosts:children]
 # Hosts to manage /etc/hosts e.g. if no internal DNS. See ansible/roles/etc_hosts/README.md
 cluster
 
-[cuda]
+[freeipa_client]
+# Hosts to be a FreeIPA client. See ansible/roles/freeipa/README.md
+
+[doca:children]
+# Add `builder` to install NVIDIA DOCA during image build
+builder
+
+[cuda:children]
 # Hosts to install NVIDIA CUDA on - see ansible/roles/cuda/README.md
+builder
+
+[slurm_recompile:children]
+# Hosts to recompile Slurm for - allows supporting Slurm autodetection method 'nvml'
+cuda
+
+[vgpu]
+# Hosts where vGPU/MIG should be configured - see docs/mig.md
 
 [eessi:children]
 # Hosts on which EESSI stack should be configured
@@ -80,19 +123,22 @@ compute
 login
 #openondemand
 
-[squid]
+[squid:children]
 # Hosts to run squid proxy
+fatimage
 
 [tuned:children]
 # Hosts to run TuneD configuration
+fatimage
 compute
 
 [ansible_init:children]
-# Hosts to run linux-anisble-init
+# Hosts to run linux-ansible-init
 cluster
 
-[sssd]
+[sssd:children]
 # Hosts to configure sssd on
+fatimage
 
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
@@ -100,6 +146,7 @@ cluster
 [compute_init:children]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
 compute
+builder
 
 [k3s_server:children]
 # Hosts to run k3s server (should only be single node i.e control node)
@@ -120,7 +167,12 @@ compute
 [extra_packages:children]
 # Hosts to install specified additional packages on
 builder
-#cluster
+
+[dnf_repos:children]
+# Hosts to replace system repos with Pulp repos
+# Some roles do installs when in install mode/on build VM only:
+fatimage
+builder
 
 [cacerts]
 # Hosts to configure CA certificates and trusts on
@@ -130,7 +182,28 @@ builder
 
 [gateway:children]
 # Add builder to this group to install gateway ansible-init playbook into image
-builder
+fatimage
+
+[nhc:children]
+# Hosts to configure for node health checks
+compute
 
 [topology:children]
+# Compute nodes to be included in the Slurm topology plugin's topology tree. See ansible/roles/topology
+# Should be set to `compute` if enabled
+# Note that this feature currently assumes all compute nodes are VMs, enabling
+# when the cluster contains baremetal compute nodes may lead to unexpected scheduling behaviour
 compute
+
+[pulp_site]
+# Add builder to this group to automatically sync pulp during image build
+
+[pulp_server]
+# Host to deploy a Pulp server on and sync with mirrors of upstream Ark repositories. Should be a group containing a single VM provisioned
+# separately from the appliance. e.g
+# pulp_host ansible_host=<VM-ip-address>
+# Note inventory host name cannot conflict with group names i.e can't be called `pulp` or `pulp_server`.
+
+[raid:children]
+# Add `builder` to configure image for software raid
+fatimage

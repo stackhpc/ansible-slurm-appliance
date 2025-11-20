@@ -1,5 +1,13 @@
+- hosts: raid
+  become: true
+  tags: raid
+  gather_facts: true
+  tasks:
+    - ansible.builtin.include_role:
+        name: raid
+
 - hosts: k3s_server:!builder
-  become: yes
+  become: true
   tags: k3s
   tasks:
     - name: Start k3s server
@@ -10,7 +18,7 @@
 # technically should be part of bootstrap.yml but hangs waiting on failed mounts
 # if runs before filesystems.yml after the control node has been reimaged
 - hosts: k3s_agent:!builder
-  become: yes
+  become: true
   tags: k3s
   tasks:
     - name: Start k3s agents
@@ -19,13 +27,13 @@
         tasks_from: agent-runtime.yml
 
 - hosts: basic_users:!builder
-  become: yes
+  become: true
   tags:
     - basic_users
     - users
-  gather_facts: yes
+  gather_facts: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: basic_users
 
 - name: Setup EESSI
@@ -34,54 +42,58 @@
   become: true
   gather_facts: false
   tasks:
-    - name: Install and configure EESSI
-      import_role:
+    - name: Install / configure EESSI
+      ansible.builtin.include_role:
         name: eessi
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup CUDA
   hosts: cuda
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tags: cuda
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: cuda
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'install.yml' }}"
+
+- name: Setup vGPU
+  hosts: vgpu
+  become: true
+  gather_facts: true
+  tags: vgpu
+  tasks:
+    - ansible.builtin.include_role:
+        name: stackhpc.linux.vgpu
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'install.yml' }}"
+  handlers:
+    - name: reboot # noqa: name[casing]
+      ansible.builtin.fail:
+        msg: Reboot handler for stackhpc.linux.vgpu role fired unexpectedly. This was supposed to be unreachable.
 
 - name: Persist hostkeys across rebuilds
   # Must be after filesystems.yml (for storage)
   # and before portal.yml (where OOD login node hostkeys are scanned)
   hosts: persist_hostkeys:!builder
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: persist_hostkeys
 
-
-- name: Setup NFS export for compute node configuration
-  hosts: compute_init:!builder
-  # NB: has to be after eeesi and os-manila-mount
-  tags: compute_init
-  become: yes
-  tasks:
-    - include_role:
-        name: compute_init
-        tasks_from: export.yml
-
 - name: Install k9s
-  become: yes
+  become: true
   hosts: k9s
   tags: k9s
   tasks:
-  - import_role:
-      name: k9s
+    - ansible.builtin.import_role:
+        name: k9s
 
 - hosts: extra_packages
-  become: yes
+  become: true
   tags:
-   - extra_packages
+    - extra_packages
   tasks:
-  - name: Install additional packages
-    dnf:
-      name: "{{ appliances_extra_packages }}"
+    - name: Install additional packages
+      ansible.builtin.dnf:
+        name: "{{ appliances_extra_packages }}"

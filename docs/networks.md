@@ -2,13 +2,15 @@
 
 The default OpenTofu configurations in the appliance do not provision networks,
 subnets or associated infrastructure such as routers. The requirements are that:
+
 1. At least one network exists.
 2. The first network defined spans all nodes, referred to as the "access network".
 3. Only one subnet per network is attached to nodes.
 4. At least one network on each node provides outbound internet access (either
-directly, or via a proxy).
+   directly, or via a proxy). In some cases this can be relaxed - see
+   [docs/experimental/isolated-clusters.md](./experimental/isolated-clusters.md).
 
-Addresses on the "access network" used as the `ansible_host` IPs.
+Addresses on the "access network" are used as the `ansible_host` IPs.
 
 It is recommended that the deploy host either has a direct connection to the
 "access network" or jumps through a host on it which is not part of the appliance.
@@ -35,6 +37,7 @@ Note that if an OpenStack subnet has a gateway IP defined then by default nodes
 with ports attached to that subnet get a default route set via that gateway.
 
 ## Single network
+
 This is the simplest possible configuration. A single network and subnet is
 used for all nodes. The subnet provides outbound internet access via the default
 route defined by the subnet gateway (often an OpenStack router to an external
@@ -51,6 +54,7 @@ cluster_networks = [
 ```
 
 ## Multiple homogenous networks
+
 This is similar to the above, except each node has multiple networks. The first
 network, "netA" is the access network. Note that only one subnet must have a
 gateway defined, else default routes via both subnets will be present causing
@@ -74,7 +78,6 @@ vnic_types = {
 }
 ...
 ```
-
 
 ## Additional networks on some nodes
 
@@ -119,13 +122,14 @@ In some multiple network configurations it may be necessary to manage default
 routes rather than them being automatically created from a subnet gateway.
 This can be done using the tofu variable `gateway_ip` which can be set for the
 cluster and/or overriden on the compute and login groups. If this is set:
+
 - a default route via that address will be created on the appropriate interface
   during boot if it does not exist
 - any other default routes will be removed
 
 For example the cluster configuration below has a "campus" network with a
 default gateway which provides inbound SSH / ondemand access and outbound
-internet  attached only to the login nodes, and a "data" network attached to
+internet attached only to the login nodes, and a "data" network attached to
 all nodes. The "data" network has no gateway IP set on its subnet to avoid dual
 default routes and routing conflicts on the multi-homed login nodes, but does
 have outbound connectivity via a router:
@@ -157,11 +161,6 @@ compute = {
 }
 ```
 
-If there is no default route at all (either from a subnet gateway or from
-`gateway_ip`) then a dummy route is created via the access network interface to
-ensure [correct](https://docs.k3s.io/installation/airgap#default-network-route)
-`k3s` operation.
-
 When using a subnet with no default gateway, OpenStack's nameserver for the
 subnet may refuse lookups. External nameservers can be defined using the
 [resolv_conf](../ansible/roles/resolv_conf/README.md) role.
@@ -187,7 +186,7 @@ compute
 # environments/$SITE/inventory/group_vars/all/squid.yml:
 # these are just examples
 squid_cache_disk: 1024 # MB
-squid_cache_mem: '12 GB'
+squid_cache_mem: "12 GB"
 ```
 
 Note that name resolution must still be possible and may require defining an

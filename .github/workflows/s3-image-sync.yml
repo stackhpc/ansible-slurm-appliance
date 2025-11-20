@@ -1,4 +1,4 @@
-name: Upload CI-tested images to Arcus S3 and sync clouds
+name: Upload CI-tested images to Leafcloud S3 and sync clouds
 on:
   workflow_dispatch:
   push:
@@ -9,6 +9,13 @@ on:
 env:
   S3_BUCKET: openhpc-images-prerelease
   IMAGE_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+  RUNNER_IMAGE_DIR: /mnt/images
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
 
 jobs:
   s3_cleanup:
@@ -17,11 +24,11 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Write s3cmd configuration
         run: |
-          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
+          echo "${{ secrets['LEAFCLOUD_S3_CFG'] }}" > ~/.s3cfg
         shell: bash
 
       - name: Install s3cmd
@@ -50,7 +57,7 @@ jobs:
     outputs:
       ci_cloud: ${{ steps.ci.outputs.CI_CLOUD }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record which cloud CI is running on
         id: ci
@@ -62,7 +69,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
         shell: bash
 
       - name: Write clouds.yaml
@@ -73,7 +80,7 @@ jobs:
 
       - name: Write s3cmd configuration
         run: |
-          echo "${{ secrets['ARCUS_S3_CFG'] }}" > ~/.s3cfg
+          echo "${{ secrets['LEAFCLOUD_S3_CFG'] }}" > ~/.s3cfg
         shell: bash
 
       - name: Install s3cmd and qemu-utils
@@ -87,33 +94,26 @@ jobs:
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
         shell: bash
 
-      - name: Clear up some space on runner
-        run: |
-          df -h
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          sudo apt-get clean
-          df -h
-
       - name: Download image to runner
         run: |
           . venv/bin/activate
-          openstack image save --file "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
+          df -h
+          sudo mkdir ${{ env.RUNNER_IMAGE_DIR }}
+          sudo chmod ugo=rwX ${{ env.RUNNER_IMAGE_DIR }}
+          openstack image save --file "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
           df -h
         shell: bash
 
       - name: Convert image to QCOW2
         run: |
           . venv/bin/activate
-          qemu-img convert -f raw -O qcow2 -c "${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
+          qemu-img convert -f raw -O qcow2 -c "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}.raw" "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}"
         shell: bash
 
       - name: Upload Image to S3
         run: |
           echo "Uploading Image: ${{ env.TARGET_IMAGE }} to S3..."
-          s3cmd --multipart-chunk-size-mb=150 put ${{ env.TARGET_IMAGE }} s3://${{ env.S3_BUCKET }}
+          s3cmd --multipart-chunk-size-mb=150 put "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}" s3://${{ env.S3_BUCKET }}
         shell: bash
 
   image_sync:
@@ -138,7 +138,7 @@ jobs:
       OS_CLOUD: openstack
       CI_CLOUD: ${{ matrix.cloud }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record which cloud CI is running on
         run: |
@@ -149,7 +149,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
         shell: bash
 
       - name: Write clouds.yaml
@@ -175,7 +175,7 @@ jobs:
           image_hanging=$(openstack image list --name ${{ env.TARGET_IMAGE }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
           if [ -n "$image_hanging" ]; then
             echo "Cleaning up OpenStack image with ID: $image_hanging"
-            openstack image delete $image_hanging
+            openstack image delete "$image_hanging"
           else
             echo "No image ID found, skipping cleanup."
           fi

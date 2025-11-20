@@ -1,3 +1,5 @@
+# Unless noted otherwise features enabled here are tested by CI site.yml playbook
+
 [basic_users:children]
 cluster
 
@@ -20,7 +22,7 @@ cluster
 # --- end of FreeIPA example ---
 
 [manila:children]
-# Allows demo; also installs manila client in fat image
+# Not actully tested but allows demo using this environment
 login
 compute
 
@@ -28,16 +30,7 @@ compute
 cluster
 
 [tuned:children]
-# Install tuned into fat image
-builder
-
-[squid:children]
-# Install squid into fat image
-builder
-
-[sssd:children]
-# Install sssd into fat image
-builder
+cluster
 
 [rebuild:children]
 control

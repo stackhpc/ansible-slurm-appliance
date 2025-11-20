@@ -1,153 +1,411 @@
 # Production Deployments
 
-This page contains some brief notes about differences between the default/demo
-configuration (as described in the main [README.md](../README.md)) and
-production-ready deployments.
+This page will guide you on how to create production-ready deployments. While
+you can start right away with this guide, you may find it useful to try with a
+demo deployment first, as described in the [main readme](../README.md).
 
-- Get it agreed up front what the cluster names will be. Changing this later
-  requires instance deletion/recreation.
+## Prerequisites
 
-- At least three environments should be created:
-    - `site`: site-specific base environment
-    - `production`: production environment
-    - `staging`: staging environment
+Before starting ensure that:
 
-  A `dev` environment should also be created if considered required, or this
-  can be left until later.
+- You have root access on the deploy host.
 
-  These can all be produced using the cookicutter instructions, but the
-  `production` and `staging` environments will need their
-  `environments/$ENV/ansible.cfg` file modifying so that they point to the
-  `site` environment:
+- You can create instances from the [latest Slurm appliance
+  image](https://github.com/stackhpc/ansible-slurm-appliance/releases),
+  which already contains the required packages. This is built and tested in
+  StackHPC's CI.
 
-    ```ini
-    inventory = ../common/inventory,../site/inventory,inventory
-    ```
+- You have an SSH keypair defined in OpenStack, with the private key
+  available on the deploy host.
 
-- To avoid divergence of configuration all possible overrides for group/role
-vars should be placed in `environments/site/inventory/group_vars/all/*.yml`
-unless the value really is environment-specific (e.g. DNS names for
-`openondemand_servername`).
+- Created instances have access to internet (note proxies can be setup
+  through the appliance if necessary).
 
-- Where possible hooks should also be placed in `environments/site/hooks/`
-and referenced from the `site` and `production` environments, e.g.:
+- Created instances have accurate/synchronised time (for VM instances this is
+  usually provided by the hypervisor; if not or for bare metal instances it
+  may be necessary to configure a time service via the appliance).
 
-    ```yaml
-    # environments/production/hooks/pre.yml:
-    - name: Import parent hook
-      import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/pre.yml"
-    ```
+- Three security groups are present: `default` allowing intra-cluster
+  communication, `SSH` allowing external access via SSH and `HTTPS`
+  allowing access for Open OnDemand.
 
-- OpenTofu configurations should be defined in the `site` environment and used
-  as a module from the other environments. This can be done with the
-  cookie-cutter generated configurations:
-  - Delete the *contents* of the cookie-cutter generated `tofu/` directories
-    from the `production` and `staging` environments.
-  - Create a `main.tf` in those directories which uses `site/tofu/` as a
-    [module](https://opentofu.org/docs/language/modules/), e.g. :
+- Usually, you'll want to deploy the Slurm Appliance into its own dedicated
+  project. It's recommended that your OpenStack credentials are defined in a
+  [clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml)
+  file in a default location with the default cloud name of `openstack`.
 
-    ```
-    ...
-    module "cluster" {
-        source = "../../site/tofu/"
+### Setup deploy host
 
-        cluster_name = "foo"
-        ...
+The following operating systems are supported for the deploy host:
+
+- Rocky Linux 9
+
+- Rocky Linux 8
+
+These instructions assume the deployment host is running Rocky Linux 8:
+
+```shell
+sudo yum install -y git python38
+git clone https://github.com/stackhpc/ansible-slurm-appliance
+cd ansible-slurm-appliance
+git checkout ${latest-release-tag}
+./dev/setup-env.sh
+```
+
+You will also need to install
+[OpenTofu](https://opentofu.org/docs/intro/install/rpm/).
+
+## Version control
+
+A production deployment should be set up under version control, so you should
+create a fork of this repository.
+
+First make an empty Git repository using your service of choice (e.g. GitHub or
+GitLab), then execute the following commands to turn the new empty repository
+into a copy of the ansible-slurm-appliance repository.
+
+```shell
+git clone https://github.com/stackhpc/ansible-slurm-appliance.git
+cd ansible-slurm-appliance
+```
+
+Maintain the existing origin remote as upstream, and create a new origin remote
+for the repository location.
+
+```shell
+git remote rename origin upstream
+git remote add origin git@<repo location>/ansible-slurm-appliance.git
+```
+
+You should use the [latest tagged
+release](https://github.com/stackhpc/ansible-slurm-appliance/releases). v1.161
+has been used as an example here, make sure to change this. Do not use the
+default main branch, as this may have features that are still works in
+progress.
+
+```shell
+git checkout v1.161
+git checkout -b site/main
+git push -u origin site/main
+```
+
+## Environment setup
+
+Get it agreed up front what the cluster names will be. Changing this later
+requires instance deletion/recreation.
+
+### Environments structure
+
+At least two environments should be created using cookiecutter, which will
+derive from the `site` base environment:
+
+- `production`: production environment
+- `staging`: staging environment
+
+A `dev` environment should also be created if considered required, or this can
+be left until later.
+
+In general only the `inventory/groups` file in the `site` environment is
+needed; it can be modified as required to enable features for all environments
+at the site.
+
+To ensure the `staging` environment provides a good test of the `production`
+environment, wherever possible group/role vars should be placed in
+`environments/site/inventory/group_vars/all/*.yml` unless the value really is
+environment-specific (e.g. DNS names for `openondemand_servername`).
+
+Where possible hooks should also be placed in `environments/site/hooks/`
+and referenced from the `production` and `staging` environments, e.g.:
+
+```yaml
+# environments/production/hooks/pre.yml:
+- name: Import parent hook
+  import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/pre.yml"
+```
+
+OpenTofu configurations are defined in the `site` environment and referenced
+as a module by the site-specific cookie-cutter generated configurations. This
+will have been generated for you already under
+`environments/$ENV/tofu/main.tf`.
+
+### Cookiecutter instructions
+
+- Run the following from the repository root to activate the venv:
+
+  ```shell
+  . venv/bin/activate
+  ```
+
+- Use the `cookiecutter` template to create a new environment to hold your
+  configuration:
+
+  ```shell
+  cd environments
+  cookiecutter ../cookiecutter
+  ```
+
+  and follow the prompts to complete the environment name and description.
+
+  **NB:** In subsequent sections this new environment is referred to as `$ENV`.
+
+- Go back to the root folder and activate the new environment:
+
+  ```shell
+  cd ..
+  . environments/$ENV/activate
+  ```
+
+  And generate secrets for it:
+
+  ```shell
+  ansible-playbook ansible/adhoc/generate-passwords.yml
+  ```
+
+## Define and deploy infrastructure
+
+Create an OpenTofu variables file to define the required infrastructure, e.g.:
+
+```text
+# environments/$ENV/tofu/terraform.tfvars
+cluster_name = "mycluster"
+cluster_networks = [
+  {
+    network = "some_network" # *
+    subnet = "some_subnet" # *
+  }
+]
+key_pair = "my_key" # *
+control_node_flavor = "some_flavor_name"
+login = {
+    # Arbitrary group name for these login nodes
+    interactive = {
+        nodes: ["login-0"]
+        flavor: "login_flavor_name" # *
     }
-    ```
+}
+cluster_image_id = "rocky_linux_9_image_uuid"
+compute = {
+    # Group name used for compute node partition definition
+    general = {
+        nodes: ["compute-0", "compute-1"]
+        flavor: "compute_flavor_name" # *
+    }
+}
+```
 
-    Note that:
-        - Environment-specific variables (`cluster_name`) should be hardcoded
-          into the module block.
-        - Environment-independent variables (e.g. maybe `cluster_net` if the
-          same is used for staging and production) should be set as *defaults*
-          in `environments/site/tofu/variables.tf`, and then don't need to
-          be passed in to the module.
+Variables marked `*` refer to OpenStack resources which must already exist.
+
+The above is a minimal configuration - for all variables and descriptions see
+`environments/site/tofu/variables.tf`.
+
+Note that:
+
+- Environment-specific variables (`cluster_name`) should be hardcoded into
+  the cluster module block.
+
+- Environment-independent variables (e.g. maybe `cluster_net` if the same
+  is used for staging and production) should be set as _defaults_ in
+  `environments/site/tofu/variables.tf`, and then don't need to be passed
+  in to the module.
+
+The cluster image used should match the release which you are deploying with.
+Published images are described in the release notes
+[here](https://github.com/stackhpc/ansible-slurm-appliance/releases).
+
+By default, the site OpenTofu configuration provisions two volumes and attaches
+them to the control node:
+
+- "$cluster_name-home" for NFS-shared home directories
+- "$cluster_name-state" for monitoring and Slurm data
+  The volumes mean this data is persisted when the control node is rebuilt.
+  However if the cluster is destroyed with `tofu destroy` then the volumes will
+  also be deleted. This is undesirable for production environments and usually
+  also for staging environments. Therefore the volumes should be manually
+  created, e.g. via the CLI:
+
+  ```shell
+  openstack volume create --size 200 mycluster-home # size in GB
+  openstack volume create --size 100 mycluster-state
+  ```
+
+and OpenTofu configured to use those volumes instead of managing them itself by
+setting:
+
+```text
+home_volume_provisioning = "attach"
+state_volume_provisioning = "attach"
+```
+
+either for a specific environment within the cluster module block in
+`environments/$ENV/tofu/main.tf`, or as the site default by changing the
+default in `environments/site/tofu/variables.tf`.
+
+For a development environment allowing OpenTofu to manage the volumes using the
+default value of `"manage"` for those varibles is usually appropriate, as it
+allows for multiple clusters to be created with this environment.
+
+If no home volume at all is required because the home directories are provided
+by a parallel filesystem (e.g. Manila) set
+
+```text
+home_volume_provisioning = "none"
+```
+
+In this case the NFS share for home directories is automatically disabled.
+
+**NB:** To apply "attach" options to existing clusters, first remove the
+volume(s) from the tofu state, e.g.:
+
+```shell
+tofu state list # find the volume(s)
+tofu state rm 'module.cluster.openstack_blockstorage_volume_v3.state[0]'
+```
+
+This leaves the volume itself intact, but means OpenTofu "forgets" it. Then set
+the "attach" options and run `tofu apply` again - this should show there are no
+changes planned.
+
+A production deployment may have a more complex networking requirements than
+just a simple network. See the [networks docs](networks.md) for details.
+
+If floating IPs are required for login nodes, create these in OpenStack and add
+the IPs into the OpenTofu `login` definition.
+
+Consider enabling topology aware scheduling. This is currently only supported
+if your cluster does not include any baremetal nodes. This can be enabled by:
+
+1. Creating Availability Zones in your OpenStack project for each physical
+   rack
+2. Setting the `availability_zone` fields of compute groups in your OpenTofu
+   configuration
+3. Adding the `compute` group as a child of `topology` in
+   `environments/$ENV/inventory/groups`
+4. (Optional) If you are aware of the physical topology of switches above the
+   rack-level, override `topology_above_rack_topology` in your groups vars
+   (see [topology docs](../ansible/roles/topology/README.md) for more detail)
+
+Consider whether mapping of baremetal nodes to ironic nodes is required. See
+[PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
+
+To deploy this infrastructure, ensure the venv and the environment are
+[activated](#cookiecutter-instructions) and run:
+
+```shell
+export OS_CLOUD=openstack
+cd environments/$ENV/tofu/
+tofu init
+tofu apply
+```
+
+and follow the prompts. Note the OS_CLOUD environment variable assumes that
+OpenStack credentials are defined using a
+[clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml)
+file in a default location with the default cloud name of `openstack`.
+
+By default, OpenTofu (and Terraform)
+[limits](https://opentofu.org/docs/cli/commands/apply/#apply-options) the
+number of concurrent operations to 10. This means that for example only 10
+ports or 10 instances can be deployed at once. This should be raised by
+modifying `environments/$ENV/activate` to add a line like:
+
+```shell
+export TF_CLI_ARGS_apply="-parallelism=25"
+```
+
+The value chosen should be the highest value demonstrated during testing. Note
+that any time spent blocked due to this parallelism limit does not count
+against the (un-overridable) internal OpenTofu timeout of 30 minutes
+
+Consider configuring [OpenTofu remote state](./opentofu-remote-state.md) for any
+environments which should be unique, e.g. production and staging.
+
+## Configure appliance
+
+### Production configuration to consider
 
 - Vault-encrypt secrets. Running the `generate-passwords.yml` playbook creates
   a secrets file at `environments/$ENV/inventory/group_vars/all/secrets.yml`.
-  To ensure staging environments are a good model for production this should
-  generally be moved into the `site` environment. It should be encrypted
-  using [Ansible vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
-  and then committed to the repository.
+  These should be created for each environment, and then be encrypted using
+  [Ansible vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
+  and committed to the repository.
 
 - Ensure created instances have accurate/synchronised time. For VM instances
   this is usually provided by the hypervisor, but if not (or for bare metal
-  instances) it may be necessary to configure or proxy `chronyd` via an
-  environment hook.
+  instances) it may be necessary to [configure chrony](./chrony.md).
 
-- The cookiecutter provided OpenTofu configurations define resources for home and
-  state volumes. The former may not be required if the cluster's `/home` is
-  provided from an external filesystem (or Manila). In any case, in at least
-  the production environment, and probably also in the staging environment,
-  the volumes should be manually created and the resources changed to [data
-  resources](https://opentofu.org/docs/language/data-sources/). This ensures that even if the cluster is deleted via tofu, the
-  volumes will persist.
+- Consider whether Prometheus storage configuration is required. By default:
 
-  For a development environment, having volumes under tofu control via volume
-  resources is usually appropriate as there may be many instantiations
-  of this environment.
+  - A 200GB state volume is provisioned (but see above)
+  - The common environment
+    [sets](../environments/common/inventory/group_vars/all/prometheus.yml) a
+    maximum retention of 100 GB and 31 days.
+    These may or may not be appropriate depending on the number of nodes, the
+    scrape interval, and other uses of the state volume (primarily the `slurmctld`
+    state and the `slurmdbd` database). See
+    [docs/monitoring-and-logging](./monitoring-and-logging.md) for more options.
 
-- Enable `etc_hosts` templating:
+- Configure Open OnDemand - see [specific documentation](openondemand.md) which
+  notes specific variables required.
 
-    ```yaml
-    # environments/site/inventory/groups:
-    [etc_hosts:children]
-    cluster
-    ```
+- Remove the `demo_user` user from
+  `environments/$ENV/inventory/group_vars/all/basic_users.yml`. Replace the
+  `hpctests_user` in `environments/$ENV/inventory/group_vars/all/hpctests.yml`
+  with an appropriately configured user.
 
-- Configure Open OnDemand - see [specific documentation](openondemand.md).
-
-- Remove the `demo_user` user from `environments/$ENV/inventory/group_vars/all/basic_users.yml`
-
-- Consider whether having (read-only) access to Grafana without login is OK. If not, remove `grafana_auth_anonymous` in `environments/$ENV/inventory/group_vars/all/grafana.yml`
-
-- Modify `environments/site/tofu/nodes.tf` to provide fixed IPs for at least
-  the control node, and (if not using FIPs) the login node(s):
-
-    ```
-    resource "openstack_networking_port_v2" "control" {
-        ...
-        fixed_ip {
-            subnet_id = data.openstack_networking_subnet_v2.cluster_subnet.id
-            ip_address = var.control_ip_address
-        }
-    }
-    ```
-    
-  Note the variable `control_ip_address` is new.
-
-  Using fixed IPs will require either using admin credentials or policy changes.
-
-- If floating IPs are required for login nodes, modify the OpenTofu configurations
-  appropriately.
-
-- Consider whether mapping of baremetal nodes to ironic nodes is required. See
-  [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
-
-- Note [PR 473](https://github.com/stackhpc/ansible-slurm-appliance/pull/473)
-  may help identify any site-specific configuration. 
+- Consider whether having (read-only) access to Grafana without login is OK. If
+  not, remove `grafana_auth_anonymous` in
+  `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
 - See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
   raising `hpctests_hpl_mem_frac` during tests.
 
-- By default, OpenTofu (and Terraform) [limits](https://opentofu.org/docs/cli/commands/apply/#apply-options)
-  the number of concurrent operations to 10. This means that for example only
-  10 ports or 10 instances can be deployed at once. This should be raised by
-  modifying `environments/$ENV/activate` to add a line like:
-
-      export TF_CLI_ARGS_apply="-parallelism=25"
-
-  The value chosen should be the highest value demonstrated during testing.
-  Note that any time spent blocked due to this parallelism limit does not count
-  against the (un-overridable) internal OpenTofu timeout of 30 minutes
-
-- By default, OpenStack Nova also [limits](https://docs.openstack.org/nova/latest/configuration/config.html#DEFAULT.max_concurrent_builds)
+- By default, OpenStack Nova
+  [limits](https://docs.openstack.org/nova/latest/configuration/config.html#DEFAULT.max_concurrent_builds)
   the number of concurrent instance builds to 10. This is per Nova controller,
-  so 10x virtual machines per hypervisor. For baremetal nodes it is 10 per cloud
-  if the OpenStack version is earlier than Caracel, else this limit can be
-  raised using [shards](https://specs.openstack.org/openstack/nova-specs/specs/2024.1/implemented/ironic-shards.html).
+  so 10x virtual machines per hypervisor. For baremetal nodes it is 10 per
+  cloud if the OpenStack version is earlier than Caracel, else this limit can
+  be raised using
+  [shards](https://specs.openstack.org/openstack/nova-specs/specs/2024.1/implemented/ironic-shards.html).
   In general it should be possible to raise this value to 50-100 if the cloud
   is properly tuned, again, demonstrated through testing.
 
-- Enable alertmanager if Slack is available - see [docs/alerting.md](./alerting.md).
+- Enable alertmanager if Slack is available - see
+  [docs/alerting.md](./alerting.md).
+
+- Enable node health checks - see
+  [ansible/roles/nhc/README.md](../ansible/roles/nhc/README.md).
+
+- By default, the appliance uses a built-in NFS share backed by an OpenStack
+  volume for the cluster home directories. You may find that you want to change
+  this. The following alternatives are supported:
+
+  - [CephFS via OpenStack Manila](./filesystems.md)
+  - [Lustre](../roles/lustre/README.md)
+
+- For some features, such as installing [DOCA-OFED](../roles/doca/README.md) or
+  [CUDA](../roles/cuda/README.md), you will need to build a custom image. It is
+  recommended that you build this on top of the latest existing openhpc image.
+  See the [image-build docs](image-build.md) for details.
+
+### Applying configuration
+
+To configure the appliance, ensure the venv and the environment are
+
+```text
+[activated](#create-a-new-environment)
+```
+
+and run:
+
+```shell
+ansible-playbook ansible/site.yml
+```
+
+Once it completes you can log in to the cluster using:
+
+```shell
+./dev/ansible-ssh login
+```
+
+For further information, including additional configuration guides and
+operations instructions, see the [docs](README.md) directory.

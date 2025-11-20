@@ -1,9 +1,9 @@
+---
 # Exactly as for slurm-infra.yml but to allow for separate manila/non-manila home appliances
 name: "slurm-manila-home"
 label: "Slurm (CephFS home)"
-description: >- 
-  Batch cluster running the Slurm workload manager, the Open 
-  OnDemand web interface, and custom monitoring.
+description: >-
+  Batch cluster running the Slurm workload manager, the Open  OnDemand web interface, and custom monitoring.
 
   This version uses CephFS for home directories.
 logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
@@ -52,7 +52,7 @@ parameters:
       count_parameter: compute_count
       min_ram: 2048
       min_disk: 20
-  
+
   - name: home_volume_size
     label: Home share size (GB)
     description: The size of the share to use for home directories.
@@ -69,7 +69,7 @@ parameters:
       this volume, 10GB is set aside for cluster state and the remaining space is used
       to store cluster metrics.
 
-      The oldest metrics records in the [Prometheus](https://prometheus.io/) database will be 
+      The oldest metrics records in the [Prometheus](https://prometheus.io/) database will be
       discarded to ensure that the database does not grow larger than this volume.
     kind: cloud.volume_size
     immutable: true
@@ -88,6 +88,7 @@ parameters:
     options:
       checkboxLabel: Run post-configuration validation?
 
+# yamllint disable rule:line-length
 usage_template: |-
   # Accessing the cluster using Open OnDemand
 
@@ -127,6 +128,7 @@ usage_template: |-
 
   Other parts of the filesystem may be affected during a patch operation, including any
   packages that have been installed using `dnf`.
+# yamllint enable rule:line-length
 
 services:
   - name: ood

@@ -19,9 +19,5 @@ if [ -f "$APPLIANCES_ENVIRONMENT_ROOT/ansible.cfg" ]; then
    export ANSIBLE_CONFIG=$APPLIANCES_ENVIRONMENT_ROOT/ansible.cfg
 fi
 
-if [ -f "$APPLIANCES_ENVIRONMENT_ROOT/env.secret" ]; then
-  echo "Including envvars from $APPLIANCES_ENVIRONMENT_ROOT/env.secret"
-  set -a
-  export $(ansible-vault view "$APPLIANCES_ENVIRONMENT_ROOT/env.secret" | xargs) || return 1
-  set +a
-fi
+export AWS_ACCESS_KEY_ID="5cd658ca9fdc41df9d5d511ff08a651e"
+export AWS_SECRET_ACCESS_KEY=$(openstack ec2 credentials show $AWS_ACCESS_KEY_ID -f value -c secret)

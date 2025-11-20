@@ -1,37 +1,34 @@
-slurm_exporter
-==============
+# slurm_exporter
 
-Build, install and configure a Prometheus exporter for metrics about Slurm itself: https://github.com/vpenso/prometheus-slurm-exporter/
+Build, install and configure a Prometheus exporter for metrics about Slurm itself: <https://github.com/vpenso/prometheus-slurm-exporter/>
 
-Requirements
-------------
+## Requirements
 
 Rocky Linux 8.5 host.
 
-Role Variables
---------------
+## Role Variables
 
 See `defaults/main.yml`
 
-Dependencies
-------------
+## Dependencies
 
 None.
 
-Example Playbook
-----------------
+## Example Playbook
 
-    - name: Deploy Slurm exporter
-      hosts: control
-      become: true
-      tags: slurm_exporter
-      tasks:
-        - import_role:
-            name: slurm_exporter
+```yaml
+- name: Deploy Slurm exporter
+  hosts: control
+  become: true
+  tags: slurm_exporter
+  tasks:
+    - import_role:
+        name: slurm_exporter
+```
 
 Prometheus scrape configuration for this might look like:
 
-```
+```text
 - job_name: "slurm_exporter"
   scrape_interval: 30s
   scrape_timeout: 30s
@@ -40,12 +37,10 @@ Prometheus scrape configuration for this might look like:
       - "{{ openhpc_slurm_control_host }}:9341"
 ```
 
-License
--------
+## License
 
 Apache v2
 
-Author Information
-------------------
+## Author Information
 
 StackHPC Ltd.

@@ -1,12 +1,12 @@
-openhpc_slurm_partitions:
+openhpc_partitions:
     - name: general-gen2
-      groups:
-        - name: general-gen2-rack6
+      nodegroups:
+        - general-gen2-rack6
       partition_params:
         DefaultTime: 15
     - name: rebuild
-      groups:
-        - name: general-gen2-rack6
+      nodegroups:
+        - general-gen2-rack6
       default: NO
       maxtime: 30
       partition_params:

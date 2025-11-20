@@ -1,101 +1,101 @@
-openhpc_slurm_partitions:
+openhpc_partitions:
     - name: general
       default: YES
       partition_params:
         DefaultTime: 15
-      groups:
-        - name: general-compute1
-        - name: general-compute2
-        - name: general-compute3
-        - name: general-compute4
-        - name: general-compute5
-        - name: general-compute6
-        - name: general-gen2-compute9
-        - name: general-gen2-compute10
-        - name: general-gen2-compute11
-        - name: general-gen2-compute12
-        - name: general-gen2-compute13
-        # - name: general-gen2-compute14
-        - name: general-gen2-compute15
-        - name: general-gen2-compute16
-        - name: general-gen2-compute17
-        - name: general-gen2-compute18
-        - name: general-gen2-compute19
-        - name: general-gen2-compute20
-        - name: general-gen2-compute21
-        - name: general-gen2-compute22
-        - name: general-gen2-compute23
-        - name: general-gen2-compute24
-        - name: general-gen2-compute25
-        - name: general-gen2-compute26
-        - name: general-gen2-compute27
-        # - name: general-gen2-compute28
-        - name: general-gen2-compute29
-        - name: general-gen2-compute30
-        - name: general-gen2-compute31
-        - name: general-gen2-compute32
-        - name: general-gen2-compute33
-        - name: general-gen2-compute34
-        - name: general-gen2-compute35
-        - name: general-gen2-compute36
-        - name: general-gen2-compute37
-        - name: general-gen2-compute38
+      nodegroups:
+        - general-compute1
+        - general-compute2
+        - general-compute3
+        - general-compute4
+        - general-compute5
+        - general-compute6
+        - general-gen2-compute9
+        - general-gen2-compute10
+        - general-gen2-compute11
+        - general-gen2-compute12
+        - general-gen2-compute13
+        # - general-gen2-compute14
+        - general-gen2-compute15
+        - general-gen2-compute16
+        - general-gen2-compute17
+        - general-gen2-compute18
+        - general-gen2-compute19
+        - general-gen2-compute20
+        - general-gen2-compute21
+        - general-gen2-compute22
+        - general-gen2-compute23
+        - general-gen2-compute24
+        - general-gen2-compute25
+        - general-gen2-compute26
+        - general-gen2-compute27
+        # - general-gen2-compute28
+        - general-gen2-compute29
+        - general-gen2-compute30
+        - general-gen2-compute31
+        - general-gen2-compute32
+        - general-gen2-compute33
+        - general-gen2-compute34
+        - general-gen2-compute35
+        - general-gen2-compute36
+        - general-gen2-compute37
+        - general-gen2-compute38
     - name: highmem
       default: NO
       partition_params:
         DefaultTime: 15
-      groups:
-        - name: highmem-compute7
-        - name: highmem-compute8
+      nodegroups:
+        - highmem-compute7
+        - highmem-compute8
     - name: gpu
       default: NO
       partition_params:
         DefaultTime: 15
-      groups:
-        - name: gpu-gpu1
-        - name: gpu-gpu2
+      nodegroups:
+        - gpu-gpu1
+        - gpu-gpu2
     - name: rebuild
-      groups:
-        - name: general-compute1
-        - name: general-compute2
-        - name: general-compute3
-        - name: general-compute4
-        - name: general-compute5
-        - name: general-compute6
-        - name: highmem-compute7
-        - name: highmem-compute8
-        - name: gpu-gpu1
-        - name: gpu-gpu2
-        - name: general-gen2-compute9
-        - name: general-gen2-compute10
-        - name: general-gen2-compute11
-        - name: general-gen2-compute12
-        - name: general-gen2-compute13
-        # - name: general-gen2-compute14
-        - name: general-gen2-compute15
-        - name: general-gen2-compute16
-        - name: general-gen2-compute17
-        - name: general-gen2-compute18
-        - name: general-gen2-compute19
-        - name: general-gen2-compute20
-        - name: general-gen2-compute21
-        - name: general-gen2-compute22
-        - name: general-gen2-compute23
-        - name: general-gen2-compute24
-        - name: general-gen2-compute25
-        - name: general-gen2-compute26
-        - name: general-gen2-compute27
-        # - name: general-gen2-compute28
-        - name: general-gen2-compute29
-        - name: general-gen2-compute30
-        - name: general-gen2-compute31
-        - name: general-gen2-compute32
-        - name: general-gen2-compute33
-        - name: general-gen2-compute34
-        - name: general-gen2-compute35
-        - name: general-gen2-compute36
-        - name: general-gen2-compute37
-        - name: general-gen2-compute38
+      nodegroups:
+        - general-compute1
+        - general-compute2
+        - general-compute3
+        - general-compute4
+        - general-compute5
+        - general-compute6
+        - highmem-compute7
+        - highmem-compute8
+        - gpu-gpu1
+        - gpu-gpu2
+        - general-gen2-compute9
+        - general-gen2-compute10
+        - general-gen2-compute11
+        - general-gen2-compute12
+        - general-gen2-compute13
+        # - general-gen2-compute14
+        - general-gen2-compute15
+        - general-gen2-compute16
+        - general-gen2-compute17
+        - general-gen2-compute18
+        - general-gen2-compute19
+        - general-gen2-compute20
+        - general-gen2-compute21
+        - general-gen2-compute22
+        - general-gen2-compute23
+        - general-gen2-compute24
+        - general-gen2-compute25
+        - general-gen2-compute26
+        - general-gen2-compute27
+        # - general-gen2-compute28
+        - general-gen2-compute29
+        - general-gen2-compute30
+        - general-gen2-compute31
+        - general-gen2-compute32
+        - general-gen2-compute33
+        - general-gen2-compute34
+        - general-gen2-compute35
+        - general-gen2-compute36
+        - general-gen2-compute37
+        - general-gen2-compute38
       default: NO
       maxtime: 30
       partition_params:

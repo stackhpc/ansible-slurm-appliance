@@ -1,24 +1,25 @@
 ---
-
 - name: Install packages
-  dnf:
+  ansible.builtin.dnf:
     name:
-    - podman
+      - podman
 
 - name: Create install directories
   ansible.builtin.file:
     state: directory
     path: "{{ pulp_site_install_dir }}/{{ item }}"
+    mode: "0755"
   loop:
-  - settings/certs
-  - pulp_storage
-  - pgsql
-  - containers
+    - settings/certs
+    - pulp_storage
+    - pgsql
+    - containers
 
 - name: Template settings file
   ansible.builtin.template:
     src: settings.py.j2
     dest: "{{ pulp_site_install_dir }}/settings/settings.py"
+    mode: "0644"
 
 - name: Install pulp podman container
   containers.podman.podman_container:
@@ -26,16 +27,31 @@
     publish:
       - "{{ pulp_site_port }}:80"
     volume:
-    - "{{ pulp_site_install_dir }}/settings:/etc/pulp{{ pulp_site_selinux_suffix }}"
-    - "{{ pulp_site_install_dir }}/pulp_storage:/var/lib/pulp{{ pulp_site_selinux_suffix }}"
-    - "{{ pulp_site_install_dir }}/pgsql:/var/lib/pgsql{{ pulp_site_selinux_suffix }}"
-    - "{{ pulp_site_install_dir }}/containers:/var/lib/containers{{ pulp_site_selinux_suffix }}"
+      - "{{ pulp_site_install_dir }}/settings:/etc/pulp{{ _pulp_site_selinux_suffix }}"
+      - "{{ pulp_site_install_dir }}/pulp_storage:/var/lib/pulp{{ _pulp_site_selinux_suffix }}"
+      - "{{ pulp_site_install_dir }}/pgsql:/var/lib/pgsql{{ _pulp_site_selinux_suffix }}"
+      - "{{ pulp_site_install_dir }}/containers:/var/lib/containers{{ _pulp_site_selinux_suffix }}"
     device: /dev/fuse
     image: docker.io/pulp/pulp:3.68.1
+    state: present
 
-- name: Reset admin password once container has initialised
+- name: Create systemd file
+  ansible.builtin.copy:
+    src: pulp.service
+    dest: /etc/systemd/system/pulp.service
+    mode: "0644"
+  register: _pulp_service
+
+- name: Start Pulp service
+  ansible.builtin.systemd:
+    name: pulp
+    state: "{{ 'started' if _pulp_service.changed else 'restarted' }}"
+    daemon_reload: "{{ _pulp_service.changed }}"
+    enabled: true
+
+- name: Reset admin password once container has initialised # noqa: no-changed-when
   no_log: true
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: "podman exec pulp bash -c 'pulpcore-manager reset-admin-password -p {{ pulp_site_password }}'"
   register: _admin_reset_output
   until: 0 == _admin_reset_output.rc

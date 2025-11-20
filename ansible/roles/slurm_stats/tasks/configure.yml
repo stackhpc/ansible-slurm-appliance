@@ -1,0 +1,32 @@
+---
+
+- name: Create a directory to house the log files
+  ansible.builtin.file:
+    state: directory
+    path: /var/log/slurm-stats
+    mode: "0755"
+  become: true
+
+- name: Create cron job
+  ansible.builtin.cron:
+    name: Generate slurm stats
+    minute: "*/5"
+    user: root
+    # NOTE: lasttimestamp is stored at /root/lasttimestamp
+    job: "TZ=UTC /opt/slurm-tools/bin/slurm-stats >> /var/log/slurm-stats/finished_jobs.json"
+    cron_file: slurm-stats
+  become: true
+
+- name: Setup log rotate
+  ansible.builtin.copy:
+    content: |
+      # WARNING: This file is managed by ansible, do not modify.
+      /var/log/slurm-stats/finished_jobs.json {
+              {{ slurm_stats_log_rotate_content_frequency }}
+              rotate {{ slurm_stats_log_rotate_content_rotate }}
+              compress
+              delaycompress
+      }
+    dest: /etc/logrotate.d/slurm-stats
+    mode: "0644"
+  become: true

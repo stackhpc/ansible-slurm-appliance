@@ -5,11 +5,11 @@
   hosts: opensearch
   tags: opensearch
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: opensearch
         tasks_from: install.yml
       become: true
-    - import_role:
+    - ansible.builtin.import_role:
         name: opensearch
         tasks_from: runtime.yml
       become: true
@@ -18,21 +18,24 @@
   hosts: slurm_stats
   tags: slurm_stats
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: slurm_stats
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Deploy filebeat
   hosts: filebeat
   tags: filebeat
   tasks:
-    - import_role:
+    - ansible.builtin.include_role:
         name: filebeat
+        tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Deploy node_exporter
   hosts: node_exporter
   tags: node_exporter
   tasks:
-    - import_role: name=cloudalchemy.node_exporter
+    - ansible.builtin.import_role:
+        name: cloudalchemy.node_exporter
 
 - name: Deploy OpenOndemand exporter
   hosts: openondemand
@@ -41,24 +44,25 @@
     - openondemand
     - openondemand_server
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: openondemand
         tasks_from: exporter.yml
 
 - name: Deploy Slurm exporter
-  hosts: control
+  hosts: slurm_exporter
   become: true
   tags: slurm_exporter
   tasks:
-    - import_role:
+    - ansible.builtin.include_role:
         name: slurm_exporter
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup core monitoring software
   hosts: prometheus
   tags: prometheus
   tasks:
     - name: Check for existing prometheus binaries
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/bin/{{ item }}
       register: prometheus_binaries
       loop:
@@ -66,34 +70,46 @@
         - promtool
     - name: Skip prometheus install if prometheus binaries exist and prometheus_version not defined
       # i.e. if prometheus_version isn't defined we don't care, so use what's already there
-      set_fact:
-        prometheus_skip_install: "{{ false if prometheus_version is defined else true }}" 
-      when: "{{ (prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined] }}"
-    - import_role:
+      ansible.builtin.set_fact:
+        prometheus_skip_install: "{{ false if prometheus_version is defined else true }}"
+      when: "(prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined]"
+    - ansible.builtin.import_role:
         name: cloudalchemy.prometheus
 
 - name: Deploy grafana
   hosts: grafana
   tags: grafana
   tasks:
-    - assert:
-        that: vault_grafana_admin_password is defined
-        fail_msg: "Must define vault_grafana_admin_password - use `ansible-playbook generate-passwords.yml` to generate a set of passwords"
-    - include_role:
+    - name: Skip plugin installation in configure mode
+      # done during fatimage - can't do this in vars block as that is recursive
+      ansible.builtin.set_fact:
+        grafana_plugins: "{{ [] if appliances_mode == 'configure' else grafana_plugins }}"
+    - name: Copy Grafana plugins installed in image into persistent grafana state
+      ansible.builtin.copy:
+        remote_src: true
+        src: /var/lib/grafana/plugins/ # trailing / means copy contents
+        dest: "{{ grafana_data_dir }}/plugins/"
+        # below matches what already exists:
+        owner: root
+        group: root
+        mode: '0755'
+      become: true
+    - ansible.builtin.include_role:
         name: cloudalchemy.grafana
       vars:
-        # We use internal roles to register the dashboards as the role does not support all options that we require.
+        # Internal role used to install dashboards as cloudalchemy role does not support all required options:
         grafana_dashboards: []
-    - import_role: # done in same play so it can use handlers from cloudalchemy.grafana
+    - ansible.builtin.include_role: # done in same play so it can use handlers from cloudalchemy.grafana
         name: grafana-dashboards
+      when: "appliances_mode != 'configure'"
 
 - name: Deploy alertmanager
   hosts: alertmanager
   tags: alertmanager
-  become: yes
+  become: true
   gather_facts: false
   tasks:
     - name: Configure alertmanager
-      include_role:
+      ansible.builtin.include_role:
         name: alertmanager
         tasks_from: configure.yml

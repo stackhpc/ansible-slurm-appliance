@@ -1,0 +1,11 @@
+---
+- name: Install EPEL repo
+  ansible.builtin.package:
+    name: epel-release
+
+- name: Install fail2ban packages
+  ansible.builtin.package:
+    name:
+      - fail2ban-server
+      - fail2ban-firewalld
+    state: present

@@ -1,0 +1,4 @@
+---
+skip-check:
+  # Requires all blocks to have rescue: - not considered appropriate
+  - CKV2_ANSIBLE_3

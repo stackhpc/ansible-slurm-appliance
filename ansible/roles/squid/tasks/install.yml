@@ -1,3 +1,4 @@
+---
 - name: Install squid package
-  dnf:
+  ansible.builtin.dnf:
     name: squid

@@ -1,3 +1,4 @@
+---
 resolv_conf_nameservers: []
 
 resolv_conf_search: "{{ resolv_conf_search_default + resolv_conf_search_extra }}"

@@ -32,25 +32,27 @@ for usage instructions for that component.
 ### common
 
 Shared configuration for all environments. This is not
-intended to be used as a standalone environment, hence the README does *not* detail
-how to provision the infrastructure.
+intended to be used as a standalone environment, hence the readme does _not_ detail
+how to provision the infrastructure. This environment should not be edited, except as part of upstreaming new features or bugfixes.
 
-### skeleton
+## site
 
-Skeleton directory that is used as a template to create a new environemnt.
+Provides the base configuration for all subsequent `cookiecutter` created environments,
+including OpenTofu configurations for infrastructure. In general, most local customisations should be made by adding to this environment.
 
 ## Defining an environment
 
 To define an environment using cookiecutter:
 
-    cookiecutter skeleton
+    cd environments
+    cookiecutter ../cookiecutter
 
 This will present you with a series of questions which you must answer.
 Once you have answered all questions, a new environment directory will
 be created. The directory will be named according to the answer you gave
 for `environment`.
 
-Follow the README in the new directory to perform initial configuration.
+Follow the readme in the new directory to perform initial configuration.
 
 ## Activating environments
 
@@ -66,13 +68,12 @@ hosts from the associated group in the inventory. A pattern we use is to name th
 ansible inventory `group` after the name of the `role` that configures it. The playbook
 that runs this role targets hosts in that group. The `common` environment typically defines
 all groups as the empty group. You must explicly opt-in and add hosts to these these groups
-to configure that service.  For example, if you don't want to deploy and configure grafana,
+to configure that service. For example, if you don't want to deploy and configure grafana,
 you simply do not add any hosts to the `grafana` group in the inventory. This allows us to
-have a shared ansible code base as we can define playbooks to configure all things,
+have a shared ansible codebase as we can define playbooks to configure all things,
 but these playbooks end up not being run if no host is in the associated group.
 
-See also:
-    - `common/inventory/groups` for a list of all groups.
+See also: - `common/inventory/groups` for a list of all groups.
 
 ## Overriding configuration
 

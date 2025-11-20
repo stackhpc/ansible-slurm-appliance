@@ -1,0 +1,20 @@
+---
+- name: Ensure NHC configuration directory exists
+  # When running site.yml after login/control upgrade, nhc group might be
+  # enabled in repo, but as the compute nodes have not yet been upgraded they
+  # do not have the package and hence this directory
+  ansible.builtin.file:
+    path: /etc/nhc
+    state: directory
+    # to match nhc-ohpc install:
+    owner: root
+    group: root
+    mode: u=rwX,go=
+
+- name: Template out NHC configuration
+  ansible.builtin.template:
+    src: "{{ nhc_config_template }}"
+    dest: /etc/nhc/nhc.conf
+    owner: root
+    group: root
+    mode: u=rw,go= # HealthChecProgram is run by root
