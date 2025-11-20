@@ -27,9 +27,12 @@ jobs:
   dummy:
     name: dummy-job1
     runs-on: ubuntu-22.04
+    env:
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      CLUSTER_NAME: ${{ github.event.inputs.cluster_name }}
 
     steps:
-      - name: print hellow
+      - name: print input vars
         run: |
-          print hello
-        shell: bash
+          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
