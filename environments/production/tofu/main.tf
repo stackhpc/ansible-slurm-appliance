@@ -7,7 +7,6 @@ module "cluster" {
     source = "../../site/tofu/"
 
     cluster_name = "slurm-production"
-    cluster_image_id = "8cdcd255-c6c2-4131-9901-6a6b25b859f0" # openhpc-250910-1710-f605b7d8
     cluster_networks = [
       {
         network = "slurm-production-control-net"
