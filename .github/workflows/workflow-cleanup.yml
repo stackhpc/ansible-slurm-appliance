@@ -1,7 +1,6 @@
 name: Workflow Cleanup
 on:
   workflow_dispatch:
-      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
       inputs:
         ci_cloud:
           description: 'Select the CI_CLOUD'
@@ -12,7 +11,7 @@ on:
             - SMS
             - ARCUS
         cluster_name:
-          description: 'Cluster to delete'
+          description: 'Cluster to delete (RL*-***)'
           type: string
           required: true
 
@@ -24,15 +23,37 @@ permissions:
   statuses: write
 
 jobs:
-  dummy:
-    name: dummy-job1
+  ci_cleanup:
+    name: ci-cleanup
     runs-on: ubuntu-22.04
     env:
+      OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
       CLUSTER_NAME: ${{ github.event.inputs.cluster_name }}
-
     steps:
+      - uses: actions/checkout@v4
+
       - name: print input vars
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
           echo CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
+
+      - name: Setup environment
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Delete CI cluster
+        run: |
+          . venv/bin/activate
+          ./dev/delete-cluster.py slurmci-${{ env.CLUSTER_NAME }}
+        shell: bash
