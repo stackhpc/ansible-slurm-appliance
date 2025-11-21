@@ -19,18 +19,19 @@ if [[ "$PYTHON_VERSION" == "" ]]; then
   if [[ "$OS" == "ubuntu" && "$MAJOR_VERSION" == "22" ]]; then
     PYTHON_VERSION="/usr/bin/python3.10"
   elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "8" ]]; then
-    # python3.9+ doesn't have selinux bindings
-    PYTHON_VERSION="/usr/bin/python3.8" # use `sudo yum install python38` on Rocky Linux 8 to install this
+    PYTHON_VERSION="/usr/bin/python3.12" # use `sudo yum install python3.12` on Rocky Linux 8 to install this
   elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "9" ]]; then
-    PYTHON_VERSION="/usr/bin/python3.9"
+    PYTHON_VERSION="/usr/bin/python3.12"
   else
     echo "Unsupported OS version: $OS $MAJOR_VERSION"
     exit 1
   fi
 fi
 
-if [[ ! -d "venv" ]]; then
-  $PYTHON_VERSION -m venv venv
+if [[ ! -x venv/bin/python ]] || \
+   [[ "$($PYTHON_VERSION -V 2>&1)" != "$(venv/bin/python -V 2>&1)" ]]; then
+    rm -rf venv
+    $PYTHON_VERSION -m venv venv
 fi
 
 # shellcheck disable=SC1091
