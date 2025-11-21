@@ -12,11 +12,12 @@ openondemand_servername: "{{ hostvars[groups['openondemand'].0].ansible_host if 
 
 openondemand_auth: basic_pam
 
-openondemand_jupyter_partition: "{{ openhpc_partitions[0]['name'] }}"
-openondemand_desktop_partition: "{{ openhpc_partitions[0]['name'] }}"
-openondemand_rstudio_partition: "{{ openhpc_partitions[0]['name'] }}"
+# Manages case where openhpc_partitions are not defined e.g. for site image builds
+openondemand_jupyter_partition: "{{ openhpc_partitions[0].name | default('') }}"
+openondemand_desktop_partition: "{{ openhpc_partitions[0].name | default('') }}"
+openondemand_rstudio_partition: "{{ openhpc_partitions[0].name | default('') }}"
 openondemand_matlab_partition: '' # Requires target site to already have MATLAB so set to empty
-openondemand_codeserver_partition: "{{ openhpc_partitions[0]['name'] }}"
+openondemand_codeserver_partition: "{{ openhpc_partitions[0].name | default('') }}"
 
 # Regex defining hosts which openondemand can proxy; the default regex is compute nodes (for apps) and grafana host,
 # e.g. if the group `compute` has hosts `compute-{0,1,2,..}` this will be '(compute-\d+)|(control)'.
