@@ -39,6 +39,15 @@ jobs:
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
           echo CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
 
+      - name: Check Cluster Name not empty
+        run: |
+          if [ -z ${{ env.CLUSTER_NAME }} ]; then
+            echo "Cluster name is empty"
+            exit 1
+          else
+            echo "Cluster name is not empty"
+          fi
+
       - name: Setup environment
         run: |
           python3 -m venv venv
