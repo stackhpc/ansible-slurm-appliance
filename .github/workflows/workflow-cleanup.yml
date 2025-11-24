@@ -56,5 +56,5 @@ jobs:
       - name: Delete CI cluster
         run: |
           . venv/bin/activate
-          ./dev/delete-cluster.py slurmci-${{ env.CLUSTER_NAME }}
+          ./dev/delete-cluster.py slurmci-${{ env.CLUSTER_NAME }} --force
         shell: bash
