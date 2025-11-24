@@ -24,7 +24,7 @@ permissions:
   statuses: write
 
 jobs:
-  ci__cluster_cleanup:
+  ci_cluster_cleanup:
     name: ci-cluster-cleanup
     runs-on: ubuntu-22.04
     env:
@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: print input vars
+      - name: Input Variables
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
           echo CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
