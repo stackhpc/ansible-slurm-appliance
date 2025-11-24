@@ -16,8 +16,8 @@ if [[ "$PYTHON_VERSION" == "" ]]; then
 
   MAJOR_VERSION=$(echo "$OS_VERSION" | cut -d. -f1)
 
-  if [[ "$OS" == "ubuntu" && "$MAJOR_VERSION" == "22" ]]; then
-    PYTHON_VERSION="/usr/bin/python3.10"
+  if [[ "$OS" == "ubuntu" && "$MAJOR_VERSION" == "24" ]]; then
+    PYTHON_VERSION="/usr/bin/python3.12"
   elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "8" ]]; then
     PYTHON_VERSION="/usr/bin/python3.12" # use `sudo yum install python3.12` on Rocky Linux 8 to install this
   elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "9" ]]; then
