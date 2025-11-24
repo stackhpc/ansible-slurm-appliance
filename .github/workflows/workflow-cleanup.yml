@@ -12,7 +12,7 @@ on:
             - SMS
             - ARCUS
         cluster_name:
-          description: 'Cluster to delete (RL*-***)'
+          description: 'Cluster to delete (workflow run number)'
           type: string
           required: true
 
@@ -56,5 +56,6 @@ jobs:
       - name: Delete CI cluster
         run: |
           . venv/bin/activate
-          ./dev/delete-cluster.py slurmci-${{ env.CLUSTER_NAME }} --force
+          ./dev/delete-cluster.py slurmci-RL8-${{ env.CLUSTER_NAME }} --force
+          ./dev/delete-cluster.py slurmci-RL9-${{ env.CLUSTER_NAME }} --force
         shell: bash
