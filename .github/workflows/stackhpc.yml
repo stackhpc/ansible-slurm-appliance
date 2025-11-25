@@ -77,6 +77,8 @@ jobs:
 
       - name: Install ansible, pip and galaxy requirements
         run: dev/setup-env.sh
+        env:
+           PYTHON_VERSION: /usr/bin/python3.10
 
       - name: Install OpenTofu
         uses: opentofu/setup-opentofu@v1.0.5
