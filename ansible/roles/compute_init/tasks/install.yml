@@ -22,8 +22,6 @@
     rsync_opts:
       - "-p"
       - "--chmod=D770,F644"
-      - "--owner=root"
-      - "--group=root"
     recursive: true
     use_ssh_args: true
   become: true
@@ -56,6 +54,14 @@
       dest: roles/
     - src: ../../eessi
       dest: roles/
+
+- name: Ensure ownership is root after sync
+  ansible.builtin.file:
+    path: "/etc/ansible-init/playbooks/"
+    owner: root
+    group: root
+    recurse: true
+  become: true
 
 - name: Add filter_plugins to ansible.cfg
   ansible.builtin.lineinfile:
