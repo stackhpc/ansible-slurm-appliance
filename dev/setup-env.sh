@@ -29,7 +29,7 @@ if [[ "$PYTHON_VERSION" == "" ]]; then
 fi
 
 if [[ ! -x venv/bin/python ]] || \
-   [[ "$($PYTHON_VERSION -V 2>&1)" != "$(venv/bin/python -V 2>&1)" ]]; then
+  [[ "$($PYTHON_VERSION -V 2>&1)" != "$(venv/bin/python -V 2>&1)" ]]; then
     rm -rf venv
     $PYTHON_VERSION -m venv venv
 fi
