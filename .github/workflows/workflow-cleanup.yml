@@ -12,7 +12,7 @@ on:
             - SMS
             - ARCUS
         cluster_name:
-          description: 'Cluster to delete'
+          description: 'Cluster to delete (workflow run number)'
           type: string
           required: true
 
@@ -24,15 +24,47 @@ permissions:
   statuses: write
 
 jobs:
-  dummy:
-    name: dummy-job1
+  ci_cluster_cleanup:
+    name: ci-cluster-cleanup
     runs-on: ubuntu-22.04
     env:
+      OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
       CLUSTER_NAME: ${{ github.event.inputs.cluster_name }}
-
     steps:
-      - name: print input vars
+      - uses: actions/checkout@v4
+
+      - name: Input Variables
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
           echo CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
+
+      - name: Check Cluster Name not empty
+        run: |
+          if [ -z ${{ env.CLUSTER_NAME }} ]; then
+            echo "Cluster name is empty"
+            exit 1
+          else
+            echo "Cluster name is not empty"
+          fi
+
+      - name: Setup environment
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack
+          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+        shell: bash
+
+      - name: Delete CI cluster
+        run: |
+          . venv/bin/activate
+          ./dev/delete-cluster.py slurmci-RL8-${{ env.CLUSTER_NAME }} --force
+          ./dev/delete-cluster.py slurmci-RL9-${{ env.CLUSTER_NAME }} --force
+        shell: bash
