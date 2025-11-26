@@ -75,19 +75,14 @@ jobs:
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
 
-      - name: Install Python 3.10 on Ubuntu 24.04 (remove once latest appliance release is published)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository -y ppa:deadsnakes/ppa
-          sudo apt-get update
-          sudo apt-get install -y python3.10 python3.10-venv python3.10-distutils python3.10-dev python3.10-pip
-        shell: bash
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
 
       - name: Install ansible, pip and galaxy requirements
         run: dev/setup-env.sh
         env:
-           PYTHON_VERSION: /usr/bin/python3.10
+           PYTHON_VERSION: python3 # overrides os-release discovery logic
 
       - name: Install OpenTofu
         uses: opentofu/setup-opentofu@v1.0.5
@@ -157,8 +152,14 @@ jobs:
       - name: Checkout current branch
         run: git checkout ${{ github.head_ref || github.ref_name }}
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
       - name: Update ansible, pip and galaxy requirements
         run: dev/setup-env.sh
+        env:
+          PYTHON_VERSION: python3 # overrides os-release discovery logic
 
       - name: Reimage login and control nodes to image in current branch
         id: reimage_non_compute
