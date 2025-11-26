@@ -18,7 +18,7 @@ permissions:
 jobs:
   doca:
     name: extra-build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9

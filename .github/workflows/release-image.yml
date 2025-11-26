@@ -16,7 +16,7 @@ permissions:
 jobs:
   ci-image-release:
     name: ci-image-release
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-${{ github.ref }}
     strategy:
       fail-fast: false
