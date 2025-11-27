@@ -3,3 +3,15 @@
 # environments/site/hooks/pre.yml:
 - name: Import parent hook
   import_playbook: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/../site/hooks/post.yml"
+
+- name: Staging-specific Slurm config
+  hosts: control
+  become: true
+  tags: openhpc
+  tasks:
+    - name: Is demo_user associated
+      ansible.builtin.command: "sacctmgr --json show assoc user=demo_user"
+      register: demo_user_assoc
+    - name: Set Slurm account for demo_user
+      ansible.builtin.command: "sacctmgr --immediate create user name=demo_user defaultaccount=root"
+      when: not (demo_user_assoc.stdout | from_json)["associations"]

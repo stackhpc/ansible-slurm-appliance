@@ -4,5 +4,6 @@
 openhpc_config_extra:
   MpiDefault: pmix
   AccountingStorageEnforce: 'associations,limits,qos,safe'
+  SelectTypeParameters: CR_Core_Memory
 
 openhpc_job_maxtime: '1-0'
