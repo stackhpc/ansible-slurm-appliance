@@ -1,4 +1,5 @@
 ---
+## squid dnf configuration:
 squid_conf_template: squid.conf.j2
 squid_started: true
 squid_enabled: true
@@ -23,3 +24,8 @@ squid_http_access: |
   http_access allow localhost
   # Finally deny all other access to this proxy
   http_access deny all
+
+## squid eeesi configuration:
+#squid_conf_template: squid-eessi.conf.j2
+squid_eessi_clients: "{{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.prefix }}"
+squid_eessi_stratum_1: '.eessi.science'
