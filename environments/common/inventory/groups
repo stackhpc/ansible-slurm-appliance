@@ -202,6 +202,10 @@ k3s_agent
 [extra_packages]
 # Hosts to install specified additional packages on
 
+[extra_packages:children]
+# To include extra packages in base image
+fatimage
+
 [dnf_repos:children]
 # Hosts to replace system repos with Pulp repos
 # Roles/groups listed here *always* do installs:
