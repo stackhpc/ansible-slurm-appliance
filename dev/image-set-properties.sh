@@ -34,8 +34,6 @@ else
     echo setting qcow2 properties
     set -x
     openstack image set \
-    --property hw_scsi_model=virtio-scsi \
-    --property hw_disk_bus=scsi \
-    --property hw_scsi_model=virtio \
+    --property hw_disk_bus=virtio \
     "$image"
 fi
