@@ -100,3 +100,5 @@ roles/*
 !roles/topology/**
 !roles/raid/
 !roles/raid/**
+!roles/custom_mounts/
+!roles/custom_mounts/**

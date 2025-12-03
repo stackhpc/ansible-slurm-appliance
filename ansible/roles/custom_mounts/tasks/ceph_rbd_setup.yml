@@ -1,0 +1,51 @@
+---
+
+- name: "{{ abs_mount_point }} - Check if RBD image is already mapped"
+  become: true
+  ansible.builtin.shell: |
+    rbd showmapped | grep "{{ ceph_rbd_item.value.pool_name }}" | grep "{{ ceph_rbd_item.value.image_name }}" | awk '{print $NF}'
+  register: rbd_existing_map
+  changed_when: false
+
+
+- name: "{{ abs_mount_point }} - Map the RBD image if not already mapped"
+  become: true
+  ansible.builtin.command: >
+    rbd map {{ ceph_rbd_item.value.pool_name }}/{{ ceph_rbd_item.value.image_name }} --id {{ ceph_rbd_item.value.credentials.client_name }}
+  when: rbd_existing_map.stdout == ""
+  register: rbd_map
+  changed_when: "'/dev/rbd' in rbd_map.stdout"
+
+- name: "{{ abs_mount_point }} - Determine RBD device path"
+  ansible.builtin.set_fact:
+    rbd_device_path: "{{ (rbd_existing_map.stdout | trim) if rbd_existing_map.stdout != '' else (rbd_map.stdout | trim) }}"
+
+- name: "{{ abs_mount_point }} - Check if device is already formatted"
+  become: true
+  command: blkid {{ rbd_device_path }}
+  register: blkid_output
+  failed_when: false
+  changed_when: false
+
+
+# - name: "{{ abs_mount_point }} - Debug ceph rdb with message"
+#   debug:
+#     msg: "{{ ceph_rbd_item | to_nice_json }}"
+
+- name: "{{ abs_mount_point }} - Format device as {{ ceph_rbd_item.value.fstype }} if not formatted"
+  become: true
+  filesystem:
+    fstype: "{{ ceph_rbd_item.value.fstype }}"
+    dev: "{{ rbd_device_path }}"
+  when: blkid_output.rc != 0
+
+- name: "{{ abs_mount_point }} - Mount the RBD device"
+  become: true
+  mount:
+    path: "{{ ceph_rbd_item.value.mount_point }}"
+    src: "{{ rbd_device_path }}"
+    fstype: "{{ ceph_rbd_item.value.fstype }}"
+    opts: "{{ ceph_rbd_item.value.mount_opts }}"
+    state: "{{ ceph_rbd_item.value.state | default('mounted') }}"
+    dump: "{{ ceph_rbd_item.value.dump | default(omit) }}"
+    passno: "{{ ceph_rbd_item.value.passno | default(omit) }}"
