@@ -8,6 +8,12 @@
 
 # See docs/slurm-controlled-rebuild.md.
 
+- name: Unlock compute instances for rebuild
+  vars:
+    lock_unlock_action: unlock
+    lock_unlock_hosts: compute
+  ansible.builtin.import_playbook: lock-unlock-instances.yml
+
 - hosts: login
   run_once: true
   gather_facts: false
