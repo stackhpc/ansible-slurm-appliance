@@ -26,6 +26,24 @@ dnf_repos_default:
       pulp_path: OpenHPC/3/updates/EL_9
       pulp_timestamp: 20250510T003301
       repo_file: OpenHPC
+  TurboVNC:
+    '8':
+      pulp_path: turbovnc/x86_64
+      pulp_timestamp: 20251009T091906
+      repo_file: TurboVNC
+    '9':
+      pulp_path: turbovnc/x86_64
+      pulp_timestamp: 20251009T091906
+      repo_file: TurboVNC
+  TurboVNC-source:
+    '8':
+      pulp_path: turbovnc/srpms
+      pulp_timestamp: 20251009T091906
+      repo_file: TurboVNC
+    '9':
+      pulp_path: turbovnc/srpms
+      pulp_timestamp: 20251009T091906
+      repo_file: TurboVNC
   appstream:
     '8.10':
       pulp_path: rocky/8.10/AppStream/x86_64/os
@@ -78,6 +96,24 @@ dnf_repos_default:
       pulp_path: rocky/9.6/BaseOS/source/os
       pulp_timestamp: 20250923T043546
       repo_file: rocky
+  cernvmfs_cfg:
+    '8':
+      pulp_path: cvmfs-config/EL/8/x86_64
+      pulp_timestamp: 20250805T130249
+      repo_file: cvmfs
+    '9':
+      pulp_path: cvmfs-config/EL/9/x86_64
+      pulp_timestamp: 20250805T130249
+      repo_file: cvmfs
+  cernvmfs_pkgs:
+    '8':
+      pulp_path: cvmfs/EL/8/x86_64
+      pulp_timestamp: 20250816T005446
+      repo_file: cvmfs
+    '9':
+      pulp_path: cvmfs/EL/9/x86_64
+      pulp_timestamp: 20250816T005446
+      repo_file: cvmfs
   crb:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/x86_64/os
@@ -115,6 +151,11 @@ dnf_repos_default:
       pulp_path: epel/9/Everything/x86_64
       pulp_timestamp: 20250923T001717
       repo_file: epel
+  epel-cisco-openh264:
+    '9':
+      pulp_path: openh264/epel/9/x86_64/os
+      pulp_timestamp: 20250925T130153
+      repo_file: epel-cisco-openh264
   epel-source:
     '8':
       pulp_path: epel/8/Everything/source
@@ -124,11 +165,6 @@ dnf_repos_default:
       pulp_path: epel/9/Everything/source
       pulp_timestamp: 20250923T001717
       repo_file: epel
-  epel-cisco-openh264:
-    '9':
-      pulp_path: openh264/epel/9/x86_64/os
-      pulp_timestamp: 20250925T130153
-      repo_file: epel-cisco-openh264
   extras:
     '8.10':
       pulp_path: rocky/8.10/extras/x86_64/os
@@ -174,39 +210,3 @@ dnf_repos_default:
       pulp_path: ondemand/4.0/web/el9/x86_64
       pulp_timestamp: 20250925T130153
       repo_file: ondemand-web
-  TurboVNC:
-    '8':
-      pulp_path: turbovnc/x86_64
-      pulp_timestamp: 20251009T091906
-      repo_file: TurboVNC
-    '9':
-      pulp_path: turbovnc/x86_64
-      pulp_timestamp: 20251009T091906
-      repo_file: TurboVNC
-  TurboVNC-source:
-    '8':
-      pulp_path: turbovnc/srpms
-      pulp_timestamp: 20251009T091906
-      repo_file: TurboVNC
-    '9':
-      pulp_path: turbovnc/srpms
-      pulp_timestamp: 20251009T091906
-      repo_file: TurboVNC
-  cernvmfs_pkgs:
-    '8':
-      pulp_path: cvmfs/EL/8/x86_64
-      pulp_timestamp: 20250816T005446
-      repo_file: cvmfs
-    '9':
-      pulp_path: cvmfs/EL/9/x86_64
-      pulp_timestamp: 20250816T005446
-      repo_file: cvmfs
-  cernvmfs_cfg:
-    '8':
-      pulp_path: cvmfs-config/EL/8/x86_64
-      pulp_timestamp: 20250805T130249
-      repo_file: cvmfs
-    '9':
-      pulp_path: cvmfs-config/EL/9/x86_64
-      pulp_timestamp: 20250805T130249
-      repo_file: cvmfs
