@@ -61,6 +61,10 @@ dnf_repos_default:
       pulp_path: rocky/9.6/AppStream/x86_64/os
       pulp_timestamp: 20251106T205505
       repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/AppStream/x86_64/os
+      pulp_timestamp: 20251203T103807
+      repo_file: rocky
   appstream-source:
     '8.10':
       pulp_path: rocky/8.10/AppStream/source/os
@@ -69,6 +73,10 @@ dnf_repos_default:
     '9.6':
       pulp_path: rocky/9.6/AppStream/source/os
       pulp_timestamp: 20251009T121903
+      repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/AppStream/source/tree
+      pulp_timestamp: 20251203T103807
       repo_file: rocky
   baseos:
     '8.10':
@@ -87,6 +95,10 @@ dnf_repos_default:
       pulp_path: rocky/9.6/BaseOS/x86_64/os
       pulp_timestamp: 20251106T211545
       repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/BaseOS/x86_64/os
+      pulp_timestamp: 20251203T103807
+      repo_file: rocky
   baseos-source:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/source/os
@@ -95,6 +107,10 @@ dnf_repos_default:
     '9.6':
       pulp_path: rocky/9.6/BaseOS/source/os
       pulp_timestamp: 20251009T121903
+      repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/BaseOS/source/tree
+      pulp_timestamp: 20251203T103807
       repo_file: rocky
   cernvmfs_cfg:
     '8':
@@ -132,6 +148,10 @@ dnf_repos_default:
       pulp_path: rocky/9.6/CRB/x86_64/os
       pulp_timestamp: 20251107T205232
       repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/CRB/x86_64/os
+      pulp_timestamp: 20251203T103807
+      repo_file: rocky
   crb-source:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/source/tree
@@ -141,6 +161,10 @@ dnf_repos_default:
     '9.6':
       pulp_path: rocky/9.6/CRB/source/os
       pulp_timestamp: 20251006T044455
+      repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/CRB/source/tree
+      pulp_timestamp: 20251203T103807
       repo_file: rocky
   epel:
     '8':
@@ -182,6 +206,10 @@ dnf_repos_default:
       pulp_path: rocky/9.6/extras/x86_64/os
       pulp_timestamp: 20250726T040613
       repo_file: rocky-extras
+    '9.7':
+      pulp_path: rocky/9.7/extras/x86_64/os
+      pulp_timestamp: 20251203T103807
+      repo_file: rocky-extras
   extras-source:
     '8.10':
       pulp_path: rocky/8.10/extras/source/os
@@ -190,6 +218,10 @@ dnf_repos_default:
     '9.6':
       pulp_path: rocky/9.6/extras/source/os
       pulp_timestamp: 20250828T161842
+      repo_file: rocky-extras
+    '9.7':
+      pulp_path: rocky/9.7/extras/source/tree
+      pulp_timestamp: 20251203T103807
       repo_file: rocky-extras
   grafana:
     '8':
