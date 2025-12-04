@@ -8,6 +8,8 @@
     baseurl: "{{ doca_repo_url }}"
     enabled: true
     gpgcheck: false
+    username: "{{ dnf_repos_username }}"
+    password: "{{ dnf_repos_password }}"
 
 - name: Install doca-extra package
   ansible.builtin.dnf:
