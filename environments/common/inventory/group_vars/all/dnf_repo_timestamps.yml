@@ -182,11 +182,11 @@ dnf_repos_default:
       repo_file: epel-cisco-openh264
   epel-source:
     '8':
-      pulp_path: epel/8/Everything/source
+      pulp_path: epel/8/Everything/source/tree
       pulp_timestamp: tree
       repo_file: epel
     '9':
-      pulp_path: epel/9/Everything/source
+      pulp_path: epel/9/Everything/source/tree
       pulp_timestamp: tree
       repo_file: epel
   extras:
