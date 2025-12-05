@@ -183,11 +183,11 @@ dnf_repos_default:
   epel-source:
     '8':
       pulp_path: epel/8/Everything/source/tree
-      pulp_timestamp: tree
+      pulp_timestamp: 20251204T205435
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/source/tree
-      pulp_timestamp: tree
+      pulp_timestamp: 20251203T203608
       repo_file: epel
   extras:
     '8.10':
