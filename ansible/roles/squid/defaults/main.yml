@@ -1,6 +1,8 @@
 ---
-## squid dnf configuration:
-squid_conf_template: squid.conf.j2
+squid_conf_mode: default # or 'eessi'
+
+## squid_conf_mode=default:
+squid_conf_template: "squid-{{ squid_conf_mode }}.conf.j2"
 squid_started: true
 squid_enabled: true
 
@@ -25,7 +27,6 @@ squid_http_access: |
   # Finally deny all other access to this proxy
   http_access deny all
 
-## squid eeesi configuration:
-#squid_conf_template: squid-eessi.conf.j2
-squid_eessi_clients: "{{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.prefix }}"
+#squid_conf_mode=eessi:
+squid_eessi_clients: "{{ cluster_subnets[0].cidr | mandatory('squid_eessi_clients must be defined when using eeesi squid config') }}"
 squid_eessi_stratum_1: '.eessi.science'

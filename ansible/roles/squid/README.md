@@ -3,13 +3,13 @@
 Deploy a caching proxy.
 
 **NB:** This role provides two default configurations, selected by setting
-`squid_conf_template`:
-- `squid.conf.j2`: This is aimed at providing a proxy for package installs etc.
+`squid_conf_mode`:
+- `default`: This is aimed at providing a proxy for package installs etc.
   for nodes which do not have direct internet connectivity. It assumes access
   to the proxy is protected by the OpenStack security groups applied to the
   cluster. The generated configuration should be reviewed if this is not case.
-- `squid-eessi.conf.j2`: This provides a proxy server for EESSI clients. It uses
-  the [recommended configuration](https://www.eessi.io/docs/tutorial/access/proxy/#configuration)
+- `eessi`: This provides a proxy server for EESSI clients. It uses the
+  [recommended configuration](https://www.eessi.io/docs/tutorial/access/proxy/#configuration)
   which assumes a server with:
       - 10Gbit link or faster to the client systems
       - a sufficiently powerful CPU
@@ -19,13 +19,15 @@ Deploy a caching proxy.
   least one for every (100-500) client nodes.
 
 ## Role Variables
-- `squid_conf_template`: Optional str. Path (using Ansible search paths) to
-  squid.conf template. Default is in-role `squid.conf.j2` template as above.
 
-### Role Variables for squid_conf_template=squid.conf.j2
+- `squid_conf_mode`: Optional str, `default` (the default) or `eessi`. See above.
+- `squid_conf_template`: Optional str. Path (using Ansible search paths) to
+  squid.conf template. Default is in-role templates. If this is overriden then
+  `squid_conf_mode` has no effect.
+
+### Role Variables for squid_conf_mode: default
 
 Where noted these map to squid parameters of the same name without the `squid_` prefix - see [squid documentation](https://www.squid-cache.org/Doc/config) for details.
-
 - `squid_started`: Optional bool. Whether to start squid service. Default `true`.
 - `squid_enabled`: Optional bool. Whether squid service is enabled on boot. Default `true`.
 - `squid_cache_mem`: Required str. Size of memory cache, e.g "1024 KB", "12 GB" etc. See squid parameter.
@@ -52,11 +54,13 @@ Where noted these map to squid parameters of the same name without the `squid_` 
 
   See squid parameter.
 
-### Role Variables for squid_conf_template=squid-eessi.conf.j2
+### Role Variables for squid_conf_mode: eessi
 
-- `squid_eessi_clients`: Optional string. CIDR specifying clients allowed to
-  access this proxy. The default is to use the CIDR of the host's default IPv4
-  interface, which should allow access from the [cluster network](../../../docs/networks.md).
-  For clusters with multiple networks this may not be appropriate.
-- `squid_eessi_stratum_1`: Optional string. Domain (squid `acl dstdomain` format)
-  of Stratum 1 replica servers. Default is the upstream EEESI Stratum 1 servers.
+- `squid_eessi_clients`: Optional str. CIDR specifying clients allowed to access
+  this proxy. Default is the CIDR for the subnet of the [access network](../../../docs/networks.md),
+  i.e. the first cluster network. For clusters with multiple networks this may
+  need overriding.
+- `squid_eessi_stratum_1`: Optional str. Domain (in squid `acl dstdomain`
+  format) of Stratum 1 replica servers. Defaults to upstream EEESI Stratum 1
+  servers.
+- `squid_cache_dir`: See definition for default mode above.

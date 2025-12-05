@@ -1,2 +1,3 @@
 ---
-squid_http_port: 3128 # defined here for proxy role
+squid_http_port: 3128 # defined here for proxy/eeesi roles
+squid_conf_mode: default # defined here for eeesi config
