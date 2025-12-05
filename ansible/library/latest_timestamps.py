@@ -61,14 +61,21 @@ def run_module():  # pylint: disable=missing-function-docstring
     timestamps = dict(module.params["repos_dict"])
     for repo in timestamps:
         for version in timestamps[repo]:
-
-            html_txt = requests.get(
-                url=module.params["content_url"]
+            url = (
+                module.params["content_url"]
                 + "/"
                 + timestamps[repo][version]["pulp_path"]
-            ).text
+            )
+            html = requests.get(url=url)
+            if not html.ok:
+                module.fail_json(
+                    msg=(
+                        f"Couldn't retrieve timestamps for {repo}[{version}]"
+                        f"url {url}: {html.status_code} {html.text}"
+                    )
+                )
             timestamp_link_list = (
-                BeautifulSoup(html_txt, features="html.parser")
+                BeautifulSoup(html.text, features="html.parser")
                 .body.find("pre")
                 .find_all()
             )  # getting raw list of timestamps from html
