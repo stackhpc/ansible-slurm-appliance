@@ -97,7 +97,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/BaseOS/x86_64/os
-      pulp_timestamp: 20251203T103807
+      pulp_timestamp: 20251204T211536
       repo_file: rocky
   baseos-source:
     '8.10':
@@ -110,7 +110,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/BaseOS/source/tree
-      pulp_timestamp: 20251203T103807
+      pulp_timestamp: 20251204T210606
       repo_file: rocky
   cernvmfs_cfg:
     '8':
@@ -169,11 +169,11 @@ dnf_repos_default:
   epel:
     '8':
       pulp_path: epel/8/Everything/x86_64
-      pulp_timestamp: 20251203T203608
+      pulp_timestamp: 20251204T205435
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/x86_64
-      pulp_timestamp: 20251202T204323
+      pulp_timestamp: 20251204T205435
       repo_file: epel
   epel-cisco-openh264:
     '9':
