@@ -1,5 +1,10 @@
 ---
 
-doca_version: "2.9.3" # 2.9 is LTS, last to support ConnectX-4, 3 years for bug fixes and CVE updates
+# 2.9 is LTS, last to support ConnectX-4, 3 years for bug fixes and CVE updates
+# See https://docs.nvidia.com/doca/archive/2-9-3/changes+and+new+features/index.html
+# Also note that DOCA 3.2.0 lists Connectx-4lx as supported so it might also work:
+# https://docs.nvidia.com/doca/sdk/general-support/index.html#src-4413883949_id-.GeneralSupportv3.2.0LC-SupportedPlatformsandNICFirmwareVersions
+doca_version: "2.9.3"
 doca_profile: doca-ofed
-doca_repo_url: "https://linux.mellanox.com/public/repo/doca/{{ doca_version }}/rhel{{ ansible_distribution_version }}/{{ ansible_architecture }}/"
+doca_distribution: "{{ doca_version is version('3.2.0', '>=') | ternary(ansible_distribution_major_version, ansible_distribution_version) }}"
+doca_repo_url: "https://ark.stackhpc.com/pulp/content/doca/{{ doca_version }}/rhel{{ doca_distribution }}/{{ ansible_architecture }}/"
