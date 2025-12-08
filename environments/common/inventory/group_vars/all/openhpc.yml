@@ -27,7 +27,7 @@ openhpc_rebuild_partition: # not a role var - could actually add more indirectio
     DisableRootJobs: false
     PreemptMode: "OFF"
     OverSubscribe: EXCLUSIVE
-openhpc_nodegroups: "{{ cluster_compute_groups | map('community.general.dict_kv', 'name') }}" # create nodegroup for each compute group
+openhpc_nodegroups: "{{ cluster_compute_groups | default([]) | map('community.general.dict_kv', 'name') }}" # create nodegroup for each compute group
 openhpc_user_partitions: "{{ openhpc_nodegroups }}" # create partition for each nodegroup (actually role default) - this is what we'd expect to be changed
 # yamllint disable-line rule:line-length
 openhpc_partitions: "{{ openhpc_user_partitions + ([openhpc_rebuild_partition] if groups['rebuild'] | length > 0 else []) }}" # auto-create rebuild partition if reqd.

@@ -105,9 +105,8 @@ resource "openstack_compute_instance_v2" "control" {
       - [LABEL=state, ${var.state_dir}]
       %{if var.home_volume_provisioning != "none"}
       - [LABEL=home, /exports/home]
-      %{endif}
+      %{endif}%{if var.additional_cloud_config != ""}
 
-    %{if var.additional_cloud_config != ""}
     ${templatestring(var.additional_cloud_config, var.additional_cloud_config_vars)}
     %{endif}
   EOF

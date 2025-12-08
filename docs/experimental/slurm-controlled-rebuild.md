@@ -119,7 +119,7 @@ compute = {
 
    - `name`: Partition name matching `rebuild` role variable `rebuild_partitions`,
      default `rebuild`.
-   - `groups`: A list of nodegroup names, matching `openhpc_nodegroup` and
+   - `nodegroups`: A list of nodegroup names, matching `openhpc_nodegroup` and
      keys in the OpenTofu `compute` variable (see example in step 2 above).
      Normally every compute node group should be listed here, unless
      Slurm-controlled rebuild is not required for certain node groups.
