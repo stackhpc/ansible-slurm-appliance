@@ -9,4 +9,4 @@
       - fail2ban-server
       - fail2ban-firewalld
     state: present
-    gpgcheck: false
+    disable_gpg_check: true
