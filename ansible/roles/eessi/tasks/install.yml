@@ -11,24 +11,12 @@
 - name: Import downloaded GPG key # noqa: no-changed-when
   ansible.builtin.command: rpm --import cvmfs-key.gpg # noqa: command-instead-of-module
 
-# cvmfs repo provided by dnf_repos role
+# cvmfs repo and eessi config provided by dnf_repos role
 
 - name: Install CVMFS
   ansible.builtin.dnf:
     name: cvmfs
 
 - name: Install EESSI CVMFS config
-  # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
   ansible.builtin.dnf:
-    name: https://github.com/EESSI/filesystem-layer/releases/download/latest/cvmfs-config-eessi-latest.noarch.rpm
-    # NOTE: Can't find any docs on obtaining gpg key - maybe downloading directly from github is ok?
-    disable_gpg_check: true
-
-# Alternative version using official repo - still no GPG key :(
-# - name: Add EESSI repo
-#   ansible.builtin.dnf:
-#     name: http://repo.eessi-infra.org/eessi/rhel/8/noarch/eessi-release-0-1.noarch.rpm
-
-# - name: Install EESSI CVMFS config
-#   ansible.builtin.dnf:
-#     name: cvmfs-config-eessi
+    name: cvmfs-eessi-config
