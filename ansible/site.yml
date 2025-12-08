@@ -1,4 +1,10 @@
 ---
+
+- ansible.builtin.import_playbook: safe-env.yml
+
+- name: Lock cluster instances
+  ansible.builtin.import_playbook: adhoc/lock-unlock-instances.yml
+
 - name: Run pre.yml hook
   vars:
     # hostvars not available here, so have to recalculate environment root:
