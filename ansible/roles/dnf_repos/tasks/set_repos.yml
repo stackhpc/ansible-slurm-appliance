@@ -21,10 +21,17 @@
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
 
-- name: Install EPEL GPG keys for Rocky 8
-  ansible.builtin.rpm_key:
-    key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8"
+- name: Install GPG key for Rocky 8
   when: ansible_distribution_major_version == '8'
+  block:
+    - name: Download epel-release 8 GPG key
+      ansible.builtin.get_url:
+        url: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+        dest: ./epel-release-key.gpg
+        mode: "0644"
+
+    - name: Import downloaded GPG key # noqa: no-changed-when
+      ansible.builtin.command: rpm --import epel-release-key.gpg # noqa: command-instead-of-module
 
 - name: Install epel-release
   # So roles installing epel via epel-release don't overwrite changes to the epel repo below
