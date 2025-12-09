@@ -7,6 +7,7 @@
     description: "{{ repo_name }}"
     enabled: false
     gpgcheck: true
+    gpgkey: "{{ repo_values.gpgkey | default('') }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
