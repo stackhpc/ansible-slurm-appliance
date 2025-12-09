@@ -21,10 +21,14 @@
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
 
-- name: Install rocky GPG key to sign epel-release on Rocky 8
-  ansible.builtin.rpm_key:
-    key: "https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-rockyofficial"
-  when: ansible_distribution_major_version == '8'
+# - name: Install rocky GPG key to sign epel-release
+#   ansible.builtin.rpm_key:
+#     key: "https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-rockyofficial"
+#   when: ansible_distribution_major_version == '8'
+
+- name: Install Rocky GPG keys package
+  ansible.builtin.dnf:
+    name: rocky-gpg-keys
 
 - name: Install epel-release
   # So roles installing epel via epel-release don't overwrite changes to the epel repo below
