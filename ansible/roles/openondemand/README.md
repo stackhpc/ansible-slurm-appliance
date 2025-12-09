@@ -10,7 +10,8 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 - The `openondemand` node, i.e. the node which will host the Open Ondemand server/portal must:
   - Have the slurm packages (e.g. `sinfo` etc) installed and be able to contact the Slurm controller (e.g. add this node to the `login` group).
   - Have access to any cluster shared filesystems.
-- Open Ondemand's authentication maps authenticated users (e.g. via OIDC) to local users on the `openondemand` node (see `openondemand_mapping_users`). You must therefore ensure that whatever is providing users for the cluster covers the `openondemand` node, e.g. if using `basic_users` role ensure the group for this includes the `openondemand` group.
+- Open Ondemand's authentication maps authenticated users (e.g. via OIDC) to local users on the `openondemand` node.
+  Therefore whatever mechanism provides cluster users (e.g. `basic_users`, `freeipa`, `ldap` via sssd) must cover the `openondemand` node.
 
 ## Role Variables
 
@@ -27,10 +28,8 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 
 See the Open Ondemand [Authentication docs](https://osc.github.io/ood-documentation/latest/authentication/overview.html) for an overview of the authentication process.
 
-- `openondemand_auth`: Required. Authentication method, either `'oidc'` or `'basic_pam'`. See relevant subsection below.
-- `openondemand_mapping_users`: Required for `openondemand_auth=='oidc'`. A list of dicts defining mappings between remote authenticated usernames and local system usernames - see the Open Ondemand [user mapping docs](https://osc.github.io/ood-documentation/latest/authentication/overview/map-user.html). Each dict should have the following keys:
-  - `name`: A local (existing) user account
-  - `openondemand_username`: The remote authenticated username. See also `openondemand_oidc_remote_user_claim` if using OIDC authentication.
+- `openondemand_auth`: Required. Authentication method, either `'oidc'`, `dex`
+or `'basic_pam'`. See relevant subsection below.
 
 #### OIDC authentication
 
@@ -45,6 +44,36 @@ The following variables are active when `openondemand_auth` is `oidc`. This role
 
 The OIDC provider should be configured to redirect to `https://{{ openondemand_servername }}/oidc` with scopes as appropriate for `openondemand_oidc_scope`.
 
+<<<<<<< HEAD
+=======
+When using OIDC the remote user must be mapped to a local Linux user. The default
+is to map the entire remote user claim string to the local username. See the
+Open Ondemand [user mapping docs](https://osc.github.io/ood-documentation/latest/authentication/overview/map-user.html)
+for more. The [osc.ood role](https://github.com/OSC/ood-ansible) variables such
+as `user_map_match` may be set directly if necessary.
+
+#### DEX authentication
+This runs DEX on the Open Ondemand host to provide an OIDC endpoint which federates
+from some other identity provider. Generally no OIDC configuration is required.
+Dex configuration can be provided using the `dex_settings` [osc.ood role](https://github.com/OSC/ood-ansible)
+variable.
+
+**IMPORTANT** This takes a string of yaml, not actual yaml. E.g.:
+
+```yaml
+dex_settings: |
+  dex:
+    connectors:
+      - type: ldap
+        id: ldap
+        name: LDAP
+  ...
+```
+
+See comments above for OIDC regarding remote user mapping. For LDAP the default
+mapping is likely to be sufficent.
+
+>>>>>>> c5636843 (update ondemand role to support DEX)
 #### Basic/PAM authentication
 
 This option uses HTTP Basic Authentication (i.e. browser prompt) to get a username and password. This is then checked against an existing local user using PAM. Note that HTTPS is configured by default, so the password is protected in transit, although there are [other](https://security.stackexchange.com/a/990) security concerns with Basic Authentication.
