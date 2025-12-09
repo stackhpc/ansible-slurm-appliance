@@ -71,6 +71,7 @@
       ansible.builtin.fail:
         msg: Reboot handler for stackhpc.linux.vgpu role fired unexpectedly. This was supposed to be unreachable.
 
+<<<<<<< HEAD
 - name: Persist hostkeys across rebuilds
   # Must be after filesystems.yml (for storage)
   # and before portal.yml (where OOD login node hostkeys are scanned)
@@ -81,6 +82,8 @@
     - ansible.builtin.import_role:
         name: persist_hostkeys
 
+=======
+>>>>>>> 31751b79 (fix hostkeys in IPA not matching host when persisting keys)
 - name: Install k9s
   become: true
   hosts: k9s
