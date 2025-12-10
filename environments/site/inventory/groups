@@ -161,8 +161,9 @@ fatimage
 [lustre]
 # Hosts to run lustre client
 
-[extra_packages]
-# Hosts to install specified additional packages on
+[extra_packages:children]
+# Groups to install specified additional packages on
+fatimage
 
 [dnf_repos:children]
 # Hosts to replace system repos with Pulp repos
