@@ -10,11 +10,11 @@ roles:
     version: stackhpc
     name: cloudalchemy.node_exporter
   - src: https://github.com/stackhpc/ansible-prometheus.git
-    version: master
+    version: stackhpc-1.0.0
     name: cloudalchemy.prometheus
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
-    version: 0f516ea925b63868719475a8eb77bccc0db11be3
+    version: stackhpc-0.20.0
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
     version: v4.0.1
