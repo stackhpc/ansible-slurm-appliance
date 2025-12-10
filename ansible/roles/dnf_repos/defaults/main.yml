@@ -4,7 +4,7 @@ dnf_repos_pulp_content_url: "{{ appliances_pulp_url }}/pulp/content"
 dnf_repos_username: "{{ omit }}"
 dnf_repos_password: "{{ omit }}"
 
-dnf_repos_ceph_key: >
+dnf_repos_ceph_key: |
   -----BEGIN PGP PUBLIC KEY BLOCK-----
   Version: GnuPG v1
 
