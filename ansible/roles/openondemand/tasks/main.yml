@@ -1,11 +1,7 @@
 ---
 - name: Set osc.ood variables from this role's defaults if no overriding inventory var
-<<<<<<< HEAD
   ansible.builtin.set_fact:
-=======
   # NB: When condition is important - some configurations require undefined vars
-  set_fact:
->>>>>>> c5636843 (update ondemand role to support DEX)
     "{{ item.key }}": "{{ lookup('vars', item.key, default=item.value) }}"
   loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
   when: (item.key in hostvars[inventory_hostname]) or (item.value)
@@ -103,27 +99,6 @@
     dest: /etc/ood/config/pun/html/missing_home_directory.html
     mode: "0644"
 
-<<<<<<< HEAD
-- name: Create mapping directory
-  ansible.builtin.file:
-    path: /etc/grid-security
-    state: directory
-    owner: root
-    group: apache
-    mode: u=rwX,g=rX,o=
-  when: openondemand_mapping_users
-
-- name: Create mapping file
-  ansible.builtin.template:
-    dest: /etc/grid-security/grid-mapfile
-    src: grid-mapfile.j2
-    owner: root
-    group: apache
-    mode: u=rw,g=r,o=
-  when: openondemand_mapping_users
-
-=======
->>>>>>> c5636843 (update ondemand role to support DEX)
 - name: Create app directories for dashboard links
   ansible.builtin.file:
     path: /var/www/ood/apps/sys/{{ item.app_name | default(item.name) }}

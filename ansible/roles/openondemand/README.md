@@ -44,8 +44,6 @@ The following variables are active when `openondemand_auth` is `oidc`. This role
 
 The OIDC provider should be configured to redirect to `https://{{ openondemand_servername }}/oidc` with scopes as appropriate for `openondemand_oidc_scope`.
 
-<<<<<<< HEAD
-=======
 When using OIDC the remote user must be mapped to a local Linux user. The default
 is to map the entire remote user claim string to the local username. See the
 Open Ondemand [user mapping docs](https://osc.github.io/ood-documentation/latest/authentication/overview/map-user.html)
@@ -73,7 +71,6 @@ dex_settings: |
 See comments above for OIDC regarding remote user mapping. For LDAP the default
 mapping is likely to be sufficent.
 
->>>>>>> c5636843 (update ondemand role to support DEX)
 #### Basic/PAM authentication
 
 This option uses HTTP Basic Authentication (i.e. browser prompt) to get a username and password. This is then checked against an existing local user using PAM. Note that HTTPS is configured by default, so the password is protected in transit, although there are [other](https://security.stackexchange.com/a/990) security concerns with Basic Authentication.

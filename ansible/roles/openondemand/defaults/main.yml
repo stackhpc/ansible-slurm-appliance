@@ -1,13 +1,8 @@
 ---
 
 # Authentication:
-<<<<<<< HEAD
-openondemand_auth: # "oidc" or "basic_pam"
-openondemand_mapping_users: []
-=======
 openondemand_auth: # "oidc", "dex" or "basic_pam"
 
->>>>>>> c5636843 (update ondemand role to support DEX)
 ## Variables for `openondemand_auth=oidc` :
 openondemand_oidc_client_id:
 openondemand_oidc_client_secret:
@@ -57,14 +52,6 @@ openondemand_auth_defaults:
       OIDCScope: "{{ openondemand_oidc_scope }}"
       OIDCRemoteUserClaim: "{{ openondemand_oidc_remote_user_claim }}"
     httpd_auth: # ood_portal.yml.j2
-<<<<<<< HEAD
-      - "AuthType openid-connect"
-      - "Require valid-user"
-      - "ProxyPreserveHost On" # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
-    user_map_cmd: /opt/ood/ood_auth_map/bin/ood_auth_map.mapfile
-    user_map_match: none
-
-=======
       - 'AuthType openid-connect'
       - 'Require valid-user'
       - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
@@ -78,25 +65,15 @@ openondemand_auth_defaults:
       - 'Require valid-user'
       - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
   
->>>>>>> c5636843 (update ondemand role to support DEX)
   # Defaults for basic/PAM auth - see https://osc.github.io/ood-documentation/latest/authentication/pam.html
   basic_pam:
     httpd_auth: # ood_portal.yml.j2
       - "AuthType Basic"
       - 'AuthName "Open OnDemand"'
-<<<<<<< HEAD
-      - "AuthBasicProvider PAM"
-      - "AuthPAMService ood"
-      - "Require valid-user"
-      - "ProxyPreserveHost On" # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
-    user_map_cmd: null
-    user_map_match: ".*"
-=======
       - 'AuthBasicProvider PAM'
       - 'AuthPAMService ood'
       - 'Require valid-user'
       - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
->>>>>>> c5636843 (update ondemand role to support DEX)
 
 # The below mapping is used to override osc.ood defaults. Keys are osc.ood variable names.
 # If you need to override *these* defaults (i.e. this role's vars are not sufficent) just set the corresponding osc.ood var as normal.
@@ -120,15 +97,7 @@ openondemand_osc_ood_defaults:
     - SSLHonorCipherOrder On
     - SSLCompression off
     - SSLSessionTickets Off
-<<<<<<< HEAD
 
-  # User mapping:
-  user_map_cmd: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_cmd }}"
-  user_map_match: "{{ openondemand_auth_defaults[openondemand_auth | lower].user_map_match }}"
-
-=======
-  
->>>>>>> c5636843 (update ondemand role to support DEX)
   # Auth:
   oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if (openondemand_auth | lower) in ['oidc', 'dex'] else none }}"
   ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
