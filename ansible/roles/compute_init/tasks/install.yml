@@ -18,7 +18,7 @@
   ansible.posix.synchronize:
     src: "{{ item.src }}"
     dest: "/etc/ansible-init/playbooks/{{ item.dest }}"
-    archive: false
+    archive: true
     rsync_opts:
       - "-p"
       - "--chmod=D770,F644"
@@ -54,14 +54,6 @@
       dest: roles/
     - src: ../../eessi
       dest: roles/
-
-- name: Ensure ownership is root after sync
-  ansible.builtin.file:
-    path: "/etc/ansible-init/playbooks/"
-    owner: root
-    group: root
-    recurse: true
-  become: true
 
 - name: Add filter_plugins to ansible.cfg
   ansible.builtin.lineinfile:
