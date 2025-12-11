@@ -8,7 +8,7 @@
     description: "{{ repo_name }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
-    gpgcheck: true
+    gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
     gpgkey: "{{ repo_values.gpgkey | default('') }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
@@ -24,15 +24,6 @@
 
 - name: Import rockyofficial GPG key # noqa: no-changed-when
   ansible.builtin.command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial # noqa: command-instead-of-module
-
-- name: Install Ceph GPG key
-  copy:
-    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-ceph
-    content: "{{ dnf_repos_ceph_key }}"
-    mode: '0644'
-
-- name: Import Ceph GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-ceph # noqa: command-instead-of-module
 
 - name: Install epel-release
   # So roles installing epel via epel-release don't overwrite changes to the epel repo below
