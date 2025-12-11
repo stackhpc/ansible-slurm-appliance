@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   s3_cleanup:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-${{ github.ref }}
     strategy:
       fail-fast: false
@@ -41,7 +41,7 @@ jobs:
           s3cmd rm s3://${{ env.S3_BUCKET }} --recursive --force
 
   image_upload:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: s3_cleanup
     concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }}
     strategy:
@@ -118,7 +118,7 @@ jobs:
 
   image_sync:
     needs: image_upload
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.cloud }}-${{ matrix.build }}
     strategy:
       fail-fast: false
