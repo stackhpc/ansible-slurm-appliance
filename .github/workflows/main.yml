@@ -19,6 +19,8 @@ permissions:
   # To report GitHub Actions status checks
   statuses: write
   id-token: write
+  # upload trivy scan results
+  security-events: write
 
 on:
   push:
@@ -143,6 +145,6 @@ jobs:
     name: Trivy scan image for vulnerabilities
     needs: files_changed
     if: |
-      needs.files_changed.outputs.trivyscan == 'true'
+      needs.files_changed.outputs.trivyscan == 'true' || github.event_name != 'pull_request'
     uses: ./.github/workflows/trivyscan.yml
     secrets: inherit

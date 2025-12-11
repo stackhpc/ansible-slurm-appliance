@@ -14,6 +14,8 @@ permissions:
   packages: write
   # To report GitHub Actions status checks
   statuses: write
+  # upload trivy scan results
+  security-events: write
 
 jobs:
   scan:
