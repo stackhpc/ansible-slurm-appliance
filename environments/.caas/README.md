@@ -12,7 +12,9 @@ Non-standard things for this environment:
         azimuth_caas_stackhpc_slurm_appliance_template:
         ...
         envVars:
-            ANSIBLE_INVENTORY: environments/common/inventory,environments/.caas/inventory
+            ANSIBLE_INVENTORY: environments/common/inventory,environments/site/inventory,environments/.caas/inventory
+
+  ([Source](https://github.com/azimuth-cloud/ansible-collection-azimuth-ops/blob/main/roles/azimuth_caas_operator/defaults/main.yml#L199))
 
   Ansible then defines `ansible_inventory_sources` which contains absolute paths, and
   that is used to derive the `appliances_environment_root` and
