@@ -138,12 +138,12 @@ dnf_repos_default:
       pulp_path: epel/8/Everything/source
       pulp_timestamp: 20250923T001717
       repo_file: epel
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
     '9':
       pulp_path: epel/9/Everything/source
       pulp_timestamp: 20250923T001717
       repo_file: epel
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-9
   epel-cisco-openh264:
     '9':
       pulp_path: openh264/epel/9/x86_64/os
