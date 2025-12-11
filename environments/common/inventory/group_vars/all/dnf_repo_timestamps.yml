@@ -238,8 +238,8 @@ dnf_repos_default:
     '8':
       pulp_path: eessi/rhel/8/noarch
       pulp_timestamp: 20251119T202303
-      repo_file: cvmfs-eessi-config
+      repo_file: cvmfs-config-eessi
     '9':
       pulp_path: eessi/rhel/8/noarch
       pulp_timestamp: 20251119T202303
-      repo_file: cvmfs-eessi-config
+      repo_file: cvmfs-config-eessi

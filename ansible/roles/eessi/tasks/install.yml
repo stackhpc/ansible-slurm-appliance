@@ -1,12 +1,12 @@
 ---
 
-- name: Download Cern GPG key
-  # checkov:skip=CKV2_ANSIBLE_2: "Ensure that HTTPS url is used with get_url"
-  ansible.builtin.get_url:
-    url: https://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM
+- name: Install Cern GPG key
+  ansible.builtin.copy:
+    content: "{{ cvmfs_gpg_key }}"
     dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
-    checksum: "{{ cvmfs_gpg_checksum }}"
-    mode: "0644"
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Import downloaded GPG key # noqa: no-changed-when
   ansible.builtin.command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM # noqa: command-instead-of-module
@@ -19,4 +19,4 @@
 
 - name: Install EESSI CVMFS config
   ansible.builtin.dnf:
-    name: cvmfs-eessi-config
+    name: cvmfs-config-eessi
