@@ -15,19 +15,23 @@ dnf_repos_default:
       pulp_path: OpenHPC/2/EL_8
       pulp_timestamp: 20241218T154614
       repo_file: OpenHPC
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL8
     '9':
       pulp_path: OpenHPC/3/EL_9
       pulp_timestamp: 20241218T154614
       repo_file: OpenHPC
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL9
   OpenHPC-updates:
     '8':
       pulp_path: OpenHPC/2/updates/EL_8
       pulp_timestamp: 20250512T003315
       repo_file: OpenHPC
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL8
     '9':
       pulp_path: OpenHPC/3/updates/EL_9
       pulp_timestamp: 20250510T003301
       repo_file: OpenHPC
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL9
   appstream:
     '8.10':
       pulp_path: rocky/8.10/AppStream/x86_64/os
@@ -46,6 +50,7 @@ dnf_repos_default:
       pulp_path: rocky/9.6/AppStream/x86_64/os
       pulp_timestamp: 20250923T031638
       repo_file: rocky
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
   appstream-source:
     '8.10':
       pulp_path: rocky/8.10/AppStream/source/os
@@ -167,6 +172,7 @@ dnf_repos_default:
       pulp_path: rocky/9.6/extras/x86_64/os
       pulp_timestamp: 20250726T040613
       repo_file: rocky-extras
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
   extras-source:
     '8.10':
       pulp_path: rocky/8.10/extras/source/os
@@ -177,6 +183,7 @@ dnf_repos_default:
       pulp_path: rocky/9.6/extras/source/os
       pulp_timestamp: 20250828T161842
       repo_file: rocky-extras
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
   grafana:
     '8':
       pulp_path: grafana/oss/rpm
@@ -230,10 +237,12 @@ dnf_repos_default:
       pulp_path: cvmfs-config/EL/8/x86_64
       pulp_timestamp: 20250805T130249
       repo_file: cvmfs
+      gpgcheck: false
     '9':
       pulp_path: cvmfs-config/EL/9/x86_64
       pulp_timestamp: 20250805T130249
       repo_file: cvmfs
+      gpgcheck: false
   cernvmfs_eessi_cfg:
     '8':
       pulp_path: eessi/rhel/8/noarch

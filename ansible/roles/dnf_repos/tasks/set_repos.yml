@@ -54,3 +54,14 @@
 
 - name: Import EPEL GPG key # noqa: no-changed-when
   ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
+
+- name: Install OpenHPC GPG key
+  ansible.builtin.copy:
+    content: "{{ openhpc_gpg_keys[ansible_distribution_major_version] }}"
+    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL{{ ansible_distribution_major_version }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Import OpenHPC GPG key # noqa: no-changed-when
+  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module

@@ -7,6 +7,17 @@
     name: R
     state: present
 
+- name: Install RStudio GPG key
+  ansible.builtin.copy:
+    content: "{{ openondemand_rstudio_gpg_key }}"
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-RStudio
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Import RStudio GPG key # noqa: no-changed-when
+  ansible.builtin.command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-RStudio # noqa: command-instead-of-module
+
 - name: Download RStudio Server RPM
   ansible.builtin.get_url:
     url: "https://download2.rstudio.org/server/rhel{{ ansible_distribution_major_version }}/x86_64/rstudio-server-rhel-{{ openondemand_rstudio_version }}-x86_64.rpm" # noqa: yaml[line-length]
@@ -18,7 +29,6 @@
   ansible.builtin.dnf:
     name: /tmp/rstudio-server.rpm
     state: present
-    disable_gpg_check: true
 
 - name: Create module directory for RStudio Server
   ansible.builtin.file:
