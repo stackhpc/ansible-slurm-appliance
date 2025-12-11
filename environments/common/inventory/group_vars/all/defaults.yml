@@ -77,7 +77,7 @@ appliances_local_users_default:
       shell: /sbin/nologin
       system: true
     enable: "{{ 'grafana' in group_names }}"
-  
+
   - group:
       name: ansible-init
       gid: 301

@@ -13,7 +13,6 @@
     - /exports/cluster/cacerts
     - /exports/cluster/cvmfs
     - /exports/cluster/hostconfig
-    
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Copy /etc/hosts to /exports/cluster
