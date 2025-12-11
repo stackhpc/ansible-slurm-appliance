@@ -156,6 +156,8 @@ openondemand_apps_desktop_default:
     script:
       job_name: "ood-desktop"
       native:
+        - "--partition"
+        - "<%= auto_queues %>"
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
         <% if node != '' %>
@@ -218,6 +220,8 @@ openondemand_apps_jupyter_default:
     script:
       job_name: "ood-jupyter"
       native:
+        - "--partition"
+        - "<%= auto_queues %>"
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
         <% if node != '' %>
