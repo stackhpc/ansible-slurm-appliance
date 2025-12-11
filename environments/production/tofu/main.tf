@@ -1202,6 +1202,15 @@ module "cluster" {
            "external-ceph": "direct"
          }
          ignore_image_changes: true
+         compute_init_enable = [
+           "compute",
+           "etc_hosts",
+           "tuned",
+           "nfs",
+           "manila",
+           "basic_users",
+           "eessi",
+         ]
      }
      gpu-gpu2 = {
          nodes: [
@@ -1216,6 +1225,15 @@ module "cluster" {
            "external-ceph": "direct"
          }
          ignore_image_changes: true
+         compute_init_enable = [
+           "compute",
+           "etc_hosts",
+           "tuned",
+           "nfs",
+           "manila",
+           "basic_users",
+           "eessi",
+         ]
      }
      highmem-compute7 = {
          nodes: [
@@ -1230,6 +1248,15 @@ module "cluster" {
            "external-ceph": "direct"
          }
          ignore_image_changes: true
+         compute_init_enable = [
+           "compute",
+           "etc_hosts",
+           "tuned",
+           "nfs",
+           "manila",
+           "basic_users",
+           "eessi",
+         ]
      }
      highmem-compute8 = {
          nodes: [
@@ -1244,6 +1271,15 @@ module "cluster" {
            "external-ceph": "direct"
          }
          ignore_image_changes: true
+         compute_init_enable = [
+           "compute",
+           "etc_hosts",
+           "tuned",
+           "nfs",
+           "manila",
+           "basic_users",
+           "eessi",
+         ]
      }
     }
 
