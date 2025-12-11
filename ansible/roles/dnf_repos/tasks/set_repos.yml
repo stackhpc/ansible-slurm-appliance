@@ -51,3 +51,6 @@
     repo_values: "{{ item.value.get(repo_os, {}) }}"
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
+
+- name: Import EPEL GPG key # noqa: no-changed-when
+  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module

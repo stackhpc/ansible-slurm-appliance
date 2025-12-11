@@ -219,10 +219,12 @@ dnf_repos_default:
       pulp_path: cvmfs/EL/8/x86_64
       pulp_timestamp: 20250816T005446
       repo_file: cvmfs
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
     '9':
       pulp_path: cvmfs/EL/9/x86_64
       pulp_timestamp: 20250816T005446
       repo_file: cvmfs
+      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
   cernvmfs_cfg:
     '8':
       pulp_path: cvmfs-config/EL/8/x86_64
