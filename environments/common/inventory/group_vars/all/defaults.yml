@@ -83,6 +83,7 @@ appliances_local_users_default:
       comment: ansible-init user
       uid: 301
       create_home: false
+      home: /var/lib/ansible-init
       shell: /sbin/nologin
       system: true
     enable: "{{ 'ansible_init' in group_names }}"
