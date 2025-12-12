@@ -64,9 +64,10 @@
   become: false
   when: hpctests_pingpong_plot | bool
 
-- ansible.builtin.debug:
-    # yamllint disable rule:line-length
-    msg: |
+- name: Set fact for summary
+  ansible.builtin.set_fact:
+  # yamllint disable rule:line-length
+    hpctests_pingpong_summary: |
       Summary for pingpong using 2x scheduler-selected nodes in '{{ hpctests_partition }}' partition, job ID {{ _pingpong_jobid }}, device '{{ hpctests_ucx_net_devices }}':
 
       Nodes: {{ hpctests_pingpong_run_nodes.stdout.split()[1] }}
@@ -78,3 +79,14 @@
       {{ _pingpong_plot.stdout }}
       {% endif %}
     # yamllint enable rule:line-length
+
+- ansible.builtin.debug:
+    msg: |
+      {{ hpctests_pingpong_summary }}
+
+- name: Write summary
+  ansible.builtin.copy:
+    dest: "{{ _pingpong_local_output | dirname }}/summary.txt"
+    content: "{{ hpctests_pingpong_summary }}"
+  delegate_to: localhost
+  become: false
