@@ -78,10 +78,7 @@ appliances_local_users_default:
       system: true
     enable: "{{ 'grafana' in group_names }}"
 
-  - group:
-      name: ansible-init
-      gid: 301
-    user:
+  - user:
       name: ansible-init
       comment: ansible-init user
       uid: 301
