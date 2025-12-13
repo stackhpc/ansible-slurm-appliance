@@ -31,6 +31,7 @@ nfs_configuration_compute_nodes: # cluster configuration for compute_init/slurm-
       server: "{{ inventory_hostname in groups['control'] }}"
       clients: false
     nfs_export: "/exports/cluster"
+    nfs_export_options: "ro,secure,root_squash"
 
 nfs_configurations_extra: [] # site-specific nfs shares
 
