@@ -88,5 +88,6 @@
   ansible.builtin.copy:
     dest: "{{ _pingpong_local_output | dirname }}/summary.txt"
     content: "{{ hpctests_pingpong_summary }}"
+    mode: "0644"
   delegate_to: localhost
   become: false
