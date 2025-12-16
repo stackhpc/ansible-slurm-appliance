@@ -19,6 +19,17 @@
     - init_d.stat.exists
     - not init_d.stat.islnk
 
+- name: Install TurboVNC GPG key
+  ansible.builtin.copy:
+    content: "{{ openondemand_turbovnc_gpg_key }}"
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-TurboVNC
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Import TurboVNC GPG key # noqa: no-changed-when
+  ansible.builtin.command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-TurboVNC # noqa: command-instead-of-module
+
 - name: Install VNC-related packages
   tags: install
   ansible.builtin.dnf:
