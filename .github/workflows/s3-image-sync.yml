@@ -51,7 +51,7 @@ jobs:
           - RL8
           - RL9
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
     outputs:
@@ -134,7 +134,7 @@ jobs:
           - cloud: ${{ needs.image_upload.outputs.ci_cloud }}
 
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       CI_CLOUD: ${{ matrix.cloud }}
     steps:

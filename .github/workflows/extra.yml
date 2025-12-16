@@ -32,7 +32,7 @@ jobs:
             inventory_groups: doca,cuda,lustre
             volume_size: 35 # needed for cuda
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}

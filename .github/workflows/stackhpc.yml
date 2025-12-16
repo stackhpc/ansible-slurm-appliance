@@ -26,7 +26,7 @@ jobs:
           - RL8
           - RL9
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
