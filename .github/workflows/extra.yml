@@ -5,7 +5,7 @@
 # See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Test extra build
-on:
+'on':
   workflow_call:
   workflow_dispatch:
 

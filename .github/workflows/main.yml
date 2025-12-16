@@ -22,7 +22,7 @@ permissions:
   # upload trivy scan results
   security-events: write
 
-on:
+'on':
   push:
     branches:
       - main
