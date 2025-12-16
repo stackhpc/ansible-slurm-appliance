@@ -29,8 +29,8 @@ permissions:
   pull_request:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.head_ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
@@ -43,18 +43,18 @@ jobs:
     runs-on: ubuntu-24.04
     # Map a step output to a job output, this allows other jobs to be gated on the filter results
     outputs:
-        # The 'stackhpc' output will be 'true' if either of the two stackhpc filters below matched
-        stackhpc: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
-        extra_on_push: ${{ steps.filter_on_some.outputs.extra_on_push }}
-        extra_on_pull_request: ${{ steps.filter_on_some.outputs.extra_on_pull_request }}
-        trivyscan: ${{ steps.filter_on_some.outputs.trivyscan }}
+      # The 'stackhpc' output will be 'true' if either of the two stackhpc filters below matched
+      stackhpc: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
+      extra_on_push: ${{ steps.filter_on_some.outputs.extra_on_push }}
+      extra_on_pull_request: ${{ steps.filter_on_some.outputs.extra_on_pull_request }}
+      trivyscan: ${{ steps.filter_on_some.outputs.trivyscan }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
         # NOTE: We're detecting the changed files within a job so that we can gate execution of other jobs.
         #       We use dorny/paths-filter which doesn't work like the conventional 'paths' and 'paths_exclude',
-        #       we can't do the following: 
+        #       we can't do the following:
         # paths:
         #   - '**'
         #   - '!dev/**'
