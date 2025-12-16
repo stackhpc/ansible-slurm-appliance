@@ -4,7 +4,7 @@ dnf_repos_pulp_content_url: "{{ appliances_pulp_url }}/pulp/content"
 dnf_repos_username: "{{ omit }}"
 dnf_repos_password: "{{ omit }}"
 
-openhpc_gpg_keys:
+openhpc_gpg_keys: # https://raw.githubusercontent.com/openhpc/ohpc/v2.6.1.GA/components/admin/ohpc-release/SOURCES/RPM-GPG-KEY-OpenHPC-2
   '8': |
     -----BEGIN PGP PUBLIC KEY BLOCK-----
 
@@ -42,7 +42,7 @@ openhpc_gpg_keys:
     12Gh2vqXQrofz8qYb+vYEKLVlPP0/w==
     =2mn6
     -----END PGP PUBLIC KEY BLOCK-----
-  '9': |
+  '9': | # https://raw.githubusercontent.com/openhpc/ohpc/v3.0.GA/components/admin/ohpc-release/SOURCES/RPM-GPG-KEY-OpenHPC-3
     -----BEGIN PGP PUBLIC KEY BLOCK-----
 
     mQENBGRAIkcBCAC8ye7kDRUXziTcPmmaUmoe0Xu3RnCHUyQgUAuRgrZBgs70XXff

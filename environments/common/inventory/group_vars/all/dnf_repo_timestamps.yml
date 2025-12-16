@@ -189,7 +189,6 @@ dnf_repos_default:
       pulp_path: grafana/oss/rpm
       pulp_timestamp: 20250917T024714
       repo_file: grafana
-      timestamp: 20250615T005738
     '9':
       pulp_path: grafana/oss/rpm
       pulp_timestamp: 20250917T024714
@@ -250,7 +249,7 @@ dnf_repos_default:
       repo_file: cvmfs-config-eessi
       gpgcheck: false
     '9':
-      pulp_path: eessi/rhel/8/noarch
+      pulp_path: eessi/rhel/8/noarch # path is a red herring - RL8/9 use the same repo
       pulp_timestamp: 20251119T202303
       repo_file: cvmfs-config-eessi
       gpgcheck: false

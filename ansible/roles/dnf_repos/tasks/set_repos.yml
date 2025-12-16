@@ -1,5 +1,22 @@
 ---
 
+- name: Import Rocky GPG key # noqa: no-changed-when
+  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
+
+- name: Import EPEL GPG key # noqa: no-changed-when
+  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
+
+- name: Install OpenHPC GPG key
+  ansible.builtin.copy:
+    content: "{{ openhpc_gpg_keys[ansible_distribution_major_version] }}"
+    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL{{ ansible_distribution_major_version }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Import OpenHPC GPG key # noqa: no-changed-when
+  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
+
 - name: Replace non-epel repos with Pulp repos
   ansible.builtin.yum_repository:
     file: "{{ repo_values.repo_file }}"
@@ -22,9 +39,6 @@
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
 
-- name: Import Rocky GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
-
 - name: Install epel-release
   # So roles installing epel via epel-release don't overwrite changes to the epel repo below
   ansible.builtin.dnf:
@@ -38,7 +52,7 @@
     description: "{{ repo_name }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
-    gpgcheck: true
+    gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
     gpgkey: "{{ repo_values.gpgkey | default('') }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
@@ -51,17 +65,3 @@
     repo_values: "{{ item.value.get(repo_os, {}) }}"
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
-
-- name: Import EPEL GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
-
-- name: Install OpenHPC GPG key
-  ansible.builtin.copy:
-    content: "{{ openhpc_gpg_keys[ansible_distribution_major_version] }}"
-    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL{{ ansible_distribution_major_version }}"
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Import OpenHPC GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module

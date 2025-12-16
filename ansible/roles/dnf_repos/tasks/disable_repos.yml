@@ -6,7 +6,7 @@
     baseurl: "{{ repo_content_url }}/{{ repo_values.pulp_path }}/{{ repo_values.pulp_timestamp }}"
     description: "{{ repo_name }}"
     enabled: false
-    gpgcheck: true
+    gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
     gpgkey: "{{ repo_values.gpgkey | default('') }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
