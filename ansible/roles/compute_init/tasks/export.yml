@@ -1,7 +1,7 @@
 ---
 - name: Ensure /exports/cluster directory structure exists
   ansible.builtin.file:
-    path: /exports/cluster
+    path: "{{ item }}"
     state: directory
     owner: ansible-init
     group: ansible-init
