@@ -1,5 +1,5 @@
 name: Upload CI-tested images to Leafcloud S3 and sync clouds
-on:
+'on':
   workflow_dispatch:
   push:
     branches:

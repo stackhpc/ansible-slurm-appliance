@@ -1,5 +1,5 @@
 name: Release images
-on:
+'on':
   workflow_dispatch:
   release:
     types:
