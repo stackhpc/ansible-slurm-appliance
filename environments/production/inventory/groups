@@ -116,7 +116,6 @@ cluster
 [extra_packages:children]
 # Hosts to install specified additional packages on
 builder
-#cluster
 
 [cacerts]
 # Hosts to configure CA certificates and trusts on
