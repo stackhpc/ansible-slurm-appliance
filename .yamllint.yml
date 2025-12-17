@@ -1,4 +1,8 @@
 ---
+ignore-from-file:
+  - .gitignore
+  - .yamlignore
+
 extends: default
 
 rules:
