@@ -44,7 +44,7 @@ if __name__ == "__main__":
     try:
         output = subprocess.check_output(ansible_cmd, text=True)
     except (subprocess.CalledProcessError):
-        msg = (f"[ERROR]: Is {pattern} missing from the inventory?")
+        msg = ("[ERROR]: ansible exited in error")
         print(msg, file=sys.stderr)
         sys.exit(-1)
     # output looks like e.g.
