@@ -83,7 +83,7 @@
         - ansible.builtin.meta: end_play
     - name: Check if hostvars exist
       become: true
-      become_user: slurm
+      become_user: ansible-init # share is root-squashed
       ansible.builtin.stat:
         path: "/mnt/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
       register: hostvars_stat
@@ -98,7 +98,7 @@
         - ansible.builtin.meta: end_play
     - name: Sync /mnt/cluster to /var/tmp
       become: true
-      become_user: slurm
+      become_user: ansible-init # share is root-squashed
       ansible.posix.synchronize:
         src: "/mnt/cluster/"
         dest: "/var/tmp/cluster/"
