@@ -49,6 +49,8 @@ if __name__ == "__main__":
     # output looks like e.g.
     # stg-login-0 | SUCCESS => {    "changed": false,    ...
     # one line per host
+    if not output:
+        sys.exit(1)
     result = output.splitlines()[0].split('>', 1)[-1]
     expanded = json.loads(result)['msg']
     # can assume ansible_host exists b/c defined by terraform
