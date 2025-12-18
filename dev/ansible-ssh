@@ -43,7 +43,7 @@ if __name__ == "__main__":
     ansible_cmd = ['ansible', pattern, '-o', '-m', 'debug', '-a', module_args]
     try:
         output = subprocess.check_output(ansible_cmd, text=True)
-    except (subprocess.CalledProcessError) as e:
+    except (subprocess.CalledProcessError):
         msg = (f"[ERROR]: Is {pattern} missing from the inventory?")
         print(msg, file=sys.stderr)
         sys.exit(-1)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     expanded = json.loads(result)['msg']
     # can assume ansible_host exists b/c defined by terraform
     # can assume ansible_user exists b/c defined in common inventory
-    
+
     cmd = shlex.split(expanded)
     if no_known_hosts:
         cmd = cmd[0:1] + NO_HOSTKEY_CHECK_OPTS + cmd[1:]
