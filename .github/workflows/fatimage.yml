@@ -35,7 +35,7 @@ jobs:
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-RL8
-            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.raw
+            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
             inventory_groups: fatimage
           - image_name: openhpc-RL9
             source_image_name: Rocky-9-GenericCloud-Base-9.7-20251123.2.x86_64.qcow2
