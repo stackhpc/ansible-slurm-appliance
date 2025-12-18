@@ -121,7 +121,7 @@ openondemand_apps_desktop_default:
   cluster: slurm
   form:
     - desktop
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - num_cores
     - gres
@@ -129,7 +129,7 @@ openondemand_apps_desktop_default:
     - node
   attributes:
     desktop: xfce
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_desktop_partition | default(none) }}"
     num_cores:
       label: Number of cores
@@ -157,6 +157,8 @@ openondemand_apps_desktop_default:
     script:
       job_name: "ood-desktop"
       native:
+        - "--partition"
+        - "<%= auto_queues %>"
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
         <% if node != '' %>
@@ -176,7 +178,7 @@ openondemand_apps_jupyter_default:
   form:
     - modules
     - extra_jupyter_args
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - num_cores
     - gres
@@ -206,7 +208,7 @@ openondemand_apps_jupyter_default:
       help: Select a particular node or leave empty to let Slurm pick the next available
       value: ""
     extra_jupyter_args: ""
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_jupyter_partition | default(none) }}"
   submit: |
     ---
@@ -219,6 +221,8 @@ openondemand_apps_jupyter_default:
     script:
       job_name: "ood-jupyter"
       native:
+        - "--partition"
+        - "<%= auto_queues %>"
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
         <% if node != '' %>
@@ -234,7 +238,7 @@ openondemand_apps_rstudio_default:
   description: Request a RStudio server
   cluster: slurm
   attributes:
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_rstudio_partition | default(none) }}"
     rstudio_module:
       label: RStudio module
@@ -293,9 +297,8 @@ openondemand_apps_rstudio_default:
       min: 1
       step: 1
   form:
-    - bc_queue
-    - rstudio_module
     - auto_queues
+    - rstudio_module
     - extra_modules_script
     - cores
     - ram
@@ -313,7 +316,7 @@ openondemand_apps_rstudio_default:
     script:
       native:
         - "--partition"
-        - "<%= bc_queue %>"
+        - "<%= auto_queues %>"
         - "--ntasks"
         - "1"
         - "--mem"
@@ -333,7 +336,7 @@ openondemand_apps_matlab_default:
   cluster: slurm
   form:
     - desktop
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - matlab_module
     - cores
@@ -344,7 +347,7 @@ openondemand_apps_matlab_default:
     desktop: xfce
     # bc_account: # i.e. slurm account
     #   value: root
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_matlab_partition | default(none) }}"
     matlab_module:
       label: MATLAB module
@@ -400,7 +403,7 @@ openondemand_apps_matlab_default:
       job_name: "ood-matlab"
       native:
         - "--partition"
-        - "<%= bc_queue %>"
+        - "<%= auto_queues %>"
         - "--ntasks"
         - "1"
         - "--mem"
@@ -417,7 +420,7 @@ openondemand_apps_codeserver_default:
   description: Request a Code Server
   cluster: slurm
   form:
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - codeserver_module
     - cores
@@ -431,7 +434,7 @@ openondemand_apps_codeserver_default:
       widget: select
       options:
         - ["Code Server v{{ openondemand_code_server_version}}", "code-server/{{ openondemand_code_server_version }}"]
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_codeserver_partition | default(none) }}"
     cores:
       label: Number of CPU cores
@@ -468,7 +471,7 @@ openondemand_apps_codeserver_default:
       job_name: "ood-codeserver"
       native:
         - "--partition"
-        - "<%= bc_queue %>"
+        - "<%= auto_queues %>"
         - "--ntasks"
         - "1"
         - "--mem"
