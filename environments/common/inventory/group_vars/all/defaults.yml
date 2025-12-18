@@ -78,6 +78,16 @@ appliances_local_users_default:
       system: true
     enable: "{{ 'grafana' in group_names }}"
 
+  - user:
+      name: ansible-init
+      comment: ansible-init user
+      uid: 301
+      create_home: false
+      home: /var/lib/ansible-init
+      shell: /sbin/nologin
+      system: true
+    enable: "{{ 'ansible_init' in group_names }}"
+
 # Overide this to add extra users whilst keeping the defaults.
 appliances_local_users_extra: [] # see format of appliances_local_users_default above
 appliances_local_users: "{{ (appliances_local_users_default + appliances_local_users_extra) | select | list }}"
