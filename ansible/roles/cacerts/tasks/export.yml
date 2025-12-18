@@ -3,9 +3,9 @@
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: /exports/cluster/cacerts/
-    owner: slurm
-    group: root
-    mode: "0644"
+    owner: ansible-init
+    group: ansible-init
+    mode: u=rw,go=
   with_fileglob:
     - "{{ cacerts_cert_dir }}/*"
   delegate_to: "{{ groups['control'] | first }}"

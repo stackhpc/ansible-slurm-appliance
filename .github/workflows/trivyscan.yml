@@ -14,10 +14,12 @@ permissions:
   packages: write
   # To report GitHub Actions status checks
   statuses: write
+  # upload trivy scan results
+  security-events: write
 
 jobs:
   scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:

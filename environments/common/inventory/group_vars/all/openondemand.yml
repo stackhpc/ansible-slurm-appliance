@@ -159,7 +159,9 @@ openondemand_apps_desktop_default:
       native:
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
+        <% if node != '' %>
         - <%= "--nodelist=#{node}" %>
+        <% end %>
         <% if gres != 'none' %>
         - <%= "--gres=#{gres}:#{gres_count}" %>
         <% end %>
@@ -219,7 +221,9 @@ openondemand_apps_jupyter_default:
       native:
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
+        <% if node != '' %>
         - <%= "--nodelist=#{node}" %>
+        <% end %>
         <% if gres != 'none' %>
         - <%= "--gres=#{gres}:#{gres_count}" %>
         <% end %>
