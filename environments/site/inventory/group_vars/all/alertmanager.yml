@@ -3,4 +3,4 @@
 #
 # alertmanager_slack_integration:
 #   channel: '#alerts'
-#   app_creds: "{% raw %}{{ vault_alertmanager_slack_integration_app_creds }}{% endraw %}"
+#   app_creds: "{{ vault_alertmanager_slack_integration_app_creds }}"
