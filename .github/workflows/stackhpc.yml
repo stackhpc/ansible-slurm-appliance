@@ -107,6 +107,12 @@ jobs:
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
+      - name: Cleanup any OpenStack resources from previous attempts
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ./dev/delete-cluster.py ${{ env.TF_VAR_cluster_name }} --force
+
       - name: Provision nodes using latest release image
         id: provision_servers
         run: |
