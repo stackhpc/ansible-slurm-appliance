@@ -50,3 +50,13 @@ alertmanager_config_default:
   receivers: "{{ alertmanager_receivers }}"
 
 alertmanager_config_extra: {} # top-level only
+
+# Whether to set ProtectHome=true in systemd unit. This option may need to be
+# disabled in some environments, to avoid a "Failed to set up mount
+# namespacing" error when starting alertmanager.
+alertmanager_systemd_protect_home: true
+
+# Whether to set ProtectSystem=strict in systemd unit. This option may need to
+# be disabled in some environments, to avoid a "Failed to set up mount
+# namespacing" error when starting alertmanager.
+alertmanager_systemd_protect_system: true
