@@ -13,6 +13,18 @@
         tasks_from: addhost.yml
       when: groups['freeipa_server'] | length > 0
 
+- name: Persist hostkeys across rebuilds
+  # Must be:
+  # - after filesystems.yml (for storage)
+  # - before ipa (re)enrolment, which updates IPA record to match actual hostkey
+  # - before portal.yml (where OOD login node hostkeys are scanned)
+  hosts: persist_hostkeys:!builder
+  become: true
+  gather_facts: false
+  tasks:
+    - ansible.builtin.import_role:
+        name: persist_hostkeys
+
 - hosts: freeipa_client
   tags:
     - freeipa
