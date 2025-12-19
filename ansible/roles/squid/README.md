@@ -16,7 +16,7 @@ Deploy a caching proxy.
   - 10Gbit link or faster to the client systems
   - a sufficiently powerful CPU
   - a decent amount of memory for the kernel cache (tens of GBs)
-  - fast local storage
+  - fast storage
   - 50GB is used for cache
 
   For this use-case the above link recommends at least two squid servers and at
