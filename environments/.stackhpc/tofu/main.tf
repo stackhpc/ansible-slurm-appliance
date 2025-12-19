@@ -60,11 +60,6 @@ variable "volume_backed_instances" {
   default = false
 }
 
-data "openstack_images_image_v2" "cluster" {
-  name        = var.cluster_image[var.os_version]
-  most_recent = true
-}
-
 module "cluster" {
   source = "../../site/tofu/"
 
@@ -72,7 +67,7 @@ module "cluster" {
   cluster_networks    = var.cluster_networks
   vnic_types          = var.vnic_types
   key_pair            = "slurm-app-ci"
-  cluster_image_id    = data.openstack_images_image_v2.cluster.id
+  cluster_image_key   = "stackhpc_openhpc_${var.os_version}"
   control_node_flavor = var.control_node_flavor
 
   login = {

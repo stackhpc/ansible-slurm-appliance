@@ -13,6 +13,7 @@ locals {
       environment_name      = basename(var.environment_root)
     }
   )
+  cluster_image_id = local.image_ids[var.cluster_image_key]
 }
 
 resource "openstack_networking_port_v2" "control" {
@@ -46,13 +47,13 @@ resource "openstack_networking_port_v2" "control" {
 resource "openstack_compute_instance_v2" "control" {
 
   name        = split(".", local.control_fqdn)[0]
-  image_id    = var.cluster_image_id
+  image_id    = local.cluster_image_id
   flavor_name = var.control_node_flavor
   key_pair    = var.key_pair
 
   # root device:
   block_device {
-    uuid                  = var.cluster_image_id
+    uuid                  = local.cluster_image_id
     source_type           = "image"
     destination_type      = var.volume_backed_instances ? "volume" : "local"
     volume_size           = var.volume_backed_instances ? var.root_volume_size : null
