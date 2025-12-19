@@ -146,7 +146,7 @@ per-checkout configuration is required.
    TOKEN_DATA=$(openstack token issue -f json)
    PROJECT_ID=$(echo "$TOKEN_DATA" | jq -r '.project_id')
    TOKEN_ID=$(echo "$TOKEN_DATA" | jq -r '.id')
-   openstack revoke token $TOKEN_ID
+   openstack token revoke $TOKEN_ID
    
    # Get first creds in current project:
    EC2_CREDS=$(openstack ec2 credentials list -f json | jq -r --arg pid "$PROJECT_ID" '.[] | select(.["Project ID"] == $pid) | @json' | head -n 1)
