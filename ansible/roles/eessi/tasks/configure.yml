@@ -16,7 +16,8 @@
 - name: Reload CVMFS config
   ansible.builtin.command:
     cmd: cvmfs_config reload
-  when: cvmfs_config.changed
+  when: cvmfs_config.changed # noqa: no-handler
+  changed_when: true # workaround ansible-lint
 
 # configure gpus
 - name: Check for NVIDIA GPU
