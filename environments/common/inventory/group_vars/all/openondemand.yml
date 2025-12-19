@@ -35,7 +35,8 @@ openondemand_dashboard_links_grafana:
 openondemand_dashboard_links: "{{ openondemand_dashboard_links_grafana if groups['grafana'] | length > 0 }}"
 
 # For FreeIPA-enroled hosts, the shell host must be an IPA-registered host to avoid an ssh key prompt
-openondemand_login_host: "{{ inventory_hostname if inventory_hostname in groups['freeipa_client'] else 'localhost' }}"
+# so use do not use localhost:
+openondemand_login_host: "{{ inventory_hostname }}"
 
 openondemand_clusters:
   slurm:
