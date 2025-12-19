@@ -129,22 +129,24 @@ additional_nodegroups = {
 
 EESSI [recommend](https://www.eessi.io/docs/tutorial/access/proxy/#general-recommendations)
 that:
+
 > The proxy server should have a 10Gbit link to the client systems, a
-sufficiently powerful CPU, a decent amount of memory for the kernel cache (tens
-of GBs), and fast local storage (SSD or NVMe).
+> sufficiently powerful CPU, a decent amount of memory for the kernel cache (tens
+> of GBs), and fast local storage (SSD or NVMe).
 >
 > As a rule of thumb, it is recommended to have (at least) one proxy server for
-every couple of hundred worker nodes (100-500).
+> every couple of hundred worker nodes (100-500).
 
 Generally, both the `squid` nodes and the `eeesi` client nodes can be
 appropriately configured simply by setting the squid mode to `eessi`:
 
-  ```yaml
-  # environments/site/inventory/group_vars/all/squid.yml:
-  squid_conf_mode: eessi
-  ```
+```yaml
+# environments/site/inventory/group_vars/all/squid.yml:
+squid_conf_mode: eessi
+```
 
 In this mode, by default:
+
 - `squid` is configured to allow clients from the access network's CIDR, using
   the EESSI-recommended cache configuration
 - `eessi` is configured to use the `squid` node IPs on the access network (the

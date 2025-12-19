@@ -4,6 +4,7 @@ Deploy a caching proxy.
 
 **NB:** This role provides two default configurations, selected by setting
 `squid_conf_mode`:
+
 - `default`: This is aimed at providing a proxy for package installs etc.
   for nodes which do not have direct internet connectivity. It assumes access
   to the proxy is protected by the OpenStack security groups applied to the
@@ -11,10 +12,13 @@ Deploy a caching proxy.
 - `eessi`: This provides a proxy server for EESSI clients. It uses the
   [recommended configuration](https://www.eessi.io/docs/tutorial/access/proxy/#configuration)
   which assumes a server with:
-      - 10Gbit link or faster to the client systems
-      - a sufficiently powerful CPU
-      - a decent amount of memory for the kernel cache (tens of GBs)
-      - fast local storage - 50GB is used for cache
+
+  - 10Gbit link or faster to the client systems
+  - a sufficiently powerful CPU
+  - a decent amount of memory for the kernel cache (tens of GBs)
+  - fast local storage
+  - 50GB is used for cache
+
   For this use-case the above link recommends at least two squid servers and at
   least one for every (100-500) client nodes.
 
@@ -28,6 +32,7 @@ Deploy a caching proxy.
 ### Role Variables for squid_conf_mode: default
 
 Where noted these map to squid parameters of the same name without the `squid_` prefix - see [squid documentation](https://www.squid-cache.org/Doc/config) for details.
+
 - `squid_started`: Optional bool. Whether to start squid service. Default `true`.
 - `squid_enabled`: Optional bool. Whether squid service is enabled on boot. Default `true`.
 - `squid_cache_mem`: Required str. Size of memory cache, e.g "1024 KB", "12 GB" etc. See squid parameter.
