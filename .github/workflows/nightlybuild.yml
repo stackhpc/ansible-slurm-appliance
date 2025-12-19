@@ -1,16 +1,16 @@
 name: Build nightly image
-on:
+'on':
   workflow_dispatch:
-      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
-      inputs:
-        ci_cloud:
-          description: 'Select the CI_CLOUD'
-          required: true
-          type: choice
-          options:
-            - LEAFCLOUD
-            - SMS
-            - ARCUS
+    # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
+    inputs:
+      ci_cloud:
+        description: 'Select the CI_CLOUD'
+        required: true
+        type: choice
+        options:
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
   # schedule:
   #   - cron: '0 0 * * *'  # Run at midnight on default branch
 
@@ -38,7 +38,7 @@ jobs:
             source_image_name: Rocky-9-GenericCloud-Base-9.4-20240523.0.x86_64.qcow2
             inventory_groups: update
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
