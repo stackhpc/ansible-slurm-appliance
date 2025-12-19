@@ -143,7 +143,11 @@ per-checkout configuration is required.
 
    ```bash
    # Get current openstack project:
-   PROJECT_ID=$(openstack token issue -f value -c project_id)
+   TOKEN_DATA=$(openstack token issue -f json)
+   PROJECT_ID=$(echo "$TOKEN_DATA" | jq -r '.project_id')
+   TOKEN_ID=$(echo "$TOKEN_DATA" | jq -r '.id')
+   openstack revoke token $TOKEN_ID
+   
    # Get first creds in current project:
    EC2_CREDS=$(openstack ec2 credentials list -f json | jq -r --arg pid "$PROJECT_ID" '.[] | select(.["Project ID"] == $pid) | @json' | head -n 1)
    # Set creds for OpenTofu s3 backend:
