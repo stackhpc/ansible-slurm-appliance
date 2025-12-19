@@ -1,41 +1,47 @@
 ---
-- name: Ensure the /exports/cluster directory exists
+- name: Ensure /exports/cluster directory structure exists
   ansible.builtin.file:
-    path: /exports/cluster
+    path: "{{ item }}"
     state: directory
-    owner: slurm
-    group: root
+    owner: ansible-init
+    group: ansible-init
     mode: u=rX,g=rwX,o=
   run_once: true
+  loop:
+    - /exports/cluster
+    - /exports/cluster/hostvars
+    - /exports/cluster/cacerts
+    - /exports/cluster/cvmfs
+    - /exports/cluster/hostconfig
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Copy /etc/hosts to /exports/cluster
   ansible.builtin.copy:
     src: /etc/hosts
     dest: /exports/cluster/hosts
-    owner: slurm
-    group: root
-    mode: u=r,g=rw,o=
+    owner: ansible-init
+    group: ansible-init
+    mode: u=rw,go=r
     remote_src: true
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
 
-- name: Create hostvars directory
+- name: Create per-host hostvars directory
   ansible.builtin.file:
     path: /exports/cluster/hostvars/{{ inventory_hostname }}/
     state: directory
-    owner: slurm
-    group: root
-    mode: u=rX,g=rwX,o=
+    owner: ansible-init
+    group: ansible-init
+    mode: u=rwX,go=
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Template out hostvars
   ansible.builtin.template:
     src: hostvars.yml.j2
     dest: /exports/cluster/hostvars/{{ inventory_hostname }}/hostvars.yml
-    owner: slurm
-    group: root
-    mode: u=r,g=rw,o=
+    owner: ansible-init
+    group: ansible-init
+    mode: u=rw,go=
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Copy manila share info to /exports/cluster
@@ -52,29 +58,19 @@
     os_manila_mount_share_info_var:
       os_manila_mount_share_info: "{{ os_manila_mount_share_info }}"
 
-- name: Ensure /exports/cluster/cvmfs directory exists
-  ansible.builtin.file:
-    path: /exports/cluster/cvmfs
-    state: directory
-    owner: slurm
-    group: root
-    mode: "0755"
-  run_once: true
-  delegate_to: "{{ groups['control'] | first }}"
-
 - name: Export cacerts
   ansible.builtin.include_role:
     name: cacerts
     tasks_from: export.yml
   when: "'cacerts' in group_names"
 
-- name: Create hostconfig directory
+- name: Create per-host hostconfig directory
   ansible.builtin.file:
     path: "/exports/cluster/hostconfig/{{ inventory_hostname }}/"
     state: directory
-    owner: slurm
-    group: root
-    mode: u=rX,g=rwX,o=
+    owner: ansible-init
+    group: ansible-init
+    mode: u=rwX,go=
   delegate_to: "{{ groups['control'] | first }}"
 
 - name: Template sssd config
