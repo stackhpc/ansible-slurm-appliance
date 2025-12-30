@@ -1,2 +1,5 @@
+# CI sets env from matrix for RL8 or RL8:
 appliances_distro_version: "{{ lookup('env', 'APPLIANCES_DISTRO_VERSION', 'RL9') }}"
-stackhpc_source_url: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images-prerelease
+
+# Use prerelease bucket only for stackhpc env:
+community_images_stackhpc_source_url: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images-prerelease
