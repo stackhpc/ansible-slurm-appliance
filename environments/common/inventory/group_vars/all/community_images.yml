@@ -1,7 +1,7 @@
 appliances_distro_version: RL9
 
 # Upstream image settings - should never need overriding:
-stackhpc_source_url: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images/
+stackhpc_source_url: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images
 # See also environments/.stackhpc/inventory/group_vars/all/community_images.yml
 stackhpc_images:
   stackhpc:
