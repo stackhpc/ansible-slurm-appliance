@@ -1,2 +1,2 @@
-appliances_distro_version: "{{ lookup('env', 'APPLIANCES_DISTRO_VERSION', 'RL9' }}"
+appliances_distro_version: "{{ lookup('env', 'APPLIANCES_DISTRO_VERSION', 'RL9') }}"
 stackhpc_source_url: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images-prerelease

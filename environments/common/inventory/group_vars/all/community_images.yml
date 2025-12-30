@@ -13,7 +13,6 @@ stackhpc_images:
 # Default images - usually won't need overriding
 # (either used directly for cluster or as source images for Packer builds)
 community_images_default: "{{ stackhpc_images }}"
-#community_images_default_packer_template: "{{ appliances_repository_root }}/packer/openstack.pkr.hcl"
 
 # Per-cloud image settings - may be overriden:
 community_images_disk_format: raw # format required on the cloud
