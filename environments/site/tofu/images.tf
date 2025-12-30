@@ -1,3 +1,3 @@
 locals {
-  image_ids = jsondecode(file("${path.module}/cluster_images.json"))
+  image_ids = jsondecode(file("${path.module}/../images/image_ids.json"))
 }

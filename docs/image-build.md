@@ -81,7 +81,7 @@ For either a site-specific fat-image build or an extra-build:
      - For a site-specific fatimage build: A RockyLinux GenericCloud or
        compatible image.
      - For an extra-build image: Usually the appropriate StackHPC fat image,
-       as defined in `environments/.stackhpc/tofu/cluster_image.auto.tfvars.json` at the
+       as defined in `environments/.stackhpc/inventory/group_vars/all/community_image_names.json` at the
        checkout's current commit. See the [GitHub release page](https://github.com/stackhpc/ansible-slurm-appliance/releases)
        for download links. In some cases extra builds may be chained, e.g.
        one extra build adds a Lustre client, and the resulting image is used

@@ -106,13 +106,13 @@ variable "login" {
     ))
   }
     EOF
-
-}
+  }
 }
 
 variable "cluster_image_key" {
   type        = string
-  description = "Key in cluster_images.json of default image for the cluster"
+  description = "Key in community_images of default image for the cluster"
+  default = "stackhpc"
 }
 
 variable "compute" {

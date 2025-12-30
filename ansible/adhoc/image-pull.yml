@@ -1,0 +1,16 @@
+- hosts: community_images # TODO default to localhost? Need to think about approach here if no deploy host
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Ensure images exist on cloud
+      ansible.builtin.include_role:
+        name: azimuth_cloud.azimuth_ops.community_images
+        tasks_from: upload_image_and_store_id.yml
+      loop: "{{ community_images | dict2items | list }}"
+      loop_control:
+        label: "{{ item.value.name }}"
+    - name: Write image IDs
+      copy:
+        dest: "{{ appliances_repository_root }}/environments/site/images/image_ids.json"
+        content: "{{ community_images_image_ids | to_nice_json }}"
+      delegate_to: localhost

@@ -67,7 +67,6 @@ module "cluster" {
   cluster_networks    = var.cluster_networks
   vnic_types          = var.vnic_types
   key_pair            = "slurm-app-ci"
-  cluster_image_key   = "stackhpc_openhpc_${var.os_version}"
   control_node_flavor = var.control_node_flavor
 
   login = {
