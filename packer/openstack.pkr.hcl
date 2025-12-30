@@ -24,6 +24,7 @@ locals {
     git_commit = data.git-commit.cwd-head.hash
     timestamp = formatdate("YYMMDD-hhmm", timestamp())
     image_name_version = var.image_name_version == "auto" ? "-${local.timestamp}-${substr(local.git_commit, 0, 8)}" : var.image_name_version
+    source_image_ids = jsondecode(file("${path.root}/environments/site/images/image_ids.json"))
 }
 
 # Path pointing to root of repository - automatically set by environment variable PKR_VAR_repo_root
@@ -44,13 +45,13 @@ variable "networks" {
 variable "source_image_name" {
   type = string
   default = null
-  description = "name of source image"
+  description = "Name of source image"
 }
 
-variable "source_image" {
+variable "source_image_key" {
   type = string
-  default = null
-  description = "UUID of source image"
+  default = "stackhpc"
+  description = "Name of community_images key defining source image"
 }
 
 variable "flavor" {
@@ -177,9 +178,9 @@ source "openstack" "openhpc" {
   floating_ip = var.floating_ip
   security_groups = var.security_groups
   
-  # Input image:
-  source_image = "${var.source_image}"
-  source_image_name = "${var.source_image_name}" # NB: must already exist in OpenStack
+  # Input image - NB must already exist in OpenStack:
+  source_image = local.source_image_ids[var.source_image_key]
+  source_image_name = "${var.source_image_name}"
   
   # SSH:
   ssh_username = var.ssh_username
