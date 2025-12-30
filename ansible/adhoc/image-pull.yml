@@ -1,4 +1,4 @@
-- hosts: community_images # TODO default to localhost? Need to think about approach here if no deploy host
+- hosts: localhost
   become: false
   gather_facts: false
   tasks:
@@ -11,6 +11,6 @@
         label: "{{ item.value.name }}"
     - name: Write image IDs
       copy:
-        dest: "{{ appliances_repository_root }}/environments/site/images/image_ids.json"
+        dest: "{{ appliances_repository_root }}/environments/site/images/community_image_ids.json"
         content: "{{ community_images_image_ids | to_nice_json }}"
       delegate_to: localhost
