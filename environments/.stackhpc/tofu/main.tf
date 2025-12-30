@@ -20,17 +20,6 @@ variable "cluster_name" {
   description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
-variable "os_version" {
-  type        = string
-  description = "RL8 or RL9"
-  default     = "RL9"
-}
-
-variable "cluster_image" {
-  description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
-  type        = map(string)
-}
-
 # tflint-ignore: terraform_typed_variables
 variable "cluster_networks" {}
 

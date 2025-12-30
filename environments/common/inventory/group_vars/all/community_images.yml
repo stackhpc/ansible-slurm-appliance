@@ -36,7 +36,3 @@ community_images_custom_properties: |
 community_images_extra: {}
 
 community_images: "{{ community_images_default | combine(community_images_extra) }}"
-
-# TODO: DEBUG only - using steveb-slurm-deploy as worker:
-community_images_workdir: /mnt/image-storage
-community_images_venv_path: "{{ community_images_workdir }}/venv"
