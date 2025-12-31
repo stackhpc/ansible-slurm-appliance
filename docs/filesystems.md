@@ -41,25 +41,21 @@ openstack share access create slurm-production-scratch cephx slurm-production
 
 ## Configuring the Slurm Appliance for Manila
 
-To mount shares onto hosts in a group, add them to the `manila` group.
+To mount CephFS shares provided by OpenStack Manila on nodes:
+
+1. Add the nodes to the `manila` group.
 
 ```yaml
 # environments/site/inventory/groups:
-[manila:children]:
+[manila:children]
 login
 compute
 ```
 
-If you are running a different version of Ceph from the defaults in the [os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount/blob/master/defaults/main.yml), you will need to update the package version by setting:
-
-```yaml
-# environments/site/inventory/group_vars/manila.yml:
-os_manila_mount_ceph_version: "18.2.4"
-```
-
-A [site-specific image](image-build.md) should be built which includes this package; add `manila` to the Packer `inventory_groups` variable.
-
-Define the list of shares to be mounted, and the paths to mount them to. The example below parameterises the share name using the environment name. See the [stackhpc.os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount) for further configuration options.
+2. Define the list of shares to be mounted, and the paths to mount them to. The
+example below parameterises the share name using the environment name. See the
+[stackhpc.os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount)
+for further configuration options.
 
 ```yaml
 # environments/site/inventory/group_vars/manila.yml:
@@ -67,6 +63,34 @@ os_manila_mount_shares:
   - share_name: "slurm-{{ appliances_environment_name }}-scratch"
     mount_path: /scratch
 ```
+
+If you are running a different version of Ceph from the defaults in the
+[os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount/blob/master/defaults/main.yml)
+you will need to override the package version by setting:
+
+```yaml
+# environments/site/inventory/group_vars/manila.yml:
+os_manila_mount_ceph_version: "18.2.4"
+```
+
+and running a [site-specific image](image-build.md) with `manila` included in the
+Packer `inventory_groups` variable.
+
+For older versions the current Ceph-provided GPG key may not be correct and
+disabling the GPG check may be necessary using something like:
+
+```
+# environments/site/inventory/group_vars/all/
+dnf_repos_extra:
+  Ceph:
+    '9':
+      pulp_path: centos/9-stream/storage/x86_64/ceph-reef
+      pulp_timestamp: 20250617T023108
+      repo_file: ceph
+      gpgcheck: false
+```
+
+See `dnf_repo_timestamps.yml` and `dnf_repos.yml` in `environments/common/inventory/group_vars/all/`.
 
 ### Shared home directory
 

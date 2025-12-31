@@ -20,7 +20,7 @@ roles:
     version: v4.0.1
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: v25.3.1
+    version: feat/reef-18.2.7 # TODO: release
   - src: mrlesmithjr.chrony
     version: v0.1.4
 
