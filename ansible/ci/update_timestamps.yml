@@ -1,4 +1,7 @@
 ---
+# Run manually with .stackhpc environment activated to update Ark DNF repo timestamps:
+# ansible-playbook ansible/ci/update_timestamps.yml
+
 - hosts: localhost
   tasks:
     - name: Get latest timestamps from sources # noqa: syntax-check[unknown-module] # ansible/library/latest_timestamps.py
