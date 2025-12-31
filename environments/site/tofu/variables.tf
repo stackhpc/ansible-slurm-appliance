@@ -60,7 +60,7 @@ variable "login" {
       nodes: List of node names
       flavor: String flavor name
     Optional:
-      image_id: Overrides variable cluster_image_id
+      image_key: Overrides variable cluster_image_key
       extra_networks: List of mappings in same format as cluster_networks
       vnic_types: Overrides variable vnic_types
       volume_backed_instances: Overrides variable volume_backed_instances
@@ -106,13 +106,13 @@ variable "login" {
     ))
   }
     EOF
-
 }
 }
 
-variable "cluster_image_id" {
+variable "cluster_image_key" {
   type        = string
-  description = "ID of default image for the cluster"
+  description = "Key in community_images of default image for the cluster"
+  default     = "stackhpc"
 }
 
 variable "compute" {
@@ -129,11 +129,11 @@ variable "compute" {
       nodes: List of node names
       flavor: String flavor name
     Optional:
-      image_id: Overrides variable cluster_image_id
+      image_key: Overrides variable cluster_image_key
       extra_networks: List of mappings in same format as cluster_networks
       vnic_types: Overrides variable vnic_types
       compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)
-      ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
+      ignore_image_changes: Ignore changes to the image ID (see docs/experimental/compute-init.md)
       volume_backed_instances: Overrides variable volume_backed_instances
       root_volume_size: Overrides variable root_volume_size
       extra_volumes: Mapping defining additional volumes to create and attach

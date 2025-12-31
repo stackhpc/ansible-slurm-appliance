@@ -30,11 +30,11 @@ collections:
   - name: community.grafana
     version: 1.5.4
   - name: ansible.posix
-    version: 1.5.4
+    version: 2.1.0
   - name: ansible.netcommon
     version: 5.1.1
   - name: community.general
-    version: 7.1.0
+    version: 11.2.1
   - name: community.crypto
     version: 2.10.0
   - name: community.mysql
@@ -55,3 +55,7 @@ collections:
     version: 0.5.5
   - name: stackhpc.linux
     version: 1.5.0
+  # for community_images role:
+  - name: https://github.com/azimuth-cloud/ansible-collection-azimuth-ops
+    type: git
+    version: 0.20.0

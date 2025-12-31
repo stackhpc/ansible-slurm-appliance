@@ -1,0 +1,38 @@
+appliances_distro_version: RL9
+
+# Default StackHPC images - usually won't need overriding:
+# (either used directly for cluster or as source images for Packer builds)
+# Image names are provided in adjacent json file as used to drive StackHPC CI:
+community_images_stackhpc_source_url: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images
+community_images_stackhpc:
+  stackhpc:
+    name: "{{ stackhpc_image_names[appliances_distro_version] }}"
+    source_url: "{{ community_images_stackhpc_source_url }}/{{ stackhpc_image_names[appliances_distro_version] }}"
+    source_disk_format: qcow2
+    container_format: bare
+community_images_default: "{{ community_images_stackhpc }}"
+
+# Per-cloud image settings - may be overriden:
+community_images_disk_format: raw # format required on the cloud
+community_images_custom_properties_default:
+  - hw_machine_type=q35
+  - hw_architecture=x86_64
+  - hw_vif_multiqueue_enabled=true
+  - hw_firmware_type=uefi
+  - os_type=linux
+  - "os_admin_user={{ ansible_user }}"
+community_images_custom_properties_disk_format:
+  raw:
+    - hw_scsi_model=virtio-scsi
+    - hw_disk_bus=scsi
+  qcow2:
+    - hw_disk_bus=virtio
+community_images_custom_properties: |
+  {{ community_images_custom_properties_default +
+      community_images_custom_properties_disk_format[community_images_disk_format]
+  }}
+
+# Additional images - usually won't need overriding
+community_images_extra: {}
+
+community_images: "{{ community_images_default | combine(community_images_extra) }}"

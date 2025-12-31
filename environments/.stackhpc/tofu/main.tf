@@ -20,17 +20,6 @@ variable "cluster_name" {
   description = "Name for cluster, used as prefix for resources - set by environment var in CI"
 }
 
-variable "os_version" {
-  type        = string
-  description = "RL8 or RL9"
-  default     = "RL9"
-}
-
-variable "cluster_image" {
-  description = "single image for all cluster nodes, keyed by os_version - a convenience for CI"
-  type        = map(string)
-}
-
 # tflint-ignore: terraform_typed_variables
 variable "cluster_networks" {}
 
@@ -60,11 +49,6 @@ variable "volume_backed_instances" {
   default = false
 }
 
-data "openstack_images_image_v2" "cluster" {
-  name        = var.cluster_image[var.os_version]
-  most_recent = true
-}
-
 module "cluster" {
   source = "../../site/tofu/"
 
@@ -72,7 +56,6 @@ module "cluster" {
   cluster_networks    = var.cluster_networks
   vnic_types          = var.vnic_types
   key_pair            = "slurm-app-ci"
-  cluster_image_id    = data.openstack_images_image_v2.cluster.id
   control_node_flavor = var.control_node_flavor
 
   login = {

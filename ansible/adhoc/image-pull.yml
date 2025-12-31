@@ -1,0 +1,17 @@
+- hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Ensure images exist on cloud
+      ansible.builtin.include_role:
+        name: azimuth_cloud.azimuth_ops.community_images
+        tasks_from: upload_image_and_store_id.yml
+      loop: "{{ community_images | dict2items | list }}"
+      loop_control:
+        label: "{{ item.value.name }}"
+    - name: Write image IDs
+      ansible.builtin.copy:
+        dest: "{{ appliances_repository_root }}/environments/site/images/community_image_ids.json"
+        content: "{{ community_images_image_ids | to_nice_json }}"
+        mode: ug=rw,o=r
+      delegate_to: localhost

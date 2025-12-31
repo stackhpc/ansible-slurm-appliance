@@ -1,5 +1,5 @@
 {
-  "cluster_image": {
+  "stackhpc_image_names": {
     "RL8": "openhpc-RL8-251213-1133-31273766",
     "RL9": "openhpc-RL9-251213-1133-31273766"
   }
