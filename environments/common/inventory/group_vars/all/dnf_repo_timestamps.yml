@@ -121,6 +121,15 @@ dnf_repos_default:
       pulp_path: cvmfs-config/EL/9/x86_64
       pulp_timestamp: 20250805T130249
       repo_file: cvmfs
+  cernvmfs_eessi_cfg:
+    '8':
+      pulp_path: eessi/rhel/8/noarch
+      pulp_timestamp: 20251119T202303
+      repo_file: cvmfs-config-eessi
+    '9':
+      pulp_path: eessi/rhel/8/noarch
+      pulp_timestamp: 20251119T202303
+      repo_file: cvmfs-config-eessi
   cernvmfs_pkgs:
     '8':
       pulp_path: cvmfs/EL/8/x86_64
