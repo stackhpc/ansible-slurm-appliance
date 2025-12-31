@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   image_upload:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: ${{ github.ref }}
     env: 
       OS_CLOUD: openstack

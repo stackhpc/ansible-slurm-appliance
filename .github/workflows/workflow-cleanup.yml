@@ -26,7 +26,7 @@ permissions:
 jobs:
   ci_cluster_cleanup:
     name: ci-cluster-cleanup
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       OS_CLOUD: openstack
       CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
