@@ -4,40 +4,51 @@ dnf_repos_default:
       pulp_path: centos/8-stream/storage/x86_64/ceph-quincy
       pulp_timestamp: 20231104T015751
       repo_file: ceph
-      gpgcheck: false
     '9':
       pulp_path: centos/9-stream/storage/x86_64/ceph-reef
       pulp_timestamp: 20250617T023108
       repo_file: ceph
-      gpgcheck: false
   OpenHPC:
     '8':
       pulp_path: OpenHPC/2/EL_8
       pulp_timestamp: 20241218T154614
       repo_file: OpenHPC
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL8
     '9':
       pulp_path: OpenHPC/3/EL_9
       pulp_timestamp: 20241218T154614
       repo_file: OpenHPC
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL9
   OpenHPC-updates:
     '8':
       pulp_path: OpenHPC/2/updates/EL_8
       pulp_timestamp: 20250512T003315
       repo_file: OpenHPC
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL8
     '9':
       pulp_path: OpenHPC/3/updates/EL_9
-      pulp_timestamp: 20250510T003301
+      pulp_timestamp: 20251104T202642
       repo_file: OpenHPC
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL9
+  TurboVNC:
+    '8':
+      pulp_path: turbovnc/x86_64
+      pulp_timestamp: 20251229T140910
+      repo_file: TurboVNC
+    '9':
+      pulp_path: turbovnc/x86_64
+      pulp_timestamp: 20251229T140910
+      repo_file: TurboVNC
+  TurboVNC-source:
+    '8':
+      pulp_path: turbovnc/srpms
+      pulp_timestamp: 20251229T140910
+      repo_file: TurboVNC
+    '9':
+      pulp_path: turbovnc/srpms
+      pulp_timestamp: 20251229T140910
+      repo_file: TurboVNC
   appstream:
     '8.10':
       pulp_path: rocky/8.10/AppStream/x86_64/os
-      pulp_timestamp: 20250923T022841
+      pulp_timestamp: 20251229T145606
       repo_file: Rocky-AppStream
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9.4':
       pulp_path: rocky/9.4/AppStream/x86_64/os
       pulp_timestamp: 20241112T003151
@@ -48,118 +59,141 @@ dnf_repos_default:
       repo_file: rocky
     '9.6':
       pulp_path: rocky/9.6/AppStream/x86_64/os
-      pulp_timestamp: 20250923T031638
+      pulp_timestamp: 20251106T205505
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+    '9.7':
+      pulp_path: rocky/9.7/AppStream/x86_64/os
+      pulp_timestamp: 20251229T144024
+      repo_file: rocky
   appstream-source:
     '8.10':
-      pulp_path: rocky/8.10/AppStream/source/os
-      pulp_timestamp: 20250923T024945
+      pulp_path: rocky/8.10/AppStream/source/tree
+      pulp_timestamp: 20251229T143636
       repo_file: Rocky-Sources
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9.6':
-      pulp_path: rocky/9.6/AppStream/source/os
-      pulp_timestamp: 20250923T043546
+      pulp_path: rocky/9.6/AppStream/source/tree
+      pulp_timestamp: 20251106T210718
+      repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/AppStream/source/tree
+      pulp_timestamp: 20251229T150242
       repo_file: rocky
   baseos:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/x86_64/os
-      pulp_timestamp: 20250918T034501
+      pulp_timestamp: 20251229T145606
       repo_file: Rocky-BaseOS
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9.4':
       pulp_path: rocky/9.4/BaseOS/x86_64/os
       pulp_timestamp: 20241115T011711
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
     '9.5':
       pulp_path: rocky/9.5/BaseOS/x86_64/os
       pulp_timestamp: 20250513T031844
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
     '9.6':
       pulp_path: rocky/9.6/BaseOS/x86_64/os
-      pulp_timestamp: 20250923T045903
+      pulp_timestamp: 20251106T211545
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+    '9.7':
+      pulp_path: rocky/9.7/BaseOS/x86_64/os
+      pulp_timestamp: 20251229T151607
+      repo_file: rocky
   baseos-source:
     '8.10':
-      pulp_path: rocky/8.10/BaseOS/source/os
-      pulp_timestamp: 20250918T040529
+      pulp_path: rocky/8.10/BaseOS/source/tree
+      pulp_timestamp: 20251219T204611
       repo_file: Rocky-Sources
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9.6':
-      pulp_path: rocky/9.6/BaseOS/source/os
-      pulp_timestamp: 20250923T043546
+      pulp_path: rocky/9.6/BaseOS/source/tree
+      pulp_timestamp: 20251107T211059
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+    '9.7':
+      pulp_path: rocky/9.7/BaseOS/source/tree
+      pulp_timestamp: 20251229T150242
+      repo_file: rocky
+  cernvmfs_cfg:
+    '8':
+      pulp_path: cvmfs-config/EL/8/x86_64
+      pulp_timestamp: 20250805T130249
+      repo_file: cvmfs
+    '9':
+      pulp_path: cvmfs-config/EL/9/x86_64
+      pulp_timestamp: 20250805T130249
+      repo_file: cvmfs
+  cernvmfs_pkgs:
+    '8':
+      pulp_path: cvmfs/EL/8/x86_64
+      pulp_timestamp: 20251113T202054
+      repo_file: cvmfs
+    '9':
+      pulp_path: cvmfs/EL/9/x86_64
+      pulp_timestamp: 20251113T202054
+      repo_file: cvmfs
   crb:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/x86_64/os
-      pulp_timestamp: 20250918T034501
+      pulp_timestamp: 20251229T145606
       repo_file: Rocky-PowerTools
       repo_name: powertools
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9.4':
       pulp_path: rocky/9.4/CRB/x86_64/os
       pulp_timestamp: 20241115T003133
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
     '9.5':
       pulp_path: rocky/9.5/CRB/x86_64/os
       pulp_timestamp: 20250514T014704
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
     '9.6':
       pulp_path: rocky/9.6/CRB/x86_64/os
-      pulp_timestamp: 20250923T031638
+      pulp_timestamp: 20251107T205232
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+    '9.7':
+      pulp_path: rocky/9.7/CRB/x86_64/os
+      pulp_timestamp: 20251229T144024
+      repo_file: rocky
   crb-source:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/source/tree
-      pulp_timestamp: 20250923T125600
+      pulp_timestamp: 20251126T230532
       repo_file: Rocky-Sources
       repo_name: powertools-source
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9.6':
-      pulp_path: rocky/9.6/CRB/source/os
-      pulp_timestamp: 20250923T043546
+      pulp_path: rocky/9.6/CRB/source/tree
+      pulp_timestamp: 20251106T210718
       repo_file: rocky
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+    '9.7':
+      pulp_path: rocky/9.7/CRB/source/tree
+      pulp_timestamp: 20251203T103807
+      repo_file: rocky
   epel:
     '8':
       pulp_path: epel/8/Everything/x86_64
-      pulp_timestamp: 20250923T001717
+      pulp_timestamp: 20251230T204936
       repo_file: epel
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9':
       pulp_path: epel/9/Everything/x86_64
-      pulp_timestamp: 20250923T001717
+      pulp_timestamp: 20251230T204936
       repo_file: epel
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
-  epel-source:
-    '8':
-      pulp_path: epel/8/Everything/source
-      pulp_timestamp: 20250923T001717
-      repo_file: epel
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
-    '9':
-      pulp_path: epel/9/Everything/source
-      pulp_timestamp: 20250923T001717
-      repo_file: epel
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-9
   epel-cisco-openh264:
     '9':
       pulp_path: openh264/epel/9/x86_64/os
       pulp_timestamp: 20250925T130153
       repo_file: epel-cisco-openh264
+  epel-source:
+    '8':
+      pulp_path: epel/8/Everything/source/tree
+      pulp_timestamp: 20251230T204936
+      repo_file: epel
+    '9':
+      pulp_path: epel/9/Everything/source/tree
+      pulp_timestamp: 20251230T204936
+      repo_file: epel
   extras:
     '8.10':
       pulp_path: rocky/8.10/extras/x86_64/os
-      pulp_timestamp: 20250510T032327
+      pulp_timestamp: 20251229T145606
       repo_file: Rocky-Extras
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9.4':
       pulp_path: rocky/9.4/extras/x86_64/os
       pulp_timestamp: 20241118T002802
@@ -172,84 +206,39 @@ dnf_repos_default:
       pulp_path: rocky/9.6/extras/x86_64/os
       pulp_timestamp: 20250726T040613
       repo_file: rocky-extras
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+    '9.7':
+      pulp_path: rocky/9.7/extras/x86_64/os
+      pulp_timestamp: 20251229T144024
+      repo_file: rocky-extras
   extras-source:
     '8.10':
-      pulp_path: rocky/8.10/extras/source/os
-      pulp_timestamp: 20250828T161842
+      pulp_path: rocky/8.10/extras/source/tree
+      pulp_timestamp: 20251229T143636
       repo_file: Rocky-Sources
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-8
     '9.6':
       pulp_path: rocky/9.6/extras/source/os
       pulp_timestamp: 20250828T161842
       repo_file: rocky-extras
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+    '9.7':
+      pulp_path: rocky/9.7/extras/source/tree
+      pulp_timestamp: 20251229T150242
+      repo_file: rocky-extras
   grafana:
     '8':
       pulp_path: grafana/oss/rpm
-      pulp_timestamp: 20250917T024714
+      pulp_timestamp: 20251229T140806
       repo_file: grafana
+      timestamp: 20250615T005738
     '9':
       pulp_path: grafana/oss/rpm
-      pulp_timestamp: 20250917T024714
+      pulp_timestamp: 20251229T140806
       repo_file: grafana
   ondemand-web:
     '8':
       pulp_path: ondemand/4.0/web/el8/x86_64
-      pulp_timestamp: 20250925T130153
+      pulp_timestamp: 20251120T213358
       repo_file: ondemand-web
     '9':
       pulp_path: ondemand/4.0/web/el9/x86_64
-      pulp_timestamp: 20250925T130153
+      pulp_timestamp: 20251120T213358
       repo_file: ondemand-web
-  TurboVNC:
-    '8':
-      pulp_path: turbovnc/x86_64
-      pulp_timestamp: 20251009T091906
-      repo_file: TurboVNC
-    '9':
-      pulp_path: turbovnc/x86_64
-      pulp_timestamp: 20251009T091906
-      repo_file: TurboVNC
-  TurboVNC-source:
-    '8':
-      pulp_path: turbovnc/srpms
-      pulp_timestamp: 20251009T091906
-      repo_file: TurboVNC
-    '9':
-      pulp_path: turbovnc/srpms
-      pulp_timestamp: 20251009T091906
-      repo_file: TurboVNC
-  cernvmfs_pkgs:
-    '8':
-      pulp_path: cvmfs/EL/8/x86_64
-      pulp_timestamp: 20250816T005446
-      repo_file: cvmfs
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
-    '9':
-      pulp_path: cvmfs/EL/9/x86_64
-      pulp_timestamp: 20250816T005446
-      repo_file: cvmfs
-      gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
-  cernvmfs_cfg:
-    '8':
-      pulp_path: cvmfs-config/EL/8/x86_64
-      pulp_timestamp: 20250805T130249
-      repo_file: cvmfs
-      gpgcheck: false
-    '9':
-      pulp_path: cvmfs-config/EL/9/x86_64
-      pulp_timestamp: 20250805T130249
-      repo_file: cvmfs
-      gpgcheck: false
-  cernvmfs_eessi_cfg:
-    '8':
-      pulp_path: eessi/rhel/8/noarch
-      pulp_timestamp: 20251119T202303
-      repo_file: cvmfs-config-eessi
-      gpgcheck: false
-    '9':
-      pulp_path: eessi/rhel/8/noarch # path is a red herring - RL8/9 use the same repo
-      pulp_timestamp: 20251119T202303
-      repo_file: cvmfs-config-eessi
-      gpgcheck: false
