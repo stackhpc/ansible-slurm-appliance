@@ -228,7 +228,6 @@ dnf_repos_default:
       pulp_path: grafana/oss/rpm
       pulp_timestamp: 20251229T140806
       repo_file: grafana
-      timestamp: 20250615T005738
     '9':
       pulp_path: grafana/oss/rpm
       pulp_timestamp: 20251229T140806
