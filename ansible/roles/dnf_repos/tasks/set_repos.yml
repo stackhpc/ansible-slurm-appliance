@@ -1,21 +1,24 @@
 ---
 
-- name: Import Rocky GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
-
-- name: Import EPEL GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
-
-- name: Install OpenHPC GPG key
+- name: Create GPG key files
   ansible.builtin.copy:
-    content: "{{ openhpc_gpg_keys[ansible_distribution_major_version] }}"
-    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL{{ ansible_distribution_major_version }}"
+    dest: "{{ item.value[ansible_distribution_major_version].path }}"
+    content: |
+      {{ item.value[ansible_distribution_major_version].key }}
     owner: root
     group: root
-    mode: '0644'
+    mode: u=rw,go=r
+  loop: "{{ dnf_repos_gpg_keys | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: "'key' in item.value[ansible_distribution_major_version]"
 
-- name: Import OpenHPC GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import "/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-EL{{ ansible_distribution_major_version }}" # noqa: command-instead-of-module
+- name: Import GPG keys
+  ansible.builtin.rpm_key:
+    key: "{{ item.value[ansible_distribution_major_version].path }}"
+  loop: "{{ dnf_repos_gpg_keys | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 - name: Replace non-epel repos with Pulp repos
   ansible.builtin.yum_repository:
@@ -26,7 +29,6 @@
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
     gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
-    gpgkey: "{{ repo_values.gpgkey | default('') }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
@@ -53,7 +55,6 @@
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
     gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
-    gpgkey: "{{ repo_values.gpgkey | default('') }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
