@@ -33,6 +33,9 @@ Support FreeIPA in the appliance. In production use it is expected the FreeIPA s
   - This is implemented when using the site OpenTofu; on the control node `appliances_state_dir` defaults to `/var/lib/state` which is mounted from a volume.
   - Nodes are not re-enroled by a [Slurm-driven reimage](../../collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md) (as that does not run this role).
   - If both a backed-up keytab and `freeipa_host_password` exist, the former is used.
+  - When re-enroling, the host record in FreeIPA host record is updated with the
+    current hostkey. The `persist_hostkeys` role may be used if rebuilds/reimages
+    should not change keys.
 
 ### Role Variables for Clients
 
