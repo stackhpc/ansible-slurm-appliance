@@ -29,25 +29,25 @@ dnf_repos_default:
   TurboVNC:
     '8':
       pulp_path: turbovnc/x86_64
-      pulp_timestamp: 20251009T091906
+      pulp_timestamp: 20251229T140910
       repo_file: TurboVNC
     '9':
       pulp_path: turbovnc/x86_64
-      pulp_timestamp: 20251009T091906
+      pulp_timestamp: 20251229T140910
       repo_file: TurboVNC
   TurboVNC-source:
     '8':
       pulp_path: turbovnc/srpms
-      pulp_timestamp: 20251009T091906
+      pulp_timestamp: 20251229T140910
       repo_file: TurboVNC
     '9':
       pulp_path: turbovnc/srpms
-      pulp_timestamp: 20251009T091906
+      pulp_timestamp: 20251229T140910
       repo_file: TurboVNC
   appstream:
     '8.10':
       pulp_path: rocky/8.10/AppStream/x86_64/os
-      pulp_timestamp: 20251214T211108
+      pulp_timestamp: 20251229T145606
       repo_file: Rocky-AppStream
     '9.4':
       pulp_path: rocky/9.4/AppStream/x86_64/os
@@ -63,12 +63,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/AppStream/x86_64/os
-      pulp_timestamp: 20251215T205523
+      pulp_timestamp: 20251229T144024
       repo_file: rocky
   appstream-source:
     '8.10':
       pulp_path: rocky/8.10/AppStream/source/tree
-      pulp_timestamp: 20251214T204840
+      pulp_timestamp: 20251229T143636
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/AppStream/source/tree
@@ -76,12 +76,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/AppStream/source/tree
-      pulp_timestamp: 20251214T212049
+      pulp_timestamp: 20251229T150242
       repo_file: rocky
   baseos:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/x86_64/os
-      pulp_timestamp: 20251214T211108
+      pulp_timestamp: 20251229T145606
       repo_file: Rocky-BaseOS
     '9.4':
       pulp_path: rocky/9.4/BaseOS/x86_64/os
@@ -97,12 +97,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/BaseOS/x86_64/os
-      pulp_timestamp: 20251215T212006
+      pulp_timestamp: 20251229T151607
       repo_file: rocky
   baseos-source:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/source/tree
-      pulp_timestamp: 20251214T204840
+      pulp_timestamp: 20251219T204611
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/BaseOS/source/tree
@@ -110,7 +110,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/BaseOS/source/tree
-      pulp_timestamp: 20251214T212049
+      pulp_timestamp: 20251229T150242
       repo_file: rocky
   cernvmfs_cfg:
     '8':
@@ -133,7 +133,7 @@ dnf_repos_default:
   crb:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/x86_64/os
-      pulp_timestamp: 20251214T211108
+      pulp_timestamp: 20251229T145606
       repo_file: Rocky-PowerTools
       repo_name: powertools
     '9.4':
@@ -150,7 +150,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/CRB/x86_64/os
-      pulp_timestamp: 20251214T205707
+      pulp_timestamp: 20251229T144024
       repo_file: rocky
   crb-source:
     '8.10':
@@ -169,11 +169,11 @@ dnf_repos_default:
   epel:
     '8':
       pulp_path: epel/8/Everything/x86_64
-      pulp_timestamp: 20251215T205559
+      pulp_timestamp: 20251230T204936
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/x86_64
-      pulp_timestamp: 20251217T204105
+      pulp_timestamp: 20251230T204936
       repo_file: epel
   epel-cisco-openh264:
     '9':
@@ -183,16 +183,16 @@ dnf_repos_default:
   epel-source:
     '8':
       pulp_path: epel/8/Everything/source/tree
-      pulp_timestamp: 20251215T205559
+      pulp_timestamp: 20251230T204936
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/source/tree
-      pulp_timestamp: 20251217T204105
+      pulp_timestamp: 20251230T204936
       repo_file: epel
   extras:
     '8.10':
       pulp_path: rocky/8.10/extras/x86_64/os
-      pulp_timestamp: 20251129T221326
+      pulp_timestamp: 20251229T145606
       repo_file: Rocky-Extras
     '9.4':
       pulp_path: rocky/9.4/extras/x86_64/os
@@ -208,12 +208,12 @@ dnf_repos_default:
       repo_file: rocky-extras
     '9.7':
       pulp_path: rocky/9.7/extras/x86_64/os
-      pulp_timestamp: 20251203T103807
+      pulp_timestamp: 20251229T144024
       repo_file: rocky-extras
   extras-source:
     '8.10':
       pulp_path: rocky/8.10/extras/source/tree
-      pulp_timestamp: 20251129T214913
+      pulp_timestamp: 20251229T143636
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/extras/source/os
@@ -221,17 +221,17 @@ dnf_repos_default:
       repo_file: rocky-extras
     '9.7':
       pulp_path: rocky/9.7/extras/source/tree
-      pulp_timestamp: 20251203T103807
+      pulp_timestamp: 20251229T150242
       repo_file: rocky-extras
   grafana:
     '8':
       pulp_path: grafana/oss/rpm
-      pulp_timestamp: 20251216T213511
+      pulp_timestamp: 20251229T140806
       repo_file: grafana
       timestamp: 20250615T005738
     '9':
       pulp_path: grafana/oss/rpm
-      pulp_timestamp: 20251216T213511
+      pulp_timestamp: 20251229T140806
       repo_file: grafana
   ondemand-web:
     '8':
