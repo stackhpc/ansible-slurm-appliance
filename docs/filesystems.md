@@ -76,6 +76,8 @@ os_manila_mount_ceph_version: "18.2.4"
 and running a [site-specific image](image-build.md) with `manila` included in the
 Packer `inventory_groups` variable.
 
+
+TODO: See if I want to change this!
 For older versions the current Ceph-provided GPG key may not be correct and
 disabling the GPG check may be necessary using something like:
 
