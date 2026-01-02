@@ -14,6 +14,7 @@
   when: "'key' in item.value[ansible_distribution_major_version]"
 
 - name: Import GPG keys
+  # Don't need fingerprint as actual key hardcoded in repo
   ansible.builtin.rpm_key:
     key: "{{ item.value[ansible_distribution_major_version].path }}"
   loop: "{{ dnf_repos_gpg_keys | dict2items }}"

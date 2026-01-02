@@ -64,35 +64,17 @@ os_manila_mount_shares:
     mount_path: /scratch
 ```
 
-If you are running a different version of Ceph from the defaults in the
+If a different version of Ceph from the defaults in
 [os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount/blob/master/defaults/main.yml)
-you will need to override the package version by setting:
+is required then override the package version by setting:
 
 ```yaml
 # environments/site/inventory/group_vars/manila.yml:
 os_manila_mount_ceph_version: "18.2.4"
 ```
 
-and running a [site-specific image](image-build.md) with `manila` included in the
+and run a [site-specific image](image-build.md) with `manila` included in the
 Packer `inventory_groups` variable.
-
-
-TODO: See if I want to change this!
-For older versions the current Ceph-provided GPG key may not be correct and
-disabling the GPG check may be necessary using something like:
-
-```
-# environments/site/inventory/group_vars/all/
-dnf_repos_extra:
-  Ceph:
-    '9':
-      pulp_path: centos/9-stream/storage/x86_64/ceph-reef
-      pulp_timestamp: 20250617T023108
-      repo_file: ceph
-      gpgcheck: false
-```
-
-See `dnf_repo_timestamps.yml` and `dnf_repos.yml` in `environments/common/inventory/group_vars/all/`.
 
 ### Shared home directory
 
