@@ -8,7 +8,7 @@ The Slurm appliance supports multiple ways of configuring shared filesystems, in
 
 - Lustre
 
-=# Manila
+## Manila
 
 The Slurm appliance supports mounting shared filesystems using [CephFS](https://docs.ceph.com/en/latest/cephfs/) via [OpenStack Manila](https://docs.openstack.org/manila/latest/). This section explains:
 
@@ -18,7 +18,7 @@ The Slurm appliance supports mounting shared filesystems using [CephFS](https://
 
 - How to switch to a Manila share for a shared home directory.
 
-## Creating shares in OpenStack
+### Creating shares in OpenStack
 
 The Slurm appliance requires that the Manila shares already exist on the system. Follow the instructions below to do this.
 
@@ -39,30 +39,30 @@ openstack share create CephFS 300 --description 'Scratch dir for Slurm prod' --n
 openstack share access create slurm-production-scratch cephx slurm-production
 ```
 
-## Configuring the Slurm Appliance for Manila
+### Configuring the Slurm Appliance for Manila
 
 To mount CephFS shares provided by OpenStack Manila on nodes:
 
 1. Add the nodes to the `manila` group.
 
-```yaml
-# environments/site/inventory/groups:
-[manila:children]
-login
-compute
-```
+    ```yaml
+    # environments/site/inventory/groups:
+    [manila:children]
+    login
+    compute
+    ```
 
 2. Define the list of shares to be mounted, and the paths to mount them to. The
-example below parameterises the share name using the environment name. See the
-[stackhpc.os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount)
-for further configuration options.
+   example below parameterises the share name using the environment name. See the
+   [stackhpc.os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount)
+   for further configuration options.
 
-```yaml
-# environments/site/inventory/group_vars/manila.yml:
-os_manila_mount_shares:
-  - share_name: "slurm-{{ appliances_environment_name }}-scratch"
-    mount_path: /scratch
-```
+    ```yaml
+    # environments/site/inventory/group_vars/manila.yml:
+    os_manila_mount_shares:
+      - share_name: "slurm-{{ appliances_environment_name }}-scratch"
+        mount_path: /scratch
+    ```
 
 If a different version of Ceph from the defaults in
 [os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount/blob/master/defaults/main.yml)
@@ -73,10 +73,10 @@ is required then override the package version by setting:
 os_manila_mount_ceph_version: "18.2.4"
 ```
 
-and run a [site-specific image](image-build.md) with `manila` included in the
+and run a [site-specific image build](image-build.md) with `manila` included in the
 Packer `inventory_groups` variable.
 
-### Shared home directory
+## Shared home directory
 
 By default, the Slurm appliance configures the control node as an NFS server and exports a directory which is mounted on the other cluster nodes as `/home`. When using Manila + CephFS for the home directory instead, this will need to be disabled. To do this, set the tf var `home_volume_provisioning` to `None`.
 
