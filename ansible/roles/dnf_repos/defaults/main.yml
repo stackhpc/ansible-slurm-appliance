@@ -4,13 +4,6 @@ dnf_repos_pulp_content_url: "{{ appliances_pulp_url }}/pulp/content"
 dnf_repos_username: "{{ omit }}"
 dnf_repos_password: "{{ omit }}"
 
-# List of dicts, with:
-# path: Required str. Path to GPG key file to write/use. Generally should be
-# the same as whatever the release repo etc installs the key at.
-# key: Optional str. (must be provided it path isn't already present)
-# NB: this is not part of dnf_repos_repos to avoid having to define keys in
-# the common environment
-
 # Define GPG keys for repos handled by this role (only)
 dnf_repos_gpg_keys:
   rocky:
