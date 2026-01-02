@@ -15,8 +15,9 @@
     group: root
     mode: '0644'
 
-- name: Import RStudio GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-RStudio # noqa: command-instead-of-module
+- name: Import RStudio GPG key
+  ansible.builtin.rpm_key:
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-RStudio
 
 - name: Download RStudio Server RPM
   ansible.builtin.get_url:

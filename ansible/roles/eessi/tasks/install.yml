@@ -1,17 +1,5 @@
 ---
-
-- name: Install CVMFS GPG key
-  ansible.builtin.copy:
-    content: "{{ cvmfs_gpg_key }}"
-    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Import CVMFS GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CernVM # noqa: command-instead-of-module
-
-# cvmfs repo and eessi config provided by dnf_repos role
+# Repos and GPG keys are provided by dnf_repos role
 
 - name: Install CVMFS
   ansible.builtin.dnf:
