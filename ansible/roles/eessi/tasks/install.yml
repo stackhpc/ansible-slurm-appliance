@@ -6,6 +6,7 @@
     name: cvmfs
 
 - name: Install EESSI CVMFS config
+  # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
   ansible.builtin.dnf:
     name: cvmfs-config-eessi
     disable_gpg_check: true # Package cvmfs-config-eessi-0.5.0-1.noarch.rpm is not signed
