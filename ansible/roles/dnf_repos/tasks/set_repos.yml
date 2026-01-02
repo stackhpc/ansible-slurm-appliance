@@ -1,5 +1,26 @@
 ---
 
+- name: Create GPG key files
+  ansible.builtin.copy:
+    dest: "{{ item.value[ansible_distribution_major_version].path }}"
+    content: |
+      {{ item.value[ansible_distribution_major_version].key }}
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  loop: "{{ dnf_repos_gpg_keys | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: "'key' in item.value[ansible_distribution_major_version]"
+
+- name: Import GPG keys
+  # Don't need fingerprint as actual key hardcoded in repo
+  ansible.builtin.rpm_key:
+    key: "{{ item.value[ansible_distribution_major_version].path }}"
+  loop: "{{ dnf_repos_gpg_keys | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
 - name: Replace non-epel repos with Pulp repos
   ansible.builtin.yum_repository:
     file: "{{ repo_values.repo_file }}"
@@ -8,7 +29,7 @@
     description: "{{ repo_name }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
-    gpgcheck: false
+    gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
@@ -34,7 +55,7 @@
     description: "{{ repo_name }}"
     username: "{{ dnf_repos_username }}"
     password: "{{ dnf_repos_password }}"
-    gpgcheck: false
+    gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
