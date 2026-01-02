@@ -45,24 +45,24 @@ To mount CephFS shares provided by OpenStack Manila on nodes:
 
 1. Add the nodes to the `manila` group.
 
-    ```yaml
-    # environments/site/inventory/groups:
-    [manila:children]
-    login
-    compute
-    ```
+   ```yaml
+   # environments/site/inventory/groups:
+   [manila:children]
+   login
+   compute
+   ```
 
 2. Define the list of shares to be mounted, and the paths to mount them to. The
    example below parameterises the share name using the environment name. See the
    [stackhpc.os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount)
    for further configuration options.
 
-    ```yaml
-    # environments/site/inventory/group_vars/manila.yml:
-    os_manila_mount_shares:
-      - share_name: "slurm-{{ appliances_environment_name }}-scratch"
-        mount_path: /scratch
-    ```
+   ```yaml
+   # environments/site/inventory/group_vars/manila.yml:
+   os_manila_mount_shares:
+     - share_name: "slurm-{{ appliances_environment_name }}-scratch"
+       mount_path: /scratch
+   ```
 
 If a different version of Ceph from the defaults in
 [os-manila-mount role](https://github.com/stackhpc/ansible-role-os-manila-mount/blob/master/defaults/main.yml)
