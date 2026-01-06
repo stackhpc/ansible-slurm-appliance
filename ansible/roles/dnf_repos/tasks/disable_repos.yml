@@ -6,13 +6,14 @@
     baseurl: "{{ repo_content_url }}/{{ repo_values.pulp_path }}/{{ repo_values.pulp_timestamp }}"
     description: "{{ repo_name }}"
     enabled: false
-    gpgcheck: false
+    gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
+  when: repo_values | length > 0
   vars:
     repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
-    repo_values: "{{ item.value[repo_os] }}"
+    repo_values: "{{ item.value.get(repo_os, {}) }}"
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
 
@@ -27,5 +28,5 @@
     path: "{{ item.path }}"
     regexp: '^enabled\ ?=\ ?1'
     replace: 'enabled=0'
-    backup: true
+    backup: false # don't leak Ark credentials during image build
   loop: "{{ _dnf_repo_files.files }}"

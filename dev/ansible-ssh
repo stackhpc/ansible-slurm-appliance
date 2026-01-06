@@ -1,66 +1,64 @@
 #!/usr/bin/env python3
+"""
+SSH to a cluster host using connection properties from Ansible inventory.
 
-# This tool allows you to ssh into a host using the ansible inventory.
-# Example: ansible-ssh compute[0] -o GlobalKnownHostsFile=/dev/null -o
-# UserKnownHostsFile=/dev/null
+Usage:
+   ansible-ssh [-n] PATTERN
+
+where PATTERN can be any of:
+    - host e.g. mycluster-login-0
+    - group e.g. login
+    - group[index] e.g. compute[0]
+options:
+    -n      Disable strict host key checking and do not store accepted keys
+"""
 
 import json
 import os
 import shlex
 import subprocess
 import sys
-from collections import defaultdict
 
-
-def _optional_arg(prototype, *values):
-    # returns empty string if any of the values are falsey
-    filtered = [value for value in values if value]
-    return prototype.format(*values) if len(values) == len(filtered) else ""
-
+NO_HOSTKEY_CHECK_OPTS = [
+    '-o', 'StrictHostKeyChecking=no',
+    '-o', 'GlobalKnownHostsFile=/dev/null',
+    '-o', 'UserKnownHostsFile=/dev/null'
+]
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        msg = (
-            f"Usage: {
-                sys.argv[0]} <inventory_hostname> [args to pass to ssh]")
-        print(msg, file=sys.stderr)
+    no_known_hosts = '-n' in sys.argv
+    if sys.argv[-1] in (sys.argv[0], '-n'):
+        print(__doc__, file=sys.stderr)
         sys.exit(-1)
 
-    # Quote to prevent shell injection
-    host = shlex.quote(sys.argv[1])
+    pattern = sys.argv[-1]
 
+    template_str = ("ssh "
+                   "{% if ansible_ssh_port | default(false) %}-p {{ ansible_ssh_port }} {% endif %}"
+                   "{% if ansible_ssh_private_key_file | default(false) %} -i {{ ansible_ssh_private_key_file }} {% endif %}"
+                   "{{ ansible_ssh_common_args | default('') }} "
+                   "{{ ansible_user }}@{{ ansible_host }}")
+    module_args = json.dumps({'msg':template_str})
+    ansible_cmd = ['ansible', pattern, '-o', '-m', 'debug', '-a', module_args]
     try:
-        output = subprocess.check_output(
-            f'ansible-inventory --host {host}', shell=True)
-    except (subprocess.CalledProcessError) as e:
-        msg = (f"[ERROR]: Is {host} missing from the inventory?")
+        output = subprocess.check_output(ansible_cmd, text=True)
+    except (subprocess.CalledProcessError):
+        msg = ("[ERROR]: ansible exited in error")
         print(msg, file=sys.stderr)
         sys.exit(-1)
+    # output looks like e.g.
+    # stg-login-0 | SUCCESS => {    "changed": false,    ...
+    # one line per host
+    if not output:
+        sys.exit(1)
+    result = output.splitlines()[0].split('>', 1)[-1]
+    expanded = json.loads(result)['msg']
+    # can assume ansible_host exists b/c defined by terraform
+    # can assume ansible_user exists b/c defined in common inventory
 
-    meta = defaultdict(str, json.loads(output))
+    cmd = shlex.split(expanded)
+    if no_known_hosts:
+        cmd = cmd[0:1] + NO_HOSTKEY_CHECK_OPTS + cmd[1:]
 
-    ansible_ssh_host = meta['ansible_ssh_host'] or meta['ansible_host']
-    ansible_ssh_user = meta['ansible_ssh_user'] or meta['ansible_user']
-    ansible_ssh_port = meta['ansible_ssh_port']
-    ansible_ssh_private_key_file = meta['ansible_ssh_private_key_file']
-
-    port = _optional_arg("-p {}", ansible_ssh_port)
-    identity = _optional_arg("-i {}", ansible_ssh_private_key_file)
-    host = _optional_arg("{}@{}", ansible_ssh_user, ansible_ssh_host)
-    opts = meta['ansible_ssh_common_args']
-
-    # Handle case where user is not set
-    if not host:
-        host = ansible_ssh_host
-
-    if not host:
-        # if we get here, "ansible_ssh_host" is not set.
-        msg = f"Could not determine the host"
-        print(msg, file=sys.stderr)
-        sys.exit(-1)
-
-    base = shlex.split(f'ssh {port} {identity} {opts}')
-    extras = sys.argv[2:]
-    cmd = base + extras + [host]
     print(f"[INFO]: Running: {subprocess.list2cmdline(cmd)}")
     os.execvp(cmd[0], cmd)

@@ -12,11 +12,12 @@ openondemand_servername: "{{ hostvars[groups['openondemand'].0].ansible_host if 
 
 openondemand_auth: basic_pam
 
-openondemand_jupyter_partition: "{{ openhpc_partitions[0]['name'] }}"
-openondemand_desktop_partition: "{{ openhpc_partitions[0]['name'] }}"
-openondemand_rstudio_partition: "{{ openhpc_partitions[0]['name'] }}"
+# Manages case where openhpc_partitions are not defined e.g. for site image builds
+openondemand_jupyter_partition: "{{ openhpc_partitions[0].name | default('') }}"
+openondemand_desktop_partition: "{{ openhpc_partitions[0].name | default('') }}"
+openondemand_rstudio_partition: "{{ openhpc_partitions[0].name | default('') }}"
 openondemand_matlab_partition: '' # Requires target site to already have MATLAB so set to empty
-openondemand_codeserver_partition: "{{ openhpc_partitions[0]['name'] }}"
+openondemand_codeserver_partition: "{{ openhpc_partitions[0].name | default('') }}"
 
 # Regex defining hosts which openondemand can proxy; the default regex is compute nodes (for apps) and grafana host,
 # e.g. if the group `compute` has hosts `compute-{0,1,2,..}` this will be '(compute-\d+)|(control)'.
@@ -33,7 +34,9 @@ openondemand_dashboard_links_grafana:
     url: "{{ grafana_url_openondemand_proxy }}"
 openondemand_dashboard_links: "{{ openondemand_dashboard_links_grafana if groups['grafana'] | length > 0 }}"
 
-openondemand_login_host: localhost
+# For FreeIPA-enroled hosts, the shell host must be an IPA-registered host to avoid an ssh key prompt
+# so do not use localhost:
+openondemand_login_host: "{{ inventory_hostname }}"
 
 openondemand_clusters:
   slurm:
@@ -119,19 +122,33 @@ openondemand_apps_desktop_default:
   cluster: slurm
   form:
     - desktop
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - num_cores
+    - gres
+    - gres_count
     - node
   attributes:
     desktop: xfce
-    # bc_account: # i.e. slurm account
-    #   value: root
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_desktop_partition | default(none) }}"
     num_cores:
       label: Number of cores
       value: 1
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
     node:
       label: Node name
       help: Select a particular node or leave empty to let Slurm pick the next available
@@ -141,9 +158,16 @@ openondemand_apps_desktop_default:
     script:
       job_name: "ood-desktop"
       native:
+        - "--partition"
+        - "<%= auto_queues %>"
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
+        <% if node != '' %>
         - <%= "--nodelist=#{node}" %>
+        <% end %>
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 openondemand_apps_desktop: "{{ {'bc_desktop':openondemand_apps_desktop_default} if openondemand_desktop_partition | default(none) else {} }}"
 
 # yamllint disable-line rule:line-length
@@ -155,19 +179,38 @@ openondemand_apps_jupyter_default:
   form:
     - modules
     - extra_jupyter_args
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - num_cores
+    - gres
+    - gres_count
     - node
   attributes: # TODO
     num_cores:
       label: Number of cores
       value: 1
     modules: ""
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
+    node:
+      label: Node name
+      help: Select a particular node or leave empty to let Slurm pick the next available
+      value: ""
     extra_jupyter_args: ""
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_jupyter_partition | default(none) }}"
-    node: ""
   submit: |
     ---
     batch_connect:
@@ -179,9 +222,16 @@ openondemand_apps_jupyter_default:
     script:
       job_name: "ood-jupyter"
       native:
+        - "--partition"
+        - "<%= auto_queues %>"
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
+        <% if node != '' %>
         - <%= "--nodelist=#{node}" %>
+        <% end %>
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 openondemand_apps_jupyter: "{{ {'jupyter':openondemand_apps_jupyter_default} if openondemand_jupyter_partition | default(none) else {} }}"
 
 openondemand_apps_rstudio_default:
@@ -189,7 +239,7 @@ openondemand_apps_rstudio_default:
   description: Request a RStudio server
   cluster: slurm
   attributes:
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_rstudio_partition | default(none) }}"
     rstudio_module:
       label: RStudio module
@@ -233,15 +283,30 @@ openondemand_apps_rstudio_default:
     bc_email_on_started: false
     auto_modules_RStudio-Server:
       default: false
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
   form:
-    - bc_queue
-    - rstudio_module
     - auto_queues
+    - rstudio_module
     - extra_modules_script
     - cores
     - ram
     - bc_num_hours
     - bc_email_on_started
+    - gres
+    - gres_count
   submit: |
     ---
     batch_connect:
@@ -252,7 +317,7 @@ openondemand_apps_rstudio_default:
     script:
       native:
         - "--partition"
-        - "<%= bc_queue %>"
+        - "<%= auto_queues %>"
         - "--ntasks"
         - "1"
         - "--mem"
@@ -261,6 +326,9 @@ openondemand_apps_rstudio_default:
         - "<%= cores.blank? ? 1 : cores.to_i %>"<% if auto_queues.start_with?("gpu") %>
         - "--gpus-per-task"
         - "1"<% end %>
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 openondemand_apps_rstudio: "{{ {'rstudio':openondemand_apps_rstudio_default} if openondemand_rstudio_partition | default(none) else {} }}"
 
 openondemand_apps_matlab_default:
@@ -269,16 +337,18 @@ openondemand_apps_matlab_default:
   cluster: slurm
   form:
     - desktop
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - matlab_module
     - cores
     - ram
+    - gres
+    - gres_count
   attributes:
     desktop: xfce
     # bc_account: # i.e. slurm account
     #   value: root
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_matlab_partition | default(none) }}"
     matlab_module:
       label: MATLAB module
@@ -314,19 +384,36 @@ openondemand_apps_matlab_default:
       step: 1
       value: 30
       cachable: true
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
   submit: |
     ---
     script:
       job_name: "ood-matlab"
       native:
         - "--partition"
-        - "<%= bc_queue %>"
+        - "<%= auto_queues %>"
         - "--ntasks"
         - "1"
         - "--mem"
         - "<%= ram.blank? ? 4 : ram.to_i %>G"
         - "--cpus-per-task"
         - "<%= cores.blank? ? 1 : cores.to_i %>"
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 openondemand_apps_matlab: "{{ {'matlab':openondemand_apps_matlab_default} if openondemand_matlab_partition | default(none) else {} }}"
 
 openondemand_apps_codeserver_default:
@@ -334,7 +421,7 @@ openondemand_apps_codeserver_default:
   description: Request a Code Server
   cluster: slurm
   form:
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - codeserver_module
     - cores
@@ -348,7 +435,7 @@ openondemand_apps_codeserver_default:
       widget: select
       options:
         - ["Code Server v{{ openondemand_code_server_version}}", "code-server/{{ openondemand_code_server_version }}"]
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_codeserver_partition | default(none) }}"
     cores:
       label: Number of CPU cores
@@ -385,7 +472,7 @@ openondemand_apps_codeserver_default:
       job_name: "ood-codeserver"
       native:
         - "--partition"
-        - "<%= bc_queue %>"
+        - "<%= auto_queues %>"
         - "--ntasks"
         - "1"
         - "--mem"

@@ -1,19 +1,5 @@
 ---
-
-- name: Download Cern GPG key
-  # checkov:skip=CKV2_ANSIBLE_2: "Ensure that HTTPS url is used with get_url"
-  ansible.builtin.get_url:
-    url: https://cvmrepo.web.cern.ch/cvmrepo/yum/RPM-GPG-KEY-CernVM-2048
-    dest: ./cvmfs-key.gpg
-    checksum: "{{ cvmfs_gpg_checksum }}"
-    mode: "0644"
-
-- name: Import downloaded GPG key # noqa: no-changed-when
-  ansible.builtin.command: rpm --import cvmfs-key.gpg # noqa: command-instead-of-module
-
-- name: Add CVMFS repo
-  ansible.builtin.dnf:
-    name: "https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-{{ cvmfs_release_version }}.noarch.rpm"
+# Repos and GPG keys are provided by dnf_repos role
 
 - name: Install CVMFS
   ansible.builtin.dnf:
@@ -22,15 +8,5 @@
 - name: Install EESSI CVMFS config
   # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
   ansible.builtin.dnf:
-    name: https://github.com/EESSI/filesystem-layer/releases/download/latest/cvmfs-config-eessi-latest.noarch.rpm
-    # NOTE: Can't find any docs on obtaining gpg key - maybe downloading directly from github is ok?
-    disable_gpg_check: true
-
-# Alternative version using official repo - still no GPG key :(
-# - name: Add EESSI repo
-#   ansible.builtin.dnf:
-#     name: http://repo.eessi-infra.org/eessi/rhel/8/noarch/eessi-release-0-1.noarch.rpm
-
-# - name: Install EESSI CVMFS config
-#   ansible.builtin.dnf:
-#     name: cvmfs-config-eessi
+    name: cvmfs-config-eessi
+    disable_gpg_check: true # Package cvmfs-config-eessi-0.5.0-1.noarch.rpm is not signed

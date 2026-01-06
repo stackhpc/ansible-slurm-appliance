@@ -18,12 +18,10 @@
   ansible.posix.synchronize:
     src: "{{ item.src }}"
     dest: "/etc/ansible-init/playbooks/{{ item.dest }}"
-    archive: false
+    archive: true
     rsync_opts:
       - "-p"
       - "--chmod=D770,F644"
-      - "--owner=root"
-      - "--group=root"
     recursive: true
     use_ssh_args: true
   become: true
@@ -53,6 +51,8 @@
     - src: ../../lustre
       dest: roles/
     - src: ../../nhc
+      dest: roles/
+    - src: ../../eessi
       dest: roles/
 
 - name: Add filter_plugins to ansible.cfg
