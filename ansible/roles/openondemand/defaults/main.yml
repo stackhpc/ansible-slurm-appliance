@@ -102,8 +102,9 @@ openondemand_osc_ood_defaults:
   ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
   httpd_auth: "{{ openondemand_auth_defaults[openondemand_auth | lower].httpd_auth }}"
 
-  # Use repo file provided by dnf_repos by default
+  # Use gpgkey and repo file provided by dnf_repos by default:
   ood_use_existing_repo_file: true
+  rpm_repo_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-ondemand
 
 # Apps:
 openondemand_code_server_version: 4.102.2
