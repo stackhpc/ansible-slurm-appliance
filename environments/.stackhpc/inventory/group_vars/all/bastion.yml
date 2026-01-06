@@ -4,9 +4,9 @@ bastion_config:
   ARCUS:
     user: slurm-app-ci
     ip: 128.232.222.183
-  LEAFCLOUD:
+  LEAFCLOUD: # https://github.com/stackhpc/leafcloud-slurm-jumphost
     user: slurm-app-ci
-    ip: 195.114.30.222
+    ip: 45.135.59.32
   SMS:
     user: slurm-app-ci
     ip: 185.45.78.150
