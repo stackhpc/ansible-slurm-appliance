@@ -131,18 +131,9 @@
       when: "'openhpc' in group_names"
 
     # - import_playbook: portal.yml
-    - name: Open OnDemand server (packages)
+    - name: Install Open OnDemand server and apps
       ansible.builtin.include_role:
-        name: osc.ood
-        tasks_from: install-package.yml
-        vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
-      when: "'openondemand' in group_names"
-
-    - name: Open OnDemand server (apps)
-      ansible.builtin.include_role:
-        name: osc.ood
-        tasks_from: install-apps.yml
-        vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
+        name: openondemand
       when: "'openondemand' in group_names"
 
     - name: Open OnDemand remote desktop # Used for plain desktop and matlab
