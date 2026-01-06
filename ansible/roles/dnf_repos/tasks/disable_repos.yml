@@ -6,7 +6,7 @@
     baseurl: "{{ repo_content_url }}/{{ repo_values.pulp_path }}/{{ repo_values.pulp_timestamp }}"
     description: "{{ repo_name }}"
     enabled: false
-    gpgcheck: false
+    gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
   loop: "{{ dnf_repos_repos | dict2items }}"
   loop_control:
     label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
@@ -28,5 +28,5 @@
     path: "{{ item.path }}"
     regexp: '^enabled\ ?=\ ?1'
     replace: 'enabled=0'
-    backup: true
+    backup: false # don't leak Ark credentials during image build
   loop: "{{ _dnf_repo_files.files }}"
