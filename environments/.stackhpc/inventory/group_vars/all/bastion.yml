@@ -14,4 +14,4 @@ bastion_config:
 bastion_user: "{{ bastion_config[ci_cloud].user }}"
 bastion_ip: "{{ bastion_config[ci_cloud].ip }}"
 ansible_ssh_private_key_file: "~/.ssh/id_rsa" # as per Packer vars
-ansible_ssh_common_args: '-o IdentitiesOnly=yes -o ProxyCommand="ssh -i {{ ansible_ssh_private_key_file }} {{ bastion_user }}@{{ bastion_ip }} -W %h:%p"'
+ansible_ssh_common_args: "-o IdentitiesOnly=yes -o ProxyCommand='ssh -i {{ ansible_ssh_private_key_file }} {{ bastion_user }}@{{ bastion_ip }} -W %h:%p'"
