@@ -72,10 +72,6 @@ jobs:
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
         shell: bash
 
-      - name: Test bastion
-        run: ssh -i /home/runner/.ssh/id_rsa slurm-app-ci@45.135.59.32
-        shell: bash
-
       - name: Install ansible etc
         run: dev/setup-env.sh
 
