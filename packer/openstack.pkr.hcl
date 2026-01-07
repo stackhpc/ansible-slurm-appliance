@@ -210,7 +210,7 @@ build {
     extra_arguments = [
       "--limit", "builder", # prevent running against real nodes, if in inventory!
       "-i", "${var.repo_root}/packer/ansible-inventory.sh",
-      "-vv",
+      "-vvv",
       "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
       ]
   }
