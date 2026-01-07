@@ -64,6 +64,7 @@ jobs:
           mkdir ~/.ssh
           echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
+          ssh-keygen -f ~/.ssh/id_rsa -y
         shell: bash
 
       - name: Add bastion's ssh key to known_hosts
