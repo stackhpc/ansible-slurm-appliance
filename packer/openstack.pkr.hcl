@@ -72,11 +72,6 @@ variable "ssh_keypair_name" {
   default = null
 }
 
-variable "ssh_agent_auth" {
-  type = bool
-  default = null
-}
-
 variable "security_groups" {
   type = list(string)
   default = []
@@ -99,11 +94,6 @@ variable "ssh_bastion_username" {
 
 variable "ssh_bastion_private_key_file" {
   type = string
-  default = null
-}
-
-variable "ssh_bastion_agent_auth" {
-  type = bool
   default = null
 }
 
@@ -196,11 +186,9 @@ source "openstack" "openhpc" {
   ssh_timeout = "20m"
   ssh_private_key_file = var.ssh_private_key_file
   ssh_keypair_name = var.ssh_keypair_name # TODO: doc this
-  ssh_agent_auth = var.ssh_agent_auth
   ssh_bastion_host = var.ssh_bastion_host
   ssh_bastion_username = var.ssh_bastion_username
   ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
-  ssh_bastion_agent_auth = var.ssh_bastion_agent_auth
   
   # Output image:
   image_disk_format = var.image_disk_format

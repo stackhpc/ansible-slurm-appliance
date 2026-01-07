@@ -62,8 +62,8 @@ jobs:
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_ssh
-          chmod 0600 ~/.ssh/id_ssh
+          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
         shell: bash
 
       - name: Add bastion's ssh key to known_hosts
@@ -90,8 +90,6 @@ jobs:
           set -x
           . venv/bin/activate
           . environments/.stackhpc/activate
-          eval $(ssh-agent)
-          ssh-add ~/.ssh/id_ssh
           cd packer/
           packer init .
 
