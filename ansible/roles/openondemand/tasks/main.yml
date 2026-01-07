@@ -1,16 +1,16 @@
 ---
+
+# Want to run specific playbooks from osc.ood role so need to replicate its
+# tasks/main:include_vars but with this vars defaults overriding them:
+- name: Include distribution variables
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/roles/osc.ood/vars/Rocky/{{ ansible_distribution_major_version }}.yml"
+
 - name: Set osc.ood variables from this role's defaults if no overriding inventory var
   ansible.builtin.set_fact:
     "{{ item.key }}": "{{ lookup('vars', item.key, default=item.value) }}"
   loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
   when: (item.key in hostvars[inventory_hostname]) or (item.value)
-
-# osc.ood variables are exposed to play here instead of setting 'public' in include role so that they will still be exposed during runtime
-- ansible.builtin.include_vars:
-    dir: "{{ playbook_dir }}/roles/osc.ood/defaults/main"
-
-- ansible.builtin.include_vars:
-    file: "{{ playbook_dir }}/roles/osc.ood/vars/Rocky/{{ ansible_distribution_major_version }}.yml"
 
 # if using PAM auth we need apache installed but NOT started so split the osc.ood role up:
 - ansible.builtin.include_role:
