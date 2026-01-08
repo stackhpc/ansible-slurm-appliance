@@ -79,6 +79,10 @@ jobs:
           EOF
         shell: bash
 
+      - name: Ensure Ansible bastion definitions are from **current** branch
+        run: git checkout ${{ github.head_ref || github.ref_name }} -- environments/.stackhpc/inventory/group_vars/all/bastion.yml
+        shell: bash
+
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
