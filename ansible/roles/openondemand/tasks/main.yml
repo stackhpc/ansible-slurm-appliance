@@ -1,16 +1,16 @@
 ---
+
+# Want to run specific playbooks from osc.ood role so need to replicate its
+# tasks/main:include_vars but with this vars defaults overriding them:
+- name: Include distribution variables
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/roles/osc.ood/vars/Rocky/{{ ansible_distribution_major_version }}.yml"
+
 - name: Set osc.ood variables from this role's defaults if no overriding inventory var
   ansible.builtin.set_fact:
     "{{ item.key }}": "{{ lookup('vars', item.key, default=item.value) }}"
   loop: "{{ openondemand_osc_ood_defaults | dict2items }}"
   when: (item.key in hostvars[inventory_hostname]) or (item.value)
-
-# osc.ood variables are exposed to play here instead of setting 'public' in include role so that they will still be exposed during runtime
-- ansible.builtin.include_vars:
-    dir: "{{ playbook_dir }}/roles/osc.ood/defaults/main"
-
-- ansible.builtin.include_vars:
-    file: "{{ playbook_dir }}/roles/osc.ood/vars/Rocky/{{ ansible_distribution_major_version }}.yml"
 
 # if using PAM auth we need apache installed but NOT started so split the osc.ood role up:
 - ansible.builtin.include_role:
@@ -24,139 +24,11 @@
     file: pam_auth.yml
   when: openondemand_auth | lower == 'basic_pam'
 
-- ansible.builtin.include_tasks:
-    file: config_changes.yml
-
-# The configure.yml playbook needs vars from Rocky (for nginx) and main if using OIDC auth. However vars_from doensn't take a list.
-# include_vars doens't interpolate from role vars, so we use that for main.yml which only requires things we override in the appliance inventory
-# and use vars_from for Rocky which requires interpolation from role vars.
-# - include_vars:
-#     file: roles/osc.ood/vars/main.yml
-
-- ansible.builtin.include_role:
-    name: osc.ood
-    tasks_from: configure.yml
-    vars_from: main.yml
-    public: true
-
-- name: Get GRES information
-  ansible.builtin.command:
-    cmd: sinfo --noheader --format "%R %G" # can't use , or : as separator
-  changed_when: true
-  register: _openondemand_sinfo_gres
-
 - ansible.builtin.include_role:
     name: osc.ood
     tasks_from: install-apps.yml
-  when: ood_install_apps
+  when: appliances_mode != 'configure'
 
-- ansible.builtin.include_role:
-    name: osc.ood
-    tasks_from: apps.yml
-    # vars_from: Rocky.yml
-  when: ood_apps
-
-- name: Ensure post_tasks dirs exists
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: "0755"
-  loop:
-    # - /etc/ood/config/apps/dashboard/initializers
-    - /etc/ood/config/locales
-    - /etc/ood/config/announcements.d
-    - /etc/ood/config/pun/html
-
-- name: Create dashboard additional config directory
-  ansible.builtin.file:
-    path: /etc/ood/config/apps/dashboard/initializers
-    state: directory
-    recurse: true
-    owner: root
-    mode: o=rwX,go=rX
-
-- name: Create additional shortcuts in Files app
-  ansible.builtin.template:
-    src: files_shortcuts.rb.j2
-    dest: /etc/ood/config/apps/dashboard/initializers/ood.rb
-    owner: root
-    mode: o=rw,go=r
-  when: openondemand_filesapp_paths
-
-- name: Create job template directory
-  ansible.builtin.file:
-    path: "/etc/ood/config/apps/myjobs/templates/"
-    state: directory
-    recurse: true
-    owner: root
-    group: root
-    mode: o=rwX,go=rX
-
-- name: Copy web page to let users create their home directory
-  ansible.builtin.copy:
-    src: missing_home_directory.html
-    dest: /etc/ood/config/pun/html/missing_home_directory.html
-    mode: "0644"
-
-- name: Create mapping directory
-  ansible.builtin.file:
-    path: /etc/grid-security
-    state: directory
-    owner: root
-    group: apache
-    mode: u=rwX,g=rX,o=
-  when: openondemand_mapping_users
-
-- name: Create mapping file
-  ansible.builtin.template:
-    dest: /etc/grid-security/grid-mapfile
-    src: grid-mapfile.j2
-    owner: root
-    group: apache
-    mode: u=rw,g=r,o=
-  when: openondemand_mapping_users
-
-- name: Create app directories for dashboard links
-  ansible.builtin.file:
-    path: /var/www/ood/apps/sys/{{ item.app_name | default(item.name) }}
-    state: directory
-    mode: "0755"
-  loop: "{{ openondemand_dashboard_links }}"
-
-- name: Create app manifests for dashboard links
-  ansible.builtin.template:
-    src: dashboard_app_links.yml.j2
-    dest: /var/www/ood/apps/sys/{{ item.app_name | default(item.name) }}/manifest.yml
-    mode: "0644"
-  loop: "{{ openondemand_dashboard_links }}"
-
-# - name: Ensure ondemand-dex is running and active
-#   service:
-#     name: ondemand-dex
-#     enabled: yes
-#     state: stopped
-#   when: false
-
-# - name: Copy site images
-#   copy:
-#     src: ansible/roles/openondemand/ondemand
-#     dest: "{{ item }}"
-#   loop:
-#     - /var/www/ood/public
-#     - /usr/share/ondemand-dex/web/themes/
-
-- name: Keyscan login host
-  ansible.builtin.command:
-    cmd: "ssh-keyscan {{ openondemand_clusters.slurm.v2.login.host }}"
-  register: _openondemand_login_key
-  changed_when: false
-
-- name: Add login hostkeys to known hosts
-  ansible.builtin.blockinfile:
-    path: /etc/ssh/ssh_known_hosts
-    create: true
-    block: "{{ _openondemand_login_key.stdout_lines | sort | join('\n') }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: openondemand login host" # allows other tasks to use blockinfile on this file
-    owner: root
-    group: root
-    mode: o=rw,go=r
+- ansible.builtin.include_tasks:
+    file: configure.yml
+  when: appliances_mode != 'build'
