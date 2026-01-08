@@ -54,6 +54,7 @@ jobs:
       CI_CLOUD: ${{ github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'false' && 'abort' || vars.PACKER_ON_ERROR }}
 
     steps:
       - uses: actions/checkout@v4
@@ -84,7 +85,7 @@ jobs:
       - name: Record settings
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
-          echo cleanup_on_failure: ${{ github.event.inputs.cleanup_on_failure  }}
+          echo PACKER_ON_ERROR: ${{ env.PACKER_ON_ERROR}}
           echo "FAT_IMAGES: ${FAT_IMAGES}"
 
       - name: Setup ssh
@@ -124,7 +125,7 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }} \
+          -on-error=${{ env.PACKER_ON_ERROR }} \
           -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
