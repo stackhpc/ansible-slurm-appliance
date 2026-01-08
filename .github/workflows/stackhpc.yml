@@ -69,10 +69,11 @@ jobs:
           mkdir ~/.ssh
           echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
+          ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
 
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
+      - name: Add bastion ssh fingerprints to known_hosts
+        run: echo ${{ vars.BASTION_FINGERPRINTS }} >> ~/.ssh/known_hosts
         shell: bash
 
       - uses: actions/setup-python@v6
