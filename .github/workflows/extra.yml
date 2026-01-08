@@ -69,6 +69,8 @@ jobs:
 
       - name: Record settings
         run: |
+          echo "Raw ci_cloud input: ${{ github.event.inputs.ci_cloud }}"
+          echo "Raw cleanup input: ${{ github.event.inputs.cleanup_on_failure }}"
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
           echo cleanup_on_failure: ${{ github.event.inputs.cleanup_on_failure  }}
           echo "FAT_IMAGES: ${FAT_IMAGES}"
