@@ -184,7 +184,12 @@ jobs:
           . environments/.stackhpc/activate
           cd "$STACKHPC_TF_DIR"
           tofu init
-          tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
+          max_retries=3
+          delay=30
+          for i in $(seq 1 $max_retries); do
+            tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" && break
+            [ "$i" -lt "$max_retries" ] && sleep $delay || exit 1
+          done
           
       - name: Configure cluster using current branch
         run: |
