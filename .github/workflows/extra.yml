@@ -98,7 +98,10 @@ jobs:
         shell: bash
 
       - name: Add bastion ssh fingerprints to known_hosts
-        run: echo ${{ vars.BASTION_FINGERPRINTS }} >> ~/.ssh/known_hosts
+        run: |
+          cat >> ~/.ssh/known_hosts << 'EOF'
+          ${{ vars.BASTION_FINGERPRINTS }}
+          EOF
         shell: bash
 
       - name: Install ansible etc
