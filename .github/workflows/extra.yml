@@ -19,7 +19,7 @@ on:
             - LEAFCLOUD
             - SMS
             - ARCUS
-          default: default # Use repo CI_CLOUD setting
+          default: default # Use repo CI_CLOUD setting or PR label
         cleanup_on_failure:
           description: Cleanup Packer resources on failure
           type: boolean
@@ -66,6 +66,20 @@ jobs:
             cat environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
             echo EOF
           } >> "$GITHUB_ENV"
+
+      - name: Override CI_CLOUD if PR label is present
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          # Iterate over the labels
+          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
+          echo "$labels"
+          for label in $labels; do
+             if [[ $label == CI_CLOUD=* ]]; then
+              # Extract the value after 'CI_CLOUD='
+              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
+            fi
+          done
 
       - name: Record settings
         run: |
