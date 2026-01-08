@@ -8,6 +8,23 @@ name: Test extra build
 on:
   workflow_call:
   workflow_dispatch:
+      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
+      inputs:
+        ci_cloud:
+          description: 'Select the CI_CLOUD'
+          required: true
+          type: choice
+          options:
+            - default
+            - LEAFCLOUD
+            - SMS
+            - ARCUS
+          default: default # Use repo CI_CLOUD setting
+        cleanup_on_failure:
+          description: Cleanup Packer resources on failure
+          type: boolean
+          required: true
+          default: true
 
 permissions:
   contents: read
@@ -34,7 +51,7 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -53,6 +70,7 @@ jobs:
       - name: Record settings
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo cleanup_on_failure: ${{ github.event.inputs.cleanup_on_failure  }}
           echo "FAT_IMAGES: ${FAT_IMAGES}"
 
       - name: Setup ssh
@@ -61,6 +79,7 @@ jobs:
           mkdir ~/.ssh
           echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
+          ssh-keygen -f ~/.ssh/id_rsa -y
         shell: bash
 
       - name: Add bastion's ssh key to known_hosts
@@ -91,7 +110,7 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ vars.PACKER_ON_ERROR }} \
+          -on-error=${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }} \
           -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
