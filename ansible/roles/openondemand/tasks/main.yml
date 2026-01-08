@@ -117,7 +117,7 @@
   # Can be dropped once on a version including https://github.com/OSC/ood-ansible/pull/272
   ansible.builtin.systemd:
     name: ondemand-dex
-    enabled: yes
+    enabled: true
     state: restarted
   when: openondemand_auth | lower == "dex"
 
