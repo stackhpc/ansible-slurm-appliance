@@ -67,24 +67,6 @@
     dest: /etc/ood/config/pun/html/missing_home_directory.html
     mode: "0644"
 
-- name: Create mapping directory
-  ansible.builtin.file:
-    path: /etc/grid-security
-    state: directory
-    owner: root
-    group: apache
-    mode: u=rwX,g=rX,o=
-  when: openondemand_mapping_users
-
-- name: Create mapping file
-  ansible.builtin.template:
-    dest: /etc/grid-security/grid-mapfile
-    src: grid-mapfile.j2
-    owner: root
-    group: apache
-    mode: u=rw,g=r,o=
-  when: openondemand_mapping_users
-
 - name: Create app directories for dashboard links
   ansible.builtin.file:
     path: /var/www/ood/apps/sys/{{ item.app_name | default(item.name) }}
@@ -99,12 +81,13 @@
     mode: "0644"
   loop: "{{ openondemand_dashboard_links }}"
 
-# - name: Ensure ondemand-dex is running and active
-#   service:
-#     name: ondemand-dex
-#     enabled: yes
-#     state: stopped
-#   when: false
+- name: Ensure ondemand-dex is running/enabled/restarted for config changes
+  # Can be dropped once on a version including https://github.com/OSC/ood-ansible/pull/272
+  ansible.builtin.systemd:
+    name: ondemand-dex
+    enabled: true
+    state: restarted
+  when: openondemand_auth | lower == "dex"
 
 # - name: Copy site images
 #   copy:
