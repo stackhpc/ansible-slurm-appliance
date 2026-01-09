@@ -21,9 +21,19 @@
   when: appliances_mode != 'configure'
   # can't set vars: from a dict hence the workaround above
 
-- ansible.builtin.include_tasks:
+- name: Install Apache PAM module
+  ansible.builtin.dnf:
+    name: mod_authnz_pam
+  when:
+    - openondemand_auth | lower == 'basic_pam'
+    - appliances_mode != 'configure'
+
+- name: Configure PAM
+  ansible.builtin.include_tasks:
     file: pam_auth.yml
-  when: openondemand_auth | lower == 'basic_pam'
+  when:
+    - openondemand_auth | lower == 'basic_pam'
+    - appliances_mode != 'build'
 
 - ansible.builtin.include_role:
     name: osc.ood
