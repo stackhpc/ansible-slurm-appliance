@@ -55,7 +55,7 @@ as `user_map_match` may be set directly if necessary.
 This runs DEX on the Open Ondemand host to provide an OIDC endpoint which federates
 from some other identity provider. Generally no OIDC configuration is required.
 Dex configuration can be provided using the `dex_settings` [osc.ood role](https://github.com/OSC/ood-ansible)
-variable.
+variable:
 
 **IMPORTANT** This takes a string of YAML, not actual YAML. E.g.:
 
@@ -68,6 +68,9 @@ dex_settings: |
         name: LDAP
   ...
 ```
+
+See [DEX documentation](https://dexidp.io/docs/connectors/) for full details of
+options for each connector, e.g. [an example LDAP configuration](https://dexidp.io/docs/connectors/ldap/#configuration).
 
 See comments above for OIDC regarding remote user mapping. For LDAP the default
 mapping is likely to be sufficent.
