@@ -50,18 +50,6 @@ jobs:
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
-      - name: Setup ssh
-        run: |
-          set -x
-          mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-        shell: bash
-
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
-        shell: bash
-
       - name: setup environment
         run: |
           python3 -m venv venv

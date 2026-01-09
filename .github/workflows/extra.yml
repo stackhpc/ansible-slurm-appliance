@@ -8,6 +8,23 @@ name: Test extra build
 on:
   workflow_call:
   workflow_dispatch:
+      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
+      inputs:
+        ci_cloud:
+          description: 'Select the CI_CLOUD'
+          required: true
+          type: choice
+          options:
+            - default
+            - LEAFCLOUD
+            - SMS
+            - ARCUS
+          default: default # Use repo CI_CLOUD setting or PR label
+        cleanup_on_failure:
+          description: Cleanup Packer resources on failure
+          type: boolean
+          required: true
+          default: true
 
 permissions:
   contents: read
@@ -34,9 +51,10 @@ jobs:
     env:
       ANSIBLE_FORCE_COLOR: True
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'false' && 'abort' || vars.PACKER_ON_ERROR }}
 
     steps:
       - uses: actions/checkout@v4
@@ -50,9 +68,24 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
+      - name: Override CI_CLOUD if PR label is present
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          # Iterate over the labels
+          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
+          echo "$labels"
+          for label in $labels; do
+             if [[ $label == CI_CLOUD=* ]]; then
+              # Extract the value after 'CI_CLOUD='
+              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
+            fi
+          done
+
       - name: Record settings
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo PACKER_ON_ERROR: ${{ env.PACKER_ON_ERROR}}
           echo "FAT_IMAGES: ${FAT_IMAGES}"
 
       - name: Setup ssh
@@ -61,10 +94,14 @@ jobs:
           mkdir ~/.ssh
           echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
+          ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
 
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
+      - name: Add bastion ssh fingerprints to known_hosts
+        run: |
+          cat >> ~/.ssh/known_hosts << 'EOF'
+          ${{ vars.BASTION_FINGERPRINTS }}
+          EOF
         shell: bash
 
       - name: Install ansible etc
@@ -91,7 +128,7 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ vars.PACKER_ON_ERROR }} \
+          -on-error=${{ env.PACKER_ON_ERROR }} \
           -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
