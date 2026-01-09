@@ -20,3 +20,7 @@ dnf_repos_password: "{{ lookup('env','ARK_PASSWORD') }}"
 # Can be set regardless of approach above:
 pulp_site_upstream_username: slurm-app-ci
 pulp_site_upstream_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}"
+
+# Open Ondemand osc.ood package installs - see ansible/roles/osc.ood/tasks/install-package.yml
+install_ondemand_dex: true # install DEX
+oidc_uri: '' # install mod_auth_openidc for OIDC
