@@ -29,7 +29,7 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 See the Open Ondemand [Authentication docs](https://osc.github.io/ood-documentation/latest/authentication/overview.html) for an overview of the authentication process.
 
 - `openondemand_auth`: Required. Authentication method, either `'oidc'`, `dex`
-or `'basic_pam'`. See relevant subsection below.
+  or `'basic_pam'`. See relevant subsection below.
 
 #### OIDC authentication
 
@@ -51,12 +51,13 @@ for more. The [osc.ood role](https://github.com/OSC/ood-ansible) variables such
 as `user_map_match` may be set directly if necessary.
 
 #### DEX authentication
+
 This runs DEX on the Open Ondemand host to provide an OIDC endpoint which federates
 from some other identity provider. Generally no OIDC configuration is required.
 Dex configuration can be provided using the `dex_settings` [osc.ood role](https://github.com/OSC/ood-ansible)
 variable.
 
-**IMPORTANT** This takes a string of yaml, not actual yaml. E.g.:
+**IMPORTANT** This takes a string of YAML, not actual YAML. E.g.:
 
 ```yaml
 dex_settings: |
