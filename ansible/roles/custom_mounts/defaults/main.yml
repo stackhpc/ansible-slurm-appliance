@@ -1,0 +1,72 @@
+---
+
+ceph_mt_conf_src_dir: "{{ appliances_environment_root }}/files"
+# ceph_mt_conf_src_dir: "{{ role_path }}/files"
+ceph_common_version: "2:19.2.2"  # if false will be latest
+ceph_repo_release: squid
+
+custom_mounts: {}
+# custom_mounts:
+#   mount_cifs: # name of mount 
+#     method: fstab      # autofs or fstab
+#     type: cifs          # cifs or cephfs or ceph_rbd
+#     # fs_name: "192.168.124.218" # ceph only 
+#     fs_path: '//192.168.124.218/install_share' # cifs 
+#     mount_point: /mnt/install_share 
+#     mount_owner: "{{ analysis_user }}" # optional owner of mount point default:root
+#     mount_group: "{{ analysis_group }}" # optional group of mount point  default:root
+#     mount_mode: "0770"         # optional permissions  of mount point default:0775
+#     mount_opts: "mfsymlinks,vers=3.02,gid=1002,forcegid,uid=5000,forceuid,dir_mode=0770,_netdev,nofail" #o ptional
+#     state: mounted # optional default('mounted') 
+#     dump: 0 # optional
+#     passno: 0 # optional
+#   autofs_cifs_share: # arbitary name of name of mount mus be unique  
+#     method: autofs      # autofs or fstab
+#     type: cifs          # only cifs or nfs compatable with autofs
+#     # fs_name: bioinformatics_share # ceph only
+#     fs_path: '//192.168.124.218/dev-pengu-fs' # cifs and nfs this must be the full source
+#     mount_point: /mnt/logs 
+#     mount_owner: "{{ analysis_user }}" 
+#     mount_group: "{{ analysis_group }}"
+#     mount_mode: "0770"
+#     mount_opts: "noatime,ro"
+#     dump:
+#     credentials:
+#       username: PHW_PenGU
+#       password: "dfsf"
+#       domain: CYMRU
+#       file_path: /etc/.cifs_credentials
+#   nfs_fstab: # name of mount 
+#     method: fstab      # autofs or fstab
+#     type: nfs          
+#     fs_path: '192.168.124.203:/iso_sr_2' # for nfs and cifs must be src_path
+#     mount_point: /mnt/iso_sr_2_nfs_fstab
+#     mount_owner: "{{ analysis_user }}"
+#     mount_group: "{{ analysis_group }}"
+#     mount_mode: "0770"
+#     mount_opts: "rw"
+#   autofs_nfs: 
+#     method: autofs      
+#     type: nfs          # cifs or cephfs or ceph_rbd 
+#     fs_path: '192.168.124.203:/iso_share' # cifs
+#     mount_point: iso_share # If master_mount_point used should be single name not path
+#     master_mount_point: /mnt/autofs_nfs # optional for autofs
+#     autofs_options: "--timeout 60" # optional for autofs to at to auto.master.d/ options 
+#     mount_owner: "{{ analysis_user }}" # optional
+#     mount_group: "{{ analysis_group }}" # optional
+#     mount_mode: "0770" # optional
+#     mount_opts: "rw" # optional
+# ceph_rbd_data:
+#     method: fstab
+#     type: ceph_rbd   # must use method fstab
+#     pool_name: rbd.fast_rbd # ceph rdb only
+#     image_name: test_rdb_image  # ceph rdb only
+#     fstype: xfs # ceph rdb only
+#     mount_point: /mnt/test_rdb_image 
+#     mount_opts: "_netdev"
+#     state: mounted
+#     dump: 0
+#     passno: 0
+#     credentials:
+#       client_name: fast_rbd # without .client 
+#       secret: dsfdfv4
