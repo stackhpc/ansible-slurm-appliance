@@ -42,12 +42,10 @@ openondemand_auth_defaults:
   oidc:
     oidc_uri: /oidc # has to be set separately to trigger oidc integration!
     ood_auth_openidc:
-      OIDCRedirectURI: "https://{{ openondemand_servername }}/oidc"
       OIDCClientID: "{{ openondemand_oidc_client_id }}"
       OIDCClientSecret: "{{ openondemand_oidc_client_secret }}" # TODO: needs to be in secrets
       OIDCProviderMetadataURL: "{{ openondemand_oidc_provider_url }}/.well-known/openid-configuration"
       OIDCCryptoPassphrase: "{{ openondemand_oidc_crypto_passphrase }}"
-      OIDCPassClaimsAs: environment
       OIDCPassIDTokenAs: serialized
       OIDCScope: "{{ openondemand_oidc_scope }}"
       OIDCRemoteUserClaim: "{{ openondemand_oidc_remote_user_claim }}"
