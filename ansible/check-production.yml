@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Confirm continuing if using production environment
+      ansible.builtin.pause:
+        prompt: |
+          *************************************
+          *  WARNING: PROTECTED ENVIRONMENT!  *
+          *************************************
+
+          Current environment: {{ appliances_environment_name }}
+          Do you really want to continue (yes/no)?
+      register: env_confirm_safe
+      when:
+        - appliances_environment_name in appliances_protected_environments
+        - not (appliances_protected_environment_autoapprove | default(false) | bool)
+      failed_when: not (env_confirm_safe.user_input | bool)

@@ -19,6 +19,8 @@ permissions:
   # To report GitHub Actions status checks
   statuses: write
   id-token: write
+  # upload trivy scan results
+  security-events: write
 
 on:
   push:
@@ -38,7 +40,7 @@ jobs:
   files_changed:
     name: Determine files changed
     needs: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Map a step output to a job output, this allows other jobs to be gated on the filter results
     outputs:
         # The 'stackhpc' output will be 'true' if either of the two stackhpc filters below matched
@@ -143,6 +145,6 @@ jobs:
     name: Trivy scan image for vulnerabilities
     needs: files_changed
     if: |
-      needs.files_changed.outputs.trivyscan == 'true'
+      needs.files_changed.outputs.trivyscan == 'true' || github.event_name != 'pull_request'
     uses: ./.github/workflows/trivyscan.yml
     secrets: inherit

@@ -9,18 +9,18 @@ roles:
   - src: https://github.com/stackhpc/ansible-node-exporter.git
     version: stackhpc
     name: cloudalchemy.node_exporter
-  - src: https://github.com/cloudalchemy/ansible-prometheus.git
-    version: 4d2c8d742de39e50387e0aa6d5510b21c7451343 # need fix in preceeding commit for rocky
+  - src: https://github.com/stackhpc/ansible-prometheus.git
+    version: stackhpc-1.0.0
     name: cloudalchemy.prometheus
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
-    version: stackhpc-0.19.0 # fix grafana install
+    version: stackhpc-0.20.0
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
     version: v4.0.1
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: v25.3.1
+    version: v26.1.1
   - src: mrlesmithjr.chrony
     version: v0.1.4
 
