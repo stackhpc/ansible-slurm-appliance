@@ -26,7 +26,7 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 
 ### Authentication
 
-See the Open Ondemand [Authentication docs](https://osc.github.io/ood-documentation/latest/authentication/overview.html) for an overview of the authentication process.
+See the Open Ondemand [Authentication docs](https://osc.github.io/ood-documentation/latest/authentication.html) for an overview of the authentication process.
 
 - `openondemand_auth`: Required. Authentication method, either `'oidc'`, `dex`
   or `'basic_pam'`. See relevant subsection below.
@@ -55,7 +55,7 @@ as `user_map_match` may be set directly if necessary.
 This runs DEX on the Open Ondemand host to provide an OIDC endpoint which federates
 from some other identity provider. Generally no OIDC configuration is required.
 Dex configuration can be provided using the `dex_settings` [osc.ood role](https://github.com/OSC/ood-ansible)
-variable.
+variable:
 
 **IMPORTANT** This takes a string of YAML, not actual YAML. E.g.:
 
@@ -68,6 +68,9 @@ dex_settings: |
         name: LDAP
   ...
 ```
+
+See [DEX documentation](https://dexidp.io/docs/connectors/) for full details of
+options for each connector, e.g. [an example LDAP configuration](https://dexidp.io/docs/connectors/ldap/#configuration).
 
 See comments above for OIDC regarding remote user mapping. For LDAP the default
 mapping is likely to be sufficent.
@@ -113,7 +116,7 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 
 The Open Ondemand portal can proxy other servers. Variables:
 
-- `openondemand_host_regex`: Synomyn for the `osc.ood: host_regex` [variable](https://osc.github.io/ood-documentation/latest/app-development/interactive/setup/enable-reverse-proxy.html). A Python regular expression matching servernames which Open Ondemand should proxy. Enables proxying and restricts which addresses are proxied (for security). E.g. this might be:
+- `openondemand_host_regex`: Synomyn for the `osc.ood: host_regex` [variable](https://osc.github.io/ood-documentation/latest/reference/files/ood-portal-yml.html#configure-reverse-proxy). A Python regular expression matching servernames which Open Ondemand should proxy. Enables proxying and restricts which addresses are proxied (for security). E.g. this might be:
 
   `'({{ openhpc_cluster_name }}-compute-\d+)|({{ groups["grafana"] | first }})'`
 
@@ -124,7 +127,7 @@ The Open Ondemand portal can proxy other servers. Variables:
 
   The exact pattern depends on inventory hostnames / partitions / addresses.
 
-- `openondemand_node_proxy_directives`: Optional, default ''. Multiline string to insert into Apache directives definition for `node_uri` ([docs](https://osc.github.io/ood-documentation/master/reference/files/ood-portal-yml.html#configure-reverse-proxy)).
+- `openondemand_node_proxy_directives`: Optional, default ''. Multiline string to insert into Apache directives definition for `node_uri` ([docs](https://osc.github.io/ood-documentation/latest/reference/files/ood-portal-yml.html#configure-reverse-proxy)).
 
 Note that:
 
