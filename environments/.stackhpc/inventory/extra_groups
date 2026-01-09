@@ -43,3 +43,6 @@ compute
 
 [topology:children]
 compute
+
+[proxy:children]
+cluster

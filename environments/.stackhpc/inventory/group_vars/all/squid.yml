@@ -1,0 +1,2 @@
+squid_cache_disk: 3000 # MB
+squid_cache_mem: '4 GB'

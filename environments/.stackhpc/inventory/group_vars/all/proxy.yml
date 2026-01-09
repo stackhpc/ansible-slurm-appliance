@@ -1,0 +1,2 @@
+proxy_http_address: "{{ hostvars[groups['squid'].0].ansible_host }}" # see environments/.stackhpc/inventory/squid
+proxy_remove: true
