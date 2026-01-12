@@ -3,46 +3,92 @@ gpu_gres:
   - conf: "gpu:A100:1"
     file: "/dev/nvidia0"
 
+gen1_features:
+  - cpu_model:epyc-7713
+
+gen2_features:
+  - cpu_model:epyc-9655
+
 openhpc_nodegroups:
   - name: general-compute1
+    features: "{{ gen1_features }}"
   - name: general-compute2
+    features: "{{ gen1_features }}"
   - name: general-compute3
+    features: "{{ gen1_features }}"
   - name: general-compute4
+    features: "{{ gen1_features }}"
   - name: general-compute5
+    features: "{{ gen1_features }}"
   - name: general-compute6
+    features: "{{ gen1_features }}"
   - name: general-gen2-compute9
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute10
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute11
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute12
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute13
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute14
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute15
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute16
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute17
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute18
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute19
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute20
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute21
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute22
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute23
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute24
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute25
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute26
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute27
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute28
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute29
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute30
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute31
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute32
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute33
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute34
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute35
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute36
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute37
+    features: "{{ gen2_features }}"
   - name: general-gen2-compute38
+    features: "{{ gen2_features }}"
   - name: highmem-compute7
+    features: "{{ gen1_features }}"
   - name: highmem-compute8
+    features: "{{ gen1_features }}"
   - name: gpu-gpu1
+    features: "{{ gen1_features }}"
     gres: "{{ gpu_gres }}"
   - name: gpu-gpu2
+    features: "{{ gen1_features }}"
     gres: "{{ gpu_gres }}"
