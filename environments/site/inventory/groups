@@ -143,6 +143,9 @@ fatimage
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
 
+[sshd:children]
+login
+
 [compute_init:children]
 # EXPERIMENTAL: Compute hosts to enable joining cluster on boot on
 compute

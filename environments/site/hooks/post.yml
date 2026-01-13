@@ -8,3 +8,17 @@
         name: stackhpc.timezone
       vars:
         timezone: "{{ cluster_timezone }}"
+
+- name: sshd config
+  hosts: sshd
+  tags: sshd
+  become: true
+  tasks:
+    - name: Install SSH public CA key
+      ansible.builtin.get_url:
+        url: https://ca.isambard.ac.uk/public_key
+        dest: /etc/ssh/conch_ssh_ca.key
+        force: true
+        mode: "u=rw,g=,o="
+        owner: root
+        group: root

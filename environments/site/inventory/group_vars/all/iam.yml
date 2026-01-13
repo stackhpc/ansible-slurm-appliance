@@ -1,0 +1,2 @@
+---
+sshd_conf_src: "{{ appliances_environment_root }}/../site/files/sshd.conf.j2"

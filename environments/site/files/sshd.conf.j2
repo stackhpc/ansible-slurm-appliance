@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+AuthenticationMethods publickey
+KbdInteractiveAuthentication no
+PasswordAuthentication no
+
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+AuthorizedKeysFile none
+
+AllowGroups bc5usrs bc5adms adm
+
+Match User rocky
+  AuthorizedKeysFile .ssh/authorized_keys
+
+Match Group bc5adms
+  AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys
+  AuthorizedKeysCommandUser nobody
+
+Match Group bc5usrs
+  TrustedUserCAKeys /etc/ssh/conch_ssh_ca.key
+
+Match All
