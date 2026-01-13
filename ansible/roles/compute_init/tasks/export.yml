@@ -48,8 +48,8 @@
   ansible.builtin.copy:
     content: "{{ os_manila_mount_share_info_var | to_nice_yaml }}"
     dest: /exports/cluster/manila_share_info.yml
-    owner: slurm
-    group: root
+    owner: ansible-init
+    group: ansible-init
     mode: u=r,g=rw,o=
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
