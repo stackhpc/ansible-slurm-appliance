@@ -9,7 +9,7 @@
     - name: Check image has been updated
       ansible.builtin.assert:
         that: rebuild_status.image_correct
-        fail_msg: "Note is NOT on correct image"
+        fail_msg: "Node is NOT on correct image"
     - name: Check a single rebuild has occured
       ansible.builtin.assert:
         that: rebuild_status.rebuild_count == 1
