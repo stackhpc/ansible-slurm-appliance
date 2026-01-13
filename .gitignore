@@ -9,5 +9,5 @@ requirements.yml.last
 .ansible
 environments/production/inventory/hosts.yml
 environments/staging/inventory/hosts.yml
-environments/production/tofu/.terraforn.lock.hcl
+environments/production/tofu/.terraform.lock.hcl
 environments/staging/tofu/.terraform.lock.hcl
