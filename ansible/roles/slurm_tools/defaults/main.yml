@@ -1,4 +1,4 @@
 ---
 pytools_editable: false
-pytools_gitref: v2.0
+pytools_gitref: feat/safer-rebuild-vars # TODO: release
 pytools_user: root
