@@ -1,32 +1,33 @@
 - hosts: compute
-  gather_facts: true
   become: false
+  gather_facts: true
   tasks:
-      - name: Get current image
-        ansible.builtin.command: "openstack server show -c image -f value {{ instance_id }}"
-        delegate_to: localhost
-        changed_when: false
-        register: image_current  # stdout e.g. 'openhpc-RL9-260109-1203-4d09658f (8e5e7289-6b96-4f2c-bed0-9bb399e5e1c4)'
+    - name: Get current image
+      ansible.builtin.command: "openstack server show -c image -f value {{ instance_id }}"
+      delegate_to: localhost
+      changed_when: false
+      register: image_current  # stdout e.g. 'openhpc-RL9-260109-1203-4d09658f (8e5e7289-6b96-4f2c-bed0-9bb399e5e1c4)'
 
-      - name: Get server events
-        ansible.builtin.command:
-          cmd: "openstack server event list -f json {{ instance_id }}"
-        delegate_to: localhost
-        changed_when: true
-        register: server_event_list
+    - name: Get server events
+      ansible.builtin.command:
+        cmd: "openstack server event list -f json {{ instance_id }}"
+      delegate_to: localhost
+      changed_when: true
+      register: server_event_list
 
-      - name: Set fact for update status
-        set_fact:
-          rebuild_status:
-            image_correct: "{{ image_id_target == image_id_current }}"
-            image_id_target: "{{ image_id_target }}"
-            image_id_current: "{{ image_id_current }}"
-            rebuild_count: "{{ rebuild_events | length }}"
-            uptime_seconds: "{{ ansible_uptime_seconds }}"
-        vars:
-          image_id_current: "{{ image_current.stdout | split | last | trim('()') }}"
-          image_id_target: "{{ image_id }}" # from TF-templated hostvars
-          rebuild_events: "{{ server_event_list.stdout | from_json | selectattr('Action', 'eq', 'rebuild') }}"
-      - name: Show rebuild rebuild_status
-        ansible.builtin.debug:
-          var: rebuild_status
+    - name: Set fact for update status
+      ansible.builtin.set_fact:
+        rebuild_status:
+          image_correct: "{{ image_id_target == image_id_current }}"
+          image_id_target: "{{ image_id_target }}"
+          image_id_current: "{{ image_id_current }}"
+          rebuild_count: "{{ rebuild_events | length }}"
+          uptime_seconds: "{{ ansible_uptime_seconds }}"
+      vars:
+        image_id_current: "{{ image_current.stdout | split | last | trim('()') }}"
+        image_id_target: "{{ image_id }}" # from TF-templated hostvars
+        rebuild_events: "{{ server_event_list.stdout | from_json | selectattr('Action', 'eq', 'rebuild') }}"
+
+    - name: Show rebuild status
+      ansible.builtin.debug:
+        var: rebuild_status

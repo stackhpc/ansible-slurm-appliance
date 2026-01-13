@@ -1,7 +1,8 @@
 - ansible.builtin.import_playbook: ../adhoc/rebuild-status.yml
+
 - hosts: compute
-  become: no
-  gather_facts: no
+  become: false
+  gather_facts: false
   vars:
     uptime_max_seconds: "{{ 5 * 60 }}"
   tasks:
