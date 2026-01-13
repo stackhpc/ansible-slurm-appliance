@@ -50,7 +50,7 @@
     dest: /exports/cluster/manila_share_info.yml
     owner: ansible-init
     group: ansible-init
-    mode: u=r,g=rw,o=
+    mode: u=rw,go=
   run_once: true
   delegate_to: "{{ groups['control'] | first }}"
   when: os_manila_mount_share_info is defined
