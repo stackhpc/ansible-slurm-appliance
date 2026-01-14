@@ -1,9 +1,13 @@
+# Report whether compute nodes have been rebuilt after a slurm-controlled upgrade.
+# NB: Current image information will not be available for volume-backed instances.
+
 - hosts: compute
   become: false
   gather_facts: true
   tasks:
     - name: Get current image
-      ansible.builtin.command: "openstack server show -c image -f value {{ instance_id }}"
+      ansible.builtin.command:
+        cmd: "openstack server show -c image -f value {{ instance_id }}"
       delegate_to: localhost
       changed_when: false
       register: image_current  # stdout e.g. 'openhpc-RL9-260109-1203-4d09658f (8e5e7289-6b96-4f2c-bed0-9bb399e5e1c4)'
