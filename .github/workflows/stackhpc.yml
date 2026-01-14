@@ -191,6 +191,7 @@ jobs:
           . environments/.stackhpc/activate
           ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
+          ansible-playbook -v ansible/ci/check_compute_rebuild.yml
 
       - name: Check sacct state survived reimage to current branch
         run: |

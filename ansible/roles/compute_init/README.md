@@ -174,7 +174,7 @@ play also get picked up.
 6. Fake a reimage of compute to run ansible-init and the updated compute-init playbook:
 
 ```shell
-ansible all -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
+ansible compute -m shell -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
 ```
 
 Use `systemctl status ansible-init` to view stdout/stderr from Ansible.

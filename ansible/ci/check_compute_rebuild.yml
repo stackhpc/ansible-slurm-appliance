@@ -1,0 +1,20 @@
+- ansible.builtin.import_playbook: ../adhoc/rebuild-status.yml
+
+- hosts: compute
+  become: false
+  gather_facts: false
+  vars:
+    uptime_max_seconds: "{{ 5 * 60 }}"
+  tasks:
+    - name: Check image has been updated
+      ansible.builtin.assert:
+        that: rebuild_status.image_correct
+        fail_msg: "Node is NOT on correct image"
+    - name: Check a single rebuild has occured
+      ansible.builtin.assert:
+        that: rebuild_status.rebuild_count == 1
+        fail_msg: "Expected 1 rebuild, found {{ rebuild_status.rebuild_count }}"
+    - name: Check uptime shows rebuild occured
+      ansible.builtin.assert:
+        that: rebuild_status.uptime_seconds < uptime_max_seconds | int
+        fail_msg: "Expected uptime < {{ uptime_max_seconds }}s, actual {{ rebuild_status.uptime_seconds }}s"
