@@ -16,14 +16,14 @@
       register: server_event_list
 
     - name: Set fact for update status
+      # from_yaml nonsense needed to get rebuild_count to be an int
       ansible.builtin.set_fact:
-        rebuild_status:
-          image_correct: "{{ image_id_target == image_id_current }}"
-          image_id_target: "{{ image_id_target }}"
-          image_id_current: "{{ image_id_current }}"
-          rebuild_count: "{{ rebuild_events | length }}"
-          uptime_seconds: "{{ ansible_uptime_seconds }}"
+        rebuild_status: "{{ rebuild_status_yaml | from_yaml }}"  
       vars:
+        rebuild_status_yaml: |
+          image_correct: {{ image_id_target == image_id_current }}
+          rebuild_count: {{ rebuild_events | length | int }}
+          uptime_seconds: {{ ansible_uptime_seconds }}
         image_id_current: "{{ image_current.stdout | split | last | trim('()') }}"
         image_id_target: "{{ image_id }}" # from TF-templated hostvars
         rebuild_events: "{{ server_event_list.stdout | from_json | selectattr('Action', 'eq', 'rebuild') }}"
