@@ -53,6 +53,7 @@ module "cluster" {
             "manila",
             "basic_users",
             "eessi",
+            "sssd",
           ]
       }
     }
