@@ -4,6 +4,9 @@
   ansible.builtin.template:
     src: "service.j2"
     dest: "/etc/systemd/system/{{ openportal_service.name }}.service"
+    mode: "u=rw,g=r,o=r"
+    owner: "root"
+    group: "root"
   register: openportal_service_files
   notify: "Restart OpenPortal services"
 
@@ -11,6 +14,9 @@
   ansible.builtin.file:
     state: directory
     path: "/etc/openportal/{{ openportal_service.name }}"
+    mode: "u=rwx,g=,o="
+    owner: "root"
+    group: "root"
 
 - name: "{{ openportal_service.name }} : Install config file"
   ansible.builtin.template:

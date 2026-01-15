@@ -7,11 +7,17 @@
   ansible.builtin.copy:
     src: "{{ openportal_binaries_dir }}/"
     dest: "/usr/local/bin"
+    mode: "u=rwx,g=rx,o=rx"
+    owner: "root"
+    group: "root"
 
 - name: Create OpenPortal config directory
   ansible.builtin.file:
     state: directory
     path: "/etc/openportal/"
+    mode: "u=rwx,g=,o="
+    owner: "root"
+    group: "root"
 
 - name: Setup Openportal {{ openportal_service.name }} service
   ansible.builtin.include_tasks: service.yml
