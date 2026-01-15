@@ -333,24 +333,24 @@ environments which should be unique, e.g. production and staging.
   this is usually provided by the hypervisor, but if not (or for bare metal
   instances) it may be necessary to [configure chrony](./chrony.md).
 
-- Consider the appropriate strategy for `/tmp`. By default nodes in `login` and
+- Consider the appropriate configuration for `/tmp`. By default nodes in `login` and
   `compute` groups will use a tmpfs with 10% of total memory. This can be modifed
   by overriding `mounts_tmp_size` with either a size in bytes or a percentage
-  of memory (as for 'size' parameter in `man tmpfs`):
+  of memory (as for 'size' parameter in `man tmpfs`), e.g.:
 
   ```yaml
   # environments/site/inventory/group_vars/all/mounts.yml:
   mounts_tmp_size: "50%"
   ```
 
-  If a tmpfs is not appropriate, either remove these nodes from the `mounts`
-  group in `environments/site/inventory/groups` if the `mounts` role is otherwise
-  unused, or else override `mounts_default`:
+  The use of a tmpfs can be disabled for all nodes using:
 
   ```yaml
   # environments/site/inventory/group_vars/all/mounts.yml:
-  mounts_default: {} # remove default /tmp tmpfs mount
+  mounts_tmp_enabled: false
   ```
+
+  or the nodes using the `mount` role can be modified in `environments/site/inventory/groups`.
 
 - Consider whether Prometheus storage configuration is required. By default:
 
