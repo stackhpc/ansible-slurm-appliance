@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenPortal {{ openportal_service.name }}
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+Environment="RUST_LOG_FORMAT=json"
+Environment="RUST_LOG=info"
+{{ openportal_service.extra + "\n" if openportal_service.extra is not undefined -}}
+ExecStart={{ openportal_service.binary }} -c /etc/openportal/{{ openportal_service.name }}/config.toml run
+
+[Install]
+WantedBy=multi-user.target

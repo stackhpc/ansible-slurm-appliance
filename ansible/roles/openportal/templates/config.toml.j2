@@ -1,0 +1,50 @@
+agent = "{{ openportal_service.config.agent }}"
+
+[service]
+name = "{{ openportal_service.config.name }}"
+url = "ws://{{ openportal_service.config.hostname }}:{{ openportal_service.config.port }}/"
+ip = "{{ openportal_service.config.ip }}"
+port = {{ openportal_service.config.port }}
+
+{% if openportal_service.config.servers is defined %}
+{% for server in openportal_service.config.servers %}
+[[service.servers]]
+name = "{{ server.name }}"
+url = "{{ server.url }}"
+zone = "{{ server.zone }}"
+
+[service.servers.inner_key]
+data = "{{ server.key.inner }}"
+
+[service.servers.outer_key]
+data = "{{ server.key.outer }}"
+{% endfor %}
+{% else %}
+servers = []
+{% endif %}
+
+{% if openportal_service.config.clients is defined %}
+{% for client in openportal_service.config.clients %}
+[[service.clients]]
+name = "{{ client.name }}"
+zone = "{{ client.zone }}"
+
+[service.clients.ip]
+Range = "{{ client.ip_range }}"
+
+[service.clients.inner_key]
+data = "{{ client.key.inner }}"
+
+[service.clients.outer_key]
+data = "{{ client.key.outer }}"
+{% endfor %}
+{% else %}
+clients = []
+{% endif %}
+
+[extras]
+{% if openportal_service.config.extras is defined %}
+{% for key, value in openportal_service.config.extras | items %}
+{{ key }} = "{{ value }}"
+{% endfor %}
+{% endif %}

@@ -51,3 +51,12 @@
     - name: Configure sssd
       ansible.builtin.import_role:
         name: sssd
+
+- hosts: openportal
+  become: true
+  gather_facts: false
+  tags: openportal
+  tasks:
+    - name: Configure OpenPortal
+      ansible.builtin.import_role:
+        name: openportal

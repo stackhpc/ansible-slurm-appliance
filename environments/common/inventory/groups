@@ -236,3 +236,5 @@ doca
 
 [fatimage]
 # Add build VM into this group to enable all features with this as child
+
+[openportal]

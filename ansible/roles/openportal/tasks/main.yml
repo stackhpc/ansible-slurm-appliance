@@ -1,0 +1,21 @@
+---
+
+# OpenPortal does not provide precompiled binaries and so we placed
+# the binaries in a local folder on the Ansible controller
+# # TODO OpenPortal does provide container images so we should switch to Podman systemd units
+- name: Install OpenPortal binaries
+  ansible.builtin.copy:
+    src: "{{ openportal_binaries_dir }}/"
+    dest: "/usr/local/bin"
+
+- name: Create OpenPortal config directory
+  ansible.builtin.file:
+    state: directory
+    path: "/etc/openportal/"
+
+- name: Setup Openportal {{ openportal_service.name }} service
+  ansible.builtin.include_tasks: service.yml
+  loop: "{{ openportal_services }}"
+  loop_control:
+    loop_var: openportal_service
+    label: "{{ openportal_service.name }}"

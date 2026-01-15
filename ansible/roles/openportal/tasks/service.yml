@@ -1,0 +1,32 @@
+---
+
+- name: "{{ openportal_service.name }} : Install service file"
+  ansible.builtin.template:
+    src: "service.j2"
+    dest: "/etc/systemd/system/{{ openportal_service.name }}.service"
+  register: openportal_service_files
+  notify: "Restart OpenPortal services"
+
+- name: "{{ openportal_service.name }} : Create config directory"
+  ansible.builtin.file:
+    state: directory
+    path: "/etc/openportal/{{ openportal_service.name }}"
+
+- name: "{{ openportal_service.name }} : Install config file"
+  ansible.builtin.template:
+    src: "config.toml.j2"
+    dest: "/etc/openportal/{{ openportal_service.name }}/config.toml"
+    owner: root
+    group: root
+    mode: "u=rw,g=,o="
+  register: openportal_config_files
+  notify: "Restart OpenPortal services"
+  no_log: true
+
+- name: "{{ openportal_service.name }} : Start and enable service"
+  ansible.builtin.systemd:
+    name: "{{ openportal_service.name }}"
+    state: "{{ 'started' if openportal_start_services else 'stopped' }}"
+    enabled: "{{ openportal_start_services }}"
+    daemon_reload: "{{ openportal_service_files is changed }}"
+  ignore_errors: "{{ ansible_check_mode }}"

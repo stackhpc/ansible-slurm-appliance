@@ -22,6 +22,8 @@ roles/*
 !roles/basic_users/**
 !roles/openondemand/
 !roles/openondemand/**
+!roles/openportal/
+!roles/openportal/**
 !roles/slurm_exporter/
 !roles/slurm_exporter/**
 !roles/firewalld/

@@ -1,0 +1,131 @@
+---
+openportal_binaries_dir: "~/openportal-binaries"
+
+openportal_keys: "{{ vault_openportal_keys }}"
+openportal_freeipa_password: "{{ vault_openportal_freeipa_password }}"
+
+openportal_services:
+  - name: "op-dl"
+    binary: "/usr/local/bin/op-provider"
+    config:
+      agent: "Provider"
+      name: "dl"
+      hostname: "localhost"
+      ip: "127.0.0.1"
+      port: 8080
+      servers:
+        - name: "brics"
+          url: "wss://op.isambard.ac.uk"
+          zone: "dl"
+          key: "{{ openportal_keys.op_to_op_dl }}"
+      clients:
+        - name: "clusters"
+          zone: "dl"
+          ip_range: "127.0.0.1/32"
+          key: "{{ openportal_keys.op_dl_to_op_dl_clusters }}"
+  - name: "op-dl-clusters"
+    binary: "/usr/local/bin/op-clusters"
+    config:
+      agent: "Platform"
+      name: "clusters"
+      hostname: "localhost"
+      ip: "127.0.0.1"
+      port: 8082
+      servers:
+        - name: "dl"
+          url: "ws://localhost:8080"
+          zone: "dl"
+          key: "{{ openportal_keys.op_dl_to_op_dl_clusters }}"
+      clients:
+        - name: "bc5"
+          zone: "dl"
+          ip_range: "127.0.0.1/32"
+          key: "{{ openportal_keys.op_dl_clusters_to_op_dl_clusters_bc5 }}"
+  - name: "op-dl-clusters-bc5"
+    binary: "/usr/local/bin/op-cluster"
+    config:
+      agent: "Instance"
+      name: "bc5"
+      hostname: "localhost"
+      ip: "127.0.0.1"
+      port: 8071
+      servers:
+        - name: "cluster"
+          url: "ws://localhost:8082"
+          zone: "dl"
+          key: "{{ openportal_keys.op_dl_clusters_to_op_dl_clusters_bc5 }}"
+        - name: "freeipa"
+          url: "ws://localhost:8085"
+          zone: "dl-clusters-bc5"
+          key: "{{ openportal_keys.op_dl_clusters_bc5_to_op_dl_freeipa }}"
+      clients:
+        - name: "filesystem"
+          zone: "dl-clusters-bc5"
+          ip_range: "127.0.0.1/32"
+          key: "{{ openportal_keys.op_dl_clusters_bc5_to_op_dl_clusters_bc5_filesystem }}"
+        - name: "slurm"
+          zone: "dl-clusters-bc5"
+          ip_range: "127.0.0.1/32"
+          key: "{{ openportal_keys.op_dl_clusters_bc5_to_op_dl_clusters_bc5_slurm }}"
+  - name: "op-dl-clusters-bc5-filesystem"
+    binary: "/usr/local/bin/op-filesystem"
+    config:
+      agent: "Filesystem"
+      name: "filesystem"
+      hostname: "localhost"
+      ip: "127.0.0.1"
+      port: 8083
+      servers:
+        - name: "bc5"
+          url: "ws://localhost:8071"
+          zone: "dl-clusters-bc5"
+          key: "{{ openportal_keys.op_dl_clusters_bc5_to_op_dl_clusters_bc5_filesystem }}"
+      extras:
+        home-root: "/home:/scratch"
+        project-links: ":/projects/{PROJECT}/public"
+        home-permissions: "0750:0750"
+        project-roots: "/projects/:/projects/public"
+        project-permissions: "2770:2775"
+  - name: "op-dl-clusters-bc5-slurm"
+    binary: "/usr/local/bin/op-slurm"
+    config:
+      agent: "Scheduler"
+      name: "slurm"
+      hostname: "localhost"
+      ip: "127.0.0.1"
+      port: 8081
+      servers:
+        - name: "bc5"
+          url: "ws://localhost:8071"
+          zone: "dl-clusters-bc5"
+          key: "{{ openportal_keys.op_dl_clusters_bc5_to_op_dl_clusters_bc5_slurm }}"
+      extras:
+        parent-account: "default"
+        scontrol: "scontrol"
+        sacctmgr: "sacctmgr"
+        sacct: "sacct"
+        slurm-cluster: "slurm-production"
+        # These numbers are chosen so that using all of a "normal" node is
+        # charged as 1 node hour, while using all of the "high memory" node
+        # is charged as 2 node hours
+        slurm-default-node: '{ "cpus": 32, "mem": 214199}'
+  - name: "op-dl-freeipa"
+    binary: "/usr/local/bin/op-freeipa"
+    extra: 'Environment="OPENPORTAL_ALLOW_INVALID_SSL_CERTS=true"'
+    config:
+      agent: "Account"
+      name: "freeipa"
+      hostname: "localhost"
+      ip: "127.0.0.1"
+      port: 8085
+      clients:
+        - name: "bc5"
+          zone: "dl-clusters-bc5"
+          ip_range: "127.0.0.1/32"
+          key: "{{ openportal_keys.op_dl_clusters_bc5_to_op_dl_freeipa }}"
+      extras:
+        freeipa-user: "openportal-api"
+        freeipa-password: "{{ openportal_freeipa_password }}"
+        instance-groups: "bc5@dl-clusters-bc5:bc5usrs"
+        freeipa-server: "https://dl-auth.acrc.bris.ac.uk"
+

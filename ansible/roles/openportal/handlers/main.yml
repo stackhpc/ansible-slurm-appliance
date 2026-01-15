@@ -1,0 +1,11 @@
+---
+
+- name: "Restart OpenPortal services"
+  ansible.builtin.service:
+    name: "{{ openportal_service.name }}"
+    state: restarted
+  when: openportal_start_services
+  loop: "{{ openportal_services }}"
+  loop_control:
+    loop_var: openportal_service
+    label: "{{ openportal_service.name }}"
