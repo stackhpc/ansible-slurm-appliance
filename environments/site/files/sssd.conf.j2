@@ -1,0 +1,24 @@
+[sssd]
+config_file_version = 2
+services = nss, pam, ssh, sudo
+domains = acrc.bris.ac.uk
+
+[nss]
+filter_users = root, rocky
+filter_groups = root
+
+[domain/acrc.bris.ac.uk]
+id_provider = ldap
+dns_discovery_domain = dl-auth.acrc.bris.ac.uk
+ldap_tls_cacert = /etc/sssd/dl-auth.acrc.bris.ac.uk.cert
+ldap_search_base = cn=accounts,dc=acrc,dc=bris,dc=ac,dc=uk
+ldap_user_search_base = cn=accounts,dc=acrc,dc=bris,dc=ac,dc=uk?subtree?(|(memberOf=cn=bc5adms,cn=groups,cn=accounts,dc=acrc,dc=bris,dc=ac,dc=uk)(memberOf=cn=bc5usrs,cn=groups,cn=accounts,dc=acrc,dc=bris,dc=ac,dc=uk)(memberOf=cn=bc5srvs,cn=groups,cn=accounts,dc=acrc,dc=bris,dc=ac,dc=uk))
+ldap_schema = rfc2307bis
+cache_credentials = True
+entry_cache_timeout = 60
+ldap_user_ssh_public_key = ipaSshPubKey
+ldap_default_bind_dn = uid=ldap,cn=sysaccounts,cn=etc,dc=acrc,dc=bris,dc=ac,dc=uk
+ldap_default_authtok = {{ vault_freeipa_ldap_bind_password }}
+
+sudo_provider = ldap
+ldap_sudo_search_base = ou=sudoers,dc=acrc,dc=bris,dc=ac,dc=uk

@@ -27,3 +27,18 @@
       ansible.builtin.systemd:
         name: tmp.mount
         state: started
+
+- name: Set up SSSD
+  hosts: sssd
+  tags: sssd
+  become: true
+  tasks:
+    - name: Copy FreeIPA server cert
+      ansible.builtin.copy:
+        src: "{{ appliances_environment_root }}/../site/files/dl-auth.acrc.bris.ac.uk.cert"
+        dest: "/etc/sssd/dl-auth.acrc.bris.ac.uk.cert"
+    - name: Set SSSD for sudo
+      ansible.builtin.lineinfile:
+        path: /etc/nsswitch.conf
+        regexp: '^sudoers:'
+        line: "sudoers: files sss"

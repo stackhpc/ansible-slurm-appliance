@@ -1,2 +1,4 @@
 ---
+sssd_conf_src: "{{ appliances_environment_root }}/../site/files/sssd.conf.j2"
+sssd_install_ldap: true
 sshd_conf_src: "{{ appliances_environment_root }}/../site/files/sshd.conf.j2"

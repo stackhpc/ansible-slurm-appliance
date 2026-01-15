@@ -139,6 +139,8 @@ cluster
 [sssd:children]
 # Hosts to configure sssd on
 fatimage
+cluster
+builder
 
 [sshd]
 # Hosts where the OpenSSH server daemon should be configured
