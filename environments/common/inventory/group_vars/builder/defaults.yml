@@ -33,4 +33,4 @@ openondemand_desktop_partition: true
 openondemand_rstudio_partition: false
 openondemand_matlab_partition: false
 openondemand_codeserver_partition: false
-mounts_default: {} # don't have /tmp in memory
+mounts_tmp_enabled: false # don't have /tmp in memory
