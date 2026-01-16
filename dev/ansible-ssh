@@ -20,14 +20,17 @@ import subprocess
 import sys
 
 NO_HOSTKEY_CHECK_OPTS = [
-    '-o', 'StrictHostKeyChecking=no',
-    '-o', 'GlobalKnownHostsFile=/dev/null',
-    '-o', 'UserKnownHostsFile=/dev/null'
+    "-o",
+    "StrictHostKeyChecking=no",
+    "-o",
+    "GlobalKnownHostsFile=/dev/null",
+    "-o",
+    "UserKnownHostsFile=/dev/null",
 ]
 
 if __name__ == "__main__":
-    no_known_hosts = '-n' in sys.argv
-    if sys.argv[-1] in (sys.argv[0], '-n'):
+    no_known_hosts = "-n" in sys.argv
+    if sys.argv[-1] in (sys.argv[0], "-n"):
         print(__doc__, file=sys.stderr)
         sys.exit(-1)
 
@@ -40,8 +43,8 @@ if __name__ == "__main__":
         "{{ ansible_ssh_common_args | default('') }} "
         "{{ ansible_user }}@{{ ansible_host }}"
     )
-    module_args = json.dumps({'msg': template_str})
-    ansible_cmd = ['ansible', pattern, '-o', '-m', 'debug', '-a', module_args]
+    module_args = json.dumps({"msg": template_str})
+    ansible_cmd = ["ansible", pattern, "-o", "-m", "debug", "-a", module_args]
     try:
         output = subprocess.check_output(ansible_cmd, text=True)
     except subprocess.CalledProcessError:
@@ -53,8 +56,8 @@ if __name__ == "__main__":
     # one line per host
     if not output:
         sys.exit(1)
-    result = output.splitlines()[0].split('>', 1)[-1]
-    expanded = json.loads(result)['msg']
+    result = output.splitlines()[0].split(">", 1)[-1]
+    expanded = json.loads(result)["msg"]
     # can assume ansible_host exists b/c defined by terraform
     # can assume ansible_user exists b/c defined in common inventory
 
