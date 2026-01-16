@@ -8,7 +8,7 @@ At present this will affect the following:
 - The MySQL database for `slurmdbd`, i.e. Slurm accounting information as shown by the `sacct` command.
 - Prometheus database
 - Grafana data
-- OpenDistro/elasticsearch data
+- OpenDistro/Elasticsearch data
 
 If using the upstream defaults in the `site` environments `inventory/groups` file then these services will all be on the `control` node and hence only this node requires persistent storage.
 

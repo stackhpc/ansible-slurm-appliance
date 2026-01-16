@@ -8,7 +8,7 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 
 - An OpenHPC v2.4 or later cluster (due to [this issue](https://github.com/openhpc/ohpc/issues/1346) in previous versions).
 - The `openondemand` node, i.e. the node which will host the Open Ondemand server/portal must:
-  - Have the slurm packages (e.g. `sinfo` etc) installed and be able to contact the Slurm controller (e.g. add this node to the `login` group).
+  - Have the Slurm packages (e.g. `sinfo` etc) installed and be able to contact the Slurm controller (e.g. add this node to the `login` group).
   - Have access to any cluster shared filesystems.
 - Open Ondemand's authentication maps authenticated users (e.g. via OIDC) to local users on the `openondemand` node.
   Therefore whatever mechanism provides cluster users (e.g. `basic_users`, `freeipa`, `ldap` via sssd) must cover the `openondemand` node.
@@ -121,7 +121,6 @@ The Open Ondemand portal can proxy other servers. Variables:
   `'({{ openhpc_cluster_name }}-compute-\d+)|({{ groups["grafana"] | first }})'`
 
   to proxy:
-
   - All "compute" nodes, e.g. for Open Ondemand interactive apps such as remote desktop and Jupyter notebook server.
   - The Grafana server - note a link to Grafana is always added to the Open Ondemand dashboard.
 

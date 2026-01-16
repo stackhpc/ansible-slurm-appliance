@@ -1,6 +1,6 @@
 # slurm_recompile
 
-Recompiles slurm from source RPMs and installs the packages that were built.
+Recompiles Slurm from source RPMs and installs the packages that were built.
 
 ## Requirements
 

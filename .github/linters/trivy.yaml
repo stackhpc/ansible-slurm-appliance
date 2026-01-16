@@ -1,0 +1,7 @@
+---
+# trivy doesn't have a way to use the .gitignore file
+scan:
+  skip-dirs:
+    - .ansible
+  skip-files:
+    - requirements.txt

@@ -2,7 +2,7 @@
 
 Manage filesystems on block devices (such as OpenStack volumes), including creating partitions, creating filesystems and mounting filesystems.
 
-This is a convenience wrapper around the ansible modules:
+This is a convenience wrapper around the Ansible modules:
 
 - community.general.parted
 - community.general.filesystem

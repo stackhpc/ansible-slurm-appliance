@@ -4,12 +4,12 @@
 
 ### [filebeat](https://www.elastic.co/beats/filebeat)
 
-Parses log files and ships them to elasticsearch. Note we use the version shipped by Open Distro.
+Parses log files and ships them to Elasticsearch. Note we use the version shipped by Open Distro.
 
 ### [grafana](https://grafana.com/)
 
 Visualisation tool that supports multiple different datasources. In our stack,
-we use it to visualise prometheus and elasticsearch data.
+we use it to visualise prometheus and Elasticsearch data.
 
 ### [opensearch](https://https://opensearch.org/)
 
@@ -23,7 +23,7 @@ Metrics are scraped from exporters. Exporters are services which expose HTTP end
 
 ### [slurm-stats](https://github.com/stackhpc/slurm-openstack-tools)
 
-Tool which parses slurm accounting data and produces a log file that is suitable for ingest by filebeat.
+Tool which parses Slurm accounting data and produces a log file that is suitable for ingest by filebeat.
 
 ## Definition of terms
 
@@ -59,13 +59,13 @@ The appliance defaults for the `filebeat` role can be found at the following loc
 
 ### filebeat overview
 
-Filebeat is configured to scrape the output of slurm stats. Slurm stats produces a json log file in the following location on the host:
+Filebeat is configured to scrape the output of Slurm stats. Slurm stats produces a JSON log file in the following location on the host:
 
 > /var/log/slurm-stats/finished_jobs.json
 
 This is exposed to the `filebeat` container through a volume which mounts `/var/log` on the host to `/logs` in the container, where `/logs` is used to differentiate the host logs from the container logs.
 
-Filebeat is configured to read this log file and post the data to elasticsearch via:
+Filebeat is configured to read this log file and post the data to Elasticsearch via:
 
 > [environments/common/files/filebeat/filebeat.yml](../environments/common/files/filebeat/filebeat.yml)
 
@@ -112,19 +112,19 @@ The appliance ships with a default set of dashboards. The set of dashboards can 
 
 #### node exporter
 
-This shows detailed metrics about an individual host. The metric source is `node exporter` (See [prometheus section](#prometheus-1) for more details). A slurm job annotation can optionally be enabled which will highlight the period of time where a given slurm job was running. The slurm job that is highlighted is controlled by the `Slurm Job ID` variable. An example is shown below:
+This shows detailed metrics about an individual host. The metric source is `node exporter` (See [prometheus section](#prometheus-1) for more details). A Slurm job annotation can optionally be enabled which will highlight the period of time where a given Slurm job was running. The Slurm job that is highlighted is controlled by the `Slurm Job ID` variable. An example is shown below:
 
 ![node exporter](screenshots/grafana/dashboard-node-exporter.png)
 
-#### slurm jobs
+#### Slurm jobs
 
-This dashboard shows all of the slurm jobs that have run in a given time window. An example screenshot is show below:
+This dashboard shows all of the Slurm jobs that have run in a given time window. An example screenshot is show below:
 
 ![slurm jobs](screenshots/grafana/dashboard-openhpc-slurm-jobs.png)
 
-Clicking on a row will link you to either the "openhpc" dashboard, or the "node exporter" dashboard. The "target dashboard" is controlled by the `Dashboard URL` drop-down menu. By navigating to these dashboards in this manner, slurm job annotations will be enabled. This will:
+Clicking on a row will link you to either the "openhpc" dashboard, or the "node exporter" dashboard. The "target dashboard" is controlled by the `Dashboard URL` drop-down menu. By navigating to these dashboards in this manner, Slurm job annotations will be enabled. This will:
 
-1. Highlight the slurm job, corresponding to the one you clicked, on the target dashboard.
+1. Highlight the Slurm job, corresponding to the one you clicked, on the target dashboard.
 
 2. It will also pass a regular expression matching nodes where the job was active. This causes the `Instance` drop down to only show those hosts.
 
@@ -136,17 +136,17 @@ This is show below:
 
 #### openhpc
 
-This dashboard is used visualise metrics from a group of hosts. The grouping is configured via the `env` label on the prometheus metrics (See [prometheus section](#prometheus-1) for more details). Grafana annotations are used to display the start and stop times of slurm jobs. An example screenshot is shown below:
+This dashboard is used visualise metrics from a group of hosts. The grouping is configured via the `env` label on the prometheus metrics (See [prometheus section](#prometheus-1) for more details). Grafana annotations are used to display the start and stop times of Slurm jobs. An example screenshot is shown below:
 
 ![slurm jobs](screenshots/grafana/dashboard-openhpc-slurm.png)
 
-The region highlighted in red shows the start and stop times of an example slurm job.
+The region highlighted in red shows the start and stop times of an example Slurm job.
 
 ### datasources
 
 The default configuration configures the following datasources:
 
-1. elasticsearch
+1. Elasticsearch
 
    Connects to the `opendistro` service that is deployed by this appliance.
 
@@ -229,7 +229,7 @@ The `prometheus` group determines the placement of the prometheus service. Load 
 
 ### Prometheus access
 
-Prometheus is exposed on port `9090` on all hosts in the prometheus group. Currently, the configuration assumes a single host. Following the reference layout in `environments/site/inventory/groups`, this will be set to the slurm `control` node, prometheus would then be accessible from:
+Prometheus is exposed on port `9090` on all hosts in the prometheus group. Currently, the configuration assumes a single host. Following the reference layout in `environments/site/inventory/groups`, this will be set to the Slurm `control` node, prometheus would then be accessible from:
 
 > http://<control_node_ip>:9090
 
@@ -260,11 +260,11 @@ of collectors that are available, see the upstream documentation.
 
 This appliance customises the default set of collectors to a minimal set, these are:
 
-- netdev
-- cpu
-- meminfo
-- infiniband
-- cpufreq
+- `netdev`
+- `cpu`
+- `meminfo`
+- `infiniband`
+- `cpufreq`
 
 The list can be customised by overriding the `collect[]` parameter of the `node` job in the `prometheus_scrape_configs` dictionary. The defaults can be found in:
 
@@ -272,7 +272,7 @@ The list can be customised by overriding the `collect[]` parameter of the `node`
 
 Variables in this file should _not_ be customised directly, but should be overridden in your `environment`. See [README.md](../README.md#environments) which details the process of overriding default variables in more detail.
 
-### custom ansible filters
+### custom Ansible filters
 
 #### prometheus_node_exporter_targets
 
@@ -288,7 +288,7 @@ applied:
 
 ## slurm-stats
 
-Slurm stats periodically queries the slurm accounting database to gather information about slurm jobs. The information it collects is output to a log file on the host at the following path:
+Slurm stats periodically queries the Slurm accounting database to gather information about Slurm jobs. The information it collects is output to a log file on the host at the following path:
 
 > /var/log/slurm-stats/finished_jobs.json
 
