@@ -33,17 +33,19 @@ if __name__ == "__main__":
 
     pattern = sys.argv[-1]
 
-    template_str = ("ssh "
-                   "{% if ansible_ssh_port | default(false) %}-p {{ ansible_ssh_port }} {% endif %}"
-                   "{% if ansible_ssh_private_key_file | default(false) %} -i {{ ansible_ssh_private_key_file }} {% endif %}"
-                   "{{ ansible_ssh_common_args | default('') }} "
-                   "{{ ansible_user }}@{{ ansible_host }}")
-    module_args = json.dumps({'msg':template_str})
+    template_str = (
+        "ssh "
+        "{% if ansible_ssh_port | default(false) %}-p {{ ansible_ssh_port }} {% endif %}"
+        "{% if ansible_ssh_private_key_file | default(false) %} -i {{ ansible_ssh_private_key_file }} {% endif %}"
+        "{{ ansible_ssh_common_args | default('') }} "
+        "{{ ansible_user }}@{{ ansible_host }}"
+    )
+    module_args = json.dumps({'msg': template_str})
     ansible_cmd = ['ansible', pattern, '-o', '-m', 'debug', '-a', module_args]
     try:
         output = subprocess.check_output(ansible_cmd, text=True)
-    except (subprocess.CalledProcessError):
-        msg = ("[ERROR]: ansible exited in error")
+    except subprocess.CalledProcessError:
+        msg = "[ERROR]: ansible exited in error"
         print(msg, file=sys.stderr)
         sys.exit(-1)
     # output looks like e.g.
