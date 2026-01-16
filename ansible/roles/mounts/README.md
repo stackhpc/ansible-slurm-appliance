@@ -7,7 +7,6 @@ Define custom mount points using fstab.
 - `mounts_default`: Optional. Dict defining required mounts. Keys are arbitrary
   unique name for the mount. Values are a dict with the following possible
   entries:
-
   - `path`: Required string. Path to the mount point (created if necessary).
   - `src`: Required string. Device, NFS volume, etc, to be mounted on `path`.
   - `fstype`: Required string. Filesystem type.
