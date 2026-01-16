@@ -230,4 +230,4 @@ as in step 3.
 
   Note that although `groups` is defined in the templated hostvars, when
   the hostvars are loaded using `include_vars:` is is ignored as it is a
-  "magic variable" determined by ansible itself and cannot be set.
+  "magic variable" determined by Ansible itself and cannot be set.

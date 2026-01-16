@@ -24,4 +24,4 @@ builder
 
 See `defaults/main.yml`
 
-Note ansible facts are required, unless setting `ofed_distro_version` and `ofed_arch` specifically.
+Note Ansible facts are required, unless setting `ofed_distro_version` and `ofed_arch` specifically.

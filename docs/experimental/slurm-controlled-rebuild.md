@@ -39,7 +39,7 @@ In summary, the way this functionality works is as follows:
    controlled by the [compute_init](../../ansible/roles/compute_init/README.md)
    role, to fully configure the node again. It retrieves the required cluster
    configuration information from the control node via an NFS mount.
-7. Once the `slurmd` daemon starts on a compute node, the slurm controller
+7. Once the `slurmd` daemon starts on a compute node, the Slurm controller
    registers the node as having finished rebooting. It then launches the actual
    job, which does not do anything.
 
