@@ -1,23 +1,23 @@
 name: Build fat image
 'on':
   workflow_dispatch:
-      # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
-      inputs:
-        ci_cloud:
-          description: 'Select the CI_CLOUD'
-          required: true
-          type: choice
-          options:
-            - default
-            - LEAFCLOUD
-            - SMS
-            - ARCUS
-          default: default # Use repo CI_CLOUD setting
-        cleanup_on_failure:
-          description: Cleanup Packer resources on failure
-          type: boolean
-          required: true
-          default: true
+    # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
+    inputs:
+      ci_cloud:
+        description: 'Select the CI_CLOUD'
+        required: true
+        type: choice
+        options:
+          - default
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+        default: default # Use repo CI_CLOUD setting
+      cleanup_on_failure:
+        description: Cleanup Packer resources on failure
+        type: boolean
+        required: true
+        default: true
 
 permissions:
   contents: read

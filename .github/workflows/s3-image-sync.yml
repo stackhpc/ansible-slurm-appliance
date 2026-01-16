@@ -35,7 +35,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get --yes install s3cmd
-      
+
       - name: Cleanup S3 bucket
         run: |
           s3cmd rm s3://${{ env.S3_BUCKET }} --recursive --force
@@ -130,7 +130,7 @@ jobs:
         build:
           - RL8
           - RL9
-        exclude: 
+        exclude:
           - cloud: ${{ needs.image_upload.outputs.ci_cloud }}
 
     env:

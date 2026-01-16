@@ -37,7 +37,7 @@ jobs:
       - name: Find the latest release
         run: |
           echo "LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name)" >> "$GITHUB_ENV"
-      
+
       - name: Checkout latest release
         uses: actions/checkout@v4
         with:
@@ -82,7 +82,7 @@ jobs:
       - name: Install ansible, pip and galaxy requirements
         run: dev/setup-env.sh
         env:
-           PYTHON_VERSION: python3 # overrides os-release discovery logic
+          PYTHON_VERSION: python3  # overrides os-release discovery logic
 
       - name: Install OpenTofu
         uses: opentofu/setup-opentofu@v1.0.5
@@ -175,7 +175,7 @@ jobs:
           cd "$STACKHPC_TF_DIR"
           tofu init
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
-          
+
       - name: Configure cluster using current branch
         run: |
           . venv/bin/activate
@@ -245,7 +245,7 @@ jobs:
       - name: Delete possible volume snapshot from slurm upgrade
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate  
+          . environments/.stackhpc/activate
           if [ -n "$SNAPSHOT" ]
           then
               echo "Deleting $SNAPSHOT"

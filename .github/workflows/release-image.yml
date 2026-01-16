@@ -34,11 +34,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get --yes install s3cmd
-      
+
       - name: Retrieve image name
         run: |
           TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
-      
+
       - name: Copy image from pre-release to release bucket
         run: s3cmd cp s3://openhpc-images-prerelease/${{ env.TARGET_IMAGE }} s3://openhpc-images
