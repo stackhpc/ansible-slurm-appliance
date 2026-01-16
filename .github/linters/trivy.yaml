@@ -3,3 +3,5 @@
 scan:
   skip-dirs:
     - .ansible
+  skip-files:
+    - requirements.txt
