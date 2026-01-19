@@ -4,13 +4,13 @@ bastion_config:
   ARCUS:
     user: slurm-app-ci
     ip: 128.232.222.183
-  LEAFCLOUD:
+  LEAFCLOUD: # https://github.com/stackhpc/leafcloud-slurm-jumphost
     user: slurm-app-ci
-    ip: 195.114.30.222
+    ip: 45.135.59.32
   SMS:
     user: slurm-app-ci
     ip: 185.45.78.150
 # NB: The bastion_{user,ip} variables are used directly in the CI workflow too
 bastion_user: "{{ bastion_config[ci_cloud].user }}"
 bastion_ip: "{{ bastion_config[ci_cloud].ip }}"
-ansible_ssh_common_args: '-o ProxyCommand="ssh {{ bastion_user }}@{{ bastion_ip }} -W %h:%p"'
+ansible_ssh_common_args: "-o ProxyCommand='ssh {{ bastion_user }}@{{ bastion_ip }} -W %h:%p'"
