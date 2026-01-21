@@ -2,10 +2,6 @@
 cvmfs_release_version: "6-3"
 
 cvmfs_quota_limit_mb: 10000 # local cache soft quota in MB (default 10GB)
-
-# NB: The string omit removes the option. Defined here for both default configs
-# so make swapping between them work properly.
-# TODO explain the omits
 cvmfs_config_single:
   CVMFS_CLIENT_PROFILE: single
   CVMFS_QUOTA_LIMIT: "{{ cvmfs_quota_limit_mb }}"

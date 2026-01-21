@@ -163,7 +163,7 @@ will have been generated for you already under
 
 ## Define and deploy infrastructure
 
-Modify the cookiecutter-templtaed OpenTofu configuration to define the required
+Modify the cookiecutter-templated OpenTofu configuration to define the required
 infrastructure, e.g.:
 
 ```hcl
@@ -450,5 +450,3 @@ Once it completes you can log in to the cluster using:
 
 For further information, including additional configuration guides and
 operations instructions, see the [docs](README.md) directory.
-
-TODO: Add stuff on eessi proxy.
