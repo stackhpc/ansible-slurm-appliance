@@ -70,6 +70,7 @@ it also requires an image build with the role name added to the
 | iam.yml                  | freeipa_server                | Not relevant for compute nodes  | n/a                 |
 | iam.yml                  | sssd                          | Fully supported                 | No                  |
 | filesystems.yml          | block_devices                 | None required - role deprecated | n/a                 |
+| filesystems.yml          | mounts                        | Fully supported                 | No                  |
 | filesystems.yml          | nfs                           | All client functionality        | No                  |
 | filesystems.yml          | manila                        | All functionality               | No [5]              |
 | filesystems.yml          | lustre                        | All functionality               | Yes                 |
@@ -174,7 +175,7 @@ play also get picked up.
 6. Fake a reimage of compute to run ansible-init and the updated compute-init playbook:
 
 ```shell
-ansible all -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
+ansible compute -m shell -ba "rm -f /var/lib/ansible-init.done && systemctl restart ansible-init"
 ```
 
 Use `systemctl status ansible-init` to view stdout/stderr from Ansible.
