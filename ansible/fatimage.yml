@@ -10,6 +10,16 @@
     - name: Report inventory groups
       ansible.builtin.debug:
         var: group_names
+    - name: Report ssh command to connect
+      ansible.builtin.debug:
+        msg: >
+          connect to builder machine using:
+          ssh {% if ansible_ssh_port | default(false) %}-p {{ ansible_ssh_port }}{% endif %}
+          {% if ansible_ssh_private_key_file | default(false) %} -i {{ ansible_ssh_private_key_file }}{% endif %}
+          {{ ansible_ssh_common_args | default('') }}
+          {{ ansible_ssh_extra_args | default('') }}
+          -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
+          {{ ansible_user }}@{{ ansible_host }}
 
 - name: Run pre.yml hook
   vars:
@@ -121,40 +131,31 @@
       when: "'openhpc' in group_names"
 
     # - import_playbook: portal.yml
-    - name: Open OnDemand server (packages)
+    - name: Install Open OnDemand server and apps
       ansible.builtin.include_role:
-        name: osc.ood
-        tasks_from: install-package.yml
-        vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
-      when: "'openondemand' in group_names"
-
-    - name: Open OnDemand server (apps)
-      ansible.builtin.include_role:
-        name: osc.ood
-        tasks_from: install-apps.yml
-        vars_from: "Rocky/{{ ansible_distribution_major_version }}.yml"
+        name: openondemand
       when: "'openondemand' in group_names"
 
     - name: Open OnDemand remote desktop # Used for plain desktop and matlab
-      ansible.builtin.import_role:
+      ansible.builtin.include_role:
         name: openondemand
         tasks_from: vnc_compute.yml
       when: "'openondemand_desktop' or 'openondemand_matlab' in group_names"
 
     - name: Open OnDemand Jupyter node
-      ansible.builtin.import_role:
+      ansible.builtin.include_role:
         name: openondemand
         tasks_from: jupyter_compute.yml
       when: "'openondemand_jupyter' in group_names"
 
     - name: Open OnDemand RStudio node
-      ansible.builtin.import_role:
+      ansible.builtin.include_role:
         name: openondemand
         tasks_from: rstudio_compute.yml
       when: "'openondemand_rstudio' in group_names"
 
     - name: Open OnDemand Code Server node
-      ansible.builtin.import_role:
+      ansible.builtin.include_role:
         name: openondemand
         tasks_from: codeserver_compute.yml
       when: "'openondemand_codeserver' in group_names"

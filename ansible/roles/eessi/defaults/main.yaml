@@ -19,5 +19,3 @@ cvmfs_config_proxy:
 cvmfs_config_default: "{{ cvmfs_config_single if cvmfs_http_proxy == '' else cvmfs_config_proxy }}"
 cvmfs_config_overrides: {}
 cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
-
-cvmfs_gpg_checksum: "sha256:5c60679d307a96524204c127250e8ebdda66a459659faa1718bdf32dde1d7069"

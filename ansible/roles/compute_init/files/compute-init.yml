@@ -12,6 +12,7 @@
     enable_sssd: "{{ os_metadata.meta.sssd | default(false) | bool }}"
     enable_sshd: "{{ os_metadata.meta.sshd | default(false) | bool }}"
     enable_tuned: "{{ os_metadata.meta.tuned | default(false) | bool }}"
+    enable_mounts: "{{ os_metadata.meta.mounts | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
     enable_lustre: "{{ os_metadata.meta.lustre | default(false) | bool }}"
@@ -57,8 +58,8 @@
       ansible.builtin.file:
         path: /mnt/cluster
         state: directory
-        owner: slurm
-        group: root
+        owner: ansible-init
+        group: ansible-init
         mode: u=rX,g=rwX,o=
 
     - name: Mount /mnt/cluster
@@ -184,6 +185,11 @@
       vars:
         sssd_conf_src: "/var/tmp/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
       when: enable_sssd
+
+    - name: Setup custom mounts
+      ansible.builtin.include_role:
+        name: mounts
+      when: enable_mounts
 
     # NFS client mount
     - name: If nfs-clients is present

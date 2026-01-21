@@ -111,7 +111,6 @@ per-checkout configuration is required.
 
 1. Create an S3 bucket with a name `${cluster_name}-${environment_name}-tfstate`
    where:
-
    - `CLUSTER_NAME` is defined in `environments/$ENV/tofu/main.tf`
    - `$ENVIRONMENT_NAME` is the name of the environment directory
 
@@ -126,8 +125,6 @@ per-checkout configuration is required.
    ```shell
    openstack ec2 credentials create
    ```
-
-   and make a note of the `access` field returned.
 
 3. Create the backend file:
 
@@ -144,12 +141,18 @@ per-checkout configuration is required.
 5. Add the following to `environments/$ENV/activate`:
 
    ```bash
-   export AWS_ACCESS_KEY_ID=$EC2_CREDENTIALS_ACCESS
-   export AWS_SECRET_ACCESS_KEY=$(openstack ec2 credentials show $AWS_ACCESS_KEY_ID -f value -c secret)
-   ```
+   # Get current openstack project:
+   TOKEN_DATA=$(openstack token issue -f json)
+   PROJECT_ID=$(echo "$TOKEN_DATA" | jq -r '.project_id')
+   TOKEN_ID=$(echo "$TOKEN_DATA" | jq -r '.id')
+   openstack token revoke $TOKEN_ID
 
-   replacing `$EC2_CREDENTIALS_ACCESS` with the `access` field of the created
-   credentials.
+   # Get first creds in current project:
+   EC2_CREDS=$(openstack ec2 credentials list -f json | jq -r --arg pid "$PROJECT_ID" '.[] | select(.["Project ID"] == $pid) | @json' | head -n 1)
+   # Set creds for OpenTofu s3 backend:
+   export AWS_ACCESS_KEY_ID=$(echo "$EC2_CREDS" | jq -r '.Access')
+   export AWS_SECRET_ACCESS_KEY=$(echo "$EC2_CREDS" | jq -r '.Secret')
+   ```
 
    This avoids these credentials being persisted in local files.
 
@@ -180,5 +183,20 @@ For more configuration options, see the OpenTofu [s3 backend docs](https://opent
 
 ### Per-checkout configuration
 
-The ec2 credentials will automatically be loaded when activating the environment.
-For a new checkout simply initialise OpenTofu as normal as described in step 7 above.
+EC2 credentials are per-user and per-project. Check you have credentials for
+the current project using:
+
+```shell
+openstack ec2 credentials list # to show credentials
+openstack project list         # to show project IDs
+```
+
+and if not, create them:
+
+```shell
+openstack ec2 credentials create
+```
+
+The ec2 credentials will then automatically be loaded when activating the
+environment. For a new checkout simply initialise OpenTofu as normal as
+described in step 7 above.

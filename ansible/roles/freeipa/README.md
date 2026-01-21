@@ -33,12 +33,15 @@ Support FreeIPA in the appliance. In production use it is expected the FreeIPA s
   - This is implemented when using the site OpenTofu; on the control node `appliances_state_dir` defaults to `/var/lib/state` which is mounted from a volume.
   - Nodes are not re-enroled by a [Slurm-driven reimage](../../collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md) (as that does not run this role).
   - If both a backed-up keytab and `freeipa_host_password` exist, the former is used.
+  - When re-enroling, the host record in FreeIPA host record is updated with the
+    current hostkey. The `persist_hostkeys` role may be used if rebuilds/reimages
+    should not change keys.
 
 ### Role Variables for Clients
 
 - `freeipa_host_password`. Required for initial enrolment only, FreeIPA host password as described above.
 - `freeipa_setup_dns`: Optional, whether to use the FreeIPA server as the client's nameserver. Defaults to `true` when `freeipa_server` contains a host, otherwise `false`.
-- `freeipa_ca_cert_file`: Optional, path **on the ansible deploy host** to FreeIPA server cert. Else this will be downloaded (insecurely) from the FreeIPA server over http.
+- `freeipa_ca_cert_file`: Optional, path **on the Ansible deploy host** to FreeIPA server cert. Else this will be downloaded (insecurely) from the FreeIPA server over http.
 
 See also use of `appliances_state_dir` on the control node as described above.
 
@@ -50,7 +53,7 @@ As noted above this is only intended for development and testing. Note it cannot
 
 - Add a single host to the `freeipa_server` group and run (at a minimum) the `ansible/bootstrap.yml` and `ansible/iam.yml` playbooks.
 - As well as configuring the FreeIPA server, the role will also:
-  - Add ansible hosts in the group `freeipa_client` as FreeIPA hosts.
+  - Add Ansible hosts in the group `freeipa_client` as FreeIPA hosts.
   - Optionally control users in FreeIPA - see `freeipa_users` below.
 
 The FreeIPA GUI will be available on `https://<freeipa_server_ip>/ipa/ui`.

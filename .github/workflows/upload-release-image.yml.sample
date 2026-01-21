@@ -14,7 +14,7 @@
 # Details on the contents of the clouds.yaml file can be found at https://docs.openstack.org/keystone/latest/user/application_credentials.html
 
 name: Upload release images to client sites from s3
-on:
+'on':
   workflow_dispatch:
     inputs:
       image_name:
