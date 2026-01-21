@@ -194,7 +194,6 @@ as in step 3.
   from this mount ASAP in the compute-init script. TODO:
 
 - There are a couple of approaches to supporting existing roles using `compute-init`:
-
   1. Control node copies files resulting from role into cluster exports,
      compute-init copies to local disk. Only works if files are not host-specific
      Examples: etc_hosts, eessi config?
@@ -231,4 +230,4 @@ as in step 3.
 
   Note that although `groups` is defined in the templated hostvars, when
   the hostvars are loaded using `include_vars:` is is ignored as it is a
-  "magic variable" determined by ansible itself and cannot be set.
+  "magic variable" determined by Ansible itself and cannot be set.
