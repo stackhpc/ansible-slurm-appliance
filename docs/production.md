@@ -196,14 +196,6 @@ module "cluster" {
       flavor = "compute_flavor_name" # *
     }
   }
-  additional_nodes = {
-    # Nodes configured to provide a squid proxy for EESSI - for guidance
-    # on number and sizing see [docs/eessi.md](./eessi.md#eessi-proxy-configuration)
-    squid = {
-      nodes = ["squid-0"]
-      flavor = squid_flavor_name # *
-    }
-  }
 }
 ```
 
@@ -388,15 +380,8 @@ environments which should be unique, e.g. production and staging.
   not, remove `grafana_auth_anonymous` in
   `environments/$ENV/inventory/group_vars/all/grafana.yml`
 
-- Configure EESSI to be proxied via the `squid` node(s) defined in the OpenTofu
-  configuration:
-
-  ```yaml
-  # environments/site/inventory/group_vars/all/squid.yml:
-  squid_conf_mode: eessi
-  ```
-
-  See [docs/eessi](./eessi.md#eessi-proxy-configuration) for more information.
+- Consider if the [default proxy deployment and configuration](./eessi.md#eessi-proxy-configuration)
+  for EESSI is appropriate.
 
 - See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
   raising `hpctests_hpl_mem_frac` during tests.

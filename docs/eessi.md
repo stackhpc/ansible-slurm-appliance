@@ -113,22 +113,16 @@ make
 ## EESSI Proxy Configuration
 
 EESSI recommend that clusters use a proxy to reduce latency for clients and
-avoid excessive load on the EESSI Stratum 1 servers. Squid can be deployed and
-configured appropriately as this proxy on separate node(s) using
-the OpenTofu variable `additional_nodegroups`, e.g.:
+avoid excessive load on the EESSI Stratum 1 servers. By default:
+- A [squid proxy](https://www.squid-cache.org/) is deployed to the control node.
+- `squid` is configured with the EESSI-recommended cache configuration, requiring
+  the node to have 50GB disk and 1024MB of RAM available.
+- `squid` allows connections from the CIDR of the [access network](./networks.md)
+  (first network in `cluster_networks`).
+- `eessi` client are configured to use the IP of `squid` node(s) on the access
+  network as the proxy address(es).
 
-```hcl
-additional_nodegroups = {
-    # EESSI squid proxy
-    squid = {
-      nodes = ["squid-0"]
-      flavor = squid.flavor
-    }
-  }
-```
-
-EESSI [recommend](https://www.eessi.io/docs/tutorial/access/proxy/#general-recommendations)
-that:
+Note that EESSI [recommend](https://www.eessi.io/docs/tutorial/access/proxy/#general-recommendations):
 
 > The proxy server should have a 10Gbit link to the client systems, a
 > sufficiently powerful CPU, a decent amount of memory for the kernel cache (tens
@@ -137,20 +131,23 @@ that:
 > As a rule of thumb, it is recommended to have (at least) one proxy server for
 > every couple of hundred worker nodes (100-500).
 
-Generally, both the `squid` nodes and the `eeesi` client nodes can be
-appropriately configured simply by setting the squid mode to `eessi`:
+The above default configuration may be modified via:
+- [squid role](../ansible/roles/squid/README.md) variables for cache sizes and access rules.
+- [eessi role](../ansible/roles/eessi/README.md) variables for proxy IPs (e.g.
+  including using a non-appliance-controlled proxy).
+- The node(s) where `squid` is deployed via `environments/site/inventory/groups`.
 
-```yaml
-# environments/site/inventory/group_vars/all/squid.yml:
-squid_conf_mode: eessi
+Separate node(s) could also be provisioned for squid via OpenTofu, e.g.:
+
+```hcl
+# environments/$ENV/tofu/main.tf:
+module "cluster" {
+...
+  additional_nodes = {
+    squid = {
+      nodes = ["squid-0"]
+      flavor = "squid_flavor_name"
+    }
+  }
+}
 ```
-
-In this mode, by default:
-
-- `squid` is configured to allow clients from the access network's CIDR, using
-  the EESSI-recommended cache configuration
-- `eessi` is configured to use the `squid` node IPs on the access network (the
-  first network in `cluster_networks`) as proxies.
-
-If this is not suitable then override the defaults provided by `environments/common/inventory/group_vars/all/eessi.yml`
-and the `eeesi` and `squid` roles.
