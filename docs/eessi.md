@@ -114,6 +114,7 @@ make
 
 EESSI recommend that clusters use a proxy to reduce latency for clients and
 avoid excessive load on the EESSI Stratum 1 servers. By default:
+
 - A [squid proxy](https://www.squid-cache.org/) is deployed to the control node.
 - `squid` is configured with the [EEESI-recommended configuration](https://www.eessi.io/docs/tutorial/access/proxy/#configuration),
   requiring the node to have 50GB disk and 1024MB of RAM available.
@@ -132,6 +133,7 @@ Note that EESSI [recommend](https://www.eessi.io/docs/tutorial/access/proxy/#gen
 > every couple of hundred worker nodes (100-500).
 
 The above default configuration may be modified via:
+
 - [squid role](../ansible/roles/squid/README.md) variables for cache sizes and access rules.
 - [eessi role](../ansible/roles/eessi/README.md) variables for proxy IPs (e.g.
   including using a non-appliance-controlled proxy).
