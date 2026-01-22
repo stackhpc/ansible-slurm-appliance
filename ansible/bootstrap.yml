@@ -165,7 +165,7 @@
         tasks_from: set_repos.yml
       when: "'dnf_repos' in group_names"
     - name: Configure squid proxy
-      ansible.builtin.import_role:
+      ansible.builtin.include_role:
         name: squid
         tasks_from: "{{ 'install.yml' if appliances_mode != 'configure' else 'main.yml' }}"
 
