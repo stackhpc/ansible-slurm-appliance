@@ -30,8 +30,6 @@ jobs:
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v25.4.0
-        with:
-          args: '-i environments/common/inventory/'
         env:
           ANSIBLE_COLLECTIONS_PATH: .ansible/collections
 

@@ -20,3 +20,6 @@ exclude_paths:
   - environments/common/files/filebeat/filebeat.yml
   # Rule 'load-failure[filenotfounderror]' is also unskippable
   - ansible/roles/compute_init/files/compute-init.yml
+
+extra_vars:
+  appliances_mode: build
