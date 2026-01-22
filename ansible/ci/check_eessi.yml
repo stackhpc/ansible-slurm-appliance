@@ -16,8 +16,8 @@
             module list
           '
       register: eeesi_modules
-    - debug:
-        var: eeesi_modules
+      changed_when: true
+
     - name: Ensure module loaded (shown in stderr)
       ansible.builtin.assert:
         that: eessi_test_module in eeesi_modules.stderr
