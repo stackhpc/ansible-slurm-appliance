@@ -167,6 +167,7 @@
     - name: Configure squid proxy
       ansible.builtin.import_role:
         name: squid
+        tasks_from: "{{ 'install.yml' if appliances_mode != 'configure' else 'main.yml' }}"
 
 - hosts: dnf_repos
   tags: dnf_repos
