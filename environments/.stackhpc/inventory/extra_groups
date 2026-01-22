@@ -43,6 +43,3 @@ compute
 
 [topology:children]
 compute
-
-[squid:children]
-control

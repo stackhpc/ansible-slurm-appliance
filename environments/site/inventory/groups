@@ -126,6 +126,7 @@ openondemand
 [squid:children]
 # Hosts to run squid proxy
 fatimage
+control
 
 [tuned:children]
 # Hosts to run TuneD configuration
