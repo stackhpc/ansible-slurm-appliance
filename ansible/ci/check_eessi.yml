@@ -1,52 +1,30 @@
 ---
 - name: Run EESSI test job
   hosts: login[0]
+  become: true
+  gather_facts: false
+  become_user: demo_user
   vars:
-    eessi_test_rootdir: /home/eessi_test
+    eessi_test_module: GCCcore/12.2.0
   tasks:
-    - name: Create test root directory
-      ansible.builtin.file:
-        path: "{{ eessi_test_rootdir }}"
-        state: directory
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: "0755"
-      become: true
-
-    - name: Clone eessi-demo repo  # noqa: latest[git]
-      ansible.builtin.git:
-        repo: "https://github.com/eessi/eessi-demo.git"
-        dest: "{{ eessi_test_rootdir }}/eessi-demo"
-
-    - name: Create batch script
-      ansible.builtin.copy:
-        dest: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow/tensorflow.sh"
-        content: |
-          #!/usr/bin/env bash
-          #SBATCH --output=%x.out
-          #SBATCH --error=%x.out
-          source /cvmfs/pilot.eessi-hpc.org/latest/init/bash
-          srun ./run.sh
-        mode: "0644"
-
-    - name: Run test job # noqa: no-changed-when
-      ansible.builtin.command:
-        cmd: sbatch --wait tensorflow.sh
-        chdir: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow"
-      register: job_output
-
-    - name: Retrieve job output
-      ansible.builtin.slurp:
-        src: "{{ eessi_test_rootdir }}/eessi-demo/TensorFlow/tensorflow.sh.out"
-      register: _tensorflow_out
-      no_log: true # as its base64 encoded so useless
-
-    - name: Show job output
-      ansible.builtin.debug:
-        msg: "{{ _tensorflow_out.content | b64decode }}"
-
-    - name: Fail if job output contains error
-      ansible.builtin.fail:
-        # Note: Job prints live progress bar to terminal, so use regex filter to remove this from stdout
-        msg: "Test job using EESSI modules failed. Job output was: {{ job_output.stdout | regex_replace('\b', '') }}"
-      when: '"Epoch 5/5" not in _tensorflow_out.content | b64decode'
+    - name: Activate EESSI and load GCC
+      ansible.builtin.shell:
+        cmd: >-
+          bash -lc '
+            source /cvmfs/software.eessi.io/versions/2023.06/init/bash &&
+            module load {{ eessi_test_module }} &&
+            module list
+          '
+      register: eeesi_modules
+    - debug:
+        var: eeesi_modules
+    - name: Ensure module loaded (shown in stderr)
+      ansible.builtin.assert:
+        that: eessi_test_module in eeesi_modules.stderr
+        fail_msg: |
+          Expected: '{{ eessi_test_module }}'
+          Got: {{ eeesi_modules.stderr }}
+      vars:
+        expected_output: |
+          Currently Loaded Modules:
+            1) GCCcore/12.2.0

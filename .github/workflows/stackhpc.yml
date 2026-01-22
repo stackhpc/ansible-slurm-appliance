@@ -149,12 +149,6 @@ jobs:
           . environments/.stackhpc/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
 
-      # - name: Run EESSI tests
-      #   run: |
-      #     . venv/bin/activate
-      #     . environments/.stackhpc/activate
-      #     ansible-playbook -vv ansible/ci/check_eessi.yml
-
       - name: Checkout current branch
         run: git checkout ${{ github.head_ref || github.ref_name }}
 
@@ -210,6 +204,12 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
+
+      - name: Run EESSI tests
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ansible-playbook -vv ansible/ci/check_eessi.yml
 
       - name: Confirm Open Ondemand is up (via SOCKS proxy)
         run: |
