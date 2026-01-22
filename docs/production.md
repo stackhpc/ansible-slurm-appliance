@@ -359,7 +359,6 @@ environments which should be unique, e.g. production and staging.
   or the nodes using the `mount` role can be modified in `environments/site/inventory/groups`.
 
 - Consider whether Prometheus storage configuration is required. By default:
-
   - A 200GB state volume is provisioned (but see above)
   - The common environment
     [sets](../environments/common/inventory/group_vars/all/prometheus.yml) a
@@ -406,7 +405,6 @@ environments which should be unique, e.g. production and staging.
 - By default, the appliance uses a built-in NFS share backed by an OpenStack
   volume for the cluster home directories. You may find that you want to change
   this. The following alternatives are supported:
-
   - [CephFS via OpenStack Manila](./filesystems.md)
   - [Lustre](../roles/lustre/README.md)
 

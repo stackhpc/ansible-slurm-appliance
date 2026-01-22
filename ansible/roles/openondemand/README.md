@@ -121,7 +121,6 @@ The Open Ondemand portal can proxy other servers. Variables:
   `'({{ openhpc_cluster_name }}-compute-\d+)|({{ groups["grafana"] | first }})'`
 
   to proxy:
-
   - All "compute" nodes, e.g. for Open Ondemand interactive apps such as remote desktop and Jupyter notebook server.
   - The Grafana server - note a link to Grafana is always added to the Open Ondemand dashboard.
 
