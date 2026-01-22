@@ -29,6 +29,7 @@ are empty here and constructed by `environments/common/inventory/groups_vars/all
   ```
 
   where:
+
   - "appstream": String, repository name (`name` parameter for `ansible.builtin.yum_repository`).
   - "8.10": String, `ansible_distribution_version` or `ansible_distribution_major_version`
   - `repo_file`: Required string giving repofile basename (`file` parameter for `ansible.builtin.yum_repository`).

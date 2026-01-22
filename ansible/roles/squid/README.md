@@ -20,6 +20,7 @@ Deploy a caching proxy.
 Where noted these map to squid parameters of the same name without the `squid_` prefix - see [squid documentation](https://www.squid-cache.org/Doc/config) for details.
 
 ## Both modes
+
 These role variables apply to both `squid_conf_mode` settings.
 
 - `squid_conf_mode`: Optional str, `default` (the default) or `eessi`. See above.
@@ -56,20 +57,20 @@ These role variables apply to both `squid_conf_mode` settings.
 - `squid_http_access`: Optional str, can be multiline. Allow/deny access based
   on access lists. Default:
 
-    ```text
-    # Deny requests to certain unsafe ports
-    http_access deny !Safe_ports
-    # Deny CONNECT to other than secure SSL ports
-    http_access deny CONNECT !SSL_ports
-    # Only allow cachemgr access from localhost
-    http_access allow localhost manager
-    http_access deny manager
-    # Rules allowing http access
-    http_access allow local_nodes
-    http_access allow localhost
-    # Finally deny all other access to this proxy
-    http_access deny all
-    ```
+  ```text
+  # Deny requests to certain unsafe ports
+  http_access deny !Safe_ports
+  # Deny CONNECT to other than secure SSL ports
+  http_access deny CONNECT !SSL_ports
+  # Only allow cachemgr access from localhost
+  http_access allow localhost manager
+  http_access deny manager
+  # Rules allowing http access
+  http_access allow local_nodes
+  http_access allow localhost
+  # Finally deny all other access to this proxy
+  http_access deny all
+  ```
 
   See squid parameter.
 
