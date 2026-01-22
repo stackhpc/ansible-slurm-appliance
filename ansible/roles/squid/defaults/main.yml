@@ -1,18 +1,23 @@
 ---
-squid_conf_mode: default # or 'eessi'
-
-# squid_conf_mode=default:
+# squid_conf_mode=eessi/general:
+squid_conf_mode: eessi # or 'general'
 squid_conf_template: "squid-{{ squid_conf_mode }}.conf.j2"
+squid_http_port: 3128
+squid_cache_mem: '1024 MB'
+squid_cache_dir: /var/spool/squid
+squid_cache_disk: 50000 # MB
+squid_maximum_object_size_in_memory:
+  eessi: '128 KB'
+  general: '64 MB'
+squid_maximum_object_size:
+  eessi: '1024 MB'
+  general: '200 MB'
+squid_local_nodes_cidr: "{{ cluster_subnets[0].cidr }}"
 squid_started: true
 squid_enabled: true
 
-squid_cache_mem: "{{ undef(hint='squid_cache_mem required, e.g. \"12 GB\"')  }}"
-squid_cache_dir: /var/spool/squid
-squid_cache_disk: "{{ undef(hint='squid_cache_disk (in MB) required, e.g. \"1024\"')  }}" # always in MB
-squid_maximum_object_size_in_memory: "64 MB"
-squid_maximum_object_size: "200 MB"
-squid_http_port: 3128
-squid_acls: acl anywhere src all # rely on openstack security groups
+# squid_conf_mode=general:
+squid_acls: "acl local_nodes src {{ squid_local_nodes_cidr }}"
 squid_http_access: |
   # Deny requests to certain unsafe ports
   http_access deny !Safe_ports
@@ -22,11 +27,10 @@ squid_http_access: |
   http_access allow localhost manager
   http_access deny manager
   # Rules allowing http access
-  http_access allow anywhere
+  http_access allow local_nodes
   http_access allow localhost
   # Finally deny all other access to this proxy
   http_access deny all
 
 # squid_conf_mode=eessi:
-squid_eessi_clients: "{{ cluster_subnets[0].cidr | mandatory('squid_eessi_clients must be defined when using eeesi squid config') }}"
 squid_eessi_stratum_1: '.eessi.science'

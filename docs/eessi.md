@@ -115,8 +115,8 @@ make
 EESSI recommend that clusters use a proxy to reduce latency for clients and
 avoid excessive load on the EESSI Stratum 1 servers. By default:
 - A [squid proxy](https://www.squid-cache.org/) is deployed to the control node.
-- `squid` is configured with the EESSI-recommended cache configuration, requiring
-  the node to have 50GB disk and 1024MB of RAM available.
+- `squid` is configured with the [EEESI-recommended configuration](https://www.eessi.io/docs/tutorial/access/proxy/#configuration),
+  requiring the node to have 50GB disk and 1024MB of RAM available.
 - `squid` allows connections from the CIDR of the [access network](./networks.md)
   (first network in `cluster_networks`).
 - `eessi` client are configured to use the IP of `squid` node(s) on the access
