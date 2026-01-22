@@ -1,7 +1,8 @@
-# tflint-ignore: terraform_required_providers
 locals {
   subnet_keys = ["name", "cidr"]
 }
+
+# tflint-ignore: terraform_required_providers
 resource "local_file" "hosts" {
   content = templatefile("${path.module}/inventory.tpl",
     {
