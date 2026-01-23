@@ -1,0 +1,28 @@
+---
+# Default state for all rules
+default: true
+
+# MD059/descriptive-link-text : Link text should be descriptive : https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md059.md
+# we often use [here](https://...)
+MD059: false
+
+# MD013/line-length : Line length : https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md
+# we wrote without this rule, so don't reformat just for the sake of it now.
+MD013:
+  line_length: 524
+
+# MD024/no-duplicate-heading : Multiple headings with the same content : https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md024.md
+MD024:
+  # Only check sibling headings
+  siblings_only: true
+
+# MD029/ol-prefix
+# the linter gets confused by blocks of code
+MD029: false
+
+# MD031/blanks-around-fences Fenced code blocks should be surrounded by blank lines
+# doesn't matter to github renderer
+MD031: false
+
+# MD036/no-emphasis-as-heading Emphasis used instead of a heading
+MD036: false

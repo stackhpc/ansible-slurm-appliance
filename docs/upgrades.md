@@ -111,7 +111,7 @@ Note a reservation cannot be created if it may overlap with currently running jo
    delete/recreate instances with the new images (depending on how the root disk is defined), and run Ansible's `site.yml`
    playbook to reconfigure the cluster, e.g. as described in the main [README.md](../README.md).
 
-1. Check slurm is up:
+1. Check Slurm is up:
 
 ```shell
 [LOGIN]$ sinfo -R

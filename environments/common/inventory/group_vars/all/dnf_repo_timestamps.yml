@@ -126,12 +126,10 @@ dnf_repos_default:
       pulp_path: eessi/rhel/8/noarch
       pulp_timestamp: 20251119T202303
       repo_file: cvmfs-config-eessi
-      # gpgcheck: false TODO:
     '9': # RL8/9 use the same repo
       pulp_path: eessi/rhel/8/noarch
       pulp_timestamp: 20251119T202303
       repo_file: cvmfs-config-eessi
-      # gpgcheck: false TODO:
   cernvmfs_pkgs:
     '8':
       pulp_path: cvmfs/EL/8/x86_64
