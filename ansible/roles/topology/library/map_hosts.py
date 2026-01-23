@@ -84,7 +84,7 @@ def run_module():  # pylint: disable=missing-function-docstring
 
     if len(all_host_ids) == 0:
         module.fail_json(
-            msg="No host_ids retrieved for servers - check OpenStack credentials are correct and servers are not shelved"
+            msg="No host_ids retrieved for servers - are OpenStack credentials correct?"
         )
 
     uuid_len = min_prefix(list(set(all_host_ids)))
