@@ -1,0 +1,28 @@
+# From https://www.eessi.io/docs/tutorial/access/proxy/
+# Define ACLs:
+acl local_nodes src {{ squid_local_nodes_cidr }}
+
+# Destination domains that are allowed
+# cern.ch + opensciencegrid.org domains because of cvmfs-config.cern.ch repository,
+# which are provided via Stratum-1 mirror servers hosted by CERN and OSG
+acl stratum_ones dstdomain .cern.ch .opensciencegrid.org {{ squid_eessi_stratum_1 }}
+
+# Squid port
+http_port {{ squid_http_port }}
+
+# Deny access to anything which is not part of our stratum_ones ACL.
+http_access deny !stratum_ones
+
+# Only allow access from our local machines
+http_access allow local_nodes
+http_access allow localhost
+
+# Finally, deny all other access to this proxy
+http_access deny all
+
+minimum_expiry_time 0
+maximum_object_size {{ squid_maximum_object_size[squid_conf_mode] }}
+
+cache_mem {{ squid_cache_mem }}
+maximum_object_size_in_memory {{ squid_maximum_object_size_in_memory[squid_conf_mode] }}
+cache_dir ufs {{ squid_cache_dir }} {{ squid_cache_disk | int }} 16 256

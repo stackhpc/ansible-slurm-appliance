@@ -168,7 +168,7 @@ docker run --rm \
     -e RUN_LOCAL=true \
     --env-file "super-linter.env" \
     -v "$(pwd)":/tmp/lint \
-    ghcr.io/super-linter/super-linter:v7.3.0
+    ghcr.io/super-linter/super-linter:v8.3.2
 ```
 
 ```shell

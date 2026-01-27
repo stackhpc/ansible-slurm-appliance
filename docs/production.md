@@ -163,33 +163,39 @@ will have been generated for you already under
 
 ## Define and deploy infrastructure
 
-Create an OpenTofu variables file to define the required infrastructure, e.g.:
+Modify the cookiecutter-templated OpenTofu configuration to define the required
+infrastructure, e.g.:
 
-```text
-# environments/$ENV/tofu/terraform.tfvars
-cluster_name = "mycluster"
-cluster_networks = [
-  {
-    network = "some_network" # *
-    subnet = "some_subnet" # *
-  }
-]
-key_pair = "my_key" # *
-control_node_flavor = "some_flavor_name"
-login = {
-    # Arbitrary group name for these login nodes
-    interactive = {
-        nodes: ["login-0"]
-        flavor: "login_flavor_name" # *
+```hcl
+# environments/$ENV/tofu/main.tf
+module "cluster" {
+  source           = "../../site/tofu/"
+  environment_root = var.environment_root
+
+  cluster_name = "mycluster"
+  cluster_networks = [
+    {
+      network = "some_network" # *
+      subnet = "some_subnet" # *
     }
-}
-cluster_image_id = "rocky_linux_9_image_uuid"
-compute = {
+  ]
+  key_pair = "my_key" # *
+  control_node_flavor = "some_flavor_name"
+  login = {
+      # Arbitrary group name for these login nodes
+      head = {
+        nodes = ["login-0"]
+        flavor = "login_flavor_name" # *
+      }
+  }
+  cluster_image_id = "rocky_linux_9_image_uuid"
+  compute = {
     # Group name used for compute node partition definition
     general = {
-        nodes: ["compute-0", "compute-1"]
-        flavor: "compute_flavor_name" # *
+      nodes = ["compute-0", "compute-1"]
+      flavor = "compute_flavor_name" # *
     }
+  }
 }
 ```
 
@@ -203,7 +209,7 @@ Note that:
 - Environment-specific variables (`cluster_name`) should be hardcoded into
   the cluster module block.
 
-- Environment-independent variables (e.g. maybe `cluster_net` if the same
+- Environment-independent variables (e.g. maybe `cluster_networks` if the same
   is used for staging and production) should be set as _defaults_ in
   `environments/site/tofu/variables.tf`, and then don't need to be passed
   in to the module.
@@ -373,6 +379,9 @@ environments which should be unique, e.g. production and staging.
 - Consider whether having (read-only) access to Grafana without login is OK. If
   not, remove `grafana_auth_anonymous` in
   `environments/$ENV/inventory/group_vars/all/grafana.yml`
+
+- Consider if the [default proxy deployment and configuration](./eessi.md#eessi-proxy-configuration)
+  for EESSI is appropriate.
 
 - See the [hpctests docs](../ansible/roles/hpctests/README.md) for advice on
   raising `hpctests_hpl_mem_frac` during tests.
