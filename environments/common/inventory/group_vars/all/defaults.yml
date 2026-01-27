@@ -97,6 +97,7 @@ appliances_local_users: "{{ (appliances_local_users_default + appliances_local_u
 ################## bootstrap: extra package installs ######################################
 
 appliances_extra_packages_default:
+  - bash-completion
   - htop
   - nano
   - screen
