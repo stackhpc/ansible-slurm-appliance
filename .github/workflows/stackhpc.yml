@@ -187,6 +187,7 @@ jobs:
           ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
           ansible-playbook -v ansible/ci/check_compute_rebuild.yml
+          ansible-playbook -v ansible/adhoc/lock.yml
 
       - name: Check sacct state survived reimage to current branch
         run: |
