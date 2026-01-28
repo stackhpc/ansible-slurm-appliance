@@ -217,6 +217,7 @@ ansible-playbook ansible/adhoc/rebuild-via-slurm.yml -e 'rebuild_job_partitions=
 ```
 
 The progress of the rebuild may be monitored using:
+
 ```shell
 ansible-playbook ansible/adhoc/rebuild-status.yml
 ```
