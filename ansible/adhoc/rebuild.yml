@@ -1,19 +1,19 @@
 ---
 # Rebuild hosts with a specified image from OpenStack.
 #
+# NB: This is provided for development use only, and is not normally required
+# NB: Run the unlock playbook as shown below first
+#
 # Use ansible's -v output to see output.
 # Use --limit to control which hosts to rebuild (either specific hosts or the <cluster_name>_<partition_name> groups defining partitions).
 # Optionally, supply `-e rebuild_image=<image_name_or_id>` to define a specific image, otherwise the current image is reused.
 #
-# After running site.yml, all instances are locked, so to run the rebuild.yml, the unlock playbook must be run:
-#   ansible-playbook ansible/adhoc/lock-unlock-instances.yml -e "lock_unlock_action=unlock"
-# Similarly to rebuild, --limit can be used to control which hosts to unlock.
-#
 # NOTE: If a hostvar `instance_id` is defined this is used to select hosts.
 #       Otherwise the hostname is used and this must be unique, which may not be the case e.g. if using identically-named staging and production hosts.
 #
-# Example:
-#   ansible-playbook -v --limit ohpc_compute ansible/adhoc/rebuild.yml -e rebuild_image=openhpc_v2.3
+# Example of just rebuilding login nodes back to current image:
+#   ansible-playbook -v --limit login ansible/adhoc/unlock.yml
+#   ansible-playbook -v --limit login ansible/adhoc/rebuild.yml
 
 - hosts: cluster
   become: false

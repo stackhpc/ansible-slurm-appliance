@@ -8,17 +8,18 @@
 
 # See docs/slurm-controlled-rebuild.md.
 
-- name: Unlock compute instances for rebuild
+- name: Unlock compute instances
   vars:
-    lock_unlock_action: unlock
-    lock_unlock_hosts: compute
-  ansible.builtin.import_playbook: lock-unlock-instances.yml
+    unlock_hosts: compute
+  ansible.builtin.import_playbook: unlock.yml
 
 - hosts: login
   run_once: true
   gather_facts: false
   tasks:
-    - name: Run slurm-controlled rebuild
+    - name: Start slurm-controlled rebuild
       ansible.builtin.import_role:
         name: rebuild
         tasks_from: rebuild.yml
+
+# TODO: how do we lock the compute nodes again??

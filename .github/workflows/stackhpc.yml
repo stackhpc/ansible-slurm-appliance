@@ -166,7 +166,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook --limit login,control ansible/adhoc/lock-unlock-instances.yml -e "lock_unlock_action=unlock"
+          ansible-playbook ansible/adhoc/unlock.yml
           cd "$STACKHPC_TF_DIR"
           tofu init
           tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
@@ -257,7 +257,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook ansible/adhoc/lock-unlock-instances.yml -e "lock_unlock_action=unlock"
+          ansible-playbook ansible/adhoc/unlock.yml
           cd "$STACKHPC_TF_DIR"
           tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" || echo "tofu failed in $STACKHPC_TF_DIR"
         if: ${{ success() || cancelled() }}

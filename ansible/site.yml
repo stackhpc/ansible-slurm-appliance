@@ -2,8 +2,9 @@
 
 - ansible.builtin.import_playbook: check-production.yml
 
-- name: Lock cluster instances
-  ansible.builtin.import_playbook: adhoc/lock-unlock-instances.yml
+- ansible.builtin.import_playbook: adhoc/unlock.yml
+  vars:
+    unlock_action: lock
 
 - name: Run pre.yml hook
   vars:

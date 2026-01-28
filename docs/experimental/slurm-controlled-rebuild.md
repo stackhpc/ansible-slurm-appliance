@@ -12,8 +12,8 @@ In summary, the way this functionality works is as follows:
 
 1. The image references(s) are manually updated in the OpenTofu configuration
    in the normal way.
-2. The adhoc playbook `lock-unlock-instances.yml` is run limited to control and login
-   nodes, with `lock_unlock_action=unlock` to allow the nodes to be rebuilt.
+2. The adhoc playbook `unlock.yml` is run to allow the login and control node
+   instances to be modified.
 3. `tofu apply` is run which rebuilds the login and control nodes to the new
    image(s). The new image reference for compute nodes is ignored, but is
    written into the hosts inventory file (and is therefore available as an
@@ -27,10 +27,11 @@ In summary, the way this functionality works is as follows:
    - Configures an application credential and helper programs on the control
      node, using the [rebuild](../../ansible/roles/rebuild/README.md) role.
 5. An admin submits Slurm jobs, one for each node, to a special "rebuild"
-   partition using the adhoc playbook `rebuild-via-slurm.yml`. Because this partition
-   has higher priority than the partitions normal users can use, these rebuild jobs
-   become the next job in the queue for every node (although any jobs currently running
-   will complete as normal).
+   partition using the adhoc playbook `rebuild-via-slurm.yml` which also unlocks
+   the compute instances. Because this partition has higher priority than the
+   partitions normal users can use, these rebuild jobs become the next job in
+   the queue for every node (although any jobs currently running will complete
+   as normal).
 6. Because these rebuild jobs have the `--reboot` flag set, before launching them
    the Slurm control node runs a [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram)
    which compares the current image for the node to the one in the cluster
@@ -44,6 +45,10 @@ In summary, the way this functionality works is as follows:
 8. Once the `slurmd` daemon starts on a compute node, the slurm controller
    registers the node as having finished rebooting. It then launches the actual
    job, which does not do anything.
+
+TODO: need to relock the instances afterwards!
+TODO: mention the playbook to check rebuild state?
+TODO: maybe we should default to only unlocking the compute/login?
 
 ## Prerequsites
 
