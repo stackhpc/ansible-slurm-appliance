@@ -45,10 +45,8 @@ In summary, the way this functionality works is as follows:
 8. Once the `slurmd` daemon starts on a compute node, the Slurm controller
    registers the node as having finished rebooting. It then launches the actual
    job, which does not do anything.
-
-TODO: need to relock the instances afterwards!
-TODO: mention the playbook to check rebuild state?
-TODO: maybe we should default to only unlocking the compute/login?
+9. The adhoc playbook `lock.yml` is run to prevent accidental modification to
+   compute nodes.
 
 ## Prerequsites
 
@@ -216,6 +214,18 @@ other priority or QOS settings:
 
 ```shell
 ansible-playbook ansible/adhoc/rebuild-via-slurm.yml -e 'rebuild_job_partitions=test rebuild_job_reboot=false'
+```
+
+The progress of the rebuild may be monitored using:
+```shell
+ansible-playbook ansible/adhoc/rebuild-status.yml
+```
+
+which will show which nodes are on the new image. Once all rebuilds have completed,
+instances can be locked again using:
+
+```shell
+ansible-playbook ansible/adhoc/lock.yml
 ```
 
 ## Testing

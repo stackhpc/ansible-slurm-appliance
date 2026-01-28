@@ -1,7 +1,5 @@
 ---
-# Lock or unlock cluster instances
-
-# Variable `unlock_action` may be 'unlock' (default) or 'lock'
+# Unlock cluster instances
 
 # A manual run is required before any action which will modify instances:
 # - ansible-playbook ansible/adhoc/rebuild.yml
@@ -16,8 +14,8 @@
   gather_facts: false
   become: false
   tasks:
-    - name: "{{ unlock_action | default('unlock') | capitalize }} instances"
+    - name: Unlock instances
       openstack.cloud.server_action:
-        action: "{{ unlock_action | default('unlock') }}"
+        action: unlock
         server: "{{ instance_id }}"
       delegate_to: localhost

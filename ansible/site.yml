@@ -2,9 +2,7 @@
 
 - ansible.builtin.import_playbook: check-production.yml
 
-- ansible.builtin.import_playbook: adhoc/unlock.yml
-  vars:
-    unlock_action: lock
+- ansible.builtin.import_playbook: adhoc/lock.yml
 
 - name: Run pre.yml hook
   vars:
