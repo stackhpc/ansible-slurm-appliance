@@ -1,4 +1,13 @@
 ---
+
+- name: Setup custom mounts
+  hosts: mounts
+  become: true
+  tags: mounts
+  tasks:
+    - ansible.builtin.include_role:
+        name: mounts
+
 - name: Setup block devices
   hosts: block_devices
   become: true

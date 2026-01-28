@@ -1,0 +1,14 @@
+- name: Ensure mount directories exist
+  ansible.builtin.file:
+    path: "{{ item.value.path }}"
+  loop: "{{ mounts | dict2items }}"
+
+- name: Ensure mount
+  ansible.posix.mount:
+    path: "{{ item.value.path }}"
+    src: "{{ item.value.src }}"
+    fstype: "{{ item.value.fstype }}"
+    state: "{{ item.value.state }}"
+    opts: "{{ item.value.opts | default(omit) }}"
+  loop: "{{ mounts | dict2items }}"
+  when: item.value.enabled | default(true)

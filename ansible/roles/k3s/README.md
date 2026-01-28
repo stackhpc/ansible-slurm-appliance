@@ -1,7 +1,7 @@
 # k3s
 
 Installs k3s agent and server services on nodes and an ansible-init playbook to activate them. The service that each node will activate on init is determined by OpenStack metadata. Also includes Helm install. Currently only supports a single k3s-server
-(i.e one control node). Install based on the [official k3s ansible role](https://github.com/k3s-io/k3s-ansible).
+(i.e one control node). Install based on the [official k3s Ansible role](https://github.com/k3s-io/k3s-ansible).
 
 ## Requirements
 

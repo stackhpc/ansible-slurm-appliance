@@ -9,7 +9,7 @@ This repository contains playbooks and configuration to define a Slurm-based HPC
 - Packages for Slurm and MPI software stacks from [OpenHPC](https://openhpc.community/).
 - Shared fileystem(s) using NFS (with in-cluster or external servers) or [CephFS](https://docs.ceph.com/en/latest/cephfs/) via [OpenStack Manila](https://wiki.openstack.org/wiki/Manila).
 - Slurm accounting using a MySQL database.
-- Monitoring integrated with Slurm jobs using Prometheus, ElasticSearch and Grafana.
+- Monitoring integrated with Slurm jobs using Prometheus, Elasticsearch and Grafana.
 - A web-based portal from [Open OnDemand](https://openondemand.org/).
 - Production-ready default Slurm configurations for access and memory limits.
 - [Packer](https://developer.hashicorp.com/packer)-based image build configurations for node images.
@@ -155,7 +155,7 @@ where the IP of the login node is given in `environments/$ENV/inventory/hosts.ym
 ## Overview of directory structure
 
 - `environments/`: See [docs/environments.md](docs/environments.md).
-- `ansible/`: Contains the ansible playbooks to configure the infrastructure.
+- `ansible/`: Contains the Ansible playbooks to configure the infrastructure.
 - `packer/`: Contains automation to use Packer to build machine images for an environment - see the readme in this directory for further information.
 - `dev/`: Contains development tools.
 
@@ -170,7 +170,7 @@ docker run --rm \
     -e RUN_LOCAL=true \
     --env-file "super-linter.env" \
     -v "$(pwd)":/tmp/lint \
-    ghcr.io/super-linter/super-linter:v7.3.0
+    ghcr.io/super-linter/super-linter:v8.3.2
 ```
 
 ```shell

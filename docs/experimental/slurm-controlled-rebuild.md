@@ -105,7 +105,6 @@ compute = {
 
 5. Update image references in the OpenTofu configuration. Normally these should
    be in:
-
    - `environments/site/tofu/variables.tf`: `cluster_image_id` for the default
      cluster image.
    - `environments/$ENV/tofu/main.tf`: parameter `image_id` in node groups
@@ -116,7 +115,6 @@ compute = {
    rebuild jobs. The default definition in `environments/common/inventory/group_vars/all/openhpc.yml`
    will automatically include this via `openhpc_rebuild_partition` also in that
    file. If modifying this, note the important parameters are:
-
    - `name`: Partition name matching `rebuild` role variable `rebuild_partitions`,
      default `rebuild`.
    - `nodegroups`: A list of nodegroup names, matching `openhpc_nodegroup` and
@@ -152,7 +150,6 @@ compute = {
 
    If it is desirable to roll out changes more gradually, it is possible to
    create multiple "rebuild" partitions, but it is necessary that:
-
    - The rebuild partitions should not themselves overlap, else nodes may be
      rebuilt more than once.
    - Each rebuild partition should entirely cover one or more "normal"
@@ -160,7 +157,6 @@ compute = {
      mix of nodes using old and new images.
 
 7. Configure the [rebuild](../../ansible/roles/rebuild/README.md) role:
-
    - Add the `control` node into the `rebuild` group.
    - Ensure an application credential to use for rebuilding nodes is available
      on the deploy host (default location `~/.config/openstack/clouds.yaml`).

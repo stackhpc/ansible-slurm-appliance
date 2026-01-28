@@ -126,6 +126,7 @@ openondemand
 [squid:children]
 # Hosts to run squid proxy
 fatimage
+control
 
 [tuned:children]
 # Hosts to run TuneD configuration
@@ -203,3 +204,8 @@ compute
 [raid:children]
 # Add `builder` to configure image for software raid
 fatimage
+
+[mounts:children]
+# Hosts with custom mounts
+login
+compute

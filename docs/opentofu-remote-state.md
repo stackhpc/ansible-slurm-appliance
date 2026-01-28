@@ -111,7 +111,6 @@ per-checkout configuration is required.
 
 1. Create an S3 bucket with a name `${cluster_name}-${environment_name}-tfstate`
    where:
-
    - `CLUSTER_NAME` is defined in `environments/$ENV/tofu/main.tf`
    - `$ENVIRONMENT_NAME` is the name of the environment directory
 
@@ -147,7 +146,7 @@ per-checkout configuration is required.
    PROJECT_ID=$(echo "$TOKEN_DATA" | jq -r '.project_id')
    TOKEN_ID=$(echo "$TOKEN_DATA" | jq -r '.id')
    openstack token revoke $TOKEN_ID
-   
+
    # Get first creds in current project:
    EC2_CREDS=$(openstack ec2 credentials list -f json | jq -r --arg pid "$PROJECT_ID" '.[] | select(.["Project ID"] == $pid) | @json' | head -n 1)
    # Set creds for OpenTofu s3 backend:

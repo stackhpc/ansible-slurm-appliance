@@ -1,6 +1,6 @@
 ---
 
-- ansible.builtin.import_playbook: safe-env.yml
+- ansible.builtin.import_playbook: check-production.yml
 
 - name: Lock cluster instances
   ansible.builtin.import_playbook: adhoc/lock-unlock-instances.yml
