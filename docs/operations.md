@@ -212,7 +212,9 @@ ansible-playbook ansible/adhoc/$PLAYBOOK
 Currently they include the following (see each playbook for links to documentation):
 
 - `hpctests.yml`: MPI-based cluster tests for latency, bandwidth and floating point performance.
+- `unlock.yml`: Unlock or lock nodes to allow/prevent changes to instances.
 - `rebuild.yml`: Rebuild nodes with existing or new images (NB: this is intended for development not for re-imaging nodes on an in-production cluster).
+  Requires `unlock.yml` be run first.
 - `restart-slurm.yml`: Restart all Slurm daemons in the correct order.
 - `update-packages.yml`: Update specified packages on cluster nodes (NB: not recommended for routine use).
 
