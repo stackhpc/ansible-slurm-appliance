@@ -1,0 +1,37 @@
+- name: Check SELinux is disabled if using opkssh
+  ansible.builtin.assert:
+    that: ansible_facts.selinux.status == 'disabled'
+    fail_msg: "appliance installation of opkssh does not support selinux - see its install script for steps"
+
+- name: Check AuthorizedKeysCommand is not set for other applications
+  ansible.builtin.find:
+    paths: /etc/ssh/sshd_config.d/
+    patterns: '*.conf'
+    contains: AuthorizedKeysCommand
+# TODO: make OK after config.yml!
+
+- name: Check AuthorizedKeysCommandUser is not set for other applications
+  ansible.builtin.find:
+    paths: /etc/ssh/sshd_config.d/
+    patterns: '*.conf'
+    contains: AuthorizedKeysCommandUser
+# TODO: make OK after config.yml!
+
+# TODO: check more than one provider
+
+- name: Check provider configuration
+  ansible.builtin.assert:
+    that: item.value.keys() | symmetric_difference(_opkssh_provider_keys) == []
+    fail_msg: "entry '{{ item.key }}' in opkssh_providers is not correct - must have keys {{ _opkssh_provider_keys }}"
+  loop: "{{ opkssh_providers | dict2items }}"
+  vars:
+    _opkssh_provider_keys: ['issuer_uri', 'client_id', 'expires']
+
+
+
+- name: Check authorized identities configuration
+# TODO: actually might want this to be a list-of-dicts
+  ansible.builtin.assert:
+    that: item | length == 3
+    fail_msg: Entries in opkssh_auth_id must have 
+  loop: "{{ opkssh_auth_id }}"

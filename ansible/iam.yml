@@ -63,3 +63,16 @@
     - name: Configure sssd
       ansible.builtin.import_role:
         name: sssd
+
+- hosts: opkssh
+  become: true
+  gather_facts: false
+  tags: opkssh
+  tasks:
+    - name: Configure opkssh
+      ansible.builtin.include_role:
+        name: opkssh
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
+      # DEBUG:
+      vars:
+        appliances_mode: all

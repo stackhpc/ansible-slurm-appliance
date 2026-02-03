@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+{% for item in opkssh_providers | dict2items %}
+{{ item.value.issuer_uri }} {{ item.value.client_id }} {{ item.value.expires }}
+{% endfor %}

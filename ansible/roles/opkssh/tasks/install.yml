@@ -1,0 +1,20 @@
+- name: Ensure group used by AuthorizedKeysCommand exists
+  ansible.builtin.group:
+    name: "{{ opkssh_install_auth_cmd_group }}"
+
+- name: Ensure user used by AuthorizedKeysCommand exists
+  ansible.builtin.user:
+    name: "{{ opkssh_install_auth_cmd_user }}"
+    comment: Used for AuthorizedKeysCommand (opkssh)
+    group: "{{ opkssh_install_auth_cmd_group }}"
+    shell: /sbin/nologin
+    system: true
+    create_home: false
+
+- name: Install opkssh binary
+  ansible.builtin.get_url:
+    url: "{{ opkssh_install_binary_url }}"
+    dest: "{{ opkssh_install_dir }}/{{ opkssh_install_binary_name }}"
+    owner: root
+    group: "{{ opkssh_install_auth_cmd_group }}"
+    mode: '0755'
