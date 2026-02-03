@@ -34,8 +34,9 @@ without requiring LDAP etc. Features:
   information for each user. In general, mapping keys/values are passed through
   as parameters to [ansible.builtin.user](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html)
   and default values are as given there, with the following differences:
-  - `generate_ssh_key`: Default is `true`, and the generated key is added to
-    the user's authorized keys.
+  - `generate_ssh_key`: Whether to generate a key and add it to the user's
+    authorized keys to allow SSH between nodes. Default determined by
+    `basic_users_generate_ssh_key` (see below).
   - `ssh_key_comment`: Default is username.
   - `home`: Set automatically based on the username and
     `basic_users_homedir_server_path`. Can be overriden for users with
@@ -53,6 +54,8 @@ without requiring LDAP etc. Features:
   - `ssh_key_type` defaults to `ed25519` instead of the `ansible.builtin.user`
     default of `rsa`.
   - Any other keys may present for other purposes (i.e. not used by this role).
+- `basic_users_generate_ssh_key`: Optional bool. Default for `generate_ssh_key`
+   parameter in `basic_users_users` above. Default `true`.
 - `basic_users_groups`: Optional, default empty list. A list of mappings defining information for each group. Mapping keys/values are passed through as parameters to [ansible.builtin.group](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html) and default values are as given there.
 - `basic_users_override_sssd`: Optional bool, default false. Whether to disable `sssd` when ensuring users/groups exist with this role. Permits creating local users/groups even if they clash with users provided via sssd (e.g. from LDAP). Ignored if host is not in group `sssd` as well. Note with this option active `sssd` will be stopped and restarted each time this role is run.
 
