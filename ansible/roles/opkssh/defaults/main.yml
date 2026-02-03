@@ -18,6 +18,10 @@ opkssh_install_github_repo: openpubkey/opkssh
 opkssh_install_arch: amd64 # NB ansible_architecture is x86_64
 opkssh_install_binary_url: "https://github.com/{{ opkssh_install_github_repo }}/releases/download/{{ opkssh_install_version }}/opkssh-linux-{{ opkssh_install_arch }}"
 
+opkssh_authorized_keys_disable: true
+opkssh_authorized_keys_groups:
+  - adm # rocky user
+
 opkssh_providers:
   google:
     issuer_uri: https://accounts.google.com

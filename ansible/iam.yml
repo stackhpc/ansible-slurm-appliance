@@ -73,6 +73,3 @@
       ansible.builtin.include_role:
         name: opkssh
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
-      # DEBUG:
-      vars:
-        appliances_mode: all
