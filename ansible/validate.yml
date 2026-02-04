@@ -158,6 +158,7 @@
     - validate
     - opkssh
   gather_facts: true
+  become: true
   tasks:
     - ansible.builtin.import_role:
         name: opkssh

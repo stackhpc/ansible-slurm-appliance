@@ -3,21 +3,24 @@
     that: ansible_facts.selinux.status == 'disabled'
     fail_msg: "appliance installation of opkssh does not support selinux - see its install script for steps"
 
-- name: Check AuthorizedKeysCommand is not set for other applications
+- name: Find sshd config with AuthorizedKeys
   ansible.builtin.find:
     paths: /etc/ssh/sshd_config.d/
-    patterns: '*.conf'
+    patterns:
+      - '*.conf'
     contains: AuthorizedKeysCommand
-# TODO: make OK after config.yml!
+    read_whole_file: true
+  register: _opkssh_authorized_keys_configs
 
-- name: Check AuthorizedKeysCommandUser is not set for other applications
-  ansible.builtin.find:
-    paths: /etc/ssh/sshd_config.d/
-    patterns: '*.conf'
-    contains: AuthorizedKeysCommandUser
-# TODO: make OK after config.yml!
-
-# TODO: check more than one provider
+- name: Check AuthorizedKeys options not set for other applications
+  ansible.builtin.assert:
+    that: _opkssh_authorized_keys_unexpected | length == 0
+    fail_msg: "Found AuthorizedKeys* keyword(s) in unexpected file(s): {{ _opkssh_authorized_keys_unexpected }}"
+  vars:
+    _opkssh_authorized_keys_unexpected: "{{ _opkssh_authorized_keys_found | difference(_opkssh_authorized_keys_expected) }}"
+    _opkssh_authorized_keys_found: "{{ _opkssh_authorized_keys_configs.files | map(attribute='path') }}"
+    _opkssh_authorized_keys_expected:
+      - /etc/ssh/sshd_config.d/60-opk-ssh.conf
 
 - name: Check provider configuration
   ansible.builtin.assert:
@@ -28,7 +31,6 @@
     _opkssh_provider_keys: ['issuer_uri', 'client_id', 'expires']
 
 - name: Check authorized identities configuration
-# TODO: actually might want this to be a list-of-dicts
   ansible.builtin.assert:
     that: item.keys() | intersect(_opkssh_auth_id_keys) | sort == _opkssh_auth_id_keys
     fail_msg: "Entries in opkssh_auth_id must have keys {{ _opkssh_auth_id_keys}}. Invalid item {{ item }}."
