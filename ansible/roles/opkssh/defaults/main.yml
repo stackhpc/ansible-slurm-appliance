@@ -18,8 +18,8 @@ opkssh_install_github_repo: openpubkey/opkssh
 opkssh_install_arch: amd64 # NB ansible_architecture is x86_64
 opkssh_install_binary_url: "https://github.com/{{ opkssh_install_github_repo }}/releases/download/{{ opkssh_install_version }}/opkssh-linux-{{ opkssh_install_arch }}"
 
-opkssh_authorized_keys_disable: true
-opkssh_authorized_keys_groups:
+opkssh_disable_authorized_keys: true
+opkssh_enable_authorized_keys_groups:
   - adm # rocky user
 
 opkssh_providers:
@@ -42,7 +42,7 @@ opkssh_providers:
 
 opkssh_auth_id: []
   # user:
-  # email, subject ID or group:
-  # issuer key:
+  # opkssh_claim_selector: email, subject ID or group
+  # [opkssh_provider]: 
 
 opkssh_default_provider: "{{ opkssh_providers.keys() | first }}"
