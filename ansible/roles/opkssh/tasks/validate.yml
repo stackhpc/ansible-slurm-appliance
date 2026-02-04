@@ -3,28 +3,9 @@
     that: ansible_facts.selinux.status == 'disabled'
     fail_msg: "appliance installation of opkssh does not support selinux - see its install script for steps"
 
-- name: Find sshd config with AuthorizedKeys
-  ansible.builtin.find:
-    paths: /etc/ssh/sshd_config.d/
-    patterns:
-      - '*.conf'
-    contains: AuthorizedKeysCommand
-    read_whole_file: true
-  register: _opkssh_authorized_keys_configs
-
-- name: Check AuthorizedKeys options not set for other applications
-  ansible.builtin.assert:
-    that: _opkssh_authorized_keys_unexpected | length == 0
-    fail_msg: "Found AuthorizedKeys* keyword(s) in unexpected file(s): {{ _opkssh_authorized_keys_unexpected }}"
-  vars:
-    _opkssh_authorized_keys_unexpected: "{{ _opkssh_authorized_keys_found | difference(_opkssh_authorized_keys_expected) }}"
-    _opkssh_authorized_keys_found: "{{ _opkssh_authorized_keys_configs.files | map(attribute='path') }}"
-    _opkssh_authorized_keys_expected:
-      - /etc/ssh/sshd_config.d/60-opk-ssh.conf
-
 - name: Check provider configuration
   ansible.builtin.assert:
-    that: item.value.keys() | symmetric_difference(_opkssh_provider_keys) == []
+    that: item.value.keys() | list | symmetric_difference(_opkssh_provider_keys) == []
     fail_msg: "entry '{{ item.key }}' in opkssh_providers is not correct - must have keys {{ _opkssh_provider_keys }}"
   loop: "{{ opkssh_providers | dict2items }}"
   vars:

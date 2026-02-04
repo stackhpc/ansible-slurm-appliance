@@ -1,3 +1,23 @@
+- name: Find sshd config with AuthorizedKeys
+  ansible.builtin.find:
+    paths: /etc/ssh/sshd_config.d/
+    patterns:
+      - '*.conf'
+    contains: AuthorizedKeysCommand
+    read_whole_file: true
+  register: _opkssh_authorized_keys_configs
+
+- name: Check AuthorizedKeys options not set for other applications
+  # NB: Can't be done by ansible/validation as maybe no roles changed config then!
+  ansible.builtin.assert:
+    that: _opkssh_authorized_keys_unexpected | length == 0
+    fail_msg: "Found AuthorizedKeys* keyword(s) in unexpected file(s): {{ _opkssh_authorized_keys_unexpected }}"
+  vars:
+    _opkssh_authorized_keys_unexpected: "{{ _opkssh_authorized_keys_found | difference(_opkssh_authorized_keys_expected) }}"
+    _opkssh_authorized_keys_found: "{{ _opkssh_authorized_keys_configs.files | map(attribute='path') }}"
+    _opkssh_authorized_keys_expected:
+      - /etc/ssh/sshd_config.d/60-opk-ssh.conf
+
 - name: Ensure configuration directories exists
   file:
     state: directory
