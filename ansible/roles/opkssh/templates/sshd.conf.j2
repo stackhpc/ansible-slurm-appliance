@@ -1,8 +1,16 @@
 {% if opkssh_authorized_keys_disable | bool %}
 AuthorizedKeysFile none
 {% endif %}
-AuthorizedKeysCommand {{ opkssh_install_dir }}/{{ opkssh_install_binary_name }} verify %u %k %t
-AuthorizedKeysCommandUser {{ opkssh_install_auth_cmd_user }}
+Match Address !{{ ansible_host }}
+    AuthorizedKeysCommand {{ opkssh_install_dir }}/{{ opkssh_install_binary_name }} verify %u %k %t
+    AuthorizedKeysCommandUser {{ opkssh_install_auth_cmd_user }}
+
+Match Address {{ ansible_host }}
+    HostbasedAuthentication yes
+    HostbasedUsesNameFromPacketOnly yes
+    HostbasedAcceptedAlgorithms ssh-ed25519
+    AuthenticationMethods hostbased
+
 {% for group in opkssh_authorized_keys_groups %}
 Match Group {{ group }}
     AuthorizedKeysFile .ssh/authorized_keys
