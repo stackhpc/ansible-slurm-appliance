@@ -1,0 +1,67 @@
+# --- "Client-side" configuration ---
+
+- name: Configure ssh client to request host-based for ssh to itself
+  ansible.builtin.copy:
+    dest: /etc/ssh/ssh_config.d/60-hba.conf
+    # TODO: inventory_hostname matches CURRENT config for ondemand, check what SKA config is
+    content: |
+      Host {{ inventory_hostname }}
+        HostbasedAuthentication yes
+    owner: root
+    group: root
+    mode: u=rw,go=r
+
+- name: Configure ssh client to enable ssh-keysign
+  # NB: has to be done in main config file (not drop-ins) as ssh-keysign
+  # itself checks main config file to see if its enabled
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/ssh_config
+    line: EnableSSHKeysign yes
+
+- name: Find client hostkeys
+  ansible.builtin.find:
+    paths: /etc/ssh/
+    patterns: 'ssh_host_*key'
+  register: _opkssh_ssh_hostkeys
+
+- name: Ensure users in ssh_keys can read client hostkeys (for ssh client signing)
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: root
+    group: ssh_keys
+    mode: u=rw,g=r,o=
+  loop: "{{ _opkssh_ssh_hostkeys.files }}"
+
+# --- "Server-side" configuration ---
+
+- name: Configure sshd to allow host-based auth from itself
+  ansible.builtin.template:
+    src: sshd-hba.conf.j2
+    dest: /etc/ssh/sshd_config.d/70-opk-ssh.conf
+    owner: root
+    group: root
+    mode: '0600'
+  notify:
+    - Restart OpenSSH server
+
+- name: Register allowed "client" systems
+  copy:
+    dest: /etc/ssh/shosts.equiv
+    content: |
+      {{ node_fqdn }}
+
+- name: Keyscan "client" FQDN
+  ansible.builtin.command:
+    cmd: "ssh-keyscan {{ node_fqdn }}"
+  register: _opkssh_fqdn_keyscan
+  changed_when: false
+
+- name: Add "client" hostkeys to known_hosts using FQDN
+  ansible.builtin.blockinfile:
+    path: /etc/ssh/ssh_known_hosts
+    create: true
+    block: "{{ _opkssh_fqdn_keyscan.stdout_lines | sort | join('\n') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: self"
+    owner: root
+    group: root
+    mode: o=rw,go=r

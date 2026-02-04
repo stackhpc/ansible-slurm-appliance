@@ -27,11 +27,11 @@
   vars:
     _opkssh_provider_keys: ['issuer_uri', 'client_id', 'expires']
 
-
-
 - name: Check authorized identities configuration
 # TODO: actually might want this to be a list-of-dicts
   ansible.builtin.assert:
-    that: item | length == 3
-    fail_msg: Entries in opkssh_auth_id must have 
+    that: item.keys() | intersect(_opkssh_auth_id_keys) | sort == _opkssh_auth_id_keys
+    fail_msg: "Entries in opkssh_auth_id must have keys {{ _opkssh_auth_id_keys}}. Invalid item {{ item }}."
   loop: "{{ opkssh_auth_id }}"
+  vars:
+    _opkssh_auth_id_keys: ['name', 'opkssh_claim_selector']

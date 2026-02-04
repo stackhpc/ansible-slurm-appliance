@@ -9,7 +9,7 @@
 # NB: Doesn't do complex check to ensure sshd_config precedence, see validate.yml
 - name: Configure OpenSSH server to use opkssh
   ansible.builtin.template:
-    src: sshd.conf.j2
+    src: sshd-opkssh.conf.j2
     dest: /etc/ssh/sshd_config.d/60-opk-ssh.conf
     owner: root
     group: root
@@ -33,3 +33,7 @@
     owner: root
     group: "{{ opkssh_install_auth_cmd_group }}"
     mode: '0640'
+
+- name: Configure hostbased authentication to allow OpenOndemand web terminal
+  ansible.builtin.include_tasks: host-based-auth.yml
+  when: opkssh_configure_hostbased_auth

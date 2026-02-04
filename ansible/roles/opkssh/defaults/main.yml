@@ -20,7 +20,8 @@ opkssh_install_binary_url: "https://github.com/{{ opkssh_install_github_repo }}/
 
 opkssh_disable_authorized_keys: true
 opkssh_enable_authorized_keys_groups:
-  - adm # rocky user
+  - adm # includes 'rocky' user
+opkssh_configure_hostbased_auth: true
 
 opkssh_providers:
   google:
