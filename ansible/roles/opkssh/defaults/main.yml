@@ -1,18 +1,7 @@
 opkssh_install_auth_cmd_user: opksshuser
 opkssh_install_auth_cmd_group: opksshuser
-opkssh_install_sudoers_path: /etc/sudoers.d/opkssh
-opkssh_install_home_policy: true
-opkssh_install_selinux_enable_proxy: false
-opkssh_install_selinux_enable_squid: false
-opkssh_install_restart_ssh: true
-#opkssh_install_overwrite_active_config: false
-opkssh_install_local_install_file:
-
-opkssh_local_te_file:
 opkssh_install_version: v0.13.0 # cannot be 'latest'
-
 opkssh_install_dir: /usr/local/bin
-
 opkssh_install_binary_name: opkssh
 opkssh_install_github_repo: openpubkey/opkssh
 opkssh_install_arch: amd64 # NB ansible_architecture is x86_64
@@ -42,7 +31,7 @@ opkssh_providers:
     expires: 24h
 
 opkssh_auth_id: []
-  # user:
+  # name:
   # opkssh_claim_selector: email, subject ID or group
   # [opkssh_provider]: 
 
