@@ -1,6 +1,7 @@
 - name: Ensure group used by AuthorizedKeysCommand exists
   ansible.builtin.group:
     name: "{{ opkssh_install_auth_cmd_group }}"
+    system: true
 
 - name: Ensure user used by AuthorizedKeysCommand exists
   ansible.builtin.user:
