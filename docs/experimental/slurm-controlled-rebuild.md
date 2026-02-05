@@ -173,6 +173,8 @@ compute = {
    > a disruptive operation and should be planned as part of a normal upgrade
    > cycle.
 
+   also:
+
    > [!CAUTION]
    > Due to OpenTofu/Terraform state limitations, this will plan to delete and
    > recreate all compute nodes in node groups where `ignore_image_changes: true`.
