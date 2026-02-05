@@ -45,10 +45,13 @@
     - Restart OpenSSH server
 
 - name: Register allowed "client" systems
-  copy:
+  ansible.builtin.copy:
     dest: /etc/ssh/shosts.equiv
     content: |
       {{ node_fqdn }}
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Keyscan "client" FQDN
   ansible.builtin.command:

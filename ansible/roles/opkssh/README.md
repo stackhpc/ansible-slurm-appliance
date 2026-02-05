@@ -18,10 +18,8 @@ from the link above, with the following differences:
    host to itself use host-based authentication (instead of user keys or OIDC).
    This allows the OpenOndemand's web shell, which uses SSH, to work as normal.
 
-   ```
-   ### IMPORTANT ###
-   This requires users to be in the pre-existing `ssh_keys` Linux group.
-   ```
+   > [!IMPORTANT]
+   > This requires users to be in the pre-existing `ssh_keys` Linux group.
 
 **NB**: This role does not itself provision Linux users/groups for cluster users.
 That should be performed separately as usual, e.g. via [basic_users](ansible/roles/basic_users/README.md)

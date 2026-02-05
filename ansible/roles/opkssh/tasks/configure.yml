@@ -19,7 +19,7 @@
       - /etc/ssh/sshd_config.d/60-opk-ssh.conf
 
 - name: Ensure configuration directories exists
-  file:
+  ansible.builtin.file:
     state: directory
     path: /etc/opk/policy.d
     owner: root
