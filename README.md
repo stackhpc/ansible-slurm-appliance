@@ -142,7 +142,7 @@ To configure the appliance, ensure the venv and the environment are [activated](
 ansible-playbook ansible/site.yml
 ```
 
-To prevent nodes from being inadvertently changed or destroyed this playbook
+To prevent nodes from being inadvertently changed or destroyed, this playbook
 locks the OpenStack instances. Any subsequent changes to instances (e.g. via
 OpenTofu) require running an unlocking playbook as described in [docs/operations.md#ad-hoc-commands-and-playbooks](docs/operations.md#ad-hoc-commands-and-playbooks).
 

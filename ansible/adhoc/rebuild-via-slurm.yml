@@ -21,5 +21,3 @@
       ansible.builtin.import_role:
         name: rebuild
         tasks_from: rebuild.yml
-
-# TODO: how do we lock the compute nodes again??

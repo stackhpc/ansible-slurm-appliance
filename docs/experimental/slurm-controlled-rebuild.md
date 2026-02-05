@@ -35,9 +35,9 @@ In summary, the way this functionality works is as follows:
 6. Because these rebuild jobs have the `--reboot` flag set, before launching them
    the Slurm control node runs a [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram)
    which compares the current image for the node to the one in the cluster
-   configuration, and if it does not match, uses OpenStack to rebuild the
-   node to the desired (updated) image.
-   TODO: Describe the logic if they DO match
+   configuration. If they do not match, it uses OpenStack to rebuild the
+   node to the desired (updated) image. If they do match it uses OpenStack to
+   reboot the node.
 7. After a rebuild, the compute node runs various Ansible tasks during boot,
    controlled by the [compute_init](../../ansible/roles/compute_init/README.md)
    role, to fully configure the node again. It retrieves the required cluster
@@ -172,7 +172,7 @@ compute = {
    > If the cluster image references were updated at step 5, this will be
    > a disruptive operation and should be planned as part of a normal upgrade
    > cycle.
-   >
+
    > [!CAUTION]
    > Due to OpenTofu/Terraform state limitations, this will plan to delete and
    > recreate all compute nodes in node groups where `ignore_image_changes: true`.
