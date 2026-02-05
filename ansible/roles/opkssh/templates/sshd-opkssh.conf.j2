@@ -1,7 +1,7 @@
 {% if opkssh_disable_authorized_keys | bool %}
 AuthorizedKeysFile none
 {% endif %}
-Match Address !{{ ansible_host }}
+Match Address *,!{{ ansible_host }}
     AuthorizedKeysCommand {{ opkssh_install_dir }}/{{ opkssh_install_binary_name }} verify %u %k %t
     AuthorizedKeysCommandUser {{ opkssh_install_auth_cmd_user }}
 

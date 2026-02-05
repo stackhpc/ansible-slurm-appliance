@@ -37,7 +37,7 @@
 - name: Configure sshd to allow host-based auth from itself
   ansible.builtin.template:
     src: sshd-hba.conf.j2
-    dest: /etc/ssh/sshd_config.d/70-opk-ssh.conf
+    dest: /etc/ssh/sshd_config.d/70-opk-hba.conf
     owner: root
     group: root
     mode: '0600'
