@@ -33,6 +33,6 @@ opkssh_providers:
 opkssh_auth_id: []
   # name:
   # opkssh_claim_selector: email, subject ID or group
-  # [opkssh_provider]: 
+  # [opkssh_provider]:
 
 opkssh_default_provider: "{{ opkssh_providers.keys() | first }}"
