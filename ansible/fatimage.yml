@@ -70,6 +70,11 @@
         name: sssd
         tasks_from: install.yml
       when: "'sssd' in group_names"
+    - name: Install opkssh
+      ansible.builtin.import_role:
+        name: opkssh
+        tasks_from: install.yml
+      when: "'opkssh' in group_names"
 
     # - import_playbook: filesystems.yml:
     - name: Install nfs packages

@@ -86,7 +86,7 @@
     label: "{{ item.name }}"
   when:
     - item.state | default('present') == 'present'
-    - item.generate_ssh_key | default(true) | bool or item.public_key is defined
+    - item.generate_ssh_key | default(basic_users_generate_ssh_key) | bool or item.public_key is defined
     - ansible_hostname == basic_users_homedir_client
 
 - name: Generate cluster ssh key
@@ -103,7 +103,7 @@
     label: "{{ item.name }}"
   when:
     - item.state | default('present') == 'present'
-    - item.generate_ssh_key | default(true)
+    - item.generate_ssh_key | default(basic_users_generate_ssh_key)
     - ansible_hostname == basic_users_homedir_client
   register: _cluster_ssh_keypair
 
@@ -121,7 +121,7 @@
     label: "{{ item.item.name }}"
   when:
     - item.item.state | default('present') == 'present'
-    - item.item.generate_ssh_key | default(true)
+    - item.item.generate_ssh_key | default(basic_users_generate_ssh_key)
     - ansible_hostname == basic_users_homedir_client
     - item.public_key is defined # NB this is the *returned* public key
 
