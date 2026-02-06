@@ -13,7 +13,9 @@
     masked: "{{ tmp_masked }}"
   vars:
     tmp_mount: "{{ mounts_default.values() | selectattr('path', 'eq', '/tmp') }}"
-    tmp_masked: "{{ false if ((tmp_mount | length > 0) and (tmp_mount.0.enabled | default(true))) else true }}"
+    tmp_tmpfs: "{{ tmp_mount.0.fstype | default('') == 'tmpfs' }}"
+    tmp_enabled: "{{ tmp_mount.0.enabled | default(true) }}"
+    tmp_masked: "{{ false if ((tmp_mount | length > 0) and tmp_tmpfs and tmp_enabled) else true }}"
 
 - name: Ensure mount
   ansible.posix.mount:
