@@ -28,6 +28,9 @@
           image_correct: {{ image_id_target == image_id_current }}
           rebuild_count: {{ rebuild_events | length | int }}
           uptime_seconds: {{ ansible_uptime_seconds }}
+          image_id_current: {{ image_id_current }}
+          image_id_target: {{ image_id_target }}
+          rebuild_events: {{ rebuild_events}}
         image_id_current: "{{ image_current.stdout | split | last | trim('()') }}"
         image_id_target: "{{ image_id }}" # from TF-templated hostvars
         rebuild_events: "{{ server_event_list.stdout | from_json | selectattr('Action', 'eq', 'rebuild') }}"

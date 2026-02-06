@@ -1,3 +1,29 @@
+- hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Get latest release info
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest
+      register: ci_uri_latest_release
+
+    - name: Set fact for latest release tag
+      ansible.builtin.set_fact:
+        ci_latest_release_tag: "{{ ci_uri_latest_release.json.tag_name }}"
+
+    - name: Ensure tags fetched
+      ansible.builtin.command:
+        cmd: git fetch --tags
+        chdir: "{{ appliances_repository_root }}"
+      changed_when: true
+
+    - name: Check if current branch image differs from last release
+      ansible.builtin.command:
+        cmd: "git diff {{ ci_latest_release_tag }} -- environments/.stackhpc/tofu/cluster_image.auto.tfvars.json"
+        chdir: "{{ appliances_repository_root }}"
+      changed_when: true
+      register: ci_diff_cluster_images
+
 - ansible.builtin.import_playbook: ../adhoc/rebuild-status.yml
 
 - hosts: compute
@@ -6,15 +32,21 @@
   vars:
     uptime_max_seconds: "{{ 5 * 60 }}"
   tasks:
-    - name: Check image has been updated
+    - name: Check node is on correct image
       ansible.builtin.assert:
         that: rebuild_status.image_correct
-        fail_msg: "Node is NOT on correct image"
-    - name: Check a single rebuild has occured
+        fail_msg: |
+          Node is NOT on correct image:
+            Current image ID: {{ rebuild_status.image_id_current }}
+            Target image ID: {{ rebuild_status.image_id_target }}
+
+    - name: Check a single rebuild has occured, if target image differs from last release
       ansible.builtin.assert:
         that: rebuild_status.rebuild_count == 1
         fail_msg: "Expected 1 rebuild, found {{ rebuild_status.rebuild_count }}"
-    - name: Check uptime shows rebuild occured
+      when: hostvars['localhost'].ci_diff_cluster_images.stdout != ''
+
+    - name: Check uptime shows rebuild or reboot occured
       ansible.builtin.assert:
         that: rebuild_status.uptime_seconds < uptime_max_seconds | int
         fail_msg: "Expected uptime < {{ uptime_max_seconds }}s, actual {{ rebuild_status.uptime_seconds }}s"
