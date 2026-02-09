@@ -13,10 +13,10 @@ All environments load the inventory from the `common` environment first, with th
 
 ### Environment-specific inventory structure
 
-The ansible inventory for the environment is in `environments/<environment>/inventory/`. It should generally contain:
+The Ansible inventory for the environment is in `environments/<environment>/inventory/`. It should generally contain:
 
 - A `hosts` file. This defines the hosts in the appliance. Generally it should be templated out by the deployment automation so it is also a convenient place to define variables which depend on the deployed hosts such as connection variables, IP addresses, SSH proxy arguments etc.
-- A `groups` file defining ansible groups, which essentially controls which features of the appliance are enabled and where they are deployed. This repository generally follows a convention where functionality is defined using ansible roles applied to a group
+- A `groups` file defining Ansible groups, which essentially controls which features of the appliance are enabled and where they are deployed. This repository generally follows a convention where functionality is defined using Ansible roles applied to a group
   of the same name, e.g. `openhpc` or `grafana`. The meaning and use of each group is described in comments in `environments/common/inventory/groups`. As the groups defined there for the common environment are empty, functionality is disabled by default and must be
   enabled in a specific environment's `groups` file. The `site` environment contains an ini file at `environments/site/inventory/groups` which enables groups for default appliance functionality across all environments. Additional groups should generally also be
   enabled in this file to avoid divergence between staging and production environments. Note that enabling some groups may require a site-specific image build and Ark credentials (see [operations guide](operations.md)).

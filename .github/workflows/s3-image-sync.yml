@@ -1,5 +1,5 @@
 name: Upload CI-tested images to Leafcloud S3 and sync clouds
-on:
+'on':
   workflow_dispatch:
   push:
     branches:
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   s3_cleanup:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-${{ github.ref }}
     strategy:
       fail-fast: false
@@ -35,13 +35,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get --yes install s3cmd
-      
+
       - name: Cleanup S3 bucket
         run: |
           s3cmd rm s3://${{ env.S3_BUCKET }} --recursive --force
 
   image_upload:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: s3_cleanup
     concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }}
     strategy:
@@ -51,7 +51,7 @@ jobs:
           - RL8
           - RL9
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
     outputs:
@@ -118,7 +118,7 @@ jobs:
 
   image_sync:
     needs: image_upload
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.cloud }}-${{ matrix.build }}
     strategy:
       fail-fast: false
@@ -130,11 +130,11 @@ jobs:
         build:
           - RL8
           - RL9
-        exclude: 
+        exclude:
           - cloud: ${{ needs.image_upload.outputs.ci_cloud }}
 
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       CI_CLOUD: ${{ matrix.cloud }}
     steps:

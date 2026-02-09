@@ -27,3 +27,10 @@ sssd_enabled: false
 slurm_exporter_state: stopped
 appliances_mode: build
 proxy_remove: true
+# for image build ood partition var is just truthy as no cluster_groups defined
+openondemand_jupyter_partition: true
+openondemand_desktop_partition: true
+openondemand_rstudio_partition: false
+openondemand_matlab_partition: false
+openondemand_codeserver_partition: false
+mounts_tmp_enabled: false # don't have /tmp in memory

@@ -1,4 +1,8 @@
 ---
+ignore-from-file:
+  - .gitignore
+  - .yamlignore
+
 extends: default
 
 rules:
@@ -10,10 +14,16 @@ rules:
   # https://github.com/adrienverge/yamllint/issues/384
   comments-indentation: false
   document-start: disable
+  key-ordering:
+    ignore: |
+      *
+      !environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml
   # 160 chars was the default used by old E204 rule, but
   # you can easily change it or disable in your .yamllint file.
   line-length:
     max: 160
+    ignore: |
+      *
   # We are adding an extra space inside braces as that's how prettier does it
   # and we are trying not to fight other linters.
   braces:

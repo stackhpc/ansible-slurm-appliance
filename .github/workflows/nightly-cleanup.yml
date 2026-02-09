@@ -1,5 +1,5 @@
 name: Cleanup CI clusters
-on:
+'on':
   workflow_dispatch:
   schedule:
     - cron: '0 21 * * *'  # Run at 9PM - image sync runs at midnight
@@ -21,7 +21,7 @@ jobs:
           - LEAFCLOUD
           - SMS
           - ARCUS
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       OS_CLOUD: openstack
       CI_CLOUD: ${{ matrix.cloud }}

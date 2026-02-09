@@ -1,5 +1,5 @@
 name: Release images
-on:
+'on':
   workflow_dispatch:
   release:
     types:
@@ -16,7 +16,7 @@ permissions:
 jobs:
   ci-image-release:
     name: ci-image-release
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: ${{ github.workflow }}-${{ github.ref }}
     strategy:
       fail-fast: false
@@ -34,11 +34,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get --yes install s3cmd
-      
+
       - name: Retrieve image name
         run: |
           TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
-      
+
       - name: Copy image from pre-release to release bucket
         run: s3cmd cp s3://openhpc-images-prerelease/${{ env.TARGET_IMAGE }} s3://openhpc-images

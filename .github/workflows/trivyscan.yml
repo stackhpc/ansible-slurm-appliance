@@ -5,7 +5,7 @@
 # See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Trivy scan image for vulnerabilities
-on:
+'on':
   workflow_call:
   workflow_dispatch:
 
@@ -14,10 +14,12 @@ permissions:
   packages: write
   # To report GitHub Actions status checks
   statuses: write
+  # upload trivy scan results
+  security-events: write
 
 jobs:
   scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -102,7 +104,7 @@ jobs:
         run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: fs
           scan-ref: "${{ steps.manifest.outputs.image-name }}"
@@ -122,7 +124,7 @@ jobs:
           category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: fs
           scan-ref: "${{ steps.manifest.outputs.image-name }}"

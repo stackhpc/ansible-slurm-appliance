@@ -12,6 +12,7 @@
     enable_sssd: "{{ os_metadata.meta.sssd | default(false) | bool }}"
     enable_sshd: "{{ os_metadata.meta.sshd | default(false) | bool }}"
     enable_tuned: "{{ os_metadata.meta.tuned | default(false) | bool }}"
+    enable_mounts: "{{ os_metadata.meta.mounts | default(false) | bool }}"
     enable_nfs: "{{ os_metadata.meta.nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
     enable_lustre: "{{ os_metadata.meta.lustre | default(false) | bool }}"
@@ -57,8 +58,8 @@
       ansible.builtin.file:
         path: /mnt/cluster
         state: directory
-        owner: slurm
-        group: root
+        owner: ansible-init
+        group: ansible-init
         mode: u=rX,g=rwX,o=
 
     - name: Mount /mnt/cluster
@@ -83,7 +84,7 @@
         - ansible.builtin.meta: end_play
     - name: Check if hostvars exist
       become: true
-      become_user: slurm
+      become_user: ansible-init # share is root-squashed
       ansible.builtin.stat:
         path: "/mnt/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
       register: hostvars_stat
@@ -98,7 +99,7 @@
         - ansible.builtin.meta: end_play
     - name: Sync /mnt/cluster to /var/tmp
       become: true
-      become_user: slurm
+      become_user: ansible-init # share is root-squashed
       ansible.posix.synchronize:
         src: "/mnt/cluster/"
         dest: "/var/tmp/cluster/"
@@ -184,6 +185,11 @@
       vars:
         sssd_conf_src: "/var/tmp/cluster/hostconfig/{{ ansible_hostname }}/sssd.conf"
       when: enable_sssd
+
+    - name: Setup custom mounts
+      ansible.builtin.include_role:
+        name: mounts
+      when: enable_mounts
 
     # NFS client mount
     - name: If nfs-clients is present
@@ -277,22 +283,13 @@
         name: basic_users
       when: enable_basic_users
 
-    - name: EESSI
-      when: enable_eessi
       # NB: don't need conditional block on enable_compute as have already exited
       # if not the case
-      block:
-        - name: Copy cvmfs config
-          ansible.builtin.copy:
-            src: /var/tmp/cluster/cvmfs/default.local
-            dest: /etc/cvmfs/default.local
-            owner: root
-            group: root
-            mode: "0644"
-
-        - name: Ensure CVMFS config is setup # noqa: no-changed-when
-          ansible.builtin.command:
-            cmd: "cvmfs_config setup"
+    - name: Configure EESSI
+      ansible.builtin.include_role:
+        name: eessi
+        tasks_from: configure.yml
+      when: enable_eessi
 
     - name: Configure VGPUs
       ansible.builtin.include_role:

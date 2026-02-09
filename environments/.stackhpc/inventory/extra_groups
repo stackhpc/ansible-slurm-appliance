@@ -40,3 +40,6 @@ cluster
 
 [compute_init:children]
 compute
+
+[topology:children]
+compute

@@ -24,7 +24,7 @@
 # The PAT should then be copied into an Actions repository secret in the downstream repo with the title `WORKFLOW_TOKEN`.
 
 name: Check for upstream updates
-on:
+'on':
   schedule:
     - cron: "0 9 * * *"
   workflow_dispatch:
@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   check_for_update:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout the config repo

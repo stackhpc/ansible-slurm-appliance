@@ -2,9 +2,9 @@
 
 ## How to Load EESSI
 
-The EESSI environment can be initialise by running:
+The EESSI environment can be initialised by running:
 
-```[bash]
+```bash
 source /cvmfs/software.eessi.io/versions/2023.06/init/bash
 ```
 
@@ -30,6 +30,8 @@ To deactivate your EESSI environment you can either restart your shell using `ex
 
 To enable GPU support, the cluster must be running a site-specific image build that has CUDA enabled. For a guide on how to do this, please refer to [docs/image-build.md](../image-build.md).
 
+More information about EESSI GPU Support can be found in the [EESSI docs](https://www.eessi.io/docs/site_specific_config/gpu/).
+
 ### Using GPUs
 
 All CUDA-enabled software in EESSI expects CUDA drivers in a specific `host_injections` directory.
@@ -38,7 +40,7 @@ All CUDA-enabled software in EESSI expects CUDA drivers in a specific `host_inje
 
 Use the `link_nvidia_host_libraries.sh` script, provided by EESSI, to symlink your GPU drivers into `host_injections`.
 
-```[bash]
+```bash
 /cvmfs/software.eessi.io/versions/2023.06/scripts/gpu_support/nvidia/link_nvidia_host_libraries.sh
 ```
 
@@ -50,43 +52,55 @@ Run `which nvcc` to confirm that the CUDA compiler is found.
 
 If `nvcc` is not found, add the CUDA path to your environment:
 
-```[bash]
+```bash
 export PATH=/usr/local/cuda/bin:$PATH
 ```
 
 `which nvcc` should now show the path to the CUDA compiler.
 
-#### Loading EESSI module for the GCC compiler
+#### Loading EESSI buildenv module
 
-Running `which gcc` with EESSI initialised should initially show a path `.../2023.06/compat...` which points to the compatibility compiler.
+The `buildenv` module provides the environment needed to build software with EESSI. The module sets up compiler and linker wrappers to ensure the builds are linked to the correct EESSI libraries. This means that the program can run even without the EESSI environment loaded.
 
-It is important to load a `gcc` version that is compatible with the host's CUDA version. This can be found by referring to the table below:
+To load the `buildenv` module, run:
 
-To find your cuda version run `nvcc --version`
-
-| **CUDA Version** | **Recommended GCC Module (EESSI 2023.06)**              |
-| ---------------- | ------------------------------------------------------- |
-| CUDA 13.0        | GCC/12.3.0                                              |
-| CUDA 12.3 – 12.5 | GCC/12.3.0 or GCC/12.2.0 (officially supports GCC 12.x) |
-| CUDA 12.0 – 12.2 | GCC/12.2.0 (officially listed supported version)        |
-| CUDA 11.4 – 11.8 | no matching GCC module in EESSI 2023.06                 |
-| CUDA < 11.4      | not supported                                           |
-
-To load correct ESSI module run, substituting x for the compatible GCC version:
-
-```[bash]
-module load GCC/12.x.0
+```bash
+module load buildenv/default-foss-2023b
 ```
 
-Running `which gcc` will now give a path `.../2023.06/software...` which is the full compiler provided by EESSI. This is what we want for CUDA builds.
+Now you can run `cmake` and `make` to compile CUDA programs using EESSI's modules loaded by `buildenv`.
 
-Now you can run `cmake` and `make` to compile CUDA using EESSI's `gcc`.
+Additional modules may need to be loaded to compile programs. To see available modules to load in EESSI run:
+
+```bash
+module avail
+```
+
+#### Useful EESSI Commands
+
+To see modules currently loaded in EESSI, run:
+
+```bash
+module list
+```
+
+To unload all currently loaded modules:
+
+```bash
+module purge
+```
+
+To unload a specific module, run (e.g GCC/12.3.0):
+
+```bash
+module unload GCC/12.3.0
+```
 
 #### Test: Compile deviceQuery from CUDA-Samples
 
 To test that your EESSI setup can compile CUDA, try compiling `deviceQuery` from CUDA-Samples with the following steps:
 
-```[bash]
+```bash
 git clone https://github.com/NVIDIA/cuda-samples.git
 cd cuda-samples/Samples/1_Utilities/deviceQuery
 mkdir -p build
@@ -94,4 +108,48 @@ cd build
 cmake ..
 make
 ./deviceQuery
+```
+
+## EESSI Proxy Configuration
+
+EESSI recommend that clusters use a proxy to reduce latency for clients and
+avoid excessive load on the EESSI Stratum 1 servers. By default:
+
+- A [squid proxy](https://www.squid-cache.org/) is deployed to the control node.
+- `squid` is configured with the [EEESI-recommended configuration](https://www.eessi.io/docs/tutorial/access/proxy/#configuration),
+  requiring the node to have 50GB disk and 1024MB of RAM available.
+- `squid` allows connections from the CIDR of the [access network](./networks.md)
+  (first network in `cluster_networks`).
+- `eessi` client are configured to use the IP of `squid` node(s) on the access
+  network as the proxy address(es).
+
+Note that EESSI [recommend](https://www.eessi.io/docs/tutorial/access/proxy/#general-recommendations):
+
+> The proxy server should have a 10Gbit link to the client systems, a
+> sufficiently powerful CPU, a decent amount of memory for the kernel cache (tens
+> of GBs), and fast local storage (SSD or NVMe).
+>
+> As a rule of thumb, it is recommended to have (at least) one proxy server for
+> every couple of hundred worker nodes (100-500).
+
+The above default configuration may be modified via:
+
+- [squid role](../ansible/roles/squid/README.md) variables for cache sizes and access rules.
+- [eessi role](../ansible/roles/eessi/README.md) variables for proxy IPs (e.g.
+  including using a non-appliance-controlled proxy).
+- The node(s) where `squid` is deployed via `environments/site/inventory/groups`.
+
+Separate node(s) could also be provisioned for squid via OpenTofu, e.g.:
+
+```hcl
+# environments/$ENV/tofu/main.tf:
+module "cluster" {
+...
+  additional_nodes = {
+    squid = {
+      nodes = ["squid-0"]
+      flavor = "squid_flavor_name"
+    }
+  }
+}
 ```

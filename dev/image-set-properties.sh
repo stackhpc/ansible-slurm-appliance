@@ -17,7 +17,6 @@ openstack image set \
 --property hw_architecture=x86_64 \
 --property hw_vif_multiqueue_enabled=true \
 --property hw_firmware_type=uefi \
---property os_distro=rocky \
 --property os_type=linux \
 --property os_admin_user=rocky \
 "$image"
@@ -34,8 +33,6 @@ else
     echo setting qcow2 properties
     set -x
     openstack image set \
-    --property hw_scsi_model=virtio-scsi \
-    --property hw_disk_bus=scsi \
-    --property hw_scsi_model=virtio \
+    --property hw_disk_bus=virtio \
     "$image"
 fi

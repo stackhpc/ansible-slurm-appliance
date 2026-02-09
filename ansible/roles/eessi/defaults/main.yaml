@@ -1,14 +1,17 @@
 ---
 cvmfs_release_version: "6-3"
 
-# Default to 10GB
-cvmfs_quota_limit_mb: 10000
-
-cvmfs_config_default:
+cvmfs_quota_limit_mb: 10000 # local cache soft quota in MB (default 10GB)
+cvmfs_config_single:
   CVMFS_CLIENT_PROFILE: single
   CVMFS_QUOTA_LIMIT: "{{ cvmfs_quota_limit_mb }}"
 
+cvmfs_http_proxy: '' # as per docs, quotes are added automatically
+# See https://www.eessi.io/docs/getting_access/native_installation/#configuring-your-client-to-use-a-squid-proxy
+cvmfs_config_proxy:
+  CVMFS_QUOTA_LIMIT: "{{ cvmfs_quota_limit_mb }}"
+  CVMFS_HTTP_PROXY: "'{{ cvmfs_http_proxy }}'"
+
+cvmfs_config_default: "{{ cvmfs_config_single if cvmfs_http_proxy == '' else cvmfs_config_proxy }}"
 cvmfs_config_overrides: {}
 cvmfs_config: "{{ cvmfs_config_default | combine(cvmfs_config_overrides) }}"
-
-cvmfs_gpg_checksum: "sha256:5c60679d307a96524204c127250e8ebdda66a459659faa1718bdf32dde1d7069"

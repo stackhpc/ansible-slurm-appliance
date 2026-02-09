@@ -4,7 +4,7 @@
   ansible.builtin.template:
     src: "{{ sssd_conf_src }}"
     dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/sssd.conf"
-    owner: root
-    group: root
+    owner: ansible-init
+    group: ansible-init
     mode: u=rw,go=
   delegate_to: "{{ groups['control'] | first }}"

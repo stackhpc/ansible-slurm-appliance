@@ -5,7 +5,7 @@
 # See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Test extra build
-on:
+'on':
   workflow_call:
   workflow_dispatch:
 
@@ -18,21 +18,21 @@ permissions:
 jobs:
   doca:
     name: extra-build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-extra-RL8
             source_image_name_key: RL8 # key into environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
-            inventory_groups: doca,cuda # lustre disabled due to https://github.com/stackhpc/ansible-slurm-appliance/pull/759 
+            inventory_groups: doca,cuda # lustre disabled due to https://github.com/stackhpc/ansible-slurm-appliance/pull/759
             volume_size: 35 # needed for cuda
           - image_name: openhpc-extra-RL9
             source_image_name_key: RL9
             inventory_groups: doca,cuda,lustre
             volume_size: 35 # needed for cuda
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
