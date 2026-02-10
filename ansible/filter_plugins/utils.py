@@ -47,19 +47,14 @@ def exists(fpath):  # pylint: disable=missing-function-docstring
 
 def to_ood_regex(items):
     """Convert a list of strings possibly containing digits into a regex containing \\d+
-
-    eg {{ [compute-001, compute-002, control] | to_regex }} -> '(compute-\\d+)|(control)'
+    eg {{ [compute-001, compute-002, control] | to_ood_regex }} -> '(compute-\\d+)|(control)'
     """
-
     # NB: for python3.12+ the \d in this function & docstring
     # need to be raw strings. See
     # https://docs.python.org/3/reference/lexical_analysis.html
-
-    # There's a python bug which means re.sub() can't use '\d' in the replacement so
-    # have to do replacement in two stages:
-    r = [re.sub(r"\d+", "XBACKSLASHX", v) for v in items]
-    r = [v.replace("XBACKSLASHX", r"\d+") for v in set(r)]
-    r = [f"({v})" for v in r]
+    r = [re.sub(r"\d+", r"\\d+", v) for v in items]
+    # remove duplicates by using set, ensure stable order by sorting
+    r = [f"({v})" for v in sorted(set(r))]
     return "|".join(r)
 
 
