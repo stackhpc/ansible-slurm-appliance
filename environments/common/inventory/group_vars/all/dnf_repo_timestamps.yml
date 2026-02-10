@@ -61,14 +61,22 @@ dnf_repos_default:
       pulp_path: rocky/9.6/AppStream/x86_64/os
       pulp_timestamp: 20251106T205505
       repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/AppStream/x86_64/os
+      pulp_timestamp: 20260208T210938
+      repo_file: rocky
   appstream-source:
     '8.10':
-      pulp_path: rocky/8.10/AppStream/source/os
-      pulp_timestamp: 20251009T082406
+      pulp_path: rocky/8.10/AppStream/source/tree
+      pulp_timestamp: 20260208T205949
       repo_file: Rocky-Sources
     '9.6':
-      pulp_path: rocky/9.6/AppStream/source/os
-      pulp_timestamp: 20251009T121903
+      pulp_path: rocky/9.6/AppStream/source/tree
+      pulp_timestamp: 20251106T210718
+      repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/AppStream/source/tree
+      pulp_timestamp: 20260208T212722
       repo_file: rocky
   baseos:
     '8.10':
@@ -87,14 +95,22 @@ dnf_repos_default:
       pulp_path: rocky/9.6/BaseOS/x86_64/os
       pulp_timestamp: 20251106T211545
       repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/BaseOS/x86_64/os
+      pulp_timestamp: 20260208T214258
+      repo_file: rocky
   baseos-source:
     '8.10':
-      pulp_path: rocky/8.10/BaseOS/source/os
-      pulp_timestamp: 20251009T082406
+      pulp_path: rocky/8.10/BaseOS/source/tree
+      pulp_timestamp: 20260208T205949
       repo_file: Rocky-Sources
     '9.6':
-      pulp_path: rocky/9.6/BaseOS/source/os
-      pulp_timestamp: 20251009T121903
+      pulp_path: rocky/9.6/BaseOS/source/tree
+      pulp_timestamp: 20251107T211059
+      repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/BaseOS/source/tree
+      pulp_timestamp: 20260208T212722
       repo_file: rocky
   cernvmfs_cfg:
     '8':
@@ -110,7 +126,7 @@ dnf_repos_default:
       pulp_path: eessi/rhel/8/noarch
       pulp_timestamp: 20251119T202303
       repo_file: cvmfs-config-eessi
-    '9': # RL8/9 use the same repo
+    '9':
       pulp_path: eessi/rhel/8/noarch
       pulp_timestamp: 20251119T202303
       repo_file: cvmfs-config-eessi
@@ -141,6 +157,10 @@ dnf_repos_default:
       pulp_path: rocky/9.6/CRB/x86_64/os
       pulp_timestamp: 20251107T205232
       repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/CRB/x86_64/os
+      pulp_timestamp: 20260208T210938
+      repo_file: rocky
   crb-source:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/source/tree
@@ -148,8 +168,12 @@ dnf_repos_default:
       repo_file: Rocky-Sources
       repo_name: powertools-source
     '9.6':
-      pulp_path: rocky/9.6/CRB/source/os
-      pulp_timestamp: 20251006T044455
+      pulp_path: rocky/9.6/CRB/source/tree
+      pulp_timestamp: 20251106T210718
+      repo_file: rocky
+    '9.7':
+      pulp_path: rocky/9.7/CRB/source/tree
+      pulp_timestamp: 20260208T212722
       repo_file: rocky
   epel:
     '8':
@@ -168,11 +192,11 @@ dnf_repos_default:
   epel-source:
     '8':
       pulp_path: epel/8/Everything/source/tree
-      pulp_timestamp: 20251230T204936
+      pulp_timestamp: 20260208T205334
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/source/tree
-      pulp_timestamp: 20251230T204936
+      pulp_timestamp: 20260208T205334
       repo_file: epel
   extras:
     '8.10':
