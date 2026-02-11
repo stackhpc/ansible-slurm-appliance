@@ -25,13 +25,13 @@ def prometheus_node_exporter_targets(hosts, hostvars, env_key, group):
     for host in hosts:
         host_env = hostvars[host].get(env_key, "ungrouped")
         per_env[host_env].append(host)
-    for env, hosts in per_env.items():  # pylint: disable=redefined-argument-from-local
+    for env, hosts_per_env in per_env.items():
         target = {
-            "targets": [f"{target}:9100" for target in hosts],
+            "targets": [f"{target}:9100" for target in sorted(hosts_per_env)],
             "labels": {"env": env, "group": group},
         }
         result.append(target)
-    return result
+    return sorted(result, key=lambda x: (x["targets"], x["labels"]))
 
 
 def readfile(fpath):  # pylint: disable=missing-function-docstring
