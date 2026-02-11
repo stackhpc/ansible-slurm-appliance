@@ -1,0 +1,2 @@
+---
+sshd_conf_maxstartups: "100:30:200"
