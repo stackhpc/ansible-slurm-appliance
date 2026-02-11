@@ -5,3 +5,4 @@ DisableForwarding {{ 'yes' if sshd_disable_forwarding | bool else 'no' }}
 AllowTcpForwarding local
 PermitOpen 127.0.0.1:*
 {% endif %}
+MaxStartups {{ sshd_conf_maxstartups }}
