@@ -1,0 +1,149 @@
+---
+# Ensures munge is installed in a fixed version and rotate key if it changed in the inventory
+#
+# How to use it:
+# 1. Edit your secrets.yml to rotate the munge key (in case it was compromised).
+#   a. Generate a new key:
+#
+#    dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64 | sed 's/^/  /'`
+#
+#   b. Change the `vault_openhpc_mungekey` value in the correct inventory `secrets.yml`:
+#
+#    ansible-vault edit ${APPLIANCES_ENVIRONMENT_ROOT}/inventory/group_vars/all/secrets.yml`
+#
+#    for example:
+#
+#    vault_openhpc_mungekey: >-
+#      E6S8105hsw4b1RGOqeNBVLpc3Ff7/of4Us6O/CuJa2ZypwLsyLEyNa+SaTxCXxcQnW/rgyYhAGPX
+#      (...)
+#
+# 2. If the controle node doesn't have access to the internet, download 2 RPMs
+#    for your RockyLinux version and copy them to a directory on the control node.
+#
+#    export MUNGE_RPMS_LOCAL_DIR=/absolute/path/to/the/rpms/directory
+#
+# 3. Run the playbook to install the updated munge version on all nodes and rotate the key
+#
+#   ansible-playbook -D ansible/adhoc/fix_munge.yml -e "munge_rpms_local_dir=${MUNGE_RPMS_LOCAL_DIR}"
+#
+# The playbook is idempotent so feel free to run it multiple times if needed.
+
+- hosts: openhpc
+  become: true
+  tags:
+    - openhpc
+  vars:
+    munge_version: 0.5.18
+    munge_rpms:
+      '9':
+        - url: http://127.0.0.1:4856/rpms-rocky9/munge-libs-0.5.18-1.el9.x86_64.rpm
+          filename: munge-libs-0.5.18-1.el9.x86_64.rpm
+          checksum: sha256:20a28d1a7fb2d914dac77bc1aacbfb97b8e41195041ee54b2e2ae62044a21cc9
+        - url: http://127.0.0.1:4856/rpms-rocky9/munge-0.5.18-1.el9.x86_64.rpm
+          filename: munge-0.5.18-1.el9.x86_64.rpm
+          checksum: sha256:2c438643d476b912fb0ff1fc9ea279b204bd5c79afd0c6b10cf4cbcb4fb3d64f
+      '8':
+        - url: x
+          filename: munge-libs-0.5.18-1.el8.x86_64.rpm
+          checksum: sha256:xxxx
+        - url: x
+          filename: munge-0.5.18-1.el8.x86_64.rpm
+          checksum: sha256:xxxx
+    _munge_rpm_dir_on_host: "/tmp/munge-rpms/"
+
+  tasks:
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Set fact containing munge package facts
+      ansible.builtin.set_fact:
+        munge_needs_update: true # "{{ munge_package.version is version(munge_version, '<') }}"
+      vars:
+        munge_package: "{{ ansible_facts.packages.get('munge', [{ 'version': '0.0'}])[0] }}"
+
+    - name: Ensure temporary directory on hosts
+      become: true
+      ansible.builtin.file:
+        path: "{{ _munge_rpm_dir_on_host }}"
+        state: directory
+        mode: "0755"
+        owner: root
+        group: root
+      when:
+        - munge_needs_update
+
+    - when:
+        - munge_rpms_local_dir | default('') | length == 0
+        - munge_needs_update
+      block:
+        - name: Download munge rpm {{ item.filename }} # noqa: run-once[task]
+          become: false
+          ansible.builtin.get_url:
+            url: "{{ item.url }}"
+            dest: "/tmp/{{ item.filename }}"
+            checksum: "{{ item.checksum }}"
+            mode: "0644"
+          register: _download_archive
+          until: _download_archive is succeeded
+          retries: 5
+          delay: 2
+          run_once: true
+          delegate_to: localhost
+          check_mode: false
+          loop: "{{ munge_rpms[ansible_distribution_major_version] }}"
+
+        - name: Propagate downloaded {{ item.filename }}
+          become: true
+          ansible.builtin.copy:
+            src: "/tmp/{{ item.filename }}"
+            dest: "{{ _munge_rpm_dir_on_host }}/{{ item.filename }}"
+            mode: "0644"
+            owner: root
+            group: root
+          loop: "{{ munge_rpms[ansible_distribution_major_version] }}"
+
+    - name: Propagate locally distributed munge rpm
+      become: true
+      ansible.builtin.copy:
+        src: "{{ munge_rpms_local_dir }}/{{ item.filename }}"
+        dest: "{{ _munge_rpm_dir_on_host }}"
+        mode: "0644"
+        owner: root
+        group: root
+      loop: "{{ munge_rpms[ansible_distribution_major_version] }}"
+      when:
+        - (munge_rpms_local_dir | default('') | length) > 0
+        - munge_needs_update
+
+    - name: Ensure RPMs are installed
+      become: true
+      ansible.builtin.command:
+        cmd: "dnf install -y {{ munge_rpms[ansible_distribution_major_version] | map(attribute='filename') | join(' ') }}"
+        chdir: "{{ _munge_rpm_dir_on_host }}"
+      changed_when: true
+      when:
+        - munge_needs_update
+
+    - name: Ensure temporary files are cleaned-up
+      become: true
+      ansible.builtin.file:
+        path: "{{ _munge_rpm_dir_on_host }}"
+        state: absent
+
+    - when: appliances_mode != 'build'
+      block:
+        - name: Write Munge key
+          become: true
+          ansible.builtin.copy:
+            content: "{{ openhpc_munge_key_b64 | b64decode }}"
+            dest: "/etc/munge/munge.key"
+            owner: munge
+            group: munge
+            mode: '0400'
+          register: _openhpc_munge_key_copy
+        - name: Ensure Munge service is running
+          become: true
+          ansible.builtin.service:
+            name: munge
+            state: "{{ 'restarted' if _openhpc_munge_key_copy.changed else 'started' }}"
