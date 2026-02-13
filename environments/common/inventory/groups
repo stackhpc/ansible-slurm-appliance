@@ -238,3 +238,6 @@ doca
 
 [mounts]
 # Hosts with custom mounts
+
+[opkssh]
+# Hosts to run opkssh to allow SSH via OIDC
