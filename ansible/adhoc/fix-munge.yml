@@ -34,21 +34,22 @@
     - openhpc
   vars:
     munge_version: 0.5.18
+    download_root_url: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/munge-rpms
     munge_rpms:
       '9':
-        - url: http://127.0.0.1:4856/rpms-rocky9/munge-libs-0.5.18-1.el9.x86_64.rpm
+        - url: "{{ download_root_url }}/9.7/munge-libs-0.5.18-1.el9.x86_64.rpm"
           filename: munge-libs-0.5.18-1.el9.x86_64.rpm
-          checksum: sha256:20a28d1a7fb2d914dac77bc1aacbfb97b8e41195041ee54b2e2ae62044a21cc9
-        - url: http://127.0.0.1:4856/rpms-rocky9/munge-0.5.18-1.el9.x86_64.rpm
+          checksum: sha256:69b8b8e8978057eb04ef618279ff67c09bb78e4f4838845557d55a45e227960d
+        - url: "{{ download_root_url }}/9.7/munge-0.5.18-1.el9.x86_64.rpm"
           filename: munge-0.5.18-1.el9.x86_64.rpm
-          checksum: sha256:2c438643d476b912fb0ff1fc9ea279b204bd5c79afd0c6b10cf4cbcb4fb3d64f
+          checksum: sha256:698c3bd4e1b524761eb2c8bc24af9ea576e62893eb907e54c6d2bb77bf63cf81
       '8':
-        - url: x
+        - url: "{{ download_root_url }}/8.10/munge-libs-0.5.18-1.el8.x86_64.rpm"
           filename: munge-libs-0.5.18-1.el8.x86_64.rpm
-          checksum: sha256:xxxx
-        - url: x
+          checksum: sha256:ef8a8b9fd94976a75493f3dffe8518c1d10f542cdeaee14730d6cd06c3469c6e
+        - url: "{{ download_root_url }}/8.10/munge-0.5.18-1.el8.x86_64.rpm"
           filename: munge-0.5.18-1.el8.x86_64.rpm
-          checksum: sha256:xxxx
+          checksum: sha256:abcd9c5651046ca8c98cc0d2adc994c826f98e544e49a4f2035db88e4dcca44f
     _munge_rpm_dir_on_host: "/tmp/munge-rpms/"
 
   tasks:
@@ -58,7 +59,7 @@
 
     - name: Set fact containing munge package facts
       ansible.builtin.set_fact:
-        munge_needs_update: true # "{{ munge_package.version is version(munge_version, '<') }}"
+        munge_needs_update: "{{ munge_package.version is version(munge_version, '<') }}"
       vars:
         munge_package: "{{ ansible_facts.packages.get('munge', [{ 'version': '0.0'}])[0] }}"
 
