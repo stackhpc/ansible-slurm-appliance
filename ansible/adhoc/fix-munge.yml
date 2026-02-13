@@ -9,7 +9,7 @@
 #
 #  b. Rerun secrets generation:
 #
-#   ansible-playbook ansible/adhoc/ansible/adhoc/generate-passwords.yml
+#   ansible-playbook ansible/adhoc/generate-passwords.yml
 #
 #  c. Vault-encrypt the resulting secrets:
 #
