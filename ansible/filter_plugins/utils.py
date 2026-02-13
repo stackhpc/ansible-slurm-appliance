@@ -25,13 +25,13 @@ def prometheus_node_exporter_targets(hosts, hostvars, env_key, group):
     for host in hosts:
         host_env = hostvars[host].get(env_key, "ungrouped")
         per_env[host_env].append(host)
-    for env, hosts in per_env.items():  # pylint: disable=redefined-argument-from-local
+    for env, hosts_per_env in per_env.items():
         target = {
-            "targets": [f"{target}:9100" for target in hosts],
+            "targets": [f"{target}:9100" for target in sorted(hosts_per_env)],
             "labels": {"env": env, "group": group},
         }
         result.append(target)
-    return result
+    return sorted(result, key=lambda x: (x["targets"], x["labels"]))
 
 
 def readfile(fpath):  # pylint: disable=missing-function-docstring
@@ -47,19 +47,14 @@ def exists(fpath):  # pylint: disable=missing-function-docstring
 
 def to_ood_regex(items):
     """Convert a list of strings possibly containing digits into a regex containing \\d+
-
-    eg {{ [compute-001, compute-002, control] | to_regex }} -> '(compute-\\d+)|(control)'
+    eg {{ [compute-001, compute-002, control] | to_ood_regex }} -> '(compute-\\d+)|(control)'
     """
-
     # NB: for python3.12+ the \d in this function & docstring
     # need to be raw strings. See
     # https://docs.python.org/3/reference/lexical_analysis.html
-
-    # There's a python bug which means re.sub() can't use '\d' in the replacement so
-    # have to do replacement in two stages:
-    r = [re.sub(r"\d+", "XBACKSLASHX", v) for v in items]
-    r = [v.replace("XBACKSLASHX", r"\d+") for v in set(r)]
-    r = [f"({v})" for v in r]
+    r = [re.sub(r"\d+", r"\\d+", v) for v in items]
+    # remove duplicates by using set, ensure stable order by sorting
+    r = [f"({v})" for v in sorted(set(r))]
     return "|".join(r)
 
 
