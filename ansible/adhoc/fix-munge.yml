@@ -1,28 +1,27 @@
 ---
-# Ensures munge is installed in a fixed version and rotate key if it changed in the inventory
+# Ensures MUNGE is installed in a fixed version and rotate key if it changed in the inventory
 #
 # How to use it:
-# 1. Edit your secrets.yml to rotate the munge key (in case it was compromised).
-#   a. Generate a new key:
+# 1. Edit your secrets.yml to rotate the MUNGE key (in case it was compromised).
+#  a. Remove the `vault_openhpc_mungekey` value in the correct inventory `secrets.yml`:
 #
-#    dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64 | sed 's/^/  /'`
+#   ansible-vault edit ${APPLIANCES_ENVIRONMENT_ROOT}/inventory/group_vars/all/secrets.yml
 #
-#   b. Change the `vault_openhpc_mungekey` value in the correct inventory `secrets.yml`:
+#  b. Rerun secrets generation:
 #
-#    ansible-vault edit ${APPLIANCES_ENVIRONMENT_ROOT}/inventory/group_vars/all/secrets.yml`
+#   ansible-playbook ansible/adhoc/ansible/adhoc/generate-passwords.yml
 #
-#    for example:
+#  c. Vault-encrypt the resulting secrets:
 #
-#    vault_openhpc_mungekey: >-
-#      E6S8105hsw4b1RGOqeNBVLpc3Ff7/of4Us6O/CuJa2ZypwLsyLEyNa+SaTxCXxcQnW/rgyYhAGPX
-#      (...)
+#   ansible-vault encrypt ${APPLIANCES_ENVIRONMENT_ROOT}/inventory/group_vars/all/secrets.yml
 #
-# 2. If the controle node doesn't have access to the internet, download 2 RPMs
-#    for your RockyLinux version and copy them to a directory on the control node.
+# 2. If the control node doesn't have access to the internet, download the munge and munge-libs
+#    RPMs from https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/munge-rpms
+#    for your Rocky Linux version and copy them to a directory on the control node.
 #
 #    export MUNGE_RPMS_LOCAL_DIR=/absolute/path/to/the/rpms/directory
 #
-# 3. Run the playbook to install the updated munge version on all nodes and rotate the key
+# 3. Run the playbook to install the updated MUNGE version on all nodes and rotate the key
 #
 #   ansible-playbook -D ansible/adhoc/fix_munge.yml -e "munge_rpms_local_dir=${MUNGE_RPMS_LOCAL_DIR}"
 #
@@ -57,7 +56,7 @@
       ansible.builtin.package_facts:
         manager: auto
 
-    - name: Set fact containing munge package facts
+    - name: Set fact containing MUNGE package facts
       ansible.builtin.set_fact:
         munge_needs_update: "{{ munge_package.version is version(munge_version, '<') }}"
       vars:
@@ -78,7 +77,7 @@
         - munge_rpms_local_dir | default('') | length == 0
         - munge_needs_update
       block:
-        - name: Download munge rpm {{ item.filename }} # noqa: run-once[task]
+        - name: Download RPMs # noqa: run-once[task]
           become: false
           ansible.builtin.get_url:
             url: "{{ item.url }}"
@@ -94,7 +93,7 @@
           check_mode: false
           loop: "{{ munge_rpms[ansible_distribution_major_version] }}"
 
-        - name: Propagate downloaded {{ item.filename }}
+        - name: Propagate downloaded RPMs
           become: true
           ansible.builtin.copy:
             src: "/tmp/{{ item.filename }}"
@@ -104,7 +103,7 @@
             group: root
           loop: "{{ munge_rpms[ansible_distribution_major_version] }}"
 
-    - name: Propagate locally distributed munge rpm
+    - name: Propagate locally distributed RPMs
       become: true
       ansible.builtin.copy:
         src: "{{ munge_rpms_local_dir }}/{{ item.filename }}"
@@ -134,7 +133,7 @@
 
     - when: appliances_mode != 'build'
       block:
-        - name: Write Munge key
+        - name: Write MUNGE key
           become: true
           ansible.builtin.copy:
             content: "{{ openhpc_munge_key_b64 | b64decode }}"
