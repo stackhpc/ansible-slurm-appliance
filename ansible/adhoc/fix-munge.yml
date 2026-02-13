@@ -23,7 +23,7 @@
 #
 # 3. Run the playbook to install the updated MUNGE version on all nodes and rotate the key
 #
-#   ansible-playbook -D ansible/adhoc/fix_munge.yml -e "munge_rpms_local_dir=${MUNGE_RPMS_LOCAL_DIR}"
+#   ansible-playbook -D ansible/adhoc/fix-munge.yml -e "munge_rpms_local_dir=${MUNGE_RPMS_LOCAL_DIR}"
 #
 # The playbook is idempotent so feel free to run it multiple times if needed.
 
