@@ -11,6 +11,9 @@ _nfs_node_ips: "{{ groups['nfs'] | map('extract', hostvars, 'ansible_host') | jo
 # default *all* entries in nfs_configurations to only permitting mounts from above IPs:
 nfs_export_clients: "{{ _nfs_node_ips }}"
 
+# default all mounts to requiring working networking:
+nfs_client_mnt_options: defaults,nosuid,nodev,_netdev,x-systemd.requires=network-online.target,x-systemd.after=network-online.target
+
 nfs_configuration_home_volume: # volume-backed home directories
   - comment: Export /exports/home from Slurm control node as /home
     nfs_enable:
