@@ -41,6 +41,7 @@ it also requires an image build with the role name added to the
 | hooks/pre.yml            | ?                             | None at present                 | n/a                 |
 | validate.yml             | n/a                           | Not relevant during boot        | n/a                 |
 | bootstrap.yml            | (wait for ansible-init)       | Not relevant during boot        | n/a                 |
+| bootstrap.yml            | journald                      | Fully supported                 | No                  |
 | bootstrap.yml            | resolv_conf                   | Fully supported                 | No                  |
 | bootstrap.yml            | etc_hosts                     | Fully supported                 | No                  |
 | bootstrap.yml            | chrony                        | Fully supported                 | No                  |
