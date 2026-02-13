@@ -418,6 +418,19 @@ environments which should be unique, e.g. production and staging.
   ~300 nodes). Consider adding `control` to the `sshd` group to [mitigate these
   issues](../environments/site/inventory/group_vars/all/sshd.yml).
 
+- Consider using the [pam_slurm_adopt.so](https://slurm.schedmd.com/pam_slurm_adopt.html) PAM plugin.
+  It replaces the default `pam_slurm.so`. Like `pam_slurm.so` it prevents users from ssh-ing into compute nodes
+  they don't have jobs running on. It also ensures users ssh-ing into a compute node will have their session bound
+  to their job's cgroup: they won't be able to use more CPU or memory than was allocated to the job.  
+  WARNING: This plugin conflicts with `pam_systemd.so`. We disable `pam_systemd.so` in `/etc/pam.d/password-auth`
+  during deployment but it will be reverted if `authselect` is later run.
+  Due to the ordering (`slurm.yml` is after `iam.yml` in `site.yml`) it should not happen during a playbook run.
+  It will happen if administrators re-run `authselect sssd --force` manually.
+  ```yaml
+  # environments/site/inventory/group_vars/all/defaults.yml:
+  appliances_enable_pam_slurm_adopt: true
+  ```
+
 ### Applying configuration
 
 To configure the appliance, ensure the venv and the environment are

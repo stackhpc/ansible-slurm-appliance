@@ -45,7 +45,19 @@
         insertafter: "account\\s+required\\s+pam_nologin.so"
         block: |
           account    sufficient   pam_access.so
+          {% if appliances_enable_pam_slurm_adopt %}
+          account    required     pam_slurm_adopt.so action_adopt_failure=deny action_generic_failure=deny
+          {% else %}
           account    required     pam_slurm.so
+          {% endif %}
+
+    - name: Ensure pam_systemd is disabled (conflicts with pam_slurm_adopt)
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/password-auth
+        regex: '^(# )?-session\s+optional\s+pam_systemd.so'
+        line: '# -session     optional      pam_systemd.so'
+      when: appliances_enable_pam_slurm_adopt
+
     - name: Configure login access control
       ansible.builtin.blockinfile:
         path: /etc/security/access.conf
@@ -72,6 +84,21 @@
     - ansible.builtin.include_role:
         name: stackhpc.openhpc
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
+
+    - name: Flush handler
+      ansible.builtin.meta: flush_handlers # get fresh ansible_local.slurm facts
+
+    - name: "Late failure if pam_slurm_adopt can't be used"
+      when: appliances_enable_pam_slurm_adopt
+      ansible.builtin.assert:
+        that:
+          - "'Contain' in (ansible_local.slurm.get('PrologFlags') | default('', true))"
+          - ansible_local.slurm.get('ProctrackType', '') == 'proctrack/cgroup'
+        fail_msg: >
+          pam_slurm_adopt needs PrologFlags=Contain,... and ProctrackType=proctrack/cgroup,
+          but you have PrologFlags={{ ansible_local.slurm.get('PrologFlags')}}
+          and ProctrackType={{ ansible_local.slurm.get('ProctrackType') }}.
+          Please fix your Slurm config.
 
 - name: Setup Node Health Checks
   # Has to be done here as it requires openhpc repos etc for installation
