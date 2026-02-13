@@ -88,7 +88,7 @@ for the first time. Slurm controlled rebuild requires that:
 
 - Compute groups in the OpenTofu `compute` variable have:
   - `ignore_image_changes: true`
-  - `compute_init_enable: ['compute', ... ]`
+  - `compute_init_enable: ["compute", ... ]`
 - The Ansible `rebuild` inventory group contains the `control` group.
 
 TODO: should also document how compute-init does NOT run if the `site.yml`
