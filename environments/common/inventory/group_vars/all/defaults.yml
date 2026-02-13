@@ -115,5 +115,5 @@ appliances_extra_packages: "{{ (appliances_extra_packages_default + appliances_e
 
 # system user groups of cluster administrators. They are allowed to ssh
 # to compute nodes even if they have no job running.
-admin_user_groups:
+appliances_admin_user_groups:
   - adm

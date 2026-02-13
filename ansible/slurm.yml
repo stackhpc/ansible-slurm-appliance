@@ -50,7 +50,7 @@
       ansible.builtin.blockinfile:
         path: /etc/security/access.conf
         block: |
-          {% for group in admin_user_groups %}
+          {% for group in appliances_admin_user_groups %}
           +:({{ group }}):ALL
           {% endfor %}
           -:ALL:ALL
