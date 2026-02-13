@@ -1,0 +1,50 @@
+name: Build munge RPMs
+'on':
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build-munge:
+    name: Build Munge
+    runs-on: ubuntu-24.04
+    steps:
+
+      - name: Build
+        run: |
+          set -x
+          set -eo pipefail
+
+          cat > build-in-container.sh <<EOF
+          #!/bin/bash
+          set -x
+          set -eo pipefail
+          dnf makecache
+          dnf install -y rpm-build bzip2-devel gcc make openssl-devel systemd-rpm-macros zlib-devel
+          curl -LO https://github.com/dun/munge/releases/download/munge-0.5.18/munge-0.5.18.tar.xz
+          sha256sum -c <<<"39c3ec6ef5604bfa206e8aa10fc05d5119040f6de4a554bc0fb98ca1aed838dc munge-0.5.18.tar.xz"
+          rpmbuild -ta munge-0.5.18.tar.xz
+          cp -av /root/rpmbuild/RPMS/x86_64/* /output/
+          (cd /output && sha256sum *.rpm | tee CHECKSUMS)
+          EOF
+
+          chmod a+rx build-in-container.sh
+
+          for tag in 8.10 9.7; do
+            mkdir -p munge_rpms/${tag}
+            podman run --rm \
+              -v "$(pwd)/munge_rpms/${tag}:/output:z" \
+              -v "$(pwd)/build-in-container.sh:/build.sh:z" \
+              "quay.io/rockylinux/rockylinux:${tag}" /build.sh 2>&1 | tee build.log
+            mv build.log "munge_rpms/${tag}/"
+            echo "========= BUILT ${tag} RPMs ================="
+          done
+        shell: bash
+
+      - name: Upload manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: munge_rpms
+          path: |
+            ./munge_rpms
+          overwrite: true
