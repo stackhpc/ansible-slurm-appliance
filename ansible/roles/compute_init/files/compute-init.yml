@@ -337,13 +337,18 @@
         insertafter: "account\\s+required\\s+pam_nologin.so"
         block: |
           account    sufficient   pam_access.so
+          {% if appliances_enable_pam_slurm_adopt %}
           account    required     pam_slurm_adopt.so action_adopt_failure=deny action_generic_failure=deny
+          {% else %}
+          account    required     pam_slurm.so
+          {% endif %}
 
     - name: Ensure pam_systemd is disabled (conflicts with pam_slurm_adopt)
       ansible.builtin.lineinfile:
         path: /etc/pam.d/password-auth
         regex: '^(# )?-session\s+optional\s+pam_systemd.so'
         line: '# -session     optional      pam_systemd.so'
+      when: appliances_enable_pam_slurm_adopt
 
     - name: Configure login access control
       ansible.builtin.blockinfile:
