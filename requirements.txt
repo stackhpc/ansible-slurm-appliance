@@ -49,7 +49,7 @@ oslo.utils==9.2.0
 packaging==23.2
 passlib==1.7.4
 pbr==7.0.3
-pillow==12.0.0
+pillow==12.1.1
 platformdirs==4.5.0
 prettytable==3.17.0
 psutil==7.1.3
