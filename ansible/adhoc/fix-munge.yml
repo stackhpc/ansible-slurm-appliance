@@ -34,8 +34,13 @@
   vars:
     munge_version: 0.5.18
     download_root_url: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/munge-rpms
+    # munge-devel is needed for slurm recompiles. Since dnf won't know how to fetch it,
+    # it's better to install it now (23kB).
     munge_rpms:
       '9':
+        - url: "{{ download_root_url }}/9.7/munge-devel-0.5.18-1.el9.x86_64.rpm"
+          filename: munge-devel-0.5.18-1.el9.x86_64.rpm
+          checksum: sha256:e86b43e7026ff0759e17ff9bd687edca2bf3aaf3d1a8dc26aa819ddacea578b1
         - url: "{{ download_root_url }}/9.7/munge-libs-0.5.18-1.el9.x86_64.rpm"
           filename: munge-libs-0.5.18-1.el9.x86_64.rpm
           checksum: sha256:69b8b8e8978057eb04ef618279ff67c09bb78e4f4838845557d55a45e227960d
@@ -43,6 +48,9 @@
           filename: munge-0.5.18-1.el9.x86_64.rpm
           checksum: sha256:698c3bd4e1b524761eb2c8bc24af9ea576e62893eb907e54c6d2bb77bf63cf81
       '8':
+        - url: "{{ download_root_url }}/8.10/munge-devel-0.5.18-1.el8.x86_64.rpm"
+          filename: munge-devel-0.5.18-1.el8.x86_64.rpm
+          checksum: sha256:33f3d50b35cad8dd85ab8d16e872df657757a3156bf1619e8d92ebb0dde46904
         - url: "{{ download_root_url }}/8.10/munge-libs-0.5.18-1.el8.x86_64.rpm"
           filename: munge-libs-0.5.18-1.el8.x86_64.rpm
           checksum: sha256:ef8a8b9fd94976a75493f3dffe8518c1d10f542cdeaee14730d6cd06c3469c6e
