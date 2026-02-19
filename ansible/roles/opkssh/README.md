@@ -12,8 +12,9 @@ from the link above, with the following differences:
    are not supported, i.e. as if the installer was run with the `--no-home-policy`
    option.
 3. By default, `sshd` is configured so keys in user's `~/.ssh/authorized_keys`
-   files do NOT permit login, unless user is in `adm` group. This is to prevent
-   users provisioning their own keys instead of using OIDC.
+   files do NOT permit login, unless user is in a group listed in
+   `appliances_admin_user_groups` (default: `[adm]`).
+   This is to prevent users provisioning their own keys instead of using OIDC.
 4. By default, `sshd` and `ssh` are configured so that SSH connections from this
    host to itself use host-based authentication (instead of user keys or OIDC).
    This allows the OpenOndemand's web shell, which uses SSH, to work as normal.
@@ -82,9 +83,9 @@ for all role variables.
   group listed in `opkssh_enable_authorized_keys_groups`. Default `true`.
 
 - `opkssh_enable_authorized_keys_groups`: Optional list. Linux groups for which
-  keys in the user's authorized_keys files do permit login. Default is `[adm]`
-  which includes the `rocky` user. This is necessary to allow Ansible to
-  configure the cluster.
+  keys in the user's authorized_keys files do permit login. Default is the same
+  as `appliances_admin_user_groups`, which includes the `rocky` user. This is
+  necessary to allow Ansible to configure the cluster.
 
 - `opkssh_configure_hostbased_auth`: Optional bool. If true, configure `sshd`
   and `ssh` so that SSH connections from this host to itself use host-based

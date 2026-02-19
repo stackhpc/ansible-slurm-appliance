@@ -8,8 +8,7 @@ opkssh_install_arch: amd64 # NB ansible_architecture is x86_64
 opkssh_install_binary_url: "https://github.com/{{ opkssh_install_github_repo }}/releases/download/{{ opkssh_install_version }}/opkssh-linux-{{ opkssh_install_arch }}"
 
 opkssh_disable_authorized_keys: true
-opkssh_enable_authorized_keys_groups:
-  - adm # includes 'rocky' user
+opkssh_enable_authorized_keys_groups: "{{ appliances_admin_user_groups }}" # includes 'rocky' user
 opkssh_configure_hostbased_auth: true
 
 opkssh_providers:
