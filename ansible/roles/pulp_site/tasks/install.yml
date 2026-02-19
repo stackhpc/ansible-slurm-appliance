@@ -20,6 +20,7 @@
     src: settings.py.j2
     dest: "{{ pulp_site_install_dir }}/settings/settings.py"
     mode: "0644"
+  register: _pulp_site_settings
 
 - name: Install pulp podman container
   containers.podman.podman_container:
@@ -42,10 +43,10 @@
     mode: "0644"
   register: _pulp_service
 
-- name: Start Pulp service
+- name: Ensure Pulp service state
   ansible.builtin.systemd:
     name: pulp
-    state: "{{ 'started' if _pulp_service.changed else 'restarted' }}"
+    state: "{{ 'restarted' if (_pulp_service.changed or _pulp_site_settings.changed) else 'started' }}"
     daemon_reload: "{{ _pulp_service.changed }}"
     enabled: true
 
