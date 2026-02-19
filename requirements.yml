@@ -1,7 +1,7 @@
 ---
 roles:
   - src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
-    version: feat/netdev # TODO: bump on release
+    version: v26.2.1
     name: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
     version: v1.5.0
