@@ -33,7 +33,7 @@
     - logging
     - journald
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
         name: journald
 
 - hosts: resolv_conf
