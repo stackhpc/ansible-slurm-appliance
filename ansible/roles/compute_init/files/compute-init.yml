@@ -16,6 +16,7 @@
     enable_nfs: "{{ os_metadata.meta.nfs | default(false) | bool }}"
     enable_manila: "{{ os_metadata.meta.manila | default(false) | bool }}"
     enable_lustre: "{{ os_metadata.meta.lustre | default(false) | bool }}"
+    enable_journald: "{{ os_metadata.meta.journald | default(false) | bool }}"
     enable_basic_users: "{{ os_metadata.meta.basic_users | default(false) | bool }}"
     enable_eessi: "{{ os_metadata.meta.eessi | default(false) | bool }}"
     enable_chrony: "{{ os_metadata.meta.chrony | default(false) | bool }}"
@@ -115,6 +116,11 @@
       # this is higher priority than vars block = normal ansible's hostvars
       ansible.builtin.include_vars:
         file: "/var/tmp/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
+
+    - name: Run journald role
+      ansible.builtin.include_role:
+        name: journald
+      when: enable_journald
 
     - name: Run chrony role
       ansible.builtin.include_role:

@@ -1,0 +1,14 @@
+---
+
+- name: Restart journald
+  ansible.builtin.service:
+    name: systemd-journald
+    state: restarted
+  become: true
+  when: "'builder' not in group_names"
+
+- name: Flush journal to disk
+  become: true
+  ansible.builtin.command: journalctl --flush
+  changed_when: false
+  when: "'builder' not in group_names"
