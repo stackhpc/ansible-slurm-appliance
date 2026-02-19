@@ -59,3 +59,10 @@
   until: 0 == _pulp_site_admin_password.rc
   retries: 6
   delay: 30
+
+- name: Manage Pulp content checksums
+  # see https://github.com/stackhpc/stackhpc-kayobe-config/blob/c9951e60452f08b41a62f3aa6a8dcec16a1c2edf/etc/kayobe/containers/pulp/post.yml#L21-L29
+  ansible.builtin.command:
+    cmd: "podman exec pulp bash -c 'pulpcore-manager handle-artifact-checksums'"
+  changed_when: true
+  when: _pulp_site_settings.changed
