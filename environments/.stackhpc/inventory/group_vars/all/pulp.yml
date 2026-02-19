@@ -1,0 +1,9 @@
+# Key pulp server by CI_CLOUD:
+pulp_server_ips:
+  SMS: 172.16.1.232
+pulp_server_ansible_host: "{{ pulp_server_ips[ci_cloud] | default('') }}"
+pulp_server_local: "http://{{ pulp_server_ansible_host }}:8080"
+pulp_server_ark: 'https://ark.stackhpc.com'
+appliances_pulp_url: "{{ pulp_server_local if ci_cloud in pulp_server_ips else pulp_server_ark }}"
+pulp_site_upstream_username: "{{ lookup('ansible.builtin.env', 'ARK_USERNAME', default='slurm-app-ci') }}"
+pulp_site_upstream_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }}"
