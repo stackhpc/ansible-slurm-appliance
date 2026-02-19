@@ -209,6 +209,11 @@
         tasks_from: source-hpl.yml
       when: "'hpctests' in group_names"
 
+
+# Install fix munge version (TEMPORARY)
+- import_playbook: adhoc/fix-munge.yml
+
+
 - hosts: prometheus
   become: true
   gather_facts: true
