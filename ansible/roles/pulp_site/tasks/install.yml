@@ -65,4 +65,4 @@
   ansible.builtin.command:
     cmd: "podman exec pulp bash -c 'pulpcore-manager handle-artifact-checksums'"
   changed_when: true
-  when: _pulp_site_settings.changed
+  when: _pulp_site_settings.changed # noqa: no-handler
