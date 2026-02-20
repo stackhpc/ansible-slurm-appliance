@@ -34,3 +34,5 @@ openondemand_rstudio_partition: false
 openondemand_matlab_partition: false
 openondemand_codeserver_partition: false
 mounts_tmp_enabled: false # don't have /tmp in memory
+journald_flush_enabled: true
+journald_restart_enabled: true

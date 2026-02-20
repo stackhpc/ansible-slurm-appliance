@@ -2,3 +2,9 @@
 # Journald storage. One of: volatile, persistent, auto, or none. Defaults to
 # `persistent`.
 journald_storage: persistent
+
+# Whether to flush logs when configuring the service
+journald_flush_enabled: true
+
+# Whether to restart journald after configuration
+journald_restart_enabled: true
