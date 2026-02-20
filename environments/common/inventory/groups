@@ -34,6 +34,9 @@ compute
 openhpc
 additional
 
+[journald]
+# Hosts where journald should be configured. See ansible/roles/journald/README.md.
+
 [builder]
 # Do not add hosts here manually - used as part of Packer image build pipeline. See packer/README.md.
 

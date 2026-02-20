@@ -27,6 +27,15 @@
           to update these variable names. ** NB: The actual secrets will not be changed.**
       when: "'secrets_openhpc_' in (hostvars[inventory_hostname] | join)"
 
+- hosts: journald
+  gather_facts: false
+  tags:
+    - logging
+    - journald
+  tasks:
+    - ansible.builtin.import_role:
+        name: journald
+
 - hosts: resolv_conf
   become: true
   gather_facts: false

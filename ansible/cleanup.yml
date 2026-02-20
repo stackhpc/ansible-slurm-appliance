@@ -54,6 +54,15 @@
     - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/poetry.lock
     - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements.txt
 
+- name: Stop journald
+  # Stop journald from writing data to the journal after we have cleared it.
+  ansible.builtin.service:
+    name: systemd-journald
+    state: stopped
+
+- name: Clear any journal files # noqa: no-changed-when
+  ansible.builtin.command: rm -rf /var/log/journal/*
+
 - name: Get package facts
   ansible.builtin.package_facts:
 
