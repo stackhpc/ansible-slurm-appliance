@@ -105,9 +105,6 @@ cuda
 [vgpu]
 # Hosts where vGPU/MIG should be configured - see docs/mig.md
 
-[vgpu]
-# Hosts where vGPU/MIG should be configured - see docs/mig.md
-
 [journald:children]
 # Hosts where journald should be configured. See ansible/roles/journald/README.md.
 cluster
