@@ -1,0 +1,10 @@
+
+- name: Collect mount facts
+  # Switch to ansible.builtin.mount_facts when bumping ansible-core>=2.18
+  mount_facts:
+    include_aggregate_mounts: true
+
+- name: Set nhc_autofs_mounts fact
+  set_fact:
+    nhc_autofs_mounts: "{{ ansible_facts.aggregate_mounts | selectattr('fstype', 'equalto', 'autofs') | map(attribute='mount') | list }}"
+

@@ -1,3 +1,7 @@
+
+- name: Collect facts
+  include_tasks: facts.yml
+
 - name: Copy stored NHC configuration to active location
   ansible.builtin.copy:
     remote_src: true
