@@ -1,3 +1,4 @@
+---
 # Used for compute-init
 - name: Template out host specific NHC config
   ansible.builtin.template:

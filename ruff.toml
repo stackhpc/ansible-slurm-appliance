@@ -35,3 +35,7 @@ select = ["E4", "E7", "E9", "F"]
 ignore = [
     "UP017", # remove and fix once CI not running 3.10 tests
 ]
+# Disable E402 for ansible/library modules where imports may come after docstrings
+per-file-ignores = {
+    "ansible/library/*.py" = ["E402"],
+}
