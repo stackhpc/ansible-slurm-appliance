@@ -26,3 +26,12 @@ appliances_state_dir: /var/lib/state
 # Defaults for caas-provided extravars:
 cluster_project_manila_share: false
 cluster_home_manila_share: false
+
+# Define templated inventory variables:
+# See
+# - ansible/roles/cluster_infra/templates/resources.tf.j2:openstack_networking_subnet_v2.cluster_subnet
+# - environments/site/tofu/inventory.tf:
+# NB: cluster_storage_network never defines the subnet, so can never add that
+cluster_subnets:
+  - name: "{{ cluster_name }}-subnet"
+    cidr: "{{ cluster_cidr | default('192.168.44.0/24') }}"
