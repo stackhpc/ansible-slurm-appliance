@@ -1,4 +1,3 @@
-
 - name: Collect facts
   include_tasks: facts.yml
 

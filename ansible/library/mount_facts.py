@@ -2,7 +2,7 @@
 # Copyright: Contributors to the Ansible project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-# NOTE: Adapted for Ansible 2.6 compatability from the upstream code. 
+# NOTE: Adapted for Ansible 2.6 compatability from the upstream code.
 
 DOCUMENTATION = """
 ---
@@ -206,72 +206,94 @@ import subprocess
 import typing as t
 
 
-
 STATIC_SOURCES = ["/etc/fstab", "/etc/vfstab", "/etc/filesystems"]
 DYNAMIC_SOURCES = ["/etc/mtab", "/proc/mounts", "/etc/mnttab"]
 
 # AIX and BSD don't have a file-based dynamic source, so the module also supports running a mount binary to collect these.
 # Pattern for Linux, including OpenBSD and NetBSD
-LINUX_MOUNT_RE = re.compile(r"^(?P<device>\S+) on (?P<mount>\S+) type (?P<fstype>\S+) \((?P<options>.+)\)$")
+LINUX_MOUNT_RE = re.compile(
+    r"^(?P<device>\S+) on (?P<mount>\S+) type (?P<fstype>\S+) \((?P<options>.+)\)$"
+)
 # Pattern for other BSD including FreeBSD, DragonFlyBSD, and MacOS
 BSD_MOUNT_RE = re.compile(r"^(?P<device>\S+) on (?P<mount>\S+) \((?P<fstype>.+)\)$")
 # Pattern for AIX, example in https://www.ibm.com/docs/en/aix/7.2?topic=m-mount-command
-AIX_MOUNT_RE = re.compile(r"^(?P<node>\S*)\s+(?P<mounted>\S+)\s+(?P<mount>\S+)\s+(?P<fstype>\S+)\s+(?P<time>\S+\s+\d+\s+\d+:\d+)\s+(?P<options>.*)$")
+AIX_MOUNT_RE = re.compile(
+    r"^(?P<node>\S*)\s+(?P<mounted>\S+)\s+(?P<mount>\S+)\s+(?P<fstype>\S+)\s+(?P<time>\S+\s+\d+\s+\d+:\d+)\s+(?P<options>.*)$"
+)
 
 
 class MountInfo:
-    _fields = ('mount_point', 'line', 'fields')
+    _fields = ("mount_point", "line", "fields")
 
-    def __init__(self, mount_point: str, line: str, fields: t.Dict[str, t.Union[str, int]]):
+    def __init__(
+        self, mount_point: str, line: str, fields: t.Dict[str, t.Union[str, int]]
+    ):
         self.mount_point = mount_point
         self.line = line
         self.fields = fields
 
     def __repr__(self) -> str:
-        return f'MountInfo(mount_point={self.mount_point!r}, line={self.line!r}, fields={self.fields!r})'
+        return f"MountInfo(mount_point={self.mount_point!r}, line={self.line!r}, fields={self.fields!r})"
 
     def __eq__(self, other: t.Any) -> bool:
         if not isinstance(other, MountInfo):
             return NotImplemented
-        return (self.mount_point, self.line, self.fields) == (other.mount_point, other.line, other.fields)
+        return (self.mount_point, self.line, self.fields) == (
+            other.mount_point,
+            other.line,
+            other.fields,
+        )
 
     def to_tuple(self):
         return tuple(getattr(self, f) for f in self._fields)
 
 
 class MountInfoOptions:
-    _fields = ('mount_point', 'line', 'fields')
+    _fields = ("mount_point", "line", "fields")
 
-    def __init__(self, mount_point: str, line: str, fields: t.Dict[str, t.Union[str, t.Dict[str, str]]]):
+    def __init__(
+        self,
+        mount_point: str,
+        line: str,
+        fields: t.Dict[str, t.Union[str, t.Dict[str, str]]],
+    ):
         self.mount_point = mount_point
         self.line = line
         self.fields = fields
 
     def __repr__(self) -> str:
-        return f'MountInfoOptions(mount_point={self.mount_point!r}, line={self.line!r}, fields={self.fields!r})'
+        return f"MountInfoOptions(mount_point={self.mount_point!r}, line={self.line!r}, fields={self.fields!r})"
 
     def __eq__(self, other: t.Any) -> bool:
         if not isinstance(other, MountInfoOptions):
             return NotImplemented
-        return (self.mount_point, self.line, self.fields) == (other.mount_point, other.line, other.fields)
+        return (self.mount_point, self.line, self.fields) == (
+            other.mount_point,
+            other.line,
+            other.fields,
+        )
 
     def to_tuple(self):
         return tuple(getattr(self, f) for f in self._fields)
 
 
 def replace_octal_escapes(value: str) -> str:
-    return re.sub(r"(\\[0-7]{3})", lambda m: codecs.decode(m.group(0), "unicode_escape"), value)
+    return re.sub(
+        r"(\\[0-7]{3})", lambda m: codecs.decode(m.group(0), "unicode_escape"), value
+    )
 
 
 @functools.lru_cache(maxsize=None)
-def get_device_by_uuid(module: AnsibleModule, uuid : str) -> t.Union[str, None]:
+def get_device_by_uuid(module: AnsibleModule, uuid: str) -> t.Union[str, None]:
     """Get device information by UUID."""
     blkid_output = None
     blkid_binary = module.get_bin_path("blkid")
     if blkid_binary:
         cmd = [blkid_binary, "--uuid", uuid]
         with suppress(subprocess.CalledProcessError):
-            blkid_output = handle_timeout(module)(subprocess.check_output)(cmd, timeout=module.params["timeout"]).decode()
+            blkid_output = handle_timeout(module)(subprocess.check_output)(
+                cmd, timeout=module.params["timeout"]
+            ).decode()
     return blkid_output
 
 
@@ -284,24 +306,39 @@ def list_uuids_linux() -> t.List[str]:
 
 
 @functools.lru_cache(maxsize=None)
-def run_lsblk(module : AnsibleModule) -> t.List[t.List[str]]:
+def run_lsblk(module: AnsibleModule) -> t.List[t.List[str]]:
     """Return device, UUID pairs from lsblk."""
     lsblk_output = ""
     lsblk_binary = module.get_bin_path("lsblk")
-    if (lsblk_binary):
-        cmd = [lsblk_binary, "--list", "--noheadings", "--paths", "--output", "NAME,UUID", "--exclude", "2"]
-        lsblk_output = subprocess.check_output(cmd, timeout=module.params["timeout"]).decode()
-    return [line.split() for line in lsblk_output.splitlines() if len(line.split()) == 2]
+    if lsblk_binary:
+        cmd = [
+            lsblk_binary,
+            "--list",
+            "--noheadings",
+            "--paths",
+            "--output",
+            "NAME,UUID",
+            "--exclude",
+            "2",
+        ]
+        lsblk_output = subprocess.check_output(
+            cmd, timeout=module.params["timeout"]
+        ).decode()
+    return [
+        line.split() for line in lsblk_output.splitlines() if len(line.split()) == 2
+    ]
 
 
 @functools.lru_cache(maxsize=None)
-def get_udevadm_device_uuid(module : AnsibleModule, device : str) -> t.Union[str,  None]:
+def get_udevadm_device_uuid(module: AnsibleModule, device: str) -> t.Union[str, None]:
     """Fallback to get the device's UUID for lsblk <= 2.23 which doesn't have the --paths option."""
     udevadm_output = ""
     udevadm_binary = module.get_bin_path("udevadm")
-    if (udevadm_binary):
+    if udevadm_binary:
         cmd = [udevadm_binary, "info", "--query", "property", "--name", device]
-        udevadm_output = subprocess.check_output(cmd, timeout=module.params["timeout"]).decode()
+        udevadm_output = subprocess.check_output(
+            cmd, timeout=module.params["timeout"]
+        ).decode()
     uuid = None
     for line in udevadm_output.splitlines():
         # a snippet of the output of the udevadm command below will be:
@@ -316,7 +353,7 @@ def get_udevadm_device_uuid(module : AnsibleModule, device : str) -> t.Union[str
     return uuid
 
 
-def get_partition_uuid(module: AnsibleModule, partname : str) -> t.Union[str,  None]:
+def get_partition_uuid(module: AnsibleModule, partname: str) -> t.Union[str, None]:
     """Get the UUID of a partition by its name."""
     # TODO: NetBSD and FreeBSD can have UUIDs in /etc/fstab,
     # but none of these methods work (mount always displays the label though)
@@ -332,6 +369,7 @@ def get_partition_uuid(module: AnsibleModule, partname : str) -> t.Union[str,  N
 
 def handle_timeout(module, default=None):
     """Decorator to catch timeout exceptions and handle failing, warning, and ignoring the timeout."""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -343,7 +381,9 @@ def handle_timeout(module, default=None):
                 elif module.params["on_timeout"] == "warn":
                     module.warn(str(e))
                 return default
+
         return wrapper
+
     return decorator
 
 
@@ -416,7 +456,7 @@ def gen_fstab_entries(lines: t.List[str]) -> t.Iterable[MountInfo]:
         if not (line) or line.startswith("#"):
             continue
         fields = [replace_octal_escapes(field) for field in line.split()]
-        mount_info  = {
+        mount_info = {
             "device": fields[0],
             "mount": fields[1],
             "fstype": fields[2],
@@ -441,7 +481,7 @@ def gen_vfstab_entries(lines: t.List[str]) -> t.Iterable[MountInfo]:
         passno = fields[4]
         with suppress(ValueError):
             passno = int(passno)
-        mount_info  = {
+        mount_info = {
             "device": fields[0],
             "device_to_fsck": fields[1],
             "mount": fields[2],
@@ -485,10 +525,10 @@ def gen_aix_filesystems_entries(lines: t.List[str]) -> t.Iterable[MountInfoOptio
 
         device = ""
         nodename = mount_info.get("nodename")
-        if (nodename):
+        if nodename:
             device = nodename
         dev = mount_info.get("dev")
-        if (dev):
+        if dev:
             if device:
                 device += ":"
             device += dev
@@ -533,8 +573,13 @@ def gen_mounts_by_file(file: str):
     - /etc/filesystems: multi-line, not column-based, and specific to AIX
     """
     lines = get_file_content(file, "").splitlines()
-    if (lines):
-        for gen_mounts in [gen_vfstab_entries, gen_mnttab_entries, gen_fstab_entries, gen_aix_filesystems_entries]:
+    if lines:
+        for gen_mounts in [
+            gen_vfstab_entries,
+            gen_mnttab_entries,
+            gen_fstab_entries,
+            gen_aix_filesystems_entries,
+        ]:
             with suppress(IndexError, ValueError):
                 # mpypy error: misc: Incompatible types in "yield from" (actual type "object", expected type "Union[MountInfo, MountInfoOptions]
                 # only works if either
@@ -566,9 +611,13 @@ def gen_mounts_by_source(module: AnsibleModule):
     sources = get_sources(module)
 
     if len(set(sources)) < len(sources):
-        module.warn(f"mount_facts option 'sources' contains duplicate entries, repeat sources will be ignored: {sources}")
+        module.warn(
+            f"mount_facts option 'sources' contains duplicate entries, repeat sources will be ignored: {sources}"
+        )
 
-    mount_fallback = module.params["mount_binary"] and set(sources).intersection(DYNAMIC_SOURCES)
+    mount_fallback = module.params["mount_binary"] and set(sources).intersection(
+        DYNAMIC_SOURCES
+    )
 
     seen = set()
     for source in sources:
@@ -581,10 +630,16 @@ def gen_mounts_by_source(module: AnsibleModule):
         if source == "mount":
             seen.add(source)
             stdout = run_mount_bin(module, module.params["mount_binary"])
-            results = [(source, *(mount_info.to_tuple())) for mount_info in gen_mounts_from_stdout(stdout)]
+            results = [
+                (source, *(mount_info.to_tuple()))
+                for mount_info in gen_mounts_from_stdout(stdout)
+            ]
         else:
             seen.add(real_source)
-            results = [(source, *(mount_info.to_tuple())) for mount_info in gen_mounts_by_file(source)]
+            results = [
+                (source, *(mount_info.to_tuple()))
+                for mount_info in gen_mounts_by_file(source)
+            ]
 
         if results and source in ("mount", *DYNAMIC_SOURCES):
             mount_fallback = False
@@ -593,7 +648,10 @@ def gen_mounts_by_source(module: AnsibleModule):
 
     if mount_fallback:
         stdout = run_mount_bin(module, module.params["mount_binary"])
-        yield from [("mount", *(mount_info.to_tuple())) for mount_info in gen_mounts_from_stdout(stdout)]
+        yield from [
+            ("mount", *(mount_info.to_tuple()))
+            for mount_info in gen_mounts_from_stdout(stdout)
+        ]
 
 
 def get_mount_facts(module: AnsibleModule):
@@ -611,12 +669,18 @@ def get_mount_facts(module: AnsibleModule):
             uuid = device.split("=", 1)[1]
             device = get_device_by_uuid(module, uuid) or device
 
-        if not any(fnmatch(device, pattern) for pattern in module.params["devices"] or ["*"]):
+        if not any(
+            fnmatch(device, pattern) for pattern in module.params["devices"] or ["*"]
+        ):
             continue
-        if not any(fnmatch(fstype, pattern) for pattern in module.params["fstypes"] or ["*"]):
+        if not any(
+            fnmatch(fstype, pattern) for pattern in module.params["fstypes"] or ["*"]
+        ):
             continue
 
-        timed_func = _timeout.timeout(seconds, f"Timed out getting mount size for mount {mount} (type {fstype})")(get_mount_size)
+        timed_func = _timeout.timeout(
+            seconds, f"Timed out getting mount size for mount {mount} (type {fstype})"
+        )(get_mount_size)
         mount_size = handle_timeout(module)(timed_func)(mount)
         if mount_size:
             fields.update(mount_size)
@@ -625,7 +689,9 @@ def get_mount_facts(module: AnsibleModule):
             with suppress(subprocess.CalledProcessError):
                 uuid = get_partition_uuid(module, device)
 
-        fields.update({"ansible_context": {"source": source, "source_data": origin}, "uuid": uuid})
+        fields.update(
+            {"ansible_context": {"source": source, "source_data": origin}, "uuid": uuid}
+        )
         mounts.append(fields)
 
     return mounts
@@ -642,12 +708,24 @@ def handle_deduplication(module, mounts):
             mount_points[mount_point] = mount
         mounts_by_source.setdefault(source, []).append(mount_point)
 
-    duplicates_by_src = {src: mnts for src, mnts in mounts_by_source.items() if len(set(mnts)) != len(mnts)}
+    duplicates_by_src = {
+        src: mnts
+        for src, mnts in mounts_by_source.items()
+        if len(set(mnts)) != len(mnts)
+    }
     if duplicates_by_src and module.params["include_aggregate_mounts"] is None:
-        duplicates_by_src = {src: mnts for src, mnts in mounts_by_source.items() if len(set(mnts)) != len(mnts)}
-        duplicates_str = ", ".join([f"{src} ({duplicates})" for src, duplicates in duplicates_by_src.items()])
-        module.warn(f"mount_facts: ignoring repeat mounts in the following sources: {duplicates_str}. "
-                    "You can disable this warning by configuring the 'include_aggregate_mounts' option as True or False.")
+        duplicates_by_src = {
+            src: mnts
+            for src, mnts in mounts_by_source.items()
+            if len(set(mnts)) != len(mnts)
+        }
+        duplicates_str = ", ".join(
+            [f"{src} ({duplicates})" for src, duplicates in duplicates_by_src.items()]
+        )
+        module.warn(
+            f"mount_facts: ignoring repeat mounts in the following sources: {duplicates_str}. "
+            "You can disable this warning by configuring the 'include_aggregate_mounts' option as True or False."
+        )
 
     if module.params["include_aggregate_mounts"]:
         aggregate_mounts = mounts
@@ -678,14 +756,23 @@ def main():
     seconds = module.params["timeout"]
     mount_binary = module.params["mount_binary"]
     if seconds is not None and seconds <= 0:
-        module.fail_json(msg=f"argument 'timeout' must be a positive number or null, not {seconds}")
+        module.fail_json(
+            msg=f"argument 'timeout' must be a positive number or null, not {seconds}"
+        )
     if mount_binary is not None and not isinstance(mount_binary, str):
-        module.fail_json(msg=f"argument 'mount_binary' must be a string or null, not {mount_binary}")
+        module.fail_json(
+            msg=f"argument 'mount_binary' must be a string or null, not {mount_binary}"
+        )
 
     mounts = get_mount_facts(module)
     mount_points, aggregate_mounts = handle_deduplication(module, mounts)
 
-    module.exit_json(ansible_facts={"mount_points": mount_points, "aggregate_mounts": aggregate_mounts})
+    module.exit_json(
+        ansible_facts={
+            "mount_points": mount_points,
+            "aggregate_mounts": aggregate_mounts,
+        }
+    )
 
 
 if __name__ == "__main__":

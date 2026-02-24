@@ -1,4 +1,3 @@
-
 - name: Collect mount facts
   # Switch to ansible.builtin.mount_facts when bumping ansible-core>=2.18
   mount_facts:
