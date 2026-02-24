@@ -1,6 +1,6 @@
 ---
 - name: Collect facts
-  include_tasks: facts.yml
+  ansible.builtin.include_tasks: facts.yml
 
 - name: Ensure NHC configuration directory exists
   # When running site.yml after login/control upgrade, nhc group might be
