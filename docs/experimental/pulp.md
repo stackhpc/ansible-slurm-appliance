@@ -46,7 +46,7 @@ reachable.
 3. Run the adhoc playbook to install and configure Pulp:
 
    ```shell
-   ansible-playbook ansible/adhoc/pulp-deploy.yml
+   ansible-playbook ansible/adhoc/deploy-pulp.yml
    ```
 
    Once complete, it will print a message giving a value to set for
@@ -98,7 +98,7 @@ two ways:
 2. The sync can be manually be triggered by running:
 
    ```shell
-   ansible-playbook ansible/adhoc/pulp-sync.yml
+   ansible-playbook ansible/adhoc/sync-pulp.yml
    ```
 
    By default this method syncs repositories for the latest version of RockyLinux
