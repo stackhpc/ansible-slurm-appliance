@@ -413,6 +413,18 @@ environments which should be unique, e.g. production and staging.
   recommended that you build this on top of the latest existing openhpc image.
   See the [image-build docs](image-build.md) for details.
 
+- Consider using the [pam_slurm_adopt.so](https://slurm.schedmd.com/pam_slurm_adopt.html) PAM plugin.
+  It replaces the default `pam_slurm.so`. Like `pam_slurm.so` it prevents users from ssh-ing into compute nodes
+  they don't have jobs running on. It also ensures users ssh-ing into a compute node will have their session bound
+  to their job's cgroup: they won't be able to use more CPU or memory than was allocated to the job.  
+  WARNING: This plugin conflicts with `pam_systemd.so`. We disable `pam_systemd.so` during deployment but it will be reverted
+  if `authselect` is used to switch profiles. Then you'll have to re-run the `slurm.yml` playbook.
+
+  ```yaml
+  # environments/site/inventory/group_vars/all/defaults.yml:
+  appliances_enable_pam_slurm_adopt: true
+  ```
+
 ### Applying configuration
 
 To configure the appliance, ensure the venv and the environment are

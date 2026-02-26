@@ -84,8 +84,9 @@ This means that when running the `site.yml` playbook, by default:
 The recommended way to resolve both of these issues is by carrying out a
 site-specific [image build](./image-build.md).
 
-By default, the following utility packages are installed in StackHPC images:
+By default, the following utility packages are installed in StackHPC images (see `appliances_extra_packages_default`):
 
+- bash-completion
 - htop
 - nano
 - screen
