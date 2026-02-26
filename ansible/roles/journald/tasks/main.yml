@@ -1,0 +1,32 @@
+---
+- name: Create /var/log/journal
+  become: true
+  ansible.builtin.file:
+    path: /var/log/journal
+    owner: "root"
+    group: "systemd-journal"
+    mode: "2755"
+    state: directory
+  notify: Flush journal to disk
+  when: journald_storage == "persistent"
+
+- name: Ensure journald drop in directory exists
+  ansible.builtin.file:
+    path: "/etc/systemd/journald.conf.d/"
+    owner: "root"
+    group: "root"
+    mode: "0770"
+    state: directory
+  become: true
+
+- name: Ensure journald.conf overrides are set
+  ansible.builtin.copy:
+    content: |
+       [Journal]
+       Storage={{ journald_storage }}
+    dest: /etc/systemd/journald.conf.d/ansible-slurm-appliance.conf
+    owner: root
+    group: root
+    mode: "0660"
+  become: true
+  notify: Restart journald
