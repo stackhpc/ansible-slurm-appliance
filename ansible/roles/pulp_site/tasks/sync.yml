@@ -1,8 +1,42 @@
 ---
-- ansible.builtin.assert:
+- name: Ensure upstream password is set
+  ansible.builtin.assert:
     that: pulp_site_upstream_password != ''
     quiet: true
     fail_msg: "Upstream password not set. Ensure `pulp_site_upstream_username` and `pulp_site_upstream_password` are overriden to your Ark credentials."
+
+- name: Install python3
+  ansible.builtin.package:
+    name: python3,git
+  become: true
+
+- name: Create virtualenv directory
+  ansible.builtin.file:
+    path: "{{ pulp_site_squeezer_venv }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Create virtualenv
+  module_defaults:
+    ansible.builtin.pip:
+      virtualenv: "{{ pulp_site_squeezer_venv }}"
+      virtualenv_command: "{{ 'python3.9 -m venv' if ansible_distribution_major_version == '8' else 'python3 -m venv' }}"
+      state: latest
+  become: true
+  block:
+    - name: Upgrade pip
+    # This needs to a separate step so that we use the updated version
+    # to install the packages below.
+      ansible.builtin.pip:
+        name: pip
+
+    - name: Install packages
+      ansible.builtin.pip:
+      # TODO: remove these from requirements.txt
+        name: "{{ pulp_cli_packages }}"
 
 - name: Ensure Pulp CLI config directory exists
   ansible.builtin.file:
@@ -26,10 +60,11 @@
   until: _pulp_status.failed == false
   retries: 30
   delay: 20
+  vars:
+    ansible_python_interpreter: "{{ pulp_site_squeezer_python }}"
 
 - vars:
     _cache_dir: "~/.cache/squeezer/{{ pulp_site_url | regex_replace(':|/', '_') }}"
-
   block:
     - name: Ensure squeezer cache exists
       ansible.builtin.file:
@@ -59,6 +94,7 @@
     pulp_username: "{{ pulp_site_username }}"
     pulp_password: "{{ pulp_site_password }}"
     pulp_repository_rpm_repos: "{{ pulp_site_rpm_repos }}"
+    ansible_python_interpreter: "{{ pulp_site_squeezer_python }}"
 
 - name: Create Pulp publications
   ansible.builtin.include_role:
@@ -69,6 +105,7 @@
     pulp_username: "{{ pulp_site_username }}"
     pulp_password: "{{ pulp_site_password }}"
     pulp_publication_rpm: "{{ pulp_site_rpm_publications }}"
+    ansible_python_interpreter: "{{ pulp_site_squeezer_python }}"
 
 - name: Create Pulp distributions
   ansible.builtin.include_role:
@@ -79,3 +116,4 @@
     pulp_username: "{{ pulp_site_username }}"
     pulp_password: "{{ pulp_site_password }}"
     pulp_distribution_rpm: "{{ pulp_site_rpm_distributions }}"
+    ansible_python_interpreter: "{{ pulp_site_squeezer_python }}"
