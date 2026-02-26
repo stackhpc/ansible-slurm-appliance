@@ -1,4 +1,4 @@
 # {{ ansible_managed }}
-{% for item in opkssh_providers | dict2items %}
-{{ item.value.issuer_uri }} {{ item.value.client_id }} {{ item.value.expires }}
+{% for item in opkssh_providers.values() %}
+{{ item.issuer_uri }} {{ item.client_id }} {{ item.expires }}
 {% endfor %}

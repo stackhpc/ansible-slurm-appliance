@@ -3,7 +3,6 @@
 - name: Configure ssh client to request host-based for ssh to itself
   ansible.builtin.copy:
     dest: /etc/ssh/ssh_config.d/60-hba.conf
-    # TODO: inventory_hostname matches CURRENT config for ondemand, check what SKA config is
     content: |
       Host {{ inventory_hostname }}
         HostbasedAuthentication yes
@@ -17,6 +16,7 @@
   ansible.builtin.lineinfile:
     path: /etc/ssh/ssh_config
     line: EnableSSHKeysign yes
+    regexp: '^EnableSSHKeysign '
 
 - name: Find client hostkeys
   ansible.builtin.find:
