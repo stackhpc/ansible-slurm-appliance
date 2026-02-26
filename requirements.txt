@@ -53,8 +53,6 @@ pillow==12.1.1
 platformdirs==4.5.0
 prettytable==3.17.0
 psutil==7.1.3
-pulp-cli==0.23.2
-pulp-glue==0.23.2
 pycparser==2.23
 Pygments==2.19.2
 pyparsing==3.2.5

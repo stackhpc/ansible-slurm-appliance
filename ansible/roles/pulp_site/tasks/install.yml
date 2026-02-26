@@ -20,6 +20,7 @@
     src: settings.py.j2
     dest: "{{ pulp_site_install_dir }}/settings/settings.py"
     mode: "0644"
+  register: _pulp_site_settings
 
 - name: Install pulp podman container
   containers.podman.podman_container:
@@ -42,18 +43,26 @@
     mode: "0644"
   register: _pulp_service
 
-- name: Start Pulp service
+- name: Ensure Pulp service state
   ansible.builtin.systemd:
     name: pulp
-    state: "{{ 'started' if _pulp_service.changed else 'restarted' }}"
+    state: "{{ 'restarted' if (_pulp_service.changed or _pulp_site_settings.changed) else 'started' }}"
     daemon_reload: "{{ _pulp_service.changed }}"
     enabled: true
 
-- name: Reset admin password once container has initialised # noqa: no-changed-when
+- name: Reset admin password once container has initialised
   no_log: true
   ansible.builtin.command:
     cmd: "podman exec pulp bash -c 'pulpcore-manager reset-admin-password -p {{ pulp_site_password }}'"
-  register: _admin_reset_output
-  until: 0 == _admin_reset_output.rc
+  register: _pulp_site_admin_password
+  changed_when: true
+  until: 0 == _pulp_site_admin_password.rc
   retries: 6
   delay: 30
+
+- name: Manage Pulp content checksums
+  # see https://github.com/stackhpc/stackhpc-kayobe-config/blob/c9951e60452f08b41a62f3aa6a8dcec16a1c2edf/etc/kayobe/containers/pulp/post.yml#L21-L29
+  ansible.builtin.command:
+    cmd: "podman exec pulp bash -c 'pulpcore-manager handle-artifact-checksums'"
+  changed_when: true
+  when: _pulp_site_settings.changed # noqa: no-handler
