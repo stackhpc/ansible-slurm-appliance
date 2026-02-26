@@ -47,7 +47,7 @@ dnf_repos_default:
   appstream:
     '8.10':
       pulp_path: rocky/8.10/AppStream/x86_64/os
-      pulp_timestamp: 20260208T214352
+      pulp_timestamp: 20260221T211506
       repo_file: Rocky-AppStream
     '9.4':
       pulp_path: rocky/9.4/AppStream/x86_64/os
@@ -63,12 +63,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/AppStream/x86_64/os
-      pulp_timestamp: 20260208T210938
+      pulp_timestamp: 20260222T211015
       repo_file: rocky
   appstream-source:
     '8.10':
       pulp_path: rocky/8.10/AppStream/source/tree
-      pulp_timestamp: 20260208T205949
+      pulp_timestamp: 20260221T205022
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/AppStream/source/tree
@@ -76,7 +76,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/AppStream/source/tree
-      pulp_timestamp: 20260208T212722
+      pulp_timestamp: 20260222T211000
       repo_file: rocky
   baseos:
     '8.10':

@@ -15,8 +15,8 @@ slurm_appliance_secrets:
   vault_demo_user_password: "{{ vault_demo_user_password | default(lookup('password', '/dev/null')) }}"
   vault_alertmanager_admin_password: "{{ vault_alertmanager_admin_password | default(lookup('password', '/dev/null')) }}"
 
-secrets_openhpc_mungekey_default:
-  content: "{{ lookup('pipe', 'dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64') }}"
+secrets_openhpc_mungekey_default: |
+  {{ lookup('pipe', 'dd if=/dev/urandom bs=1 count=1024 2>/dev/null | base64') }}
 
 # yamllint disable-line rule:line-length
 openhpc_passwords_output_path: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') | default(undefined, true) | mandatory('You must define the APPLIANCES_ENVIRONMENT_ROOT environment variable') }}/inventory/group_vars/all/secrets.yml"
