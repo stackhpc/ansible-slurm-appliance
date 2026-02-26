@@ -98,6 +98,8 @@ roles/*
 !roles/eessi/**
 !roles/topology/
 !roles/topology/**
+!roles/journald/
+!roles/journald/**
 !roles/raid/
 !roles/raid/**
 !roles/mounts/
