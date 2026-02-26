@@ -12,36 +12,41 @@ In summary, the way this functionality works is as follows:
 
 1. The image references(s) are manually updated in the OpenTofu configuration
    in the normal way.
-2. `tofu apply` is run which rebuilds the login and control nodes to the new
+2. The adhoc playbook `unlock.yml` is run to allow the login and control node
+   instances to be modified.
+3. `tofu apply` is run which rebuilds the login and control nodes to the new
    image(s). The new image reference for compute nodes is ignored, but is
    written into the hosts inventory file (and is therefore available as an
    Ansible hostvar).
-3. The `site.yml` playbook is run which reconfigures the cluster as normal. At
-   this point the cluster is functional, but using a new image for the login
-   and control nodes and the old image for the compute nodes. This playbook
-   also:
+4. The `site.yml` playbook is run which locks the instances again and reconfigures
+   the cluster as normal. At this point the cluster is functional, but using a new
+   image for the login and control nodes and the old image for the compute nodes.
+   This playbook also:
    - Writes cluster configuration to the control node, using the
      [compute_init](../../ansible/roles/compute_init/README.md) role.
    - Configures an application credential and helper programs on the control
      node, using the [rebuild](../../ansible/roles/rebuild/README.md) role.
-4. An admin submits Slurm jobs, one for each node, to a special "rebuild"
-   partition using an Ansible playbook. Because this partition has higher
-   priority than the partitions normal users can use, these rebuild jobs become
-   the next job in the queue for every node (although any jobs currently
-   running will complete as normal).
-5. Because these rebuild jobs have the `--reboot` flag set, before launching them
+5. An admin submits Slurm jobs, one for each node, to a special "rebuild"
+   partition using the adhoc playbook `rebuild-via-slurm.yml` which also unlocks
+   the compute instances. Because this partition has higher priority than the
+   partitions normal users can use, these rebuild jobs become the next job in
+   the queue for every node (although any jobs currently running will complete
+   as normal).
+6. Because these rebuild jobs have the `--reboot` flag set, before launching them
    the Slurm control node runs a [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram)
    which compares the current image for the node to the one in the cluster
-   configuration, and if it does not match, uses OpenStack to rebuild the
-   node to the desired (updated) image.
-   TODO: Describe the logic if they DO match
-6. After a rebuild, the compute node runs various Ansible tasks during boot,
+   configuration. If they do not match, it uses OpenStack to rebuild the
+   node to the desired (updated) image. If they do match it uses OpenStack to
+   reboot the node.
+7. After a rebuild, the compute node runs various Ansible tasks during boot,
    controlled by the [compute_init](../../ansible/roles/compute_init/README.md)
    role, to fully configure the node again. It retrieves the required cluster
    configuration information from the control node via an NFS mount.
-7. Once the `slurmd` daemon starts on a compute node, the Slurm controller
+8. Once the `slurmd` daemon starts on a compute node, the Slurm controller
    registers the node as having finished rebooting. It then launches the actual
    job, which does not do anything.
+9. The adhoc playbook `lock.yml` is run to prevent accidental modification to
+   compute nodes.
 
 ## Prerequsites
 
@@ -167,7 +172,9 @@ compute = {
    > If the cluster image references were updated at step 5, this will be
    > a disruptive operation and should be planned as part of a normal upgrade
    > cycle.
-   >
+
+   also:
+
    > [!CAUTION]
    > Due to OpenTofu/Terraform state limitations, this will plan to delete and
    > recreate all compute nodes in node groups where `ignore_image_changes: true`.
@@ -209,6 +216,19 @@ other priority or QOS settings:
 
 ```shell
 ansible-playbook ansible/adhoc/rebuild-via-slurm.yml -e 'rebuild_job_partitions=test rebuild_job_reboot=false'
+```
+
+The progress of the rebuild may be monitored using:
+
+```shell
+ansible-playbook ansible/adhoc/rebuild-status.yml
+```
+
+which will show which nodes are on the new image. Once all rebuilds have completed,
+instances can be locked again using:
+
+```shell
+ansible-playbook ansible/adhoc/lock.yml
 ```
 
 ## Testing
