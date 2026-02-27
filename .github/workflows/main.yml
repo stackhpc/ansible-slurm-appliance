@@ -1,0 +1,31 @@
+---
+
+# This file governs the main CI workflow.
+# It's the only workflow triggered on push and pull requests,
+
+name: Lint on push and pull request
+
+permissions:
+  actions: write
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+  id-token: write
+  # upload trivy scan results
+  security-events: write
+
+'on':
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint on push
+    uses: ./.github/workflows/lint.yml
