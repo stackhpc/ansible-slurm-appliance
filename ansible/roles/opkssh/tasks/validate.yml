@@ -1,0 +1,20 @@
+- name: Check SELinux is disabled if using opkssh
+  ansible.builtin.assert:
+    that: ansible_facts.selinux.status == 'disabled'
+    fail_msg: "appliance installation of opkssh does not support selinux - see its install script for steps"
+
+- name: Check provider configuration
+  ansible.builtin.assert:
+    that: item.value.keys() | list | symmetric_difference(_opkssh_provider_keys) == []
+    fail_msg: "entry '{{ item.key }}' in opkssh_providers is not correct - must have keys {{ _opkssh_provider_keys }}"
+  loop: "{{ opkssh_providers | dict2items }}"
+  vars:
+    _opkssh_provider_keys: ['issuer_uri', 'client_id', 'expires']
+
+- name: Check authorized identities configuration
+  ansible.builtin.assert:
+    that: item.keys() | intersect(_opkssh_auth_id_keys) | sort == _opkssh_auth_id_keys
+    fail_msg: "Entries in opkssh_auth_id must have keys {{ _opkssh_auth_id_keys}}. Invalid item {{ item }}."
+  loop: "{{ opkssh_auth_id }}"
+  vars:
+    _opkssh_auth_id_keys: ['name', 'opkssh_claim_selector']

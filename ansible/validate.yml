@@ -152,6 +152,18 @@
         name: freeipa
         tasks_from: validate.yml
 
+- name: Validate opkssh configuration
+  hosts: opkssh
+  tags:
+    - validate
+    - opkssh
+  gather_facts: true
+  become: true
+  tasks:
+    - ansible.builtin.import_role:
+        name: opkssh
+        tasks_from: validate.yml
+
 - name: Validate lustre configuration
   hosts: lustre
   tags:
