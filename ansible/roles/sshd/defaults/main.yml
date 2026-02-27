@@ -4,3 +4,4 @@ sshd_disable_forwarding: true
 sshd_allow_local_forwarding: false
 sshd_conf_src: sshd.conf.j2
 sshd_conf_dest: /etc/ssh/sshd_config.d/10-ansible.conf
+sshd_conf_maxstartups: "10:30:100"

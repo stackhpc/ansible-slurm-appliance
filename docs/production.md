@@ -413,6 +413,11 @@ environments which should be unique, e.g. production and staging.
   recommended that you build this on top of the latest existing openhpc image.
   See the [image-build docs](image-build.md) for details.
 
+- On systems with a large number of nodes, the default sshd configuration may
+  not be sufficient for the control node (e.g. issues have been seen with
+  ~300 nodes). Consider adding `control` to the `sshd` group to [mitigate these
+  issues](../environments/site/inventory/group_vars/all/sshd.yml).
+
 ### Applying configuration
 
 To configure the appliance, ensure the venv and the environment are
