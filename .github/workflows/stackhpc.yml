@@ -4,10 +4,29 @@
 # This workflow can run standalone or as part of the main CI workflow.
 # See the workflow file 'main.yml' for how this is CI triggered.
 
-name: Test deployment and reimage on OpenStack
+name: Test deployment and upgrade on OpenStack
 'on':
-  workflow_call:
   workflow_dispatch:
+    push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!dev/**'
+      - 'dev/setup-env.sh'
+      - '!**.md'
+      - '!.gitignore'
+      - '!.github/workflows/'
+      - '.github/workflows/stackhpc'
+  pull_request:
+    paths:
+      - '**'
+      - '!dev/**'
+      - 'dev/setup-env.sh'
+      - '!**.md'
+      - '!.gitignore'
+      - '!.github/workflows/'
+      - '.github/workflows/stackhpc'
 
 permissions:
   contents: read
@@ -16,8 +35,11 @@ permissions:
   statuses: write
 
 jobs:
-  openstack:
+  upgrade_openstack_job:
     name: openstack-ci
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }} # to branch/PR + OS
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
@@ -160,6 +182,15 @@ jobs:
         run: dev/setup-env.sh
         env:
           PYTHON_VERSION: python3 # overrides os-release discovery logic
+
+      - name: Wait for linting to succeed
+        # Can't do this in the current release as this file doesn't exist!
+        # TODO: consider moving to a separate checkout job??
+        run: |
+          .github/bin/wait-for-gh-workflow.py -v \
+            "Lint on push and pull request" \
+            "${GITHUB_REF#refs/heads/}" \
+            "$GITHUB_SHA"
 
       - name: Reimage login and control nodes to image in current branch
         id: reimage_non_compute

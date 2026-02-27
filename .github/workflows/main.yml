@@ -2,15 +2,8 @@
 
 # This file governs the main CI workflow.
 # It's the only workflow triggered on push and pull requests,
-# it manages the CI workflow as follows:
-# 1. Lint the code aborting the workflow if there are linting errors.
-# 2. Determine which files have changed and set job outputs accordingly.
-# 3. Conditionally run the other workflows based on the changed files:
-#    * stackhpc.yml
-#    * extra.yml
-#    * trivyscan.yml
 
-name: Test on push and pull request
+name: Lint on push and pull request
 
 permissions:
   actions: write
@@ -34,117 +27,5 @@ concurrency:
 
 jobs:
   lint:
-    name: Lint
+    name: Lint on push
     uses: ./.github/workflows/lint.yml
-
-  files_changed:
-    name: Determine files changed
-    needs: lint
-    runs-on: ubuntu-24.04
-    # Map a step output to a job output, this allows other jobs to be gated on the filter results
-    outputs:
-      # The 'stackhpc' output will be 'true' if either of the two stackhpc filters below matched
-      stackhpc: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
-      extra_on_push: ${{ steps.filter_on_some.outputs.extra_on_push }}
-      extra_on_pull_request: ${{ steps.filter_on_some.outputs.extra_on_pull_request }}
-      trivyscan: ${{ steps.filter_on_some.outputs.trivyscan }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-        # NOTE: We're detecting the changed files within a job so that we can gate execution of other jobs.
-        #       We use dorny/paths-filter which doesn't work like the conventional 'paths' and 'paths_exclude',
-        #       we can't do the following:
-        # paths:
-        #   - '**'
-        #   - '!dev/**'
-        #   - 'dev/setup-env.sh'
-        #
-        #      Which would include all files whilst removing all "dev/" files except "dev/setup-env.sh".
-        #      We have to use two filters:
-        #        * first filter includes all changed files and removes "dev/" files
-        #        * second filter explicitly adds 'dev/setup-env.sh'
-        #      We use the logical OR of the filters outputs to gate jobs.
-
-      - name: Paths matching on every filter rule
-        # For safety use the commit of dorny/paths-filter@v3
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
-        id: filter_on_every
-        with:
-          # Filter changed files, 'every' means the file is matched only if it matches all filter rules.
-          # NOTE: currently seeing: Warning: Unexpected input(s) 'predicate-quantifier', valid inputs are..
-          #       this can be ignored, filtering works as expected.
-          predicate-quantifier: 'every'
-          list-files: 'json'
-          filters: |
-            stackhpc:
-              - '**'
-              - '!dev/**'
-              - '!**/*.md'
-              - '!.gitignore'
-              - '!.github/workflows/**'
-
-      - name: Paths matching on any filter rule
-        # For safety use the commit of dorny/paths-filter@v3
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
-        id: filter_on_some
-        with:
-          # Filter changed files, 'some' means the file is matched if any one of the filter rules match.
-          # NOTE: currently seeing: Warning: Unexpected input(s) 'predicate-quantifier', valid inputs are..
-          #       this can be ignored, filtering works as expected.
-          predicate-quantifier: 'some'
-          list-files: 'json'
-          filters: |
-            stackhpc:
-              - 'dev/setup-env.sh'
-              - '.github/workflows/stackhpc.yml'
-            extra_on_push:
-              - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
-              - 'ansible/roles/doca/**'
-              - 'ansible/roles/cuda/**'
-              - 'ansible/roles/slurm_recompile/**' # runs on cuda group
-              - 'ansible/roles/lustre/**'
-              - '.github/workflows/extra.yml'
-            extra_on_pull_request:
-              - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
-              - 'ansible/roles/doca/**'
-              - 'ansible/roles/cuda/**'
-              - 'ansible/roles/lustre/**'
-              - '.github/workflows/extra.yml'
-            trivyscan:
-              - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
-
-      - name: Paths matched output
-        # NOTE: This is a debug step, it shows what files were matched by the filters.
-        #       It's useful because dorny/paths-filter doesn't work like the conventional 'paths' and 'paths_exclude'
-        run: >
-          echo '{ "stackhpc_every_files": ${{ steps.filter_on_every.outputs.stackhpc_files }} }' | jq -r '.';
-          echo '{ "stackhpc_some_files": ${{ steps.filter_on_some.outputs.stackhpc_files }} }' | jq -r '.';
-          echo '{ "extra_on_push_files": ${{ steps.filter_on_some.outputs.extra_on_push_files }} }' | jq -r '.';
-          echo '{ "extra_on_pull_request_files": ${{ steps.filter_on_some.outputs.extra_on_pull_request_files }} }' | jq -r '.';
-          echo '{ "trivyscan_files": ${{ steps.filter_on_some.outputs.trivyscan_files }} }' | jq -r '.'
-
-  stackhpc:
-    name: Test deployment and reimage on OpenStack
-    needs: files_changed
-    if: |
-      needs.files_changed.outputs.stackhpc == 'true'
-    uses: ./.github/workflows/stackhpc.yml
-    secrets: inherit
-
-  extra:
-    name: Test extra build
-    needs: files_changed
-    if: |
-      github.event_name != 'pull_request' && needs.files_changed.outputs.extra_on_push == 'true' ||
-      github.event_name == 'pull_request' && needs.files_changed.outputs.extra_on_pull_request == 'true'
-    uses: ./.github/workflows/extra.yml
-    secrets: inherit
-
-  trivyscan:
-    name: Trivy scan image for vulnerabilities
-    needs: files_changed
-    if: |
-      needs.files_changed.outputs.trivyscan == 'true' || github.event_name != 'pull_request'
-    uses: ./.github/workflows/trivyscan.yml
-    secrets: inherit
