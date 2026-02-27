@@ -26,8 +26,12 @@ permissions:
   statuses: write
 
 jobs:
-  openstack:
-    name: openstack-imagebuild
+  fatimage_lint_job:
+    name: Lint for image build
+    uses: ./.github/workflows/lint.yml
+  fatimage_build_job:
+    name: Packer build
+    needs: fatimage_lint_job
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
       cancel-in-progress: true

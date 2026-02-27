@@ -6,7 +6,11 @@
 
 name: Test extra build
 'on':
-  workflow_call:
+  workflow_run:
+    workflows:
+      - 'Build fat image'
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -16,8 +20,12 @@ permissions:
   statuses: write
 
 jobs:
-  doca:
-    name: extra-build
+  extra_build_job:
+    name: Test extra build
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails

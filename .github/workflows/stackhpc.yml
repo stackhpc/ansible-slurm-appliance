@@ -4,10 +4,29 @@
 # This workflow can run standalone or as part of the main CI workflow.
 # See the workflow file 'main.yml' for how this is CI triggered.
 
-name: Test deployment and reimage on OpenStack
+name: Test deployment and upgrade on OpenStack
 'on':
-  workflow_call:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!dev/**'
+      - 'dev/setup-env.sh'
+      - '!**.md'
+      - '!.gitignore'
+      - '!.github/workflows/'
+      - '.github/workflows/stackhpc'
+  pull_request:
+    paths:
+      - '**'
+      - '!dev/**'
+      - 'dev/setup-env.sh'
+      - '!**.md'
+      - '!.gitignore'
+      - '!.github/workflows/'
+      - '.github/workflows/stackhpc'
 
 permissions:
   contents: read
@@ -16,8 +35,15 @@ permissions:
   statuses: write
 
 jobs:
-  openstack:
+  upgrade_lint_job:
+    name: Lint for deploy/upgrade build
+    uses: ./.github/workflows/lint.yml
+  upgrade_openstack_job:
     name: openstack-ci
+    needs: upgrade_lint_job
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }} # to branch/PR + OS
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails

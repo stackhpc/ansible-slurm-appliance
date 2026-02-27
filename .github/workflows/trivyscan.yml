@@ -6,7 +6,11 @@
 
 name: Trivy scan image for vulnerabilities
 'on':
-  workflow_call:
+  workflow_run:
+    workflows:
+      - 'Build fat image'
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -18,7 +22,12 @@ permissions:
   security-events: write
 
 jobs:
-  scan:
+  scan_job:
+    name: Carry out scan
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + build
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
