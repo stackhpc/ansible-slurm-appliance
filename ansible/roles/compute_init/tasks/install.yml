@@ -54,6 +54,10 @@
       dest: roles/
     - src: ../../eessi
       dest: roles/
+    - src: ../../mounts
+      dest: roles/
+    - src: ../../journald
+      dest: roles/
 
 - name: Add filter_plugins to ansible.cfg
   ansible.builtin.lineinfile:

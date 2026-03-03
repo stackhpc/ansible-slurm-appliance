@@ -37,11 +37,3 @@
   args:
     creates: /lib64/libnvidia-ml.so
   when: slurm_recompile_with_nvml | bool
-
-- name: Cleanup Dependencies # noqa: no-changed-when
-  ansible.builtin.shell: |
-    #!/bin/bash
-    set -eux
-    set -o pipefail
-    dnf history list | grep Install | grep 'builddep -y slurm.spec' | head -n 1 |  awk '{print $1}' | xargs dnf history -y undo
-  become: true

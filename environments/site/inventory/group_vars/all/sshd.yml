@@ -1,0 +1,5 @@
+---
+# On systems with a large number of nodes, tasks which delegate to the control
+# node in site.yml can create too many unauthenticated ssh connections. We
+# increase the MaxStartups limits to avoid connections being throttled.
+sshd_conf_maxstartups: "{{ '100:30:200' if 'control' in group_names else '10:30:100' }}"

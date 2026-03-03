@@ -29,3 +29,9 @@ pulp_site_rpm_repos: |
 
 pulp_site_rpm_publications: "{{ _pulp_site_rpm_info | to_rpm_pubs }}"
 pulp_site_rpm_distributions: "{{ _pulp_site_rpm_info | to_rpm_distros }}"
+
+pulp_site_squeezer_venv: /opt/pulp-cli
+pulp_site_squeezer_python: "{{ pulp_site_squeezer_venv }}/bin/python3"
+pulp_cli_packages:
+  - pulp-cli==0.23.2
+  - pulp-glue==0.23.2

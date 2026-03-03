@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: pulp_server
   tasks:
     - ansible.builtin.include_role:
         name: pulp_site

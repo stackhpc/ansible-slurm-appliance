@@ -1,8 +1,5 @@
 # https://osc.github.io/ood-documentation/latest/authentication/pam.html
 ---
-- name: Install Apache PAM module # Extracted from start of roles/openondemand/tasks/pam_auth.yml to ensure only installed during build
-  ansible.builtin.dnf:
-    name: mod_authnz_pam
 
 - name: Enable Apache PAM module
   ansible.builtin.lineinfile:
@@ -27,5 +24,3 @@
     state: true
     persistent: true
   when: ansible_facts.selinux.status == 'enabled'
-
-# TODO: do we need to restart OOD here??

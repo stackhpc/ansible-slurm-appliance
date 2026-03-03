@@ -8,6 +8,8 @@ The Slurm appliance supports multiple ways of configuring shared filesystems, in
 
 - Lustre
 
+- Other mounts
+
 ## Manila
 
 The Slurm appliance supports mounting shared filesystems using [CephFS](https://docs.ceph.com/en/latest/cephfs/) via [OpenStack Manila](https://docs.openstack.org/manila/latest/). This section explains:
@@ -98,3 +100,11 @@ os_manila_mount_shares:
   - share_name: "slurm-{{ appliances_environment_name }}-home"
     mount_path: /home
 ```
+
+## Other mounts
+
+The [mounts](../ansible/roles/mounts/README.md) role can be used to configure
+arbitrary mounts. By default this is enabled for the `login` and `compute`
+nodes only and used to provide a tmpfs for `/tmp`. However it could also be
+used to mount any filesystem supported by installed packages, either local or
+networked.

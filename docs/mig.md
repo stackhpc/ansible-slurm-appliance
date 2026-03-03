@@ -4,7 +4,7 @@ This page details how to configure Multi Instance GPU (MIG) in Slurm.
 
 ## Pre-requisites
 
-- Image built with cuda support. This should automatically recompile slurm
+- Image built with cuda support. This should automatically recompile Slurm
   against NVML. The builder will need to be added to the `vgpu` and `cuda`
   groups.
 
@@ -147,17 +147,17 @@ All done.
 +-----------------------------------------------------------------------------+
 ```
 
-## compute_init configuration for slurm triggered rebuild (optional)
+## compute_init configuration for Slurm triggered rebuild (optional)
 
-You only need to configure this if you are using the slurm triggered rebuild
+You only need to configure this if you are using the Slurm triggered rebuild
 feature. Use the `vgpu` metadata option to enable creation of mig devices on
 rebuild.
 
 ## GRES configuration
 
 GPU resources need to be added to the OpenHPC nodegroup definitions (`openhpc_nodegroups`). To
-do this you need to determine the names of the GPU types as detected by slurm. First
-deploy slurm with the default nodegroup definitions to get a working cluster. Make a temporary
+do this you need to determine the names of the GPU types as detected by Slurm. First
+deploy Slurm with the default nodegroup definitions to get a working cluster. Make a temporary
 copy of slurm.conf:
 
 ```text
@@ -217,5 +217,5 @@ openhpc_nodegroups:
 ```
 
 Making sure the types (the identifier after `gpu:`) match those collected with `slurmd -G`. Substrings
-of this type are also permissable, see the [slurm docs](https://slurm.schedmd.com/gres.html#MIG_Management)
+of this type are also permissable, see the [Slurm docs](https://slurm.schedmd.com/gres.html#MIG_Management)
 for more details.

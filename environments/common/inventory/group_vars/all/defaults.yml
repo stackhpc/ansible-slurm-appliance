@@ -97,6 +97,7 @@ appliances_local_users: "{{ (appliances_local_users_default + appliances_local_u
 ################## bootstrap: extra package installs ######################################
 
 appliances_extra_packages_default:
+  - bash-completion
   - htop
   - nano
   - screen
@@ -111,3 +112,8 @@ appliances_extra_packages_default:
 
 appliances_extra_packages_other: []
 appliances_extra_packages: "{{ (appliances_extra_packages_default + appliances_extra_packages_other) | select | list }}"
+
+# system user groups of cluster administrators. They are allowed to ssh
+# to compute nodes even if they have no job running.
+appliances_admin_user_groups:
+  - adm

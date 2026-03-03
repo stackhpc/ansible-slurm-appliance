@@ -6,7 +6,7 @@
 # NB: Variables prefixed ood_ are all from https://github.com/OSC/ood-ansible
 
 ondemand_package_version: "4.0.7" # used in ansible/cleanup.yml
-ondemand_package: ondemand-"{{ ondemand_package_version }}" # osc.ood role var controlling installed package
+ondemand_package: "ondemand-{{ ondemand_package_version }}" # osc.ood role var controlling installed package
 
 openondemand_servername: "{{ hostvars[groups['openondemand'].0].ansible_host if groups['openondemand'] else '' }}"
 

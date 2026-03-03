@@ -1,0 +1,14 @@
+---
+
+- name: Restart journald
+  ansible.builtin.service:
+    name: systemd-journald
+    state: restarted
+  become: true
+  when: journald_restart_enabled | bool
+
+- name: Flush journal to disk
+  become: true
+  ansible.builtin.command: journalctl --flush
+  changed_when: false
+  when: journald_flush_enabled | bool

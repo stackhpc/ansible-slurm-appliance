@@ -1,0 +1,16 @@
+# Automatically configure EESSI clients to use any 'squid' node(s) with squid_conf_mode == eessi as a proxy:
+cvmfs_proxy_ip_var: ansible_host # hostvar with proxy IP - default is IP on access network
+cvmfs_proxy_ips: >- # list of IPs for squid nodes with squid_conf_mode == eessi:
+  {{
+    hostvars.values() |
+    selectattr('group_names', 'contains', 'squid') |
+    selectattr('squid_conf_mode', 'eq', 'eessi') |
+    map(attribute=cvmfs_proxy_ip_var)
+  }}
+# proxy string as per EESSI docs (but unquoted), or empty string:
+cvmfs_http_proxy: >-
+  {{
+    cvmfs_proxy_ips |
+    map('regex_replace', '^(.*)$', 'http://\1:' ~ (squid_http_port | string)) |
+    join('|')
+  }}

@@ -45,6 +45,7 @@ See above for definition of "Default" features. In the "Isolated?" column:
 | gateway              | n/a      | n/a - build only         |
 | grafana              | Y        | Y                        |
 | hpctests             | Y        | Y                        |
+| journald             | Y        | Y                        |
 | k3s_agent            | -        | ?                        |
 | k3s_server           | -        | ?                        |
 | k9s                  | -        | ?                        |
