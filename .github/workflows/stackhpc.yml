@@ -2,7 +2,7 @@
 
 # Test deployment and reimage on OpenStack.
 # This workflow can run standalone or as part of the main CI workflow.
-# See the workflow file 'main.yml' for how this is CI triggered.
+# TODO: See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Test deployment and reimage on OpenStack
 'on':
@@ -16,8 +16,57 @@ permissions:
   statuses: write
 
 jobs:
+  check_paths:
+    runs-on: ubuntu-24.04
+  outputs:
+      stackhpc: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Paths matching on every filter rule
+      # For safety use the commit of dorny/paths-filter@v3
+      uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+      id: filter_on_every
+      with:
+        # Filter changed files, 'every' means the file is matched only if it matches all filter rules.
+        # NOTE: currently seeing: Warning: Unexpected input(s) 'predicate-quantifier', valid inputs are..
+        #       this can be ignored, filtering works as expected.
+        predicate-quantifier: 'every'
+        list-files: 'json'
+        filters: |
+          stackhpc:
+            - '**'
+            - '!dev/**'
+            - '!**/*.md'
+            - '!.gitignore'
+            - '!.github/workflows/**'
+
+    - name: Paths matching on any filter rule
+      # For safety use the commit of dorny/paths-filter@v3
+      uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+      id: filter_on_some
+      with:
+        # Filter changed files, 'some' means the file is matched if any one of the filter rules match.
+        # NOTE: currently seeing: Warning: Unexpected input(s) 'predicate-quantifier', valid inputs are..
+        #       this can be ignored, filtering works as expected.
+        predicate-quantifier: 'some'
+        list-files: 'json'
+        filters: |
+          stackhpc:
+            - 'dev/setup-env.sh'
+            - '.github/workflows/stackhpc.yml'
+
+    - name: Show paths matching filters
+      # Debug step, useful because dorny/paths-filter doesn't work like the conventional 'paths' and 'paths_exclude'
+      run: >
+        echo '{ "stackhpc_every_files": ${{ steps.filter_on_every.outputs.stackhpc_files }} }' | jq -r '.';
+        echo '{ "stackhpc_some_files": ${{ steps.filter_on_some.outputs.stackhpc_files }} }' | jq -r '.';
+
   openstack:
     name: openstack-ci
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    # && check_paths.outputs.stackhpc == 'true' }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
