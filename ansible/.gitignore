@@ -104,3 +104,5 @@ roles/*
 !roles/raid/**
 !roles/mounts/
 !roles/mounts/**
+!roles/opkssh/
+!roles/opkssh/**

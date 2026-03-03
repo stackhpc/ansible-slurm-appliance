@@ -213,3 +213,6 @@ fatimage
 # Hosts with custom mounts
 login
 compute
+
+[opkssh]
+# Hosts to run opkssh to allow SSH via OIDC
