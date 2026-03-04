@@ -17,8 +17,6 @@ permissions:
 jobs:
   openstack:
     name: openstack-ci
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
-    # && check_paths.outputs.stackhpc == 'true' }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
