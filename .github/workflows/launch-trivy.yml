@@ -1,4 +1,4 @@
-name: Launch extra build
+name: Launch trivy scan
 'on':
   workflow_run:
     workflows:
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
   outputs:
-    paths_changed: ${{ steps.filter_on_some.outputs.extra }}
+    paths_changed: ${{ steps.filter_on_some.outputs.trivyscan }}
   steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -37,22 +37,18 @@ jobs:
         predicate-quantifier: 'some'
         list-files: 'json'
         filters: |
-          extra:
+          trivyscan:
             - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
-            - 'ansible/roles/doca/**'
-            - 'ansible/roles/cuda/**'
-            - 'ansible/roles/slurm_recompile/**' # runs on cuda group
-            - 'ansible/roles/lustre/**'
-            - '.github/workflows/extra.yml'
 
     - name: Show paths matching filters
       # Debug step, useful because dorny/paths-filter doesn't work like the conventional 'paths' and 'paths_exclude'
       run: >
         echo '{ "paths_changed": ${{ steps.filter_on_some.outputs.paths_changed }} }' | jq -r '.';
 
-  extra_launch:
-    name: Launch test extra build
+  trivy_launch:
+    name: Launch trivy scan of image for vulnerabilities
     needs: check_paths
-    if: needs.check_paths.outputs.paths_changed == 'true'
-    uses: ./.github/workflows/extra.yml
+    if: |
+      needs.check_paths.outputs.paths_changed == 'true'
+    uses: ./.github/workflows/trivyscan.yml
     secrets: inherit

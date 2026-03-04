@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  stackhpc_check_paths:
+  check_paths:
     runs-on: ubuntu-24.04
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
   outputs:
@@ -26,6 +26,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    # NOTE: Will detect the changed files to gate execution of other jobs using
+    # dorny/paths-filter, which doesn't work quite like conventional 'paths'
+    # and 'paths_exclude' options. So have to use two filters logically ORed.
+    
     - name: Paths matching on every filter rule
       # For safety use the commit of dorny/paths-filter@v3
       uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
@@ -66,8 +70,7 @@ jobs:
 
   stackhpc_launch:
     name: Launch test of deployment and reimage on OpenStack
-    needs: stackhpc_check_paths
-    if: |
-      needs.stackhpc_check_paths.outputs.paths_changed == 'true'
+    needs: check_paths
+    if: needs.check_paths.outputs.paths_changed == 'true'
     uses: ./.github/workflows/stackhpc.yml
     secrets: inherit
