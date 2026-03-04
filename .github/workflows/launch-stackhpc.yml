@@ -2,7 +2,7 @@ name: Launch test deployment and reimage on OpenStack
 'on':
   workflow_run:
     workflows:
-      - main
+      - lint
     types:
       - completed
 
