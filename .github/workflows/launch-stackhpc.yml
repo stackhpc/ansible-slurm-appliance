@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
   outputs:
-      paths_changed: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
+    paths_changed: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
   steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
       run: >
         echo '{ "stackhpc_every_files": ${{ steps.filter_on_every.outputs.stackhpc_files }} }' | jq -r '.';
         echo '{ "stackhpc_some_files": ${{ steps.filter_on_some.outputs.stackhpc_files }} }' | jq -r '.';
-  
+
   stackhpc_launch:
     name: Test deployment and reimage on OpenStack
     needs: stackhpc_check_paths

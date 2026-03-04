@@ -19,7 +19,7 @@ jobs:
   check_paths:
     runs-on: ubuntu-24.04
   outputs:
-      stackhpc: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
+    stackhpc: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
   steps:
     - name: Checkout
       uses: actions/checkout@v4
