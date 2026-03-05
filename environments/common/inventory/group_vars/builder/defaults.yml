@@ -30,7 +30,7 @@ proxy_remove: true
 # for image build ood partition var is just truthy as no cluster_groups defined
 openondemand_jupyter_partition: true
 openondemand_desktop_partition: true
-openondemand_rstudio_partition: false
+openondemand_rstudio_partition: true
 openondemand_matlab_partition: false
-openondemand_codeserver_partition: false
+openondemand_codeserver_partition: true
 mounts_tmp_enabled: false # don't have /tmp in memory
