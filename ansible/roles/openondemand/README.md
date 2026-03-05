@@ -107,7 +107,9 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
   to provide a drop-down for resource/GRES selection in application forms. The
   default constructs a list from all GRES definitions in the cluster. See the
   `option` attribute of the Select Field [form widget](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/form-widgets.html#form-widgets).
-- `openondemand_module_file_dir`: Optional. Path to lmod modules, for [module browser page](https://osc.github.io/ood-documentation/latest/release-notes/v4.1-release-notes.html#module-browser-page). Default is `/opt/ohpc/pub/modulefiles`.
+- `openondemand_module_file_dir`: Optional. Path to [lmod modules files](https://osc.github.io/ood-documentation/latest/reference/files/ondemand-d-ymls.html#module-file-dir)
+  for [module browser page](https://osc.github.io/ood-documentation/latest/release-notes/v4.1-release-notes.html#module-browser-page).
+  Default is `/etc/ood/modules` which is automatically populated by the role.
 
 ### Monitoring
 
