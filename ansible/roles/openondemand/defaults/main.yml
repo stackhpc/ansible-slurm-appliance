@@ -26,6 +26,7 @@ openondemand_dashboard_links: []
 openondemand_rstudio_partition: ''
 openondemand_matlab_partition: ''
 openondemand_codeserver_partition: ''
+openondemand_module_file_dir: /etc/ood/modules
 
 # Monitoring:
 openondemand_exporter: true
@@ -83,6 +84,7 @@ openondemand_osc_ood_defaults:
   host_regex: "{{ openondemand_host_regex }}"
   node_uri: "{{ '/node' if openondemand_host_regex else none }}"
   rnode_uri: "{{ '/rnode' if openondemand_host_regex else none }}"
+  module_file_dir: "{{ openondemand_module_file_dir }}"
 
   # Enable SSL by default:
   httpd_port: 443

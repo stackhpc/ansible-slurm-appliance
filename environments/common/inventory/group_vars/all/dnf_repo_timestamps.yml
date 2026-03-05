@@ -243,10 +243,10 @@ dnf_repos_default:
       repo_file: grafana
   ondemand-web:
     '8':
-      pulp_path: ondemand/4.0/web/el8/x86_64
-      pulp_timestamp: 20251120T213358
+      pulp_path: ondemand/4.1/web/el8/x86_64
+      pulp_timestamp: 20260304T171429
       repo_file: ondemand-web
     '9':
-      pulp_path: ondemand/4.0/web/el9/x86_64
-      pulp_timestamp: 20251120T213358
+      pulp_path: ondemand/4.1/web/el9/x86_64
+      pulp_timestamp: 20260304T171429
       repo_file: ondemand-web

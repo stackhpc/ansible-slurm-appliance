@@ -17,7 +17,7 @@ roles:
     version: stackhpc-0.20.0
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
-    version: v4.0.1
+    version: v4.1.1
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
     version: v26.1.1
