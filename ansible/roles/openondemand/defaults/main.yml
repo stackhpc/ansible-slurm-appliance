@@ -26,7 +26,7 @@ openondemand_dashboard_links: []
 openondemand_rstudio_partition: ''
 openondemand_matlab_partition: ''
 openondemand_codeserver_partition: ''
-openondemand_module_file_dir: /opt/ohpc/pub/modulefiles
+openondemand_module_file_dir: /etc/ood/modules
 
 # Monitoring:
 openondemand_exporter: true
