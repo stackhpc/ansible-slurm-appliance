@@ -126,7 +126,6 @@ jobs:
         cloud:
           - LEAFCLOUD
           - SMS
-          - ARCUS
         build:
           - RL8
           - RL9
