@@ -28,6 +28,11 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Run build-appropriate validation
+  ansible.builtin.import_playbook: validate.yml
+  tags:
+    - galaxy
+
 - name: Sync pulp repos with upstream
   hosts: pulp_site
   tasks:
