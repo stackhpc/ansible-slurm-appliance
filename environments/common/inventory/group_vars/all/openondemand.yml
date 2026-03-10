@@ -38,40 +38,38 @@ openondemand_dashboard_links: "{{ openondemand_dashboard_links_grafana if groups
 # so do not use localhost:
 openondemand_login_host: "{{ inventory_hostname }}"
 
-openondemand_clusters:
-  slurm:
-    v2:
-      metadata:
-        title: "{{ openhpc_cluster_name }}" # interpolation here works as openondemand is lexically after openhpc
-      login:
-        host: "{{ openondemand_login_host }}"
-        default: true
-      job:
-        adapter: slurm
-        cluster: "{{ openhpc_cluster_name }}"
-      batch_connect:
-        basic:
-          script_wrapper: |
-            module purge
-            %s
-          set_host: host=$(hostname -s)
-        vnc:
-          script_wrapper: |
-            module purge
+openondemand_cluster:
+  v2:
+    metadata:
+      title: "{{ openhpc_cluster_name }}" # interpolation here works as openondemand is lexically after openhpc
+    login:
+      host: "{{ openondemand_login_host }}"
+      default: true
+    job:
+      adapter: slurm
+    batch_connect:
+      basic:
+        script_wrapper: |
+          module purge
+          %s
+        set_host: host=$(hostname -s)
+      vnc:
+        script_wrapper: |
+          module purge
 
-            export PATH=/opt/TurboVNC/bin:$PATH
-            # avoid "Failed to create secure directory (/run/user/*/pulse)"
-            export XDG_RUNTIME_DIR="$TMPDIR/xdg_runtime"
+          export PATH=/opt/TurboVNC/bin:$PATH
+          # avoid "Failed to create secure directory (/run/user/*/pulse)"
+          export XDG_RUNTIME_DIR="$TMPDIR/xdg_runtime"
 
-            # Workaround to avoid "Unable to contact settings server" when
-            # lauching xfce4-session
-            xfce4-session() { /bin/dbus-launch /bin/xfce4-session $@ ; }
-            export -f xfce4-session
-            %s
-          set_host: host=$(hostname -s)
-      custom: "{{ openondemand_clusters_grafana if groups['grafana'] | length > 0 else {} }}"
+          # Workaround to avoid "Unable to contact settings server" when
+          # lauching xfce4-session
+          xfce4-session() { /bin/dbus-launch /bin/xfce4-session $@ ; }
+          export -f xfce4-session
+          %s
+        set_host: host=$(hostname -s)
+    custom: "{{ openondemand_cluster_grafana if groups['grafana'] | length > 0 else {} }}"
 
-openondemand_clusters_grafana:
+openondemand_cluster_grafana:
   # embed grafana panels in Jobs app: https://osc.github.io/ood-documentation/latest/customization.html#grafana-support
   grafana:
     host: "{{ grafana_url }}"
@@ -119,7 +117,7 @@ ood_install_apps: >-
 openondemand_apps_desktop_default:
   title: Remote Desktop
   description: Request a desktop to run GUI applications.
-  cluster: slurm
+  cluster: "{{ openhpc_cluster_name }}"
   form:
     - desktop
     - auto_queues
@@ -175,7 +173,7 @@ openondemand_apps_desktop: "{{ {'bc_desktop':openondemand_apps_desktop_default} 
 openondemand_apps_jupyter_default:
   title: Jupyter Notebook
   description: Request a Jupyter Notebook server
-  cluster: slurm
+  cluster: "{{ openhpc_cluster_name }}"
   form:
     - modules
     - extra_jupyter_args
@@ -237,7 +235,7 @@ openondemand_apps_jupyter: "{{ {'jupyter':openondemand_apps_jupyter_default} if 
 openondemand_apps_rstudio_default:
   title: RStudio
   description: Request a RStudio server
-  cluster: slurm
+  cluster: "{{ openhpc_cluster_name }}"
   attributes:
     auto_queues:
       value: "{{ openondemand_rstudio_partition | default(none) }}"
@@ -334,7 +332,7 @@ openondemand_apps_rstudio: "{{ {'rstudio':openondemand_apps_rstudio_default} if 
 openondemand_apps_matlab_default:
   title: MATLAB
   description: Request a desktop to run MATLAB.
-  cluster: slurm
+  cluster: "{{ openhpc_cluster_name }}"
   form:
     - desktop
     - auto_queues
@@ -419,7 +417,7 @@ openondemand_apps_matlab: "{{ {'matlab':openondemand_apps_matlab_default} if ope
 openondemand_apps_codeserver_default:
   title: Code Server
   description: Request a Code Server
-  cluster: slurm
+  cluster: "{{ openhpc_cluster_name }}"
   form:
     - auto_queues
     - bc_num_hours
