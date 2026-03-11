@@ -25,11 +25,19 @@
     - THREADS
     - MEMORY
 
+- name: Get Slurm effective cpu count
+  ansible.builtin.command: scontrol show nodes --json
+  register: hpctests_scontrol_nodes
+  changed_when: false
+
 - name: Calculate number of processes (per node)
   # Will run array job, which is SAME on each node, so only need to deal with a single node's processors here
-  # Also ignore any hyperthreading TODO: document
   ansible.builtin.set_fact:
-    hpctests_hplsolo_ntasks: "{{ (hpctests_nodeinfo.info['SOCKETS'][0]) | int * (hpctests_nodeinfo.info['CORES'][0] | int) }}"
+    # one task per core, even if cpu_count was threads
+    hpctests_hplsolo_ntasks: "{{ ((cpu_count | int) / (hpctests_nodeinfo.info['THREADS'][0] | int)) | int }}"
+  vars:
+    nodes_json: "{{ hpctests_scontrol_nodes.stdout | from_json }}"
+    cpu_count: "{{ nodes_json.nodes | selectattr('hostname', 'in', hpctests_computes.stdout_lines) | map(attribute='effective_cpus') | min }}"
 
 - name: Calculate problem shape
   # Want to go nearly square - again this is per-node remember
