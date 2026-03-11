@@ -23,3 +23,5 @@ hpctests_hpl_mem_frac: 0.3
 hpctests_hpl_arch: linux64
 # hpctests_nodes:
 # hpctests_partition:
+# hpctests_account:
+# hpctests_qos:
