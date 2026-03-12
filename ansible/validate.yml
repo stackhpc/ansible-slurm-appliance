@@ -12,40 +12,7 @@
         name: passwords
         tasks_from: validate.yml
 
-- name: Validate Ansible Galaxy installs are up to date
-  hosts: localhost
-  gather_facts: false
-  become: false
-  tags:
-    - validate
-    - galaxy
-  tasks:
-      # Can't use e.g. ansible-galaxy {role,collection} list to check installed
-      # vs desired, as git-installed collections do not provide any metadata for
-      # the actual installed version.
-      # So this compares requirements.yml against a .last version produced by a
-      # successful dev/setup-env.sh run.
-    - ansible.builtin.assert:
-        that: "{{ _requirements_current == _requirements_installed }}"
-        fail_msg: |
-          Ansible Galaxy installs are out of date:
-
-          {% for req in _requirements_installed | difference(_requirements_current) %}
-          {{ req }}
-          {% endfor %}
-
-          _requirements_current:
-          .{{ _requirements_current }}.
-          _requirements_installed:
-          .{{ _requirements_installed }}.
-
-          Run dev/setup-env.sh to fix this.
-      vars:
-        # note difference filter requires lists, so need to rearrange yaml from files.
-        _requirements_path: "{{ appliances_repository_root }}/requirements.yml"
-        _requirements_current: "{{ (lookup('file', _requirements_path) | from_yaml).values() | flatten }}"
-        # below produced by dev/setup-env.sh - gives empty list if file is missing:
-        _requirements_installed: "{{ ((lookup('file', _requirements_path + '.last', errors='ignore') or '{}') | from_yaml ).values() | flatten }}"
+- ansible.builtin.import_playbook: validate-galaxy.yml
 
 - name: Validate OpenTofu templated inventory is appropriate
   # This "documents" the assumptions that Ansible makes about the
