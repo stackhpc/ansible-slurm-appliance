@@ -3,6 +3,14 @@ name: Lint
 
 'on':
   workflow_call:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -14,12 +22,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      packages: read
-      # To report GitHub Actions status checks
-      statuses: write
-
     steps:
       - uses: actions/checkout@v4
         with:
