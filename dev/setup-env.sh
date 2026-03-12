@@ -22,6 +22,9 @@ if [[ "$PYTHON_VERSION" == "" ]]; then
     PYTHON_VERSION="/usr/bin/python3.12" # use `sudo yum install python3.12` on Rocky Linux 8 to install this
   elif [[ "$OS" == "rocky" && "$MAJOR_VERSION" == "9" ]]; then
     PYTHON_VERSION="/usr/bin/python3.12"
+  elif [[ "$OS" == "fedora" && "$MAJOR_VERSION" == "43" ]]; then
+    PYTHON_VERSION="$(uv python find 3.12 2> /dev/null)" \
+      || echo "Please install python 3.12 via uv (uv python install 3.12) and retry"
   else
     echo "Unsupported OS version: $OS $MAJOR_VERSION"
     exit 1
