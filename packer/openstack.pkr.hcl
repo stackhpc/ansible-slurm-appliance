@@ -94,7 +94,7 @@ variable "ssh_bastion_username" {
 
 variable "ssh_bastion_private_key_file" {
   type = string
-  default = "~/.ssh/id_rsa"
+  default = null
 }
 
 variable "floating_ip_network" {

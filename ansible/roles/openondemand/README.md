@@ -17,7 +17,10 @@ This uses the [osc.ood](https://github.com/OSC/ood-ansible) Ansible role to prov
 
 ### General
 
-- `openondemand_clusters`: Required. Synonym for [osc.ood: clusters](https://github.com/OSC/ood-ansible#clusters) role variable.
+- `openondemand_cluster`: Required. `{v2: ...}`, a single value for the [osc.ood: clusters](https://github.com/OSC/ood-ansible#clusters) role variable.
+- `openondemand_clusters`: Deprecated. `{ignored_name: { v2: ...},}`, same structure as [osc.ood: clusters](https://github.com/OSC/ood-ansible#clusters) role variable.
+  Please use `openondemand_cluster` instead, since only one cluster is supported in this list (for instance by `tasks/configure.yml`).
+  Also note that the key will be replaced by `openhpc_cluster_name` because those must match since OOD 4.1 for account and qos retrieval.
 - `openondemand_servername`: Required. Synonym for [osc.ood: servername](https://github.com/OSC/ood-ansible/blob/master/defaults/main/ood_portal.yml#L27) role variable.
   This defines what the Open Ondemand portal's Apache server uses for the [name-based virtual host](https://httpd.apache.org/docs/current/mod/core.html#servername).
   It should be the IP or hostname(+domain) part of the URL used to access Open Ondemand in the browser, e.g. `ondemand.mysite.org`. **NB:** If a domain or external IP is not available, specify the host's internal IP here and use SSH with a `DynamicForward` option and a SOCKS proxy to access this address.
@@ -107,6 +110,9 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
   to provide a drop-down for resource/GRES selection in application forms. The
   default constructs a list from all GRES definitions in the cluster. See the
   `option` attribute of the Select Field [form widget](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/form-widgets.html#form-widgets).
+- `openondemand_module_file_dir`: Optional. Path to [lmod modules files](https://osc.github.io/ood-documentation/latest/reference/files/ondemand-d-ymls.html#module-file-dir)
+  for [module browser page](https://osc.github.io/ood-documentation/latest/release-notes/v4.1-release-notes.html#module-browser-page).
+  Default is `/etc/ood/modules` which is automatically populated by the role.
 
 ### Monitoring
 

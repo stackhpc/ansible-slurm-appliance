@@ -81,14 +81,6 @@
     mode: "0644"
   loop: "{{ openondemand_dashboard_links }}"
 
-- name: Ensure ondemand-dex is running/enabled/restarted for config changes
-  # Can be dropped once on a version including https://github.com/OSC/ood-ansible/pull/272
-  ansible.builtin.systemd:
-    name: ondemand-dex
-    enabled: true
-    state: restarted
-  when: openondemand_auth | lower == "dex"
-
 # - name: Copy site images
 #   copy:
 #     src: ansible/roles/openondemand/ondemand
@@ -99,7 +91,7 @@
 
 - name: Keyscan login host
   ansible.builtin.command:
-    cmd: "ssh-keyscan {{ openondemand_clusters.slurm.v2.login.host }}"
+    cmd: "ssh-keyscan {{ openondemand_cluster.v2.login.host }}"
   register: _openondemand_login_key
   changed_when: false
 
@@ -112,3 +104,28 @@
     owner: root
     group: root
     mode: o=rw,go=r
+
+- name: Create module listing directory
+  ansible.builtin.file:
+    path: "{{ openondemand_module_file_dir }}"
+    state: directory
+    # below based on /etc/ood/config/:
+    owner: root
+    group: root
+    mode: u=rwX,go=rX
+
+- name: Spider modules
+  # see module_file_dir in https://osc.github.io/ood-documentation/latest/reference/files/ondemand-d-ymls.html
+  ansible.builtin.command:
+    cmd: '$LMOD_DIR/spider -o spider-json "$MODULEPATH"'
+  become: false
+  changed_when: true
+  register: _openondemand_spider
+
+- name: Create module listing
+  ansible.builtin.template:
+    src: modules.j2
+    dest: "{{ openondemand_module_file_dir }}/{{ openondemand_cluster_name }}.json"
+    owner: root
+    group: root
+    mode: u=rw,go=r

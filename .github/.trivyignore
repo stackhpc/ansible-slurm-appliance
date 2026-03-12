@@ -1,0 +1,4 @@
+# NOTE(m-bull): Affects the the deepdiff Python package bundled with the
+# netbox.netbox Ansible collection. This package is never actually installed,
+# and only appears in the netbox.netbox poetry.lock file, so it is safe to ignore.
+CVE-2025-58367
