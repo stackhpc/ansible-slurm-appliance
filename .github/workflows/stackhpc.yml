@@ -83,6 +83,7 @@ jobs:
         run: |
           git fetch origin ${{ github.head_ref || github.ref_name }}
           git checkout origin/${{ github.head_ref || github.ref_name }} -- environments/.stackhpc/inventory/group_vars/all/bastion.yml
+          cat environments/.stackhpc/inventory/group_vars/all/bastion.yml
         shell: bash
 
       - uses: actions/setup-python@v6
