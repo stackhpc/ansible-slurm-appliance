@@ -1,5 +1,5 @@
 - name: Validate Ansible Galaxy installs are up to date
-  hosts: localhost
+  hosts: all
   gather_facts: false
   become: false
   tags:
@@ -11,7 +11,10 @@
       # the actual installed version.
       # So this compares requirements.yml against a .last version produced by a
       # successful dev/setup-env.sh run.
-    - ansible.builtin.assert:
+    - name: Verify Galaxy dependencies
+      delegate_to: localhost
+      run_once: true # noqa: run-once[task]
+      ansible.builtin.assert:
         that: "{{ _requirements_current == _requirements_installed }}"
         fail_msg: |
           Ansible Galaxy installs are out of date:
