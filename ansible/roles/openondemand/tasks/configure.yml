@@ -91,7 +91,7 @@
 
 - name: Keyscan login host
   ansible.builtin.command:
-    cmd: "ssh-keyscan {{ openondemand_clusters.slurm.v2.login.host }}"
+    cmd: "ssh-keyscan {{ openondemand_cluster.v2.login.host }}"
   register: _openondemand_login_key
   changed_when: false
 
@@ -125,9 +125,7 @@
 - name: Create module listing
   ansible.builtin.template:
     src: modules.j2
-    dest: "{{ openondemand_module_file_dir }}/{{ cluster_name }}.json"
+    dest: "{{ openondemand_module_file_dir }}/{{ openondemand_cluster_name }}.json"
     owner: root
     group: root
     mode: u=rw,go=r
-  vars:
-    cluster_name: "{{ openondemand_clusters.keys() | first }}"

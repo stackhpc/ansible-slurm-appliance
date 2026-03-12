@@ -32,7 +32,9 @@ openondemand_module_file_dir: /etc/ood/modules
 openondemand_exporter: true
 
 # Synonyms for osc:ood role vars:
-openondemand_clusters: {} # synonym for osc.ood:clusters
+openondemand_cluster: {} # single entry for the osc.ood:clusters role variable.
+openondemand_clusters: "{{ {'slurm': openondemand_cluster} }}" # synonym for osc.ood:clusters; deprecated; the key will be replaced by openhpc_cluster_name
+openondemand_cluster_name: "{{ openhpc_cluster_name }}"
 openondemand_servername: ""
 openondemand_host_regex:
 # Other:
@@ -79,7 +81,7 @@ openondemand_auth_defaults:
 openondemand_osc_ood_defaults:
 
   # Synonyms:
-  clusters: "{{ openondemand_clusters }}"
+  clusters: "{{ {openondemand_cluster_name: openondemand_cluster} }}"
   servername: "{{ openondemand_servername }}"
   host_regex: "{{ openondemand_host_regex }}"
   node_uri: "{{ '/node' if openondemand_host_regex else none }}"
