@@ -57,6 +57,7 @@
   # Needs apache running
   ansible.builtin.command:
     cmd: "certbot --apache --no-eff-email --email {{ openondemand_certbot_email }}"
+  changed_when: true
   when:
     - openondemand_certbot | bool
     - appliances_mode != 'build'

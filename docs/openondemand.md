@@ -77,7 +77,7 @@ By default the appliance authenticates against OOD with basic auth through PAM. 
 Its password is found under `vault_openondemand_default_user` in the appliance secrets store in `environments/{ENV}/inventory/group_vars/all/secrets.yml`.
 Other users can be defined by overriding the `basic_users_users` variable in your environment (templated into `environments/{ENV}/inventory/group_vars/all/basic_users.yml` by default).
 
-# Certificates
+## Certificates
 
 The default configuration uses a self-signed certificate. Instead, you can bring your own certificate and key, or use Let's Encrypt to generate the initial certificate.
 See [../ansible/roles/openondemand/README.md](../ansible/roles/openondemand/README.md) for more details.
