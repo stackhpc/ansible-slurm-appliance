@@ -143,13 +143,6 @@
         name: openondemand
       when: "'openondemand' in group_names"
 
-    # TODO:
-    # - name: Open OnDemand certbot
-    #   import_role:
-    #     name: openondemand
-    #     tasks_from: certbot.yml
-    #   when: "'openondemand' in group_names"
-
     - name: Open OnDemand remote desktop # Used for plain desktop and matlab
       ansible.builtin.include_role:
         name: openondemand
