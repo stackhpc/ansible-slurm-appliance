@@ -81,4 +81,3 @@ Other users can be defined by overriding the `basic_users_users` variable in you
 
 The default configuration uses a self-signed certificate. Instead, you can bring your own certificate and key, or use Let's Encrypt to generate the initial certificate.
 See [../ansible/roles/openondemand/README.md](../ansible/roles/openondemand/README.md) for more details.
-
