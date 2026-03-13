@@ -1,9 +1,0 @@
-[MESSAGES CONTROL]
-
-# There seems to be an issue with the check
-# https://github.com/pylint-dev/pylint/issues/214
-disable=
-    duplicate-code,invalid-name
-
-[FORMAT]
-max-line-length=125
