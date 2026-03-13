@@ -193,7 +193,7 @@
         name: cloudalchemy.node_exporter
       when: "'node_exporter' in group_names"
 
-    - name: Openondemand exporter
+    - name: Open Ondemand exporter
       ansible.builtin.dnf:
         name: ondemand_exporter
       when: "'openondemand' in group_names"

@@ -3,3 +3,16 @@
   ansible.builtin.assert:
     that: openondemand_servername != ''
     fail_msg: "Variable `openondemand_servername` must be set on openondemand and (by default) grafana hosts. See ansible/roles/openondemand/README.md"
+
+- name: Check Open Ondemand servername is not IP for certbot
+  ansible.builtin.assert:
+    that: "[openondemand_servername] | ansible.utils.ipv4 | length == 0"
+    fail_msg: "openondemand_servername ({{ openondemand_servername }}) must not be an IP when openondemand_certbot is true"
+  when: openondemand_certbot | bool
+
+- name: Check that email address is set for certbot
+  ansible.builtin.assert:
+    that:
+      - openondemand_certbot_email | length > 0
+    fail_msg: openondemand_certbot_email must be set when openondemand_certbot is true
+  when: openondemand_certbot | bool

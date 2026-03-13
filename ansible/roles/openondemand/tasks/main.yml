@@ -35,6 +35,15 @@
     - openondemand_auth | lower == 'basic_pam'
     - appliances_mode != 'build'
 
+- name: Install certbot
+  ansible.builtin.dnf:
+    name:
+      - certbot
+      - python3-certbot-apache
+  when:
+    - openondemand_certbot | bool
+    - appliances_mode != 'configure'
+
 - ansible.builtin.include_role:
     name: osc.ood
     tasks_from: install-apps.yml
@@ -43,3 +52,12 @@
 - ansible.builtin.include_tasks:
     file: configure.yml
   when: appliances_mode != 'build'
+
+- name: Generate Let's Encrypt certificate
+  # Needs apache running
+  ansible.builtin.command:
+    cmd: "certbot --apache --no-eff-email --email {{ openondemand_certbot_email }}"
+  changed_when: true
+  when:
+    - openondemand_certbot | bool
+    - appliances_mode != 'build'
