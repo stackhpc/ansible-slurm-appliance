@@ -1,3 +1,4 @@
+---
 - hosts: control
   gather_facts: false
   become: true
@@ -7,13 +8,13 @@
       1,pingpong.sh,COMPLETED
   tasks:
     - name: Get info for ended jobs
-      shell:
+      ansible.builtin.command:
         cmd: sacct --format=jobid,jobname,state --allocations --parsable2 --delimiter=, --starttime=now-1days --endtime=now
         # by default start/end time is midnight/now which is not robust
       changed_when: false
       register: sacct
     - name: Check info for ended jobs
-      assert:
+      ansible.builtin.assert:
         that: sacct_stdout_expected in sacct.stdout
         fail_msg: |
           Expected:

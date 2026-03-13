@@ -1,0 +1,17 @@
+- name: Enable autoassembly of mdraid devices
+  # adds rd.auto=1 - see `man dracut.cmdline`
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: >
+      ^{{ grub_cmdline_var[ansible_distribution_major_version] }}="((?:(?!rd.auto=1).)*?)"$
+    line: >
+      {{ grub_cmdline_var[ansible_distribution_major_version] }}="\1 rd.auto=1"
+    backup: true
+    backrefs: true
+  register: update_grub
+  notify:
+    - Update GRUB configuration file
+  vars:
+    grub_cmdline_var:
+      '8': GRUB_CMDLINE_LINUX
+      '9': GRUB_CMDLINE_LINUX_DEFAULT

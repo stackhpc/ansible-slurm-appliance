@@ -6,5 +6,5 @@ ssh_private_key_file = "~/.ssh/id_rsa"
 security_groups = ["default", "SSH"]
 # see environments/.stackhpc/inventory/group_vars/all/bastion.yml:
 ssh_bastion_username = "slurm-app-ci"
-ssh_bastion_host = "195.114.30.222"
+ssh_bastion_host = "45.135.59.32"
 ssh_bastion_private_key_file = "~/.ssh/id_rsa"

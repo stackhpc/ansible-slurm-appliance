@@ -1,6 +1,6 @@
 # StackHPC Slurm Appliance Documentation
 
-### Operator docs
+## Operator docs
 
 [Image build](image-build.md)
 
@@ -16,7 +16,7 @@
 
 [Sequence diagrams](sequence.md)
 
-### Configuration docs
+## Configuration docs
 
 [Alerting](alerting.md)
 
@@ -32,7 +32,7 @@
 
 [Persistent state](persistent-state.md)
 
-#### Experimental fetaures
+### Experimental fetaures
 
 [Compute init](experimental/compute-init.md)
 
@@ -40,6 +40,6 @@
 
 [Slurm controlled rebuild](experimental/slurm-controlled-rebuild.md)
 
-### Contributor docs
+## Contributor docs
 
 [Adding functionality](adding-functionality.md)

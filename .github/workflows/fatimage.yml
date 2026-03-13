@@ -1,20 +1,29 @@
 name: Build fat image
-on:
+'on':
   workflow_dispatch:
-      inputs:
-        ci_cloud:
-          description: 'Select the CI_CLOUD'
-          required: true
-          type: choice
-          options:
-            - LEAFCLOUD
-            - SMS
-            - ARCUS
-        cleanup_on_failure:
-          description: Cleanup Packer resources on failure
-          type: boolean
-          required: true
-          default: true
+    # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
+    inputs:
+      ci_cloud:
+        description: 'Select the CI_CLOUD'
+        required: true
+        type: choice
+        options:
+          - default
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+        default: default # Use repo CI_CLOUD setting
+      cleanup_on_failure:
+        description: Cleanup Packer resources on failure
+        type: boolean
+        required: true
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
 
 jobs:
   openstack:
@@ -22,31 +31,32 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
       cancel-in-progress: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-RL8
-            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.raw
-            inventory_groups: control,compute,login,update
+            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
+            inventory_groups: fatimage
           - image_name: openhpc-RL9
-            source_image_name: Rocky-9-GenericCloud-Base-9.5-20241118.0.x86_64.raw
-            inventory_groups: control,compute,login,update
+            source_image_name: Rocky-9-GenericCloud-Base-9.7-20251123.2.x86_64.qcow2
+            inventory_groups: fatimage
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ github.event.inputs.ci_cloud }}
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       LEAFCLOUD_PULP_PASSWORD: ${{ secrets.LEAFCLOUD_PULP_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Record settings for CI cloud
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo cleanup_on_failure: ${{ github.event.inputs.cleanup_on_failure  }}
 
       - name: Setup ssh
         run: |
@@ -54,10 +64,14 @@ jobs:
           mkdir ~/.ssh
           echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
+          ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
 
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
+      - name: Add bastion ssh fingerprints to known_hosts
+        run: |
+          cat >> ~/.ssh/known_hosts << 'EOF'
+          ${{ vars.BASTION_FINGERPRINTS }}
+          EOF
         shell: bash
 
       - name: Install ansible etc
@@ -84,8 +98,8 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ github.event.inputs.cleanup_on_failure && 'cleanup' || 'abort' }} \
-          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
+          -on-error=${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }} \
+          -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
@@ -96,19 +110,24 @@ jobs:
         run: |
           . venv/bin/activate
           IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
-          while ! openstack image show -f value -c name $IMAGE_ID; do
+          while ! openstack image show -f value -c name "$IMAGE_ID"; do
             sleep 5
           done
-          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
-          echo $IMAGE_ID > image-id.txt
-          echo $IMAGE_NAME > image-name.txt
+          echo "$IMAGE_ID" > image-id.txt
+          echo "$IMAGE_NAME" > image-name.txt
 
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
           openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}" || true
+
+      - name: Set image properties
+        run: |
+          . venv/bin/activate
+          . dev/image-set-properties.sh "${{ steps.manifest.outputs.image-id }}"
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4

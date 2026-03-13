@@ -96,3 +96,13 @@ roles/*
 !roles/nhc/**
 !roles/eessi/
 !roles/eessi/**
+!roles/topology/
+!roles/topology/**
+!roles/journald/
+!roles/journald/**
+!roles/raid/
+!roles/raid/**
+!roles/mounts/
+!roles/mounts/**
+!roles/opkssh/
+!roles/opkssh/**

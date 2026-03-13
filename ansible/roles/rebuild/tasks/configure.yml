@@ -1,7 +1,7 @@
 ---
 
 - name: Create /etc/openstack
-  file:
+  ansible.builtin.file:
     path: /etc/openstack
     state: directory
     owner: slurm
@@ -9,7 +9,7 @@
     mode: u=rX,g=rwX
 
 - name: Copy out clouds.yaml
-  copy:
+  ansible.builtin.copy:
     src: "{{ rebuild_clouds_path }}"
     dest: /etc/openstack/clouds.yaml
     owner: slurm

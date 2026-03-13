@@ -1,0 +1,4 @@
+# for super-linter
+/github/workspace/environments/common/files/filebeat/filebeat.yml
+# for local yamllint invocation
+environments/common/files/filebeat/filebeat.yml

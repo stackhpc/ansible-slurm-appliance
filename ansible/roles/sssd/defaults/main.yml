@@ -1,3 +1,4 @@
+---
 sssd_packages:
   - sssd-common
 sssd_install_ldap: false

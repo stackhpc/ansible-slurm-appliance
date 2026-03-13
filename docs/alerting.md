@@ -4,10 +4,10 @@ The [prometheus.io docs](https://prometheus.io/docs/alerting/latest/overview/)
 describe the overall alerting process:
 
 > Alerting with Prometheus is separated into two parts. Alerting rules in
-  Prometheus servers send alerts to an Alertmanager. The Alertmanager then
-  manages those alerts, including silencing, inhibition, aggregation and
-  sending out notifications via methods such as email, on-call notification
-  systems, and chat platforms.
+> Prometheus servers send alerts to an Alertmanager. The Alertmanager then
+> manages those alerts, including silencing, inhibition, aggregation and
+> sending out notifications via methods such as email, on-call notification
+> systems, and chat platforms.
 
 The general Prometheus configuration is described in
 [monitoring-and-logging.md](./monitoring-and-logging.md#defaults-3) - note that
@@ -21,38 +21,35 @@ must be configured to generate notifications.
 ## Enabling alertmanager
 
 1. Ensure both the `prometheus` and `alertmanager` servers are deployed on the
-control node  - for new environments the `cookiecutter` tool will have done
-this:
+   control node - these are deployed by default in the site environment's groups:
 
-    ```ini
-    # environments/site/groups:
-    [prometheus:children]
-    control
+```ini
+# environments/site/groups:
+[prometheus:children]
+control
+[alertmanager:children]
+control
+```
 
-    [alertmanager:children]
-    control
-    ```
+2. If the appliance was deployed before the alertmanager functionality was included, generate a password for the alertmanager UI user:
 
-2. If the appliance was deployed before the alertmanager functionality was included,
-generate a password for the alertmanager UI user:
-
-    ```shell
-    ansible-playbook ansible/adhoc/generate-passwords.yml
-    ```
+```shell
+ansible-playbook ansible/adhoc/generate-passwords.yml
+```
 
 3. Configure a receiver to generate notifications from alerts. Currently a Slack
-integration is provided (see below) but alternative receivers could be defined
-via overriding role defaults.
- 
+   integration is provided (see below) but alternative receivers could be defined
+   via overriding role defaults.
+
 4. If desired, any other [role defaults](../ansible/roles/alertmanager/README.md)
-may be overriden in e.g. `environments/site/inventory/group_vars/all/alertmanager.yml`.
+   may be overriden in e.g. `environments/site/inventory/group_vars/all/alertmanager.yml`.
 
 5. Run the `monitoring.yml` playbook (if the cluster is already up) to configure
-both alertmanager and prometheus:
+   both alertmanager and prometheus:
 
-    ```shell
-    ansible-playbook ansible/monitoring.yml
-    ```
+```shell
+ansible-playbook ansible/monitoring.yml
+```
 
 ## Access
 
@@ -76,7 +73,7 @@ of alerts via Slack.
 
 1. Create an app with a bot token:
 
-- Go to https://api.slack.com/apps
+- Go to <https://api.slack.com/apps>
 - select "Create an App"
 - select "From scratch"
 - Set app name and workspace fields, select "Create"
@@ -93,16 +90,20 @@ of alerts via Slack.
 - Uncomment `vault_alertmanager_slack_integration_app_creds` and add the token
 - Vault-encrypt that file:
 
-        ansible-vault encrypt environments/$ENV/inventory/group_vars/all/vault_alertmanager.yml
+```shell
+ansible-vault encrypt environments/$ENV/inventory/group_vars/all/vault_alertmanager.yml
+```
 
 - Open `environments/$ENV/inventory/group_vars/all/alertmanager.yml`
 - Uncomment the `alertmanager_slack_integration` mapping and set your alert channel name
 
 3. Invite the bot to your alerts channel
+
 - In the appropriate Slack channel type:
 
-        /invite @YOUR_BOT_NAME
-
+```text
+/invite @YOUR_BOT_NAME
+```
 
 ## Alerting Rules
 
@@ -112,15 +113,16 @@ which is defined for the appliance at
 
 Two [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus)
 role variables are relevant:
+
 - `prometheus_alert_rules_files`: Paths to check for files providing rules.
   Note these are copied to Prometheus config directly, so jinja expressions for
   Prometheus do not need escaping.
 - `prometheus_alert_rules`: Yaml-format rules. Jinja templating here will be
-interpolated by Ansible, so templating intended for Prometheus must be escaped
-using `{% raw %}`/`{% endraw %}` tags.
+  interpolated by Ansible, so templating intended for Prometheus must be escaped
+  using `{% raw %}`/`{% endraw %}` tags.
 
 By default, `prometheus_alert_rules_files` is set so that any `*.rules` files
-in a directory `files/prometheus/rules` in the current environment or *any*
+in a directory `files/prometheus/rules` in the current environment or _any_
 parent environment are loaded. So usually, site-specific alerts should be added
 by creating additional rules files in `environments/site/files/prometheus/rules`.
 If the same file exists in more than one environment, the "child" file will take
@@ -128,6 +130,7 @@ precedence and any rules in the "parent" file will be ignored.
 
 A set of default alert rule files is provided at `environments/common/files/prometheus/rules/`.
 These cover:
+
 - Some node-exporter metrics for disk, filesystems, memory and clock. Note
   no alerts are triggered on memory for compute nodes due to the intended use
   of those nodes.
@@ -137,6 +140,7 @@ These cover:
 When defining additional rules, note the [labels defined](./monitoring-and-logging.md#prometheus_node_exporter_targets) for node-exporter targets.
 
 In future more alerts may be added for:
+
 - smartctl-exporter-based rules for baremetal nodes where there is no
   infrastructure-level smart monitoring
 - loss of "up" network interfaces

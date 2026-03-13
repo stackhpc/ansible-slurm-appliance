@@ -1,18 +1,14 @@
-mysql
-=====
+# MySQL
 
 Deploy containerised `mysql` server using Podman.
 
-
-Requirements
-------------
+## Requirements
 
 None.
 
-Role Variables
---------------
+## Role Variables
 
-- `mysql_root_password`: Required str. Password to set for `root` mysql user. **NB** This cannot be changed by this role once mysql server has initialised.
+- `mysql_root_password`: Required str. Password to set for `root` MySQL user. **NB** This cannot be changed by this role once MySQL server has initialised.
 - `mysql_tag`: Optional str. Tag for version of `mysql` container image to use. Default `8.0.30`.
 - `mysql_systemd_service_enabled`: Optional bool. Whether `mysql` service starts on boot. Default `yes`.
 - `mysql_state`: Optional str. As per `ansible.builtin.systemd:state`. Default is `started` or `restarted` as required.
@@ -22,13 +18,11 @@ Role Variables
 - `mysql_users`: Optional list of dicts defining users as per `community.mysql.mysql_user`. Default `[]`.
 - `mysql_databases`: Optional list of dicts defining databases as per `community.mysql.mysql_db`. Default `[]`.
 
-Dependencies
-------------
+## Dependencies
 
 None.
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```yaml
 - name: Setup DB
@@ -38,15 +32,13 @@ Example Playbook
     - mysql
   tasks:
     - include_role:
-        name:  mysql
+        name: mysql
 ```
 
-License
--------
+## License
 
 Apache v2
 
-Author Information
-------------------
+## Author Information
 
-Steve Brasier steveb@stackhpc.com
+Steve Brasier <steveb@stackhpc.com>

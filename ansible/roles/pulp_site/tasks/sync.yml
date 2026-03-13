@@ -1,9 +1,55 @@
 ---
-
-- ansible.builtin.assert:
+- name: Ensure upstream password is set
+  ansible.builtin.assert:
     that: pulp_site_upstream_password != ''
     quiet: true
-    fail_msg: "Upstream password not set. Either set env var ARK_PASSWORD or override pulp_site_upstream_password."
+    fail_msg: "Upstream password not set. Ensure `pulp_site_upstream_username` and `pulp_site_upstream_password` are overriden to your Ark credentials."
+
+- name: Install python3
+  ansible.builtin.package:
+    name: python3,git
+  become: true
+
+- name: Create virtualenv directory
+  ansible.builtin.file:
+    path: "{{ pulp_site_squeezer_venv }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Create virtualenv
+  module_defaults:
+    ansible.builtin.pip:
+      virtualenv: "{{ pulp_site_squeezer_venv }}"
+      virtualenv_command: "{{ 'python3.9 -m venv' if ansible_distribution_major_version == '8' else 'python3 -m venv' }}"
+      state: latest
+  become: true
+  block:
+    - name: Upgrade pip
+    # This needs to a separate step so that we use the updated version
+    # to install the packages below.
+      ansible.builtin.pip:
+        name: pip
+
+    - name: Install packages
+      ansible.builtin.pip:
+      # TODO: remove these from requirements.txt
+        name: "{{ pulp_cli_packages }}"
+
+- name: Ensure Pulp CLI config directory exists
+  ansible.builtin.file:
+    path: ~/.config/pulp
+    state: directory
+    mode: "0755"
+
+- name: Create config file
+  no_log: true
+  ansible.builtin.template:
+    src: cli.toml.j2
+    dest: ~/.config/pulp/cli.toml
+    mode: "0644"
 
 - name: Wait for Pulp server
   pulp.squeezer.status:
@@ -14,38 +60,30 @@
   until: _pulp_status.failed == false
   retries: 30
   delay: 20
-
-- name: Ensure Pulp CLI config directory exists
-  ansible.builtin.file:
-    path: ~/.config/pulp
-    state: directory
-
-- name: Create config file
-  no_log: true
-  ansible.builtin.template:
-    src: cli.toml.j2
-    dest: ~/.config/pulp/cli.toml
-    mode: '0644'
-
-- block:
-  - name: Ensure squeezer cache exists
-    ansible.builtin.file:
-      path: "{{ _cache_dir }}"
-      state: directory
-
-  - name: Check if squeezer cache is populated
-    ansible.builtin.stat:
-      path: "{{ _cache_dir }}/api.json"
-    register: _cache_stat
-
-  - name: Prepopulate squeezer cache # workaround for race on the cache
-    ansible.builtin.get_url:
-      url: "{{ pulp_site_url }}/pulp/api/v3/docs/api.json"
-      dest: "{{ _cache_dir }}/api.json"
-      timeout: 40
-    when: not _cache_stat.stat.exists
   vars:
-    _cache_dir: "~/.cache/squeezer/{{ pulp_site_url | regex_replace( ':|/' , '_' ) }}"
+    ansible_python_interpreter: "{{ pulp_site_squeezer_python }}"
+
+- vars:
+    _cache_dir: "~/.cache/squeezer/{{ pulp_site_url | regex_replace(':|/', '_') }}"
+  block:
+    - name: Ensure squeezer cache exists
+      ansible.builtin.file:
+        path: "{{ _cache_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Check if squeezer cache is populated
+      ansible.builtin.stat:
+        path: "{{ _cache_dir }}/api.json"
+      register: _cache_stat
+
+    - name: Prepopulate squeezer cache # workaround for race on the cache
+      ansible.builtin.get_url:
+        url: "{{ pulp_site_url }}/pulp/api/v3/docs/api.json"
+        dest: "{{ _cache_dir }}/api.json"
+        mode: "0644"
+        timeout: 40
+      when: not _cache_stat.stat.exists
 
 - name: Get Pulp repos from release train
   ansible.builtin.include_role:
@@ -56,6 +94,7 @@
     pulp_username: "{{ pulp_site_username }}"
     pulp_password: "{{ pulp_site_password }}"
     pulp_repository_rpm_repos: "{{ pulp_site_rpm_repos }}"
+    ansible_python_interpreter: "{{ pulp_site_squeezer_python }}"
 
 - name: Create Pulp publications
   ansible.builtin.include_role:
@@ -66,6 +105,7 @@
     pulp_username: "{{ pulp_site_username }}"
     pulp_password: "{{ pulp_site_password }}"
     pulp_publication_rpm: "{{ pulp_site_rpm_publications }}"
+    ansible_python_interpreter: "{{ pulp_site_squeezer_python }}"
 
 - name: Create Pulp distributions
   ansible.builtin.include_role:
@@ -76,3 +116,4 @@
     pulp_username: "{{ pulp_site_username }}"
     pulp_password: "{{ pulp_site_password }}"
     pulp_distribution_rpm: "{{ pulp_site_rpm_distributions }}"
+    ansible_python_interpreter: "{{ pulp_site_squeezer_python }}"

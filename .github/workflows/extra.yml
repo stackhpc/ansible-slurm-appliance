@@ -1,52 +1,63 @@
+---
+
+# Test building extra images on OpenStack.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
+
 name: Test extra build
-on:
+'on':
+  workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
-      - 'ansible/roles/doca/**'
-      - 'ansible/roles/cuda/**'
-      - 'ansible/roles/slurm_recompile/**' # runs on cuda group
-      - 'ansible/roles/lustre/**'
-      - '.github/workflows/extra.yml'
-  pull_request:
-    paths:
-      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
-      - 'ansible/roles/doca/**'
-      - 'ansible/roles/cuda/**'
-      - 'ansible/roles/lustre/**'
-      - '.github/workflows/extra.yml'
+    # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
+    inputs:
+      ci_cloud:
+        description: 'Select the CI_CLOUD'
+        required: true
+        type: choice
+        options:
+          - default
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+        default: default # Use repo CI_CLOUD setting or PR label
+      cleanup_on_failure:
+        description: Cleanup Packer resources on failure
+        type: boolean
+        required: true
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
 
 jobs:
   doca:
     name: extra-build
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
-      cancel-in-progress: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
           - image_name: openhpc-extra-RL8
             source_image_name_key: RL8 # key into environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
-            inventory_groups: doca,cuda,lustre
+            inventory_groups: doca,cuda # lustre disabled due to https://github.com/stackhpc/ansible-slurm-appliance/pull/759
             volume_size: 35 # needed for cuda
           - image_name: openhpc-extra-RL9
             source_image_name_key: RL9
             inventory_groups: doca,cuda,lustre
             volume_size: 35 # needed for cuda
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
-      CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud || vars.CI_CLOUD }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'false' && 'abort' || vars.PACKER_ON_ERROR }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Load current fat images into GITHUB_ENV
         # see https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#example-of-a-multiline-string
@@ -57,10 +68,25 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
+      - name: Override CI_CLOUD if PR label is present
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          # Iterate over the labels
+          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
+          echo "$labels"
+          for label in $labels; do
+             if [[ $label == CI_CLOUD=* ]]; then
+              # Extract the value after 'CI_CLOUD='
+              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
+            fi
+          done
+
       - name: Record settings
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
-          echo FAT_IMAGES: ${FAT_IMAGES}
+          echo PACKER_ON_ERROR: ${{ env.PACKER_ON_ERROR}}
+          echo "FAT_IMAGES: ${FAT_IMAGES}"
 
       - name: Setup ssh
         run: |
@@ -68,10 +94,14 @@ jobs:
           mkdir ~/.ssh
           echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
+          ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
 
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
+      - name: Add bastion ssh fingerprints to known_hosts
+        run: |
+          cat >> ~/.ssh/known_hosts << 'EOF'
+          ${{ vars.BASTION_FINGERPRINTS }}
+          EOF
         shell: bash
 
       - name: Install ansible etc
@@ -98,8 +128,8 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ vars.PACKER_ON_ERROR }} \
-          -var-file=$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl \
+          -on-error=${{ env.PACKER_ON_ERROR }} \
+          -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
           -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
@@ -111,14 +141,14 @@ jobs:
         run: |
           . venv/bin/activate
           IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
-          while ! openstack image show -f value -c name $IMAGE_ID; do
+          while ! openstack image show -f value -c name "$IMAGE_ID"; do
             sleep 5
           done
-          IMAGE_NAME=$(openstack image show -f value -c name $IMAGE_ID)
+          IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
           echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
-          echo $IMAGE_ID > image-id.txt
-          echo $IMAGE_NAME > image-name.txt
+          echo "$IMAGE_ID" > image-id.txt
+          echo "$IMAGE_NAME" > image-name.txt
 
       - name: Make image usable for further builds
         run: |

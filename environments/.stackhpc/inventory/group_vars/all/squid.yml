@@ -1,0 +1,1 @@
+squid_cache_disk: 500 # CI nodes are only 20GB

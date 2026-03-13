@@ -219,6 +219,14 @@ resource "openstack_networking_port_v2" "login" {
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
   }
+
+  lifecycle {
+    ignore_changes = [
+      binding, # fixes running as admin
+      extra_dhcp_option # required for networking-mlnx neutron plugin
+    ]
+  }
+
 }
 
 # Storage network
@@ -235,6 +243,14 @@ resource "openstack_networking_port_v2" "login_storage" {
   binding {
     vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
   }
+
+  lifecycle {
+    ignore_changes = [
+      binding, # fixes running as admin
+      extra_dhcp_option # required for networking-mlnx neutron plugin
+    ]
+  }
+
 }
 {% endif %}
 
@@ -258,8 +274,15 @@ resource "openstack_networking_port_v2" "control" {
 
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
-
   }
+
+  lifecycle {
+    ignore_changes = [
+      binding, # fixes running as admin
+      extra_dhcp_option # required for networking-mlnx neutron plugin
+    ]
+  }
+
 }
 
 # Storage network
@@ -276,6 +299,14 @@ resource "openstack_networking_port_v2" "control_storage" {
   binding {
     vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
   }
+
+  lifecycle {
+    ignore_changes = [
+      binding, # fixes running as admin
+      extra_dhcp_option # required for networking-mlnx neutron plugin
+    ]
+  }
+
 }
 {% endif %}
 
@@ -301,6 +332,14 @@ resource "openstack_networking_port_v2" "{{ nodegroup.name }}" {
   binding {
     vnic_type = "{{ cluster_vnic_type | default('normal') }}"
   }
+
+  lifecycle {
+    ignore_changes = [
+      binding, # fixes running as admin
+      extra_dhcp_option # required for networking-mlnx neutron plugin
+    ]
+  }
+
 }
 
 # Storage network
@@ -318,6 +357,14 @@ resource "openstack_networking_port_v2" "{{ nodegroup.name }}_storage" {
   binding {
     vnic_type = "{{ cluster_storage_vnic_type | default('normal') }}"
   }
+
+  lifecycle {
+    ignore_changes = [
+      binding, # fixes running as admin
+      extra_dhcp_option # required for networking-mlnx neutron plugin
+    ]
+  }
+
 }
 {% endif %}
 

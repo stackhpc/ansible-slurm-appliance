@@ -94,11 +94,17 @@ variable "ssh_bastion_username" {
 
 variable "ssh_bastion_private_key_file" {
   type = string
-  default = "~/.ssh/id_rsa"
+  default = null
 }
 
 variable "floating_ip_network" {
   type = string
+  default = null
+}
+
+variable "floating_ip" {
+  type = string
+  description = "ID of pre-existing FIP to attach. Note floating_ip_network is not required when using this"
   default = null
 }
 
@@ -119,7 +125,12 @@ variable "volume_type" {
 
 variable "volume_size" {
   type = number
-  default = 15
+  default = 20
+}
+
+variable "volume_name" {
+  type = string
+  default = null
 }
 
 variable "image_disk_format" {
@@ -156,12 +167,14 @@ source "openstack" "openhpc" {
   use_blockstorage_volume = var.use_blockstorage_volume
   volume_type = var.volume_type
   volume_size = var.volume_size
+  volume_name = "${var.image_name}${local.image_name_version}"
   metadata = var.metadata
   instance_metadata = {
     ansible_init_disable = "true"
   }
   networks = var.networks
   floating_ip_network = var.floating_ip_network
+  floating_ip = var.floating_ip
   security_groups = var.security_groups
   
   # Input image:

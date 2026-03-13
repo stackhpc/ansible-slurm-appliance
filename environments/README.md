@@ -1,15 +1,15 @@
 # Environments
 
 This folder contains the configuration for multiple different environments. Essentially
-an environment is an ansible inventory, any files that may be referenced by that inventory,
+an environment is an Ansible inventory, any files that may be referenced by that inventory,
 and some code used to provision the infrastrcture. The code to provision the infrastructure
-typically contains all the environment specific config. It must output an ansible inventory
+typically contains all the environment specific config. It must output an Ansible inventory
 that conforms to the structure we expect. Providing that the inventory conforms to this
-structure, the ansible code will still be able to interface with that inventory.
-This allows the ansible code to be decoupled from the code that deployed the infrastructure
+structure, the Ansible code will still be able to interface with that inventory.
+This allows the Ansible code to be decoupled from the code that deployed the infrastructure
 and can therefore be tool and cloud agnostic.
 
-A pattern we use is to chain multiple ansible inventories to provide a crude form of inheritance. e.g
+A pattern we use is to chain multiple Ansible inventories to provide a crude form of inheritance. e.g
 
     common -> my_site -> production
 
@@ -32,47 +32,48 @@ for usage instructions for that component.
 ### common
 
 Shared configuration for all environments. This is not
-intended to be used as a standalone environment, hence the README does *not* detail
-how to provision the infrastructure.
+intended to be used as a standalone environment, hence the readme does _not_ detail
+how to provision the infrastructure. This environment should not be edited, except as part of upstreaming new features or bugfixes.
 
-### skeleton
+## site
 
-Skeleton directory that is used as a template to create a new environemnt.
+Provides the base configuration for all subsequent `cookiecutter` created environments,
+including OpenTofu configurations for infrastructure. In general, most local customisations should be made by adding to this environment.
 
 ## Defining an environment
 
 To define an environment using cookiecutter:
 
-    cookiecutter skeleton
+    cd environments
+    cookiecutter ../cookiecutter
 
 This will present you with a series of questions which you must answer.
 Once you have answered all questions, a new environment directory will
 be created. The directory will be named according to the answer you gave
 for `environment`.
 
-Follow the README in the new directory to perform initial configuration.
+Follow the readme in the new directory to perform initial configuration.
 
 ## Activating environments
 
 Typically, you need to activate an environment to be able to use it. You should then
 be able to run the code in the `ansible` and `packer` toplevel directories. Activating
-the environment will ensure that the ansible runs with the correct configuration for
+the environment will ensure that the Ansible runs with the correct configuration for
 that environment. See the `README.md` in the relevant subdirectory for more details.
 
 ## Enabling/Disabling services
 
 Services are typically enabled/disabled by adding/removing a particular host or all
 hosts from the associated group in the inventory. A pattern we use is to name the
-ansible inventory `group` after the name of the `role` that configures it. The playbook
+Ansible inventory `group` after the name of the `role` that configures it. The playbook
 that runs this role targets hosts in that group. The `common` environment typically defines
 all groups as the empty group. You must explicly opt-in and add hosts to these these groups
-to configure that service.  For example, if you don't want to deploy and configure grafana,
+to configure that service. For example, if you don't want to deploy and configure grafana,
 you simply do not add any hosts to the `grafana` group in the inventory. This allows us to
-have a shared ansible code base as we can define playbooks to configure all things,
+have a shared Ansible codebase as we can define playbooks to configure all things,
 but these playbooks end up not being run if no host is in the associated group.
 
-See also:
-    - `common/inventory/groups` for a list of all groups.
+See also: - `common/inventory/groups` for a list of all groups.
 
 ## Overriding configuration
 
@@ -85,7 +86,7 @@ Pull requests are welcome to split variables into smaller components to make it 
 
 ### role variables
 
-The pattern we use is that the role is run against an ansible inventory group matching
+The pattern we use is that the role is run against an Ansible inventory group matching
 the name of the role. The role variables are defined as group variables in a file matching
 the role name. These files are in placed in `group_vars/all` so that they have the lowest
 precedence and more easily overridable. This convention makes it easier to find where the

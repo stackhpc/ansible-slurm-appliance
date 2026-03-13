@@ -1,18 +1,25 @@
+---
+
+# Scan the built image for vulnerabilities using Trivy.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
+
 name: Trivy scan image for vulnerabilities
-on:
+'on':
+  workflow_call:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+  # upload trivy scan results
+  security-events: write
 
 jobs:
   scan:
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }} # to branch/PR + build
-      cancel-in-progress: true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -23,19 +30,19 @@ jobs:
       CI_CLOUD: ${{ vars.CI_CLOUD }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           # Iterate over the labels
           labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
-          echo $labels
+          echo "$labels"
           for label in $labels; do
              if [[ $label == CI_CLOUD=* ]]; then
               # Extract the value after 'CI_CLOUD='
               CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
-              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> $GITHUB_ENV
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
             fi
           done
 
@@ -43,24 +50,12 @@ jobs:
         run: |
           echo CI_CLOUD: ${{ env.CI_CLOUD }}
 
-      - name: Setup ssh
-        run: |
-          set -x
-          mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-        shell: bash
-
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
-        shell: bash
-
       - name: setup environment
         run: |
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
         shell: bash
 
       - name: Write clouds.yaml
@@ -97,7 +92,7 @@ jobs:
         run: sudo guestmount -a /mnt/images/${{ steps.manifest.outputs.image-name }}.qcow2 -i --ro -o allow_other './${{ steps.manifest.outputs.image-name }}'
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@0.34.2
         with:
           scan-type: fs
           scan-ref: "${{ steps.manifest.outputs.image-name }}"
@@ -111,13 +106,13 @@ jobs:
           TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
           category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@0.34.2
         with:
           scan-type: fs
           scan-ref: "${{ steps.manifest.outputs.image-name }}"
@@ -126,7 +121,10 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL'
           ignore-unfixed: true
+          trivyignores: .github/.trivyignore
           timeout: 15m
+          # On a subsequent call to the action we know trivy is already installed so can skip this
+          skip-setup-trivy: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2

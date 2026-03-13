@@ -1,36 +1,24 @@
+---
+
+# Test deployment and reimage on OpenStack.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Test deployment and reimage on OpenStack
-on:
+'on':
+  workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - '**'
-      - '!dev/**'
-      - 'dev/setup-env.sh'
-      - '!docs/**'
-      - '!README.md'
-      - '!.gitignore'
-      - '!.github/workflows/'
-      - '.github/workflows/stackhpc'
-  pull_request:
-    paths:
-      - '**'
-      - '!dev/**'
-      - 'dev/setup-env.sh'
-      - '!docs/**'
-      - '!README.md'
-      - '!.gitignore'
-      - '!.github/workflows/'
-      - '.github/workflows/stackhpc'
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+
 jobs:
   openstack:
     name: openstack-ci
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os_version }} # to branch/PR + OS
-      cancel-in-progress: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix:
@@ -38,7 +26,7 @@ jobs:
           - RL8
           - RL9
     env:
-      ANSIBLE_FORCE_COLOR: True
+      ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
       TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
@@ -48,8 +36,8 @@ jobs:
 
       - name: Find the latest release
         run: |
-          echo LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name) >> "$GITHUB_ENV"
-      
+          echo "LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name)" >> "$GITHUB_ENV"
+
       - name: Checkout latest release
         uses: actions/checkout@v4
         with:
@@ -61,19 +49,19 @@ jobs:
         run: |
           # Iterate over the labels
           labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
-          echo $labels
+          echo "$labels"
           for label in $labels; do
              if [[ $label == CI_CLOUD=* ]]; then
               # Extract the value after 'CI_CLOUD='
               CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
-              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> $GITHUB_ENV
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
             fi
           done
 
       - name: Record debug info
         run: |
-          echo LATEST_RELEASE_TAG: $LATEST_RELEASE_TAG
-          echo CI_CLOUD: $CI_CLOUD
+          echo "LATEST_RELEASE_TAG: $LATEST_RELEASE_TAG"
+          echo "CI_CLOUD: $CI_CLOUD"
 
       - name: Setup ssh
         run: |
@@ -81,14 +69,31 @@ jobs:
           mkdir ~/.ssh
           echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
+          ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
 
-      - name: Add bastion's ssh key to known_hosts
-        run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
+      - name: Add bastion ssh fingerprints to known_hosts
+        run: |
+          cat >> ~/.ssh/known_hosts << 'EOF'
+          ${{ vars.BASTION_FINGERPRINTS }}
+          EOF
         shell: bash
+
+      - name: Ensure Ansible bastion definitions are from **current** branch
+        run: |
+          git fetch origin ${{ github.head_ref || github.ref_name }}
+          git checkout origin/${{ github.head_ref || github.ref_name }} -- environments/.stackhpc/inventory/group_vars/all/bastion.yml
+          cat environments/.stackhpc/inventory/group_vars/all/bastion.yml
+        shell: bash
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
 
       - name: Install ansible, pip and galaxy requirements
         run: dev/setup-env.sh
+        env:
+          PYTHON_VERSION: python3  # overrides os-release discovery logic
 
       - name: Install OpenTofu
         uses: opentofu/setup-opentofu@v1.0.5
@@ -109,23 +114,34 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          echo vault_demo_user_password: "$DEMO_USER_PASSWORD" > $APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml
+          echo "vault_demo_user_password: $DEMO_USER_PASSWORD" > "$APPLIANCES_ENVIRONMENT_ROOT/inventory/group_vars/all/test_user.yml"
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+
+      - name: Cleanup any OpenStack resources from previous attempts
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ./dev/delete-cluster.py ${{ env.TF_VAR_cluster_name }} --force
 
       - name: Provision nodes using latest release image
         id: provision_servers
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
-          tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
+          cd "$STACKHPC_TF_DIR"
+          max_retries=3
+          delay=30
+          for i in $(seq 1 $max_retries); do
+            tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" && break
+            [ "$i" -lt "$max_retries" ] && sleep $delay || exit 1
+          done
 
       - name: Delete infrastructure if provisioning failed
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd "$STACKHPC_TF_DIR"
           tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
@@ -144,27 +160,32 @@ jobs:
           . environments/.stackhpc/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
 
-      # - name: Run EESSI tests
-      #   run: |
-      #     . venv/bin/activate
-      #     . environments/.stackhpc/activate
-      #     ansible-playbook -vv ansible/ci/check_eessi.yml
-
       - name: Checkout current branch
         run: git checkout ${{ github.head_ref || github.ref_name }}
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
       - name: Update ansible, pip and galaxy requirements
         run: dev/setup-env.sh
+        env:
+          PYTHON_VERSION: python3 # overrides os-release discovery logic
 
       - name: Reimage login and control nodes to image in current branch
         id: reimage_non_compute
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd "$STACKHPC_TF_DIR"
           tofu init
-          tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars"
-          
+          max_retries=3
+          delay=30
+          for i in $(seq 1 $max_retries); do
+            tofu apply -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" && break
+            [ "$i" -lt "$max_retries" ] && sleep $delay || exit 1
+          done
+
       - name: Configure cluster using current branch
         run: |
           . venv/bin/activate
@@ -180,6 +201,7 @@ jobs:
           . environments/.stackhpc/activate
           ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
+          ansible-playbook -v ansible/ci/check_compute_rebuild.yml
 
       - name: Check sacct state survived reimage to current branch
         run: |
@@ -199,6 +221,12 @@ jobs:
           . environments/.stackhpc/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml
 
+      - name: Run EESSI tests
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          ansible-playbook -vv ansible/ci/check_eessi.yml
+
       - name: Confirm Open Ondemand is up (via SOCKS proxy)
         run: |
           . venv/bin/activate
@@ -207,14 +235,14 @@ jobs:
           # load ansible variables into shell:
           ansible-playbook ansible/ci/output_vars.yml \
             -e output_vars_hosts=openondemand \
-            -e output_vars_path=$APPLIANCES_ENVIRONMENT_ROOT/vars.txt \
+            -e output_vars_path="$APPLIANCES_ENVIRONMENT_ROOT/vars.txt" \
             -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
-          source $APPLIANCES_ENVIRONMENT_ROOT/vars.txt
+          source "$APPLIANCES_ENVIRONMENT_ROOT/vars.txt"
 
           # setup ssh proxying:
           sudo apt-get --yes install proxychains
           echo proxychains installed
-          ssh -v -fN -D 9050 ${bastion_user}@${bastion_ip}
+          ssh -v -fN -D 9050 "${bastion_user}@${bastion_ip}"
           echo port 9050 forwarded
 
           # check OOD server returns 200:
@@ -224,26 +252,26 @@ jobs:
             --server-response \
             --no-check-certificate \
             --http-user=demo_user \
-            --http-password=${DEMO_USER_PASSWORD} https://${openondemand_servername} \
+            --http-password="${DEMO_USER_PASSWORD}" "https://${openondemand_servername}" \
             2>&1)
-          (echo $statuscode | grep "200 OK") || (echo $statuscode  && exit 1)
+          (echo "$statuscode" | grep "200 OK") || (echo "$statuscode"  && exit 1)
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Delete possible volume snapshot from slurm upgrade
         run: |
           . venv/bin/activate
-          . environments/.stackhpc/activate  
+          . environments/.stackhpc/activate
           if [ -n "$SNAPSHOT" ]
           then
-              echo Deleting $SNAPSHOT
-              openstack volume snapshot delete $SNAPSHOT
+              echo "Deleting $SNAPSHOT"
+              openstack volume snapshot delete "$SNAPSHOT"
           fi
 
       - name: Delete infrastructure
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          cd $STACKHPC_TF_DIR
+          cd "$STACKHPC_TF_DIR"
           tofu destroy -auto-approve -var-file="${{ env.CI_CLOUD }}.tfvars" || echo "tofu failed in $STACKHPC_TF_DIR"
         if: ${{ success() || cancelled() }}

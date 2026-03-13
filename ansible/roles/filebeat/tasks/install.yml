@@ -1,8 +1,9 @@
 ---
 - name: Create systemd unit file
-  template:
+  ansible.builtin.template:
     dest: /etc/systemd/system/filebeat.service
     src: filebeat.service.j2
+    mode: "0644"
   become: true
   register: _filebeat_unit
 
@@ -10,9 +11,10 @@
   containers.podman.podman_image:
     name: "docker.elastic.co/beats/filebeat-oss"
     tag: "{{ filebeat_version }}"
+  become: true
   become_user: "{{ filebeat_podman_user }}"
 
-- name: Reload filebeat unit file
-  command: systemctl daemon-reload
-  when: _filebeat_unit.changed
+- name: Reload filebeat unit file # noqa: no-changed-when
+  ansible.builtin.command: systemctl daemon-reload # noqa: command-instead-of-module
+  when: _filebeat_unit.changed # noqa: no-handler
   become: true

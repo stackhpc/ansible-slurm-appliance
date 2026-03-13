@@ -1,3 +1,6 @@
+---
+
+# yamllint disable-line rule:line-length
 test_demo_user_password: "{{ lookup('env', 'DEMO_USER_PASSWORD') | default(vault_demo_user_password, true) }}" # CI uses env, debug can set vault_demo_user_password
 
 basic_users_users:

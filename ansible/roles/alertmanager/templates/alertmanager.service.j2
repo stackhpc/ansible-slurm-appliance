@@ -38,7 +38,9 @@ LockPersonality=true
 NoNewPrivileges=true
 MemoryDenyWriteExecute=true
 PrivateTmp=true
+{% if alertmanager_systemd_protect_home | bool %}
 ProtectHome=true
+{% endif %}
 ReadWriteDirectories={{ alertmanager_storage_path }}
 RemoveIPC=true
 RestrictSUIDSGID=true
@@ -47,7 +49,9 @@ PrivateUsers=true
 ProtectControlGroups=true
 ProtectKernelModules=true
 ProtectKernelTunables=yes
+{% if alertmanager_systemd_protect_system | bool %}
 ProtectSystem=strict
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

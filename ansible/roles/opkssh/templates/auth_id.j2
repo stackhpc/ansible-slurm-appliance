@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+{% for item in opkssh_auth_id %}
+{{ item.name }} {{ item.opkssh_claim_selector }} {{ opkssh_providers[item.opkssh_provider | default(opkssh_default_provider)].issuer_uri }}
+{% endfor %}

@@ -1,10 +1,9 @@
-- hosts: localhost
+---
+- hosts: pulp_server
   tasks:
     - ansible.builtin.include_role:
         name: pulp_site
         tasks_from: sync.yml
       vars:
-        pulp_site_target_arch: "x86_64"
-        pulp_site_target_distribution: "rocky"
-        pulp_site_target_distribution_version: "9.5"
-        pulp_site_target_distribution_version_major: "9"
+        # default distribution to *latest* specified for baseos repo:
+        pulp_site_target_distribution_version: "{{ dnf_repos_repos['baseos'].keys() | map('float') | sort | last }}"

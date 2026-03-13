@@ -1,12 +1,12 @@
+---
 - hosts: login:!builder
-  become: no
-  gather_facts: no
+  become: false
+  gather_facts: false
   tasks:
-    - import_tasks: get_image_ids.yml
-    
-    - name: Delete images
-      shell:
+    - ansible.builtin.import_tasks: get_image_ids.yml
+    - name: Delete images # noqa: no-changed-when
+      ansible.builtin.shell:
         cmd: |
           openstack image delete {{ item.artifact_id }}
       delegate_to: localhost
-      loop: "{{ manifest['builds'] }}"
+      loop: "{{ manifest['builds'] }}" # noqa: no-changed-when
