@@ -56,8 +56,17 @@
 - name: Generate Let's Encrypt certificate
   # Needs apache running
   ansible.builtin.command:
-    cmd: "certbot --apache --no-eff-email --email {{ openondemand_certbot_email }}"
-  changed_when: true
+    cmd: >
+      certbot
+        --non-interactive --agree-tos --verbose
+        --apache --no-eff-email
+        --domains {{ openondemand_servername }}
+        {% if openondemand_certbot_staging | bool %}
+        --staging
+        {% endif %}
+        --email {{ openondemand_certbot_email }}"
+  register: _openondemand_certbot
+  changed_when: "'Certificate not yet due for renewal' not in _openondemand_certbot.stdout"
   when:
     - openondemand_certbot | bool
     - appliances_mode != 'build'
