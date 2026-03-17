@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=invalid-name
 
 """
 Delete infrastructure for a cluster without using Terraform. Useful for CI clusters.
@@ -18,16 +17,16 @@ import sys
 CLUSTER_RESOURCES = ["server", "port", "volume"]
 
 
-# pylint: disable-next=missing-function-docstring, redefined-outer-name
 def delete_cluster(cluster_prefix, force=False):
 
     to_delete = {}
     for resource_type in CLUSTER_RESOURCES:
         to_delete[resource_type] = []
-        resource_list = subprocess.run(  # pylint: disable=subprocess-run-check
+        resource_list = subprocess.run(
             f"openstack {resource_type} list --format json",
             stdout=subprocess.PIPE,
             shell=True,
+            check=True,
         )
         resources = json.loads(resource_list.stdout)
         for item in resources:
@@ -44,10 +43,11 @@ def delete_cluster(cluster_prefix, force=False):
             items = [v["ID"] for v in to_delete[resource_type]]
             if items:
                 # delete all resources of each type in a single call for speed:
-                subprocess.run(  # pylint: disable=subprocess-run-check
+                subprocess.run(
                     f"openstack {resource_type} delete {' '.join(items)}",
                     stdout=subprocess.PIPE,
                     shell=True,
+                    check=True,
                 )
                 print(f"Deleted {len(items)} {resource_type}s")
     else:
@@ -57,7 +57,7 @@ def delete_cluster(cluster_prefix, force=False):
 if __name__ == "__main__":
     if len(sys.argv) < 2 or len(sys.argv) > 3:
         print("ERROR: Incorrect argument(s).\n" + __doc__)
-        exit(1)  # pylint: disable=consider-using-sys-exit
+        exit(1)
     force_flag = "--force" in sys.argv
     cluster_prefix = sys.argv[1]
     delete_cluster(cluster_prefix, force_flag)
