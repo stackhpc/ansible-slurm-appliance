@@ -4,34 +4,33 @@ line-length = 120
 cache-dir = "/tmp/.ruff_cache"
 
 # as for azimuth-cloud python repos, e.g. azimuth-caas-operator
+# + pylint rules
 [lint]
-# FIXME: temporary disabling azimuth config, only selecting ruff default
-select = ["E4", "E7", "E9", "F"]
-# select = [
-#     # pycodestyle
-#     "E",
-#     # Pyflakes
-#     "F",
-#     # flake8-builtins
-#     "A",
-#     # Ruff rules
-#     "RUF",
-#     # flake8-async
-#     "ASYNC",
-#     # pyupgrade
-#     "UP",
-#     # tidy imports
-#     "TID",
-#     # sorted imports
-#     "I",
-#     # check complexity
-#     "C90",
-#     # TODO: fix pep8 naming
-#     # "N",
-#     # pylint rules
-#     "PLE",
-#     "PLW",
-# ]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # flake8-builtins
+    "A",
+    # Ruff rules
+    "RUF",
+    # flake8-async
+    "ASYNC",
+    # pyupgrade
+    "UP",
+    # tidy imports
+    "TID",
+    # sorted imports
+    "I",
+    # check complexity
+    "C90",
+    # TODO: fix pep8 naming
+    # "N",
+    # pylint rules
+    "PLE",
+    "PLW",
+]
 ignore = [
     "UP017", # remove and fix once CI not running 3.10 tests
 ]
