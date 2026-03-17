@@ -1,8 +1,7 @@
 ---
 
 # Test deployment and reimage on OpenStack.
-# This workflow can run standalone or as part of the main CI workflow.
-# See the workflow file 'main.yml' for how this is CI triggered.
+# Either run manually, or triggered by the launch-stackhpc workflow after linting.
 
 name: Test deployment and reimage on OpenStack
 'on':
