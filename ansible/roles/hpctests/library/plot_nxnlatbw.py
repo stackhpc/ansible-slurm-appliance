@@ -68,9 +68,7 @@ HTML_TEMPLATE = """
 """
 
 
-def html_rows(
-    rankAs, rankBs, nodes, data
-):
+def html_rows(rankAs, rankBs, nodes, data):
     """Create an HTML-format fragment defining table rows.
 
     Args:
@@ -87,13 +85,9 @@ def html_rows(
     rows = []
     for rankA in rankAs:  # row
         if nodes:
-            outrow = [
-                f"<tr><td>{nodes[rankA]} [{rankA}]</td>"
-            ]
+            outrow = [f"<tr><td>{nodes[rankA]} [{rankA}]</td>"]
         else:
-            outrow = [
-                f"<tr><td>{rankA}</td>"
-            ]
+            outrow = [f"<tr><td>{rankA}</td>"]
         for rankB in rankBs:
             val = data.get((rankA, rankB))
             if val is not None:
@@ -151,9 +145,7 @@ def run_module():
             if vals[0] == "src":
                 continue
             if len(vals) != 4:
-                print(
-                    f"warning: skipping line {ln} ({len(vals)} values)"
-                )
+                print(f"warning: skipping line {ln} ({len(vals)} values)")
                 continue
             try:
                 (
@@ -191,10 +183,7 @@ def run_module():
     max_bw = max(bandwidths.values())
 
     # create HTML fragments:
-    ranks = " ".join(
-        f"<td>{rankB}</td>"
-        for rankB in rankBs
-    )
+    ranks = " ".join(f"<td>{rankB}</td>" for rankB in rankBs)
 
     lat_rows = html_rows(rankAs, rankBs, nodes, latencies)
     bw_rows = html_rows(rankAs, rankBs, nodes, bandwidths)

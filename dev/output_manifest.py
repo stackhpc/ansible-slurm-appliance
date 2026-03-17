@@ -24,6 +24,4 @@ for build in data["builds"]:
         image_id  # NB: this deliberately gets the LAST build for a node type
     )
 for node_type, image_id in output.items():
-    print(
-        f"::set-output name=NEW_{node_type.upper()}_IMAGE_ID::{image_id}"
-    )
+    print(f"::set-output name=NEW_{node_type.upper()}_IMAGE_ID::{image_id}")

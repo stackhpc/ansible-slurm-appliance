@@ -81,7 +81,6 @@ def extract_log_info_and_generate_csv(
                 f"{int(row[2] // 3600):02}:{int((row[2] % 3600) // 60):02}:{row[2] % 60:.3f}"
             )
 
-
     with open(output_csv_path, "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["Task Name", "Task Path", "Time to Complete"])
