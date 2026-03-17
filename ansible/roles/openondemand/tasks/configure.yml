@@ -16,7 +16,7 @@
 - name: Get GRES information
   ansible.builtin.command:
     cmd: sinfo --noheader --format "%R %G" # can't use , or : as separator
-  changed_when: true
+  changed_when: false
   register: _openondemand_sinfo_gres
 
 - ansible.builtin.include_role:
@@ -119,7 +119,7 @@
   ansible.builtin.command:
     cmd: '$LMOD_DIR/spider -o spider-json "$MODULEPATH"'
   become: false
-  changed_when: true
+  changed_when: false
   register: _openondemand_spider
 
 - name: Create module listing
