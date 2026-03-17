@@ -59,7 +59,7 @@ def to_ood_regex(items):
 
 
 # pylint: disable=useless-object-inheritance
-class FilterModule(object):
+class FilterModule:
     """Ansible core jinja2 filters"""
 
     # pylint: disable=missing-function-docstring

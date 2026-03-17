@@ -1,6 +1,6 @@
 # pylint: disable=invalid-name, missing-module-docstring
 # pylint: disable-next=missing-class-docstring, useless-object-inheritance
-class FilterModule(object):
+class FilterModule:
 
     def filters(self):  # pylint: disable=missing-function-docstring
         return {
