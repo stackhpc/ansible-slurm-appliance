@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=invalid-name
 """opentofu external data program to load inventory string variables from
 a (possibly vault-encrypted) secrets file.
 
@@ -28,17 +27,17 @@ import json
 import subprocess
 import sys
 
-import yaml  # pylint: disable=import-error
+import yaml
 
-input = sys.stdin.read()  # pylint: disable=redefined-builtin
-secrets_path = json.loads(input)["path"]
+input_text = sys.stdin.read()
+secrets_path = json.loads(input_text)["path"]
 
-with open(secrets_path) as f:  # pylint: disable=unspecified-encoding
+with open(secrets_path) as f:
     header = f.readline()
     if header.startswith("$ANSIBLE_VAULT"):
         cmd = ["ansible-vault", "view", secrets_path]
-        # pylint: disable-next=subprocess-run-check
-        ansible = subprocess.run(cmd, capture_output=True, text=True)
+
+        ansible = subprocess.run(cmd, capture_output=True, text=True, check=True)
         contents = ansible.stdout
     else:
         contents = f.read()
