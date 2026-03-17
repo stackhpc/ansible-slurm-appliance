@@ -97,8 +97,11 @@ Alternatively, you can generate a certificate from Let's Encrypt automatically b
 - `openondemand_certbot_email`: Required when `openondemand_certbot` is true. Email address for registration and recovery contact. Can provide multiple comma-separated addresses.
 - `openondemand_certbot_staging:` Optional. Whether to use Let's Encrypt staging server to provide (invalid) test certs. For testing and development only.
 
-If using Let's Encrypt, leave `openondemand_ssl_cert` and `openondemand_ssl_cert_key` set to their default values.
-Certificates will be renewed automatically, see the systemd timer `certbot-renew.timer`.
+If using Let's Encrypt:
+- Leave `openondemand_ssl_cert` and `openondemand_ssl_cert_key` set to their default values.
+- `openondemand_servername` must be a valid DNS name, not an IP.
+- Port 80 on the `openondemand` host to be externally accessible.
+- Certificates will be renewed automatically by the systemd timer `certbot-renew.timer`.
 
 ### Dashboard and application configuration
 
