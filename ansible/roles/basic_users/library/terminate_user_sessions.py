@@ -3,11 +3,8 @@
 
 # Copyright: (c) 2021, Steve Brasier <steveb@stackhpc.com>
 # Apache V2 licence
-from __future__ import absolute_import, division, print_function
 
 from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
-
-__metaclass__ = type  # pylint: disable=invalid-name
 
 DOCUMENTATION = r"""
 ---
