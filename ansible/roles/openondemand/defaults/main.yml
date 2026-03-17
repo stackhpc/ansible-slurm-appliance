@@ -11,7 +11,10 @@ openondemand_oidc_crypto_passphrase:
 openondemand_oidc_remote_user_claim: preferred_username
 openondemand_oidc_scope: openid profile preferred_username
 
-# SSL Certificates
+# SSL Configuration:
+openondemand_certbot: false
+openondemand_certbot_staging: false
+openondemand_certbot_email: ''
 openondemand_ssl_cert: /etc/pki/tls/certs/localhost.crt
 openondemand_ssl_cert_key: /etc/pki/tls/private/localhost.key
 

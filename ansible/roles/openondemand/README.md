@@ -91,6 +91,19 @@ This role enables SSL on the Open Ondemand server, using the following self-sign
 - `openondemand_ssl_cert`: Optional. Default `/etc/pki/tls/certs/localhost.crt`.
 - `openondemand_ssl_cert_key`: Optional. Default `/etc/pki/tls/private/localhost.key`
 
+Alternatively, you can generate a certificate from Let's Encrypt automatically by configuring the following variables:
+
+- `openondemand_certbot`: Optional. Default is false. Set to true to request a certificate from Let's Encrypt.
+- `openondemand_certbot_email`: Required when `openondemand_certbot` is true. Email address for registration and recovery contact. Can provide multiple comma-separated addresses.
+- `openondemand_certbot_staging:` Optional. Whether to use Let's Encrypt staging server to provide (invalid) test certs. For testing and development only.
+
+If using Let's Encrypt:
+
+- Leave `openondemand_ssl_cert` and `openondemand_ssl_cert_key` set to their default values.
+- `openondemand_servername` must be a valid DNS name, not an IP.
+- Port 80 on the `openondemand` host to be externally accessible.
+- Certificates will be renewed automatically by the systemd timer `certbot-renew.timer`.
+
 ### Dashboard and application configuration
 
 - `openondemand_dashboard_docs_url`: Optional. URL of docs to show under Help in dashboard. Default `(undefined)`.
