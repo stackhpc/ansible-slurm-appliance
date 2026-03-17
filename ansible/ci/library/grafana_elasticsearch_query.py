@@ -2,14 +2,11 @@
 # pylint: disable=missing-module-docstring
 
 # Copyright: (c) 2022 Steve Brasier steve@stackhpc.com
-from __future__ import absolute_import, division, print_function
 
 import json
 
 import requests  # pylint: disable=import-error
 from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
-
-__metaclass__ = type  # pylint: disable=invalid-name
 
 DOCUMENTATION = r"""
 ---
