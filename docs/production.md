@@ -293,6 +293,24 @@ if your cluster does not include any baremetal nodes. This can be enabled by:
 Consider whether mapping of baremetal nodes to ironic nodes is required. See
 [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
 
+Consider whether any Open Ondemand server (by default, the first login node)
+will use Let's Encrypt for certificates. If so the OpenTofu variable
+`login_security_groups` must be modified to include a pre-existing security
+group allowing inbound access to port 80, e.g.:
+
+```hcl
+# environments/site/tofu/variables.tf:
+variable "login_security_groups" {
+  ...
+  default = [
+    "default", # allow all in-cluster services
+    "SSH",     # access via ssh
+    "HTTP",    # HTTP-01 challenge for Let's Encrypt
+    "HTTPS",   # access OpenOndemand
+  ]
+}
+```
+
 To deploy this infrastructure, ensure the venv and the environment are
 [activated](#cookiecutter-instructions) and run:
 
