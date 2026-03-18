@@ -21,7 +21,7 @@ if [ "${VALIDATE_ANSIBLE_LINT:-true}" = true ]; then
 		ansible_lint_failed=true
 	fi
 fi
-SUPERLINTER=$(grep -o '\S\+super-linter@\S\+' .github/workflows/lint.yml | tr '@' ':') # e.g. super-linter/super-linter@v8.3.2
+SUPERLINTER=$(grep -o '\S\+super-linter@\S\+' .github/workflows/lint.yml | tr '@' ':') # e.g. super-linter/super-linter:v8.3.2
 export APPLIANCES_REPO_ROOT="${APPLIANCES_REPO_ROOT:-$(pwd)}" # allows running from uninitialized environment
 
 echo "Using ${SUPERLINTER}"
