@@ -1,0 +1,41 @@
+#!/bin/bash
+# A simple script to run ansible-lint and super-linter with some fixes enabled.
+
+# Usage: [VALIDATE_GITLEAKS=false] [VALIDATE_ANSIBLE_LINT=false] ./dev/run-linters [-f|--fast] [FILE_OR_DIR_TO_CHECK...]
+
+
+# Disabled linters: checkov stays stuck for some reason!
+# VALIDATE_GITLEAKS=false is controversial because that's the best time to catch errors
+
+if [ "$1" = "-f" ] || [ "$1" = "--false" ]; then
+	echo "Disabling slow linters: ansible-lint and gitleaks"
+	VALIDATE_ANSIBLE_LINT=false
+	export VALIDATE_GITLEAKS=false
+	shift
+fi
+if [ "${VALIDATE_ANSIBLE_LINT:-true}" = true ]; then
+	echo "Running ansible-lint $*..."
+	ansible_lint_failed=false
+	if ! ansible-lint "$@"; then
+		echo "ansible-lint found errors"
+		ansible_lint_failed=true
+	fi
+fi
+SUPERLINTER=$(grep -o '\S\+super-linter@\S\+' .github/workflows/lint.yml | tr '@' ':') # e.g. super-linter/super-linter:v8.3.2
+export APPLIANCES_REPO_ROOT="${APPLIANCES_REPO_ROOT:-$(pwd)}" # allows running from uninitialized environment
+
+echo "Using ${SUPERLINTER}"
+podman run --rm \
+    --env FILTER_REGEX_INCLUDE="$*" \
+	--env FIX_PYTHON_BLACK=true --env FIX_MARKDOWN_PRETTIER=true \
+	--env FIX_NATURAL_LANGUAGE=true --env FIX_TERRAFORM_FMT=true\
+	--env VALIDATE_CHECKOV=false --env VALIDATE_GITLEAKS \
+	--env RUN_LOCAL=true --env DEFAULT_WORKSPACE=/github/workspace \
+	--env-file "${APPLIANCES_REPO_ROOT}/super-linter.env" \
+	-v "$(pwd)":/github/workspace --security-opt label=disable \
+	ghcr.io/super-linter/super-linter:v8.3.2
+superlinter_exit=$?
+
+if $ansible_lint_failed || [ "$superlinter_exit" != 0 ]; then
+	exit 1
+fi
