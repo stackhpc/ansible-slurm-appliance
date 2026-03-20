@@ -3,6 +3,6 @@ networks = ["e2b9e59f-43da-4e1c-b558-dc9da4c0d738"] # stackhpc-ipv4-geneve
 ssh_keypair_name = "slurm-app-ci"
 ssh_private_key_file = "~/.ssh/id_rsa"
 # see environments/.stackhpc/inventory/group_vars/all/bastion.yml:
-ssh_bastion_username = "slurm-app-ci"
+ssh_bastion_username = "slurm-app-ci-v3"
 ssh_bastion_host = "149.126.81.67"
 ssh_bastion_private_key_file = "~/.ssh/id_rsa"
