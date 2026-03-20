@@ -40,6 +40,22 @@
           delegate_to: localhost
       when: appliances_mode != 'configure'
 
+- hosts: builder
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Ensure psi=1 on boot
+      ansible.builtin.i nclude_role:
+        name: stackhpc.linux.grubcmdline
+      vars:
+        kernel_cmdline: "{{ grubcmdline_kernel_cmdline }}"
+        kernel_cmdline_remove: "{{ grubcmdline_kernel_cmdline_remove }}"
+  handlers:
+    - name: reboot
+      ansible.builtin.debug:
+        msg: no need to reboot when building
+
+
 - import_playbook: bootstrap.yml
 
 - hosts: doca
