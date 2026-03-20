@@ -71,7 +71,7 @@ module "cluster" {
   cluster_name        = var.cluster_name
   cluster_networks    = var.cluster_networks
   vnic_types          = var.vnic_types
-  key_pair            = "slurm-app-ci"
+  key_pair            = "slurm-app-ci-v2"
   cluster_image_id    = data.openstack_images_image_v2.cluster.id
   control_node_flavor = var.control_node_flavor
 
