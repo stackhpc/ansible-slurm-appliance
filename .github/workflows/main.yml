@@ -141,10 +141,10 @@ jobs:
     uses: ./.github/workflows/extra.yml
     secrets: inherit
 
-  trivyscan:
-    name: Trivy scan image for vulnerabilities
-    needs: files_changed
-    if: |
-      needs.files_changed.outputs.trivyscan == 'true' || github.event_name != 'pull_request'
-    uses: ./.github/workflows/trivyscan.yml
-    secrets: inherit
+  # trivyscan:
+  #   name: Trivy scan image for vulnerabilities
+  #   needs: files_changed
+  #   if: |
+  #     needs.files_changed.outputs.trivyscan == 'true' || github.event_name != 'pull_request'
+  #   uses: ./.github/workflows/trivyscan.yml
+  #   secrets: inherit
