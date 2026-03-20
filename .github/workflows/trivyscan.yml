@@ -5,9 +5,10 @@
 # See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Trivy scan image for vulnerabilities
-'on':
-  workflow_call:
-  workflow_dispatch:
+'on': {}
+# disabling until we can verify its safe
+#   workflow_call:
+#   workflow_dispatch:
 
 permissions:
   contents: read
