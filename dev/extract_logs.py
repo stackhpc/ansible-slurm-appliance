@@ -16,29 +16,26 @@ import re
 import sys
 
 
-def convert_time_to_seconds(time_str):  # pylint: disable=missing-function-docstring
+def convert_time_to_seconds(time_str):
     h, m, s = time_str.split(":")
     return int(h) * 3600 + int(m) * 60 + float(s)
 
 
-# pylint: disable-next=missing-function-docstring, too-many-locals
 def extract_log_info_and_generate_csv(
-    # pylint: disable=redefined-outer-name
     log_file_path,
     output_csv_path,
     target_directory,
-    # pylint: enable=redefined-outer-name
 ):
     data = []
 
     unwanted_chars = re.compile(r"(\x1B\[[0-9;]*m)|([^\x00-\x7F])")
 
-    with open(log_file_path, "r") as file:  # pylint: disable=unspecified-encoding
+    with open(log_file_path) as file:
         lines = file.readlines()
 
         previous_task = None
 
-        for i in range(len(lines)):  # pylint: disable=consider-using-enumerate
+        for i in range(len(lines)):
             if "TASK [" in lines[i]:
                 task_name = lines[i].strip().split("TASK [")[1].split("]")[0]
 
@@ -56,7 +53,7 @@ def extract_log_info_and_generate_csv(
                 time_to_complete = lines[i + 2].strip().split("(")[1].split(")")[0]
 
                 if previous_task:
-                    # pylint: disable-next=unsupported-assignment-operation
+
                     previous_task[2] = (
                         time_to_complete  # Shift the time to the previous task
                     )
@@ -84,7 +81,6 @@ def extract_log_info_and_generate_csv(
                 f"{int(row[2] // 3600):02}:{int((row[2] % 3600) // 60):02}:{row[2] % 60:.3f}"
             )
 
-    # pylint: disable-next=unspecified-encoding
     with open(output_csv_path, "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["Task Name", "Task Path", "Time to Complete"])
@@ -100,7 +96,6 @@ if len(sys.argv) != 2:
     sys.exit(1)
 log_file_path = sys.argv[1]  # Input workflow log name
 output_csv_path = log_file_path.replace(".txt", ".csv")  # Output CSV name
-# pylint: disable-next=invalid-name
 target_directory = "/ansible/"  # Shared directory for task path
 
 extract_log_info_and_generate_csv(log_file_path, output_csv_path, target_directory)

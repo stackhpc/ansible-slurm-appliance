@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# pylint: disable=missing-module-docstring
-# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2020, StackHPC
 # Apache 2 License
 
 import os
 
-from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
+from ansible.module_utils.basic import AnsibleModule
 
 ANSIBLE_METADATA = {
     "metadata_version": "0.1",
@@ -70,9 +68,7 @@ HTML_TEMPLATE = """
 """
 
 
-def html_rows(
-    rankAs, rankBs, nodes, data
-):  # pylint: disable=invalid-name # pylint: disable=invalid-name
+def html_rows(rankAs, rankBs, nodes, data):
     """Create an HTML-format fragment defining table rows.
 
     Args:
@@ -87,20 +83,12 @@ def html_rows(
     maxv = max(data.values())
 
     rows = []
-    for rankA in rankAs:  # row # pylint: disable=invalid-name
+    for rankA in rankAs:  # row
         if nodes:
-            outrow = [
-                # pylint: disable-next=consider-using-f-string
-                "<tr><td>%s [%s]</td>"
-                % (nodes[rankA], rankA)
-            ]
+            outrow = [f"<tr><td>{nodes[rankA]} [{rankA}]</td>"]
         else:
-            outrow = [
-                # pylint: disable-next=consider-using-f-string
-                "<tr><td>%s</td>"
-                % rankA
-            ]
-        for rankB in rankBs:  # pylint: disable=invalid-name
+            outrow = [f"<tr><td>{rankA}</td>"]
+        for rankB in rankBs:
             val = data.get((rankA, rankB))
             if val is not None:
                 try:
@@ -110,9 +98,7 @@ def html_rows(
                 except ZeroDivisionError:  # no min-max spread
                     lightness = 100
                 outrow += [
-                    # pylint: disable-next=consider-using-f-string
-                    '<td style="background-color:hsl(0, 100%%, %i%%);">%.1f</td>'
-                    % (lightness, val)
+                    f'<td style="background-color:hsl(0, 100%, {lightness}%);">{val:.1f}</td>'
                 ]
             else:
                 outrow += ["<td>-</td>"]
@@ -121,7 +107,7 @@ def html_rows(
     return "\n".join(rows)
 
 
-def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
+def run_module():
     module_args = {
         "src": {
             "type": "str",
@@ -153,19 +139,14 @@ def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
     # read latencies/bandwidths:
     latencies = {}
     bandwidths = {}
-    with open(src) as nxn_f:  # pylint: disable=unspecified-encoding
+    with open(src) as nxn_f:
         for ln, line in enumerate(nxn_f):
             vals = line.split(",")
             if vals[0] == "src":
                 continue
             if len(vals) != 4:
-                print(
-                    # pylint: disable-next=consider-using-f-string
-                    "warning: skipping line %i (%i values)"
-                    % (ln, len(vals))
-                )
+                print(f"warning: skipping line {ln} ({len(vals)} values)")
                 continue
-            # pylint: disable=invalid-name
             try:
                 (
                     rankA,
@@ -183,17 +164,15 @@ def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
                 continue
             latencies[rankA, rankB] = lat
             bandwidths[rankA, rankB] = bw
-            # pylint: enable=invalid-name
 
     # get list of node IDs:
-    rankAs = sorted(set(k[0] for k in latencies))  # pylint: disable=invalid-name
-    rankBs = sorted(set(k[1] for k in latencies))  # pylint: disable=invalid-name
+    rankAs = sorted(set(k[0] for k in latencies))
+    rankBs = sorted(set(k[1] for k in latencies))
     if rankAs != rankBs:
         module.fail_json("Ranks extracted from result columns differed", **result)
     if nodes and len(nodes) != len(rankAs):
         module.fail_json(
-            "Results contained %i ranks but %i node names provided"  # pylint: disable=consider-using-f-string
-            % (len(rankAs), len(nodes)),
+            f"Results contained {len(rankAs)} ranks but {len(nodes)} node names provided",
             **result,
         )
 
@@ -204,11 +183,7 @@ def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
     max_bw = max(bandwidths.values())
 
     # create HTML fragments:
-    ranks = " ".join(
-        # pylint: disable-next=consider-using-f-string
-        "<td>%s</td>" % rankB
-        for rankB in rankBs
-    )
+    ranks = " ".join(f"<td>{rankB}</td>" for rankB in rankBs)
 
     lat_rows = html_rows(rankAs, rankBs, nodes, latencies)
     bw_rows = html_rows(rankAs, rankBs, nodes, bandwidths)
@@ -223,7 +198,7 @@ def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
         bw_rows=bw_rows,
     )
 
-    with open(dest, "w") as outf:  # pylint: disable=unspecified-encoding
+    with open(dest, "w") as outf:
         outf.write(page)
 
     result["changed"] = True
@@ -239,7 +214,7 @@ def run_module():  # pylint: disable=missing-function-docstring, too-many-locals
     module.exit_json(**result)
 
 
-def main():  # pylint: disable=missing-function-docstring
+def main():
     run_module()
 
 
