@@ -58,11 +58,13 @@ jobs:
       ci_cloud: ${{ steps.ci.outputs.CI_CLOUD }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Record which cloud CI is running on
         id: ci
         run: |
-          echo "CI_CLOUD=${{ env.CI_CLOUD }}" >> "$GITHUB_OUTPUT"
+          echo "CI_CLOUD=${CI_CLOUD}" >> "$GITHUB_OUTPUT"
 
       - name: Setup environment
         run: |
@@ -100,20 +102,20 @@ jobs:
           df -h
           sudo mkdir ${{ env.RUNNER_IMAGE_DIR }}
           sudo chmod ugo=rwX ${{ env.RUNNER_IMAGE_DIR }}
-          openstack image save --file "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}.raw" "${{ env.TARGET_IMAGE }}"
+          openstack image save --file "${{ env.RUNNER_IMAGE_DIR }}/${TARGET_IMAGE}.raw" "${TARGET_IMAGE}"
           df -h
         shell: bash
 
       - name: Convert image to QCOW2
         run: |
           . venv/bin/activate
-          qemu-img convert -f raw -O qcow2 -c "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}.raw" "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}"
+          qemu-img convert -f raw -O qcow2 -c "${{ env.RUNNER_IMAGE_DIR }}/${TARGET_IMAGE}.raw" "${{ env.RUNNER_IMAGE_DIR }}/${TARGET_IMAGE}"
         shell: bash
 
       - name: Upload Image to S3
         run: |
-          echo "Uploading Image: ${{ env.TARGET_IMAGE }} to S3..."
-          s3cmd --multipart-chunk-size-mb=150 put "${{ env.RUNNER_IMAGE_DIR }}/${{ env.TARGET_IMAGE }}" s3://${{ env.S3_BUCKET }}
+          echo "Uploading Image: ${TARGET_IMAGE} to S3..."
+          s3cmd --multipart-chunk-size-mb=150 put "${{ env.RUNNER_IMAGE_DIR }}/${TARGET_IMAGE}" s3://${{ env.S3_BUCKET }}
         shell: bash
 
   image_sync:
@@ -141,7 +143,7 @@ jobs:
 
       - name: Record which cloud CI is running on
         run: |
-          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo CI_CLOUD: ${CI_CLOUD}
 
       - name: Setup environment
         run: |
@@ -165,18 +167,18 @@ jobs:
       - name: Download latest image if missing
         run: |
           . venv/bin/activate
-          bash .github/bin/get-s3-image.sh ${{ env.TARGET_IMAGE }} ${{ env.S3_BUCKET }}
+          bash .github/bin/get-s3-image.sh ${TARGET_IMAGE} ${{ env.S3_BUCKET }}
 
       - name: Set Glance image properties correctly for Slurm images
         run: |
           . venv/bin/activate
-          . dev/image-set-properties.sh "${{ env.TARGET_IMAGE }}"
+          . dev/image-set-properties.sh "${TARGET_IMAGE}"
 
       - name: Cleanup OpenStack Image (on error or cancellation)
         if: cancelled() || failure()
         run: |
           . venv/bin/activate
-          image_hanging=$(openstack image list --name ${{ env.TARGET_IMAGE }} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
+          image_hanging=$(openstack image list --name ${TARGET_IMAGE} -f value -c ID -c Status | grep -v ' active$' | awk '{print $1}')
           if [ -n "$image_hanging" ]; then
             echo "Cleaning up OpenStack image with ID: $image_hanging"
             openstack image delete "$image_hanging"

@@ -33,15 +33,17 @@ jobs:
       CLUSTER_NAME: ${{ github.event.inputs.cluster_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Input Variables
         run: |
-          echo CI_CLOUD: ${{ env.CI_CLOUD }}
-          echo CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
+          echo CI_CLOUD: ${CI_CLOUD}
+          echo CLUSTER_NAME: ${CLUSTER_NAME}
 
       - name: Check Cluster Name not empty
         run: |
-          if [ -z ${{ env.CLUSTER_NAME }} ]; then
+          if [ -z ${CLUSTER_NAME} ]; then
             echo "Cluster name is empty"
             exit 1
           else
@@ -65,6 +67,6 @@ jobs:
       - name: Delete CI cluster
         run: |
           . venv/bin/activate
-          ./dev/delete-cluster.py slurmci-RL8-${{ env.CLUSTER_NAME }} --force
-          ./dev/delete-cluster.py slurmci-RL9-${{ env.CLUSTER_NAME }} --force
+          ./dev/delete-cluster.py slurmci-RL8-${CLUSTER_NAME} --force
+          ./dev/delete-cluster.py slurmci-RL9-${CLUSTER_NAME} --force
         shell: bash

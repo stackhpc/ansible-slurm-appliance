@@ -30,7 +30,7 @@ jobs:
 
       - name: Record which cloud CI is running on
         run: |
-          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo CI_CLOUD: ${CI_CLOUD}
 
       - name: Setup environment
         run: |

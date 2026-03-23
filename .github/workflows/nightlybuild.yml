@@ -49,7 +49,7 @@ jobs:
 
       - name: Record settings for CI cloud
         run: |
-          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo CI_CLOUD: ${CI_CLOUD}
 
       - name: Setup ssh
         run: |
@@ -87,13 +87,15 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error="${{ vars.PACKER_ON_ERROR }}" \
-          -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
+          -on-error="${VARS_PACKER_ON_ERROR}" \
+          -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
           -var "source_image_name=${{ matrix.build.source_image_name }}" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "image_name_version=" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           openstack.pkr.hcl
+        env:
+          VARS_PACKER_ON_ERROR: ${{ vars.PACKER_ON_ERROR }}
 
       - name: Get created image names from manifest
         id: manifest
@@ -110,19 +112,23 @@ jobs:
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}"
+          openstack image unset --property signature_verified "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
 
       - name: Delete old latest image
         run: |
           . venv/bin/activate
-          IMAGE_COUNT=$(openstack image list --name ${{ steps.manifest.outputs.image-name }} -f value -c ID | wc -l)
+          IMAGE_COUNT=$(openstack image list --name ${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME} -f value -c ID | wc -l)
           if [ "$IMAGE_COUNT" -gt 1 ]; then
-            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${{ steps.manifest.outputs.image-name }}"  -f value -c ID | head -n 1)
+            OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}"  -f value -c ID | head -n 1)
             echo "Deleting old image ID: $OLD_IMAGE_ID"
             openstack image delete "$OLD_IMAGE_ID"
           else
             echo "Only one image exists, skipping deletion."
           fi
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}
 
   upload:
     name: upload-nightly-targets
@@ -152,8 +158,8 @@ jobs:
 
       - name: Record settings for CI cloud
         run: |
-          echo SOURCE_CLOUD: ${{ env.SOURCE_CLOUD }}
-          echo TARGET_CLOUD: ${{ env.TARGET_CLOUD }}
+          echo SOURCE_CLOUD: ${SOURCE_CLOUD}
+          echo TARGET_CLOUD: ${TARGET_CLOUD}
 
       - name: Install openstackclient
         run: |

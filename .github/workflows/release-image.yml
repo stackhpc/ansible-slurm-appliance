@@ -41,4 +41,4 @@ jobs:
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
 
       - name: Copy image from pre-release to release bucket
-        run: s3cmd cp s3://openhpc-images-prerelease/${{ env.TARGET_IMAGE }} s3://openhpc-images
+        run: s3cmd cp s3://openhpc-images-prerelease/${TARGET_IMAGE} s3://openhpc-images
