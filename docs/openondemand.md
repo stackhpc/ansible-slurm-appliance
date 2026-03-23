@@ -30,9 +30,9 @@ The above functionality is configured by running the `ansible/portal.yml` playbo
 
 ## MATLAB
 
-_NB_ Due to licensing, the MATLAB batch connect app requires a MATLAB intallation to be present on the relevant compute nodes. The MATLAB app is therefore disabled by default, and must be enabled by setting `openondemand_matlab_partition` in e.g. `environments/site/inventory/group_vars/all/openondemand.yml` to the name of the partition where MATLAB is available.
+_NB_ Due to licensing, the MATLAB batch connect app requires a MATLAB installation to be present on the relevant compute nodes. The MATLAB app is therefore disabled by default, and must be enabled by setting `openondemand_matlab_partition` in e.g. `environments/site/inventory/group_vars/all/openondemand.yml` to the name of the partition where MATLAB is available.
 
-An Lmod modulefile also needs to be available on compute nodes - this is not provided by the appliance. See e.g.`roles/openondemand/tasks/rstudio_compute.yml` for an example. The modulefile must be named `matlab/$MATLAB_VERSION`, where the version matches thes `openondemand_matlab_version` variable. This variable is set to empty in the role default so must be defined in `environments/site/inventory/group_vars/all/openondemand.yml`.
+An Lmod modulefile also needs to be available on compute nodes - this is not provided by the appliance. See e.g.`roles/openondemand/tasks/rstudio_compute.yml` for an example. The modulefile must be named `matlab/$MATLAB_VERSION`, where the version matches the `openondemand_matlab_version` variable. This variable is set to empty in the role default so must be defined in `environments/site/inventory/group_vars/all/openondemand.yml`.
 
 As MATLAB requires a remote desktop, the TurboVNC and Xfce Desktop packages and configuration from the "openondemand_desktop" app will be automatically applied to nodes where the MATLAB app is enabled.
 
@@ -69,7 +69,7 @@ By default, most ondemand apps are installed in image builds when the build incl
 defined by the `openondemand_<app>_partition` variables in `environments/common/inventory/group_vars/all/builder/defaults.yml`. Note that in this case the values are not strings and are instead
 simply truthy, i.e. they do not describe cluster partition groups but just whether those apps will be installed in the image or not.
 
-For e.g. site-specific image builds where different app installs are required, due to precedence rules these must overriden in a `builder`-groupvars file e.g. `environments/site/inventory/group_vars/all/builder/defaults.yml`.
+For e.g. site-specific image builds where different app installs are required, due to precedence rules these must overridden in a `builder`-groupvars file e.g. `environments/site/inventory/group_vars/all/builder/defaults.yml`.
 
 ## Access
 

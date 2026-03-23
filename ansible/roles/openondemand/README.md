@@ -36,7 +36,7 @@ See the Open Ondemand [Authentication docs](https://osc.github.io/ood-documentat
 
 #### OIDC authentication
 
-The following variables are active when `openondemand_auth` is `oidc`. This role uses the variables below plus a few required defaults to set the `osc.ood: ood_auth_openidc` [variable](https://github.com/OSC/ood-ansible#open-id-connect) - if the below is insufficent to correctly configure OIDC then set `ood_auth_openidc` directly.
+The following variables are active when `openondemand_auth` is `oidc`. This role uses the variables below plus a few required defaults to set the `osc.ood: ood_auth_openidc` [variable](https://github.com/OSC/ood-ansible#open-id-connect) - if the below is insufficient to correctly configure OIDC then set `ood_auth_openidc` directly.
 
 - `openondemand_oidc_client_id`: Required. Client ID, as specified by the OIDC provider
 - `openondemand_oidc_client_secret`: Required. Client secret, as specified the OIDC provider (should be vault-protected).
@@ -76,7 +76,7 @@ See [DEX documentation](https://dexidp.io/docs/connectors/) for full details of
 options for each connector, e.g. [an example LDAP configuration](https://dexidp.io/docs/connectors/ldap/#configuration).
 
 See comments above for OIDC regarding remote user mapping. For LDAP the default
-mapping is likely to be sufficent.
+mapping is likely to be sufficient.
 
 #### Basic/PAM authentication
 

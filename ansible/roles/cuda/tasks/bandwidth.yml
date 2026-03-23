@@ -7,7 +7,7 @@
     group: "{{ ansible_user }}"
     mode: "0755"
 
-- name: Download CUDA bandwith test release
+- name: Download CUDA bandwidth test release
   ansible.builtin.unarchive:
     remote_src: true
     src: "{{ cuda_bandwidth_release_url }}"

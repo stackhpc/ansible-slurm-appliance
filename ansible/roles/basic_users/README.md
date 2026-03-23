@@ -39,7 +39,7 @@ without requiring LDAP etc. Features:
     `basic_users_generate_ssh_key` (see below).
   - `ssh_key_comment`: Default is username.
   - `home`: Set automatically based on the username and
-    `basic_users_homedir_server_path`. Can be overriden for users with
+    `basic_users_homedir_server_path`. Can be overridden for users with
     non-standard home directory paths.
   - `uid`: Should be set, so that the UID/GID is consistent across the cluster
     (which Slurm requires).

@@ -62,7 +62,7 @@ openondemand_cluster:
           export XDG_RUNTIME_DIR="$TMPDIR/xdg_runtime"
 
           # Workaround to avoid "Unable to contact settings server" when
-          # lauching xfce4-session
+          # launching xfce4-session
           xfce4-session() { /bin/dbus-launch /bin/xfce4-session $@ ; }
           export -f xfce4-session
           %s

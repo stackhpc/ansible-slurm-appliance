@@ -132,7 +132,7 @@ usage_template: |-
 
   Note that home directories are deleted when the platform is destroyed.
 
-  If configured by the adminstrator, a project filesystem may be mounted at `/project`.
+  If configured by the administrator, a project filesystem may be mounted at `/project`.
   Content stored there will be available to all such configured workstations and Slurm
   clusters, and will persist after deletion of workstations/clusters.
 

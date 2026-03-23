@@ -1,6 +1,6 @@
 # EESSI
 
-Configure the EESSI pilot respository for use on given hosts.
+Configure the EESSI pilot repository for use on given hosts.
 
 ## Requirements
 

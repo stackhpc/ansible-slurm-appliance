@@ -7,7 +7,7 @@ This repository contains playbooks and configuration to define a Slurm-based HPC
 - [Rocky Linux](https://rockylinux.org/)-based hosts.
 - [OpenTofu](https://opentofu.org/) configurations to define the cluster's infrastructure-as-code.
 - Packages for Slurm and MPI software stacks from [OpenHPC](https://openhpc.community/).
-- Shared fileystem(s) using NFS (with in-cluster or external servers) or [CephFS](https://docs.ceph.com/en/latest/cephfs/) via [OpenStack Manila](https://wiki.openstack.org/wiki/Manila).
+- Shared filesystem(s) using NFS (with in-cluster or external servers) or [CephFS](https://docs.ceph.com/en/latest/cephfs/) via [OpenStack Manila](https://wiki.openstack.org/wiki/Manila).
 - Slurm accounting using a MySQL database.
 - Monitoring integrated with Slurm jobs using Prometheus, Elasticsearch and Grafana.
 - A web-based portal from [Open OnDemand](https://openondemand.org/).
