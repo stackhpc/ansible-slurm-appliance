@@ -31,6 +31,8 @@ jobs:
       contents: read
       # To write Super-linter status checks
       statuses: write
+      pull-requests: write
+      issues: write
     uses: ./.github/workflows/lint.yml
 
   files_changed:
