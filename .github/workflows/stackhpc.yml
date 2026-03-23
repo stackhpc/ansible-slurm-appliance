@@ -9,16 +9,14 @@ name: Test deployment and reimage on OpenStack
   workflow_call:
   workflow_dispatch:
 
-permissions:
-  contents: read
-  packages: write
-  # To report GitHub Actions status checks
-  statuses: write
+permissions: {}
 
 jobs:
   openstack:
     name: openstack-ci
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix:

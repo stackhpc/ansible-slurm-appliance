@@ -4,11 +4,7 @@ name: Lint
 'on':
   workflow_call:
 
-permissions:
-  contents: read
-  packages: read
-  # To report GitHub Actions status checks
-  statuses: write
+permissions: {}
 
 jobs:
   lint:
@@ -16,7 +12,6 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      packages: read
       # To report GitHub Actions status checks
       statuses: write
 

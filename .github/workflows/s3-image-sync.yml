@@ -11,11 +11,7 @@ env:
   IMAGE_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
   RUNNER_IMAGE_DIR: /mnt/images
 
-permissions:
-  contents: read
-  packages: write
-  # To report GitHub Actions status checks
-  statuses: write
+permissions: {}
 
 jobs:
   s3_cleanup:

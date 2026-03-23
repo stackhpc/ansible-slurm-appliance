@@ -4,11 +4,7 @@ name: Cleanup CI clusters
   schedule:
     - cron: '0 21 * * *'  # Run at 9PM - image sync runs at midnight
 
-permissions:
-  contents: read
-  packages: write
-  # To report GitHub Actions status checks
-  statuses: write
+permissions: {}
 
 jobs:
   ci_cleanup:

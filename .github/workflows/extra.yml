@@ -26,11 +26,7 @@ name: Test extra build
         required: true
         default: true
 
-permissions:
-  contents: read
-  packages: write
-  # To report GitHub Actions status checks
-  statuses: write
+permissions: {}
 
 jobs:
   doca:
