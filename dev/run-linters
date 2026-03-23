@@ -21,20 +21,20 @@ if [ "${VALIDATE_ANSIBLE_LINT:-true}" = true ]; then
 		ansible_lint_failed=true
 	fi
 fi
-SUPERLINTER=$(grep -o '\S\+super-linter@\S\+' .github/workflows/lint.yml | tr '@' ':') # e.g. super-linter/super-linter:v8.3.2
+SUPERLINTER=$(grep '\S\+super-linter/slim@\S\+ # v\S\+' .github/workflows/lint.yml | sed -E 's/.*#\s*//') # e.g. super-linter/super-linter:abcdkerf # v8.5.0  ===> v8.5.0
 export APPLIANCES_REPO_ROOT="${APPLIANCES_REPO_ROOT:-$(pwd)}" # allows running from uninitialized environment
 
-echo "Using ${SUPERLINTER}"
+echo "Using super-linter ${SUPERLINTER}"
 podman run --rm \
     --env FILTER_REGEX_INCLUDE="$*" \
 	--env FIX_PYTHON_BLACK=true --env FIX_MARKDOWN_PRETTIER=true \
 	--env FIX_NATURAL_LANGUAGE=true --env FIX_TERRAFORM_FMT=true\
-	--env FIX_GITHUB_ACTIONS_ZIZMOR=true \
+	--env FIX_SPELL_CODESPELL=true --env FIX_GITHUB_ACTIONS_ZIZMOR=true \
 	--env VALIDATE_CHECKOV=false --env VALIDATE_GITLEAKS \
 	--env RUN_LOCAL=true --env DEFAULT_WORKSPACE=/github/workspace \
 	--env-file "${APPLIANCES_REPO_ROOT}/super-linter.env" \
 	-v "$(pwd)":/github/workspace --security-opt label=disable \
-	ghcr.io/super-linter/super-linter:v8.3.2
+	"ghcr.io/super-linter/super-linter:slim-$SUPERLINTER"
 superlinter_exit=$?
 
 if $ansible_lint_failed || [ "$superlinter_exit" != 0 ]; then
