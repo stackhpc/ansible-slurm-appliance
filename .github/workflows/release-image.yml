@@ -26,6 +26,8 @@ jobs:
           - RL9
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Write s3cmd configuration
         run: echo "${{ secrets.LEAFCLOUD_S3_CFG }}" > ~/.s3cfg

@@ -25,6 +25,8 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Write s3cmd configuration
         run: |
@@ -140,6 +142,8 @@ jobs:
       CI_CLOUD: ${{ matrix.cloud }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Record which cloud CI is running on
         run: |

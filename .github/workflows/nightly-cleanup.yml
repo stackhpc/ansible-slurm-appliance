@@ -27,6 +27,8 @@ jobs:
       CI_CLOUD: ${{ matrix.cloud }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Record which cloud CI is running on
         run: |

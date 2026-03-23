@@ -46,6 +46,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Record settings for CI cloud
         run: |
@@ -155,6 +157,8 @@ jobs:
       TARGET_CLOUD: ${{ matrix.target_cloud }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Record settings for CI cloud
         run: |

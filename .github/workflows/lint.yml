@@ -27,6 +27,7 @@ jobs:
           # list of files that changed across commits
           fetch-depth: 0
           submodules: true
+          persist-credentials: false
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v25.4.0

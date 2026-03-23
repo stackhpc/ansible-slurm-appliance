@@ -51,6 +51,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
         # NOTE: We're detecting the changed files within a job so that we can gate execution of other jobs.
         #       We use dorny/paths-filter which doesn't work like the conventional 'paths' and 'paths_exclude',
