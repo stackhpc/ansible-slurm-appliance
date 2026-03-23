@@ -85,12 +85,12 @@ jobs:
 
       - name: Ensure Ansible bastion definitions are from **current** branch
         run: |
-          git fetch origin "$GITHUB_REF"
-          git checkout "origin/$GITHUB_REF" -- environments/.stackhpc/inventory/group_vars/all/bastion.yml
+          git fetch origin "$GITHUB_HEAD_REF_OR_NAME"
+          git checkout "origin/$GITHUB_HEAD_REF_OR_NAME" -- environments/.stackhpc/inventory/group_vars/all/bastion.yml
           cat environments/.stackhpc/inventory/group_vars/all/bastion.yml
         shell: bash
         env:
-          GITHUB_REF: ${{ github.head_ref || github.ref_name }}
+          GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
@@ -174,9 +174,9 @@ jobs:
           ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
 
       - name: Checkout current branch
-        run: git checkout "$GITHUB_REF"
+        run: git checkout "$GITHUB_HEAD_REF_OR_NAME"
         env:
-          GITHUB_REF: ${{ github.head_ref || github.ref_name }}
+          GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
