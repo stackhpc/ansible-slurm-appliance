@@ -21,7 +21,7 @@ jobs:
       statuses: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           # super-linter needs the full git history to get the
           # list of files that changed across commits
@@ -30,7 +30,7 @@ jobs:
           persist-credentials: false
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v25.4.0
+        uses: ansible/ansible-lint@e98f9b38769d45cbe3c55a23b2eb25631babe7c4 # v25.4.0
         env:
           ANSIBLE_COLLECTIONS_PATH: .ansible/collections
 
@@ -44,7 +44,7 @@ jobs:
         if: always()
 
       - name: Run super-linter
-        uses: super-linter/super-linter@v8.3.2
+        uses: super-linter/super-linter@d5b0a2ab116623730dd094f15ddc1b6b25bf7b99 # v8.3.2
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

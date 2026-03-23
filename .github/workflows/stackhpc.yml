@@ -39,7 +39,7 @@ jobs:
           echo "LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name)" >> "$GITHUB_ENV"
 
       - name: Checkout latest release
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ env.LATEST_RELEASE_TAG }}
           fetch-depth: 0
@@ -94,7 +94,7 @@ jobs:
         env:
           GITHUB_REF: ${{ github.head_ref || github.ref_name }}
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.12'
 
@@ -104,9 +104,14 @@ jobs:
           PYTHON_VERSION: python3  # overrides os-release discovery logic
 
       - name: Install OpenTofu
-        uses: opentofu/setup-opentofu@v1.0.5
-        with:
-          tofu_version: 1.9.0
+        run: |
+          TOFU_VERSION=1.9.0
+          cd /tmp
+          curl -sSfLO https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}/tofu_${TOFU_VERSION}_linux_amd64.tar.gz
+          curl -sSfLO https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}/tofu_${TOFU_VERSION}_SHA256SUMS
+          sha256sum -c --ignore-missing tofu_${TOFU_VERSION}_SHA256SUMS
+          cd /usr/bin && sudo tar xvf /tmp/tofu_${TOFU_VERSION}_linux_amd64.tar.gz tofu
+          rm /tmp/tofu_${TOFU_VERSION}_*
 
       - name: Initialise tofu
         run: tofu init
@@ -175,7 +180,7 @@ jobs:
         env:
           GITHUB_REF: ${{ github.head_ref || github.ref_name }}
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.12'
 
