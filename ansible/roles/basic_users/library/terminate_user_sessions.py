@@ -1,13 +1,9 @@
 #!/usr/bin/python
-# pylint: disable=missing-module-docstring
 
 # Copyright: (c) 2021, Steve Brasier <steveb@stackhpc.com>
 # Apache V2 licence
-from __future__ import absolute_import, division, print_function
 
-from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
-
-__metaclass__ = type  # pylint: disable=invalid-name
+from ansible.module_utils.basic import AnsibleModule
 
 DOCUMENTATION = r"""
 ---
@@ -40,7 +36,7 @@ RETURN = r"""
 """
 
 
-def run_module():  # pylint: disable=missing-function-docstring
+def run_module():
     # define available arguments/parameters a user can pass to the module]
     module_args = {
         "user": {
@@ -67,8 +63,7 @@ def run_module():  # pylint: disable=missing-function-docstring
         session_id = session_info[0]
         if user == module.params["user"]:
             _, sessions_stdout, _ = module.run_command(
-                # pylint: disable-next=consider-using-f-string
-                "loginctl terminate-session %s" % session_id,
+                f"loginctl terminate-session {session_id}",
                 check_rc=True,
             )
             result["changed"] = True
@@ -77,7 +72,7 @@ def run_module():  # pylint: disable=missing-function-docstring
     module.exit_json(**result)
 
 
-def main():  # pylint: disable=missing-function-docstring
+def main():
     run_module()
 
 
