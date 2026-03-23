@@ -41,7 +41,7 @@ jobs:
         with:
           ref: ${{ env.LATEST_RELEASE_TAG }}
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
