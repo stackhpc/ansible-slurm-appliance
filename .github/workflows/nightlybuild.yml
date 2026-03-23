@@ -51,15 +51,17 @@ jobs:
 
       - name: Record settings for CI cloud
         run: |
-          echo CI_CLOUD: ${CI_CLOUD}
+          echo "CI_CLOUD: ${CI_CLOUD}"
 
       - name: Setup ssh
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "$SECRETS_SSH_KEY" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
         shell: bash
+        env:
+          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Add bastion's ssh key to known_hosts
         run: cat environments/.stackhpc/bastion_fingerprints >> ~/.ssh/known_hosts
@@ -71,8 +73,10 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Setup environment
         run: |
@@ -121,7 +125,7 @@ jobs:
       - name: Delete old latest image
         run: |
           . venv/bin/activate
-          IMAGE_COUNT=$(openstack image list --name ${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME} -f value -c ID | wc -l)
+          IMAGE_COUNT=$(openstack image list --name "${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}" -f value -c ID | wc -l)
           if [ "$IMAGE_COUNT" -gt 1 ]; then
             OLD_IMAGE_ID=$(openstack image list --sort created_at:asc --name "${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}"  -f value -c ID | head -n 1)
             echo "Deleting old image ID: $OLD_IMAGE_ID"
@@ -162,8 +166,8 @@ jobs:
 
       - name: Record settings for CI cloud
         run: |
-          echo SOURCE_CLOUD: ${SOURCE_CLOUD}
-          echo TARGET_CLOUD: ${TARGET_CLOUD}
+          echo "SOURCE_CLOUD: ${SOURCE_CLOUD}"
+          echo "TARGET_CLOUD: ${TARGET_CLOUD}"
 
       - name: Install openstackclient
         run: |
@@ -175,8 +179,11 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.SOURCE_CLOUD)] }}" > ~/.config/openstack/source_clouds.yaml
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.TARGET_CLOUD)] }}" > ~/.config/openstack/target_clouds.yaml
+          echo "$SECRETS_SOURCE_CLOUD" > ~/.config/openstack/source_clouds.yaml
+          echo "$SECRETS_TARGET_CLOUD" > ~/.config/openstack/target_clouds.yaml
+        env:
+          SECRETS_SOURCE_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.SOURCE_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
+          SECRETS_TARGET_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.TARGET_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Download source image
         run: |

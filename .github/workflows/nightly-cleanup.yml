@@ -32,7 +32,7 @@ jobs:
 
       - name: Record which cloud CI is running on
         run: |
-          echo CI_CLOUD: ${CI_CLOUD}
+          echo "CI_CLOUD: ${CI_CLOUD}"
 
       - name: Setup environment
         run: |
@@ -45,8 +45,10 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Delete all CI clusters
         run: |

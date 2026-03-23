@@ -38,12 +38,12 @@ jobs:
 
       - name: Input Variables
         run: |
-          echo CI_CLOUD: ${CI_CLOUD}
-          echo CLUSTER_NAME: ${CLUSTER_NAME}
+          echo "CI_CLOUD: ${CI_CLOUD}"
+          echo "CLUSTER_NAME: ${CLUSTER_NAME}"
 
       - name: Check Cluster Name not empty
         run: |
-          if [ -z ${CLUSTER_NAME} ]; then
+          if [ -z "${CLUSTER_NAME}" ]; then
             echo "Cluster name is empty"
             exit 1
           else
@@ -61,12 +61,14 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Delete CI cluster
         run: |
           . venv/bin/activate
-          ./dev/delete-cluster.py slurmci-RL8-${CLUSTER_NAME} --force
-          ./dev/delete-cluster.py slurmci-RL9-${CLUSTER_NAME} --force
+          ./dev/delete-cluster.py "slurmci-RL8-${CLUSTER_NAME}" --force
+          ./dev/delete-cluster.py "slurmci-RL9-${CLUSTER_NAME}" --force
         shell: bash

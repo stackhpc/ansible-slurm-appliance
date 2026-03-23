@@ -56,8 +56,8 @@ jobs:
 
       - name: Record settings for CI cloud
         run: |
-          echo CI_CLOUD: ${CI_CLOUD}
-          echo cleanup_on_failure: ${GITHUB_EVENT_INPUTS_CLEANUP_ON_FAILURE}
+          echo "CI_CLOUD: ${CI_CLOUD}"
+          echo "cleanup_on_failure: ${GITHUB_EVENT_INPUTS_CLEANUP_ON_FAILURE}"
         env:
           GITHUB_EVENT_INPUTS_CLEANUP_ON_FAILURE: ${{ github.event.inputs.cleanup_on_failure  }}
 
@@ -65,10 +65,12 @@ jobs:
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "$SECRETS_SSH_KEY" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
           ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
+        env:
+          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Add bastion ssh fingerprints to known_hosts
         run: |
@@ -85,8 +87,10 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Setup environment
         run: |

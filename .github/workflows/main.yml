@@ -120,11 +120,11 @@ jobs:
         # NOTE: This is a debug step, it shows what files were matched by the filters.
         #       It's useful because dorny/paths-filter doesn't work like the conventional 'paths' and 'paths_exclude'
         run: >
-          echo '{ "stackhpc_every_files": ${STEPS_FILTER_ON_EVERY_OUTPUTS_STACKHPC_FILES} }' | jq -r '.';
-          echo '{ "stackhpc_some_files": ${STEPS_FILTER_ON_SOME_OUTPUTS_STACKHPC_FILES} }' | jq -r '.';
-          echo '{ "extra_on_push_files": ${STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PUSH_FILES} }' | jq -r '.';
-          echo '{ "extra_on_pull_request_files": ${STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PULL_REQUEST_FILES} }' | jq -r '.';
-          echo '{ "trivyscan_files": ${STEPS_FILTER_ON_SOME_OUTPUTS_TRIVYSCAN_FILES} }' | jq -r '.'
+          echo '{ "stackhpc_every_files": '"${STEPS_FILTER_ON_EVERY_OUTPUTS_STACKHPC_FILES}"' }' | jq -r '.';
+          echo '{ "stackhpc_some_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_STACKHPC_FILES}"' }' | jq -r '.';
+          echo '{ "extra_on_push_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PUSH_FILES}"' }' | jq -r '.';
+          echo '{ "extra_on_pull_request_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PULL_REQUEST_FILES}"' }' | jq -r '.';
+          echo '{ "trivyscan_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_TRIVYSCAN_FILES}"' }' | jq -r '.'
         env:
           STEPS_FILTER_ON_EVERY_OUTPUTS_STACKHPC_FILES: ${{ steps.filter_on_every.outputs.stackhpc_files }}
           STEPS_FILTER_ON_SOME_OUTPUTS_STACKHPC_FILES: ${{ steps.filter_on_some.outputs.stackhpc_files }}

@@ -74,30 +74,33 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           # Iterate over the labels
-          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
-          echo "$labels"
-          for label in $labels; do
+          echo "$LABELS"
+          for label in $LABELS; do
              if [[ $label == CI_CLOUD=* ]]; then
               # Extract the value after 'CI_CLOUD='
-              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              CI_CLOUD_OVERRIDE="${label#CI_CLOUD=}"
               echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
             fi
           done
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
 
       - name: Record settings
         run: |
-          echo CI_CLOUD: ${CI_CLOUD}
-          echo PACKER_ON_ERROR: ${PACKER_ON_ERROR}
+          echo "CI_CLOUD: ${CI_CLOUD}"
+          echo "PACKER_ON_ERROR: ${PACKER_ON_ERROR}"
           echo "FAT_IMAGES: ${FAT_IMAGES}"
 
       - name: Setup ssh
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "$SECRETS_SSH_KEY" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
           ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
+        env:
+          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Add bastion ssh fingerprints to known_hosts
         run: |
@@ -114,8 +117,10 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Setup environment
         run: |
@@ -132,13 +137,15 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${PACKER_ON_ERROR} \
+          -on-error="${PACKER_ON_ERROR}" \
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
-          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
+          -var "source_image_name=$ENV_FAT_IMAGE" \
           -var "image_name=${{ matrix.build.image_name }}" \
           -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
           -var "volume_size=${{ matrix.build.volume_size }}" \
           openstack.pkr.hcl
+        env:
+          ENV_FAT_IMAGE: ${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}
 
       - name: Get created image names from manifest
         id: manifest

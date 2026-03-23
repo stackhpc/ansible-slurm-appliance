@@ -49,15 +49,16 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           # Iterate over the labels
-          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
-          echo "$labels"
-          for label in $labels; do
+          echo "$LABELS"
+          for label in $LABELS; do
              if [[ $label == CI_CLOUD=* ]]; then
               # Extract the value after 'CI_CLOUD='
-              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              CI_CLOUD_OVERRIDE="${label#CI_CLOUD=}"
               echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
             fi
           done
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
 
       - name: Record debug info
         run: |
@@ -68,10 +69,12 @@ jobs:
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "$SECRETS_SSH_KEY" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
           ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
+        env:
+          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Add bastion ssh fingerprints to known_hosts
         run: |
@@ -84,10 +87,12 @@ jobs:
 
       - name: Ensure Ansible bastion definitions are from **current** branch
         run: |
-          git fetch origin ${{ github.head_ref || github.ref_name }}
-          git checkout origin/${{ github.head_ref || github.ref_name }} -- environments/.stackhpc/inventory/group_vars/all/bastion.yml
+          git fetch origin "$GITHUB_REF"
+          git checkout "origin/$GITHUB_REF" -- environments/.stackhpc/inventory/group_vars/all/bastion.yml
           cat environments/.stackhpc/inventory/group_vars/all/bastion.yml
         shell: bash
+        env:
+          GITHUB_REF: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-python@v6
         with:
@@ -110,8 +115,10 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Setup environment-specific inventory/tofu inputs
         run: |
@@ -125,7 +132,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ./dev/delete-cluster.py ${TF_VAR_CLUSTER_NAME} --force
+          ./dev/delete-cluster.py "${TF_VAR_CLUSTER_NAME}" --force
 
       - name: Provision nodes using latest release image
         id: provision_servers
@@ -164,7 +171,9 @@ jobs:
           ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
 
       - name: Checkout current branch
-        run: git checkout ${{ github.head_ref || github.ref_name }}
+        run: git checkout "$GITHUB_REF"
+        env:
+          GITHUB_REF: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-python@v6
         with:
