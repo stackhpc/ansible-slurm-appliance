@@ -29,6 +29,7 @@ podman run --rm \
     --env FILTER_REGEX_INCLUDE="$*" \
 	--env FIX_PYTHON_BLACK=true --env FIX_MARKDOWN_PRETTIER=true \
 	--env FIX_NATURAL_LANGUAGE=true --env FIX_TERRAFORM_FMT=true\
+	--env FIX_GITHUB_ACTIONS_ZIZMOR=true \
 	--env VALIDATE_CHECKOV=false --env VALIDATE_GITLEAKS \
 	--env RUN_LOCAL=true --env DEFAULT_WORKSPACE=/github/workspace \
 	--env-file "${APPLIANCES_REPO_ROOT}/super-linter.env" \
