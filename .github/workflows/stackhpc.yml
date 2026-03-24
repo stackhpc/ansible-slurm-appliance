@@ -135,7 +135,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ./dev/delete-cluster.py "${TF_VAR_CLUSTER_NAME}" --force
+          ./dev/delete-cluster.py "${TF_VAR_cluster_name}" --force
 
       - name: Provision nodes using latest release image
         id: provision_servers
