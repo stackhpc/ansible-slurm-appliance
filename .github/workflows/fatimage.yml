@@ -70,9 +70,7 @@ jobs:
 
       - name: Add bastion ssh fingerprints to known_hosts
         run: |
-          cat >> ~/.ssh/known_hosts << 'EOF'
-          ${VARS_BASTION_FINGERPRINTS}
-          EOF
+          cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
         shell: bash
         env:
           VARS_BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
