@@ -26,7 +26,9 @@ jobs:
           persist-credentials: false
 
       - name: Write s3cmd configuration
-        run: echo "${{ secrets.LEAFCLOUD_S3_CFG }}" > ~/.s3cfg
+        run: echo "$SECRETS_LEAFCLOUD_S3_CFG" > ~/.s3cfg
+        env:
+          SECRETS_LEAFCLOUD_S3_CFG: ${{ secrets.LEAFCLOUD_S3_CFG }}
 
       - name: Install s3cmd
         run: |

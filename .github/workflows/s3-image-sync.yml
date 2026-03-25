@@ -96,24 +96,26 @@ jobs:
 
       - name: Retrieve image name
         run: |
-          TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
+          TARGET_IMAGE=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$IMAGE_PATH")
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
         shell: bash
+        env:
+          MATRIX_BUILD: ${{ matrix.build }}
 
       - name: Download image to runner
         run: |
           . venv/bin/activate
           df -h
-          sudo mkdir ${{ env.RUNNER_IMAGE_DIR }}
-          sudo chmod ugo=rwX ${{ env.RUNNER_IMAGE_DIR }}
-          openstack image save --file "${{ env.RUNNER_IMAGE_DIR }}/${TARGET_IMAGE}.raw" "${TARGET_IMAGE}"
+          sudo mkdir "$RUNNER_IMAGE_DIR"
+          sudo chmod ugo=rwX "$RUNNER_IMAGE_DIR"
+          openstack image save --file "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}.raw" "${TARGET_IMAGE}"
           df -h
         shell: bash
 
       - name: Convert image to QCOW2
         run: |
           . venv/bin/activate
-          qemu-img convert -f raw -O qcow2 -c "${{ env.RUNNER_IMAGE_DIR }}/${TARGET_IMAGE}.raw" "${{ env.RUNNER_IMAGE_DIR }}/${TARGET_IMAGE}"
+          qemu-img convert -f raw -O qcow2 -c "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}.raw" "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}"
         shell: bash
 
       - name: Upload Image to S3
@@ -169,8 +171,10 @@ jobs:
 
       - name: Retrieve image name
         run: |
-          TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
+          TARGET_IMAGE=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "${IMAGE_PATH}")
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
+        env:
+          MATRIX_BUILD: ${{ matrix.build }}
 
       - name: Download latest image if missing
         run: |

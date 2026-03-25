@@ -134,12 +134,15 @@ jobs:
           -on-error="${PACKER_ON_ERROR}" \
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
           -var "source_image_name=$ENV_FAT_IMAGE" \
-          -var "image_name=${{ matrix.build.image_name }}" \
-          -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
-          -var "volume_size=${{ matrix.build.volume_size }}" \
+          -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
+          -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
+          -var "volume_size=$MATRIX_BUILD_VOLUME_SIZE" \
           openstack.pkr.hcl
         env:
           ENV_FAT_IMAGE: ${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}
+          MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
+          MATRIX_BUILD_INVENTORY_GROUPS: ${{ matrix.build.inventory_groups }}
+          MATRIX_BUILD_VOLUME_SIZE: ${{ matrix.build.volume_size }}
 
       - name: Get created image names from manifest
         id: manifest
