@@ -60,8 +60,10 @@ jobs:
 
       - name: Record debug info
         run: |
+          (
           echo "LATEST_RELEASE_TAG: $LATEST_RELEASE_TAG"
           echo "CI_CLOUD: $CI_CLOUD"
+          ) | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Setup ssh
         run: |

@@ -83,9 +83,11 @@ jobs:
 
       - name: Record settings
         run: |
+          (
           echo "CI_CLOUD: ${CI_CLOUD}"
           echo "PACKER_ON_ERROR: ${PACKER_ON_ERROR}"
           echo "FAT_IMAGES: ${FAT_IMAGES}"
+          ) | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Setup ssh
         run: |
@@ -153,8 +155,8 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
-          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
-          echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "image-id=$IMAGE_ID" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           echo "$IMAGE_ID" > image-id.txt
           echo "$IMAGE_NAME" > image-name.txt
 
