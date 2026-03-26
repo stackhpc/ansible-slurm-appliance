@@ -1,0 +1,15 @@
+name: Scan image for vulnerabilities
+'on':
+  workflow_call:
+  workflow_dispatch:
+
+permissions: {}
+  # TODO: probably need this back to upload scan results
+  #security-events: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Do nothing
+        run: echo not doing anything
