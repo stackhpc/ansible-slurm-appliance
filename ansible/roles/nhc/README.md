@@ -29,7 +29,7 @@ When the `ansible/site.yml` playbook is run this will automatically:
    It will run healthchecks on all `IDLE` nodes which are not `DRAINED` or
    `NOT_RESPONDING` every 300 seconds. See [slurm.conf parameters](https://slurm.schedmd.com/slurm.conf.html)
    `HealthCheckInterval`, `HealthCheckNodeState`, `HealthCheckProgram`. These
-   may be overriden if required by redefining `openhpc_config_nhc` in e.g.
+   may be overridden if required by redefining `openhpc_config_nhc` in e.g.
    `environments/site/inventory/group_vars/nhc/yml`.
 
 2. Template out node health check rules using Ansible facts for each compute

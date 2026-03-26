@@ -247,7 +247,7 @@ either for a specific environment within the cluster module block in
 default in `environments/site/tofu/variables.tf`.
 
 For a development environment allowing OpenTofu to manage the volumes using the
-default value of `"manage"` for those varibles is usually appropriate, as it
+default value of `"manage"` for those variables is usually appropriate, as it
 allows for multiple clusters to be created with this environment.
 
 If no home volume at all is required because the home directories are provided
@@ -358,7 +358,7 @@ environments which should be unique, e.g. production and staging.
   instances) it may be necessary to [configure chrony](./chrony.md).
 
 - Consider the appropriate configuration for `/tmp`. By default nodes in `login` and
-  `compute` groups will use a tmpfs with 10% of total memory. This can be modifed
+  `compute` groups will use a tmpfs with 10% of total memory. This can be modified
   by overriding `mounts_tmp_size` with either a size in bytes or a percentage
   of memory (as for 'size' parameter in `man tmpfs`), e.g.:
 

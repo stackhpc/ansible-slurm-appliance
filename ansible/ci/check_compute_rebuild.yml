@@ -40,13 +40,13 @@
             Current image ID: {{ rebuild_status.image_id_current }}
             Target image ID: {{ rebuild_status.image_id_target }}
 
-    - name: Check a single rebuild has occured, if target image differs from last release
+    - name: Check a single rebuild has occurred, if target image differs from last release
       ansible.builtin.assert:
         that: rebuild_status.rebuild_count == 1
         fail_msg: "Expected 1 rebuild, found {{ rebuild_status.rebuild_count }}"
       when: hostvars['localhost'].ci_diff_cluster_images.stdout != ''
 
-    - name: Check uptime shows rebuild or reboot occured
+    - name: Check uptime shows rebuild or reboot occurred
       ansible.builtin.assert:
         that: rebuild_status.uptime_seconds < uptime_max_seconds | int
         fail_msg: "Expected uptime < {{ uptime_max_seconds }}s, actual {{ rebuild_status.uptime_seconds }}s"

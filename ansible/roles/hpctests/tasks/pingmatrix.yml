@@ -27,7 +27,7 @@
 # The sbatch manpage says nodes provided via --nodelist are sorted, but doesn't specify how.
 # Some testing using a "helloworld" program showed it is NOT sorted the same as python's sorted(),
 # it's lexicographical. So we use scontrol to guarantee the same sort order.
-# Note this still doesn't fix any non-unique names but we should get a length mis-match at least with that.
+# Note this still doesn't fix any non-unique names but we should get a length mismatch at least with that.
 # although this looks a bit crazy:
 - name: Expand node list # noqa: no-changed-when
   ansible.builtin.command: "scontrol show hostnames {{ hpctests_nodes if hpctests_nodes is defined else (hpctests_computes.stdout_lines | join(',')) }}"

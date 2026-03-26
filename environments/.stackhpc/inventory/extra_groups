@@ -22,7 +22,7 @@ cluster
 # --- end of FreeIPA example ---
 
 [manila:children]
-# Not actully tested but allows demo using this environment
+# Not actually tested but allows demo using this environment
 login
 compute
 

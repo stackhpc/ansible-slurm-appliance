@@ -48,7 +48,7 @@ variable "control_node_flavor" {
 variable "login" {
   default     = {}
   description = <<-EOF
-    Mapping defining homogenous groups of login nodes. Multiple groups may
+    Mapping defining homogeneous groups of login nodes. Multiple groups may
     be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
     to define login nodes with different capabilities such as high-memory.
 
@@ -82,7 +82,7 @@ variable "login" {
                     select addresses.
       match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
       availability_zone: Name of availability zone. If undefined, defaults to 'nova' 
-                         if match_ironic_node is true, defered to OpenStack otherwise
+                         if match_ironic_node is true, deferred to OpenStack otherwise
       gateway_ip: Address to add default route via
       nodename_template: Overrides variable cluster_nodename_template
       server_group_id: String ID of server group to use for scheduler hint
@@ -118,7 +118,7 @@ variable "cluster_image_id" {
 variable "compute" {
   default     = {}
   description = <<-EOF
-    Mapping defining homogenous groups of compute nodes. Groups are used
+    Mapping defining homogeneous groups of compute nodes. Groups are used
     in Slurm partition definitions.
 
     Keys are names of groups, and cannot be 'compute', 'login', 'control', 'default'
@@ -148,7 +148,7 @@ variable "compute" {
                     select addresses.
       match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
       availability_zone: Name of availability zone. If undefined, defaults to 'nova'
-                         if match_ironic_node is true, defered to OpenStack otherwise
+                         if match_ironic_node is true, deferred to OpenStack otherwise
       gateway_ip: Address to add default route via
       nodename_template: Overrides variable cluster_nodename_template
       server_group_id: String ID of server group to use for scheduler hint
@@ -172,7 +172,7 @@ variable "compute" {
 variable "additional_nodegroups" {
   default     = {}
   description = <<-EOF
-    Mapping defining homogenous groups of nodes for arbitrary purposes.
+    Mapping defining homogeneous groups of nodes for arbitrary purposes.
     These nodes are not in the compute or login inventory groups so they
     will not run slurmd.
 

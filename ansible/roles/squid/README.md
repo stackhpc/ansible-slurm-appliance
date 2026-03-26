@@ -25,7 +25,7 @@ These role variables apply to both `squid_conf_mode` settings.
 
 - `squid_conf_mode`: Optional str, `default` (the default) or `eessi`. See above.
 - `squid_conf_template`: Optional str. Path (using Ansible search paths) to
-  squid.conf template. Default is in-role templates. If this is overriden then
+  squid.conf template. Default is in-role templates. If this is overridden then
   `squid_conf_mode` has no effect.
 - `squid_http_port`: Optional str. Socket addresses to listen for client requests,
   default '3128'. See squid parameter.

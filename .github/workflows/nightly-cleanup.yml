@@ -4,11 +4,7 @@ name: Cleanup CI clusters
   schedule:
     - cron: '0 21 * * *'  # Run at 9PM - image sync runs at midnight
 
-permissions:
-  contents: read
-  packages: write
-  # To report GitHub Actions status checks
-  statuses: write
+permissions: {}
 
 jobs:
   ci_cleanup:
@@ -26,11 +22,13 @@ jobs:
       OS_CLOUD: openstack
       CI_CLOUD: ${{ matrix.cloud }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Record which cloud CI is running on
         run: |
-          echo CI_CLOUD: ${{ env.CI_CLOUD }}
+          echo "CI_CLOUD: ${CI_CLOUD}"
 
       - name: Setup environment
         run: |
@@ -43,8 +41,10 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Delete all CI clusters
         run: |

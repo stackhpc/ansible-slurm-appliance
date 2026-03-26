@@ -7,7 +7,7 @@ This repository contains playbooks and configuration to define a Slurm-based HPC
 - [Rocky Linux](https://rockylinux.org/)-based hosts.
 - [OpenTofu](https://opentofu.org/) configurations to define the cluster's infrastructure-as-code.
 - Packages for Slurm and MPI software stacks from [OpenHPC](https://openhpc.community/).
-- Shared fileystem(s) using NFS (with in-cluster or external servers) or [CephFS](https://docs.ceph.com/en/latest/cephfs/) via [OpenStack Manila](https://wiki.openstack.org/wiki/Manila).
+- Shared filesystem(s) using NFS (with in-cluster or external servers) or [CephFS](https://docs.ceph.com/en/latest/cephfs/) via [OpenStack Manila](https://wiki.openstack.org/wiki/Manila).
 - Slurm accounting using a MySQL database.
 - Monitoring integrated with Slurm jobs using Prometheus, Elasticsearch and Grafana.
 - A web-based portal from [Open OnDemand](https://openondemand.org/).
@@ -161,20 +161,7 @@ For further information see the [docs](docs/) directory.
 
 ## Developing locally
 
-To run the GitHub Actions linters locally, use:
+To run the GitHub Actions linters locally, use `./dev/run-linter`.
 
-```shell
-docker run --rm \
-    -e RUN_LOCAL=true \
-    --env-file "super-linter.env" \
-    -v "$(pwd)":/tmp/lint \
-    ghcr.io/super-linter/super-linter:v8.3.2
-```
-
-```shell
-ANSIBLE_COLLECTIONS_PATH=.ansible/collections \
-    ansible-lint -c .ansible-lint.yml
-```
-
-Specifying `ANSIBLE_COLLECTIONS_PATH` ensures `ansible-lint` downloads collections and roles under the `.ansible` directory, separating them from our own roles under the `ansible` directory.
-We exclude these downloaded files from linting by listing `.ansible` under `exclude_paths` in `.ansible-lint.yml`.
+A faster run can be achieved by `./dev/run-linter -f`, which skips ansible-lint and gitleaks.
+They can also be skipped individually via `VALIDATE_ANSIBLE_LINT=false` or `VALIDATE_GITLEAKS=false` environment variables.

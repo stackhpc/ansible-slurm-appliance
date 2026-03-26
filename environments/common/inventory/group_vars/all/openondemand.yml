@@ -62,7 +62,7 @@ openondemand_cluster:
           export XDG_RUNTIME_DIR="$TMPDIR/xdg_runtime"
 
           # Workaround to avoid "Unable to contact settings server" when
-          # lauching xfce4-session
+          # launching xfce4-session
           xfce4-session() { /bin/dbus-launch /bin/xfce4-session $@ ; }
           export -f xfce4-session
           %s
@@ -242,7 +242,7 @@ openondemand_apps_rstudio_default:
     rstudio_module:
       label: RStudio module
       required: true
-      cachable: true
+      cacheable: true
       help: Choose your RStudio module
       widget: select
       options:
@@ -260,7 +260,7 @@ openondemand_apps_rstudio_default:
       max: 48
       step: 1
       value: 1
-      cachable: true
+      cacheable: true
     ram:
       widget: number_field
       label: RAM in GB
@@ -269,7 +269,7 @@ openondemand_apps_rstudio_default:
       max: 700
       step: 1
       value: 4
-      cachable: true
+      cacheable: true
     bc_num_hours:
       widget: number_field
       help: Maximum runtime in hours for your session. NB Ensure this is within the maximum allowed by your chosen partition
@@ -277,7 +277,7 @@ openondemand_apps_rstudio_default:
       max: 240
       step: 1
       value: 30
-      cachable: true
+      cacheable: true
     bc_email_on_started: false
     auto_modules_RStudio-Server:
       default: false
@@ -351,7 +351,7 @@ openondemand_apps_matlab_default:
     matlab_module:
       label: MATLAB module
       required: true
-      cachable: true
+      cacheable: true
       help: Choose your MATLAB module
       widget: select
       options:
@@ -364,7 +364,7 @@ openondemand_apps_matlab_default:
       max: 48
       step: 1
       value: 1
-      cachable: true
+      cacheable: true
     ram:
       widget: number_field
       label: RAM in GB
@@ -373,7 +373,7 @@ openondemand_apps_matlab_default:
       max: 700
       step: 1
       value: 4
-      cachable: true
+      cacheable: true
     bc_num_hours:
       widget: number_field
       help: Maximum runtime in hours for your session. NB Ensure this is within the maximum allowed by your chosen partition
@@ -381,7 +381,7 @@ openondemand_apps_matlab_default:
       max: 240
       step: 1
       value: 30
-      cachable: true
+      cacheable: true
     gres:
       label: Resources
       help: Select GPU or other Slurm GRES resources
@@ -428,7 +428,7 @@ openondemand_apps_codeserver_default:
     codeserver_module:
       label: Code Server module
       required: true
-      cachable: true
+      cacheable: true
       help: Choose your Code Server module
       widget: select
       options:
@@ -443,7 +443,7 @@ openondemand_apps_codeserver_default:
       max: 48
       step: 1
       value: 1
-      cachable: true
+      cacheable: true
     ram:
       widget: number_field
       label: RAM in GB
@@ -452,7 +452,7 @@ openondemand_apps_codeserver_default:
       max: 700
       step: 1
       value: 4
-      cachable: true
+      cacheable: true
     bc_num_hours:
       widget: number_field
       help: Maximum runtime in hours for your session. NB Ensure this is within the maximum allowed by your chosen partition

@@ -2,7 +2,7 @@
 # If squid group is non-empty, default the proxy address to the hostname of
 # the first squid host, port 3128. Else empty string to avoid breaking hostvars
 
-# Any of these defaults may be overriden in e.g. environments/site/group_vars/all/proxy.yml if required.
+# Any of these defaults may be overridden in e.g. environments/site/group_vars/all/proxy.yml if required.
 
 # override if basic_auth is required:
 proxy_basic_user: ''

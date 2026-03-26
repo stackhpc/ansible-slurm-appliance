@@ -46,7 +46,7 @@ class FilterModule(object):
         for repo_data in rpm_info:
             rpm_data = (
                 repo_defaults.copy()
-            )  # NB: this changes behaviour vs before, so now defaults can correctly be overriden
+            )  # NB: this changes behaviour vs before, so now defaults can correctly be overridden
             rpm_data["name"] = repo_data["pulp_repo_name"]
             rpm_data["url"] = "/".join(
                 [content_url, repo_data["pulp_path"], repo_data["pulp_timestamp"]]

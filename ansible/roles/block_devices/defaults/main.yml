@@ -9,6 +9,6 @@ block_devices_resizefs: false # Grow filesystem into block device space (yes or 
 block_devices_filesystem_state: present # 'present', 'absent' (as for community.general.filesystem:state) or 'skip'
 block_devices_path: # Path to mount point, e.g. '/mnt/files'
 block_devices_mount_state: mounted # Mount state, see ansible.posix.mount:state
-block_devices_owner: # Name of owner for mounted directory (ansible.buildin.file:owner
-block_devices_group: # Name of group for mounted directory (ansible.buildin.file.group)
+block_devices_owner: # Name of owner for mounted directory (ansible.builtin.file:owner
+block_devices_group: # Name of group for mounted directory (ansible.builtin.file.group)
 # also see hostnames

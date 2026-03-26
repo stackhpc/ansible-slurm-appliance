@@ -11,6 +11,7 @@ Where PREFIX is the string at the start of the resource's names.
 If --force is provided, it will delete all resources without confirmation.
 """
 
+import argparse
 import json
 import subprocess
 import sys
@@ -55,9 +56,18 @@ def delete_cluster(cluster_prefix, force=False):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2 or len(sys.argv) > 3:
-        print("ERROR: Incorrect argument(s).\n" + __doc__)
-        exit(1)  # pylint: disable=consider-using-sys-exit
-    force_flag = "--force" in sys.argv
-    cluster_prefix = sys.argv[1]
-    delete_cluster(cluster_prefix, force_flag)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="don't ask for confirmation before deleting",
+    )
+    parser.add_argument("cluster_prefix")
+    args = parser.parse_args()
+    if not args.cluster_prefix:
+        print("ERROR: empty cluster prefix is not allowed", file=sys.stderr)
+        sys.exit(1)
+    delete_cluster(args.cluster_prefix, args.force)

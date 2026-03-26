@@ -19,7 +19,7 @@
 - when: "mysql_state | default('unspecified') != 'stopped'"
   block:
     - name: Wait for mysql to initialise
-    # NB: It is not sufficent to wait_for the port
+    # NB: It is not sufficient to wait_for the port
       community.mysql.mysql_info:
         login_user: root
         login_password: "{{ mysql_root_password }}"

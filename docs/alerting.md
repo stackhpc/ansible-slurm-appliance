@@ -42,7 +42,7 @@ ansible-playbook ansible/adhoc/generate-passwords.yml
    via overriding role defaults.
 
 4. If desired, any other [role defaults](../ansible/roles/alertmanager/README.md)
-   may be overriden in e.g. `environments/site/inventory/group_vars/all/alertmanager.yml`.
+   may be overridden in e.g. `environments/site/inventory/group_vars/all/alertmanager.yml`.
 
 5. Run the `monitoring.yml` playbook (if the cluster is already up) to configure
    both alertmanager and prometheus:
