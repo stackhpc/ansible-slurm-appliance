@@ -1,6 +1,6 @@
 # CI/CD automation
 
-The `.github` directory contains a set of sample workflows which can be used by downstream site-specific configuration repositories to simplify ongoing maintainence tasks. These include:
+The `.github` directory contains a set of sample workflows which can be used by downstream site-specific configuration repositories to simplify ongoing maintenance tasks. These include:
 
 - An [upgrade check](.github/workflows/upgrade-check.yml.sample) workflow which automatically checks this upstream stackhpc/ansible-slurm-appliance repository for new releases and proposes a pull request to the downstream site-specific repository when a new release is published.
 

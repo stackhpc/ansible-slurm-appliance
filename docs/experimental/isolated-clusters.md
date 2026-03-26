@@ -90,7 +90,7 @@ inventory_groups = 'proxy,freeipa_client'
 ```
 
 ```yaml
-# environments/$ENV/group_vars/builder/overrrides.yml:
+# environments/$ENV/group_vars/builder/overrides.yml:
 proxy_basic_user: someuser
 proxy_basic_password: "{{ vault_proxy_basic_password }}"
 proxy_http_address: squid.mysite.org

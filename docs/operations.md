@@ -135,7 +135,7 @@ an urgent patch), it is possible to install packages directly during the
 `extra_packages` group. An error will occur if Ark credentials are defined in
 this case, as they are readable by unprivileged users in the `.repo` files. A
 local Pulp mirror must be used instead, which also has the advantage of making
-this approach more reproducable.
+this approach more reproducible.
 
 If additional repositories are required, these could be added/enabled as necessary in a play added to `environments/$SITE_ENV/hooks/{pre,post}.yml` as appropriate.
 Note such a play should NOT exclude the builder group, so that the repositories are also added to built images.

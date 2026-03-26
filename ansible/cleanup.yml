@@ -14,9 +14,9 @@
   ansible.builtin.file:
     path: /etc/resolv.conf
     state: absent
-  when: "'resolv_conf' not in group_names" # if its been overriden, deleting it is the wrong thing to do
+  when: "'resolv_conf' not in group_names" # if its been overridden, deleting it is the wrong thing to do
 
-- name: Reenable NetworkManager control of resolv.conf
+- name: Re-enable NetworkManager control of resolv.conf
   # NB: This *doesn't* delete the 90-dns-none.conf file created by the resolv_conf role
   # as if nameservers are explicitly being set by that role we don't want to allow NM
   # to override it again.

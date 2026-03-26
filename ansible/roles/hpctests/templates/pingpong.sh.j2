@@ -6,9 +6,15 @@
 #SBATCH --error=%x.out
 #SBATCH --exclusive
 #SBATCH --partition={{ hpctests_partition }}
-{%if hpctests_nodes is defined %}#SBATCH --nodelist={{ hpctests_nodes }}{% endif %}
-{%if hpctests_account is defined %}#SBATCH --account={{ hpctests_account }}{% endif %}
-{%if hpctests_qos is defined %}#SBATCH --qos={{ hpctests_qos }}{% endif %}
+{%if hpctests_nodes is defined %}
+#SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}
+{% endif %}
+{%if hpctests_account is defined %}
+#SBATCH --account={{ hpctests_account }}
+{% endif %}
+{%if hpctests_qos is defined %}
+#SBATCH --qos={{ hpctests_qos }}
+{% endif %}
 
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST

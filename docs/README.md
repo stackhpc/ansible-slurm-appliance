@@ -32,7 +32,7 @@
 
 [Persistent state](persistent-state.md)
 
-### Experimental fetaures
+### Experimental features
 
 [Compute init](experimental/compute-init.md)
 

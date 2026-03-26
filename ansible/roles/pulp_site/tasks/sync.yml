@@ -3,7 +3,7 @@
   ansible.builtin.assert:
     that: pulp_site_upstream_password != ''
     quiet: true
-    fail_msg: "Upstream password not set. Ensure `pulp_site_upstream_username` and `pulp_site_upstream_password` are overriden to your Ark credentials."
+    fail_msg: "Upstream password not set. Ensure `pulp_site_upstream_username` and `pulp_site_upstream_password` are overridden to your Ark credentials."
 
 - name: Install python3
   ansible.builtin.package:

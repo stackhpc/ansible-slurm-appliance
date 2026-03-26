@@ -26,11 +26,7 @@ name: Test extra build
         required: true
         default: true
 
-permissions:
-  contents: read
-  packages: write
-  # To report GitHub Actions status checks
-  statuses: write
+permissions: {}
 
 jobs:
   doca:
@@ -57,7 +53,9 @@ jobs:
       PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'false' && 'abort' || vars.PACKER_ON_ERROR }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Load current fat images into GITHUB_ENV
         # see https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#example-of-a-multiline-string
@@ -72,37 +70,42 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           # Iterate over the labels
-          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
-          echo "$labels"
-          for label in $labels; do
+          echo "$LABELS"
+          for label in $LABELS; do
              if [[ $label == CI_CLOUD=* ]]; then
               # Extract the value after 'CI_CLOUD='
-              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              CI_CLOUD_OVERRIDE="${label#CI_CLOUD=}"
               echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
             fi
           done
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
 
       - name: Record settings
         run: |
-          echo CI_CLOUD: ${{ env.CI_CLOUD }}
-          echo PACKER_ON_ERROR: ${{ env.PACKER_ON_ERROR}}
+          (
+          echo "CI_CLOUD: ${CI_CLOUD}"
+          echo "PACKER_ON_ERROR: ${PACKER_ON_ERROR}"
           echo "FAT_IMAGES: ${FAT_IMAGES}"
+          ) | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Setup ssh
         run: |
           set -x
           mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
+          echo "$SECRETS_SSH_KEY" > ~/.ssh/id_rsa
           chmod 0600 ~/.ssh/id_rsa
           ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
         shell: bash
+        env:
+          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Add bastion ssh fingerprints to known_hosts
         run: |
-          cat >> ~/.ssh/known_hosts << 'EOF'
-          ${{ vars.BASTION_FINGERPRINTS }}
-          EOF
+          cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
         shell: bash
+        env:
+          VARS_BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
 
       - name: Install ansible etc
         run: dev/setup-env.sh
@@ -110,8 +113,10 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Setup environment
         run: |
@@ -128,13 +133,18 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ env.PACKER_ON_ERROR }} \
-          -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
-          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
-          -var "image_name=${{ matrix.build.image_name }}" \
-          -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
-          -var "volume_size=${{ matrix.build.volume_size }}" \
+          -on-error="${PACKER_ON_ERROR}" \
+          -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
+          -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
+          -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
+          -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
+          -var "volume_size=$MATRIX_BUILD_VOLUME_SIZE" \
           openstack.pkr.hcl
+        env:
+          MATRIX_BUILD_SOURCE_IMAGE_NAME: ${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}
+          MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
+          MATRIX_BUILD_INVENTORY_GROUPS: ${{ matrix.build.inventory_groups }}
+          MATRIX_BUILD_VOLUME_SIZE: ${{ matrix.build.volume_size }}
 
       - name: Get created image names from manifest
         id: manifest
@@ -145,24 +155,28 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
-          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
-          echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "image-id=$IMAGE_ID" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           echo "$IMAGE_ID" > image-id.txt
           echo "$IMAGE_NAME" > image-name.txt
 
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}" || true
+          openstack image unset --property signature_verified "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}" || true
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
 
       - name: Delete image for automatically-run workflows
         run: |
           . venv/bin/activate
-          openstack image delete "${{ steps.manifest.outputs.image-id }}"
+          openstack image delete "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
         if: ${{ github.event_name != 'workflow_dispatch' }}
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
 
       - name: Upload manifest artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: image-details-${{ matrix.build.image_name }}
           path: |

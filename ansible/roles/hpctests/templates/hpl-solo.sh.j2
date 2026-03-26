@@ -9,8 +9,12 @@
 {% if hpctests_hplsolo_excluded_nodes | length > 0 %}
 #SBATCH --exclude={{ hpctests_hplsolo_excluded_nodes | join(',') }}
 {% endif %}
-{%if hpctests_account is defined %}#SBATCH --account={{ hpctests_account }}{% endif %}
-{%if hpctests_qos is defined %}#SBATCH --qos={{ hpctests_qos }}{% endif %}
+{%if hpctests_account is defined %}
+#SBATCH --account={{ hpctests_account }}
+{% endif %}
+{%if hpctests_qos is defined %}
+#SBATCH --qos={{ hpctests_qos }}
+{% endif %}
 
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST

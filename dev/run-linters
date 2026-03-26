@@ -1,0 +1,44 @@
+#!/bin/bash
+# A simple script to run ansible-lint and super-linter with some fixes enabled.
+
+# Usage: [VALIDATE_GITLEAKS=false] [VALIDATE_ANSIBLE_LINT=false] ./dev/run-linters [-f|--fast] [FILE_OR_DIR_TO_CHECK...]
+
+
+# Disabled linters: checkov stays stuck for some reason!
+# VALIDATE_GITLEAKS=false is controversial because that's the best time to catch errors
+
+if [ "$1" = "-f" ] || [ "$1" = "--false" ]; then
+	echo "Disabling slow linters: ansible-lint and gitleaks"
+	VALIDATE_ANSIBLE_LINT=false
+	export VALIDATE_GITLEAKS=false
+	shift
+fi
+if [ "${VALIDATE_ANSIBLE_LINT:-true}" = true ]; then
+	echo "Running ansible-lint $*..."
+	ansible_lint_failed=false
+	# Specifying `ANSIBLE_COLLECTIONS_PATH` ensures `ansible-lint` downloads collections and roles under the `.ansible` directory, separating them from our own roles under the `ansible` directory.
+	# We exclude these downloaded files from linting by listing `.ansible` under `exclude_paths` in `.ansible-lint.yml`.
+	if ! ANSIBLE_COLLECTIONS_PATH=.ansible/collections ansible-lint -c .ansible-lint.yml "$@"; then
+		echo "ansible-lint found errors"
+		ansible_lint_failed=true
+	fi
+fi
+SUPERLINTER_VERSION=$(grep '\S\+super-linter/slim@\S\+ # v\S\+' .github/workflows/lint.yml | sed -E 's/.*#\s*//') # e.g. super-linter/super-linter/slim:abcdkerf # v8.5.0  ===> v8.5.0
+export APPLIANCES_REPO_ROOT="${APPLIANCES_REPO_ROOT:-$(pwd)}" # allows running from uninitialized environment
+
+echo "Using super-linter ${SUPERLINTER_VERSION}"
+podman run --rm \
+    --env FILTER_REGEX_INCLUDE="$*" \
+	--env FIX_PYTHON_BLACK=true --env FIX_MARKDOWN_PRETTIER=true \
+	--env FIX_NATURAL_LANGUAGE=true --env FIX_TERRAFORM_FMT=true\
+	--env FIX_SPELL_CODESPELL=true --env FIX_GITHUB_ACTIONS_ZIZMOR=true \
+	--env VALIDATE_CHECKOV=false --env VALIDATE_GITLEAKS \
+	--env RUN_LOCAL=true --env DEFAULT_WORKSPACE=/github/workspace \
+	--env-file "${APPLIANCES_REPO_ROOT}/super-linter.env" \
+	-v "$(pwd)":/github/workspace --security-opt label=disable \
+	"ghcr.io/super-linter/super-linter:slim-$SUPERLINTER_VERSION"
+superlinter_exit=$?
+
+if $ansible_lint_failed || [ "$superlinter_exit" != 0 ]; then
+	exit 1
+fi
