@@ -49,7 +49,7 @@ jobs:
         run: |
           echo CI_CLOUD: "${CI_CLOUD}"
 
-      - name: setup environment
+      - name: Setup environment
         run: |
           python3 -m venv venv
           . venv/bin/activate
@@ -69,19 +69,19 @@ jobs:
         id: manifest
         run: |
           IMAGE_NAME=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$JSON_PATH")
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_ENV"
           echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
         env:
           MATRIX_BUILD: ${{ matrix.build }}
           JSON_PATH: ${{ env.JSON_PATH }}
 
       - name: Download image
+        # NB: use /mnt as that is a separate disk with more space
         run: |
           . venv/bin/activate
           sudo mkdir /mnt/images
           sudo chmod 777 /mnt/images
-          openstack image save --file "/mnt/images/${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}.qcow2" "${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}"
-        env:
-          STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}
+          openstack image save --file "/mnt/images/${IMAGE_NAME}.qcow2" "${IMAGE_NAME}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
@@ -92,28 +92,24 @@ jobs:
           sudo apt -y install libguestfs-tools
 
       - name: Make directory for mount
-        run: sudo mkdir -p "./${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}"
-        env:
-          STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}
+        run: sudo mkdir -p "./${IMAGE_NAME}"
 
       - name: Mount qcow2 file
-        run: sudo guestmount -a "/mnt/images/${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}.qcow2" -i --ro -o allow_other "./${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}"
-        env:
-          STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}
+        run: sudo guestmount -a "/mnt/images/${IMAGE_NAME}.qcow2" -i --ro -o allow_other "./${IMAGE_NAME}"
 
       - name: Generate sbom
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
         id: generate-sbom
         with:
-          path: "/mnt/images/${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}"
-          artifact-name: "${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}-sbom.spdx.json"
-          output-file: "${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}-sbom.spdx.json"
+          path: "./${{ steps.manifest.outputs.image-name }}"
+          artifact-name: "${{ steps.manifest.outputs.image-name }}-sbom.spdx.json"
+          output-file: "${{ steps.manifest.outputs.image-name }}-sbom.spdx.json"
           format: spdx-json
 
       - name: Fail if scan has CRITICAL vulnerabilities
         uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
         with:
-          sbom: "${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}-sbom.spdx.json"
+          sbom: "${{ steps.manifest.outputs.image-name }}-sbom.spdx.json"
           output-format: table
           severity-cutoff: critical
           only-fixed: true
