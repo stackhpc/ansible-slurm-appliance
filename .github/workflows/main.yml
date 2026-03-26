@@ -8,7 +8,7 @@
 # 3. Conditionally run the other workflows based on the changed files:
 #    * stackhpc.yml
 #    * extra.yml
-#    * trivyscan.yml
+#    * scan.yml
 
 name: Test on push and pull request
 
@@ -45,7 +45,7 @@ jobs:
       stackhpc: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
       extra_on_push: ${{ steps.filter_on_some.outputs.extra_on_push }}
       extra_on_pull_request: ${{ steps.filter_on_some.outputs.extra_on_pull_request }}
-      trivyscan: ${{ steps.filter_on_some.outputs.trivyscan }}
+      scan: ${{ steps.filter_on_some.outputs.scan }}
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -111,7 +111,7 @@ jobs:
               - 'ansible/roles/cuda/**'
               - 'ansible/roles/lustre/**'
               - '.github/workflows/extra.yml'
-            trivyscan:
+            scan:
               - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
 
       - name: Paths matched output
@@ -122,13 +122,13 @@ jobs:
           echo '{ "stackhpc_some_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_STACKHPC_FILES}"' }' | jq -r '.';
           echo '{ "extra_on_push_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PUSH_FILES}"' }' | jq -r '.';
           echo '{ "extra_on_pull_request_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PULL_REQUEST_FILES}"' }' | jq -r '.';
-          echo '{ "trivyscan_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_TRIVYSCAN_FILES}"' }' | jq -r '.'
+          echo '{ "scan_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_SCAN_FILES}"' }' | jq -r '.'
         env:
           STEPS_FILTER_ON_EVERY_OUTPUTS_STACKHPC_FILES: ${{ steps.filter_on_every.outputs.stackhpc_files }}
           STEPS_FILTER_ON_SOME_OUTPUTS_STACKHPC_FILES: ${{ steps.filter_on_some.outputs.stackhpc_files }}
           STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PUSH_FILES: ${{ steps.filter_on_some.outputs.extra_on_push_files }}
           STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PULL_REQUEST_FILES: ${{ steps.filter_on_some.outputs.extra_on_pull_request_files }}
-          STEPS_FILTER_ON_SOME_OUTPUTS_TRIVYSCAN_FILES: ${{ steps.filter_on_some.outputs.trivyscan_files }}
+          STEPS_FILTER_ON_SOME_OUTPUTS_SCAN_FILES: ${{ steps.filter_on_some.outputs.scan_files }}
 
   stackhpc:
     name: Test deployment and reimage on OpenStack
@@ -151,10 +151,10 @@ jobs:
     # uses most secrets, dynamically, so silence the warning
     secrets: inherit # zizmor: ignore[secrets-inherit]
 
-  # trivyscan:
-  #   name: Trivy scan image for vulnerabilities
-  #   needs: files_changed
-  #   if: |
-  #     needs.files_changed.outputs.trivyscan == 'true' || github.event_name != 'pull_request'
-  #   uses: ./.github/workflows/trivyscan.yml
-  #   secrets: inherit
+  scan:
+    name: Trivy scan image for vulnerabilities
+    needs: files_changed
+    if: |
+      needs.files_changed.outputs.scan == 'true' || github.event_name != 'pull_request'
+    uses: ./.github/workflows/scan.yml
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
