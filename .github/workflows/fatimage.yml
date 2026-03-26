@@ -44,6 +44,7 @@ jobs:
       CI_CLOUD: ${{ github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud }}
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }}
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -53,9 +54,7 @@ jobs:
       - name: Record settings for CI cloud
         run: |
           echo "CI_CLOUD: ${CI_CLOUD}"
-          echo "cleanup_on_failure: ${GITHUB_EVENT_INPUTS_CLEANUP_ON_FAILURE}"
-        env:
-          GITHUB_EVENT_INPUTS_CLEANUP_ON_FAILURE: ${{ github.event.inputs.cleanup_on_failure  }}
+          echo "PACKER_ON_ERROR: ${PACKER_ON_ERROR}"
 
       - name: Setup ssh
         run: |
@@ -101,12 +100,16 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }} \
+          -on-error="$PACKER_ON_ERROR" \
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
-          -var "source_image_name=${{ matrix.build.source_image_name }}" \
-          -var "image_name=${{ matrix.build.image_name }}" \
-          -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
+          -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
+          -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
+          -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
           openstack.pkr.hcl
+        env:
+          MATRIX_BUILD_SOURCE_IMAGE_NAME: ${{ matrix.build.source_image_name }}
+          MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
+          MATRIX_BUILD_INVENTORY_GROUPS: ${{ matrix.build.inventory_groups }}
 
       - name: Get created image names from manifest
         id: manifest
