@@ -81,7 +81,7 @@ jobs:
           . venv/bin/activate
           sudo mkdir /mnt/images
           sudo chmod 777 /mnt/images
-          openstack image save --file "/mnt/images/${IMAGE_NAME}.qcow2" "${IMAGE_NAME}"
+          openstack image save --file "/mnt/images/${IMAGE_NAME}" "${IMAGE_NAME}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
@@ -94,8 +94,8 @@ jobs:
       - name: Make directory for mount
         run: sudo mkdir -p "./${IMAGE_NAME}"
 
-      - name: Mount qcow2 file
-        run: sudo guestmount -a "/mnt/images/${IMAGE_NAME}.qcow2" -i --ro -o allow_other "./${IMAGE_NAME}"
+      - name: Mount image file
+        run: sudo guestmount -a "/mnt/images/${IMAGE_NAME}" -i --ro -o allow_other "./${IMAGE_NAME}"
 
       - name: Generate sbom
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
