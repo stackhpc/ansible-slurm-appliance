@@ -9,9 +9,8 @@ name: Scan image for vulnerabilities
   workflow_call:
   workflow_dispatch:
 
-permissions: {}
-  # TODO: probably need this back to upload scan results
-  # security-events: write
+permissions:
+  security-events: write
 
 jobs:
   scan:
