@@ -102,18 +102,25 @@ jobs:
         id: generate-sbom
         with:
           path: "./${{ steps.manifest.outputs.image-name }}"
-          artifact-name: "${{ steps.manifest.outputs.image-name }}-sbom.spdx.json"
-          output-file: "${{ steps.manifest.outputs.image-name }}-sbom.spdx.json"
-          format: spdx-json
+          artifact-name: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          output-file: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          format: syft-json
 
       - name: Generate SARIF Scan Report
         uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
         id: scan
         with:
-          sbom: "${{ steps.manifest.outputs.image-name }}-sbom.spdx.json"
+          sbom: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
           severity-cutoff: low  # want everything for the Security Tab
           output-format: sarif # format required for github security tab
           fail-build: false # don't stop workflow if vulns are found
+
+      - name: Upload scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+          # Useful if you are running this in a matrix
+          category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
         uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
