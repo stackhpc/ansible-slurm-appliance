@@ -9,9 +9,6 @@ name: Scan image for vulnerabilities
   workflow_call:
   workflow_dispatch:
 
-permissions:
-  security-events: write
-
 jobs:
   scan:
     runs-on: ubuntu-24.04
@@ -19,11 +16,13 @@ jobs:
       fail-fast: false
       matrix:
         build: ["RL8", "RL9"]
+    permissions:
+      security-events: write
+      contents: write
     env:
       JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
-
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
