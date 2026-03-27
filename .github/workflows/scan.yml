@@ -106,6 +106,15 @@ jobs:
           output-file: "${{ steps.manifest.outputs.image-name }}-sbom.spdx.json"
           format: spdx-json
 
+      - name: Generate SARIF Scan Report
+        uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
+        id: scan
+        with:
+          sbom: "${{ steps.manifest.outputs.image-name }}-sbom.spdx.json"
+          severity-cutoff: low  # want everything for the Security Tab
+          output-format: sarif # format required for github security tab
+          fail-build: false # don't stop workflow if vulns are found
+
       - name: Fail if scan has CRITICAL vulnerabilities
         uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
         with:
@@ -113,29 +122,3 @@ jobs:
           output-format: table
           severity-cutoff: critical
           only-fixed: true
-
-      # TODO -- not changed below here
-
-      # - name: Upload Trivy scan results to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v4
-      #   with:
-      #     sarif_file: "${{ steps.manifest.outputs.image-name }}.sarif"
-      #     category: "${{ matrix.build }}"
-
-      # - name: Fail if scan has CRITICAL vulnerabilities
-      #   uses: aquasecurity/trivy-action@57a97c7
-      #   with:
-      #     scan-type: fs
-      #     scan-ref: "${{ steps.manifest.outputs.image-name }}"
-      #     scanners: "vuln"
-      #     format: table
-      #     exit-code: '1'
-      #     severity: 'CRITICAL'
-      #     ignore-unfixed: true
-      #     trivyignores: .github/.trivyignore
-      #     timeout: 15m
-      #     # On a subsequent call to the action we know trivy is already installed so can skip this
-      #     skip-setup-trivy: true
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     TRIVY_DB_REPOSITORY: ghcr.io/azimuth-cloud/trivy-db:2
