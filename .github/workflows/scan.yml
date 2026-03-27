@@ -1,6 +1,6 @@
 ---
 
-# Scan the built image for vulnerabilities using Crype.
+# Scan the built image for vulnerabilities using Grype.
 # This workflow can run standalone or as part of the main CI workflow.
 # See the workflow file 'main.yml' for how this is CI triggered.
 
@@ -105,6 +105,11 @@ jobs:
           artifact-name: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
           output-file: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
           format: syft-json
+      
+      - name: Upload sbom
+        uses: anchore/sbom-action/publish-sbom@e22c389904149dbc22b58101806040fa8d37a610
+        with:
+          sbom-artifact-match: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
 
       - name: Generate SARIF Scan Report
         uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
