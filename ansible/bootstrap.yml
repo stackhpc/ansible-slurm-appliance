@@ -217,10 +217,10 @@
   become: true
   tags: cockpit
   tasks:
-    - name: Remove RHEL cockpit # noqa: no-changed-when
-      ansible.builtin.command: dnf -y remove cockpit-ws
-      register: dnf_remove_output
-      ignore_errors: true # Avoid failing if a lock or other error happens
+    - name: Remove RHEL cockpit
+      ansible.builtin.dnf:
+        name: cockpit-ws
+        state: absent
 
 - hosts: firewalld
   gather_facts: false
