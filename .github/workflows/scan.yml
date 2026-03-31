@@ -115,6 +115,7 @@ jobs:
         with:
           sbom: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
           severity-cutoff: low  # want everything for the Security Tab
+          only-fixed: true
           output-format: sarif # format required for github security tab
           fail-build: false # don't stop workflow if vulns are found
 
