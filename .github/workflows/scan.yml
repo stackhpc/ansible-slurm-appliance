@@ -9,6 +9,8 @@ name: Scan image for vulnerabilities
   workflow_call:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   scan:
     runs-on: ubuntu-24.04
@@ -17,8 +19,8 @@ jobs:
       matrix:
         build: ["RL8", "RL9"]
     permissions:
-      security-events: write
-      contents: write
+      security-events: write # to upload to security tab
+      contents: write # to upload sbom
     env:
       JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack

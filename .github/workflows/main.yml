@@ -158,3 +158,6 @@ jobs:
       needs.files_changed.outputs.scan == 'true' || github.event_name != 'pull_request'
     uses: ./.github/workflows/scan.yml
     secrets: inherit  # zizmor: ignore[secrets-inherit]
+    permissions:
+      security-events: write # to upload to security tab
+      contents: write # to upload sbom
