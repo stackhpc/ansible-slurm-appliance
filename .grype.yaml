@@ -1,0 +1,90 @@
+---
+# ignore rules for grype, with justification
+ignore:
+# NOTE(m-bull): Affects the the deepdiff Python package bundled with the
+# netbox.netbox Ansible collection. This package is never actually installed,
+# and only appears in the netbox.netbox poetry.lock file, so it is safe to ignore.
+  - vulnerability: CVE-2025-58367
+
+# will be masked at runtime
+# FIXME: could cleanup better!
+# eg /tmp/prometheus-2.27.0.linux-amd64/prometheus
+  - package:
+      location: "/tmp/**"
+
+# go crypto/tls vulnerability: programs not used with TLS
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/bin/ondemand_exporter
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/local/bin/prometheus"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/local/bin/promtool"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/sbin/ondemand-dex"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/sbin/ondemand-dex-session"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/share/grafana/bin/grafana"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/share/grafana/bin/grafana-cli"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/share/grafana/bin/grafana-server"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /var/lib/podman/.local/share/containers/storage/overlay/b51397a6db0ae651df3ffd51be823f98a26ab18ac7033847fedbac792798ae18/diff/usr/share/filebeat/filebeat
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /var/lib/podman/.local/share/containers/storage/overlay/efeebaada56fcf04784f6d67852667327a8e50d18bbf9aea6d3556865e894f59/diff/usr/local/bin/gosu
+
+#  go crypto/tls vulnerability: programs used with trusted TLS servers
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# system dep, what can we do?
+  - vulnerability: CVE-2025-68121
+    package:
+      name: podman
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/bin/podman
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/libexec/podman/**"
+  - vulnerability: CVE-2025-68121  # ondemand dep
+    package:
+      location: "/usr/bin/rclone"
+
+# go crypto/tls vulnerability: programs run by users not admins
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/bin/apptainer"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/libexec/apptainer/**"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/libexec/apptainer/**"
+
+# programs not run
+  - package:
+      location: /var/www/ood/apps/sys/dashboard/node_modules/@esbuild/linux-x64/bin/esbuild
+  - package:
+      location: /usr/lib/rstudio-server/bin/quarto/bin/tools/x86_64/esbuild
