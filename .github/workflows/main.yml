@@ -152,7 +152,7 @@ jobs:
     secrets: inherit # zizmor: ignore[secrets-inherit]
 
   scan:
-    name: Trivy scan image for vulnerabilities
+    name: Scan image for vulnerabilities
     needs: files_changed
     if: |
       needs.files_changed.outputs.scan == 'true' || github.event_name != 'pull_request'
