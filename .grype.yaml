@@ -6,6 +6,18 @@ ignore:
 # and only appears in the netbox.netbox poetry.lock file, so it is safe to ignore.
   - vulnerability: CVE-2025-58367
 
+# GOARCH=wasm GOOS=js is not used
+  - vulnerability: CVE-2021-38297
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: CVE-2021-38297
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: CVE-2021-38297
+    package:
+      location: /usr/local/bin/promtool
+
+
 # will be masked at runtime
 # FIXME: could cleanup better!
 # eg /tmp/prometheus-2.27.0.linux-amd64/prometheus
