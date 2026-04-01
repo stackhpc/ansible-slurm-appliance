@@ -1,15 +1,132 @@
+---
+
+# Scan the built image for vulnerabilities using Grype.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
+
 name: Scan image for vulnerabilities
 'on':
   workflow_call:
   workflow_dispatch:
 
 permissions: {}
-  # TODO: probably need this back to upload scan results
-  #security-events: write
 
 jobs:
   scan:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        build: ["RL8", "RL9"]
+    permissions:
+      security-events: write # to upload to security tab
+      contents: write # to upload sbom
+    env:
+      JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
     steps:
-      - name: Do nothing
-        run: echo not doing anything
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Override CI_CLOUD if PR label is present
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          # Iterate over the labels
+          echo "$LABELS"
+          for label in $LABELS; do
+             if [[ $label == CI_CLOUD=* ]]; then
+              # Extract the value after 'CI_CLOUD='
+              CI_CLOUD_OVERRIDE="${label#CI_CLOUD=}"
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
+            fi
+          done
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: "${CI_CLOUD}"
+
+      - name: Setup environment
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
+        shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
+
+      - name: Parse image name json
+        id: manifest
+        run: |
+          IMAGE_NAME=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$JSON_PATH")
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_ENV"
+          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+        env:
+          MATRIX_BUILD: ${{ matrix.build }}
+          JSON_PATH: ${{ env.JSON_PATH }}
+
+      - name: Download image
+        # NB: use /mnt as that is a separate disk with more space
+        run: |
+          . venv/bin/activate
+          sudo mkdir /mnt/images
+          sudo chmod 777 /mnt/images
+          openstack image save --file "/mnt/images/${IMAGE_NAME}" "${IMAGE_NAME}"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+
+      - name: Install libguestfs
+        run: |
+          sudo apt -y update
+          sudo apt -y install libguestfs-tools
+
+      - name: Make directory for mount
+        run: sudo mkdir -p "./${IMAGE_NAME}"
+
+      - name: Mount image file
+        run: sudo guestmount -a "/mnt/images/${IMAGE_NAME}" -i --ro -o allow_other "./${IMAGE_NAME}"
+
+      - name: Generate sbom and attach to release if applicable
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        id: generate-sbom
+        with:
+          path: "./${{ steps.manifest.outputs.image-name }}"
+          artifact-name: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          output-file: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          format: syft-json
+
+      - name: Generate SARIF Scan Report
+        uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c # v7.3.2
+        id: scan
+        with:
+          sbom: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          severity-cutoff: low  # want everything for the Security Tab
+          only-fixed: true
+          output-format: sarif # format required for github security tab
+          fail-build: false # don't stop workflow if vulns are found
+
+      - name: Upload scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@b8bb9f28b8d3f992092362369c57161b755dea45 # v4.35.0
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+          # Useful if you are running this in a matrix
+          category: "${{ matrix.build }}"
+
+      - name: Fail if scan has CRITICAL vulnerabilities
+        uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c # v7.3.2
+        with:
+          sbom: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          output-format: table
+          severity-cutoff: critical
+          only-fixed: true
