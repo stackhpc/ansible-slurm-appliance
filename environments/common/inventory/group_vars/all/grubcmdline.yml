@@ -1,0 +1,10 @@
+# Enable Presure Stall Information (psi) for performance diagnostics.
+# the rest of the arguments were taken from the default value.
+# They need to be specified or they are removed!
+grubcmdline_kernel_cmdline:
+  - console=ttyS0,115200n8
+  - no_timer_check
+  - crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M
+  - net.ifnames=0
+  - psi=1
+grubcmdline_kernel_cmdline_remove: []
