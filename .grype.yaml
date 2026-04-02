@@ -171,3 +171,14 @@ ignore:
   - vulnerability: CVE-2024-8986
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2025-22871 request smuggling in net/http server (bare LF) -- no server forwarding chunked data here
+  - vulnerability: CVE-2025-22871
+    package:
+      location: /usr/bin/ondemand_exporter
+  - vulnerability: CVE-2025-22871
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+  - vulnerability: CVE-2025-22871
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
