@@ -155,3 +155,11 @@ ignore:
   - vulnerability: CVE-2023-3128
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2024-24790 IsPrivate, IsLoopback, etc broken for IPv4-mapped IPv6 addresses -- not affected
+  - vulnerability: CVE-2024-24790
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+  - vulnerability: CVE-2024-24790
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
