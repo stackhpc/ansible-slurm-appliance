@@ -163,3 +163,11 @@ ignore:
   - vulnerability: CVE-2024-24790
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2024-8986 Grafana plugin SDK Information Leakage about git source repository -- not affected
+  - vulnerability: CVE-2024-8986
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: CVE-2024-8986
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
