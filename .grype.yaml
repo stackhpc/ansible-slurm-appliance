@@ -128,3 +128,25 @@ ignore:
 # CVE-2022-21797
   - package:
       location: /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements-dev.txt
+
+# CVE-2023-24531 `go env` command is not used
+  - vulnerability: CVE-2023-24531
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+# CVE-2023-24531 `go env` command is not used
+  - vulnerability: CVE-2023-24531
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2023-29402 go command is not used
+  - vulnerability: CVE-2023-29402
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+# CVE-2023-29404 go command is not used
+  - vulnerability: CVE-2023-29404
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+# CVE-2023-29405 go command is not used
+  - vulnerability: CVE-2023-29405
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
