@@ -123,3 +123,8 @@ ignore:
 # CVE-2021-43267, CVE-2021-47378, ...
   - package:
       location: /boot/vmlinuz-0-rescue-*
+
+# ansible-init dev requirements are not used in image
+# CVE-2022-21797
+  - package:
+      location: /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements-dev.txt
