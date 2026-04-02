@@ -182,3 +182,14 @@ ignore:
   - vulnerability: CVE-2025-22871
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not running go server
+  - vulnerability: CVE-2026-33186
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: CVE-2026-33186
+    package:
+      location: /usr/bin/rclone
+  - vulnerability: CVE-2026-33186
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
