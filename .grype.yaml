@@ -150,3 +150,8 @@ ignore:
   - vulnerability: CVE-2023-29405
     package:
       location: /usr/bin/prometheus-slurm-exporter
+
+# CVE-2023-3128 grafana Azure AD auth bypass by spoofing -- not used
+  - vulnerability: CVE-2023-3128
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
