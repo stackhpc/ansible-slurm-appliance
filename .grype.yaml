@@ -198,3 +198,15 @@ ignore:
   - vulnerability: CVE-2024-45337
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2026-33937 Handlebars.compile() javascript injection
+# Handlebars.compile() is only used by the shell app via hbs. All uses seem safe:
+#  - protected by `typeof input !== 'string'` as https://github.com/handlebars-lang/handlebars.js/security/advisories/GHSA-2w6w-674q-4c4q
+#  - or from string by directly reading a file on disk
+  - vulnerability: CVE-2026-33937
+    package:
+      location: /var/www/ood/apps/sys/shell/yarn.lock
+# Handlebars.compile() is only used by webpack.config.js and input from string by directly reading a file on disk
+  - vulnerability: CVE-2026-33937
+    package:
+      location: /opt/jupyter-py39/lib/python3.9/site-packages/jupyterlab/staging/yarn.lock
