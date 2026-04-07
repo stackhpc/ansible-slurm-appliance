@@ -30,6 +30,8 @@ without requiring LDAP etc. Features:
   This should be a host mounting the home directories. Default is the first
   node in the `login` group which is appropriate for the default appliance
   configuration.
+- `basic_users_uid_min`: Optional int, default `3000`. The minimum UID for
+  normal users, i.e. those without the `system` attribute.
 - `basic_users_users`: Optional, default empty list. A list of mappings defining
   information for each user. In general, mapping keys/values are passed through
   as parameters to [ansible.builtin.user](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html)
