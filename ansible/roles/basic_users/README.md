@@ -67,66 +67,66 @@ None.
 
 ## Example Configurations
 
-1.  With default appliance NFS configuration, create user `alice` with access
-    to all nodes except the control node, and delete user `bob`:
+1. With default appliance NFS configuration, create user `alice` with access
+   to all nodes except the control node, and delete user `bob`:
 
-        ```yaml
-        basic_users_users:
-          - comment: Alice Aardvark
-            name: alice
-            uid: 2005
-            public_key: ssh-ed25519 ...
-          - comment: Bob Badger
-            name: bob
-            uid: 2006
-            public_key: ssh-ed25519 ...
-            state: absent
-        ```
+   ```yaml
+   basic_users_users:
+     - comment: Alice Aardvark
+       name: alice
+       uid: 2005
+       public_key: ssh-ed25519 ...
+     - comment: Bob Badger
+       name: bob
+       uid: 2006
+       public_key: ssh-ed25519 ...
+       state: absent
+   ```
 
-        Note the UIDs for these users are above the default `basic_users_uid_min`.
+   Note the UIDs for these users are above the default `basic_users_uid_min`.
 
-2.  Using an external fileshare which:
-    - Does not root squash (so this role can create directories on it)
-    - Is mounted to all nodes including the control node (so this role can set
-      authorized keys there)
+2. Using an external fileshare which:
+   - Does not root squash (so this role can create directories on it)
+   - Is mounted to all nodes including the control node (so this role can set
+     authorized keys there)
 
-    create user `carol`:
+   create user `carol`:
 
-    ```yaml
-    basic_users_homedir_host: "{{ ansible_play_hosts | first }}" # doesn't matter which host is used
-    basic_users_homedir_host_path: /home # homedir_host is client not server
-    basic_users_user:
-      - comment: Carol Crane
-        name: carol
-        uid: 2007
-        public_key: ssh-ed25519 ...
-    ```
+   ```yaml
+   basic_users_homedir_host: "{{ ansible_play_hosts | first }}" # doesn't matter which host is used
+   basic_users_homedir_host_path: /home # homedir_host is client not server
+   basic_users_user:
+     - comment: Carol Crane
+       name: carol
+       uid: 2007
+       public_key: ssh-ed25519 ...
+   ```
 
-3.  Using an external share which _does_ root squash, so home directories cannot be
-    created by this role and must already exist, create user `Dan`:
+3. Using an external share which _does_ root squash, so home directories cannot be
+   created by this role and must already exist, create user `Dan`:
 
-        ```yaml
-        basic_users_homedir_host: "{{ ansible_play_hosts | first }}"
-        basic_users_homedir_host_path: /home
-        basic_users_users:
-          - comment: Dan Deer
-            create_home: false
-            name: dan
-            uuid: 2008
-            public_key: ssh-ed25519 ...
-        ```
+   ```yaml
+   basic_users_homedir_host: "{{ ansible_play_hosts | first }}"
+   basic_users_homedir_host_path: /home
+   basic_users_users:
+     - comment: Dan Deer
+       create_home: false
+       name: dan
+       uuid: 2008
+       public_key: ssh-ed25519 ...
+   ```
 
-4.  Using NFS exported from the control node, but mounted to all nodes (so that
-    authorized keys applies to all nodes), create user `Erin` with passwordless sudo:
+4. Using NFS exported from the control node, but mounted to all nodes (so that
+   authorized keys applies to all nodes), create user `Erin` with passwordless sudo:
 
-        ```yaml
-        basic_users_users:
-          - comment: Erin Eagle
-            name: erin
-            uid: 2009
-            shell: /bin/bash # override default nologin on control
-            groups:
-              - adm # enables ssh to compute nodes even without a job running
-            sudo: erin ALL=(ALL) NOPASSWD:ALL
-            public_key: ssh-ed25519 ...
-        ```
+   ```yaml
+   basic_users_users:
+     - comment: Erin Eagle
+       name: erin
+       uid: 2009
+       shell: /bin/bash # override default nologin on control
+       groups:
+         - adm # enables ssh to compute nodes even without a job running
+       sudo: erin ALL=(ALL) NOPASSWD:ALL
+       public_key: ssh-ed25519 ...
+   ```
