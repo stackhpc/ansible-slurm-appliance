@@ -35,7 +35,7 @@
   tags: node_exporter
   tasks:
     - ansible.builtin.import_role:
-        name: cloudalchemy.node_exporter
+        name: prometheus.prometheus.node_exporter
 
 - name: Deploy Open OnDemand exporter
   hosts: openondemand
@@ -74,7 +74,7 @@
         prometheus_skip_install: "{{ false if prometheus_version is defined else true }}"
       when: "(prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined]"
     - ansible.builtin.import_role:
-        name: cloudalchemy.prometheus
+        name: prometheus.prometheus.prometheus
 
 - name: Deploy grafana
   hosts: grafana
@@ -110,6 +110,7 @@
   gather_facts: false
   tasks:
     - name: Configure alertmanager
+      # TODO: compare with prometheus.prometheus.alertmanager
       ansible.builtin.include_role:
         name: alertmanager
         tasks_from: configure.yml

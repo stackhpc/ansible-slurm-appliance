@@ -3,7 +3,7 @@
 # See: https://github.com/cloudalchemy/ansible-prometheus
 # for variable definitions
 
-prometheus_version: 2.27.0 # default from ansible/roles/cloudalchemy.prometheus/defaults/main.yml
+prometheus_version: 3.5.1 # latest LTS (https://prometheus.io/docs/introduction/release-cycle/)
 prometheus_web_external_url: "http://{{ hostvars[groups['prometheus'].0].ansible_host }}:9090/" # default to host IP address
 prometheus_storage_retention: "31d"
 prometheus_storage_retention_size: "100GB"
