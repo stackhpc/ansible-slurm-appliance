@@ -1,5 +1,8 @@
 ---
-alertmanager_port: "9093" # defined here as required for prometheus
+alertmanager_version: "0.31.1"  # Latest version at the time of writing. Usually nothing prevents us from bumping alertmanager version.
+alertmanager_checksum: 35191cbd9d4f8162458b78dd7e93990cccd246044d9a6f788adb1c66ac3ea07b
+
+alertmanager_port: "9093"
 
 alertmanager_slack_receiver_name: slack-receiver
 alertmanager_slack_receiver_send_resolved: true
