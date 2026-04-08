@@ -223,7 +223,9 @@
     - ansible.builtin.import_role:
         name: prometheus.prometheus.prometheus
       vars:
-        prometheus_stopped: true
+        prometheus_skip_configure: true
+        # prometheus_alert_rules contain undefined variables at this time, causing
+        # an assertion failure in arg check
         prometheus_alert_rules: []
 
 - hosts: grafana

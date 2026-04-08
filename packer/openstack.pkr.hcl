@@ -161,6 +161,12 @@ variable "image_name_version" {
   default = "auto"
 }
 
+variable "skip_tags" {
+  type = string
+  description = "Tags to skip when running the fatimage playbook. No need to override."
+  default = "prometheus_configure,prometheus_run"
+}
+
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
@@ -212,6 +218,7 @@ build {
       "-i", "${var.repo_root}/packer/ansible-inventory.sh",
       "-vv",
       "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
+      "--skip-tags", "${var.skip_tags}",
       ]
   }
 
