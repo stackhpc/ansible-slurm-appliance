@@ -61,6 +61,7 @@
     owner: "{{ item.name }}"
     group: "{{ item.name }}"
     mode: u=rwX,go=
+    force: false # prevents user changes to skeleton being overwritten
   loop: "{{ basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
