@@ -7,6 +7,7 @@ At present this will affect the following:
 - `slurmctld` state, i.e. the Slurm queue.
 - The MySQL database for `slurmdbd`, i.e. Slurm accounting information as shown by the `sacct` command.
 - Prometheus database
+- Alertmanager database
 - Grafana data
 - OpenDistro/Elasticsearch data
 

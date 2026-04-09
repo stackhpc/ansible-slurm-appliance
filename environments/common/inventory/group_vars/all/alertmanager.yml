@@ -59,3 +59,5 @@ alertmanager_slack_receiver:
       send_resolved: "{{ alertmanager_slack_receiver_send_resolved }}"
 
 alertmanager_web_external_url: "http://{{ hostvars[groups['alertmanager'].0].ansible_host }}:{{ alertmanager_port}}/"
+
+alertmanager_db_dir: "{{ appliances_state_dir | default('/var/lib') }}/alertmanager"
