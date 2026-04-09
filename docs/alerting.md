@@ -112,7 +112,7 @@ These are part of [Prometheus configuration](https://prometheus.io/docs/promethe
 which is defined for the appliance at
 [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml).
 
-Two [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus)
+Two [prometheus.prometheus.prometheus](https://github.com/stackhpc/prometheus-community-ansible/tree/stackhpc/roles/prometheus)
 role variables are relevant:
 
 - `prometheus_alert_rules_files`: Paths to check for files providing rules.

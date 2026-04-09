@@ -12,7 +12,7 @@ from ansible.utils.display import Display  # pylint: disable=import-error
 
 
 def prometheus_node_exporter_targets(hosts, hostvars, env_key, group):
-    """Return a mapping in cloudalchemy.nodeexporter prometheus_targets
+    """Return a mapping in prometheus.prometheus.prometheus prometheus_targets
     format.
 
     hosts: list of inventory_hostnames
