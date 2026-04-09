@@ -161,7 +161,7 @@ For further information see the [docs](docs/) directory.
 
 ## Developing locally
 
-To run the GitHub Actions linters locally, use `./dev/run-linter`.
+To run the GitHub Actions linters locally, use `./dev/run-linters`.
 
-A faster run can be achieved by `./dev/run-linter -f`, which skips ansible-lint and gitleaks.
+A faster run can be achieved by `./dev/run-linters -f`, which skips ansible-lint and gitleaks.
 They can also be skipped individually via `VALIDATE_ANSIBLE_LINT=false` or `VALIDATE_GITLEAKS=false` environment variables.
