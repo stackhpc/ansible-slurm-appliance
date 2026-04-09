@@ -206,8 +206,15 @@
 
     - name: Install alertmanager
       ansible.builtin.include_role:
-        name: alertmanager
-        tasks_from: install.yml
+        name: prometheus.prometheus.alertmanager
+      vars:
+        alertmanager_skip_configure: true
+        # must be overridden because the alertmanager password is undefined at this staged
+        # so it won't pass "Validating arguments against arg spec 'main'"
+        alertmanager_web_config:
+          basic_auth_users: {}
+          http_server_config: {}
+          tls_server_config: {}
       when: "'alertmanager' in group_names"
 
     - name: Download HPL source
