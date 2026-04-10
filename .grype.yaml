@@ -199,6 +199,13 @@ ignore:
     package:
       location: /usr/sbin/ondemand-dex-session
 
+
+# CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- TMP disable to check ignores are working
+# FIXME: should upgrade grafana to  Grafana 12.4.2
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/share/grafana/bin/grafana
+
 # CVE-2024-45337 (GO-2024-3321) Misuse of ServerConfig.PublicKeyCallback -- not using ssh
   - vulnerability: GHSA-v778-237x-gjrc
     package:
