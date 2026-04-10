@@ -4,8 +4,9 @@ ignore:
 # NOTE(m-bull): Affects the the deepdiff Python package bundled with the
 # netbox.netbox Ansible collection. This package is never actually installed,
 # and only appears in the netbox.netbox poetry.lock file, so it is safe to ignore.
-  - vulnerability: CVE-2025-58367
-
+  - vulnerability: GHSA-mw26-5g2v-hqw3
+    package:
+      location: /usr/lib/ansible-init/lib/python3.9/site-packages/ansible_collections/netbox/netbox/poetry.lock
 
 # go crypto/tls vulnerability: programs not used with TLS
   - vulnerability: CVE-2025-68121
@@ -133,7 +134,7 @@ ignore:
       location: /usr/bin/prometheus-slurm-exporter
 
 # CVE-2023-3128 grafana Azure AD auth bypass by spoofing -- not used
-  - vulnerability: CVE-2023-3128
+  - vulnerability: GHSA-mpv3-g8m3-3fjc
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
@@ -146,10 +147,10 @@ ignore:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2024-8986 Grafana plugin SDK Information Leakage about git source repository -- not affected
-  - vulnerability: CVE-2024-8986
+  - vulnerability: GHSA-xxxw-3j6h-q7h6
     package:
       location: /usr/share/grafana/bin/grafana
-  - vulnerability: CVE-2024-8986
+  - vulnerability: GHSA-xxxw-3j6h-q7h6
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
@@ -165,24 +166,24 @@ ignore:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not running go server
-  - vulnerability: CVE-2026-33186
+  - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /usr/bin/apptainer
-  - vulnerability: CVE-2026-33186
+  - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /usr/bin/rclone
-  - vulnerability: CVE-2026-33186
+  - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /usr/local/bin/amtool
-  - vulnerability: CVE-2026-33186
+  - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /usr/local/bin/promtool
-  - vulnerability: CVE-2026-33186
+  - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- no auth to start with
-  - vulnerability: CVE-2026-33186
+  - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /usr/local/bin/prometheus
 
@@ -191,18 +192,18 @@ ignore:
 # DEX doesn't use grpc/authz but has custom interceptors. I couldn't tell if it's vulnerable to the attack.
 # Regardless, the gRPC API is off by default (https://dexidp.io/docs/configuration/api/#configuration)
 # Our deployments don't enable it. Check for the commented-out `grpc:` block in `/etc/ood/dex/config.yaml` to confirm.
-  - vulnerability: CVE-2026-33186
+  - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /usr/sbin/ondemand-dex
-  - vulnerability: CVE-2026-33186
+  - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /usr/sbin/ondemand-dex-session
 
 # CVE-2024-45337 (GO-2024-3321) Misuse of ServerConfig.PublicKeyCallback -- not using ssh
-  - vulnerability: CVE-2024-45337
+  - vulnerability: GHSA-v778-237x-gjrc
     package:
       location: /usr/libexec/apptainer/bin/gocryptfs
-  - vulnerability: CVE-2024-45337
+  - vulnerability: GHSA-v778-237x-gjrc
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
@@ -210,20 +211,20 @@ ignore:
 # Handlebars.compile() is only used by the shell app via hbs. All uses seem safe:
 #  - protected by `typeof input !== 'string'` as https://github.com/handlebars-lang/handlebars.js/security/advisories/GHSA-2w6w-674q-4c4q
 #  - or from string by directly reading a file on disk
-  - vulnerability: CVE-2026-33937
+  - vulnerability: GHSA-2w6w-674q-4c4q
     package:
       location: /var/www/ood/apps/sys/shell/yarn.lock
 # Handlebars.compile() is only used by webpack.config.js and input from string by directly reading a file on disk
-  - vulnerability: CVE-2026-33937
+  - vulnerability: GHSA-2w6w-674q-4c4q
     package:
       location: /opt/jupyter-py39/lib/python3.9/site-packages/jupyterlab/staging/yarn.lock
 
 # CVE-2026-39324 Rack::Session::Cookie secrets: decrypt failure fallback enables secretless session forgery and Marshal deserialization
 # Preliminary checks indicate OOD is not affected, as a Ruby on Rails application.
-  - vulnerability: CVE-2026-33937
+  - vulnerability: GHSA-33qg-7wpp-89cq
     package:
       location: /opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/rack-session-2.1.1.gemspec
-  - vulnerability: CVE-2026-33937
+  - vulnerability: GHSA-33qg-7wpp-89cq
     package:
       location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
 
