@@ -1,4 +1,20 @@
 ---
+- name: Ensure uid is defined
+  ansible.builtin.assert:
+    that: "_basic_users_missing_uid | length == 0"
+    fail_msg: "User(s) {{ _basic_users_missing_uid | join(', ') }} are missing uid"
+  vars:
+    _basic_users_missing_uid: "{{ basic_users_users | reject('contains', 'uid') | map(attribute='name') }}"
+  run_once: true
+
+- name: Ensure uid is suitable
+  ansible.builtin.assert:
+    that: "_basic_users_low_uid | length == 0"
+    fail_msg: "User(s) {{ _basic_users_low_uid | join(', ') }} are not 'system' users but have a uid < basic_users_uid_min ({{ basic_users_uid_min }})"
+  vars:
+    _basic_users_low_uid: "{{ basic_users_users | reject('contains', 'system') | selectattr('uid', 'lt', basic_users_uid_min) | map(attribute='name') }}"
+  run_once: true
+
 - name: Terminate systemd user sessions for absent users
   terminate_user_sessions:
     user: "{{ item.name }}"
