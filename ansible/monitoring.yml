@@ -110,7 +110,5 @@
   gather_facts: false
   tasks:
     - name: Configure alertmanager
-      # TODO: compare with prometheus.prometheus.alertmanager
       ansible.builtin.include_role:
-        name: alertmanager
-        tasks_from: configure.yml
+        name: prometheus.prometheus.alertmanager
