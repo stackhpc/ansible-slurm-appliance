@@ -6,11 +6,6 @@ ignore:
 # and only appears in the netbox.netbox poetry.lock file, so it is safe to ignore.
   - vulnerability: CVE-2025-58367
 
-# will be masked at runtime
-# FIXME: could cleanup better!
-# eg /tmp/prometheus-2.27.0.linux-amd64/prometheus
-  - package:
-      location: "/tmp/**"
 
 # go crypto/tls vulnerability: programs not used with TLS
   - vulnerability: CVE-2025-68121
@@ -232,6 +227,10 @@ ignore:
     package:
       location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
 
-# Exclude podman images, pending MySQL+OpenSearch+Filebeat upgrade
-  - package:
-      location: /var/lib/podman/.local/share/**
+# Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
+exclude:
+  - /var/lib/podman/.local/share/**
+# will be masked at runtime
+# FIXME: could cleanup better!
+# eg /tmp/prometheus-2.27.0.linux-amd64/prometheus
+  - /tmp/**
