@@ -231,3 +231,7 @@ ignore:
   - vulnerability: CVE-2026-33937
     package:
       location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
+
+# Exclude podman images, pending MySQL+OpenSearch+Filebeat upgrade
+  - package:
+      location: /var/lib/podman/.local/share/**
