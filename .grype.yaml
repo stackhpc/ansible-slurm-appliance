@@ -222,3 +222,12 @@ ignore:
   - vulnerability: CVE-2026-33937
     package:
       location: /opt/jupyter-py39/lib/python3.9/site-packages/jupyterlab/staging/yarn.lock
+
+# CVE-2026-39324 Rack::Session::Cookie secrets: decrypt failure fallback enables secretless session forgery and Marshal deserialization
+# Preliminary checks indicate OOD is not affected, as a Ruby on Rails application.
+  - vulnerability: CVE-2026-33937
+    package:
+      location: /opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/rack-session-2.1.1.gemspec
+  - vulnerability: CVE-2026-33937
+    package:
+      location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
