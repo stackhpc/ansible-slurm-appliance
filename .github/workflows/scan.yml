@@ -106,6 +106,9 @@ jobs:
           output-file: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
           format: syft-json
 
+      - name: Confirm .grype.yaml is present
+        run: ls -l .grype.yaml
+
       - name: Generate SARIF Scan Report
         uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c # v7.3.2
         id: scan
@@ -115,6 +118,7 @@ jobs:
           only-fixed: true
           output-format: sarif # format required for github security tab
           fail-build: false # don't stop workflow if vulns are found
+          config: ./.grype.yaml # our exclusion rules
 
       - name: Upload scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@b8bb9f28b8d3f992092362369c57161b755dea45 # v4.35.0
@@ -130,3 +134,4 @@ jobs:
           output-format: table
           severity-cutoff: critical
           only-fixed: true
+          config: ./.grype.yaml # our exclusion rules
