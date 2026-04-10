@@ -6,18 +6,6 @@ ignore:
 # and only appears in the netbox.netbox poetry.lock file, so it is safe to ignore.
   - vulnerability: CVE-2025-58367
 
-# GOARCH=wasm GOOS=js is not used
-  - vulnerability: CVE-2021-38297
-    package:
-      location: /usr/local/bin/node_exporter
-  - vulnerability: CVE-2021-38297
-    package:
-      location: /usr/local/bin/prometheus
-  - vulnerability: CVE-2021-38297
-    package:
-      location: /usr/local/bin/promtool
-
-
 # will be masked at runtime
 # FIXME: could cleanup better!
 # eg /tmp/prometheus-2.27.0.linux-amd64/prometheus
@@ -31,9 +19,7 @@ ignore:
   - vulnerability: CVE-2025-68121
     package:
       location: /usr/bin/prometheus-slurm-exporter
-  - vulnerability: CVE-2025-68121
-    package:
-      location: /usr/local/bin/node_exporter
+  # prometheus 3.5.1 still has an older go runtime
   - vulnerability: CVE-2025-68121
     package:
       location: "/usr/local/bin/prometheus"
@@ -192,7 +178,18 @@ ignore:
       location: /usr/bin/rclone
   - vulnerability: CVE-2026-33186
     package:
+      location: /usr/local/bin/amtool
+  - vulnerability: CVE-2026-33186
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: CVE-2026-33186
+    package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- no auth to start with
+  - vulnerability: CVE-2026-33186
+    package:
+      location: /usr/local/bin/prometheus
 
 # CVE-2024-45337 (GO-2024-3321) Misuse of ServerConfig.PublicKeyCallback -- not using ssh
   - vulnerability: CVE-2024-45337
