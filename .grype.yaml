@@ -191,6 +191,18 @@ ignore:
     package:
       location: /usr/local/bin/prometheus
 
+# CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not affected in our deployments
+# XXX: grpc version bump is in DEX master but it needs a new DEX release before OOD release to produce the ondemand-dex package
+# DEX doesn't use grpc/authz but has custom interceptors. I couldn't tell if it's vulnerable to the attack.
+# Regardless, the gRPC API is off by default (https://dexidp.io/docs/configuration/api/#configuration)
+# Our deployments don't enable it. Check for the commented-out `grpc:` block in `/etc/ood/dex/config.yaml` to confirm.
+  - vulnerability: CVE-2026-33186
+    package:
+      location: /usr/sbin/ondemand-dex
+  - vulnerability: CVE-2026-33186
+    package:
+      location: /usr/sbin/ondemand-dex-session
+
 # CVE-2024-45337 (GO-2024-3321) Misuse of ServerConfig.PublicKeyCallback -- not using ssh
   - vulnerability: CVE-2024-45337
     package:
