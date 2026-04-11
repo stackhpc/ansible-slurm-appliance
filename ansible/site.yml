@@ -2,6 +2,8 @@
 
 - ansible.builtin.import_playbook: check-production.yml
 
+- ansible.builtin.import_playbook: adhoc/lock.yml
+
 - name: Run pre.yml hook
   vars:
     # hostvars not available here, so have to recalculate environment root:
