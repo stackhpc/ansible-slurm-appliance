@@ -119,19 +119,45 @@ ignore:
   - vulnerability: CVE-2023-24531
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# RL8 CVE-2023-24531 `go env` command is not used
+  - vulnerability: CVE-2023-24531
+    package:
+      location: /usr/bin/rclone
 
 # CVE-2023-29402 go command is not used
   - vulnerability: CVE-2023-29402
     package:
       location: /usr/bin/prometheus-slurm-exporter
+# RL8 CVE-2023-29402 go command is not used
+  - vulnerability: CVE-2023-29402
+    package:
+      location: /usr/bin/rclone
 # CVE-2023-29404 go command is not used
   - vulnerability: CVE-2023-29404
     package:
       location: /usr/bin/prometheus-slurm-exporter
+# RL8 CVE-2023-29404 go command is not used
+  - vulnerability: CVE-2023-29404
+    package:
+      location: /usr/bin/rclone
 # CVE-2023-29405 go command is not used
   - vulnerability: CVE-2023-29405
     package:
       location: /usr/bin/prometheus-slurm-exporter
+# RL8 CVE-2023-29405 go command is not used
+  - vulnerability: CVE-2023-29405
+    package:
+      location: /usr/bin/rclone
+# RL8 CVE-2023-24540 go template javascript
+# bad templates provided by `rclone serve` are in the control of the same user running the command in the first place
+  - vulnerability: CVE-2023-24540
+    package:
+      location: /usr/bin/rclone
+# RL8 CVE-2023-24538 go template backtick -- `rclone serve`
+# bad templates provided by `rclone serve` are in the control of the same user running the command in the first place
+  - vulnerability: CVE-2023-24538
+    package:
+      location: /usr/bin/rclone
 
 # CVE-2023-3128 grafana Azure AD auth bypass by spoofing -- not used
   - vulnerability: GHSA-mpv3-g8m3-3fjc
@@ -145,6 +171,10 @@ ignore:
   - vulnerability: CVE-2024-24790
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# RL8 CVE-2024-24790 IsPrivate, IsLoopback, etc broken for IPv4-mapped IPv6 addresses -- not affected
+  - vulnerability: CVE-2024-24790
+    package:
+      location: /usr/bin/rclone
 
 # CVE-2024-8986 Grafana plugin SDK Information Leakage about git source repository -- not affected
   - vulnerability: GHSA-xxxw-3j6h-q7h6
@@ -164,6 +194,10 @@ ignore:
   - vulnerability: CVE-2025-22871
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# RL8 CVE-2025-22871 request smuggling in net/http server (bare LF) -- no server forwarding chunked data here
+  - vulnerability: CVE-2025-22871
+    package:
+      location: /usr/bin/rclone
 
 # CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not running go server
   - vulnerability: GHSA-p77j-4mvh-x3m3
@@ -213,6 +247,10 @@ ignore:
   - vulnerability: GHSA-v778-237x-gjrc
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# RL8 CVE-2024-45337 (GO-2024-3321) Misuse of ServerConfig.PublicKeyCallback -- not using ssh
+  - vulnerability: GHSA-v778-237x-gjrc
+    package:
+      location: /usr/bin/rclone
 
 # CVE-2026-33937 Handlebars.compile() javascript injection
 # Handlebars.compile() is only used by the shell app via hbs. All uses seem safe:
@@ -234,6 +272,12 @@ ignore:
   - vulnerability: GHSA-33qg-7wpp-89cq
     package:
       location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
+
+# CVE-2022-23806/GHSA-8c83-vp4v-h7fq RL8 Curve.IsOnCurve can incorrectly return true
+# `rclone serve sftp` could be affected with elliptic curve authentication but it is not a known usage of the command
+  - vulnerability: CVE-2022-23806
+    package:
+      location: /usr/bin/rclone
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 exclude:
