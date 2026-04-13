@@ -4,6 +4,8 @@
 - hosts: builder
   become: false
   gather_facts: false
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
   tasks:
     - name: Report hostname (= final image name)
       ansible.builtin.command: hostname # noqa: no-changed-when
@@ -20,6 +22,11 @@
           {{ ansible_ssh_extra_args | default('') }}
           -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
           {{ ansible_user }}@{{ ansible_host }}
+    - name: Ensure python3.9 is installed
+      become: true
+      ansible.builtin.package:
+        name: python3.9
+        state: installed
 
 - name: Run pre.yml hook
   vars:

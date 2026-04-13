@@ -122,6 +122,8 @@
 - hosts: selinux
   gather_facts: false
   become: true
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
   tags:
     - selinux
   tasks:
@@ -226,6 +228,8 @@
   gather_facts: false
   become: true
   tags: firewalld
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
   tasks:
     - ansible.builtin.include_role:
         name: firewalld

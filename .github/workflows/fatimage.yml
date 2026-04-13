@@ -35,9 +35,11 @@ jobs:
           - image_name: openhpc-RL8
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
             inventory_groups: fatimage
+            ansible_python_interpreter: /usr/bin/python3.9 # avoid using python3.6 as much as possible
           - image_name: openhpc-RL9
             source_image_name: Rocky-9-GenericCloud-Base-9.7-20251123.2.x86_64.qcow2
             inventory_groups: fatimage
+            ansible_python_interpreter: ""
     env:
       ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
@@ -104,12 +106,14 @@ jobs:
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
           -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
           -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
+          -var "ansible_python_interpreter=$MATRIX_BUILD_ANSIBLE_PYTHON_INTERPRETER" \
           -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
           openstack.pkr.hcl
         env:
           MATRIX_BUILD_SOURCE_IMAGE_NAME: ${{ matrix.build.source_image_name }}
           MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
           MATRIX_BUILD_INVENTORY_GROUPS: ${{ matrix.build.inventory_groups }}
+          MATRIX_BUILD_ANSIBLE_PYTHON_INTERPRETER: ${{ matrix.build.ansible_python_interpreter }}
 
       - name: Get created image names from manifest
         id: manifest
