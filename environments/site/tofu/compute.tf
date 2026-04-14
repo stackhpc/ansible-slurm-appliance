@@ -35,6 +35,10 @@ module "compute" {
   availability_zone    = lookup(each.value, "availability_zone", null)
   ip_addresses         = lookup(each.value, "ip_addresses", null)
   server_group_id      = lookup(each.value, "server_group_id", null)
+  trunk_parent_network_id = lookup(each.value, "trunk_parent_network_id", null)
+  trunk_subport_network_id = lookup(each.value, "trunk_subport_network_id", null)
+  trunk_subport_vlan_id = lookup(each.value, "trunk_subport_vlan_id", null)
+  use_trunk = lookup(each.value, "use_trunk", false)
 
   # computed
   # not using openstack_compute_instance_v2.control.access_ip_v4 to avoid
@@ -65,7 +69,11 @@ module "compute" {
     "nodename_template",
     "additional_cloud_config",
     "additional_cloud_config_vars",
-    "server_group_id"
+    "server_group_id",
+    "trunk_parent_network_id",
+    "trunk_subport_network_id",
+    "trunk_subport_vlan_id",
+    "use_trunk"
   ]
 
 }
