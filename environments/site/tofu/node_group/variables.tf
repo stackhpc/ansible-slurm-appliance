@@ -217,7 +217,7 @@ variable "server_group_id" {
 
 variable "trunk_parent_network_id" {
   type    = string
-  description = "ID of the network to use as the parent port of the trunk."
+  description = "ID of the network to use as the parent port of the trunk. This controls the access (native) VLAN ID implicitly."
   default = null
 }
 
