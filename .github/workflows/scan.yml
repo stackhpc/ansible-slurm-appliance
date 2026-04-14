@@ -70,7 +70,7 @@ jobs:
         run: |
           IMAGE_NAME=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$JSON_PATH")
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_ENV"
-          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
         env:
           MATRIX_BUILD: ${{ matrix.build }}
           JSON_PATH: ${{ env.JSON_PATH }}
