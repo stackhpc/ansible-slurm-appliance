@@ -55,8 +55,8 @@ jobs:
 
       - name: Record settings for CI cloud
         run: |
-          echo "CI_CLOUD: ${CI_CLOUD}"
-          echo "PACKER_ON_ERROR: ${PACKER_ON_ERROR}"
+          echo "CI_CLOUD: ${CI_CLOUD}" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "PACKER_ON_ERROR | tee -a ${PACKER_ON_ERROR}"
 
       - name: Setup ssh
         run: |
