@@ -1,12 +1,6 @@
 ---
 # ignore rules for grype, with justification
 ignore:
-# NOTE(m-bull): Affects the the deepdiff Python package bundled with the
-# netbox.netbox Ansible collection. This package is never actually installed,
-# and only appears in the netbox.netbox poetry.lock file, so it is safe to ignore.
-  - vulnerability: GHSA-mw26-5g2v-hqw3
-    package:
-      location: /usr/lib/ansible-init/lib/python3.9/site-packages/ansible_collections/netbox/netbox/poetry.lock
 
 # go crypto/tls vulnerability: programs not used with TLS
   - vulnerability: CVE-2025-68121
@@ -73,15 +67,6 @@ ignore:
   - vulnerability: CVE-2025-68121
     package:
       location: "/usr/libexec/apptainer/**"
-  - vulnerability: CVE-2025-68121
-    package:
-      location: "/usr/libexec/apptainer/**"
-
-# programs not run
-  - package:
-      location: /var/www/ood/apps/sys/dashboard/node_modules/@esbuild/linux-x64/bin/esbuild
-  - package:
-      location: /usr/lib/rstudio-server/bin/quarto/bin/tools/x86_64/esbuild
 
 # Python 2.7 vulnerabilities in filebeat and opensearch ignored: python not used at runtime
 # CVE-2014-4650 CGIHTTPServer module in Python 2.7.5, in filebeat and opensearch images
@@ -105,11 +90,6 @@ ignore:
 # CVE-2021-43267, CVE-2021-47378, ...
   - package:
       location: /boot/vmlinuz-0-rescue-*
-
-# ansible-init dev requirements are not used in image
-# CVE-2022-21797
-  - package:
-      location: /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements-dev.txt
 
 # CVE-2023-24531 `go env` command is not used
   - vulnerability: CVE-2023-24531
