@@ -38,7 +38,7 @@
   ansible.builtin.command: cloud-init clean --logs --seed
 
 - name: Cleanup /tmp # noqa: no-changed-when
-  ansible.builtin.command: rm -rf /tmp/*
+  ansible.builtin.shell: rm -rvf /tmp/*
 
 - name: Delete files triggering vulnerability scans
   ansible.builtin.file:
