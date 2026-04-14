@@ -86,6 +86,10 @@ variable "login" {
       gateway_ip: Address to add default route via
       nodename_template: Overrides variable cluster_nodename_template
       server_group_id: String ID of server group to use for scheduler hint
+      trunk_parent_network_id: ID of the network to use as the parent port of the trunk
+      trunk_subport_network_id: ID of the network to use as the subport of the trunk
+      trunk_subport_vlan_id: VLAN ID of the network used as the subport of the trunk
+      use_trunk: Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_id, and trunk_subport_vlan_id must also be set
   EOF
 
   type = any
@@ -152,6 +156,10 @@ variable "compute" {
       gateway_ip: Address to add default route via
       nodename_template: Overrides variable cluster_nodename_template
       server_group_id: String ID of server group to use for scheduler hint
+      trunk_parent_network_id: ID of the network to use as the parent port of the trunk
+      trunk_subport_network_id: ID of the network to use as the subport of the trunk
+      trunk_subport_vlan_id: VLAN ID of the network used as the subport of the trunk
+      use_trunk: Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_id, and trunk_subport_vlan_id must also be set
 
     Nodes are added to the following inventory groups:
     - $group_name

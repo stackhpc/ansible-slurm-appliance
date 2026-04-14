@@ -214,3 +214,28 @@ variable "server_group_id" {
   type    = string
   default = null
 }
+
+variable "trunk_parent_network_id" {
+  type    = string
+  description = "ID of the network to use as the parent port of the trunk."
+  default = null
+}
+
+variable "trunk_subport_network_id" {
+  type    = string
+  description = "ID of the network to use as the subport of the trunk."
+  default = null
+}
+
+variable "trunk_subport_vlan_id" {
+  type    = string
+  description = "VLAN ID of the network used as the subport of the trunk."
+  default = null
+}
+
+variable "use_trunk" {
+  type    = bool
+  description = "Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_id, and trunk_subport_vlan_id must also be set."
+  default = false
+  nullable = false
+}

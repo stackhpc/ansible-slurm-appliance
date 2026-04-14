@@ -110,8 +110,8 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
   dynamic "network" {
     for_each = { for net in var.networks : net.network => net }
     content {
-      port           = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
-      access_network = network.key == var.networks[0].network
+      port           = var.use_trunk ? openstack_networking_trunk_v2.trunk["${each.key}"].port_id : openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
+      access_network = var.use_trunk ? true : network.key == var.networks[0].network
     }
   }
 
@@ -178,8 +178,8 @@ resource "openstack_compute_instance_v2" "compute" {
   dynamic "network" {
     for_each = { for net in var.networks : net.network => net }
     content {
-      port           = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
-      access_network = network.key == var.networks[0].network
+      port           = var.use_trunk ? openstack_networking_trunk_v2.trunk["${each.key}"].port_id : openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
+      access_network = var.use_trunk ? true : network.key == var.networks[0].network
     }
   }
 
