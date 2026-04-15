@@ -34,6 +34,16 @@ locals {
   }
 
   baremetal_az = var.availability_zone != null ? var.availability_zone : "nova"
+
+  trunks = {
+    for n in var.nodes :
+    n => var.use_trunk ? openstack_networking_trunk_v2.trunk : {}
+  }
+
+  trunk_subports = {
+    for n in var.nodes :
+    n => var.use_trunk ? openstack_networking_port_v2.trunk_subport : {}
+  }
 }
 
 data "openstack_blockstorage_volume_v3" "compute" {
@@ -244,6 +254,14 @@ output "fqdns" {
 
 output "nodegroup_fips" {
   value = local.nodegroup_fips
+}
+
+output "trunks" {
+  value = local.trunks
+}
+
+output "trunk_subports" {
+  value = local.trunk_subports
 }
 
 output "volumes" {
