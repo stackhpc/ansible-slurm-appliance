@@ -53,6 +53,9 @@ ${cluster_name}_${group_name}:
             instance_id: ${ node.id }
             networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
             node_fqdn: ${compute_groups[group_name]["fqdns"][nodename]}
+            trunk_subport_network_id: ${compute_groups[group_name]["trunk_subports"][nodename] != {} ? compute_groups[group_name]["trunk_subports"][nodename][nodename]["network_id"] : "no"}
+            trunk_subport_fixed_ip_v4: ${compute_groups[group_name]["trunk_subports"][nodename] != {} ? compute_groups[group_name]["trunk_subports"][nodename][nodename]["all_fixed_ips"][0] : "no"}
+            trunk_subport_vlan_id: ${compute_groups[group_name]["trunks"][nodename] != {} ? tolist(compute_groups[group_name]["trunks"][nodename][nodename]["sub_port"])[0]["segmentation_id"] : "no"} 
 %{ endfor ~}
     vars:
         # NB: this is the target image, not necessarily what is provisioned
