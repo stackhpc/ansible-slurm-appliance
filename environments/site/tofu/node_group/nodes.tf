@@ -40,7 +40,7 @@ locals {
 
   trunk_subports = {
     for n in var.nodes :
-    n => var.use_trunk ? openstack_networking_port_v2.trunk-subport : {}
+    n => var.use_trunk ? openstack_networking_port_v2.trunk_subport : {}
   }
 }
 
