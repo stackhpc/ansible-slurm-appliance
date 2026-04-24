@@ -6,7 +6,7 @@ description: >-
   Batch cluster running the Slurm workload manager, the Open  OnDemand web interface, and custom monitoring.
 
   This version uses CephFS for home directories.
-logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
+logo: https://github.com/stackhpc/ansible-slurm-appliance/raw/main/environments/.caas/assets/slurm-logo.png
 
 requires_ssh_key: true
 
