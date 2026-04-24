@@ -147,7 +147,7 @@
       ansible.builtin.include_role:
         name: openondemand
         tasks_from: vnc_compute.yml
-      when: "'openondemand_desktop' or 'openondemand_matlab' in group_names"
+      when: "'openondemand_desktop' in group_names or 'openondemand_matlab' in group_names"
 
     - name: Open OnDemand Jupyter node
       ansible.builtin.include_role:
