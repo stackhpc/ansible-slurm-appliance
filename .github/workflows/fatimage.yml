@@ -35,9 +35,11 @@ jobs:
           - image_name: openhpc-RL8
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
             inventory_groups: fatimage
+            ansible_python_interpreter: /usr/bin/python3.9 # avoid using python3.6 as much as possible
           - image_name: openhpc-RL9
             source_image_name: Rocky-9-GenericCloud-Base-9.7-20251123.2.x86_64.qcow2
             inventory_groups: fatimage
+            ansible_python_interpreter: ""
     env:
       ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
@@ -53,8 +55,8 @@ jobs:
 
       - name: Record settings for CI cloud
         run: |
-          echo "CI_CLOUD: ${CI_CLOUD}"
-          echo "PACKER_ON_ERROR: ${PACKER_ON_ERROR}"
+          echo "CI_CLOUD: ${CI_CLOUD}" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "PACKER_ON_ERROR | tee -a ${PACKER_ON_ERROR}"
 
       - name: Setup ssh
         run: |
@@ -104,12 +106,14 @@ jobs:
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
           -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
           -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
+          -var "ansible_python_interpreter=$MATRIX_BUILD_ANSIBLE_PYTHON_INTERPRETER" \
           -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
           openstack.pkr.hcl
         env:
           MATRIX_BUILD_SOURCE_IMAGE_NAME: ${{ matrix.build.source_image_name }}
           MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
           MATRIX_BUILD_INVENTORY_GROUPS: ${{ matrix.build.inventory_groups }}
+          MATRIX_BUILD_ANSIBLE_PYTHON_INTERPRETER: ${{ matrix.build.ansible_python_interpreter }}
 
       - name: Get created image names from manifest
         id: manifest
@@ -120,8 +124,8 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
-          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
-          echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "image-id=$IMAGE_ID" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           echo "$IMAGE_ID" > image-id.txt
           echo "$IMAGE_NAME" > image-name.txt
 

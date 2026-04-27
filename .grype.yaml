@@ -1,0 +1,268 @@
+---
+# ignore rules for grype, with justification
+ignore:
+
+# go crypto/tls vulnerability: programs not used with TLS
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/bin/ondemand_exporter
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+  # prometheus 3.5.1 still has an older go runtime
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/local/bin/prometheus"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/local/bin/promtool"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/sbin/ondemand-dex"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/sbin/ondemand-dex-session"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/share/grafana/bin/grafana"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/share/grafana/bin/grafana-cli"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/share/grafana/bin/grafana-server"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /var/lib/podman/.local/share/containers/storage/overlay/b51397a6db0ae651df3ffd51be823f98a26ab18ac7033847fedbac792798ae18/diff/usr/share/filebeat/filebeat
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /var/lib/podman/.local/share/containers/storage/overlay/efeebaada56fcf04784f6d67852667327a8e50d18bbf9aea6d3556865e894f59/diff/usr/local/bin/gosu
+
+#  go crypto/tls vulnerability: programs used with trusted TLS servers
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# system dep, what can we do?
+  - vulnerability: CVE-2025-68121
+    package:
+      name: podman
+  - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/bin/podman
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/libexec/podman/**"
+  - vulnerability: CVE-2025-68121  # ondemand dep
+    package:
+      location: "/usr/bin/rclone"
+
+# go crypto/tls vulnerability: programs run by users not admins
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/bin/apptainer"
+  - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/libexec/apptainer/**"
+
+# Python 2.7 vulnerabilities in filebeat and opensearch ignored: python not used at runtime
+# CVE-2014-4650 CGIHTTPServer module in Python 2.7.5, in filebeat and opensearch images
+# CVE-2016-0718, CVE-2016-9063 Expat
+# CVE-2017-1000158 integer overflow in the PyString_DecodeEscape
+# CVE-2018-1000802 Command Injection vulnerability in shutil
+  - package: # filebeat
+      location: /var/lib/podman/.local/share/containers/storage/overlay/174f5685490326fc0a1c0f5570b8663732189b327007e47ff13d2ca59673db02/diff/usr/bin/python2.7
+  - package: # filebeat
+      location: /var/lib/podman/.local/share/containers/storage/overlay/174f5685490326fc0a1c0f5570b8663732189b327007e47ff13d2ca59673db02/diff/usr/lib64/libpython2.7.so.1.0
+  - package: # filebeat
+      location: /var/lib/podman/.local/share/containers/storage/overlay/6b0b788550f0cdfdceded05ec82b17c5bd3801b6a7795fecb4a18d1103d5d548/diff/usr/bin/python2.7
+  - package: # filebeat
+      location: /var/lib/podman/.local/share/containers/storage/overlay/6b0b788550f0cdfdceded05ec82b17c5bd3801b6a7795fecb4a18d1103d5d548/diff/usr/lib64/libpython2.7.so.1.0
+  - package: # opensearch
+      location: /var/lib/podman/.local/share/containers/storage/overlay/6042fe893e2746bb7637efe59d35909d895c9060b43950db261e692ad3dfb834/diff/usr/bin/python2.7
+  - package: # opensearch
+      location: /var/lib/podman/.local/share/containers/storage/overlay/6042fe893e2746bb7637efe59d35909d895c9060b43950db261e692ad3dfb834/diff/usr/lib64/libpython2.7.so.1.0
+
+# kernel rescue image: won't be booted
+# CVE-2021-43267, CVE-2021-47378, ...
+  - package:
+      location: /boot/vmlinuz-0-rescue-*
+
+# CVE-2023-24531 `go env` command is not used
+  - vulnerability: CVE-2023-24531
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+# CVE-2023-24531 `go env` command is not used
+  - vulnerability: CVE-2023-24531
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# RL8 CVE-2023-24531 `go env` command is not used
+  - vulnerability: CVE-2023-24531
+    package:
+      location: /usr/bin/rclone
+
+# CVE-2023-29402 go command is not used
+  - vulnerability: CVE-2023-29402
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+# RL8 CVE-2023-29402 go command is not used
+  - vulnerability: CVE-2023-29402
+    package:
+      location: /usr/bin/rclone
+# CVE-2023-29404 go command is not used
+  - vulnerability: CVE-2023-29404
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+# RL8 CVE-2023-29404 go command is not used
+  - vulnerability: CVE-2023-29404
+    package:
+      location: /usr/bin/rclone
+# CVE-2023-29405 go command is not used
+  - vulnerability: CVE-2023-29405
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+# RL8 CVE-2023-29405 go command is not used
+  - vulnerability: CVE-2023-29405
+    package:
+      location: /usr/bin/rclone
+# RL8 CVE-2023-24540 go template javascript
+# bad templates provided by `rclone serve` are in the control of the same user running the command in the first place
+  - vulnerability: CVE-2023-24540
+    package:
+      location: /usr/bin/rclone
+# RL8 CVE-2023-24538 go template backtick -- `rclone serve`
+# bad templates provided by `rclone serve` are in the control of the same user running the command in the first place
+  - vulnerability: CVE-2023-24538
+    package:
+      location: /usr/bin/rclone
+
+# CVE-2023-3128 grafana Azure AD auth bypass by spoofing -- not used
+  - vulnerability: GHSA-mpv3-g8m3-3fjc
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2024-24790 IsPrivate, IsLoopback, etc broken for IPv4-mapped IPv6 addresses -- not affected
+  - vulnerability: CVE-2024-24790
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+  - vulnerability: CVE-2024-24790
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# RL8 CVE-2024-24790 IsPrivate, IsLoopback, etc broken for IPv4-mapped IPv6 addresses -- not affected
+  - vulnerability: CVE-2024-24790
+    package:
+      location: /usr/bin/rclone
+
+# CVE-2024-8986 Grafana plugin SDK Information Leakage about git source repository -- not affected
+  - vulnerability: GHSA-xxxw-3j6h-q7h6
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GHSA-xxxw-3j6h-q7h6
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2025-22871 request smuggling in net/http server (bare LF) -- no server forwarding chunked data here
+  - vulnerability: CVE-2025-22871
+    package:
+      location: /usr/bin/ondemand_exporter
+  - vulnerability: CVE-2025-22871
+    package:
+      location: /usr/bin/prometheus-slurm-exporter
+  - vulnerability: CVE-2025-22871
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# RL8 CVE-2025-22871 request smuggling in net/http server (bare LF) -- no server forwarding chunked data here
+  - vulnerability: CVE-2025-22871
+    package:
+      location: /usr/bin/rclone
+
+# CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not running go server
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/bin/rclone
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
+# CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- no auth to start with
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/local/bin/prometheus
+
+# CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not affected in our deployments
+# XXX: grpc version bump is in DEX master but it needs a new DEX release before OOD release to produce the ondemand-dex package
+# DEX doesn't use grpc/authz but has custom interceptors. I couldn't tell if it's vulnerable to the attack.
+# Regardless, the gRPC API is off by default (https://dexidp.io/docs/configuration/api/#configuration)
+# Our deployments don't enable it. Check for the commented-out `grpc:` block in `/etc/ood/dex/config.yaml` to confirm.
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/sbin/ondemand-dex
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/sbin/ondemand-dex-session
+
+
+# CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- TMP disable to check ignores are working
+# FIXME: should upgrade grafana to  Grafana 12.4.2
+  - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/share/grafana/bin/grafana
+
+# CVE-2024-45337 (GO-2024-3321) Misuse of ServerConfig.PublicKeyCallback -- not using ssh
+  - vulnerability: GHSA-v778-237x-gjrc
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GHSA-v778-237x-gjrc
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# RL8 CVE-2024-45337 (GO-2024-3321) Misuse of ServerConfig.PublicKeyCallback -- not using ssh
+  - vulnerability: GHSA-v778-237x-gjrc
+    package:
+      location: /usr/bin/rclone
+
+# CVE-2026-33937 Handlebars.compile() javascript injection
+# Handlebars.compile() is only used by the shell app via hbs. All uses seem safe:
+#  - protected by `typeof input !== 'string'` as https://github.com/handlebars-lang/handlebars.js/security/advisories/GHSA-2w6w-674q-4c4q
+#  - or from string by directly reading a file on disk
+  - vulnerability: GHSA-2w6w-674q-4c4q
+    package:
+      location: /var/www/ood/apps/sys/shell/yarn.lock
+# Handlebars.compile() is only used by webpack.config.js and input from string by directly reading a file on disk
+  - vulnerability: GHSA-2w6w-674q-4c4q
+    package:
+      location: /opt/jupyter-py39/lib/python3.9/site-packages/jupyterlab/staging/yarn.lock
+
+# CVE-2026-39324 Rack::Session::Cookie secrets: decrypt failure fallback enables secretless session forgery and Marshal deserialization
+# Preliminary checks indicate OOD is not affected, as a Ruby on Rails application.
+  - vulnerability: GHSA-33qg-7wpp-89cq
+    package:
+      location: /opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/rack-session-2.1.1.gemspec
+  - vulnerability: GHSA-33qg-7wpp-89cq
+    package:
+      location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
+
+# CVE-2022-23806/GHSA-8c83-vp4v-h7fq RL8 Curve.IsOnCurve can incorrectly return true
+# `rclone serve sftp` could be affected with elliptic curve authentication but it is not a known usage of the command
+  - vulnerability: CVE-2022-23806
+    package:
+      location: /usr/bin/rclone
+
+# Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
+exclude:
+  - /var/lib/podman/.local/share/**
+# will be masked at runtime
+# FIXME: could cleanup better!
+# eg /tmp/prometheus-2.27.0.linux-amd64/prometheus
+  - /tmp/**

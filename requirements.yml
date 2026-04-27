@@ -6,12 +6,6 @@ roles:
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
     version: v1.5.0
     name: stackhpc.openhpc
-  - src: https://github.com/stackhpc/ansible-node-exporter.git
-    version: stackhpc
-    name: cloudalchemy.node_exporter
-  - src: https://github.com/stackhpc/ansible-prometheus.git
-    version: stackhpc-1.0.0
-    name: cloudalchemy.prometheus
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
     version: stackhpc-0.20.0
@@ -55,3 +49,7 @@ collections:
     version: 0.5.5
   - name: stackhpc.linux
     version: 1.5.0
+  - name: prometheus.prometheus
+    source: https://github.com/stackhpc/prometheus-community-ansible
+    type: git
+    version: stackhpc

@@ -53,6 +53,12 @@ variable "source_image" {
   description = "UUID of source image"
 }
 
+variable "ansible_python_interpreter" {
+  type = string
+  default = ""
+  description = "Override ansible_python_interpreter in the generated inventory. Set to /usr/bin/python3.9 for Rocky Linux 8"
+}
+
 variable "flavor" {
   type = string
 }
@@ -161,6 +167,12 @@ variable "image_name_version" {
   default = "auto"
 }
 
+variable "skip_tags" {
+  type = string
+  description = "Tags to skip when running the fatimage playbook. No need to override."
+  default = "prometheus_configure,prometheus_run"
+}
+
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
@@ -205,6 +217,7 @@ build {
   provisioner "ansible" {
     playbook_file = "${var.repo_root}/ansible/fatimage.yml"
     groups = concat(["builder"], var.inventory_groups == "" ? [] : split(",", var.inventory_groups))
+    inventory_file_template = "{{ .HostAlias }} ansible_host={{ .Host }} ansible_user={{ .User }} ansible_port={{ .Port }}%{ if var.ansible_python_interpreter != "" } ansible_python_interpreter=${var.ansible_python_interpreter}%{ endif }\n"
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
     extra_arguments = [
@@ -212,6 +225,7 @@ build {
       "-i", "${var.repo_root}/packer/ansible-inventory.sh",
       "-vv",
       "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
+      "--skip-tags", "${var.skip_tags}",
       ]
   }
 

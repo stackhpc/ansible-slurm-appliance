@@ -1,9 +1,52 @@
 ---
-alertmanager_port: "9093" # defined here as required for prometheus
+alertmanager_version: "0.32.0"  # Latest version at the time of writing. Usually nothing prevents us from bumping alertmanager version.
+alertmanager_checksum: be72f50f6124ec53d944c0f100f8ec8108d969bade02fcc9f06a3068ff6c726f
+
+# Notes about the change from own role alertmanager to prometheus.prometheus.alertmanager:
+# - alertmanager_web_config_file changed to /etc/alertmanager/web_config.yml from /etc/alertmanager/alertmanager-web.yml
+# - alertmanager_config_default alertmanager_config_extra are not supported anymore, see the alertmanager.yml.j2 template in the prometheus.prometheus.alertmanager role
+# - variable alertmanager_child_routes is rejected by prometheus.prometheus.alertmanager:
+#   use asa_alertmanager_child_routes instead.
+# - alertmanager_web_listen_address can still be a list, despite the name change (was alertmanager_web_listen_addresses)
+# - variable alertmanager_storage_path changed to alertmanager_db_dir
+
+
+alertmanager_data_retention: "120h"
+alertmanager_data_maintenance_interval: "15m"
+alertmanager_config_flags_extra:
+  data.retention: "{{ alertmanager_data_retention }}"
+  data.maintenance-interval: "{{ alertmanager_data_maintenance_interval }}"
+
+alertmanager_web_config_default:
+  basic_auth_users:
+    alertmanager:
+      hashed: "{{ vault_alertmanager_admin_password | password_hash('bcrypt', ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890' | shuffle(seed=inventory_hostname) | join)[:22], rounds=12, ident='2b') }}"
+  http_server_config: {}
+  tls_server_config: {}
+alertmanager_alertmanager_web_config_extra: {}
+
+alertmanager_web_config: "{{ alertmanager_web_config_default | combine(alertmanager_alertmanager_web_config_extra) }}"
+
+alertmanager_null_receiver:
+  name: "null"
+alertmanager_extra_receivers: []
+alertmanager_default_receivers: "{{ [alertmanager_null_receiver] + ([alertmanager_slack_receiver] if alertmanager_slack_integration is defined else []) }}"
+alertmanager_receivers: "{{ alertmanager_default_receivers  + alertmanager_extra_receivers }}"
+
+alertmanager_route:
+  group_by:
+    - "..."
+  receiver: "{{ alertmanager_slack_receiver_name if alertmanager_slack_integration is defined else 'null' }}"
+  routes: "{{ asa_alertmanager_child_routes }}"
+asa_alertmanager_child_routes: []
+
+alertmanager_port: "9093"
+alertmanager_web_listen_address:
+  - ":{{ alertmanager_port }}"
 
 alertmanager_slack_receiver_name: slack-receiver
 alertmanager_slack_receiver_send_resolved: true
-alertmanager_slack_receiver: # defined here as needs prometheus address
+alertmanager_slack_receiver:
   name: "{{ alertmanager_slack_receiver_name }}"
   slack_configs:
     - channel: "{{ alertmanager_slack_integration.channel | default('none') }}"
@@ -16,3 +59,5 @@ alertmanager_slack_receiver: # defined here as needs prometheus address
       send_resolved: "{{ alertmanager_slack_receiver_send_resolved }}"
 
 alertmanager_web_external_url: "http://{{ hostvars[groups['alertmanager'].0].ansible_host }}:{{ alertmanager_port}}/"
+
+alertmanager_db_dir: "{{ appliances_state_dir | default('/var/lib') }}/alertmanager"

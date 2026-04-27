@@ -122,6 +122,8 @@
 - hosts: selinux
   gather_facts: false
   become: true
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
   tags:
     - selinux
   tasks:
@@ -218,7 +220,7 @@
   tags: cockpit
   tasks:
     - name: Remove RHEL cockpit # noqa: no-changed-when
-      ansible.builtin.command: dnf -y remove cockpit-ws
+      ansible.builtin.command: dnf -y remove cockpit-ws cockpit-system cockpit-bridge
       register: dnf_remove_output
       ignore_errors: true # Avoid failing if a lock or other error happens
 
@@ -226,6 +228,8 @@
   gather_facts: false
   become: true
   tags: firewalld
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
   tasks:
     - ansible.builtin.include_role:
         name: firewalld

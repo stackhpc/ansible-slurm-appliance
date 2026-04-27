@@ -1,9 +1,11 @@
 ---
 
-# See: https://github.com/cloudalchemy/ansible-prometheus
+# See: https://github.com/stackhpc/prometheus-community-ansible
 # for variable definitions
 
-prometheus_version: 2.27.0 # default from ansible/roles/cloudalchemy.prometheus/defaults/main.yml
+prometheus_version: 3.5.1 # latest LTS (https://prometheus.io/docs/introduction/release-cycle/)
+prometheus_checksum: cd6aea0ab214b05838470668dfcee7d01a7d91913509a227b00401ca872423f0
+
 prometheus_web_external_url: "http://{{ hostvars[groups['prometheus'].0].ansible_host }}:9090/" # default to host IP address
 prometheus_storage_retention: "31d"
 prometheus_storage_retention_size: "100GB"
@@ -15,7 +17,7 @@ prometheus_alertmanager_config_default:
           - "{{ alertmanager_address }}:{{ alertmanager_port }}"
     basic_auth:
       username: alertmanager
-      # cloudalchemy.prometheus/preflight checks this config so it must be
+      # prometheus.prometheus.prometheus/preflight checks this config so it must be
       # templatable even during build when it is not used
       password: "{{ vault_alertmanager_admin_password | default('UNDEFINED') }}"
 

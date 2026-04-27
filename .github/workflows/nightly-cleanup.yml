@@ -28,7 +28,7 @@ jobs:
 
       - name: Record which cloud CI is running on
         run: |
-          echo "CI_CLOUD: ${CI_CLOUD}"
+          echo "CI_CLOUD: ${CI_CLOUD}" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Setup environment
         run: |

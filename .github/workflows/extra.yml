@@ -40,6 +40,7 @@ jobs:
             source_image_name_key: RL8 # key into environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
             inventory_groups: doca,cuda # lustre disabled due to https://github.com/stackhpc/ansible-slurm-appliance/pull/759
             volume_size: 35 # needed for cuda
+            ansible_python_interpreter: /usr/bin/python3.9 # avoid using python3.6 as much as possible
           - image_name: openhpc-extra-RL9
             source_image_name_key: RL9
             inventory_groups: doca,cuda,lustre
