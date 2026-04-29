@@ -262,7 +262,3 @@ ignore:
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 exclude:
   - /var/lib/podman/.local/share/**
-# will be masked at runtime
-# FIXME: could cleanup better!
-# eg /tmp/prometheus-2.27.0.linux-amd64/prometheus
-  - /tmp/**
