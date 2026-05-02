@@ -1,0 +1,33 @@
+# TODO: decide on reboot logic
+# TODO: test idempotency
+#   ok: run, reboot, run, shows no changes
+# TODO: test RL8
+#   ok after reboot both RL8 and RL9 did have the initcall_blacklist in /proc/cmdline
+
+- name: Get kernel config before changes
+  ansible.builtin.command:
+    cmd: grubby --info=DEFAULT
+  register: _grubby_info_pre
+
+- name: Set commandline via grubby
+  ansible.builtin.command: # TODO: remove echo!
+    cmd: >-
+      grubby
+      --update-kernel={{ grubby_kernel }}
+      {% if grubby_args_present %}--args=\"{{ grubby_args_present.items() | map('join', '=') | join(' ') }}\"{% endif %}
+      {% if grubby_args_absent %}--remove-args=\"{{ grubby_remove_args | join(' ') }}\"{% endif %}
+
+- name: Get kernel config after changes
+  ansible.builtin.command:
+    cmd: grubby --info=DEFAULT
+  register: _grubby_info_post
+
+- name: Check for changes # TODO: decide if we need this
+  ansible.builtin.debug:
+    msg: |
+      same? {{ _grubby_info_pre.stdout == _grubby_info_post.stdout }}
+
+      diff:
+      {{ _grubby_info_pre.stdout | ansible.utils.fact_diff(_grubby_info_post.stdout) }}
+
+- meta: end_here # TODO: remove

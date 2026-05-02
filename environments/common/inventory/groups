@@ -244,3 +244,6 @@ doca
 
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
+
+[grubby]
+# Hosts to modify kernel command line on

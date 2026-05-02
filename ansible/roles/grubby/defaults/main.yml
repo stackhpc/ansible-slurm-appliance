@@ -1,0 +1,7 @@
+grubby_kernel: ALL
+grubby_args_present_default:
+  # CVE-2026-31431 copy.fail mitigation:
+  initcall_blacklist: af_alg_init,algif_hash_init,algif_skcipher_init,algif_aead_init,rng_init
+grubby_args_present_extra: {}
+grubby_args_present: "{{ grubby_args_present_default | combine(grubby_args_present_extra) }}"
+grubby_args_absent: []

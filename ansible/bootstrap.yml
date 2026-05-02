@@ -36,6 +36,14 @@
     - ansible.builtin.import_role:
         name: journald
 
+- hosts: grubby
+  become: true
+  gather_facts: false
+  tags: grubby
+  tasks:
+    - ansible.builtin.include_role:
+        name: grubby
+
 - hosts: resolv_conf
   become: true
   gather_facts: false
