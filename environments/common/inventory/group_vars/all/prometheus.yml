@@ -3,8 +3,8 @@
 # See: https://github.com/stackhpc/prometheus-community-ansible
 # for variable definitions
 
-prometheus_version: 3.5.1 # latest LTS (https://prometheus.io/docs/introduction/release-cycle/)
-prometheus_checksum: cd6aea0ab214b05838470668dfcee7d01a7d91913509a227b00401ca872423f0
+prometheus_version: 3.5.3 # latest LTS (https://prometheus.io/docs/introduction/release-cycle/)
+prometheus_checksum: 8c30b9d99664e39b0363c0ba54fab30a7958e9d3de27246bf26ed85e6cfb8946
 
 prometheus_web_external_url: "http://{{ hostvars[groups['prometheus'].0].ansible_host }}:9090/" # default to host IP address
 prometheus_storage_retention: "31d"
