@@ -1,6 +1,6 @@
 ---
-alertmanager_version: "0.32.0"  # Latest version at the time of writing. Usually nothing prevents us from bumping alertmanager version.
-alertmanager_checksum: be72f50f6124ec53d944c0f100f8ec8108d969bade02fcc9f06a3068ff6c726f
+alertmanager_version: "0.32.1"  # Latest version at the time of writing. Usually nothing prevents us from bumping alertmanager version.
+alertmanager_checksum: e3ba4a543111dd4bbf436838385cbf88108f0b128a723e61fe97d3569294ad4d
 
 # Notes about the change from own role alertmanager to prometheus.prometheus.alertmanager:
 # - alertmanager_web_config_file changed to /etc/alertmanager/web_config.yml from /etc/alertmanager/alertmanager-web.yml
