@@ -262,6 +262,17 @@ ignore:
     package:
       location: /usr/bin/rclone
 
+# CVE-2026-41179/GHSA-jfwf-28xr-xw6q operations/fsinfo endpoint exposed without AuthRequired:true and allows command execution
+# only when `rclone -rc` without -rc-user/--rc-pass/--rc-htpasswd
+  - vulnerability: GHSA-jfwf-28xr-xw6q
+    package:
+      location: /usr/bin/rclone
+# CVE-2026-41176/GHSA-25qr-6mpr-f7qx options/set endpoint exposed without AuthRequired:true
+# only when `rclone -rc` without -rc-user/--rc-pass/--rc-htpasswd
+  - vulnerability: GHSA-25qr-6mpr-f7qx
+    package:
+      location: /usr/bin/rclone
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 exclude:
   - /var/lib/podman/.local/share/**
