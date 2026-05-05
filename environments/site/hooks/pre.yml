@@ -1,0 +1,110 @@
+- hosts: login:!builder
+  become: yes
+  gather_facts: no
+  tags: hostkeys
+  tasks:
+    - name: Ensure directory exists to persist hostkeys
+      file:
+        path: "{{ hostvars[groups['control'].0].appliances_state_dir }}/hostkeys/{{ inventory_hostname }}"
+        state: directory
+        owner: root
+        group: root
+        mode: u=rw,go=
+      delegate_to: control
+    - name: Find persisted hostkeys
+      find:
+        paths: "{{ hostvars[groups['control'].0].appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/"
+        patterns: '*key*'
+      register: _find_persisted_hostkeys
+      delegate_to: control
+    - name: Slurp persisted hostkeys
+      slurp:
+        src: "{{ item.path }}"
+      loop: "{{ _find_persisted_hostkeys.files }}"
+      register: _slurp_persisted_hostkeys
+      delegate_to: control
+      when: _find_persisted_hostkeys.files | length > 0
+    - name: Restore persisted hostkeys
+      copy:
+        dest: "/etc/ssh/{{ item.item.path | basename }}"
+        content: "{{ item.content | b64decode }}"
+        owner: "{{ item.item.pw_name }}"
+        group: "{{ item.item.gr_name }}"
+        mode: "{{ item.item.mode }}"
+      loop: "{{ _slurp_persisted_hostkeys.results }}"
+      when: _find_persisted_hostkeys.files | length > 0
+    - block:
+      - name: Find current hostkeys
+        find:
+          paths: /etc/ssh
+          patterns: '*key*'
+        register: _find_current_hostkeys
+      - name: Slurp current hostkeys
+        slurp:
+          src: "{{ item.path }}"
+        loop: "{{ _find_current_hostkeys.files }}"
+        register: _slurp_current_hostkeys
+      - name: Persist hostkeys
+        copy:
+          dest: "{{ hostvars[groups['control'].0].appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/{{ item.item.path | basename }}"
+          content: "{{ item.content | b64decode }}"
+          owner: "{{ item.item.pw_name }}"
+          group: "{{ item.item.gr_name }}"
+          mode: "{{ item.item.mode }}"
+        loop: "{{ _slurp_current_hostkeys.results }}"
+        delegate_to: control
+      when: _find_persisted_hostkeys.files | length == 0
+
+
+- hosts: control:!builder
+  become: true
+  gather_facts: false
+  tags: fix_state
+  tasks:
+    # For a running containerised service the state subdir will be owned by
+    # a `podman` user subuid. However in in old NeSI DIB images podman user
+    # gid/uid=1002, whereas in upstream images =1001. So chown/chgrp if needed.
+    #
+    # NB: Trying to just move the `podman` user to uid/gid 1002 didn't work,
+    # mysql failed to start with:
+    # Error: creating /etc/mtab symlink: value too large for defined data type
+    - name: Stat containerised persistent service directories
+      ansible.builtin.stat:
+        path: "{{ appliances_state_dir }}/{{ item }}"
+      register: _stat_container_state_dirs
+      loop:
+        - mysql
+        - opensearch
+
+    - name: Check service state
+      ansible.builtin.command:
+        cmd: "systemctl show -p ActiveState --value {{ item.item }}"
+      changed_when: false
+      register: _servicestate_container_state # active or inactive
+      loop: "{{ _stat_container_state_dirs.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: Check service is not running
+      ansible.builtin.assert:
+        that: "item.stdout != 'active'"
+        fail_msg: "Service {{ item.item.item }} is active but its state directory has the wrong UID. Stop it and run again."
+      loop: "{{ _servicestate_container_state.results }}"
+      loop_control:
+        label: "{{ item.item.item }}"
+      when:
+        - item.item.stat.exists
+        - item.item.stat.uid == 1002
+
+    - name: Change directory to be owned by current podman
+      ansible.builtin.file:
+        state: directory
+        path: "{{ appliances_state_dir }}/{{ item.item.item }}"
+        owner: podman
+        group: podman
+      loop: "{{ _servicestate_container_state.results }}"
+      loop_control:
+        label: "{{ item.item.item }}"
+      when:
+        - item.item.stat.exists
+        - item.item.stat.uid == 1002
