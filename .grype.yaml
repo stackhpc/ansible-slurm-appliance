@@ -46,6 +46,9 @@ ignore:
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
+# go compiler bug introduces potential unverified memory access wr loops with induction variables on under or overflow
+  - vulnerability: CVE-2026-27143
+
 # system dep, what can we do?
   - vulnerability: CVE-2025-68121
     package:
