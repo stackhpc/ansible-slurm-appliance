@@ -22,6 +22,7 @@ variable "cluster_networks" {
 variable "key_pair" {
   type        = string
   description = "Name of an existing keypair in OpenStack"
+  default = "rocky_bastion_v2"
 }
 
 variable "control_ip_addresses" {
@@ -43,6 +44,7 @@ variable "control_ip_addresses" {
 variable "control_node_flavor" {
   type        = string
   description = "Flavor name for control node"
+  default = "agr.compute1.8cpu16ram"
 }
 
 variable "login" {
@@ -113,6 +115,8 @@ variable "login" {
 variable "cluster_image_id" {
   type        = string
   description = "ID of default image for the cluster"
+  # use upstream v2.5 image - # TODO: change for one with cuda/doca
+  default = "f64bdc75-0e18-42e7-8dcd-007805718629" # openhpc-RL8-250820-0800-767addd8
 }
 
 variable "compute" {
@@ -224,7 +228,7 @@ variable "state_volume_type" {
 
 variable "state_volume_provisioning" {
   type        = string
-  default     = "manage"
+  default     = "attach"
   description = <<-EOT
     How to manage the state volume. Valid values are:
       "manage": (Default) OpenTofu will create a volume "$cluster_name-state"
@@ -264,7 +268,7 @@ variable "home_volume_type" {
 
 variable "home_volume_provisioning" {
   type        = string
-  default     = "manage"
+  default     = "none"
   description = <<-EOT
     How to manage the home volume. Valid values are:
       "manage": (Default) OpenTofu will create a volume "$cluster_name-home"
@@ -292,7 +296,11 @@ variable "vnic_types" {
     Default VNIC types, keyed by network name. See https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs/resources/networking_port_v2#vnic_type
     If not given this defaults to the "normal" type.
   EOT
-  default     = {}
+  default     = {
+    # NB: have to define for control here so need to override for any baremetals
+    nesi-hpc-baremetal-vlan112 = "direct"
+    agr-vlan107 = "direct"
+  }
 }
 
 variable "login_security_groups" {
@@ -349,7 +357,8 @@ variable "cluster_nodename_template" {
       $${environment_name}: The last element of the current environment's path
   EOT
   type        = string
-  default     = "$${cluster_name}-$${node}.$${cluster_name}.$${cluster_domain_suffix}"
+  #default     = "$${cluster_name}-$${node}.$${cluster_name}.$${cluster_domain_suffix}"
+  default = "$${node}.$${cluster_name}.$${cluster_domain_suffix}"
 }
 
 variable "config_drive" {
