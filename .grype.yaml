@@ -6,9 +6,6 @@ ignore:
   - vulnerability: CVE-2025-68121
     package:
       location: /usr/bin/ondemand_exporter
-  - vulnerability: CVE-2025-68121
-    package:
-      location: /usr/bin/prometheus-slurm-exporter
   # prometheus 3.5.1 still has an older go runtime
   - vulnerability: CVE-2025-68121
     package:
@@ -94,24 +91,7 @@ ignore:
 # CVE-2023-24531 `go env` command is not used
   - vulnerability: CVE-2023-24531
     package:
-      location: /usr/bin/prometheus-slurm-exporter
-# CVE-2023-24531 `go env` command is not used
-  - vulnerability: CVE-2023-24531
-    package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
-
-# CVE-2023-29402 go command is not used
-  - vulnerability: CVE-2023-29402
-    package:
-      location: /usr/bin/prometheus-slurm-exporter
-# CVE-2023-29404 go command is not used
-  - vulnerability: CVE-2023-29404
-    package:
-      location: /usr/bin/prometheus-slurm-exporter
-# CVE-2023-29405 go command is not used
-  - vulnerability: CVE-2023-29405
-    package:
-      location: /usr/bin/prometheus-slurm-exporter
 
 # CVE-2023-3128 grafana Azure AD auth bypass by spoofing -- not used
   - vulnerability: GHSA-mpv3-g8m3-3fjc
@@ -119,9 +99,6 @@ ignore:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2024-24790 IsPrivate, IsLoopback, etc broken for IPv4-mapped IPv6 addresses -- not affected
-  - vulnerability: CVE-2024-24790
-    package:
-      location: /usr/bin/prometheus-slurm-exporter
   - vulnerability: CVE-2024-24790
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
@@ -138,9 +115,6 @@ ignore:
   - vulnerability: CVE-2025-22871
     package:
       location: /usr/bin/ondemand_exporter
-  - vulnerability: CVE-2025-22871
-    package:
-      location: /usr/bin/prometheus-slurm-exporter
   - vulnerability: CVE-2025-22871
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
