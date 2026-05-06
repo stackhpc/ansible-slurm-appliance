@@ -10,8 +10,7 @@ fatimage
 # All Slurm compute nodes (in all partitions).
 fatimage
 
-[nfs:children]
-openhpc
+[nfs]
 
 [hpctests:children]
 # Login group to use for running mpi-based testing.
@@ -61,9 +60,9 @@ login
 # Add `openhpc` group to add Slurm users via creation of users on each node.
 openhpc
 
-[openondemand:children]
+[openondemand]
 # Host to run Open OnDemand server on - subset of login
-login
+# Use tofu-templated groups as is only 1x node
 
 [openondemand_desktop:children]
 # Subset of compute to run a interactive desktops on via Open OnDemand
@@ -216,3 +215,6 @@ compute
 
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
+
+[email:children]
+control

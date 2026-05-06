@@ -1,0 +1,35 @@
+- hosts: email
+  gather_facts: yes
+  become: yes
+  tags:
+    - email
+  tasks:
+    - import_role:
+        name: email
+
+- hosts: openondemand
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Install SSL Private Key
+      copy:
+        content: "{{ openondemand_ssl_cert_key_str }}"
+        dest: "{{ openondemand_ssl_cert_key }}"
+        mode: 0600
+      when: openondemand_ssl_cert_key_str is defined
+
+    - name: Install SSL certificate
+      copy:
+        content: "{{ openondemand_ssl_cert_str }}"
+        dest: "{{ openondemand_ssl_cert }}"
+        mode: 0600
+      when: openondemand_ssl_cert_str is defined
+      
+    - name: Install user mapping script
+      copy:
+        content: |
+          #!/bin/bash
+          function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+          id -nu $(urldecode $1)
+        dest: "{{ user_map_cmd }}"
+        mode: 0755

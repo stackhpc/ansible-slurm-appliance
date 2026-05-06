@@ -41,7 +41,7 @@ module "cluster" {
         agr-vlan107                = ["10.29.107.120"]
       }
     }
-    ondemand = {
+    openondemand = {
       nodes  = ["ondemand"]
       flavor = "agr.compute1.32cpu64ram"
       extra_networks = [

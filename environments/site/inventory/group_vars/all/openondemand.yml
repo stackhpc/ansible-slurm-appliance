@@ -1,0 +1,154 @@
+openondemand_auth: basic_pam
+openondemand_jupyter_partition: interactive
+openondemand_desktop_partition: vgpu
+openondemand_filesapp_paths:
+  - /projects
+  - /datasets
+  - /scratch
+
+user_map_cmd: /usr/local/bin/ondemand-usermap # see post-bootstrap hook
+
+ood_install_apps:
+  jupyter:  # repo currently named "eRI Jupyter"
+    repo: "https://ignored:{{ vault_jupyter_ood_apps_glpat }}@gitlab.com/nesi1/ood-apps/bc_example_jupyter.git"
+    version: staging
+  igv: # repo currently named "IGV"
+    repo: "https://ignored:{{ vault_igv_ood_apps_glpat }}@gitlab.com/nesi1/ood-apps/igv.git"
+    version: staging
+
+# https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
+# also https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
+openondemand_apps_desktop_agr:
+  title: Remote Desktop
+  description: Request a desktop to run GUI applications.
+  cluster: slurm
+  form:
+    - desktop
+    - bc_queue
+    - bc_num_hours
+    - num_cores
+    - node
+  attributes:
+    desktop: xfce
+    # bc_account: # i.e. slurm account
+    #   value: root
+    bc_queue:
+      value: "{{ openondemand_desktop_partition | default(none) }}"
+    num_cores:
+      label: Number of cores
+      value: 1
+    node:
+      label: Node name
+      help: Select a particular node or leave empty to let Slurm pick the next available
+      value: ""
+  submit: |
+    ---
+    script:
+      job_name: "ood-desktop"
+      native:
+        - <%= "--nodes=1" %>
+        - <%= "--ntasks=#{num_cores}" %>
+        - <%= "--nodelist=#{node}" %>
+        - <%= "--export=ALL" %>
+
+openondemand_apps_jupyter_agr:
+  title: Jupyter Lab
+  description: Request a Jupyter Lab server
+  cluster: slurm
+  form:
+    - modules
+    - extra_jupyter_args
+    - bc_queue
+    - bc_num_hours
+    - num_cores
+    - num_mem
+    - node
+  attributes:
+    num_cores:
+      label: Number of cores
+      widget: number_field
+    num_mem:
+      label: Memory per job (GB)
+      widget: number_field
+      value: 2
+      min: 2
+      max: 15
+      step: 1
+    modules: ""
+    extra_jupyter_args: ""
+    bc_queue:
+      value: "{{ openondemand_jupyter_partition | default(none) }}"
+    node: ""
+  submit: |
+    ---
+    batch_connect:
+      template: "basic"
+    script:
+      job_name: "ood-jupyter"
+      native:
+        - <%= "--nodes=1" %>
+        - <%= "--ntasks=#{num_cores}" %>
+        - <%= "--mem=#{num_mem}gb" %>
+        - <%= "--nodelist=#{node}" %>
+
+openondemand_dashboard_support_url: 'https://nznesi.atlassian.net/servicedesk/customer/portal/1/group/18'
+openondemand_dashboard_docs_url: 'https://nznesi.atlassian.net/wiki/spaces/eRI/'
+
+openondemand_apps_agr:
+  files:
+    env:
+      ood_shell: ""
+  shell:
+    env:
+      ood_shell_origin_check: "https://{{ openondemand_servername }}"
+  dashboard:
+    env:
+      motd_path: /etc/motd
+      motd_format: markdown
+      ood_dashboard_support_url: "{{ openondemand_dashboard_support_url }}"
+      ood_dashboard_docs_url: "{{ openondemand_dashboard_docs_url }}"
+      ood_brand_bg_color: "#1b262b"
+      ood_dashboard_title: "eRI OnDemand"
+
+openondemand_apps_igv_agr:
+  title: IGV
+  description: Request an igv server
+  cluster: slurm
+  attributes:
+    bc_vnc_resolution:
+      required: true
+    bc_queue: "interactive"
+    bc_num_hours: 
+      min: 1
+      max: 8
+      step: 1
+    num_of_cores: 1
+  form:
+    - bc_num_hours
+    - bc_vnc_resolution
+    - bc_queue
+    - num_of_cores
+    - modules
+  tile:
+    title: "IGV"
+    sub_caption: |
+      Integrative Genomics Viewer
+  submit: |
+    ---
+    batch_connect:
+      template: "vnc"
+    script:
+      job_name: "ood-igv"
+      native:
+        - "-n"
+        - "<%= num_of_cores %>"
+        - "--mem"
+        - "5gb"
+        - <%= "--export=ALL" %>
+
+openondemand_apps_interactive_agr:
+  bc_desktop: "{{ openondemand_apps_desktop_agr }}"
+  jupyter: "{{ openondemand_apps_jupyter_agr }}"
+  igv: "{{ openondemand_apps_igv_agr }}"
+
+ood_apps: "{{ openondemand_apps_agr | combine(openondemand_apps_interactive_agr) }}"
