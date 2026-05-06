@@ -211,8 +211,10 @@ This section details the configuration of prometheus.
 
 ### Prometheus defaults
 
-Internally, we use the [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus) role. You can customise any of the variables that the role supports. For a full list, please see the
-[upstream documentation](https://github.com/cloudalchemy/ansible-prometheus). The appliance defaults can be found here:
+Internally, we use the [prometheus](https://github.com/stackhpc/prometheus-community-ansible/tree/stackhpc/roles/prometheus) role
+from `prometheus-community/ansible`, lightly patched. You can customise any of the variables that the role supports. For a full list, please see the
+[upstream documentation](https://prometheus-community.github.io/ansible/branch/main/prometheus_role.html#ansible-collections-prometheus-prometheus-prometheus-role).
+The appliance defaults can be found here:
 
 > [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml)
 

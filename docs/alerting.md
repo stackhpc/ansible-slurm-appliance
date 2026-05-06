@@ -13,9 +13,10 @@ The general Prometheus configuration is described in
 [monitoring-and-logging.md](./monitoring-and-logging.md#defaults-3) - note that
 section specifies some role variables which commonly need modification.
 
-The alertmanager server is defined by the [ansible/roles/alertmanager](../ansible/roles/alertmanager/README.md),
-and all the configuration options and defaults are defined there. The defaults
-are fully functional, except that a [receiver](https://prometheus.io/docs/alerting/latest/configuration/#receiver)
+The alertmanager server is deployed by the [prometheus-community/Ansible collection](https://github.com/stackhpc/prometheus-community-ansible),
+(fork with small tweaks) and all the configuration options and defaults are defined there.
+Also see `environments/common/inventory/group_vars/all/alertmanager.yml` for our configuration template.
+The defaults are fully functional, except that a [receiver](https://prometheus.io/docs/alerting/latest/configuration/#receiver)
 must be configured to generate notifications.
 
 ## Enabling alertmanager
@@ -41,8 +42,8 @@ ansible-playbook ansible/adhoc/generate-passwords.yml
    integration is provided (see below) but alternative receivers could be defined
    via overriding role defaults.
 
-4. If desired, any other [role defaults](../ansible/roles/alertmanager/README.md)
-   may be overridden in e.g. `environments/site/inventory/group_vars/all/alertmanager.yml`.
+4. If desired, any other [role](https://github.com/stackhpc/prometheus-community-ansible/blob/stackhpc/roles/alertmanager/README.md)
+   and [common](#common-variable-reference) defaults may be overridden in e.g. `environments/site/inventory/group_vars/all/alertmanager.yml`.
 
 5. Run the `monitoring.yml` playbook (if the cluster is already up) to configure
    both alertmanager and prometheus:
@@ -111,7 +112,7 @@ These are part of [Prometheus configuration](https://prometheus.io/docs/promethe
 which is defined for the appliance at
 [environments/common/inventory/group_vars/all/prometheus.yml](../environments/common/inventory/group_vars/all/prometheus.yml).
 
-Two [cloudalchemy.prometheus](https://github.com/cloudalchemy/ansible-prometheus)
+Two [prometheus.prometheus.prometheus](https://github.com/stackhpc/prometheus-community-ansible/tree/stackhpc/roles/prometheus)
 role variables are relevant:
 
 - `prometheus_alert_rules_files`: Paths to check for files providing rules.
@@ -144,3 +145,65 @@ In future more alerts may be added for:
 - smartctl-exporter-based rules for baremetal nodes where there is no
   infrastructure-level smart monitoring
 - loss of "up" network interfaces
+
+## Common variable reference
+
+We provide some guidance on customization based on `environments/common/inventory/group_vars/all/alertmanager.yml`.
+
+All variables are optional. See [prometheus.prometheus.alertmanager](https://github.com/stackhpc/prometheus-community-ansible/blob/stackhpc/roles/alertmanager/defaults/main.yml)
+and environments/common/inventory/group_vars/all/alertmanager.yml for all default values.
+
+General variables:
+
+- `alertmanager_version`: String, version (no leading 'v')
+- `alertmanager_checksum`: String, **sha256** checksum for relevant version from
+  [GitHub releases](https://github.com/prometheus/alertmanager/releases), in format
+  `value`.
+- `alertmanager_port`: Port to listen on.
+
+- `alertmanager_web_external_url`: String, the URL under which Alertmanager is
+  externally reachable - defaults to host IP address and `alertmanager_port`.
+  See man page for more details if proxying alertmanager.
+- `alertmanager_data_retention`: String, how long to keep data for
+- `alertmanager_data_maintenance_interval`: String, interval between garbage
+  collection and snapshotting to disk of the silences and the notification logs.
+
+The following variables are templated into the alertmanager [main configuration](https://prometheus.io/docs/alerting/latest/configuration/):
+
+- `alertmanager_receivers`: A list of [receiver](https://prometheus.io/docs/alerting/)
+  mappings to define under the top-level `receivers` configuration key. This
+  will contain the Slack receiver if that has been enabled (see below).
+- `alertmanager_extra_receivers`: A list of additional [receiver](https://prometheus.io/docs/alerting/),
+  mappings to add, by default empty.
+- `alertmanager_slack_receiver`: Mapping defining the [Slack receiver](https://prometheus.io/docs/alerting/latest/configuration/#slack_config). Note the default configuration for this is in
+  `environments/common/inventory/group_vars/all/alertmanager.yml`.
+- `alertmanager_slack_receiver_name`: String, name for the above Slack receiver.
+- `alertmanager_slack_receiver_send_resolved`: Bool, whether to send resolved alerts via the above Slack receiver.
+- `alertmanager_null_receiver`: Mapping defining a `null` [receiver](https://prometheus.io/docs/alerting/latest/configuration/#receiver) so a receiver is always defined.
+- `asa_alertmanager_child_routes`: a list of [routes](https://prometheus.io/docs/alerting/latest/configuration/#route-related-settings)
+  that will be put under the default route.
+
+Additional customization can be achieved by variables from `prometheus.prometheus.alertmanager`:
+
+SMTP settings:
+
+```yaml
+alertmanager_smtp:
+  from: smtp.example.org:587
+```
+
+Time intervals:
+
+```yaml
+alertmanager_time_intervals:
+  - name: monday-to-friday
+      time_intervals:
+      - weekdays: ['monday:friday']
+```
+
+The following variables are templated into the alertmanager [web configuration](https://prometheus.io/docs/alerting/latest/https/):
+
+- `alertmanager_web_config_default`: Mapping with default configuration for
+  `basic_auth_users` providing the default web user.
+- `alertmanager_alertmanager_web_config_extra`: Mapping with additional web
+  configuration. Keys in this become top-level keys in the web configuration.
