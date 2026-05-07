@@ -1,5 +1,7 @@
 ---
 pulp_site_port: 8080
+# default to latest distro defined in our environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml:
+pulp_site_target_distribution_version: "{{ dnf_repos_repos['baseos'].keys() | community.general.version_sort | last }}"
 
 # If using Ark directly (no local Pulp server), override the following with Ark creds
 

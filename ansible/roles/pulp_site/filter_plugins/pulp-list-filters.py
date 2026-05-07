@@ -27,10 +27,7 @@ class FilterModule(object):
             elif target_distro_ver_major in dnf_repos[repokey]:
                 selected_ver = target_distro_ver_major
             else:
-                raise ValueError(
-                    # pylint: disable-next=line-too-long
-                    f"No key matching {target_distro_ver_major} or {target_distro_ver} found in f{repokey}"
-                )
+                continue  # e.g. epel-cisco-openh264 only relevant for RL9
             repo_data = dnf_repos[repokey][selected_ver]
             repo_data["pulp_repo_name"] = (
                 f"{repokey}-{selected_ver}-{dnf_repos[repokey][selected_ver]['pulp_timestamp']}"
