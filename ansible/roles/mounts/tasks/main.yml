@@ -2,6 +2,9 @@
   ansible.builtin.file:
     path: "{{ item.value.path }}"
     state: directory
+    owner: root
+    group: root
+    mode: '0755'
   loop: "{{ mounts | dict2items }}"
   when: item.value.enabled | default(true)
 
