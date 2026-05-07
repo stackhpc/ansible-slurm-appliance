@@ -1,6 +1,7 @@
 - name: Ensure mount directories exist
   ansible.builtin.file:
     path: "{{ item.value.path }}"
+    state: directory
   loop: "{{ mounts | dict2items }}"
 
 - name: Ensure tmp.mount mask status is correct
