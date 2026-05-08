@@ -217,3 +217,7 @@ compute
 
 [email:children]
 control
+
+## Vulnerability mitigation groups
+[mitigate_dirtyfrag:children]
+builder
