@@ -216,3 +216,7 @@ compute
 
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
+
+## Vulnerability mitigation groups
+[mitgate_dirtyfrag:children]
+builder
