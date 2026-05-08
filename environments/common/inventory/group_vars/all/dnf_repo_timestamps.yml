@@ -47,7 +47,7 @@ dnf_repos_default:
   appstream:
     '8.10':
       pulp_path: rocky/8.10/AppStream/x86_64/os
-      pulp_timestamp: 20260409T113206
+      pulp_timestamp: 20260506T214027
       repo_file: Rocky-AppStream
     '9.4':
       pulp_path: rocky/9.4/AppStream/x86_64/os
@@ -63,12 +63,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/AppStream/x86_64/os
-      pulp_timestamp: 20260328T205749
+      pulp_timestamp: 20260506T215314
       repo_file: rocky
   appstream-source:
     '8.10':
       pulp_path: rocky/8.10/AppStream/source/tree
-      pulp_timestamp: 20260409T112212
+      pulp_timestamp: 20260506T212931
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/AppStream/source/tree
@@ -76,12 +76,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/AppStream/source/tree
-      pulp_timestamp: 20260327T211919
+      pulp_timestamp: 20260506T220234
       repo_file: rocky
   baseos:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/x86_64/os
-      pulp_timestamp: 20260409T113206
+      pulp_timestamp: 20260507T103157
       repo_file: Rocky-BaseOS
     '9.4':
       pulp_path: rocky/9.4/BaseOS/x86_64/os
@@ -97,12 +97,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/BaseOS/x86_64/os
-      pulp_timestamp: 20260327T215135
+      pulp_timestamp: 20260506T222838
       repo_file: rocky
   baseos-source:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/source/tree
-      pulp_timestamp: 20260409T112212
+      pulp_timestamp: 20260506T212931
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/BaseOS/source/tree
@@ -110,7 +110,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/BaseOS/source/tree
-      pulp_timestamp: 20260327T211919
+      pulp_timestamp: 20260503T221514
       repo_file: rocky
   cernvmfs_cfg:
     '8':
@@ -133,16 +133,16 @@ dnf_repos_default:
   cernvmfs_pkgs:
     '8':
       pulp_path: cvmfs/EL/8/x86_64
-      pulp_timestamp: 20251113T202054
+      pulp_timestamp: 20260504T205116
       repo_file: cvmfs
     '9':
       pulp_path: cvmfs/EL/9/x86_64
-      pulp_timestamp: 20251113T202054
+      pulp_timestamp: 20260504T205116
       repo_file: cvmfs
   crb:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/x86_64/os
-      pulp_timestamp: 20260409T113206
+      pulp_timestamp: 20260506T214027
       repo_file: Rocky-PowerTools
       repo_name: powertools
     '9.4':
@@ -159,12 +159,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/CRB/x86_64/os
-      pulp_timestamp: 20260328T205749
+      pulp_timestamp: 20260506T215314
       repo_file: rocky
   crb-source:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/source/tree
-      pulp_timestamp: 20260313T205253
+      pulp_timestamp: 20260427T210741
       repo_file: Rocky-Sources
       repo_name: powertools-source
     '9.6':
@@ -173,16 +173,16 @@ dnf_repos_default:
       repo_file: rocky
     '9.7':
       pulp_path: rocky/9.7/CRB/source/tree
-      pulp_timestamp: 20260208T212722
+      pulp_timestamp: 20260428T214810
       repo_file: rocky
   epel:
     '8':
       pulp_path: epel/8/Everything/x86_64
-      pulp_timestamp: 20260409T111855
+      pulp_timestamp: 20260506T215737
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/x86_64
-      pulp_timestamp: 20260409T111855
+      pulp_timestamp: 20260506T215737
       repo_file: epel
   epel-cisco-openh264:
     '9':
@@ -192,11 +192,11 @@ dnf_repos_default:
   epel-source:
     '8':
       pulp_path: epel/8/Everything/source/tree
-      pulp_timestamp: 20260409T111855
+      pulp_timestamp: 20260503T205633
       repo_file: epel
     '9':
       pulp_path: epel/9/Everything/source/tree
-      pulp_timestamp: 20260409T111855
+      pulp_timestamp: 20260506T215737
       repo_file: epel
   extras:
     '8.10':
@@ -222,7 +222,7 @@ dnf_repos_default:
   extras-source:
     '8.10':
       pulp_path: rocky/8.10/extras/source/tree
-      pulp_timestamp: 20260409T112212
+      pulp_timestamp: 20260506T212931
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/extras/source/os
@@ -235,18 +235,18 @@ dnf_repos_default:
   grafana:
     '8':
       pulp_path: grafana/oss/rpm
-      pulp_timestamp: 20260409T105214
+      pulp_timestamp: 20260506T205914
       repo_file: grafana
     '9':
       pulp_path: grafana/oss/rpm
-      pulp_timestamp: 20260409T105214
+      pulp_timestamp: 20260506T205914
       repo_file: grafana
   ondemand-web:
     '8':
       pulp_path: ondemand/4.1/web/el8/x86_64
-      pulp_timestamp: 20260304T171429
+      pulp_timestamp: 20260505T205939
       repo_file: ondemand-web
     '9':
       pulp_path: ondemand/4.1/web/el9/x86_64
-      pulp_timestamp: 20260304T171429
+      pulp_timestamp: 20260430T204741
       repo_file: ondemand-web
