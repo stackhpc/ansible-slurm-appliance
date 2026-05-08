@@ -1,0 +1,25 @@
+- name: Apply dirtyfrag mitigation
+  hosts: mitigate_dirtyfrag
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Prevent modules loading
+      ansible.builtin.copy:
+        dest: /etc/modprobe.d/dirtyfrag.conf
+        owner: root
+        group: root
+        mode: u=rw,go=r
+        content: |
+          install esp4 /bin/false
+          install esp6 /bin/false
+          install rxrpc /bin/false
+    # below probably is not needed but is safer
+    - name: Unload modules
+      ansible.builtin.command:
+        cmd: rmmod esp4 esp6 rxrpc
+      failed_when: false
+      changed_when: true
+    - name: Clear page cache
+      ansible.builtin.command:
+        cmd: echo 3 > /proc/sys/vm/drop_caches
+      changed_when: true

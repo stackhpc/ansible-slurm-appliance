@@ -30,6 +30,8 @@
 
 - ansible.builtin.import_playbook: validate-galaxy.yml
 
+- ansible.builtin.import_playbook: mitigations.yml
+
 - name: Sync pulp repos with upstream
   hosts: pulp_site
   gather_facts: true
