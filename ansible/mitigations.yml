@@ -1,5 +1,5 @@
 - name: Apply dirtyfrag mitigation
-  hosts: mitgate_dirtyfrag
+  hosts: mitigate_dirtyfrag
   gather_facts: false
   become: true
   tasks:

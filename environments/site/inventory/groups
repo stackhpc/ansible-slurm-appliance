@@ -218,5 +218,5 @@ compute
 # Hosts to run opkssh to allow SSH via OIDC
 
 ## Vulnerability mitigation groups
-[mitgate_dirtyfrag:children]
+[mitigate_dirtyfrag:children]
 builder
