@@ -1,7 +1,12 @@
 - name: Ensure mount directories exist
   ansible.builtin.file:
     path: "{{ item.value.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
   loop: "{{ mounts | dict2items }}"
+  when: item.value.enabled | default(true)
 
 - name: Ensure tmp.mount mask status is correct
   # RL8-specific fix; otherwise rootfs comes up read-only after a reboot!
