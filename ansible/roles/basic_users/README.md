@@ -30,7 +30,7 @@ without requiring LDAP etc. Features:
   This should be a host mounting the home directories. Default is the first
   node in the `login` group which is appropriate for the default appliance
   configuration.
-- `basic_users_uid_min`: Optional int, default `2000`. The minimum UID for
+- `basic_users_uid_min`: Optional int, default `1000`. The minimum UID for
   normal users, i.e. those without the `system` attribute.
 - `basic_users_users`: Optional, default empty list. A list of mappings defining
   information for each user. In general, mapping keys/values are passed through
@@ -71,6 +71,7 @@ None.
    to all nodes except the control node, and delete user `bob`:
 
    ```yaml
+   basic_users_uid_min: 2000
    basic_users_users:
      - comment: Alice Aardvark
        name: alice
@@ -83,7 +84,7 @@ None.
        state: absent
    ```
 
-   Note the UIDs for these users are above the default `basic_users_uid_min`.
+   Note the UIDs for these users are above the `basic_users_uid_min` set.
 
 2. Using an external fileshare which:
    - Does not root squash (so this role can create directories on it)
@@ -93,6 +94,7 @@ None.
    create user `carol`:
 
    ```yaml
+   basic_users_uid_min: 2000
    basic_users_homedir_host: "{{ ansible_play_hosts | first }}" # doesn't matter which host is used
    basic_users_homedir_host_path: /home # homedir_host is client not server
    basic_users_user:
@@ -106,6 +108,7 @@ None.
    created by this role and must already exist, create user `Dan`:
 
    ```yaml
+   basic_users_uid_min: 2000
    basic_users_homedir_host: "{{ ansible_play_hosts | first }}"
    basic_users_homedir_host_path: /home
    basic_users_users:
@@ -120,6 +123,7 @@ None.
    authorized keys applies to all nodes), create user `Erin` with passwordless sudo:
 
    ```yaml
+   basic_users_uid_min: 2000
    basic_users_users:
      - comment: Erin Eagle
        name: erin
