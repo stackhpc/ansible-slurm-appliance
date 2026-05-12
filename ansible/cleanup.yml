@@ -38,7 +38,7 @@
   ansible.builtin.command: cloud-init clean --logs --seed
 
 - name: Cleanup /tmp # noqa: no-changed-when
-  ansible.builtin.command: rm -rf /tmp/*
+  ansible.builtin.shell: rm -rvf /tmp/*
 
 - name: Delete files triggering vulnerability scans
   ansible.builtin.file:
@@ -53,6 +53,23 @@
     # chrony role: only used for role dev, venv never created on disk
     - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/poetry.lock
     - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements.txt
+    - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements-dev.txt
+    # netbox collection: only used for role dev
+    - /usr/lib/ansible-init/lib/python3.9/site-packages/ansible_collections/netbox/netbox/poetry.lock
+    # esbuild in OOD
+    - /var/www/ood/apps/sys/dashboard/node_modules/@esbuild/linux-x64/bin/esbuild
+    - /usr/lib/rstudio-server/bin/quarto/bin/tools/x86_64/esbuild
+
+- name: Replace rclone with a no-op script
+  ansible.builtin.copy:
+    content: |
+      #!/bin/sh
+      echo "The rclone executable has been removed in ansible-slurm-appliance images due to too many security warnings." 1>&2
+      exit 1
+    dest: /usr/bin/rclone
+    owner: root
+    group: root
+    mode: "0555"
 
 - name: Stop journald
   # Stop journald from writing data to the journal after we have cleared it.

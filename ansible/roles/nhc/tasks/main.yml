@@ -1,4 +1,7 @@
 ---
+- name: Collect facts
+  ansible.builtin.include_tasks: facts.yml
+
 - name: Ensure NHC configuration directory exists
   # When running site.yml after login/control upgrade, nhc group might be
   # enabled in repo, but as the compute nodes have not yet been upgraded they

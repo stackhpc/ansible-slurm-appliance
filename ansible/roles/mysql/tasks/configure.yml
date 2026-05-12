@@ -17,6 +17,8 @@
     daemon_reload: "{{ _mysql_unitfile.changed }}"
 
 - when: "mysql_state | default('unspecified') != 'stopped'"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.9
   block:
     - name: Wait for mysql to initialise
     # NB: It is not sufficient to wait_for the port

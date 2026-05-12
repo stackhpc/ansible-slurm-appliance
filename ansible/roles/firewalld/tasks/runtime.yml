@@ -1,4 +1,6 @@
 ---
+# Note: needs to be run with platform-python python interpreter because it uses python
+# bindings.
 - name: Apply firewalld configs # noqa: args[module]
   ansible.posix.firewalld: "{{ item }}"
   notify: Restart firewalld

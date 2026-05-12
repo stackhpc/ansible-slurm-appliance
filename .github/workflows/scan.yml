@@ -70,7 +70,7 @@ jobs:
         run: |
           IMAGE_NAME=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$JSON_PATH")
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_ENV"
-          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
         env:
           MATRIX_BUILD: ${{ matrix.build }}
           JSON_PATH: ${{ env.JSON_PATH }}
@@ -84,7 +84,7 @@ jobs:
           openstack image save --file "/mnt/images/${IMAGE_NAME}" "${IMAGE_NAME}"
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
 
       - name: Install libguestfs
         run: |
@@ -117,7 +117,7 @@ jobs:
           fail-build: false # don't stop workflow if vulns are found
 
       - name: Upload scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@b8bb9f28b8d3f992092362369c57161b755dea45 # v4.35.0
+        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
           # Useful if you are running this in a matrix

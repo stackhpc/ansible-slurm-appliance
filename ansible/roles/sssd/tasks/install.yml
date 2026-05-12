@@ -1,7 +1,7 @@
 ---
 - name: Ensure sssd packages are installed
   ansible.builtin.dnf:
-    name: "{{ sssd_packages + sssd_ldap_packages if (sssd_install_ldap | bool) else [] }}"
+    name: "{{ sssd_packages + (sssd_ldap_packages if (sssd_install_ldap | bool) else []) }}"
 
 - name: Control if sssd should start on boot
   # Needs to be done here to prevent starting after image build, is enabled by default

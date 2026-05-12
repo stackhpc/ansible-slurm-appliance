@@ -34,8 +34,8 @@ jobs:
 
       - name: Input Variables
         run: |
-          echo "CI_CLOUD: ${CI_CLOUD}"
-          echo "CLUSTER_NAME: ${CLUSTER_NAME}"
+          echo "CI_CLOUD: ${CI_CLOUD}" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "CLUSTER_NAME: ${CLUSTER_NAME}" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Check Cluster Name not empty
         run: |
