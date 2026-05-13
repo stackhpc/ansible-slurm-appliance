@@ -1,12 +1,25 @@
+---
+
+- name: Check mount directories
+  ansible.builtin.stat:
+    path: "{{ item.path }}"
+  register: _mounts_mountpoints
+  loop: "{{ mounts.values() }}"
+  when: item.enabled | default(true)
+
 - name: Ensure mount directories exist
   ansible.builtin.file:
-    path: "{{ item.value.path }}"
+    path: "{{ stat_result.item.path }}"
     state: directory
     owner: root
     group: root
     mode: '0755'
-  loop: "{{ mounts | dict2items }}"
-  when: item.value.enabled | default(true)
+  loop: "{{ _mounts_mountpoints.results | default([]) }}"
+  loop_control:
+    loop_var: stat_result
+  # Only run when mountpoint is missing, to avoid resetting owner/mode on mounted directories
+  # Also has to cope with .stat missing when enabled: false
+  when: not (stat_results.stat.exists | default(true))
 
 - name: Ensure tmp.mount mask status is correct
   # RL8-specific fix; otherwise rootfs comes up read-only after a reboot!
