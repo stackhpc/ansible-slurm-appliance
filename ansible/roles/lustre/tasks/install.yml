@@ -34,7 +34,8 @@
 
 - name: Check rpms found
   ansible.builtin.assert:
-    that: _lustre_find_rpms.files | length
+    that:
+      - _lustre_find_rpms.matched > 0
     fail_msg: "No lustre repos found with lustre_rpm_globs = {{ lustre_rpm_globs }}"
 
 - name: Install lustre rpms
