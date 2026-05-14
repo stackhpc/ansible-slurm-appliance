@@ -29,7 +29,8 @@ export APPLIANCES_REPO_ROOT="${APPLIANCES_REPO_ROOT:-$(pwd)}" # allows running f
 echo "Using super-linter ${SUPERLINTER_VERSION}"
 podman run --rm \
     --env FILTER_REGEX_INCLUDE="$*" \
-	--env FIX_PYTHON_BLACK=true --env FIX_MARKDOWN_PRETTIER=true \
+	--env FIX_PYTHON_BLACK=true \
+	--env FIX_MARKDOWN_PRETTIER=true --env FIX_MARKDOWN=true \
 	--env FIX_NATURAL_LANGUAGE=true --env FIX_TERRAFORM_FMT=true\
 	--env FIX_SPELL_CODESPELL=true --env FIX_GITHUB_ACTIONS_ZIZMOR=true \
 	--env VALIDATE_CHECKOV=false --env VALIDATE_GITLEAKS \
