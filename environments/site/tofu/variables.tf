@@ -60,7 +60,7 @@ variable "login" {
       nodes: List of node names
       flavor: String flavor name
     Optional:
-      image_id: Overrides variable cluster_image_id
+      image_label: Overrides variable cluster_image_label
       extra_networks: List of mappings in same format as cluster_networks
       vnic_types: Overrides variable vnic_types
       volume_backed_instances: Overrides variable volume_backed_instances
@@ -110,9 +110,10 @@ variable "login" {
 }
 }
 
-variable "cluster_image_id" {
+variable "cluster_image_label" {
   type        = string
-  description = "ID of default image for the cluster"
+  description = "Label (in environments/site/images/) of default image for the cluster"
+  default     = "stackhpc-RL9"
 }
 
 variable "compute" {
@@ -129,7 +130,7 @@ variable "compute" {
       nodes: List of node names
       flavor: String flavor name
     Optional:
-      image_id: Overrides variable cluster_image_id
+      image_label: Overrides variable cluster_image_label
       extra_networks: List of mappings in same format as cluster_networks
       vnic_types: Overrides variable vnic_types
       compute_init_enable: Toggles compute-init rebuild (see compute-init role docs)

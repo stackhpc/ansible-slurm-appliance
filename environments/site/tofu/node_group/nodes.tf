@@ -32,6 +32,8 @@ locals {
   }
 
   baremetal_az = var.availability_zone != null ? var.availability_zone : "nova"
+
+  image_id = jsondecode(file("${abspath(path.module)}/../../images/${var.image_label}.json"))["id"]
 }
 
 resource "openstack_blockstorage_volume_v3" "compute" {
@@ -90,14 +92,14 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
   for_each = var.ignore_image_changes ? toset(var.nodes) : []
 
   name        = split(".", local.fqdns[each.key])[0]
-  image_id    = var.image_id
+  image_id    = local.image_id
   flavor_name = var.flavor
   key_pair    = var.key_pair
 
   dynamic "block_device" {
     for_each = var.volume_backed_instances ? [1] : []
     content {
-      uuid                  = var.image_id
+      uuid                  = local.image_id
       source_type           = "image"
       destination_type      = "volume"
       volume_size           = var.root_volume_size
@@ -158,14 +160,14 @@ resource "openstack_compute_instance_v2" "compute" {
   for_each = var.ignore_image_changes ? [] : toset(var.nodes)
 
   name        = split(".", local.fqdns[each.key])[0]
-  image_id    = var.image_id
+  image_id    = local.image_id
   flavor_name = var.flavor
   key_pair    = var.key_pair
 
   dynamic "block_device" {
     for_each = var.volume_backed_instances ? [1] : []
     content {
-      uuid                  = var.image_id
+      uuid                  = local.image_id
       source_type           = "image"
       destination_type      = "volume"
       volume_size           = var.root_volume_size
@@ -228,7 +230,7 @@ output "compute_instances" {
 }
 
 output "image_id" {
-  value = var.image_id
+  value = local.image_id
 }
 
 output "fqdns" {
