@@ -193,6 +193,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
+          ansible-playbook ansible/adhoc/unlock.yml
           cd "$STACKHPC_TF_DIR"
           tofu init
           max_retries=3
@@ -218,6 +219,7 @@ jobs:
           ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
           ansible-playbook -v ansible/ci/check_compute_rebuild.yml
+          ansible-playbook -v ansible/adhoc/lock.yml
 
       - name: Check sacct state survived reimage to current branch
         run: |
@@ -288,6 +290,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
+          ansible-playbook ansible/adhoc/unlock.yml
           cd "$STACKHPC_TF_DIR"
           tofu destroy -auto-approve -var-file="${CI_CLOUD}.tfvars" || echo "tofu failed in $STACKHPC_TF_DIR"
         if: ${{ success() || cancelled() }}
