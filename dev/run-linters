@@ -7,7 +7,7 @@
 # Disabled linters: checkov stays stuck for some reason!
 # VALIDATE_GITLEAKS=false is controversial because that's the best time to catch errors
 
-if [ "$1" = "-f" ] || [ "$1" = "--false" ]; then
+if [ "$1" = "-f" ] || [ "$1" = "--fast" ]; then
 	echo "Disabling slow linters: ansible-lint and gitleaks"
 	VALIDATE_ANSIBLE_LINT=false
 	export VALIDATE_GITLEAKS=false
@@ -16,9 +16,10 @@ fi
 if [ "${VALIDATE_ANSIBLE_LINT:-true}" = true ]; then
 	echo "Running ansible-lint $*..."
 	ansible_lint_failed=false
-	# Specifying `ANSIBLE_COLLECTIONS_PATH` ensures `ansible-lint` downloads collections and roles under the `.ansible` directory, separating them from our own roles under the `ansible` directory.
-	# We exclude these downloaded files from linting by listing `.ansible` under `exclude_paths` in `.ansible-lint.yml`.
-	if ! ANSIBLE_COLLECTIONS_PATH=.ansible/collections ansible-lint -c .ansible-lint.yml "$@"; then
+	# Create an array of uncommitted role paths:
+	mapfile -t excludes < <(git ls-files --others --ignored --exclude-standard --directory ansible/roles/)
+	# Run ansible-lint in offline mode so it doesn't download galaxy requirements itself, ignoring galaxy-installed roles:
+	if ! ansible-lint --offline --config-file .ansible-lint.yml --exclude "${excludes[@]}" "$@"; then
 		echo "ansible-lint found errors"
 		ansible_lint_failed=true
 	fi
@@ -33,7 +34,7 @@ podman run --rm \
 	--env FIX_MARKDOWN_PRETTIER=true --env FIX_MARKDOWN=true \
 	--env FIX_NATURAL_LANGUAGE=true --env FIX_TERRAFORM_FMT=true\
 	--env FIX_SPELL_CODESPELL=true --env FIX_GITHUB_ACTIONS_ZIZMOR=true \
-	--env VALIDATE_CHECKOV=false --env VALIDATE_GITLEAKS \
+	--env VALIDATE_GITLEAKS \
 	--env RUN_LOCAL=true --env DEFAULT_WORKSPACE=/github/workspace \
 	--env-file "${APPLIANCES_REPO_ROOT}/super-linter.env" \
 	-v "$(pwd)":/github/workspace --security-opt label=disable \
