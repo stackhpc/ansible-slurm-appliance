@@ -26,19 +26,6 @@ jobs:
           submodules: true
           persist-credentials: false
 
-      - name: Install ansible etc
-        # NB: could prepend to path using GITHUB_PATH but don't want to check
-        # if that messes with superlinter
-        run: dev/setup-env.sh
-
-      - name: Run ansible-lint
-        # use offline mode galaxy roles/collections already installed
-        # but build a list so we can ignore them
-        run: |
-          . venv/bin/activate
-          mapfile -t excludes < <(git ls-files --others --ignored --exclude-standard --directory ansible/roles/)
-          ansible-lint --offline --config-file .ansible-lint.yml --exclude "${excludes[@]}"
-
       - name: Load super-linter configuration
         # Use grep inverse matching to exclude eventual comments in the .env file
         # because the GitHub Actions command to set environment variables doesn't
@@ -53,3 +40,16 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install ansible etc
+        # NB: could prepend to path using GITHUB_PATH but don't want to check
+        # if that messes with superlinter
+        run: dev/setup-env.sh
+
+      - name: Run ansible-lint
+        # use offline mode galaxy roles/collections already installed
+        # but build a list so we can ignore them
+        run: |
+          . venv/bin/activate
+          mapfile -t excludes < <(git ls-files --others --ignored --exclude-standard --directory ansible/roles/)
+          ansible-lint --offline --config-file .ansible-lint.yml --exclude "${excludes[@]}"
