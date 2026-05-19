@@ -31,11 +31,6 @@ jobs:
         # if that messes with superlinter
         run: dev/setup-env.sh
 
-      - name: Install ansible-lint
-        run: |
-          . venv/bin/activate
-          pip install git+https://github.com/ansible/ansible-lint@a2bc8b8b13a80802215856c56823d85007d3baf5 # v25.12.2
-
       - name: Run ansible-lint
         run: |
           . venv/bin/activate
