@@ -26,6 +26,14 @@ jobs:
           submodules: true
           persist-credentials: false
 
+      - name: Cache pip
+        # Don't cache galaxy/requirements.yml as during dev its common for this
+        # to use branch names
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+
       - name: Load super-linter configuration
         # Use grep inverse matching to exclude eventual comments in the .env file
         # because the GitHub Actions command to set environment variables doesn't
@@ -44,7 +52,6 @@ jobs:
         # if that messes with superlinter
         run: dev/setup-env.sh
         if: always()
-
 
       - name: Run ansible-lint
         # use offline mode galaxy roles/collections already installed
