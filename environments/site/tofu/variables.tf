@@ -115,8 +115,7 @@ variable "login" {
 variable "cluster_image_id" {
   type        = string
   description = "ID of default image for the cluster"
-  # use upstream v2.5 image - # TODO: change for one with cuda/doca
-  default = "41e1a697-2669-4757-bf00-6900520546cd" # openhpc-RL8-260506-0657-2411273e (main) - NB: copy fail vulnerable!
+  default = "fad34c48-bb4b-4cf9-a912-d39525f0e7b7" # openhpc-RL8-260508-1119-0374764b upstream v2.16
 }
 
 variable "compute" {
