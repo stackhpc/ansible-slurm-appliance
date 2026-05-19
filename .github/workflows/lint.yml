@@ -26,8 +26,20 @@ jobs:
           submodules: true
           persist-credentials: false
 
+      - name: Install ansible etc
+        # NB: could prepend to path using GITHUB_PATH but don't want to check
+        # if that messes with superlinter
+        run: dev/setup-env.sh
+
+      - name: Install ansible-lint
+        run: |
+          . venv/bin/activate
+          pip install git+https://github.com/ansible/ansible-lint@a2bc8b8b13a80802215856c56823d85007d3baf5 # v25.12.2
+
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@a2bc8b8b13a80802215856c56823d85007d3baf5 # v25.12.2
+        run: |
+          . venv/bin/activate
+          ansible-lint
         env:
           ANSIBLE_COLLECTIONS_PATH: .ansible/collections
 
