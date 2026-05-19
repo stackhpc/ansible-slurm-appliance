@@ -30,6 +30,9 @@
   gather_facts: false
   tasks:
     # See https://docs.kernel.org/admin-guide/LSM/Yama.html for explanation
+    # Implementation note: we've decided to not use ansible.posix.sysctl for
+    # this one because we wanted to show the command to run manually if need be
+    # and also wanted to have a comment in the generated sysctl.d file.
     - name: Apply ssh-keysign-pwn mitigation to live system
       ansible.builtin.command: sysctl kernel.yama.ptrace_scope=2
       changed_when: true
@@ -44,6 +47,8 @@
         msg: "/proc/sys/kernel/yama/ptrace_scope={{ ptrace_scope.content|b64decode }}"
     - name: Prepare sysctl.d file to apply mitigation upon reboot
       ansible.builtin.copy:
+        # beware: /usr/lib/sysctl.d/10-default-yama-scope.conf will set it to 0
+        # so filename prefix needs to be greater than 10.
         dest: /etc/sysctl.d/99-prevent-ptrace_scope.conf
         content: |
           # this is a mitigation for ssh-keysign-pwn
