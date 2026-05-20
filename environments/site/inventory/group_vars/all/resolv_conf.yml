@@ -1,0 +1,4 @@
+# Network nameservers don't work. Use AgR FreeIPA as default nameserver
+resolv_conf_nameservers:
+  - '10.29.113.1'
+  - '10.29.113.4'

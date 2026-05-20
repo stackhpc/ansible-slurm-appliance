@@ -1,0 +1,4 @@
+chrony_ntp_servers:
+  - server: '10.29.113.1'
+    options:
+      - option: iburst

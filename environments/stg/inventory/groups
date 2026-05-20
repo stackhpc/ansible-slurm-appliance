@@ -1,0 +1,3 @@
+[freeipa_client:children]
+# Hosts to be a FreeIPA client. See ansible/roles/freeipa/README.md
+openhpc

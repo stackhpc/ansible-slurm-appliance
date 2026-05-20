@@ -1,0 +1,5 @@
+freeipa_enrol_method: pkinit
+freeipa_realm: IAM.FLEXI.NESI.ORG.NZ
+freeipa_servers:
+  - idm1.iam.flexi.nesi.org.nz
+  - idm4.iam.flexi.nesi.org.nz
