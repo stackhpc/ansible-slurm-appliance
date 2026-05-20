@@ -247,3 +247,4 @@ doca
 
 ## Vulnerability mitigation groups
 [mitigate_dirtyfrag]
+[mitigate_ssh_keysign_pwn]

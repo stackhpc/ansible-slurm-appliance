@@ -220,3 +220,5 @@ compute
 ## Vulnerability mitigation groups
 [mitigate_dirtyfrag:children]
 builder
+[mitigate_ssh_keysign_pwn:children]
+builder
