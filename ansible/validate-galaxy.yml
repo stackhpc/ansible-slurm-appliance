@@ -15,21 +15,23 @@
       delegate_to: localhost
       run_once: true # noqa: run-once[task]
       ansible.builtin.assert:
-        that: "{{ _requirements_current == _requirements_installed }}"
+        that: _requirements_difference | length == 0
         fail_msg: |
-          Ansible Galaxy installs are out of date:
+          The following Ansible Galaxy installs are incorrect:
 
-          {% for req in _requirements_installed | difference(_requirements_current) %}
+          {% for req in _requirements_difference %}
           {{ req }}
           {% endfor %}
 
           _requirements_current:
-          .{{ _requirements_current }}.
+          {{ _requirements_current }}
           _requirements_installed:
-          .{{ _requirements_installed }}.
+          {{ _requirements_installed }}
 
           Run dev/setup-env.sh to fix this.
       vars:
+        # difference filter seems to depend on direction in some cases!
+        _requirements_difference: "{{ (_requirements_current | difference(_requirements_installed)) + (_requirements_installed | difference(_requirements_current)) | unique }}"
         # note difference filter requires lists, so need to rearrange yaml from files.
         _requirements_path: "{{ appliances_repository_root }}/requirements.yml"
         _requirements_current: "{{ (lookup('file', _requirements_path) | from_yaml).values() | flatten }}"
