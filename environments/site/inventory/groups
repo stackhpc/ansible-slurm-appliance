@@ -49,9 +49,9 @@ slurm_stats
 [update:children]
 fatimage
 
-[fail2ban:children]
+[fail2ban]
 # Hosts to install fail2ban on to protect SSH
-login
+# Login nodes are on a private network, so no fail2ban is needed.
 
 [block_devices:children]
 # Environment-specific so not defined here
