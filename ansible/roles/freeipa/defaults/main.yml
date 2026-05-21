@@ -11,3 +11,4 @@ freeipa_servers: [] # list of FQDNs - disables DNS autodiscovery for Kerberos
 # freeipa_realm:
 freeipa_domain: "{{ freeipa_realm | lower }}"
 freeipa_cert_path: "{{ appliances_environment_root }}/freeipa"
+_freeipa_keytab_backup_path: "{{ hostvars[groups['control'].0].appliances_state_dir }}/freeipa/{{ inventory_hostname }}/krb5.keytab"
