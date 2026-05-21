@@ -13,6 +13,7 @@ skip_list:
 exclude_paths:
   - actionlint.yml
   - .ansible/
+  - ansible/collections/
   - .github/
   # Rule 'syntax-check' is unskippable, you cannot use it in 'skip_list' or 'warn_list'.
   # It breaks the parser which takes place before the linter, the only option is to exclude the file.
