@@ -1,12 +1,12 @@
 # based on https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/installing_identity_management/assembly_installing-an-idm-client_installing-identity-management
 
 - name: Check if FreeIPA client is enrolled
-  stat:
+  ansible.builtin.stat:
     path: /var/lib/ipa-client/sysrestore/sysrestore.index
   register: _stat_ipa_client_lib
 
 - name: Transfer FreeIPA client certs etc
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: /root/ipa/
     mode: u=r,go=
@@ -19,7 +19,7 @@
 
 - name: Get FreeIPA cert info
   community.crypto.x509_certificate_info:
-     path: "/root/ipa/{{ item }}"
+    path: "/root/ipa/{{ item }}"
   register: freeipa_cert_results
   loop:
     - "{{ inventory_hostname }}.pem"
@@ -35,7 +35,7 @@
     label: "{{ item.item }}"
 
 - name: Enrole/reenrole FreeIPA client
-  command:
+  ansible.builtin.command:
     cmd: >
       ipa-client-install
       --pkinit-identity=FILE:/root/ipa/{{ inventory_hostname }}.pem,/root/ipa/{{ inventory_hostname }}.key
@@ -48,12 +48,13 @@
       --domain {{ freeipa_domain }}
       --unattended
   when: not _stat_ipa_client_lib.stat.exists
+  changed_when: true
 
 - name: Ensure NFS RPC security service is running
   # This service is installed by nfs-utils, which attempts to start it.
   # It has ConditionPathExists=/etc/krb5.keytab which fails if host is not enroled.
   # This task avoids a reboot.
-  systemd:
+  ansible.builtin.systemd:
     name: rpc-gssd.service
     state: started
     enabled: true
