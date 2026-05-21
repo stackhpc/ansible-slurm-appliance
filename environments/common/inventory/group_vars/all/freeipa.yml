@@ -1,0 +1,3 @@
+---
+# See ansible/roles/freeipa/README.md
+freeipa_realm: "{{ openhpc_cluster_name | upper }}.{{ cluster_domain_suffix | upper }}"

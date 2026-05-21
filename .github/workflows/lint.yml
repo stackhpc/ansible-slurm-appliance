@@ -58,6 +58,7 @@ jobs:
         # but build a list so we can ignore them
         run: |
           . venv/bin/activate
+          . environments/.stackhpc/activate
           mapfile -t excludes < <(git ls-files --others --ignored --exclude-standard --directory ansible/roles/)
           ansible-lint --offline --config-file .ansible-lint.yml --exclude "${excludes[@]}"
         if: always()
