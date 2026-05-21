@@ -226,3 +226,7 @@ control
 ## Vulnerability mitigation groups
 [mitigate_dirtyfrag:children]
 builder
+
+[spectrum_scale:children]
+# Hosts to run spectrum scale/GPFS
+openhpc

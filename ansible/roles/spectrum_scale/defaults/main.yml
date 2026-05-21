@@ -1,0 +1,17 @@
+spectrum_scale_installer_s3path: "{{ undef(hint='spectrum_scale_installer_s3path is required') }}" # e.g. s3://spectrum_scale/Spectrum_Scale_Erasure_Code-5.1.6.1-x86_64-Linux-install
+spectrum_scale_installer_md5sum: "{{ undef(hint='spectrum_scale_installer_md5sum is required') }}" # e.g. 141c410a272b287894d5406eb552be36
+spectrum_scale_s3cfg: "{{ undef(hint='spectrum_scale_s3cfg is required') }}"
+spectrum_scale_installer_tmp: "/tmp/{{ spectrum_scale_installer_s3path | basename }}"
+spectrum_scale_prerequisite_packages:
+  - s3cmd
+  - "kernel-devel-{{ ansible_kernel }}" # NB: Not doing any check here that the running kernel will be the running one after reboot!
+  - cpp
+  - gcc
+  - gcc-c++
+  - binutils
+  - elfutils-libelf-devel
+
+spectrum_scale_backup_path: "{{ appliances_state_dir }}/spectrum_scale/CCRBackup.tar.gz"
+spectrum_scale_backup_host: "{{ groups['control'] | first }}"
+spectrum_scale_binary_path: /usr/lpp/mmfs/bin
+

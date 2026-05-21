@@ -2,6 +2,8 @@ collections
 roles/*
 *.pyc
 # Whitelist roles that are checked into this repository.
+!roles/spectrum_scale/
+!roles/spectrum_scale/**
 !roles/filebeat/
 !roles/filebeat/**
 !roles/opensearch/

@@ -1,0 +1,11 @@
+# will be provided to IBM role:
+scale_install_remotepkg_path: "{{ spectrum_scale_installer_tmp }}"
+# Rocky not officially supported:
+ansible_distribution: RedHat
+# Fix issues with spectrum_scale/roles/core_install/tasks/upgrade.yml when using _localpkg_path:
+scale_install_needsupdate: false
+scale_install_updated: false
+# role defaults - not available because we directly run tasks:
+scale_prepare_disable_selinux: false
+scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
+scale_install_prereqs_packages: false

@@ -1,0 +1,103 @@
+# The spectrum_scale hosts form a cluster without local storage, only remotemounts
+#
+# Role vars here:
+#   spectrum_scale_*: From in-appliance wrapper role, ansible/roles/spectrum_scale
+#   scale_*: From IBM role, see ansible/collections/ansible_collections/ibm/spectrum_scale/roles/docs/VARIABLES.md
+
+# --- Installation ---
+scale_version: '5.1.8.2' # TODO: add validation that this is set?
+spectrum_scale_s3cfg: "{{ vault_spectrum_scale_s3cfg }}"
+spectrum_scale_installer_s3path: s3://spectrum_scale/Storage_Scale_Advanced-5.1.8.2-x86_64-Linux-install
+spectrum_scale_installer_md5sum: 149d315d5caa091d88bc22a57b8a00ad
+
+# --- Node preparation ---
+scale_prepare_enable_ssh_login: true
+scale_prepare_restrict_ssh_address: false
+scale_prepare_disable_ssh_hostkeycheck: true
+scale_prepare_exchange_keys: true
+scale_prepare_disable_firewall: false
+
+# --- Remote mount configuration ---
+# See IBM roles/remotemount_configure/README.md for definitions
+# scale_remotemount_debug: true
+
+# Originally the dual-homed login/control nodes had their "primary" interface
+# being agr-vlan103 and therefore needed a 2nd routable name adding for
+# GPFS on the "baremetal-vlan". Now that is not the case but want to keep the
+# GPFS nodenames the same so it can restore GPFS cluster from backup.
+scale_daemon_nodename: "{{ inventory_hostname ~ '-data' if inventory_hostname in groups['control'] + groups['login'] else inventory_hostname }}"
+
+# scale_remotemount_debug: true
+scale_remotemount_client_no_gui: true
+scale_remotemount_storage_gui_username: agr_slurm_cluster
+scale_remotemount_storage_gui_password: "{{ vault_scale_remotemount_storage_gui_password }}"
+scale_remotemount_storage_gui_hostname: '10.1.110.235'
+scale_remotemount_filesystem_name:
+  - scale_remotemount_client_filesystem_name: scratch
+    scale_remotemount_client_remotemount_path: /mnt/gpfs/scratch
+    scale_remotemount_storage_filesystem_name: tdc_scratch
+    scale_remotemount_access_mount_attributes: rw,nofail
+  - scale_remotemount_client_filesystem_name: persist
+    scale_remotemount_client_remotemount_path: /mnt/gpfs/persist
+    scale_remotemount_storage_filesystem_name: tdc_persist
+    scale_remotemount_access_mount_attributes: rw,nofail
+
+# Identify quorum nodes - don't want default of 1st 7x hosts in inventory,
+# use specific baremetals:
+_scale_cluster_quorum_nodes:
+  - compute-0
+  - hugemem-0
+  - gpu-0
+scale_cluster_quorum: "{{ inventory_hostname in _scale_cluster_quorum_nodes }}"
+
+# Define nodesets and config by IB device on the 112 network:
+# TODO: would be nice to specify the IB device by network not index
+_ib_device_map: # inventory group (or 'default') -> nodeclass name
+  default: default         # VMs
+  eri_compute: mlx5_bond_0 # baremetal
+  eri_hugemem: mlx5_bond_0 # baremetal
+  eri_gpu: mlx5_bond_0     # baremetal
+ib_device_group: "{{ group_names | intersect(_ib_device_map.keys()) | first | default('default') }}"
+scale_nodeclass:
+    - "{{ ib_device_map[ib_device_group] }}"
+
+# Define scale_config specifying nodeclasses:
+# NB: The spectrum_scale role fails if scale_config includes nodeclasses which don't match nodes in the cluster.
+# As staging won't (necessarily) have all node types scale_config must be built dynamically.
+# Probably this could be simplified now (to use the group name as the nodeclass) but I don't want to change
+# the production nodeclasses.
+scale_config_default: # VMs
+  - nodeclass: default
+    params:
+      - verbsRdma: disable
+scale_config_all:
+  # auto building this via a jinja template doesn't work as
+  # https://github.com/IBM/ibm-spectrum-scale-install-infra/blob/b5edb870417332845e9cc41f77e09a244ae8b5ff/roles/core_configure/tasks/config.yml#L85
+  # accesses it via hostvars, which means it gets the template string, not the result!
+  - group: eri_compute # baremetal
+    scale_config:
+      nodeclass: mlx5_bond_0
+      params:
+        - verbsPorts: mlx5_bond_0
+        - verbsRdma: enable
+        - verbsRdmaCm: enable
+        - verbsRdmaSend: yes
+  - group: eri_hugemem # baremetal
+    scale_config:
+      nodeclass: mlx5_bond_0
+      params:
+        - verbsPorts: mlx5_bond_0
+        - verbsRdma: enable
+        - verbsRdmaCm: enable
+        - verbsRdmaSend: yes
+  - group: eri_gpu # baremetal
+    scale_config:
+      nodeclass: mlx5_bond_0
+      params:
+        - verbsPorts: mlx5_bond_0
+        - verbsRdma: enable
+        - verbsRdmaCm: enable
+        - verbsRdmaSend: yes
+non_empty_groups: "{{ groups | dict2items | selectattr('value') | map(attribute='key') }}" 
+scale_config_present: "{{ scale_config_all | selectattr('group', 'in', non_empty_groups) | map(attribute='scale_config') }}"
+scale_config: "{{ scale_config_default + scale_config_present | unique }}"
