@@ -199,19 +199,6 @@
         name: tuned
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
-- hosts: freeipa_server
-  # Done here as it might be providing DNS
-  tags:
-    - freeipa
-    - freeipa_server
-  gather_facts: true
-  become: true
-  tasks:
-    - name: Install FreeIPA server
-      ansible.builtin.import_role:
-        name: freeipa
-        tasks_from: server.yml
-
 - hosts: cluster
   gather_facts: false
   become: true
