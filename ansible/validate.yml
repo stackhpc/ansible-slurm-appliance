@@ -110,10 +110,12 @@
         - grafana
 
 - name: Validate freeipa configuration
-  hosts: freeipa
+  hosts: freeipa_client
+  gather_facts: false
+  become: false
   tags:
     - validate
-    - freeipa
+    - freeipa_client
   tasks:
     - ansible.builtin.import_role:
         name: freeipa
