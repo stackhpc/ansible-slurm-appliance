@@ -101,7 +101,7 @@
 
 - name: Run post-filesystems.yml hook
   vars:
-    appliances_environment_root: "{{ ansible_inventory_sources | last | dirname }}"
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
     hook_path: "{{ appliances_environment_root }}/hooks/post-filesystems.yml"
   ansible.builtin.import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
