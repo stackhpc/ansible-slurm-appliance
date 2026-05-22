@@ -11,7 +11,7 @@
       register: _result
 
     - name: Overwrite repo timestamps with latest
-      ansible.builtin.copy:
+      ansible.builtin.copy: # noqa: risky-file-permissions
         dest: "{{ appliances_repository_root }}/environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml"
         content: "{{ repo_template | to_nice_yaml(indent=2) }}"
         backup: true

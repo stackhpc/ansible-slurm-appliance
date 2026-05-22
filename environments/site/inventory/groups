@@ -230,3 +230,9 @@ builder
 [spectrum_scale:children]
 # Hosts to run spectrum scale/GPFS
 openhpc
+
+## Vulnerability mitigation groups
+[mitigate_dirtyfrag:children]
+builder
+[mitigate_ssh_keysign_pwn:children]
+builder
