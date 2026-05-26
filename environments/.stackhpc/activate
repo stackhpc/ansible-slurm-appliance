@@ -20,3 +20,25 @@ if [ -f "$APPLIANCES_ENVIRONMENT_ROOT/ansible.cfg" ]; then
 fi
 
 alias tofu="`which tofu` -chdir=$APPLIANCES_ENVIRONMENT_ROOT/tofu"
+
+# Non-standard variables to cope with multiple CI clouds below here
+if [[ -z "${CI_CLOUD:-}" ]]; then
+  echo "Error: CI_CLOUD must be set" >&2
+  return 1
+fi
+
+# Set which Tofu config to use:
+export TF_CLI_ARGS="-var-file=${CI_CLOUD}.tfvars"
+
+# Get bastion details:
+source "$APPLIANCES_ENVIRONMENT_ROOT/${CI_CLOUD}.bastion.env"
+export BASTION_USER BASTION_IP
+
+# Use them if BASTION_KEYFILE is defined:
+if [[ -n "${BASTION_KEYFILE:-}" ]]; then
+  export ANSIBLE_SSH_COMMON_ARGS="-o ProxyJump=${BASTION_USER}@${BASTION_IP} -i ${BASTION_KEYFILE}"
+  # Packer uses PKR_VAR_ prefix for env-based var injection:
+  export PKR_VAR_bastion_ip="${BASTION_IP}"
+  export PKR_VAR_bastion_user="${BASTION_USER}"
+  export PKR_VAR_bastion_keyfile="${BASTION_KEYFILE}"
+fi

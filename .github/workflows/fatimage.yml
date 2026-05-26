@@ -45,6 +45,7 @@ jobs:
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }}
+      BASTION_KEYFILE: /home/runner/.ssh/bastion_key
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -60,10 +61,9 @@ jobs:
         run: |
           set -x
           mkdir ~/.ssh
-          echo "$SECRETS_SSH_KEY" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-          ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
-        shell: bash
+          echo "$SECRETS_SSH_KEY" > "${BASTION_KEYFILE}"
+          chmod 0600 "${BASTION_KEYFILE}"
+          ssh-keygen -f "${BASTION_KEYFILE}" -y # tests key format is correct
         env:
           SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
@@ -102,6 +102,7 @@ jobs:
           PACKER_LOG=1 packer build \
           -on-error="$PACKER_ON_ERROR" \
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
+          -var-file="$PKR_VAR_environment_root/debug-sshkey.hcl" \
           -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
           -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
           -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
