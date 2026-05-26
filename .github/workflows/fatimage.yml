@@ -45,7 +45,6 @@ jobs:
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }}
-      BASTION_KEYFILE: /home/runner/.ssh/bastion_key
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -58,20 +57,35 @@ jobs:
           echo "PACKER_ON_ERROR | tee -a ${PACKER_ON_ERROR}"
 
       - name: Setup ssh
+        # NB: This is ALL done in the workflow rather than relying on committed
+        # files as the stackhpc.yml workflow checks out different commits
+        # and want to share the approach between workflows
         run: |
           set -x
-          mkdir ~/.ssh
+          mkdir -p ~/.ssh
+
+          # setup bastion private key:
           echo "$SECRETS_SSH_KEY" > "${BASTION_KEYFILE}"
           chmod 0600 "${BASTION_KEYFILE}"
           ssh-keygen -f "${BASTION_KEYFILE}" -y # tests key format is correct
-        env:
-          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
-      - name: Add bastion ssh fingerprints to known_hosts
-        run: |
+          # accept bastion hostkeys
           cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
-        shell: bash
+
+          {
+            # setup bastion for ansible:
+            echo "ANSIBLE_SSH_COMMON_ARGS='-o ProxyJump=${BASTION_USER}@${BASTION_HOST} -i ${BASTION_KEYFILE}'"
+
+            # setup bastion for packer:
+            echo "PKR_VAR_ssh_bastion_host=${BASTION_HOST}"
+            echo "PKR_VAR_ssh_bastion_username=${BASTION_USER}"
+            echo "PKR_VAR_ssh_bastion_private_key_file=${BASTION_KEYFILE}"
+          } >> "$GITHUB_ENV"
         env:
+          BASTION_KEYFILE: /home/runner/.ssh/bastion_key
+          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
+          BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
+          BASTION_USER: slurm-app-ci # does not depend on cloud
           VARS_BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
 
       - name: Install ansible etc

@@ -1,0 +1,24 @@
+export OS_CLIENT_CONFIG_FILE=$(realpath ../sms.clouds.yaml)
+#export OS_CLOUD=slurm-ci
+export OS_CLOUD=steveb@stackhpc.com
+echo "Set OS_CLOUD=${OS_CLOUD}"
+export CI_CLOUD=SMS
+echo "Set CI_CLOUD=${CI_CLOUD}"
+#export BASTION_KEYFILE=$(realpath ../id_ed25519-slurm-app-ci-v3)
+#echo "Set BASTION_KEYFILE=${BASTION_KEYFILE}"
+export TF_VAR_os_version=RL9
+echo "Set TF_VAR_os_version=${TF_VAR_os_version}"
+
+. venv/bin/activate
+. environments/.stackhpc/activate
+
+#eval $(ssh-agent)
+#ssh-add ../id_slurmci_ed25519
+# once https://github.com/stackhpc/terraform-bastion/pull/141 merged change
+#this to:
+#ssh-add ../id_ed25519-slurm-app-ci-v3
+
+# does this work ok with init?
+#export TF_CLI_ARGS="-var-file=${CI_CLOUD}.tfvars"?
+
+
