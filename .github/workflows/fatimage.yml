@@ -70,10 +70,11 @@ jobs:
           cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
 
           {
-            # setup bastion for ansible:
-            echo "ANSIBLE_SSH_COMMON_ARGS='-o ProxyJump=${BASTION_USER}@${BASTION_HOST} -i ${BASTION_KEYFILE}'"
+            # setup bastion for Ansible:
+            # NB Do NOT change this to use ProxyJump, it doesn't pickup the key
+            echo "ANSIBLE_SSH_COMMON_ARGS=-o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
 
-            # setup bastion for packer:
+            # setup bastion for Packer:
             echo "PKR_VAR_ssh_bastion_host=${BASTION_HOST}"
             echo "PKR_VAR_ssh_bastion_username=${BASTION_USER}"
             echo "PKR_VAR_ssh_bastion_private_key_file=${BASTION_KEYFILE}"
@@ -87,6 +88,14 @@ jobs:
           BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
           BASTION_USER: slurm-app-ci # currently same for both CI clouds
           VARS_BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
+
+      - name: Cache pip
+        # Don't cache galaxy/requirements.yml as during dev its common for this
+        # to use branch names
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
 
       - name: Install ansible etc
         run: dev/setup-env.sh

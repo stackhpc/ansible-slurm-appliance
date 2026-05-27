@@ -174,7 +174,6 @@ variable "additional_cloud_config" {
 
 variable "additional_cloud_config_vars" {
   description = "Map of values passed to the `additional_cloud_config` templatestring"
-  type        = map(any)
   default     = {}
 }
 
@@ -233,7 +232,7 @@ build {
     extra_arguments = [
       "--limit", "builder", # prevent running against real nodes, if in inventory!
       "-i", "${var.repo_root}/packer/ansible-inventory.sh",
-      "-vv",
+      "-vvvv",
       "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
       ]
   }
