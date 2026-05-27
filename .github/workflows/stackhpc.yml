@@ -29,7 +29,7 @@ jobs:
       TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
-      STACKHPC_TF_DIR: environments/.stackhpc/tofu # TODO: should be able to remove this?
+      STACKHPC_TF_DIR: environments/.stackhpc/tofu
     steps:
 
       - name: Find the latest release
@@ -66,36 +66,32 @@ jobs:
           ) | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Setup ssh
-        # NB: This is ALL done in the workflow rather than relying on committed
-        # files as the stackhpc.yml workflow checks out different commits
-        # and want to share the approach between workflows
-
         run: |
-          # shellcheck disable=SC2129
           set -x
-          mkdir -p ~/.ssh
-
-          # setup bastion private key:
-          echo "$SECRETS_SSH_KEY" > "${BASTION_KEYFILE}"
-          chmod 0600 "${BASTION_KEYFILE}"
-          ssh-keygen -f "${BASTION_KEYFILE}" -y # tests key format is correct
-
-          # accept bastion hostkeys
-          cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
-
-          # setup bastion for ansible:
-          echo "ANSIBLE_SSH_COMMON_ARGS='-o ProxyJump=${BASTION_USER}@${BASTION_HOST} -i ${BASTION_KEYFILE}'" >> "$GITHUB_ENV"
-
-          # setup bastion for packer:
-          echo "PKR_VAR_ssh_bastion_host=${BASTION_HOST}"  >> "$GITHUB_ENV"
-          echo "PKR_VAR_ssh_bastion_username=${BASTION_USER}" >> "$GITHUB_ENV"
-          echo "PKR_VAR_ssh_bastion_private_key_file=${BASTION_KEYFILE}" >> "$GITHUB_ENV"
+          mkdir ~/.ssh
+          echo "$SECRETS_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
+          ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
+        shell: bash
         env:
-          BASTION_KEYFILE: /home/runner/.ssh/bastion_key
           SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
-          BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
-          BASTION_USER: slurm-app-ci # does not depend on cloud
+
+      - name: Add bastion ssh fingerprints to known_hosts
+        run: |
+          cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
+          cat ~/.ssh/known_hosts
+        shell: bash
+        env:
           VARS_BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
+
+      - name: Ensure Ansible bastion definitions are from **current** branch
+        run: |
+          git fetch origin "$GITHUB_HEAD_REF_OR_NAME"
+          git checkout "origin/$GITHUB_HEAD_REF_OR_NAME" -- environments/.stackhpc/inventory/group_vars/all/bastion.yml
+          cat environments/.stackhpc/inventory/group_vars/all/bastion.yml
+        shell: bash
+        env:
+          GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
@@ -164,21 +160,19 @@ jobs:
         if: failure() && steps.provision_servers.outcome == 'failure'
 
       - name: Configure cluster at latest release
-        # NB: ANSIBLE_SSH_COMMON_ARGS is set as an extravar to ensure it
-        # overrides variables in the code
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible all -vvvv -m wait_for_connection
-          ansible-playbook ansible/adhoc/generate-passwords.ym
-          ansible-playbook -v ansible/site.yml -e ansible_ssh_common_args="${ANSIBLE_SSH_COMMON_ARGS}"
-          ansible-playbook -v ansible/ci/check_slurm.yml -e ansible_ssh_common_args="${ANSIBLE_SSH_COMMON_ARGS}"
+          ansible-playbook ansible/adhoc/generate-passwords.yml
+          ansible-playbook -v ansible/site.yml
+          ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Run MPI-based tests at latest release
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong -e ansible_ssh_common_args="${ANSIBLE_SSH_COMMON_ARGS}"
+          ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
 
       - name: Checkout current branch
         run: git checkout "$GITHUB_HEAD_REF_OR_NAME"
@@ -258,13 +252,13 @@ jobs:
           ansible-playbook ansible/ci/output_vars.yml \
             -e output_vars_hosts=openondemand \
             -e output_vars_path="$APPLIANCES_ENVIRONMENT_ROOT/vars.txt" \
-            -e output_vars_items=openondemand_servername
+            -e output_vars_items=bastion_ip,bastion_user,openondemand_servername
           source "$APPLIANCES_ENVIRONMENT_ROOT/vars.txt"
 
           # setup ssh proxying:
           sudo apt-get --yes install proxychains
           echo proxychains installed
-          ssh -v -fN -D 9050 "${BASTION_USER}@${BASTION_HOST}"
+          ssh -v -fN -D 9050 "${bastion_user}@${bastion_ip}"
           echo port 9050 forwarded
 
           # check OOD server returns 200:
