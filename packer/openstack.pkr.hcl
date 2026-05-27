@@ -161,22 +161,6 @@ variable "image_name_version" {
   default = "auto"
 }
 
-variable "additional_cloud_config" {
-  description = <<-EOT
-    Multiline string to be appended to the node's cloud-init cloud-config user-data.
-    Must be in yaml format and not include the #cloud-config or any other user-data headers.
-    See https://cloudinit.readthedocs.io/en/latest/explanation/format.html#cloud-config-data.
-    Can be a templatestring parameterised by `additional_cloud_config_vars`.
-  EOT
-  type        = string
-  default     = ""
-}
-
-variable "additional_cloud_config_vars" {
-  description = "Map of values passed to the `additional_cloud_config` templatestring"
-  default     = {}
-}
-
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
@@ -192,12 +176,6 @@ source "openstack" "openhpc" {
   floating_ip_network = var.floating_ip_network
   floating_ip = var.floating_ip
   security_groups = var.security_groups
-  user_data = <<-EOF
-    #cloud-config
-    %{if var.additional_cloud_config != ""}
-    ${templatestring(var.additional_cloud_config, var.additional_cloud_config_vars)}
-    %{endif}
-  EOF
   
   # Input image:
   source_image = "${var.source_image}"
@@ -207,7 +185,7 @@ source "openstack" "openhpc" {
   ssh_username = var.ssh_username
   ssh_timeout = "20m"
   ssh_private_key_file = var.ssh_private_key_file
-  ssh_keypair_name = var.ssh_keypair_name
+  ssh_keypair_name = var.ssh_keypair_name # TODO: doc this
   ssh_bastion_host = var.ssh_bastion_host
   ssh_bastion_username = var.ssh_bastion_username
   ssh_bastion_private_key_file = var.ssh_bastion_private_key_file
@@ -232,7 +210,7 @@ build {
     extra_arguments = [
       "--limit", "builder", # prevent running against real nodes, if in inventory!
       "-i", "${var.repo_root}/packer/ansible-inventory.sh",
-      "-vvvv",
+      "-vv",
       "-e", "@${var.repo_root}/packer/openhpc_extravars.yml", # not overridable by environments
       ]
   }
