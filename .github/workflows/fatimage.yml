@@ -57,9 +57,6 @@ jobs:
           echo "PACKER_ON_ERROR | tee -a ${PACKER_ON_ERROR}"
 
       - name: Setup ssh
-        # NB: This is ALL done in the workflow rather than relying on committed
-        # files as the stackhpc.yml workflow checks out different commits
-        # and want to share the approach between workflows
         run: |
           set -x
           mkdir -p ~/.ssh
@@ -81,11 +78,14 @@ jobs:
             echo "PKR_VAR_ssh_bastion_username=${BASTION_USER}"
             echo "PKR_VAR_ssh_bastion_private_key_file=${BASTION_KEYFILE}"
           } >> "$GITHUB_ENV"
+
+          echo "bastion details:"
+          cat "$GITHUB_ENV"
         env:
           BASTION_KEYFILE: /home/runner/.ssh/bastion_key
           SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
           BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
-          BASTION_USER: slurm-app-ci # does not depend on cloud
+          BASTION_USER: slurm-app-ci # currently same for both CI clouds
           VARS_BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
 
       - name: Install ansible etc
@@ -116,7 +116,6 @@ jobs:
           PACKER_LOG=1 packer build \
           -on-error="$PACKER_ON_ERROR" \
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
-          -var-file="$PKR_VAR_environment_root/debug-sshkey.hcl" \
           -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
           -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
           -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
