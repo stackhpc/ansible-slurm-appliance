@@ -25,6 +25,6 @@
 - name: Build CUDA samples
   ansible.builtin.shell:
     # We need to source /etc/profile.d/sh.local to add CUDA to the PATH
-    cmd: . /etc/profile.d/sh.local && cmake .. && make -j {{ ansible_processor_vcpus }}
+    cmd: . /etc/profile.d/sh.local && cmake .. && make -j {{ cuda_samples_build_concurrency }} && make install
     chdir: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build"
-    creates: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build/Samples/1_Utilities/deviceQuery/deviceQuery"
+    creates: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build/bin"
