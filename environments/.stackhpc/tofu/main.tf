@@ -65,13 +65,23 @@ data "openstack_images_image_v2" "cluster" {
   most_recent = true
 }
 
+variable "key_path" {
+  description = "Path to private key to use for deployment. Note there must be a matching .pub key present too."
+  type        = string
+}
+
+resource "openstack_compute_keypair_v2" "deploy" {
+  name       = var.cluster_name
+  public_key = file("${var.key_path}.pub")
+}
+
 module "cluster" {
   source = "../../site/tofu/"
 
   cluster_name        = var.cluster_name
   cluster_networks    = var.cluster_networks
   vnic_types          = var.vnic_types
-  key_pair            = "slurm-app-ci"
+  key_pair            = openstack_compute_keypair_v2.deploy.name
   cluster_image_id    = data.openstack_images_image_v2.cluster.id
   control_node_flavor = var.control_node_flavor
 

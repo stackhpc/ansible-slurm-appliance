@@ -36,12 +36,21 @@ jobs:
         run: |
           echo "LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name)" >> "$GITHUB_ENV"
 
-      - name: Checkout latest release
+      # - name: Checkout latest release
+      #   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      #   with:
+      #     ref: ${{ env.LATEST_RELEASE_TAG }}
+      #     fetch-depth: 0
+      #     persist-credentials: true
+
+      - name: TESTING Checkout current branch
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
-          ref: ${{ env.LATEST_RELEASE_TAG }}
+          ref: ${{ env.GITHUB_HEAD_REF_OR_NAME }}
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
+        env:
+          GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
@@ -76,6 +85,9 @@ jobs:
           set -x
           mkdir -p ~/.ssh
 
+          # create new deploy key:
+          ssh-keygen -t ed25519 -f "${DEPLOY_KEYFILE}" -q -P ""
+
           # setup bastion/keypair private key:
           echo "$SECRETS_SSH_KEY" > "${BASTION_KEYFILE}"
           chmod 0600 "${BASTION_KEYFILE}"
@@ -85,9 +97,12 @@ jobs:
           cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
 
           {
-            # setup bastion/keypair for Ansible:
+            # setup ssh for Ansible:
             # NB Do NOT change this to use ProxyJump, it doesn't pickup the key
-            echo "ANSIBLE_SSH_COMMON_ARGS=-i ${BASTION_KEYFILE} -o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
+            echo "ANSIBLE_SSH_COMMON_ARGS=-i ${DEPLOY_KEYFILE} -o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
+
+            # make deploy key available to OpenTofu:
+            echo "TF_VAR_key_path=${DEPLOY_KEYFILE}"
 
             # make bastion details directly available for ondemand checks:
             echo "BASTION_USER=${BASTION_USER}"
@@ -98,6 +113,7 @@ jobs:
           echo "bastion details:"
           cat "$GITHUB_ENV"
         env:
+          DEPLOY_KEYFILE: /home/runner/.ssh/deploy_key
           BASTION_KEYFILE: /home/runner/.ssh/bastion_key
           SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
           BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
@@ -192,6 +208,9 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
           ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
+
+      - name: TESTING END
+        run: exit 1
 
       - name: Checkout current branch
         run: git checkout --force "$GITHUB_HEAD_REF_OR_NAME"
