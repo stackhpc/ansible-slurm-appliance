@@ -107,7 +107,7 @@ jobs:
           format: syft-json
 
       - name: Generate SARIF Scan Report
-        uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c # v7.3.2
+        uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
         id: scan
         with:
           sbom: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
@@ -124,7 +124,7 @@ jobs:
           category: "${{ matrix.build }}"
 
       - name: Fail if scan has CRITICAL vulnerabilities
-        uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c # v7.3.2
+        uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
         with:
           sbom: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
           output-format: table
