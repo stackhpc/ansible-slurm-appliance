@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#SBATCH --nodes=1
+#SBATCH --output=%x.%a.out
+#SBATCH --error=%x.%a.out
+#SBATCH --cpus-per-task=4
+#SBATCH --partition={{ hpctests_partition }}
+#SBATCH --time=00:30:00
+{%if hpctests_nodes is defined %}
+#SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}
+{% endif %}
+{%if hpctests_account is defined %}
+#SBATCH --account={{ hpctests_account }}
+{% endif %}
+{%if hpctests_qos is defined %}
+#SBATCH --qos={{ hpctests_qos }}
+{% endif %}
+
+echo "arch: {{ hpctests_hpl_arch }}"
+echo "compute level: {{ hpctests_cuda_compute_level }}"
+{{ hpctests_pre_cmd }}
+# start from a clean state
+rm -r gpu-burn
+git clone https://github.com/wilicc/gpu-burn.git
+cd gpu-burn
+git checkout 671f4be92477ce01cd9b536bc534a006dbee058f # latest commit in master at this time
+make "COMPUTE={{ hpctests_cuda_compute_level }}"
+mkdir -p "{{ hpctests_gpuburn_install_dir }}"
+cp -a gpu_burn "{{ hpctests_gpuburn_install_dir }}/"
+cp -a compare.ptx "{{ hpctests_gpuburn_install_dir }}/"
+# shellcheck gets confused by jinja templating...
+#shellcheck disable=SC1056

@@ -26,3 +26,5 @@ hpctests_hpl_arch: linux64
 # hpctests_reservation:
 # hpctests_account:
 # hpctests_qos:
+hpctests_cuda_compute_level: 8.0
+hpctests_gpuburn_minutes: 20
