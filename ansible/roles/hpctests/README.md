@@ -9,6 +9,7 @@ Tests (with corresponding tags) are:
 - `pingpong`: Runs Intel MPI Benchmark's IMB-MPI1 pingpong between a pair of (scheduler-selected) nodes. Reports zero-size message latency and maximum bandwidth.
 - `pingmatrix`: Runs a similar pingpong test but between all pairs of nodes. Reports zero-size message latency & maximum bandwidth.
 - `hpl-solo`: Runs the HPL benchmark individually on all nodes. Reports Gflops.
+- `gpuburn`: Runs the [gpuburn](https://github.com/wilicc/gpu-burn/) utility to load-test GPUs. Reports Gflops.
 
 All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 
@@ -39,6 +40,9 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
   be selected to target using this fraction of each node's memory -
   **CAUTION: see note below**.
 - `hpctests_hpl_arch`: Optional, default 'linux64'. Arbitrary architecture name for HPL build. HPL is compiled on the first compute node of those selected (see `hpctests_nodes`), so this can be used to create different builds for different types of compute node.
+- `hpctests_cuda_compute_level`: Optional, default '8.0' which is good for A100 and newer. Cuda compute level used for gpuburn's compare kernel. Check <https://developer.nvidia.com/cuda/GPUs> for compatibility with target hardware.
+- `hpctests_gpuburn_gres`: Optional, all GPUs will be selected if absent. `srun --gres` option: needed on hosts with heterogeneous cards (incl. MIG). eg. `gpu:nvidia_h200=2gpu`
+- `hpctests_gpuburn_minutes`: Optional, default 20. Duration in minutes of gpuburn's GPU load.
 
 ---
 

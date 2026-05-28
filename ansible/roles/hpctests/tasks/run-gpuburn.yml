@@ -1,0 +1,102 @@
+---
+- name: Assert gpuburn executable is present
+  block:
+    - ansible.builtin.stat:
+        path: "{{ hpctests_gpuburn_install_dir }}/gpu_burn"
+      register: gpuburn_exe_stat
+    - ansible.builtin.assert:
+        that:
+          - gpuburn_exe_stat.stat.exists and gpuburn_exe_stat.stat.executable
+        fail_msg: "Run build-gpuburn.yml to produce {{ hpctests_gpuburn_install_dir }}/gpu_burn"
+
+- name: Get Slurm node info
+  scontrol_node_info:
+    nodes: "{{ hpctests_computes.stdout_lines }}"
+  register: hpctests_nodeinfo
+
+- name: Select GPUs
+  ansible.builtin.set_fact:
+    hpctests_gpuburn_gres: "{% for gpu in (hpctests_nodeinfo.info[0].gpus | default({})) | dict2items %}{% if loop.index0 > 0 %},{% endif %}gpu:{{ gpu.key }}={{ gpu.value }}{% endfor %}"
+  when: hpctests_gpuburn_gres is not defined
+
+- name: Show selected GPUs
+  ansible.builtin.debug:
+    msg: "Will run --gres={{ hpctests_gpuburn_gres }}"
+
+- name: Create sbatch script
+  ansible.builtin.template:
+    src: gpuburn.sh.j2
+    dest: "{{ hpctests_rootdir }}/gpuburn/gpuburn.sh"
+    mode: "0755"
+
+- name: Remove previous outputs # noqa: no-changed-when
+  ansible.builtin.shell:
+    cmd: "rm -f {{ hpctests_rootdir }}/gpuburn/gpuburn.sh.*.out"
+
+- name: Run gpuburn # noqa: no-changed-when
+  ansible.builtin.command: >-
+    sbatch --wait --time={{ timeout_h }}:{{ timeout_m }}:30 ./gpuburn.sh
+  args:
+    chdir: "{{ hpctests_rootdir }}/gpuburn"
+  register: hpctests_gpuburn_sbatch
+  vars:
+    timeout_h: "{{ ((hpctests_gpuburn_minutes | int) // 60) }}"
+    timeout_m: "{{ ((hpctests_gpuburn_minutes | int) % 60) }}"
+  async: "{{ ((hpctests_gpuburn_minutes | int)+ 1) * 60 }}" # give async an extra minute after slurm
+  poll: 15  # check every 15 seconds
+
+- name: Extract results
+  # Example of gpuburn output. Notice the ^M = \0d characters because it redraws on screen:
+  # (snip)
+  # 100.0%  proc'd: 2363 (45303 Gflop/s) - 2363 (45066 Gflop/s)   errors: 0 - 0   temps: 41 C - 42 C ^M100.0%  proc'd: 2502 (45287 Gflop/s) - 2363 (45066 Gflop/s)   errors: 0 - 0   temps: 41 C - 42 C
+  # Killing processes with SIGTERM (soft kill)
+  # Using compare file: compare.ptx
+  # Burning for 60 seconds.
+  # Initialized device 1 with 81081 MB of memory (80484 MB available, using 72436 MB of it), using DOUBLES
+  # Results are 536870912 bytes each, thus performing 139 iterations
+  # Freed memory for dev 1
+  # Uninitted cublas
+  # Using compare file: compare.ptx
+  # Burning for 60 seconds.
+  # Initialized device 0 with 81081 MB of memory (80484 MB available, using 72436 MB of it), using DOUBLES
+  # Results are 536870912 bytes each, thus performing 139 iterations
+  # Freed memory for dev 0
+  # Uninitted cublas
+  # done
+  #
+  # Tested 2 GPUs:
+  #         GPU 0: OK
+  #         GPU 1: OK
+  tags: postpro
+  ansible.builtin.shell: |
+    set -o pipefail
+    for res in gpuburn.*.out; do
+      echo "=== $res ==="
+      grep SLURM_JOB_ID "$res"
+      grep -E '^GPU [0-9]*:' "$res"
+      grep 100.0% "$res" | tr '\r' '\n' | tail -1
+      awk '/Tested [0-9]+ GPUs:/ { ok=1 } (ok) { print }' < "$res"
+    done
+  args:
+    chdir: "{{ hpctests_rootdir }}/gpuburn"
+  changed_when: false
+  register: perf
+
+- name: Print results
+  tags: postpro
+  ansible.builtin.debug:
+    msg: |
+      {{ perf.stdout }}
+
+- name: Check gpuburn completed OK
+  tags: postpro
+  ansible.builtin.shell: |
+    set -o pipefail
+    for f in gpuburn.sh.*.out; do
+      awk '/Tested [0-9]+ GPUs:/ { ok=1 } (ok) { print }' < $f
+    done
+  args:
+    chdir: "{{ hpctests_rootdir }}/gpuburn"
+  changed_when: false
+  register: passed
+  failed_when: "'OK' not in passed.stdout"
