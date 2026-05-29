@@ -45,7 +45,7 @@ if __name__ == "__main__":
             ssh_cmd = re.sub(r"\s+-v+\b", "", ssh_cmd)
             # strip out our timeout arg
             ssh_cmd = re.sub(r"-o ConnectTimeout=1", "", ssh_cmd)
-            continue
+            break
     if ssh_cmd is None:
         sys.exit("ERROR: Did not find SSH command in output")
     cmd = shlex.split(ssh_cmd)
