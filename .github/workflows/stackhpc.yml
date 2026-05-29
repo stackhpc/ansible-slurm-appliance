@@ -1,11 +1,10 @@
 ---
-
 # Test deployment and reimage on OpenStack.
 # This workflow can run standalone or as part of the main CI workflow.
 # See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Test deployment and reimage on OpenStack
-'on':
+"on":
   workflow_call:
   workflow_dispatch:
 
@@ -24,14 +23,13 @@ jobs:
           - RL8
           - RL9
     env:
-      ANSIBLE_FORCE_COLOR: 'true'
+      ANSIBLE_FORCE_COLOR: "true"
       OS_CLOUD: openstack
       TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
       STACKHPC_TF_DIR: environments/.stackhpc/tofu
     steps:
-
       - name: Find the latest release
         run: |
           echo "LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name)" >> "$GITHUB_ENV"
@@ -94,15 +92,19 @@ jobs:
           ssh-keygen -f "${BASTION_KEYFILE}" -y # tests key format is correct
 
           # accept bastion hostkeys
-          cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
+          cat >> ~/.ssh/known_hosts <<< "${BASTION_FINGERPRINTS}"
 
           {
             # setup ssh for Ansible:
             # NB Do NOT change this to use ProxyJump, it doesn't pickup the key
             echo "ANSIBLE_SSH_COMMON_ARGS=-i ${DEPLOY_KEYFILE} -o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
 
-            # make public part of deploy key available to OpenTofu:
-            echo "TF_VAR_public_key_path=${DEPLOY_KEYFILE}.pub"
+            # configure OpenTofu to create a keypair using public part of deploy key:
+            echo "TF_VAR_deploy_key_path=${DEPLOY_KEYFILE}.pub"
+            echo "TF_VAR_key_pair=${TF_VAR_cluster_name}"
+
+            # setup additional debug key for OpenTofu:
+            echo "TF_VAR_ssh_debug_public_key=${SSH_DEBUG_PUBLIC_KEY}"
 
             # make bastion details directly available for ondemand checks:
             echo "BASTION_USER=${BASTION_USER}"
@@ -118,11 +120,13 @@ jobs:
           SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
           BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
           BASTION_USER: slurm-app-ci # currently same for both CI clouds
-          VARS_BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
+          BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
+          SSH_DEBUG_PUBLIC_KEY: ${{ vars.SSH_DEBUG_PUBLIC_KEY}}
+          TF_VAR_cluster_name: ${{ env.TF_VAR_cluster_name }}
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Cache pip
         # Don't cache galaxy/requirements.yml as during dev its common for this
@@ -135,7 +139,7 @@ jobs:
       - name: Install ansible, pip and galaxy requirements
         run: dev/setup-env.sh
         env:
-          PYTHON_VERSION: python3  # overrides os-release discovery logic
+          PYTHON_VERSION: python3 # overrides os-release discovery logic
 
       - name: Install OpenTofu
         run: |
@@ -219,7 +223,7 @@ jobs:
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Update ansible, pip and galaxy requirements
         run: dev/setup-env.sh

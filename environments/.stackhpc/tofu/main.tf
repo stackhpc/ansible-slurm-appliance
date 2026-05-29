@@ -63,11 +63,16 @@ variable "volume_backed_instances" {
 variable "key_pair" {
   type        = string
   description = "Name of (existing or managed) keypair"
-  default     = "slurm-app-ci"
 }
 
-variable "public_key_path" {
-  description = "Path to public key to use to create a keypair. If not provided var.key_pair must already exist."
+variable "deploy_key_path" {
+  description = "Path to public key file to use to create a keypair. If not provided the keypair defined by var.key_pair must already exist."
+  type        = string
+  default     = null
+}
+
+variable "ssh_debug_public_key" {
+  description = "An additional public key string to inject for the default user"
   type        = string
   default     = null
 }
@@ -78,9 +83,9 @@ data "openstack_images_image_v2" "cluster" {
 }
 
 resource "openstack_compute_keypair_v2" "deploy" {
-  count      = var.public_key_path == null ? 0 : 1
+  count      = var.deploy_key_path == null ? 0 : 1
   name       = var.key_pair
-  public_key = file(var.public_key_path)
+  public_key = file(var.deploy_key_path)
 }
 
 module "cluster" {
@@ -89,7 +94,7 @@ module "cluster" {
   cluster_name        = var.cluster_name
   cluster_networks    = var.cluster_networks
   vnic_types          = var.vnic_types
-  key_pair            = length(openstack_compute_keypair_v2.deploy) > 0 ? openstack_compute_keypair_v2.deploy.name : var.key_pair
+  key_pair            = length(openstack_compute_keypair_v2.deploy) > 0 ? openstack_compute_keypair_v2.deploy[0].name : var.key_pair
   cluster_image_id    = data.openstack_images_image_v2.cluster.id
   control_node_flavor = var.control_node_flavor
 
@@ -124,4 +129,8 @@ module "cluster" {
   state_volume_type = var.state_volume_type
   home_volume_type  = var.home_volume_type
 
+  additional_cloud_config = var.ssh_debug_public_key == null ? "" : <<-EOT
+    ssh_authorized_keys:
+      - ${var.ssh_debug_public_key}
+    EOT
 }
