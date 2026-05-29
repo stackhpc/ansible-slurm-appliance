@@ -5,7 +5,7 @@
 #SBATCH --mem-per-gpu=2G
 #SBATCH --output=%x.%N.out
 #SBATCH --error=%x.%N.out
-#SBATCH --array=0-{{ hpctests_computes.stdout_lines | length - 1 }}
+#SBATCH --nodes={{ hpctests_computes.stdout_lines | length }}
 #SBATCH --partition={{ hpctests_partition }}
 {%if hpctests_nodes is defined %}
 #SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}
