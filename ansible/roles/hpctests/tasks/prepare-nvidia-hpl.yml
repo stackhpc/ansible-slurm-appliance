@@ -10,7 +10,7 @@
 
 - name: Ensure nvidia_peermem is loaded
   # FIXME: Move into site hook
-  ansible.builtin.modprobe:
+  community.general.modprobe:
     name: nvidia_peermem
     persistent: present
     state: present

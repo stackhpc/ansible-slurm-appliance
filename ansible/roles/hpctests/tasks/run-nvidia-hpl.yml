@@ -53,9 +53,6 @@
     nodes: "{{ hpctests_computes.stdout_lines }}"
   register: hpctests_nodeinfo
 
-- debug:
-   msg: "{{ hpctests_nodeinfo.info[0] }}"
-
 - name: Select GPUs
   ansible.builtin.set_fact:
     hpctests_nvidia_hpl_gres: >-
@@ -70,8 +67,8 @@
     gpus: hpctests_nodeinfo.info[0].gpus | default({})
   when: hpctests_nvidia_hpl_gres is not defined
 
-- debug:
-    var: hpctests_nvidia_hpl_gres
+- ansible.builtin.debug:
+    msg: "Will run --gres={{ hpctests_nvidia_hpl_gres }}"
 
 - name: Check hpctests_nvidia_hpl_gres
   ansible.builtin.assert:
@@ -86,8 +83,8 @@
     selected_gpu: "{{ ((hpctests_nvidia_hpl_gres | split(':'))[1] | split('='))[0] }}"
     selected_gpu_count: "{{ (hpctests_nvidia_hpl_gres | split('='))[1] | int }}"
 
-- debug:
-   var: hpctests_nvidia_hpl_dat
+- ansible.builtin.debug:
+    var: hpctests_nvidia_hpl_dat
 
 # Templating a script to be run on each node by srun.
 # Contrary to sbatch, all slurm parameters must be given on the command-line.
@@ -129,15 +126,17 @@
       		bash -c '/workspace/hpl.sh --dat /workspace/hpl-linux-x86_64/sample-dat/{{ hpctests_nvidia_hpl_dat }}'
 
 - name: Delete old results
-  file:
+  ansible.builtin.file:
     path: "{{ hpctests_rootdir }}/nvidia-hpl/results"
     state: absent
   run_once: true
 
 - name: Create results directory
-  file:
+  ansible.builtin.file:
     path: "{{ hpctests_rootdir }}/nvidia-hpl/results"
     state: directory
+    mode: "0755"
+    owner: "{{ hpctests_user }}"
   run_once: true
 
 # We could have used another sbatch script, calling `srun nvidia-hpl.sh` after
@@ -171,21 +170,21 @@
 - name: Display results
   tags: postpro
   block:
-  - ansible.builtin.shell: |
-      set -o pipefail
-       for res in results/nvidia-hpl.*.out; do
-         echo "=== $res ==="
-         grep -E '^((GPU [0-9]*)|(Job Id)|(Tasks per host)|(Hostname)):' "$res"
-         echo
-         awk '/Time          Gflops/ { ok=1;} (ok) { print}' "$res"
-         echo
-       done
-    register: cat_res
-    args:
-      chdir: "{{ hpctests_rootdir }}/nvidia-hpl"
-    changed_when: false
-  - ansible.builtin.debug:
-      msg: "{{ cat_res.stdout }}"
+    - ansible.builtin.shell: |
+        set -o pipefail
+         for res in results/nvidia-hpl.*.out; do
+           echo "=== $res ==="
+           grep -E '^((GPU [0-9]*)|(Job Id)|(Tasks per host)|(Hostname)):' "$res"
+           echo
+           awk '/Time          Gflops/ { ok=1;} (ok) { print}' "$res"
+           echo
+         done
+      register: cat_res
+      args:
+        chdir: "{{ hpctests_rootdir }}/nvidia-hpl"
+      changed_when: false
+    - ansible.builtin.debug:
+        msg: "{{ cat_res.stdout }}"
 
 - name: Extract Job Id
   tags: postpro
