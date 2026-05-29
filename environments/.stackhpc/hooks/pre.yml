@@ -1,4 +1,16 @@
 ---
+- hosts: builder
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Configure DNF for maximum parallel downloads
+      community.general.ini_file:
+        path: /etc/dnf/dnf.conf
+        section: main
+        option: max_parallel_downloads
+        value: 10
+        no_extra_spaces: true
+
 - hosts: control:!builder
   become: true
   gather_facts: false
