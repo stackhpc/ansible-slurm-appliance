@@ -38,9 +38,7 @@ if __name__ == "__main__":
     for line in output.splitlines():
         match = re.match(r".*SSH: EXEC (.*) '/bin/sh", line)
         if match is not None:
-            if len(match.groups()) != 1:
-                sys.exit("ERROR: Could not extract SSH command from output")
-            ssh_cmd = match.groups()[0]
+            ssh_cmd = match.group(1)
             # strip out verbosity flags
             ssh_cmd = re.sub(r"\s+-v+\b", "", ssh_cmd)
             # strip out our timeout arg
