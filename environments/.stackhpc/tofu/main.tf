@@ -66,21 +66,21 @@ variable "key_pair" {
   default     = "slurm-app-ci"
 }
 
+variable "public_key_path" {
+  description = "Path to public key to use to create a keypair. If not provided var.key_pair must already exist."
+  type        = string
+  default     = null
+}
+
 data "openstack_images_image_v2" "cluster" {
   name        = var.cluster_image[var.os_version]
   most_recent = true
 }
 
-variable "public_key_path" {
-  description = "Path to public key to use to create a keypair."
-  type        = string
-  default     = null
-}
-
 resource "openstack_compute_keypair_v2" "deploy" {
   count      = var.public_key_path == null ? 0 : 1
   name       = var.key_pair
-  public_key = file("${var.key_path}")
+  public_key = file(var.public_key_path)
 }
 
 module "cluster" {

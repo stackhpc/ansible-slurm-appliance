@@ -101,8 +101,8 @@ jobs:
             # NB Do NOT change this to use ProxyJump, it doesn't pickup the key
             echo "ANSIBLE_SSH_COMMON_ARGS=-i ${DEPLOY_KEYFILE} -o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
 
-            # make deploy key available to OpenTofu:
-            echo "TF_VAR_key_path=${DEPLOY_KEYFILE}"
+            # make public part of deploy key available to OpenTofu:
+            echo "TF_VAR_public_key_path=${DEPLOY_KEYFILE}.pub"
 
             # make bastion details directly available for ondemand checks:
             echo "BASTION_USER=${BASTION_USER}"
