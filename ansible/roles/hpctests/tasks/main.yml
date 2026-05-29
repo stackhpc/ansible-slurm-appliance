@@ -43,6 +43,7 @@
   become_user: "{{ hpctests_user }}"
   tags:
     - nvidia-hpl
+    - hpctests-gpu
   block:
     - ansible.builtin.include_tasks: fetch-nvidia-hpl.yml
 
@@ -50,6 +51,7 @@
   become: true
   tags:
     - nvidia-hpl
+    - hpctests-gpu
   block:
     - ansible.builtin.include_tasks: prepare-nvidia-hpl.yml
 
@@ -58,5 +60,6 @@
   become_user: "{{ hpctests_user }}"
   tags:
     - nvidia-hpl
+    - hpctests-gpu
   block:
     - ansible.builtin.include_tasks: run-nvidia-hpl.yml
