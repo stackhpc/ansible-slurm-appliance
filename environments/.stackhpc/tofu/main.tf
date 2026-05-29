@@ -60,19 +60,27 @@ variable "volume_backed_instances" {
   default = false
 }
 
+variable "key_pair" {
+  type        = string
+  description = "Name of (existing or managed) keypair"
+  default     = "slurm-app-ci"
+}
+
 data "openstack_images_image_v2" "cluster" {
   name        = var.cluster_image[var.os_version]
   most_recent = true
 }
 
-variable "key_path" {
-  description = "Path to private key to use for deployment. Note there must be a matching .pub key present too."
+variable "public_key_path" {
+  description = "Path to public key to use to create a keypair."
   type        = string
+  default     = null
 }
 
 resource "openstack_compute_keypair_v2" "deploy" {
-  name       = var.cluster_name
-  public_key = file("${var.key_path}.pub")
+  count      = var.public_key_path == null ? 0 : 1
+  name       = var.key_pair
+  public_key = file("${var.key_path}")
 }
 
 module "cluster" {
@@ -81,7 +89,7 @@ module "cluster" {
   cluster_name        = var.cluster_name
   cluster_networks    = var.cluster_networks
   vnic_types          = var.vnic_types
-  key_pair            = openstack_compute_keypair_v2.deploy.name
+  key_pair            = length(openstack_compute_keypair_v2.deploy) > 0 ? openstack_compute_keypair_v2.deploy.name : var.key_pair
   cluster_image_id    = data.openstack_images_image_v2.cluster.id
   control_node_flavor = var.control_node_flavor
 
