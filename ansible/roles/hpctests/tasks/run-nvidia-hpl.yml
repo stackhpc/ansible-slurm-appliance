@@ -1,0 +1,225 @@
+---
+# Runs one task per gpu using mpirun because task isolation via slurm cgroup ConstrainDevices=yes breaks NVIDIA HPL:
+# xhpl crashes with following stacktrace:
+# [HPL TRACE] cuda_nvshmem_init: max=0.3384 (0) min=0.3384 (1)
+# [WARNING] Change Input N 136608 to 136192
+# detected in tcache 2
+#  *** Process received signal ***
+#  Signal: Aborted (6)
+#  Signal code:  (-6)
+#  [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x45320)[0x7f78c4633320]
+#  [ 1] /lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7f78c468cb1c]
+#  [ 2] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7f78c463326e]
+#  [ 3] /lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7f78c46168ff]
+#  [ 4] /lib/x86_64-linux-gnu/libc.so.6(+0x297b6)[0x7f78c46177b6]
+#  [ 5] /lib/x86_64-linux-gnu/libc.so.6(+0xa8fe5)[0x7f78c4696fe5]
+#  [ 6] /lib/x86_64-linux-gnu/libc.so.6(+0xab54f)[0x7f78c469954f]
+#  [ 7] /lib/x86_64-linux-gnu/libc.so.6(__libc_free+0x7e)[0x7f78c469bd9e]
+#  [ 8] /lib/x86_64-linux-gnu/libnccl.so.2(+0x6437e)[0x7f78caa6337e]
+#  [ 9] /lib/x86_64-linux-gnu/libnccl.so.2(pncclCommInitRank+0x153)[0x7f78caa65513]
+#  [10] /workspace/hpl-linux-x86_64/xhpl[0x46a00a]
+#  [11] /workspace/hpl-linux-x86_64/xhpl[0x488d07]
+#  [12] /workspace/hpl-linux-x86_64/xhpl[0x45bfdc]
+#  [13] /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca)[0x7f78c46181ca]
+#  [14] /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b)[0x7f78c461828b]
+#  [15] /workspace/hpl-linux-x86_64/xhpl[0x45c92e]
+#  *** End of error message ***
+#
+# Also note that on clusters with ConstrainDevices=no, a direct srun with one task per GPU works,
+# but it must be run with --cpu-bind=none or the cards end up in error.
+
+- name: Assert sif image is present
+  block:
+    - ansible.builtin.stat:
+        path: "{{ hpctests_nvidia_hpl_sif_file }}"
+        get_checksum: false
+      register: sif_stat
+    - ansible.builtin.assert:
+        that:
+          - sif_stat.stat.exists
+        fail_msg: "Run fetch-nvidia-hpl.yml to produce {{ hpctests_nvidia_hpl_sif_file }}"
+
+- name: Get all nodes in partition
+  ansible.builtin.command: "sinfo --Node --noheader --format %N --partition={{ hpctests_partition }}"
+  register: all_nodes
+  changed_when: false
+
+- name: Calculate excluded nodes
+  ansible.builtin.set_fact:
+    hpctests_excluded_nodes: "{{ all_nodes.stdout_lines | difference(hpctests_computes.stdout_lines) }}"
+
+- name: Get Slurm node info
+  scontrol_node_info:
+    nodes: "{{ hpctests_computes.stdout_lines }}"
+  register: hpctests_nodeinfo
+
+- debug:
+   msg: "{{ hpctests_nodeinfo.info[0] }}"
+
+- name: Select GPUs
+  ansible.builtin.set_fact:
+    hpctests_nvidia_hpl_gres: >-
+      {%- if gpus | length == 1 -%}
+        {# homogeneous node #}
+        {%- set gpu = gpus | dict2items | first -%}
+            gpu:{{ gpu.key }}:{{ gpu.value }}
+      {%- else -%}
+        {{ notdefined | mandatory(msg="Unsupported: nodes with heterogeneous (MIG?) GPUs, please specify wanted hpctests_nvidia_hpl_gres") }}
+      {%- endif -%}
+  vars:
+    gpus: hpctests_nodeinfo.info[0].gpus | default({})
+  when: hpctests_nvidia_hpl_gres is not defined
+
+- debug:
+    var: hpctests_nvidia_hpl_gres
+
+- name: Check hpctests_nvidia_hpl_gres
+  ansible.builtin.assert:
+    that: hpctests_nvidia_hpl_gres is search('^gpu:.*=[0-9]+$')
+
+- name: Select HPL.dat
+  ansible.builtin.set_fact:
+    hpctests_nvidia_hpl_dat: >-
+      {{ hpctests_nvidia_hpl_dat | default(hpctests_nvidia_hpl_dat_matrix.get(selected_gpu, hpctests_nvidia_hpl_dat_matrix.default).get(selected_gpu_count | int ) | mandatory(msg="Unsupported GPU count")) }}
+    hpctests_ntasks: "{{ selected_gpu_count }}"
+  vars:
+    selected_gpu: "{{ ((hpctests_nvidia_hpl_gres | split(':'))[1] | split('='))[0] }}"
+    selected_gpu_count: "{{ (hpctests_nvidia_hpl_gres | split('='))[1] | int }}"
+
+- debug:
+   var: hpctests_nvidia_hpl_dat
+
+# Templating a script to be run on each node by srun.
+# Contrary to sbatch, all slurm parameters must be given on the command-line.
+- name: Create srun script
+  ansible.builtin.copy:
+    dest: "{{ hpctests_rootdir }}/nvidia-hpl/nvidia-hpl.sh"
+    mode: "0755"
+    content: |
+      #!/bin/bash
+      #https://github.com/openucx/ucx/issues/4224
+      export UCX_POSIX_USE_PROC_LINK=n
+      # https://github.com/open-mpi/ompi/issues/7516
+      export PMIX_MCA_gds=^ds12
+      # https://docs.nvidia.com/nvidia-hpc-benchmarks/HPL_benchmark.html#nvidia-hpl-benchmark-environment-variables
+      # Possible Values: 0 (NVSHMEM), 1 (host MPI)
+      export HPL_FCT_COMM_POLICY=0
+      # Disable self testing
+      export HPL_CUSOLVER_MP_TESTS=0
+      {% if hpctests_nvidia_hpl_version == 26.02 %}
+      # Avoid the error message: host version is not compatible with container version of the library
+      export HPL_USE_NVSHMEM=0
+      {% endif %}
+      # xhpl will be run TEST_LOOPS times. One time takes ~1 minute
+      export TEST_LOOPS={{ hpctests_nvidia_hpl_test_loops }}
+
+      echo "Job Id: $SLURM_JOB_ID"
+      echo "Hostname: $(hostname -s)"
+      echo "Tasks per host: {{ hpctests_ntasks }}"
+      nvidia-smi -L
+
+      # to get mpirun command
+      module load {{ hpctests_hpl_modules | join(' ' ) }}
+
+      # cleanup SLURM environment, preventing mpirun to spawn N tasks. Message is:
+      #   There are not enough slots available in the system to satisfy the 2
+      #   slots that were requested by the application
+      eval $(env|grep SLURM | sed 's/=.*//' | xargs echo unset)
+      mpirun -n {{ hpctests_ntasks }} apptainer run --nv "{{ hpctests_nvidia_hpl_sif_file }}" \
+      		bash -c '/workspace/hpl.sh --dat /workspace/hpl-linux-x86_64/sample-dat/{{ hpctests_nvidia_hpl_dat }}'
+
+- name: Delete old results
+  file:
+    path: "{{ hpctests_rootdir }}/nvidia-hpl/results"
+    state: absent
+  run_once: true
+
+- name: Create results directory
+  file:
+    path: "{{ hpctests_rootdir }}/nvidia-hpl/results"
+    state: directory
+  run_once: true
+
+# We could have used another sbatch script, calling `srun nvidia-hpl.sh` after
+# setting the environment but I preferred using a single templated file + direct srun.
+- name: Run nvidia-hpl # noqa: no-changed-when
+  ansible.builtin.shell: |
+    source /etc/profile.d/lmod.sh
+    srun \
+      --tasks-per-node=1 \
+      --cpu-bind=none \
+      --time={{ timeout_h }}:{{ timeout_m }}:30 \
+      --gres={{ hpctests_nvidia_hpl_gres }} \
+      --mem={{ (0.8 * (hpctests_nodeinfo.info[0].free_mem.number | int)) | round(method='floor') | int }} \
+      --cpus-per-gpu={{ hpctests_nodeinfo.info[0].effective_cpus // (hpctests_ntasks | int) }} \
+      --nodes={{ hpctests_nodeinfo.info | length }} \
+      --output=results/%x.%N.out \
+      --partition={{ hpctests_partition }} \
+      {% if hpctests_excluded_nodes | length > 0 %}--exclude={{ hpctests_excluded_nodes | join(',') }} {% endif %} \
+      {%if hpctests_account is defined %}--account={{ hpctests_account }}{% endif %} \
+      {%if hpctests_qos is defined %}--qos={{ hpctests_qos }}{% endif %} \
+      nvidia-hpl.sh
+  args:
+    chdir: "{{ hpctests_rootdir }}/nvidia-hpl"
+  register: hpctests_nvidia_hpl_srun
+  async: "{{ (hpctests_nvidia_hpl_minutes + 1) * 60 }}" # give async an extra minute after slurm
+  poll: 5 # check every 5 seconds
+  vars:
+    timeout_h: "{{ ((hpctests_nvidia_hpl_minutes | int) // 60) }}"
+    timeout_m: "{{ ((hpctests_nvidia_hpl_minutes | int) % 60) }}"
+
+- name: Display results
+  tags: postpro
+  block:
+  - ansible.builtin.shell: |
+      set -o pipefail
+       for res in results/nvidia-hpl.*.out; do
+         echo "=== $res ==="
+         grep -E '^((GPU [0-9]*)|(Job Id)|(Tasks per host)|(Hostname)):' "$res"
+         echo
+         awk '/Time          Gflops/ { ok=1;} (ok) { print}' "$res"
+         echo
+       done
+    register: cat_res
+    args:
+      chdir: "{{ hpctests_rootdir }}/nvidia-hpl"
+    changed_when: false
+  - ansible.builtin.debug:
+      msg: "{{ cat_res.stdout }}"
+
+- name: Extract Job Id
+  tags: postpro
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep '^Job Id: ' results/nvidia-hpl.*.out | head -n 1 | awk '{ print $3}'
+  args:
+    chdir: "{{ hpctests_rootdir }}/nvidia-hpl"
+  changed_when: false
+  register: srun_job_id
+
+- name: Extract performance
+  tags: postpro
+  ansible.builtin.shell: |
+    set -o pipefail
+    for res in $(ls -1 results/nvidia-hpl.*.out | sort); do
+      # T/V                N    NB     P     Q         Time          Gflops (   per GPU)
+      awk '/^WC0 / {print $7}' "$res"
+    done
+  args:
+    chdir: "{{ hpctests_rootdir }}/nvidia-hpl"
+  changed_when: false
+  register: perf
+
+- name: Summarise results
+  tags: postpro
+  ansible.builtin.debug:
+    # yamllint disable rule:line-length
+    msg: |
+      {%- set floats = perf.stdout_lines | map('float') -%}
+      Summary for nvidia-hpl on {{ hpctests_computes.stdout_lines | length }} nodes in '{{ hpctests_partition }}' partition, job ID {{ srun_job_id.stdout.split()[-1] }}, GPUs '{{ hpctests_nvidia_hpl_gres }}':
+        Max:  {{ floats | max }} Gflops ({{ ((floats | max) / hpctests_ntasks | int) | round(1)  }} Gflops per GPU)
+        Min:  {{ floats | min }} Gflops ({{ ((floats | min) / hpctests_ntasks | int) | round(1) }} Gflops per GPU)
+        Mean: {{ ((floats | sum) / (hpctests_computes.stdout_lines | length)) | round(1) }} Gflops ({{ ((floats | sum) / (hpctests_computes.stdout_lines | length) / hpctests_ntasks | int) | round(1) }} Gflops per GPU)
+
+      Individual node results (Gflops):
+      {{ dict(hpctests_computes.stdout_lines | sort | zip(perf.stdout_lines | map('float'))) | to_nice_yaml }}

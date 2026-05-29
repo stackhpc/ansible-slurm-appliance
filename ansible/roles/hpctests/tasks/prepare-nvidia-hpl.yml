@@ -1,0 +1,19 @@
+---
+
+- name: Run nvidia-smi
+  # WORKAROUND: cudaGetDeviceCount(&device_count) = 999 (unknown error) on some hosts after reboot
+  ansible.builtin.command: nvidia-smi
+  become: true
+  changed_when: false
+  delegate_to: "{{ item }}"
+  loop: "{{ hpctests_computes.stdout_lines }}"
+
+- name: Ensure nvidia_peermem is loaded
+  # FIXME: Move into site hook
+  ansible.builtin.modprobe:
+    name: nvidia_peermem
+    persistent: present
+    state: present
+  become: true
+  delegate_to: "{{ item }}"
+  loop: "{{ hpctests_computes.stdout_lines }}"
