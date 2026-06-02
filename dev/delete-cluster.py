@@ -34,7 +34,7 @@ def delete_cluster(cluster_prefix, force=False):
         for item in resources:
             try:
                 if item["Name"] is not None and item["Name"].startswith(cluster_prefix):
-                    print(resource_type, item["Name"], item["ID"])
+                    print(resource_type, item["Name"], item["ID"] if "ID" in item else "")  # keypairs don't have ID
                     to_delete[resource_type].append(item)
             except BaseException:
                 print(resource_type, item)
@@ -42,11 +42,12 @@ def delete_cluster(cluster_prefix, force=False):
 
     if force or input("Delete these (y/n)?:") == "y":
         for resource_type in CLUSTER_RESOURCES:
-            items = [v["ID"] for v in to_delete[resource_type]]
+            items = [v.get("ID", v["Name"]) for v in to_delete[resource_type]]
             if items:
+                wait_flag = "--wait" if resource_type == "server" else ""  # only server has/needs this option
                 # delete all resources of each type in a single call for speed:
                 subprocess.run(  # pylint: disable=subprocess-run-check
-                    f"openstack {resource_type} delete {' '.join(items)}",
+                    f"openstack {resource_type} delete {wait_flag} {' '.join(items)}",
                     stdout=subprocess.PIPE,
                     shell=True,
                 )
