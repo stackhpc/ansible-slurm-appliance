@@ -36,7 +36,7 @@ jobs:
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
             inventory_groups: fatimage
           - image_name: openhpc-RL9
-            source_image_name: Rocky-9-GenericCloud-Base-9.7-20251123.2.x86_64.qcow2
+            source_image_name: Rocky-9-GenericCloud-Base-9.8-20260525.0.x86_64
             inventory_groups: fatimage
     env:
       ANSIBLE_FORCE_COLOR: 'true'
