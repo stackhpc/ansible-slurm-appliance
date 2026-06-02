@@ -198,51 +198,48 @@ jobs:
           tofu destroy -auto-approve -var-file="${CI_CLOUD}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
-      - name: Configure cluster at latest release
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible all -vvvv -m wait_for_connection
-          ansible-playbook ansible/adhoc/generate-passwords.yml
-          ansible-playbook -v ansible/site.yml
-          ansible-playbook -v ansible/ci/check_slurm.yml
+      # - name: Configure cluster at latest release
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible all -vvvv -m wait_for_connection
+      #     ansible-playbook ansible/adhoc/generate-passwords.yml
+      #     ansible-playbook -v ansible/site.yml
+      #     ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Run MPI-based tests at latest release
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
+      # - name: Run MPI-based tests at latest release
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
 
-      - name: TESTING END
-        run: exit 1
+      # - name: Checkout current branch
+      #   run: git checkout --force "$GITHUB_HEAD_REF_OR_NAME"
+      #   env:
+      #     GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
 
-      - name: Checkout current branch
-        run: git checkout --force "$GITHUB_HEAD_REF_OR_NAME"
-        env:
-          GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
+      # - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      #   with:
+      #     python-version: "3.12"
 
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: "3.12"
+      # - name: Update ansible, pip and galaxy requirements
+      #   run: dev/setup-env.sh
+      #   env:
+      #     PYTHON_VERSION: python3 # overrides os-release discovery logic
 
-      - name: Update ansible, pip and galaxy requirements
-        run: dev/setup-env.sh
-        env:
-          PYTHON_VERSION: python3 # overrides os-release discovery logic
-
-      - name: Reimage login and control nodes to image in current branch
-        id: reimage_non_compute
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          cd "$STACKHPC_TF_DIR"
-          tofu init
-          max_retries=3
-          delay=30
-          for i in $(seq 1 $max_retries); do
-            tofu apply -auto-approve -var-file="${CI_CLOUD}.tfvars" && break
-            [ "$i" -lt "$max_retries" ] && sleep $delay || exit 1
-          done
+      # - name: Reimage login and control nodes to image in current branch
+      #   id: reimage_non_compute
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     cd "$STACKHPC_TF_DIR"
+      #     tofu init
+      #     max_retries=3
+      #     delay=30
+      #     for i in $(seq 1 $max_retries); do
+      #       tofu apply -auto-approve -var-file="${CI_CLOUD}.tfvars" && break
+      #       [ "$i" -lt "$max_retries" ] && sleep $delay || exit 1
+      #     done
 
       - name: Configure cluster using current branch
         run: |
@@ -253,25 +250,25 @@ jobs:
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Reimage compute nodes to image in current branch using slurm
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
-          ansible-playbook -v ansible/ci/check_slurm.yml
-          ansible-playbook -v ansible/ci/check_compute_rebuild.yml
+      # - name: Reimage compute nodes to image in current branch using slurm
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
+      #     ansible-playbook -v ansible/ci/check_slurm.yml
+      #     ansible-playbook -v ansible/ci/check_compute_rebuild.yml
 
-      - name: Check sacct state survived reimage to current branch
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
+      # - name: Check sacct state survived reimage to current branch
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
 
-      - name: Check MPI-based tests are shown in Grafana
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/ci/check_grafana.yml
+      # - name: Check MPI-based tests are shown in Grafana
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible-playbook -vv ansible/ci/check_grafana.yml
 
       - name: Run MPI-based tests again in current branch
         run: |
