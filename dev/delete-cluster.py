@@ -16,7 +16,7 @@ import json
 import subprocess
 import sys
 
-CLUSTER_RESOURCES = ["server", "port", "volume"]
+CLUSTER_RESOURCES = ["server", "port", "volume", "keypair"]
 
 
 # pylint: disable-next=missing-function-docstring, redefined-outer-name
@@ -56,9 +56,7 @@ def delete_cluster(cluster_prefix, force=False):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawTextHelpFormatter
-    )
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         "-f",
         "--force",
