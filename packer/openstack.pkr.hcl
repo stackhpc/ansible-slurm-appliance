@@ -99,7 +99,7 @@ variable "ssh_bastion_private_key_file" {
 
 variable "ssh_debug_public_key" {
   type = string
-  description = "An additional public key to inject for the default user"
+  description = "An additional public key string to inject for the default user"
   default = null
 }
 

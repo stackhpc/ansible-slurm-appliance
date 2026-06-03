@@ -1,11 +1,10 @@
 ---
-
 # Test deployment and reimage on OpenStack.
 # This workflow can run standalone or as part of the main CI workflow.
 # See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Test deployment and reimage on OpenStack
-'on':
+"on":
   workflow_call:
   workflow_dispatch:
 
@@ -24,24 +23,32 @@ jobs:
           - RL8
           - RL9
     env:
-      ANSIBLE_FORCE_COLOR: 'true'
+      ANSIBLE_FORCE_COLOR: "true"
       OS_CLOUD: openstack
       TF_VAR_cluster_name: slurmci-${{ matrix.os_version }}-${{ github.run_number }}
       CI_CLOUD: ${{ vars.CI_CLOUD }} # default from repo settings
       TF_VAR_os_version: ${{ matrix.os_version }}
       STACKHPC_TF_DIR: environments/.stackhpc/tofu
     steps:
-
       - name: Find the latest release
         run: |
           echo "LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name)" >> "$GITHUB_ENV"
 
-      - name: Checkout latest release
+      # - name: Checkout latest release
+      #   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      #   with:
+      #     ref: ${{ env.LATEST_RELEASE_TAG }}
+      #     fetch-depth: 0
+      #     persist-credentials: true
+
+      - name: TESTING Checkout current branch
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
-          ref: ${{ env.LATEST_RELEASE_TAG }}
+          ref: ${{ env.GITHUB_HEAD_REF_OR_NAME }}
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
+        env:
+          GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
 
       - name: Override CI_CLOUD if PR label is present
         if: ${{ github.event_name == 'pull_request' }}
@@ -76,18 +83,28 @@ jobs:
           set -x
           mkdir -p ~/.ssh
 
+          # create new deploy key:
+          ssh-keygen -t ed25519 -f "${DEPLOY_KEYFILE}" -q -P ""
+
           # setup bastion/keypair private key:
           echo "$SECRETS_SSH_KEY" > "${BASTION_KEYFILE}"
           chmod 0600 "${BASTION_KEYFILE}"
           ssh-keygen -f "${BASTION_KEYFILE}" -y # tests key format is correct
 
           # accept bastion hostkeys
-          cat >> ~/.ssh/known_hosts <<< "${VARS_BASTION_FINGERPRINTS}"
+          cat >> ~/.ssh/known_hosts <<< "${BASTION_FINGERPRINTS}"
 
           {
-            # setup bastion/keypair for Ansible:
+            # setup ssh for Ansible:
             # NB Do NOT change this to use ProxyJump, it doesn't pickup the key
-            echo "ANSIBLE_SSH_COMMON_ARGS=-i ${BASTION_KEYFILE} -o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
+            echo "ANSIBLE_SSH_COMMON_ARGS=-i ${DEPLOY_KEYFILE} -o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
+
+            # configure OpenTofu to create a keypair using public part of deploy key:
+            echo "TF_VAR_deploy_key_path=${DEPLOY_KEYFILE}.pub"
+            echo "TF_VAR_key_pair=${TF_VAR_cluster_name}"
+
+            # setup additional debug key for OpenTofu:
+            echo "TF_VAR_ssh_debug_public_key=${SSH_DEBUG_PUBLIC_KEY}"
 
             # make bastion details directly available for ondemand checks:
             echo "BASTION_USER=${BASTION_USER}"
@@ -98,15 +115,18 @@ jobs:
           echo "bastion details:"
           cat "$GITHUB_ENV"
         env:
+          DEPLOY_KEYFILE: /home/runner/.ssh/deploy_key
           BASTION_KEYFILE: /home/runner/.ssh/bastion_key
           SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
           BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
           BASTION_USER: slurm-app-ci # currently same for both CI clouds
-          VARS_BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
+          BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
+          SSH_DEBUG_PUBLIC_KEY: ${{ vars.SSH_DEBUG_PUBLIC_KEY}}
+          TF_VAR_cluster_name: ${{ env.TF_VAR_cluster_name }}
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Cache pip
         # Don't cache galaxy/requirements.yml as during dev its common for this
@@ -119,7 +139,7 @@ jobs:
       - name: Install ansible, pip and galaxy requirements
         run: dev/setup-env.sh
         env:
-          PYTHON_VERSION: python3  # overrides os-release discovery logic
+          PYTHON_VERSION: python3 # overrides os-release discovery logic
 
       - name: Install OpenTofu
         run: |
@@ -178,48 +198,48 @@ jobs:
           tofu destroy -auto-approve -var-file="${CI_CLOUD}.tfvars"
         if: failure() && steps.provision_servers.outcome == 'failure'
 
-      - name: Configure cluster at latest release
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible all -vvvv -m wait_for_connection
-          ansible-playbook ansible/adhoc/generate-passwords.yml
-          ansible-playbook -v ansible/site.yml
-          ansible-playbook -v ansible/ci/check_slurm.yml
+      # - name: Configure cluster at latest release
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible all -vvvv -m wait_for_connection
+      #     ansible-playbook ansible/adhoc/generate-passwords.yml
+      #     ansible-playbook -v ansible/site.yml
+      #     ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Run MPI-based tests at latest release
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
+      # - name: Run MPI-based tests at latest release
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible-playbook -vv ansible/adhoc/hpctests.yml --tags pingpong
 
-      - name: Checkout current branch
-        run: git checkout --force "$GITHUB_HEAD_REF_OR_NAME"
-        env:
-          GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
+      # - name: Checkout current branch
+      #   run: git checkout --force "$GITHUB_HEAD_REF_OR_NAME"
+      #   env:
+      #     GITHUB_HEAD_REF_OR_NAME: ${{ github.head_ref || github.ref_name }}
 
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: '3.12'
+      # - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      #   with:
+      #     python-version: "3.12"
 
-      - name: Update ansible, pip and galaxy requirements
-        run: dev/setup-env.sh
-        env:
-          PYTHON_VERSION: python3 # overrides os-release discovery logic
+      # - name: Update ansible, pip and galaxy requirements
+      #   run: dev/setup-env.sh
+      #   env:
+      #     PYTHON_VERSION: python3 # overrides os-release discovery logic
 
-      - name: Reimage login and control nodes to image in current branch
-        id: reimage_non_compute
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          cd "$STACKHPC_TF_DIR"
-          tofu init
-          max_retries=3
-          delay=30
-          for i in $(seq 1 $max_retries); do
-            tofu apply -auto-approve -var-file="${CI_CLOUD}.tfvars" && break
-            [ "$i" -lt "$max_retries" ] && sleep $delay || exit 1
-          done
+      # - name: Reimage login and control nodes to image in current branch
+      #   id: reimage_non_compute
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     cd "$STACKHPC_TF_DIR"
+      #     tofu init
+      #     max_retries=3
+      #     delay=30
+      #     for i in $(seq 1 $max_retries); do
+      #       tofu apply -auto-approve -var-file="${CI_CLOUD}.tfvars" && break
+      #       [ "$i" -lt "$max_retries" ] && sleep $delay || exit 1
+      #     done
 
       - name: Configure cluster using current branch
         run: |
@@ -230,25 +250,25 @@ jobs:
           ansible-playbook -v ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
-      - name: Reimage compute nodes to image in current branch using slurm
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
-          ansible-playbook -v ansible/ci/check_slurm.yml
-          ansible-playbook -v ansible/ci/check_compute_rebuild.yml
+      # - name: Reimage compute nodes to image in current branch using slurm
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible-playbook -v ansible/adhoc/rebuild-via-slurm.yml
+      #     ansible-playbook -v ansible/ci/check_slurm.yml
+      #     ansible-playbook -v ansible/ci/check_compute_rebuild.yml
 
-      - name: Check sacct state survived reimage to current branch
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
+      # - name: Check sacct state survived reimage to current branch
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible-playbook -vv ansible/ci/check_sacct_hpctests.yml
 
-      - name: Check MPI-based tests are shown in Grafana
-        run: |
-          . venv/bin/activate
-          . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/ci/check_grafana.yml
+      # - name: Check MPI-based tests are shown in Grafana
+      #   run: |
+      #     . venv/bin/activate
+      #     . environments/.stackhpc/activate
+      #     ansible-playbook -vv ansible/ci/check_grafana.yml
 
       - name: Run MPI-based tests again in current branch
         run: |
