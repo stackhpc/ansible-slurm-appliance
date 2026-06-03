@@ -1,0 +1,19 @@
+- name: Write supplied authorized_keys to authorized_keys for local users
+  ansible.posix.authorized_key:
+    user: "{{ item.0.user.name }}"
+    state: "{{ _authorized_key_state }}"
+    manage_dir: false
+    key: "{{ _authorized_key }}"
+    path: ~/.ssh/authorized_keys
+  become: true
+  become_user: "{{ item.0.user.name }}"
+  loop: "{{ appliances_local_users | selectattr('user.authorized_keys', 'defined') | subelements('user.authorized_keys') }}"
+  loop_control:
+    label: "{{ item.0.user.name }} :: {{ _authorized_key }}"
+  vars:
+    _authorized_key: "{{ item.1.public_key if item.1 is mapping else item.1 }}"
+    _authorized_key_state: "{{ item.1.state | default('present') if item.1 is mapping else 'present' }}"
+  when:
+    - item.0.enable | default(true) | bool
+    - item.0.user.state | default('present') == 'present'
+    - _authorized_key | string | length > 0 # NB this is a *provided* public key from authorized_keys
