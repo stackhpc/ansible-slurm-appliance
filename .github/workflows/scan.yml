@@ -25,6 +25,7 @@ jobs:
       JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack
       CI_CLOUD: ${{ vars.CI_CLOUD }}
+      GRYPE_VERSION: v0.113.0
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
@@ -115,6 +116,7 @@ jobs:
           only-fixed: true
           output-format: sarif # format required for github security tab
           fail-build: false # don't stop workflow if vulns are found
+          grype-version: ${{ env.GRYPE_VERSION }}
 
       - name: Upload scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
@@ -130,3 +132,4 @@ jobs:
           output-format: table
           severity-cutoff: critical
           only-fixed: true
+          grype-version: ${{ env.GRYPE_VERSION }}
