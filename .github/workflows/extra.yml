@@ -42,7 +42,7 @@ jobs:
             volume_size: 35 # needed for cuda
           - image_name: openhpc-extra-RL9
             source_image_name_key: RL9
-            inventory_groups: doca,cuda,lustre
+            inventory_groups: doca,cuda
             volume_size: 35 # needed for cuda
     env:
       ANSIBLE_FORCE_COLOR: 'true'
