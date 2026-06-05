@@ -3,7 +3,11 @@
 ignore:
 
 # go crypto/tls vulnerability: programs not used with TLS
+  # CVE-2025-68121 / GO-2026-4337
   - vulnerability: CVE-2025-68121
+    package:
+      location: /usr/bin/ondemand_exporter
+  - vulnerability: GO-2026-4337
     package:
       location: /usr/bin/ondemand_exporter
   # prometheus 3.5.1 still has an older go runtime
@@ -16,7 +20,13 @@ ignore:
   - vulnerability: CVE-2025-68121
     package:
       location: "/usr/sbin/ondemand-dex"
+  - vulnerability: GO-2026-4337
+    package:
+      location: "/usr/sbin/ondemand-dex"
   - vulnerability: CVE-2025-68121
+    package:
+      location: "/usr/sbin/ondemand-dex-session"
+  - vulnerability: GO-2026-4337
     package:
       location: "/usr/sbin/ondemand-dex-session"
   - vulnerability: CVE-2025-68121
@@ -36,10 +46,14 @@ ignore:
       location: /var/lib/podman/.local/share/containers/storage/overlay/efeebaada56fcf04784f6d67852667327a8e50d18bbf9aea6d3556865e894f59/diff/usr/local/bin/gosu
 
 #  go crypto/tls vulnerability: programs used with trusted TLS servers
+# CVE-2025-68121 / GO-2026-4337
   - vulnerability: CVE-2025-68121
     package:
       location: /usr/local/bin/alertmanager
   - vulnerability: CVE-2025-68121
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-4337
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
@@ -102,6 +116,9 @@ ignore:
   - vulnerability: CVE-2024-24790
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2024-2887
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2024-8986 Grafana plugin SDK Information Leakage about git source repository -- not affected
   - vulnerability: GHSA-xxxw-3j6h-q7h6
@@ -110,6 +127,13 @@ ignore:
   - vulnerability: GHSA-xxxw-3j6h-q7h6
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2024-3140
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2024-3140
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
 
 # CVE-2025-22871 request smuggling in net/http server (bare LF) -- no server forwarding chunked data here
   - vulnerability: CVE-2025-22871
@@ -118,9 +142,19 @@ ignore:
   - vulnerability: CVE-2025-22871
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+- vulnerability: GO-2025-3563
+    package:
+      location: /usr/bin/ondemand_exporter
+  - vulnerability: GO-2025-3563
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
 
 # CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not running go server
   - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-4762
     package:
       location: /usr/bin/apptainer
   - vulnerability: GHSA-p77j-4mvh-x3m3
@@ -130,6 +164,9 @@ ignore:
     package:
       location: /usr/local/bin/promtool
   - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-4762
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
@@ -146,7 +183,13 @@ ignore:
   - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
       location: /usr/sbin/ondemand-dex
+  - vulnerability: GO-2026-4762
+    package:
+      location: /usr/sbin/ondemand-dex
   - vulnerability: GHSA-p77j-4mvh-x3m3
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-4762
     package:
       location: /usr/sbin/ondemand-dex-session
 
@@ -162,6 +205,9 @@ ignore:
     package:
       location: /usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-v778-237x-gjrc
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2024-3321
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
