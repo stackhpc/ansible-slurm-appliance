@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+"""
+Process a grype output file to group critical vulnerabilities by CVE. Outputs
+all grype vulnerability IDs and paths for each CVE.
+
+The input file should be produced using:
+    grype sbom:<sbom-path> -o json > grype-output.json
+
+Return code is 1 if critical vulnerabilities found.
+"""
 
 import sys
 import json
@@ -95,9 +104,6 @@ def main():
     # Find critical CVEs, deduplicating info
     critical = group_by_cve(matches)
 
-    
-    pprint.pprint(critical)
-    
     # Create output:
     table = []
     for cve in critical:
@@ -107,6 +113,10 @@ def main():
         entry = [cve, native_ids, locations]
         table.append(entry)
     print(tabulate(table, ["CVE", "Native IDs", "Locations"]))
+
+    if critical:
+        print()
+        sys.exit(f"{len(critical)} critical vulnerabilities found.")
 
 if __name__ == "__main__":
     main()

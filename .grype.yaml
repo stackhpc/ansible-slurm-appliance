@@ -142,7 +142,7 @@ ignore:
   - vulnerability: CVE-2025-22871
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
-- vulnerability: GO-2025-3563
+  - vulnerability: GO-2025-3563
     package:
       location: /usr/bin/ondemand_exporter
   - vulnerability: GO-2025-3563
