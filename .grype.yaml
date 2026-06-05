@@ -279,15 +279,21 @@ ignore:
     package:
       location: /usr/sbin/ondemand-dex
 
-# ???
-
-# CVE-2026-1229   GO-2026-4550
+# CVE-2026-1229: CIRCL has an incorrect calculation in secp384r1 CombinedMult in github.com/cloudflare/circl
 # https://osv.dev/vulnerability/GO-2026-4550
 # https://github.com/grafana/grafana/issues/120256
-# NEW: can't fix, needs 12.4.2 or 12.3.6
-  # - vulnerability: GO-2026-4550
-  #   package:
-  #     location: /usr/share/grafana/bin/grafana
+# For grafana it is not vulerable:
+# - govulncheck finds it vulnerable, but
+# - go tool nm /usr/share/grafana/bin/grafana | grep "CombinedMult"
+#   does not find CombinedMult from circl/ecc/p384, only from
+#     - crypto/elliptic (i.e stdlib)
+#     - circl/ecc/goldilocks
+#   So the govulncheck is a false +ve.
+# - Anyway CVE record states "ECDH and ECDSA signing relying on this curve are not affected."
+#   so standard SSL using this library would be fine
+  - vulnerability: GO-2026-4550
+    package:
+      location: /usr/share/grafana/bin/grafana
 
 # CVE-2026-46595: Extension of CVE-2024-45337 to non-public-key callbacks
 # Ignore: Not using ssh
@@ -407,7 +413,24 @@ ignore:
       location: /usr/sbin/ondemand-dex
 
 # CVE-2026-39821: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna
-# TODO:
+# govulncheck -mode=binary found no issue
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/local/bin/node_exporter
+# other paths are reported as vulnerable:
+# /usr/bin/apptainer
+# /usr/bin/ondemand_exporter
+# /usr/libexec/apptainer/bin/starter
+# /usr/libexec/apptainer/cni/dhcp
+# /usr/local/bin/alertmanager
+# /usr/local/bin/amtool
+# /usr/local/bin/node_exporter
+# /usr/local/bin/prometheus
+# /usr/local/bin/promtool
+# /usr/sbin/ondemand-dex
+# /usr/sbin/ondemand-dex-session
+# /usr/share/grafana/bin/grafana
+# /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2026-39833: Invoking key constraints not enforced in golang.org/x/crypto/ssh/agent
 # Ignore: Not using ssh
