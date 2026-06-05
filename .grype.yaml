@@ -232,6 +232,337 @@ ignore:
     package:
       location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
 
+# CVE-2025-41115: SCIM client can provision a user with a numeric externalId
+# SCIM is not enabled by default: environments/common/inventory/group_vars/all/grafana.yml:grafana_auth
+  - vulnerability: GO-2025-4153
+    package:
+      location: /var/lib/grafana/plugins/
+
+# CVE-2026-39832: # https://nvd.nist.gov/vuln/detail/CVE-2026-39832
+# Destination restrictions are stripped when adding ssh keys to remote agents,
+# allowing unrestricted use of the key on the remote host
+# Ignore: Packages don't use ssh
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5006
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5006
+    package:
+      location: /usr/sbin/ondemand-dex
+
+# ???
+
+# CVE-2026-1229   GO-2026-4550
+# https://osv.dev/vulnerability/GO-2026-4550
+# https://github.com/grafana/grafana/issues/120256
+# NEW: can't fix, needs 12.4.2 or 12.3.6
+  # - vulnerability: GO-2026-4550
+  #   package:
+  #     location: /usr/share/grafana/bin/grafana
+
+# CVE-2026-46595: Extension of CVE-2024-45337 to non-public-key callbacks
+# Ignore: Not using ssh
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5023
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5023
+    package:
+      location: /usr/sbin/ondemand-dex
+
+# CVE-2026-39830: ssh connection blocked by unsolicited global request responses
+# Ignore: Not using ssh
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5017
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5017
+    package:
+      location: /usr/sbin/ondemand-dex
+
+# CVE-2026-39834: ssh doens't make progress for data > 4GB in single write call
+# Ignore: Not using ssh
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5020
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/sbin/ondemand-dex
+
+# CVE-2026-39821: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna
+# TODO:
+
+# CVE-2026-39833: Invoking key constraints not enforced in golang.org/x/crypto/ssh/agent
+# Ignore: Not using ssh
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5005
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/sbin/ondemand-dex
+
+# CVE-2026-39833: Invoking auth bypass via unenforced @revoked status in golang.org/x/crypto/ssh/knownhosts
+# Ignore: Not using ssh
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5005
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5005
+    package:
+      location: /usr/sbin/ondemand-dex
+
+# CVE-2026-42508: Invoking auth bypass via unenforced @revoked status in golang.org/x/crypto/ssh/knownhosts
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5021
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5021
+    package:
+      location: /usr/sbin/ondemand-dex
+
+# CVE-2026-39831: Invoking bypass of FIDO/U2F security keys physical interaction in golang.org/x/crypto/ssh
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5019
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5019
+    package:
+      location: /usr/sbin/ondemand-dex
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 exclude:
   - /var/lib/podman/.local/share/**
