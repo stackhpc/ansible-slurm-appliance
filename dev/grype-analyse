@@ -11,11 +11,11 @@ Return code is 1 if critical vulnerabilities found.
 
 import sys
 import json
-import pprint
 import argparse
 from itertools import chain
 from tabulate import tabulate
 from dataclasses import dataclass
+
 
 @dataclass(frozen=True)
 class Package:
@@ -24,14 +24,17 @@ class Package:
     type: str
     locations: tuple
 
+
 def flatten(nested):
     return list(chain.from_iterable(nested))
+
 
 def load_matches(path):
     with open(sys.argv[1]) as f:
         data = json.load(f)
 
     return data.get("matches", [])
+
 
 def cve_key(match: dict) -> str:
     """
@@ -47,6 +50,7 @@ def cve_key(match: dict) -> str:
             return rv["id"]
     return native_id  # no CVE alias exists; use native id as key
 
+
 def group_by_cve(matches):
     """
     Group critical matches. Returns a dict:
@@ -55,39 +59,42 @@ def group_by_cve(matches):
     """
     groups = {}
     for m in matches:
-        vuln     = m.get("vulnerability", {})
-        native   = vuln.get("id", "UNKNOWN")
+        vuln = m.get("vulnerability", {})
+        native = vuln.get("id", "UNKNOWN")
         severity = vuln.get("severity", "Unknown")
         if severity.lower() != "critical":
             continue
-        
+
         key = cve_key(m)
 
         artifact = m.get("artifact", {})
         pkg = Package(
-            name =      artifact.get("name", "?"),
-            version =   artifact.get("version", "?"),
-            type =      artifact.get("type", "?"),
-            locations = tuple(loc.get("path", "?") for loc in artifact.get("locations", [])),
+            name=artifact.get("name", "?"),
+            version=artifact.get("version", "?"),
+            type=artifact.get("type", "?"),
+            locations=tuple(
+                loc.get("path", "?") for loc in artifact.get("locations", [])
+            ),
         )
- 
+
         if key not in groups:
             fix_versions = vuln.get("fix", {}).get("versions", [])
             groups[key] = {
-                "key":     key,
-                "severity":   severity,
+                "key": key,
+                "severity": severity,
                 "description": vuln.get("description", ""),
-                "fix":        ", ".join(fix_versions) if fix_versions else "none",
-                "urls":       vuln.get("urls", []),
-                "native_ids": set(),   # the IDs to put in .grype.yaml
-                "packages":   set(),
+                "fix": ", ".join(fix_versions) if fix_versions else "none",
+                "urls": vuln.get("urls", []),
+                "native_ids": set(),
+                "packages": set(),
             }
- 
+
         # Collect every distinct native advisory ID seen for this CVE
         groups[key]["native_ids"].add(native)
- 
+
         groups[key]["packages"].add(pkg)
     return groups
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -100,7 +107,7 @@ def main():
 
     matches = load_matches(args.input)
     print(f"Loaded {len(matches)} matches")
-    
+
     # Find critical CVEs, deduplicating info
     critical = group_by_cve(matches)
 
@@ -108,8 +115,8 @@ def main():
     table = []
     for cve in critical:
         item = critical[cve]
-        native_ids = '\n'.join(critical[cve]['native_ids'])
-        locations = '\n'.join(flatten(p.locations for p in item['packages']))
+        native_ids = "\n".join(critical[cve]["native_ids"])
+        locations = "\n".join(flatten(p.locations for p in item["packages"]))
         entry = [cve, native_ids, locations]
         table.append(entry)
     print(tabulate(table, ["CVE", "Native IDs", "Locations"]))
@@ -117,6 +124,7 @@ def main():
     if critical:
         print()
         sys.exit(f"{len(critical)} critical vulnerabilities found.")
+
 
 if __name__ == "__main__":
     main()
