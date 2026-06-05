@@ -50,12 +50,12 @@ jobs:
         run: |
           echo CI_CLOUD: "${CI_CLOUD}"
 
-      - name: Setup environment
+      - name: Setup Python environment
         run: |
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install "$(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)"
+          pip install -r requirements.txt
         shell: bash
 
       - name: Write clouds.yaml
@@ -125,11 +125,12 @@ jobs:
           # Useful if you are running this in a matrix
           category: "${{ matrix.build }}"
 
-      - name: Fail if scan has CRITICAL vulnerabilities
-        uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
-        with:
-          sbom: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
-          output-format: table
-          severity-cutoff: critical
-          only-fixed: true
-          grype-version: ${{ env.GRYPE_VERSION }}
+      - name: Fail if scan has fixed CRITICAL vulnerabilities
+        # anchore/scan-action installs grype
+        run: |
+          . venv/bin/activate
+          grype --only-fixed "sbom:${SBOM}" -o json > "${GRYPE_OUTPUT}"
+          dev/grype-analyse "${GRYPE_OUTPUT}"
+        env:
+          GRYPE_OUTPUT: "${{ steps.manifest.outputs.image-name }}.grype.json"
+          SBOM: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
