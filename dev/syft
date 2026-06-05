@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+
+import sys
+import json
+import pprint
+import argparse
+from itertools import chain
+from tabulate import tabulate 
+
+def flatten(nested):
+    return list(chain.from_iterable(nested))
+
+def load_matches(path):
+    with open(sys.argv[1]) as f:
+        data = json.load(f)
+
+    return data.get("matches", [])
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Analyse a Grype JSON output file.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+    parser.add_argument("input", help="Path to grype-output.json")
+    args = parser.parse_args()
+
+    
+
+    matches = load_matches(args.input)
+    print(f"Loaded {len(matches)} matches")
+    
+    # Find critical CVEs, deduplicating info
+    groups = {} # key: cve, value: {}
+    for m in matches:
+        vuln = m.get("vulnerability", {})
+        cve_id = vuln.get("id", "UNKNOWN")
+        severity = vuln.get("severity", "Unknown")
+        if severity.lower() != "critical":
+            continue
+        artifact = m.get("artifact", {})
+        pkg = {
+            "name":    artifact.get("name", "?"),
+            "version": artifact.get("version", "?"),
+            "type":    artifact.get("type", "?"),
+            "locations": [loc.get("path", "?") for loc in artifact.get("locations", [])],
+        }
+        if cve_id not in groups:
+            fix_versions = vuln.get("fix", {}).get("versions", [])
+            groups[cve_id] = {
+                "id":          cve_id,
+                "severity":    severity,
+                "description": vuln.get("description", ""),
+                "cvss":        vuln.get("cvss", []),
+                "fix":         ", ".join(fix_versions) if fix_versions else "none",
+                "urls":        vuln.get("urls", []),
+                "packages":    [],
+            }
+        # Avoid duplicate package entries
+        if pkg not in groups[cve_id]["packages"]:
+            groups[cve_id]["packages"].append(pkg)
+
+    #pprint.pprint(groups)
+    # Create output:
+    table = []
+    for cve in groups:
+        item = groups[cve]
+        locations = '\n'.join(flatten(p['locations'] for p in item['packages']))
+        relatedVulnerabilities
+        entry = [cve, locations]
+        table.append(entry)
+    print(tabulate(table, ["CVE", "Locations"]))
+
+if __name__ == "__main__":
+    main()
