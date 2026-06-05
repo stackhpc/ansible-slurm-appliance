@@ -5,7 +5,15 @@ import json
 import pprint
 import argparse
 from itertools import chain
-from tabulate import tabulate 
+from tabulate import tabulate
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Package:
+    name: str
+    version: str
+    type: str
+    locations: tuple
 
 def flatten(nested):
     return list(chain.from_iterable(nested))
@@ -16,6 +24,62 @@ def load_matches(path):
 
     return data.get("matches", [])
 
+def cve_key(match: dict) -> str:
+    """
+    Return the CVE-* id for this match if one exists (either as the native id
+    or in relatedVulnerabilities), otherwise fall back to the native id.
+    This is the grouping key — one entry per CVE.
+    """
+    native_id = match.get("vulnerability", {}).get("id", "UNKNOWN")
+    if native_id.startswith("CVE-"):
+        return native_id
+    for rv in match.get("relatedVulnerabilities", []):
+        if rv.get("id", "").startswith("CVE-"):
+            return rv["id"]
+    return native_id  # no CVE alias exists; use native id as key
+
+def group_by_cve(matches):
+    """
+    Group critical matches. Returns a dict:
+        key: CVE where available or native ID if missing.
+        value: {native_ids: [], packages: [], ...}
+    """
+    groups = {}
+    for m in matches:
+        vuln     = m.get("vulnerability", {})
+        native   = vuln.get("id", "UNKNOWN")
+        severity = vuln.get("severity", "Unknown")
+        if severity.lower() != "critical":
+            continue
+        
+        key = cve_key(m)
+
+        artifact = m.get("artifact", {})
+        pkg = Package(
+            name =      artifact.get("name", "?"),
+            version =   artifact.get("version", "?"),
+            type =      artifact.get("type", "?"),
+            locations = tuple(loc.get("path", "?") for loc in artifact.get("locations", [])),
+        )
+ 
+        if key not in groups:
+            fix_versions = vuln.get("fix", {}).get("versions", [])
+            groups[key] = {
+                "key":     key,
+                "severity":   severity,
+                "description": vuln.get("description", ""),
+                "fix":        ", ".join(fix_versions) if fix_versions else "none",
+                "urls":       vuln.get("urls", []),
+                "native_ids": set(),   # the IDs to put in .grype.yaml
+                "packages":   set(),
+            }
+ 
+        # Collect every distinct native advisory ID seen for this CVE
+        groups[key]["native_ids"].add(native)
+ 
+        groups[key]["packages"].add(pkg)
+    return groups
+
 def main():
     parser = argparse.ArgumentParser(
         description="Analyse a Grype JSON output file.",
@@ -25,51 +89,24 @@ def main():
     parser.add_argument("input", help="Path to grype-output.json")
     args = parser.parse_args()
 
-    
-
     matches = load_matches(args.input)
     print(f"Loaded {len(matches)} matches")
     
     # Find critical CVEs, deduplicating info
-    groups = {} # key: cve, value: {}
-    for m in matches:
-        vuln = m.get("vulnerability", {})
-        cve_id = vuln.get("id", "UNKNOWN")
-        severity = vuln.get("severity", "Unknown")
-        if severity.lower() != "critical":
-            continue
-        artifact = m.get("artifact", {})
-        pkg = {
-            "name":    artifact.get("name", "?"),
-            "version": artifact.get("version", "?"),
-            "type":    artifact.get("type", "?"),
-            "locations": [loc.get("path", "?") for loc in artifact.get("locations", [])],
-        }
-        if cve_id not in groups:
-            fix_versions = vuln.get("fix", {}).get("versions", [])
-            groups[cve_id] = {
-                "id":          cve_id,
-                "severity":    severity,
-                "description": vuln.get("description", ""),
-                "cvss":        vuln.get("cvss", []),
-                "fix":         ", ".join(fix_versions) if fix_versions else "none",
-                "urls":        vuln.get("urls", []),
-                "packages":    [],
-            }
-        # Avoid duplicate package entries
-        if pkg not in groups[cve_id]["packages"]:
-            groups[cve_id]["packages"].append(pkg)
+    critical = group_by_cve(matches)
 
-    #pprint.pprint(groups)
+    
+    pprint.pprint(critical)
+    
     # Create output:
     table = []
-    for cve in groups:
-        item = groups[cve]
-        locations = '\n'.join(flatten(p['locations'] for p in item['packages']))
-        relatedVulnerabilities
-        entry = [cve, locations]
+    for cve in critical:
+        item = critical[cve]
+        native_ids = '\n'.join(critical[cve]['native_ids'])
+        locations = '\n'.join(flatten(p.locations for p in item['packages']))
+        entry = [cve, native_ids, locations]
         table.append(entry)
-    print(tabulate(table, ["CVE", "Locations"]))
+    print(tabulate(table, ["CVE", "Native IDs", "Locations"]))
 
 if __name__ == "__main__":
     main()
