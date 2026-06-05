@@ -22,20 +22,11 @@ grafana_serve_from_sub_path: "{{ groups['openondemand'] | count > 0 }}"
 
 grafana_dashboards_default:
   # node exporter slurm:
-  - dashboard_id: 13427
-    replacements:
-      - placeholder: DS_PROMETHEUS
-        replacement: prometheus
-      - placeholder: DS_ELASTICSEARCH
-        replacement: slurmstats
-    revision_id: 1
+  - dashboard_file: node-exporter-slurm.json
+    replacements: []
   # openhpc slurm:
   - dashboard_file: openhpc-slurm.json
-    replacements:
-      - placeholder: DS_PROMETHEUS
-        replacement: prometheus
-      - placeholder: DS_SLURMSTATS
-        replacement: slurmstats
+    replacements: []
   # slurm jobs overview
   - dashboard_file: slurm-jobs.json
     replacements:
