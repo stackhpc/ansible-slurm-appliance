@@ -2,7 +2,7 @@
 
 # See: https://github.com/cloudalchemy/ansible-grafana
 # for variable definitions.
-grafana_version: "10.4.18"
+grafana_version: "12.4.4"
 
 # need to copy some role defaults here so we can use in inventory:
 grafana_port: 3000
@@ -74,7 +74,7 @@ grafana_datasources:
     # readOnly: false
 
 grafana_plugins:
-  - grafana-opensearch-datasource 2.8.1
+  - grafana-opensearch-datasource 2.33.1
 
 # want to set grafana_server.serve_from_sub_path if have Open Ondemand to proxy:
 grafana_server:
