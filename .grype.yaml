@@ -38,12 +38,6 @@ ignore:
   - vulnerability: CVE-2025-68121
     package:
       location: "/usr/share/grafana/bin/grafana-server"
-  - vulnerability: CVE-2025-68121
-    package:
-      location: /var/lib/podman/.local/share/containers/storage/overlay/b51397a6db0ae651df3ffd51be823f98a26ab18ac7033847fedbac792798ae18/diff/usr/share/filebeat/filebeat
-  - vulnerability: CVE-2025-68121
-    package:
-      location: /var/lib/podman/.local/share/containers/storage/overlay/efeebaada56fcf04784f6d67852667327a8e50d18bbf9aea6d3556865e894f59/diff/usr/local/bin/gosu
 
 #  go crypto/tls vulnerability: programs used with trusted TLS servers
 # CVE-2025-68121 / GO-2026-4337
@@ -57,16 +51,18 @@ ignore:
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
-# go compiler bug introduces potential unverified memory access wr loops with induction variables on under or overflow
+# FIXME: go compiler bug introduces potential unverified memory access wr loops with induction variables on under or overflow
   - vulnerability: CVE-2026-27143
 
-# system dep, what can we do?
+# FIXME: system dep, what can we do?
   - vulnerability: CVE-2025-68121
     package:
       name: podman
+# FIXME: system dep, what can we do?
   - vulnerability: CVE-2025-68121
     package:
       location: /usr/bin/podman
+# FIXME: system dep, what can we do?
   - vulnerability: CVE-2025-68121
     package:
       location: "/usr/libexec/podman/**"
@@ -78,24 +74,6 @@ ignore:
   - vulnerability: CVE-2025-68121
     package:
       location: "/usr/libexec/apptainer/**"
-
-# Python 2.7 vulnerabilities in filebeat and opensearch ignored: python not used at runtime
-# CVE-2014-4650 CGIHTTPServer module in Python 2.7.5, in filebeat and opensearch images
-# CVE-2016-0718, CVE-2016-9063 Expat
-# CVE-2017-1000158 integer overflow in the PyString_DecodeEscape
-# CVE-2018-1000802 Command Injection vulnerability in shutil
-  - package: # filebeat
-      location: /var/lib/podman/.local/share/containers/storage/overlay/174f5685490326fc0a1c0f5570b8663732189b327007e47ff13d2ca59673db02/diff/usr/bin/python2.7
-  - package: # filebeat
-      location: /var/lib/podman/.local/share/containers/storage/overlay/174f5685490326fc0a1c0f5570b8663732189b327007e47ff13d2ca59673db02/diff/usr/lib64/libpython2.7.so.1.0
-  - package: # filebeat
-      location: /var/lib/podman/.local/share/containers/storage/overlay/6b0b788550f0cdfdceded05ec82b17c5bd3801b6a7795fecb4a18d1103d5d548/diff/usr/bin/python2.7
-  - package: # filebeat
-      location: /var/lib/podman/.local/share/containers/storage/overlay/6b0b788550f0cdfdceded05ec82b17c5bd3801b6a7795fecb4a18d1103d5d548/diff/usr/lib64/libpython2.7.so.1.0
-  - package: # opensearch
-      location: /var/lib/podman/.local/share/containers/storage/overlay/6042fe893e2746bb7637efe59d35909d895c9060b43950db261e692ad3dfb834/diff/usr/bin/python2.7
-  - package: # opensearch
-      location: /var/lib/podman/.local/share/containers/storage/overlay/6042fe893e2746bb7637efe59d35909d895c9060b43950db261e692ad3dfb834/diff/usr/lib64/libpython2.7.so.1.0
 
 # kernel rescue image: won't be booted
 # CVE-2021-43267, CVE-2021-47378, ...
@@ -587,5 +565,6 @@ ignore:
       location: /usr/sbin/ondemand-dex
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
+# NB: these do not even show in grype's ignored matches
 exclude:
   - /var/lib/podman/.local/share/**
