@@ -125,17 +125,18 @@ jobs:
           # Useful if you are running this in a matrix
           category: "${{ matrix.build }}"
 
-      - name: Fail if scan has fixed CRITICAL vulnerabilities
+      - name: Analyse scan and fail worfkflow if fixed CRITICAL vulnerabilities are not ignored
         # anchore/scan-action installs grype to tmpdir, reuse for speed
         run: |
           . venv/bin/activate
+          pip install git+https://github.com/stackhpc/grype-analyse@main
           GRYPE=$(find /tmp -name grype -type f 2>/dev/null | head -1)
           if [ -z "$GRYPE" ]; then
             echo "grype binary not found in /tmp"
             exit 1
           fi
           $GRYPE --only-fixed "sbom:${SBOM}" -o json > "${GRYPE_OUTPUT}"
-          dev/grype-analyse "${GRYPE_OUTPUT}"
+          grype-analyse -c .grype.yaml "${GRYPE_OUTPUT}"
         env:
           GRYPE_OUTPUT: "${{ steps.manifest.outputs.image-name }}.grype.json"
           SBOM: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
