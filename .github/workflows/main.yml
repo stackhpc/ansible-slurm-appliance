@@ -161,3 +161,4 @@ jobs:
     permissions:
       security-events: write # to upload to security tab
       contents: write # to upload sbom
+      checks: write # to write check-runs statuses
