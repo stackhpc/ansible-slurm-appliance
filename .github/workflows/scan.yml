@@ -136,7 +136,8 @@ jobs:
             exit 1
           fi
           $GRYPE --only-fixed "sbom:${SBOM}" -o json > "${GRYPE_OUTPUT}"
-          grype-analyse -c .grype.yaml "${GRYPE_OUTPUT}"
+          grype-analyse --config .grype.yaml --github-checks "${GRYPE_OUTPUT}"
         env:
           GRYPE_OUTPUT: "${{ steps.manifest.outputs.image-name }}.grype.json"
           SBOM: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          GRYPE_ANALYSE_MATRIX: ${{ matrix.build }}
