@@ -21,6 +21,7 @@ jobs:
     permissions:
       security-events: write # to upload to security tab
       contents: write # to upload sbom
+      checks: write # to write check-runs statuses
     env:
       JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
       OS_CLOUD: openstack
@@ -72,12 +73,22 @@ jobs:
           IMAGE_NAME=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$JSON_PATH")
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_ENV"
           echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "SBOM_NAME=${IMAGE_NAME}-sbom.syft-json" >> "$GITHUB_ENV"
+          echo "sbom_name=${IMAGE_NAME}-sbom.syft-json" >> "$GITHUB_OUTPUT"
         env:
           MATRIX_BUILD: ${{ matrix.build }}
           JSON_PATH: ${{ env.JSON_PATH }}
 
+      - name: Restore SBOM cache
+        id: cache_restore
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.manifest.outputs.sbom_name }}
+          key: ${{ steps.manifest.outputs.sbom_name }}
+
       - name: Download image
         # NB: use /mnt as that is a separate disk with more space
+        if: steps.cache_restore.outputs.cache-hit != 'true'
         run: |
           . venv/bin/activate
           sudo mkdir /mnt/images
@@ -85,45 +96,50 @@ jobs:
           openstack image save --file "/mnt/images/${IMAGE_NAME}" "${IMAGE_NAME}"
 
       - name: Set up QEMU
+        if: steps.cache_restore.outputs.cache-hit != 'true'
         uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
 
       - name: Install libguestfs
+        if: steps.cache_restore.outputs.cache-hit != 'true'
         run: |
           sudo apt -y update
           sudo apt -y install libguestfs-tools
 
       - name: Make directory for mount
+        if: steps.cache_restore.outputs.cache-hit != 'true'
         run: sudo mkdir -p "./${IMAGE_NAME}"
 
       - name: Mount image file
+        if: steps.cache_restore.outputs.cache-hit != 'true'
         run: sudo guestmount -a "/mnt/images/${IMAGE_NAME}" -i --ro -o allow_other "./${IMAGE_NAME}"
 
       - name: Generate sbom and attach to release if applicable
+        if: steps.cache_restore.outputs.cache-hit != 'true'
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
         id: generate-sbom
         with:
           path: "./${{ steps.manifest.outputs.image-name }}"
-          artifact-name: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
-          output-file: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          artifact-name: ${{ steps.manifest.outputs.sbom_name }}
+          output-file: ${{ steps.manifest.outputs.sbom_name }}
           format: syft-json
+
+      - name: Save SBOM cache
+        if: steps.cache_restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.manifest.outputs.sbom_name }}
+          key: ${{ steps.manifest.outputs.sbom_name }}
 
       - name: Generate SARIF Scan Report
         uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
         id: scan
         with:
-          sbom: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          sbom: ${{ steps.manifest.outputs.sbom_name }}
           severity-cutoff: low  # want everything for the Security Tab
           only-fixed: true
           output-format: sarif # format required for github security tab
           fail-build: false # don't stop workflow if vulns are found
           grype-version: ${{ env.GRYPE_VERSION }}
-
-      - name: Upload scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
-        with:
-          sarif_file: ${{ steps.scan.outputs.sarif }}
-          # Useful if you are running this in a matrix
-          category: "${{ matrix.build }}"
 
       - name: Analyse scan and fail worfkflow if fixed CRITICAL vulnerabilities are not ignored
         # anchore/scan-action installs grype to tmpdir, reuse for speed
@@ -139,5 +155,13 @@ jobs:
           grype-analyse --config .grype.yaml --github-checks "${GRYPE_OUTPUT}"
         env:
           GRYPE_OUTPUT: "${{ steps.manifest.outputs.image-name }}.grype.json"
-          SBOM: "${{ steps.manifest.outputs.image-name }}-sbom.syft-json"
+          SBOM: ${{ steps.manifest.outputs.sbom_name }}
           GRYPE_ANALYSE_MATRIX: ${{ matrix.build }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload SARIF scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+          # Useful if you are running this in a matrix
+          category: "${{ matrix.build }}"
