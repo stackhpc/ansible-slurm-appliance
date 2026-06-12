@@ -28,7 +28,7 @@ jobs:
       CI_CLOUD: ${{ vars.CI_CLOUD }}
       GRYPE_VERSION: v0.113.0
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
 
@@ -141,7 +141,7 @@ jobs:
           fail-build: false # don't stop workflow if vulns are found
           grype-version: ${{ env.GRYPE_VERSION }}
 
-      - name: Analyse scan and fail worfkflow if fixed CRITICAL vulnerabilities are not ignored
+      - name: Analyse scan and fail workflow if fixed CRITICAL vulnerabilities are not ignored
         # anchore/scan-action installs grype to tmpdir, reuse for speed
         run: |
           . venv/bin/activate
