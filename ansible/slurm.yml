@@ -106,7 +106,7 @@
 
 - name: Setup Node Health Checks
   # Has to be done here as it requires openhpc repos etc for installation
-  hosts: nhc:!builder
+  hosts: nhc
   become: true
   tags: nhc
   tasks:
