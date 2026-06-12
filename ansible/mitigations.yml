@@ -57,3 +57,23 @@
         owner: root
         group: root
         mode: "0644"
+
+- name: Apply CVE-2026-43037 mitigation
+  hosts: mitigate_cve_2026_43037
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Prevent modules loading
+      ansible.builtin.copy:
+        dest: /etc/modprobe.d/cve_2026_43037.conf
+        owner: root
+        group: root
+        mode: u=rw,go=r
+        content: |
+          install ip6_tunnel /bin/false
+    # below probably is not needed but is safer
+    - name: Unload modules
+      ansible.builtin.command:
+        cmd: rmmod ip6_tunnel
+      failed_when: false
+      changed_when: true
