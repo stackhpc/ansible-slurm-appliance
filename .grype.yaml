@@ -576,6 +576,19 @@ ignore:
     package:
       location: /usr/sbin/ondemand-dex
 
+# CVE-2026-43037: buffer overflow vuln in ip6_tunnel kernel module
+# Module disabled in ansible/mitigations.yml
+# RockyLinux 9: https://access.redhat.com/errata/RHSA-2026:25217
+# FIXME: By kernel-5.14.0-687.15.1
+  - vulnerability: CVE-2026-43037
+    package:
+      location: /var/lib/rpm/rpmdb.sqlite
+# RockyLinux 8: https://access.redhat.com/errata/RHSA-2026:25121
+# FIXME: By kernel-4.18.0-553.132.1
+  - vulnerability: CVE-2026-43037
+    package:
+      location: /var/lib/rpm/Packages
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
 exclude:
