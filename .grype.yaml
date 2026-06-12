@@ -32,12 +32,6 @@ ignore:
   - vulnerability: CVE-2025-68121
     package:
       location: "/usr/share/grafana/bin/grafana"
-  - vulnerability: CVE-2025-68121
-    package:
-      location: "/usr/share/grafana/bin/grafana-cli"
-  - vulnerability: CVE-2025-68121
-    package:
-      location: "/usr/share/grafana/bin/grafana-server"
 
 #  go crypto/tls vulnerability: programs used with trusted TLS servers
 # CVE-2025-68121 / GO-2026-4337
@@ -54,26 +48,10 @@ ignore:
 # FIXME: go compiler bug introduces potential unverified memory access wr loops with induction variables on under or overflow
   - vulnerability: CVE-2026-27143
 
-# FIXME: system dep, what can we do?
-  - vulnerability: CVE-2025-68121
-    package:
-      name: podman
-# FIXME: system dep, what can we do?
-  - vulnerability: CVE-2025-68121
-    package:
-      location: /usr/bin/podman
-# FIXME: system dep, what can we do?
-  - vulnerability: CVE-2025-68121
-    package:
-      location: "/usr/libexec/podman/**"
-
 # go crypto/tls vulnerability: programs run by users not admins
   - vulnerability: CVE-2025-68121
     package:
       location: "/usr/bin/apptainer"
-  - vulnerability: CVE-2025-68121
-    package:
-      location: "/usr/libexec/apptainer/**"
 
 # kernel rescue image: won't be booted
 # CVE-2021-43267, CVE-2021-47378, ...
@@ -209,12 +187,6 @@ ignore:
   - vulnerability: GHSA-33qg-7wpp-89cq
     package:
       location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
-
-# CVE-2025-41115: SCIM client can provision a user with a numeric externalId
-# SCIM is not enabled by default: environments/common/inventory/group_vars/all/grafana.yml:grafana_auth
-  - vulnerability: GO-2025-4153
-    package:
-      location: /var/lib/grafana/plugins/
 
 # CVE-2026-39832: # https://nvd.nist.gov/vuln/detail/CVE-2026-39832
 # Destination restrictions are stripped when adding ssh keys to remote agents,
@@ -391,24 +363,64 @@ ignore:
       location: /usr/sbin/ondemand-dex
 
 # CVE-2026-39821: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna
-# govulncheck -mode=binary found no issue
+# govulncheck -mode=binary found no issue:
   - vulnerability: GO-2026-5026
     package:
       location: /usr/local/bin/node_exporter
-# other paths are reported as vulnerable:
-# /usr/bin/apptainer
-# /usr/bin/ondemand_exporter
-# /usr/libexec/apptainer/bin/starter
-# /usr/libexec/apptainer/cni/dhcp
-# /usr/local/bin/alertmanager
-# /usr/local/bin/amtool
-# /usr/local/bin/node_exporter
-# /usr/local/bin/prometheus
-# /usr/local/bin/promtool
-# /usr/sbin/ondemand-dex
-# /usr/sbin/ondemand-dex-session
-# /usr/share/grafana/bin/grafana
-# /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# All paths below are reported as vulnerable by govulncheck, but considered acceptable risk from AI-based review:
+# apptainer: Very low risk. IDNA pulled transitively; no hostname ACL pattern.
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+# apptainer dhpc: Negligible risk, no reason for IDNA use. False positive from transitive linking?
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/libexec/apptainer/cni/dhcp
+# alertmanager, amtool: Low risk. No hostname-based privilege separation
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/local/bin/amtool
+# node_exporter: Negligible  risk. Metrics server only.
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/local/bin/node_exporter
+# prometheus, promtool: Low risk. No IDNA-based access control
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/local/bin/promtool
+# grafana: Low-Moderate risk. OAuth/auth proxy flows could theoretically touch this,
+# unlikely to be exploitable in actual config.
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/share/grafana/bin/grafana
+# opensearch datasource: Very Low risk. Admin-configured endpoint only.
+  - vulnerability: GO-2026-5026
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+# ondemand_exporter: Negligible risk. No hostname-based privilege checks, no IDNA normalisation in security path.
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/bin/ondemand_exporter
+# DEX: Negligible risk, unless used with IDNA URLs, which require an internationalised
+# domain name for the ondemand "servername" parameter. Leaving as fixme as should
+# patch when possible.
+# FIXME:
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/sbin/ondemand-dex
+# FIXME:
+  - vulnerability: GO-2026-5026
+    package:
+      location: /usr/sbin/ondemand-dex-session
 
 # CVE-2026-39833: Invoking key constraints not enforced in golang.org/x/crypto/ssh/agent
 # Ignore: Not using ssh
