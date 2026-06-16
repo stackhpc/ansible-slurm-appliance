@@ -37,7 +37,7 @@ jobs:
           echo "LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/stackhpc/ansible-slurm-appliance/releases/latest | jq -r .tag_name)" >> "$GITHUB_ENV"
 
       - name: Checkout latest release
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: ${{ env.LATEST_RELEASE_TAG }}
           fetch-depth: 0
