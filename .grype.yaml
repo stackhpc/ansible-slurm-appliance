@@ -501,6 +501,7 @@ ignore:
       location: /usr/sbin/ondemand-dex
 
 # CVE-2026-42508: Invoking auth bypass via unenforced @revoked status in golang.org/x/crypto/ssh/knownhosts
+# Ignore: not using ssh
   - vulnerability: GO-2026-5021
     package:
       location: /usr/bin/apptainer
@@ -539,6 +540,7 @@ ignore:
       location: /usr/sbin/ondemand-dex
 
 # CVE-2026-39831: Invoking bypass of FIDO/U2F security keys physical interaction in golang.org/x/crypto/ssh
+# Ignore: not using ssh
   - vulnerability: GO-2026-5019
     package:
       location: /usr/bin/apptainer
