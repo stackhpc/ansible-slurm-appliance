@@ -1,0 +1,83 @@
+---
+# Stripped-down version of fatimage, just updating base packages
+
+- hosts: builder
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Report hostname (= final image name)
+      ansible.builtin.command: hostname # noqa: no-changed-when
+    - name: Report inventory groups
+      ansible.builtin.debug:
+        var: group_names
+    - name: Report ssh command to connect
+      ansible.builtin.debug:
+        msg: >
+          connect to builder machine using:
+          ssh {% if ansible_ssh_port | default(false) %}-p {{ ansible_ssh_port }}{% endif %}
+          {% if ansible_ssh_private_key_file | default(false) %} -i {{ ansible_ssh_private_key_file }}{% endif %}
+          {{ ansible_ssh_common_args | default('') }}
+          {{ ansible_ssh_extra_args | default('') }}
+          -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
+          {{ ansible_user }}@{{ ansible_host }}
+
+- hosts: builder
+  tags: dnf_repos
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Replace system repos with pulp repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: set_repos.yml
+
+- hosts: builder
+  gather_facts: false
+  become: true
+  tags: cockpit
+  tasks:
+    - name: Remove RHEL cockpit # noqa: no-changed-when
+      ansible.builtin.command: dnf -y remove cockpit-ws cockpit-system cockpit-bridge
+      register: dnf_remove_output
+      ignore_errors: true # Avoid failing if a lock or other error happens
+
+- hosts: builder
+  gather_facts: false
+  become: true
+  tags:
+    - update
+  tasks:
+    - name: Update selected packages
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+      async: "{{ 30 * 60 }}" # wait for up to 30 minutes
+      poll: 15 # check every 15 seconds
+      register: updates
+    - name: Log updated packages
+      ansible.builtin.debug:
+        msg: |
+          {{ updates.results | length }} changes to packages
+          {{ updates.results | join('\n') }}
+
+- hosts: builder
+  become: true
+  tags: dnf_repos
+  tasks:
+    - name: Disable pulp repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: disable_repos.yml
+      when: not dnf_repos_enabled | default(false) | bool
+
+
+# NB: Reusing cleanup tasks
+- hosts: builder
+  become: true
+  gather_facts: true
+  tags: finalise
+  tasks:
+    - name: Cleanup image
+      ansible.builtin.import_tasks: cleanup.yml
+    - name: Shutdown Packer VM
+      community.general.shutdown:
