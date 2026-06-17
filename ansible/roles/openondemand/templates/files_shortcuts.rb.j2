@@ -4,7 +4,7 @@
 Rails.application.config.after_initialize do
   OodFilesApp.candidate_favorite_paths.tap do |paths|
 {% for path in openondemand_filesapp_paths | default([]) %}
-    paths << Pathname.new("{{ path }}")
+    paths << Pathname.new({{ path | to_json }})
 {% endfor %}
   end
 end
