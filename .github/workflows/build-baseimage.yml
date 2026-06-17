@@ -101,8 +101,8 @@ jobs:
           path: ~/.cache/pip
           key: pip-${{ hashFiles('requirements.txt') }}
 
-      - name: Install ansible etc
-        run: dev/setup-env.sh
+      - name: Install python requirements
+        run: SKIP_ANSIBLE_GALAXY=true dev/setup-env.sh
 
       - name: Write clouds.yaml
         run: |
@@ -125,6 +125,9 @@ jobs:
           fi
         env:
           MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
+
+      - name: Install ansible etc
+        run: dev/setup-env.sh
 
       - name: Setup environment
         run: |
