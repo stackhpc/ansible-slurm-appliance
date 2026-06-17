@@ -1,0 +1,193 @@
+name: Build base image
+'on':
+  workflow_dispatch:
+    # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
+    inputs:
+      ci_cloud:
+        description: 'Select the CI_CLOUD'
+        required: true
+        type: choice
+        options:
+          - default
+          - LEAFCLOUD
+          - SMS
+          - ARCUS
+        default: default # Use repo CI_CLOUD setting
+      cleanup_on_failure:
+        description: Cleanup Packer resources on failure
+        type: boolean
+        required: true
+        default: true
+
+permissions: {}
+
+jobs:
+  openstack:
+    name: openstack-imagebuild
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
+      cancel-in-progress: true
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false # allow other matrix jobs to continue even if one fails
+      matrix: # build RL8, RL9
+        build:
+          - image_name: base-RL8
+            source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
+            inventory_groups: fatimage
+          - image_name: base-RL9
+            source_image_name: Rocky-9-GenericCloud-Base-9.8-20260525.0.x86_64
+            inventory_groups: fatimage
+    env:
+      ANSIBLE_FORCE_COLOR: 'true'
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud }}
+      ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
+      PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }}
+
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Record settings for CI cloud
+        run: |
+          echo "CI_CLOUD: ${CI_CLOUD}" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "PACKER_ON_ERROR | tee -a ${PACKER_ON_ERROR}"
+
+      - name: Setup ssh
+        run: |
+          set -x
+          mkdir -p ~/.ssh
+
+          # setup bastion private key:
+          echo "$SECRETS_SSH_KEY" > "${BASTION_KEYFILE}"
+          chmod 0600 "${BASTION_KEYFILE}"
+          ssh-keygen -f "${BASTION_KEYFILE}" -y # tests key format is correct
+
+          # accept bastion hostkeys
+          cat >> ~/.ssh/known_hosts <<< "${BASTION_FINGERPRINTS}"
+
+          {
+            # setup bastion for Ansible:
+            # NB Do NOT change this to use ProxyJump, it doesn't pickup the key
+            echo "ANSIBLE_SSH_COMMON_ARGS=-o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
+
+            # setup bastion for Packer:
+            echo "PKR_VAR_ssh_bastion_host=${BASTION_HOST}"
+            echo "PKR_VAR_ssh_bastion_username=${BASTION_USER}"
+            echo "PKR_VAR_ssh_bastion_private_key_file=${BASTION_KEYFILE}"
+
+            # setup additional debug key for Packer:
+            echo "PKR_VAR_ssh_debug_public_key=${SSH_DEBUG_PUBLIC_KEY}"
+          } >> "$GITHUB_ENV"
+
+          echo "bastion details:"
+          cat "$GITHUB_ENV"
+        env:
+          BASTION_KEYFILE: /home/runner/.ssh/bastion_key
+          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
+          BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
+          BASTION_USER: slurm-app-ci # currently same for both CI clouds
+          BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
+          SSH_DEBUG_PUBLIC_KEY: ${{ vars.SSH_DEBUG_PUBLIC_KEY}}
+
+      - name: Cache pip
+        # Don't cache galaxy/requirements.yml as during dev its common for this
+        # to use branch names
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
+        shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
+
+      - name: Compute base image_name_version and check if already exists
+        id: compute_image_name_version
+        run: |
+          . venv/bin/activate
+          image_name_version="-$(sha256sum environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml | awk '{ print $1 }')"
+          echo image_name_version="$image_name_version" | tee -a "$GITHUB_OUTPUT"
+          full_image_name="${MATRIX_BUILD_IMAGE_NAME}${image_name_version}"
+          if openstack image show -f value -c name "$full_image_name"; then
+            echo "Image $full_image_name already exists, will skip remaining steps"
+            echo "image_exists=true" | tee -a "$GITHUB_OUTPUT"
+          fi
+        env:
+          MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
+
+      - name: Setup environment
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+
+      - name: Build fat image with packer
+        id: packer_build
+        run: |
+          set -x
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+          cd packer/
+          packer init .
+
+          PACKER_LOG=1 packer build \
+          -on-error="$PACKER_ON_ERROR" \
+          -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
+          -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
+          -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
+          -var "image_name_version=$STEP_IMAGE_NAME_VERSION" \
+          -var "playbook=baseimage.yml" \
+          -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
+          openstack.pkr.hcl
+        env:
+          MATRIX_BUILD_SOURCE_IMAGE_NAME: ${{ matrix.build.source_image_name }}
+          MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
+          MATRIX_BUILD_INVENTORY_GROUPS: ${{ matrix.build.inventory_groups }}
+          STEP_IMAGE_NAME_VERSION: ${{ steps.compute_image_name_version.outputs.image_name_version }}
+
+      - name: Get created image names from manifest
+        id: manifest
+        run: |
+          . venv/bin/activate
+          IMAGE_ID=$(jq --raw-output '.builds[-1].artifact_id' packer/packer-manifest.json)
+          while ! openstack image show -f value -c name "$IMAGE_ID"; do
+            sleep 5
+          done
+          IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
+          echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "image-id=$IMAGE_ID" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "$IMAGE_ID" > image-id.txt
+          echo "$IMAGE_NAME" > image-name.txt
+
+      - name: Make image usable for further builds
+        run: |
+          . venv/bin/activate
+          openstack image unset --property signature_verified "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}" || true
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
+
+      - name: Set image properties
+        run: |
+          . venv/bin/activate
+          . dev/image-set-properties.sh "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
+
+      - name: Upload manifest artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: image-details-${{ matrix.build.image_name }}
+          path: |
+            ./image-id.txt
+            ./image-name.txt
+          overwrite: true
