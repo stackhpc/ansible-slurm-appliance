@@ -81,6 +81,9 @@
           - podman
           - python3
         state: installed
+    - name: Install CVMFS
+      ansible.builtin.dnf:
+        name: cvmfs
 
 - hosts: builder
   become: true
