@@ -183,6 +183,7 @@ jobs:
         run: |
           . venv/bin/activate
           . dev/image-set-properties.sh "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
+          openstack image set --property "gh_run=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID#GITHUB_RUN_ATTEMPT" "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
         env:
           STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
 
