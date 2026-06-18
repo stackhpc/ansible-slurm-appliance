@@ -62,7 +62,7 @@
     - name: Update selected packages
       ansible.builtin.dnf:
         name: "*"
-        state: latest
+        state: latest # noqa: package-latest
       async: "{{ 30 * 60 }}" # wait for up to 30 minutes
       poll: 15 # check every 15 seconds
       register: updates
