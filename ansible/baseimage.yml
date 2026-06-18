@@ -21,6 +21,27 @@
           -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
           {{ ansible_user }}@{{ ansible_host }}
 
+- hosts: cluster
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Add system user groups
+      ansible.builtin.group: "{{ item.group }}" # noqa: args[module]
+      loop: "{{ appliances_local_users }}"
+      when:
+        - item.enable | default(true) | bool
+        - "'group' in item"
+      become_method: ansible.builtin.sudo
+      # Need to change working directory otherwise we try to switch back to non-existent directory.
+      become_flags: "-i"
+    - name: Add system users
+      ansible.builtin.user: "{{ item.user }}" # noqa: args[module]
+      loop: "{{ appliances_local_users }}"
+      when: item.enable | default(true) | bool
+      become_method: ansible.builtin.sudo
+      # Need to change working directory otherwise we try to switch back to non-existent directory.
+      become_flags: "-i"
+
 - hosts: builder
   tags: dnf_repos
   gather_facts: true
