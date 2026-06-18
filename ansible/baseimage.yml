@@ -34,6 +34,18 @@
 - hosts: builder
   gather_facts: false
   become: true
+  tags:
+    - selinux
+  tasks:
+    - name: Set SELinux state and policy
+      ansible.posix.selinux:
+        state: "{{ selinux_state }}"
+        policy: "{{ selinux_policy }}"
+      register: sestatus
+
+- hosts: builder
+  gather_facts: false
+  become: true
   tags: cockpit
   tasks:
     - name: Remove RHEL cockpit # noqa: no-changed-when
