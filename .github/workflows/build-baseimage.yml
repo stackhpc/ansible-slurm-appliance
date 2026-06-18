@@ -172,6 +172,18 @@ jobs:
           echo "$IMAGE_ID" > image-id.txt
           echo "$IMAGE_NAME" > image-name.txt
 
+      - name: Delete existing image with same name
+        run: |
+          . venv/bin/activate
+          for img in $(openstack image list --name "$STEPS_MANIFEST_OUTPUTS_IMAGE_NAME" --status active -c id -f value | grep -v "$STEPS_MANIFEST_OUTPUTS_IMAGE_ID"); do
+            echo "Existing image with same name, deleting"
+            openstack image show "$img"
+            openstack image delete "$img"
+          done
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
+          STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}
+
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
