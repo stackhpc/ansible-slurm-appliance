@@ -14,10 +14,47 @@
     - tasks
     - roles
 
+- name: Prepare Inject files from roles
+  delegate_to: localhost
+  changed_when: true
+  ansible.builtin.shell: |
+    rm -rf __tmp_inject_files
+    mkdir -p \
+      __tmp_inject_files/files \
+      __tmp_inject_files/roles \
+      __tmp_inject_files/tasks \
+      __tmp_inject_files/templates
+    cp \
+      roles/resolv_conf/templates/resolv.conf.j2 \
+      roles/stackhpc.os-manila-mount/templates/ceph.conf.j2 \
+      roles/stackhpc.os-manila-mount/templates/ceph.keyring.j2 \
+      __tmp_inject_files/templates/
+    cp \
+      roles/resolv_conf/files/NetworkManager-dns-none.conf \
+      __tmp_inject_files/files/
+    cp -r \
+      roles/basic_users \
+      roles/cacerts \
+      roles/sssd \
+      roles/sshd \
+      roles/stackhpc.nfs \
+      roles/mrlesmithjr.chrony \
+      roles/lustre \
+      roles/nhc \
+      roles/eessi \
+      roles/mounts \
+      roles/journald \
+      __tmp_inject_files/roles/
+    cp \
+      roles/tuned/tasks/configure.yml \
+      __tmp_inject_files/tasks/tuned.yml
+  args:
+    chdir: "{{ role_path }}/../.."  # this is $APPLIANCES_REPO_ROOT/ansible
+
 - name: Inject files from roles
   ansible.posix.synchronize:
-    src: "{{ item.src }}"
-    dest: "/etc/ansible-init/playbooks/{{ item.dest }}"
+    src: "{{ role_path }}/../../__tmp_inject_files/"
+    dest: "/etc/ansible-init/playbooks/"
     archive: true
     rsync_opts:
       - "-p"
@@ -25,39 +62,12 @@
     recursive: true
     use_ssh_args: true
   become: true
-  loop:
-    - src: ../../resolv_conf/templates/resolv.conf.j2
-      dest: templates/resolv.conf.j2
-    - src: ../../stackhpc.os-manila-mount/templates/ceph.conf.j2
-      dest: templates/ceph.conf.j2
-    - src: ../../stackhpc.os-manila-mount/templates/ceph.keyring.j2
-      dest: templates/ceph.keyring.j2
-    - src: ../../resolv_conf/files/NetworkManager-dns-none.conf
-      dest: files/NetworkManager-dns-none.conf
-    - src: ../../basic_users
-      dest: roles/
-    - src: ../../cacerts
-      dest: roles/
-    - src: ../../sssd
-      dest: roles/
-    - src: ../../sshd
-      dest: roles/
-    - src: ../../tuned/tasks/configure.yml
-      dest: tasks/tuned.yml
-    - src: ../../stackhpc.nfs
-      dest: roles/
-    - src: ../../mrlesmithjr.chrony
-      dest: roles/
-    - src: ../../lustre
-      dest: roles/
-    - src: ../../nhc
-      dest: roles/
-    - src: ../../eessi
-      dest: roles/
-    - src: ../../mounts
-      dest: roles/
-    - src: ../../journald
-      dest: roles/
+
+- name: Cleanup Inject files from roles
+  delegate_to: localhost
+  ansible.builtin.file:
+    path: "{{ role_path }}/../../__tmp_inject_files"
+    state: absent
 
 - name: Add filter_plugins to ansible.cfg
   ansible.builtin.lineinfile:
