@@ -1,15 +1,8 @@
 ---
-- name: Ensure nhc is patched
-  ansible.builtin.include_tasks:
-    file: install.yml
-  when: appliances_mode != 'configure'
-
 - name: Collect facts
   ansible.builtin.include_tasks: facts.yml
-  when: appliances_mode != 'build'
 
 - name: Ensure NHC configuration directory exists
-  when: appliances_mode != 'build'
   # When running site.yml after login/control upgrade, nhc group might be
   # enabled in repo, but as the compute nodes have not yet been upgraded they
   # do not have the package and hence this directory
@@ -22,7 +15,6 @@
     mode: u=rwX,go=
 
 - name: Template out NHC configuration
-  when: appliances_mode != 'build'
   ansible.builtin.template:
     src: "{{ nhc_config_template }}"
     dest: /etc/nhc/nhc.conf

@@ -112,3 +112,9 @@
   tasks:
     - ansible.builtin.include_role:
         name: nhc
+        tasks_from: install.yml
+      when: appliances_mode != 'configure'
+    - ansible.builtin.include_role:
+        name: nhc
+        tasks_from: runtime.yml
+      when: appliances_mode != 'build'
