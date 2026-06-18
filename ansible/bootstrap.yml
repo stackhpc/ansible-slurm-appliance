@@ -208,6 +208,7 @@
       ansible.builtin.command: dnf -y remove cockpit-ws cockpit-system cockpit-bridge
       register: dnf_remove_output
       ignore_errors: true # Avoid failing if a lock or other error happens
+      changed_when: '"Nothing to do." not in dnf_remove_output.stdout'
 
 - hosts: firewalld
   gather_facts: false
