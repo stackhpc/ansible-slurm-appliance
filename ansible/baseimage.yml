@@ -84,6 +84,15 @@
     - name: Install CVMFS
       ansible.builtin.dnf:
         name: cvmfs
+    - name: Install R from EPEL
+      ansible.builtin.dnf:
+        name: R
+    - name: Install squid package
+      ansible.builtin.dnf:
+        name: squid
+    - name: Install Xfce desktop
+      ansible.builtin.dnf:
+        name: "@Xfce"
 
 - hosts: builder
   become: true
