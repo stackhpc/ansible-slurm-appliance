@@ -251,7 +251,7 @@
             exclude: "{{ update_exclude }}"
             disablerepo: "{{ update_disablerepo }}"
           async: "{{ 30 * 60 }}" # wait for up to 30 minutes
-          poll: 15 # check every 15 seconds
+          poll: 5 # check every 5 seconds
           register: updates
         - name: Ensure update log directory on localhost exists
           ansible.builtin.file:
