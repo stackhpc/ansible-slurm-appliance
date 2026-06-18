@@ -74,6 +74,16 @@
 
 - hosts: builder
   become: true
+  tasks:
+    - name: Install podman
+      ansible.builtin.dnf:
+        name:
+          - podman
+          - python3
+        state: installed
+
+- hosts: builder
+  become: true
   tags: dnf_repos
   tasks:
     - name: Disable pulp repos
