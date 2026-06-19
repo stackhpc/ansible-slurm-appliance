@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=missing-module-docstring
-# pylint: disable=line-too-long
 # Set github workflow output parameters defining image IDs from a packer manifest.
 # Usage:
 #   ./packer/read_manifest.py packer/packer-manifest.json
@@ -12,13 +10,12 @@
 # which can be used in subsequent workflow steps: [1]
 #
 # [1]: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-setting-a-value
-# pylint: enable=line-too-long
 
 import json
 import sys
 
 output = {}
-with open(sys.argv[1]) as f:  # pylint: disable=unspecified-encoding
+with open(sys.argv[1]) as f:
     data = json.load(f)
 for build in data["builds"]:
     node_type = build["custom_data"]["source"]
@@ -27,8 +24,4 @@ for build in data["builds"]:
         image_id  # NB: this deliberately gets the LAST build for a node type
     )
 for node_type, image_id in output.items():
-    print(
-        # pylint: disable-next=consider-using-f-string
-        "::set-output name=NEW_%s_IMAGE_ID::%s"
-        % (node_type.upper(), image_id)
-    )
+    print(f"::set-output name=NEW_{node_type.upper()}_IMAGE_ID::{image_id}")

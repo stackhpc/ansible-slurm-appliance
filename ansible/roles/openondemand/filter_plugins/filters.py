@@ -27,7 +27,7 @@ def to_gres_options(stdout):
 
     [1] https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/form-widgets.html#form-widgets
     [2] https://slurm.schedmd.com/srun.html#OPT_gres
-    """  # noqa: E501 pylint: disable=line-too-long
+    """
 
     gres_data = {}
     # key=gres_opt - 'name' or 'name:type', i.e. what would be passed to --gres
@@ -77,7 +77,7 @@ def to_gres_options(stdout):
 
 # pylint: disable=useless-object-inheritance
 # pylint: disable=too-few-public-methods
-class FilterModule(object):
+class FilterModule:
     """Ansible core jinja2 filters"""
 
     # pylint: disable=missing-function-docstring

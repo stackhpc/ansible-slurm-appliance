@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright: Contributors to the Ansible project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -11,7 +10,8 @@ module: mount_facts
 version_added: 2.18
 short_description: Retrieve mount information.
 description:
-  - Retrieve information about mounts from preferred sources and filter the results based on the filesystem type and device.
+  - Retrieve information about mounts from preferred sources and filter the results based on the filesystem type and
+    device.
 options:
   devices:
     description: A list of fnmatch patterns to filter mounts by the special device or remote file system.
@@ -25,19 +25,25 @@ options:
     elements: str
   sources:
     description:
-      - A list of sources used to determine the mounts. Missing file sources (or empty files) are skipped. Repeat sources, including symlinks, are skipped.
+      - A list of sources used to determine the mounts. Missing file sources (or empty files) are skipped.
+        Repeat sources, including symlinks, are skipped.
       - The C(mount_points) return value contains the first definition found for a mount point.
       - Additional mounts to the same mount point are available from C(aggregate_mounts) (if enabled).
-      - By default, mounts are retrieved from all of the standard locations, which have the predefined aliases V(all)/V(static)/V(dynamic).
+      - By default, mounts are retrieved from all of the standard locations, which have the predefined aliases
+        V(all)/V(static)/V(dynamic).
       - V(all) contains V(dynamic) and V(static).
-      - V(dynamic) contains V(/etc/mtab), V(/proc/mounts), V(/etc/mnttab), and the value of O(mount_binary) if it is not None.
-        This allows platforms like BSD or AIX, which don't have an equivalent to V(/proc/mounts), to collect the current mounts by default.
+      - V(dynamic) contains V(/etc/mtab), V(/proc/mounts), V(/etc/mnttab), and the value of O(mount_binary) if it is not
+        None.
+        This allows platforms like BSD or AIX, which don't have an equivalent to V(/proc/mounts), to collect the current
+        mounts by default.
         See the O(mount_binary) option to disable the fall back or configure a different executable.
       - V(static) contains V(/etc/fstab), V(/etc/vfstab), and V(/etc/filesystems).
-        Note that V(/etc/filesystems) is specific to AIX. The Linux file by this name has a different format/purpose and is ignored.
+        Note that V(/etc/filesystems) is specific to AIX. The Linux file by this name has a different format/purpose and
+        is ignored.
       - The value of O(mount_binary) can be configured as a source, which will cause it to always execute.
         Depending on the other sources configured, this could be inefficient/redundant.
-        For example, if V(/proc/mounts) and V(mount) are listed as O(sources), Linux hosts will retrieve the same mounts twice.
+        For example, if V(/proc/mounts) and V(mount) are listed as O(sources), Linux hosts will retrieve the same mounts
+        twice.
     default: ~
     type: list
     elements: str
@@ -50,10 +56,11 @@ options:
     default: mount
   timeout:
     description:
-      - This is the maximum number of seconds to wait for each mount to complete. When this is V(null), wait indefinitely.
+      - maximum number of seconds to wait for each mount to complete. When this is V(null), wait indefinitely.
       - Configure in conjunction with O(on_timeout) to skip unresponsive mounts.
       - This timeout also applies to the O(mount_binary) command to list mounts.
-      - If the module is configured to run during the play's fact gathering stage, set a timeout using module_defaults to prevent a hang (see example).
+      - If the module is configured to run during the play's fact gathering stage, set a timeout using module_defaults
+        to prevent a hang (see example).
     type: float
   on_timeout:
     description:
@@ -122,10 +129,14 @@ EXAMPLES = """
 RETURN = """
 ansible_facts:
     description:
-      - An ansible_facts dictionary containing a dictionary of C(mount_points) and list of C(aggregate_mounts) when enabled.
-      - Each key in C(mount_points) is a mount point, and the value contains mount information (similar to C(ansible_facts["mounts"])).
-        Each value also contains the key C(ansible_context), with details about the source and line(s) corresponding to the parsed mount point.
-      - When C(aggregate_mounts) are included, the containing dictionaries are the same format as the C(mount_point) values.
+      - An ansible_facts dictionary containing a dictionary of C(mount_points) and list of C(aggregate_mounts)
+        when enabled.
+      - Each key in C(mount_points) is a mount point, and the value contains mount information
+       (similar to C(ansible_facts["mounts"])).
+        Each value also contains the key C(ansible_context), with details about the source and line(s) corresponding
+        to the parsed mount point.
+      - When C(aggregate_mounts) are included, the containing dictionaries are the same format as the C(mount_point)
+        values.
     returned: on success
     type: dict
     sample:
@@ -133,7 +144,8 @@ ansible_facts:
         /proc/sys/fs/binfmt_misc:
           ansible_context:
             source: /proc/mounts
-            source_data: "systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=33,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=33850 0 0"
+            source_data: "systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=33,pgrp=1,timeout=0,minproto=5,"
+                         "maxproto=5,direct,pipe_ino=33850 0 0"
           block_available: 0
           block_size: 4096
           block_total: 0
@@ -153,7 +165,8 @@ ansible_facts:
       aggregate_mounts:
         - ansible_context:
             source: /proc/mounts
-            source_data: "systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=33,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=33850 0 0"
+            source_data: "systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=33,pgrp=1,timeout=0,minproto=5,"
+                         "maxproto=5,direct,pipe_ino=33850 0 0"
           block_available: 0
           block_size: 4096
           block_total: 0
@@ -191,13 +204,6 @@ ansible_facts:
           uuid: null
 """
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.facts import timeout as _timeout
-from ansible.module_utils.facts.utils import get_mount_size, get_file_content
-
-from contextlib import suppress
-from fnmatch import fnmatch
-
 import codecs
 import datetime
 import functools
@@ -205,11 +211,18 @@ import os
 import re
 import subprocess
 import typing as t
+from contextlib import suppress
+from fnmatch import fnmatch
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.facts import timeout as _timeout
+from ansible.module_utils.facts.utils import get_file_content, get_mount_size
 
 STATIC_SOURCES = ["/etc/fstab", "/etc/vfstab", "/etc/filesystems"]
 DYNAMIC_SOURCES = ["/etc/mtab", "/proc/mounts", "/etc/mnttab"]
 
-# AIX and BSD don't have a file-based dynamic source, so the module also supports running a mount binary to collect these.
+# AIX and BSD don't have a file-based dynamic source, so the module also supports running a mount binary to collect
+# these.
 # Pattern for Linux, including OpenBSD and NetBSD
 LINUX_MOUNT_RE = re.compile(
     r"^(?P<device>\S+) on (?P<mount>\S+) type (?P<fstype>\S+) \((?P<options>.+)\)$"
@@ -218,7 +231,8 @@ LINUX_MOUNT_RE = re.compile(
 BSD_MOUNT_RE = re.compile(r"^(?P<device>\S+) on (?P<mount>\S+) \((?P<fstype>.+)\)$")
 # Pattern for AIX, example in https://www.ibm.com/docs/en/aix/7.2?topic=m-mount-command
 AIX_MOUNT_RE = re.compile(
-    r"^(?P<node>\S*)\s+(?P<mounted>\S+)\s+(?P<mount>\S+)\s+(?P<fstype>\S+)\s+(?P<time>\S+\s+\d+\s+\d+:\d+)\s+(?P<options>.*)$"
+    r"^(?P<node>\S*)\s+(?P<mounted>\S+)\s+(?P<mount>\S+)\s+(?P<fstype>\S+)"
+    r"\s+(?P<time>\S+\s+\d+\s+\d+:\d+)\s+(?P<options>.*)$"
 )
 
 
@@ -246,6 +260,9 @@ class MountInfo:
 
     def to_tuple(self):
         return tuple(getattr(self, f) for f in self._fields)
+
+    def __hash__(self):
+        return hash(self.to_tuple())
 
 
 class MountInfoOptions:
@@ -275,6 +292,9 @@ class MountInfoOptions:
 
     def to_tuple(self):
         return tuple(getattr(self, f) for f in self._fields)
+
+    def __hash__(self):
+        return hash(self.to_tuple())
 
 
 def replace_octal_escapes(value: str) -> str:
@@ -395,7 +415,7 @@ def run_mount_bin(module: AnsibleModule, mount_bin: str) -> str:  # type: ignore
             mount_bin, timeout=module.params["timeout"]
         ).decode()
     except subprocess.CalledProcessError as e:
-        module.fail_json(msg=f"Failed to execute {mount_bin}: {str(e)}")
+        module.fail_json(msg=f"Failed to execute {mount_bin}: {e!s}")
 
 
 def get_mount_pattern(stdout: str):
@@ -420,7 +440,8 @@ def gen_mounts_from_stdout(stdout: str) -> t.Iterable[MountInfo]:
         match = pattern.match(line)
         if not (match):
             # AIX has a couple header lines for some reason
-            # MacOS "map" lines are skipped (e.g. "map auto_home on /System/Volumes/Data/home (autofs, automounted, nobrowse)")
+            # MacOS "map" lines are skipped (e.g. "map auto_home on /System/Volumes/Data/home
+            # (autofs, automounted, nobrowse)")
             # TODO: include MacOS lines
             continue
 
@@ -451,8 +472,8 @@ def gen_fstab_entries(lines: t.List[str]) -> t.Iterable[MountInfo]:
 
     Each tuple contains the mount point, line of origin, and the dictionary of the parsed line.
     """
-    for line in lines:
-        line = line.strip()
+    for ln in lines:
+        line = ln.strip()
         if not (line) or line.startswith("#"):
             continue
         fields = [replace_octal_escapes(field) for field in line.split()]
@@ -494,7 +515,8 @@ def gen_vfstab_entries(lines: t.List[str]) -> t.Iterable[MountInfo]:
 
 
 def list_aix_filesystems_stanzas(lines: t.List[str]) -> t.List[t.List[str]]:
-    """Parse stanzas from /etc/filesystems according to https://www.ibm.com/docs/hu/aix/7.2?topic=files-filesystems-file."""
+    """Parse stanzas from /etc/filesystems according to
+    https://www.ibm.com/docs/hu/aix/7.2?topic=files-filesystems-file."""
     stanzas = []
     for line in lines:
         if line.startswith("*") or not line.strip():
@@ -581,7 +603,8 @@ def gen_mounts_by_file(file: str):
             gen_aix_filesystems_entries,
         ]:
             with suppress(IndexError, ValueError):
-                # mpypy error: misc: Incompatible types in "yield from" (actual type "object", expected type "Union[MountInfo, MountInfoOptions]
+                # mpypy error: misc: Incompatible types in "yield from" (actual type "object", expected type
+                # "Union[MountInfo, MountInfoOptions]
                 # only works if either
                 # * the list of functions excludes gen_aix_filesystems_entries
                 # * the list of functions only contains gen_aix_filesystems_entries
@@ -607,7 +630,8 @@ def get_sources(module: AnsibleModule) -> t.List[str]:
 
 
 def gen_mounts_by_source(module: AnsibleModule):
-    """Iterate over the sources and yield tuples containing the source, mount point, source line(s), and the parsed result."""
+    """Iterate over the sources and yield tuples containing the source, mount point, source line(s),
+    and the parsed result."""
     sources = get_sources(module)
 
     if len(set(sources)) < len(sources):
@@ -663,7 +687,8 @@ def get_mount_facts(module: AnsibleModule):
         fstype = fields["fstype"]
 
         # Convert UUIDs in Linux /etc/fstab to device paths
-        # TODO need similar for OpenBSD which lists UUIDS (without the UUID= prefix) in /etc/fstab, needs another approach though.
+        # TODO need similar for OpenBSD which lists UUIDS (without the UUID= prefix) in /etc/fstab, needs another
+        # approach though.
         uuid = None
         if device.startswith("UUID="):
             uuid = device.split("=", 1)[1]

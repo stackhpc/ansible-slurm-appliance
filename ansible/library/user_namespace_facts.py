@@ -4,14 +4,11 @@
 # Copyright: (c) 2020, Will Szumski <will@stackhpc.com>
 # GNU General Public License v3.0+ (see COPYING or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import absolute_import, division, print_function
 
 import csv
 import os
 
 from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
-
-__metaclass__ = type  # pylint: disable=invalid-name
 
 DOCUMENTATION = r"""
 ---
