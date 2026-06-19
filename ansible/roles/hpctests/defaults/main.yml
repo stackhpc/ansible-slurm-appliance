@@ -25,3 +25,28 @@ hpctests_hpl_arch: linux64
 # hpctests_partition:
 # hpctests_account:
 # hpctests_qos:
+# hpctests_nvidia_hpl_gres:
+hpctests_nvidia_hpl_image: nvcr.io/nvidia/hpc-benchmarks
+hpctests_nvidia_hpl_install_dir: "{{ hpctests_rootdir }}/nvidia-hpl"
+hpctests_nvidia_hpl_minutes: 20
+hpctests_nvidia_hpl_sif_file: "{{ hpctests_nvidia_hpl_install_dir }}/nvidia-hpc-benchmarks-{{ hpctests_nvidia_hpl_version }}.sif"
+hpctests_nvidia_hpl_test_loops: 1
+hpctests_nvidia_hpl_version: 25.02
+hpctests_nvidia_hpl_dat_matrix:
+  nvidia_h200:
+    1: HPL-H200-1GPU.dat
+    2: HPL-H200-2GPUs.dat
+    4: HPL-H200-4GPUs.dat
+  default:
+    1: HPL-1GPU.dat
+    2: HPL-2GPUs.dat
+    4: HPL-4GPUs.dat
+
+# Apptainer> less /workspace/hpl-linux-x86_64/sample-dat/HPL-
+# HPL-1024GPUs.dat      HPL-4GPUs.dat         HPL-B200-256GPUs.dat  HPL-GH-128GPUs.dat    HPL-GH-512GPUs.dat    HPL-H200-4GPUs.dat    HPL-OOC-4GPUs.dat     HPL-dgx-1N-4.dat
+# HPL-128GPUs.dat       HPL-512GPUs.dat       HPL-B200-2GPUs.dat    HPL-GH-16GPUs.dat     HPL-GH-64GPUs.dat     HPL-H200-8GPUs.dat    HPL-OOC-64GPUs.dat    HPL-dgx-1N.dat
+# HPL-16GPUs.dat        HPL-64GPUs.dat        HPL-B200-32GPUs.dat   HPL-GH-1GPU.dat       HPL-GH-8GPUs.dat      HPL-OOC-128GPUs.dat   HPL-OOC-8GPUs.dat     HPL-dgx-2N.dat
+# HPL-1GPU.dat          HPL-8GPUs.dat         HPL-B200-4GPUs.dat    HPL-GH-256GPUs.dat    HPL-H200-16GPUs.dat   HPL-OOC-16GPUs.dat    HPL-dgx-128N.dat      HPL-dgx-32N.dat
+# HPL-256GPUs.dat       HPL-B200-128GPUs.dat  HPL-B200-512GPUs.dat  HPL-GH-2GPUs.dat      HPL-H200-1GPU.dat     HPL-OOC-1GPU.dat      HPL-dgx-16N.dat       HPL-dgx-4N.dat
+# HPL-2GPUs.dat         HPL-B200-16GPUs.dat   HPL-B200-64GPUs.dat   HPL-GH-32GPUs.dat     HPL-H200-2GPUs.dat    HPL-OOC-2GPUs.dat     HPL-dgx-1N-1.dat      HPL-dgx-64N.dat
+# HPL-32GPUs.dat        HPL-B200-1GPU.dat     HPL-B200-8GPUs.dat    HPL-GH-4GPUs.dat      HPL-H200-32GPUs.dat   HPL-OOC-32GPUs.dat    HPL-dgx-1N-2.dat      HPL-dgx-8N.dat

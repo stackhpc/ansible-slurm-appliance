@@ -1,0 +1,30 @@
+#!/usr/bin/bash
+#SBATCH --nodes=1
+#SBATCH --output=%x.%a.out
+#SBATCH --error=%x.%a.out
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=40G
+#SBATCH --partition={{ hpctests_partition }}
+#SBATCH --time=00:30:00
+{%if hpctests_nodes is defined %}
+#SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}
+{% endif %}
+{%if hpctests_account is defined %}
+#SBATCH --account={{ hpctests_account }}
+{% endif %}
+{%if hpctests_qos is defined %}
+#SBATCH --qos={{ hpctests_qos }}
+{% endif %}
+
+set -e
+DOCKER_REF=docker://"{{ hpctests_nvidia_hpl_image }}:{{ hpctests_nvidia_hpl_version }}"
+echo "Downloading $DOCKER_REF to {{ hpctests_nvidia_hpl_sif_file }}..."
+{{ hpctests_pre_cmd }}
+if [ -e "$DEST_FILE" ]; then
+  rm "$DEST_FILE"
+fi
+mkdir -p "$(dirname "{{ hpctests_nvidia_hpl_sif_file }}")"
+apptainer pull --disable-cache=true "{{ hpctests_nvidia_hpl_sif_file }}" "$DOCKER_REF"
+ls -hl "{{ hpctests_nvidia_hpl_sif_file }}"
+# shellcheck gets confused about jinja templates
+#shellcheck disable=SC1056
