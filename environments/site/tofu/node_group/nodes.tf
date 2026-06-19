@@ -32,6 +32,16 @@ locals {
   }
 
   baremetal_az = var.availability_zone != null ? var.availability_zone : "nova"
+
+  trunks = {
+    for n in var.nodes :
+    n => var.use_trunk ? openstack_networking_trunk_v2.trunk : {}
+  }
+
+  trunk_subports = {
+    for n in var.nodes :
+    n => var.use_trunk ? openstack_networking_port_v2.trunk_subport : {}
+  }
 }
 
 resource "openstack_blockstorage_volume_v3" "compute" {
@@ -110,8 +120,8 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
   dynamic "network" {
     for_each = { for net in var.networks : net.network => net }
     content {
-      port           = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
-      access_network = network.key == var.networks[0].network
+      port           = var.use_trunk ? openstack_networking_trunk_v2.trunk["${each.key}"].port_id : openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
+      access_network = var.use_trunk ? true : network.key == var.networks[0].network
     }
   }
 
@@ -178,8 +188,8 @@ resource "openstack_compute_instance_v2" "compute" {
   dynamic "network" {
     for_each = { for net in var.networks : net.network => net }
     content {
-      port           = openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
-      access_network = network.key == var.networks[0].network
+      port           = var.use_trunk ? openstack_networking_trunk_v2.trunk["${each.key}"].port_id : openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
+      access_network = var.use_trunk ? true : network.key == var.networks[0].network
     }
   }
 
@@ -237,4 +247,12 @@ output "fqdns" {
 
 output "nodegroup_fips" {
   value = local.nodegroup_fips
+}
+
+output "trunk_subports" {
+  value = local.trunk_subports
+}
+
+output "trunks" {
+  value = local.trunks
 }
