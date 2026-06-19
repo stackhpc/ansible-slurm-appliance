@@ -22,7 +22,7 @@ echo "compute level: {{ hpctests_cuda_compute_level }}"
 rm -r gpu-burn
 git clone https://github.com/wilicc/gpu-burn.git
 cd gpu-burn
-git checkout 671f4be92477ce01cd9b536bc534a006dbee058f # latest commit in master at this time
+git checkout "{{ hpctests_gpuburn_version }}"
 make "COMPUTE={{ hpctests_cuda_compute_level }}"
 mkdir -p "{{ hpctests_gpuburn_install_dir }}"
 cp -a gpu_burn "{{ hpctests_gpuburn_install_dir }}/"

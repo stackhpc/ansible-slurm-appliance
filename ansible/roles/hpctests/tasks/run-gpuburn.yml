@@ -23,6 +23,29 @@
   ansible.builtin.debug:
     msg: "Will run --gres={{ hpctests_gpuburn_gres }}"
 
+- name: Compute node chunk size
+  ansible.builtin.set_fact:
+    hpctests_gpuburn_node_chunk_size: >-
+      {{ ((hpctests_computes.stdout_lines | length) * (hpctests_gpuburn_node_chunk_percent | int) / 100) | round(method="ceil") | int }}
+  when: hpctests_gpuburn_node_chunk_size is  not defined
+
+- name: Ensure node chunk size is not zero
+  ansible.builtin.assert:
+    that: hpctests_gpuburn_node_chunk_size | int > 0
+    fail_msg: >
+      Can't run gpuburn on node chunks of size 0.
+      Please change hpctests_gpuburn_node_chunk_percent or specify
+      hpctests_gpuburn_node_chunk_size directly
+
+- name: Compute node chunk count
+  ansible.builtin.set_fact:
+    hpctests_gpuburn_node_chunk_count: >-
+      {{ ((hpctests_computes.stdout_lines | length) / (hpctests_gpuburn_node_chunk_size | int)) | round(method="ceil") | int }}
+
+- name: Show node chunks
+  ansible.builtin.debug:
+    msg: "Will run gpuburn on {{ hpctests_gpuburn_node_chunk_count }} chunks of {{ hpctests_gpuburn_node_chunk_size }} nodes at a time"
+
 - name: Create sbatch script
   ansible.builtin.template:
     src: gpuburn.sh.j2
@@ -40,9 +63,10 @@
     chdir: "{{ hpctests_rootdir }}/gpuburn"
   register: hpctests_gpuburn_sbatch
   vars:
-    timeout_h: "{{ ((hpctests_gpuburn_minutes | int) // 60) }}"
-    timeout_m: "{{ ((hpctests_gpuburn_minutes | int) % 60) }}"
-  async: "{{ ((hpctests_gpuburn_minutes | int)+ 1) * 60 }}" # give async an extra minute after slurm
+    timeout_minutes: "{{ (hpctests_gpuburn_minutes | int) * (hpctests_gpuburn_node_chunk_count | int) }}"
+    timeout_h: "{{ ((timeout_minutes | int) // 60) }}"
+    timeout_m: "{{ ((timeout_minutes | int) % 60) }}"
+  async: "{{ ((timeout_minutes | int) + 1) * 60 }}" # give async an extra minute after slurm
   poll: 15  # check every 15 seconds
 
 - name: Extract results

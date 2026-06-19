@@ -43,6 +43,8 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 - `hpctests_cuda_compute_level`: Optional, default '8.0' which is good for A100 and newer. Cuda compute level used for gpuburn's compare kernel. Check <https://developer.nvidia.com/cuda/GPUs> for compatibility with target hardware.
 - `hpctests_gpuburn_gres`: Optional, all GPUs will be selected if absent. `srun --gres` option: needed on hosts with heterogeneous cards (incl. MIG). eg. `gpu:nvidia_h200=2gpu`
 - `hpctests_gpuburn_minutes`: Optional, default 20. Duration in minutes of gpuburn's GPU load.
+- `hpctests_gpuburn_node_chunk_percent`: Optional, default 10. Portion of all nodes to run gpuburn on at a time (by default, only run on 10% of the nodes at the time, rounded upward).
+- `hpctests_gpuburn_node_chunk_size`: Optional, default computed from hpctests_gpuburn_node_chunk_percent and hpctests_nodes and partition size. How many nodes to run gpuburn on at a time
 
 ---
 
