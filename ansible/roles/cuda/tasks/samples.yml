@@ -28,3 +28,32 @@
     cmd: . /etc/profile.d/sh.local && cmake .. && make -j {{ cuda_samples_build_concurrency }} && make install
     chdir: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build"
     creates: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}/build/bin"
+
+- name: Prepare output dir
+  ansible.builtin.tempfile:
+    path: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}"
+    prefix: "output-"
+    state: directory
+  register: cuda_samples_output_dir
+
+- name: Show output dir
+  ansible.builtin.debug:
+    msg: "cuda samples will output files to: {{ cuda_samples_output_dir.path }}"
+
+- name: Run cuda samples
+  ansible.builtin.command: >-
+    python3 ./run_tests.py
+      --config test_args.json
+      --dir build/bin
+      --output {{ cuda_samples_output_dir.path }}
+      --parallel {{ cuda_samples_run_tests_concurrency }}
+  args:
+    chdir: "{{ cuda_samples_path }}/cuda-samples-{{ cuda_version_short }}"
+  changed_when: true
+  register: cuda_samples_run
+
+- name: Show cuda samples output
+  ansible.builtin.debug:
+    msg: |
+      {{ cuda_samples_run.stderr }}
+      {{ cuda_samples_run.stdout }}
