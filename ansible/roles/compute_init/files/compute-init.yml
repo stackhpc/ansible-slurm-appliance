@@ -122,6 +122,10 @@
         name: journald
       when: enable_journald
 
+    - name: Run authorized_keys role
+      ansible.builtin.include_role:
+        name: authorized_keys
+
     - name: Run chrony role
       ansible.builtin.include_role:
         name: mrlesmithjr.chrony

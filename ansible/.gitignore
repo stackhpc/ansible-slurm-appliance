@@ -106,3 +106,5 @@ roles/*
 !roles/mounts/**
 !roles/opkssh/
 !roles/opkssh/**
+!roles/authorized_keys/
+!roles/authorized_keys/**

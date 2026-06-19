@@ -43,12 +43,15 @@ appliances_local_users_podman: # also used in environments/common/inventory/grou
   home: /var/lib/podman
   uid: "{{ appliances_local_users_podman_uid }}"
 
+appliances_local_users_ansible_user_authorized_keys: []
+
 appliances_local_users_default:
   - user:
       name: "{{ appliances_local_users_ansible_user_name }}"
       home: /var/lib/{{ appliances_local_users_ansible_user_name }}
       move_home: true
       local: true
+      authorized_keys: "{{ appliances_local_users_ansible_user_authorized_keys }}"
 
   - user: "{{ appliances_local_users_podman }}"
     enable: "{{ 'podman' in group_names }}"

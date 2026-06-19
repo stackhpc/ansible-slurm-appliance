@@ -50,7 +50,18 @@ without requiring LDAP etc. Features:
     nodes. Explicitly setting this defines the shell for all nodes and if the
     shared home directories are mounted on the control node will allow the
     user to log in to the control node.
-  - `public_key`: Optional, define a key to log into the cluster with.
+  - `authorized_keys`: Optional, list of mappings defining SSH public keys for
+    the user's authorized_keys file.
+    - `public_key`: Required, SSH public key string.
+    - `state`: Optional, one of `present` or `absent`. Default `present`.
+      Shorthand is also supported: list items may be plain strings, treated as
+      `public_key` with `state: present`.
+      For backwards compatibility this list is extended to include item.public_key
+      if that is set. It is preferred not to set public_key, but to include that
+      key in this list explicitly as item.public_key will be removed at some point
+      in the future.
+  - `public_key`: Deprecated: public key to add to authorized_keys. Please use
+    authorized_keys instead.
   - `sudo`: Optional, a (possibly multiline) string defining sudo rules for the
     user.
   - `ssh_key_type` defaults to `ed25519` instead of the `ansible.builtin.user`
@@ -76,11 +87,16 @@ None.
      - comment: Alice Aardvark
        name: alice
        uid: 2005
-       public_key: ssh-ed25519 ...
+       authorized_keys:
+         - ssh-ed25519 ... # shorthand for { public_key: ..., state: present }
+         - public_key: ssh-ed25519 ...
+           state: present
      - comment: Bob Badger
        name: bob
        uid: 2006
-       public_key: ssh-ed25519 ...
+       authorized_keys:
+         - public_key: ssh-ed25519 ...
+           state: present
        state: absent
    ```
 
@@ -101,7 +117,9 @@ None.
      - comment: Carol Crane
        name: carol
        uid: 2007
-       public_key: ssh-ed25519 ...
+       authorized_keys:
+         - public_key: ssh-ed25519 ...
+           state: present
    ```
 
 3. Using an external share which _does_ root squash, so home directories cannot be
@@ -116,7 +134,9 @@ None.
        create_home: false
        name: dan
        uuid: 2008
-       public_key: ssh-ed25519 ...
+       authorized_keys:
+         - public_key: ssh-ed25519 ...
+           state: present
    ```
 
 4. Using NFS exported from the control node, but mounted to all nodes (so that
@@ -132,5 +152,7 @@ None.
        groups:
          - adm # enables ssh to compute nodes even without a job running
        sudo: erin ALL=(ALL) NOPASSWD:ALL
-       public_key: ssh-ed25519 ...
+       authorized_keys:
+         - public_key: ssh-ed25519 ...
+           state: present
    ```
