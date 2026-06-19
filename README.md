@@ -142,7 +142,11 @@ To configure the appliance, ensure the venv and the environment are [activated](
 ansible-playbook ansible/site.yml
 ```
 
-Once it completes you can log in to the cluster using:
+To prevent nodes from being inadvertently changed or destroyed, this playbook
+locks the OpenStack instances. Any subsequent changes to instances (e.g. via
+OpenTofu) require running an unlocking playbook as described in [docs/operations.md#ad-hoc-commands-and-playbooks](docs/operations.md#ad-hoc-commands-and-playbooks).
+
+Once `site.yml` completes you can log in to the cluster using:
 
 ```shell
 ssh rocky@$login_ip
