@@ -131,6 +131,8 @@
   become: true
   gather_facts: true
   tags: finalise
+  vars:
+    appliances_fatimage_cleanup_dnf: false
   tasks:
     - name: Cleanup image
       ansible.builtin.import_tasks: cleanup.yml
