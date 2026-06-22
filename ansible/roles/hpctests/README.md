@@ -54,8 +54,7 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 > Values up to ~0.8 may be appropriate for a stress test but ensure cloud
 > operators are aware in case this overloads e.g. power supplies or cooling.
 > Values > 0.8 require longer runtimes and increase the risk of out-of-memory
-
-## errors without normally significantly increasing the stress on the node
+> errors without normally significantly increasing the stress on the node
 
 The following variables should not generally be changed:
 
