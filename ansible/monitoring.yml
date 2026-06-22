@@ -84,15 +84,23 @@
       # done during fatimage - can't do this in vars block as that is recursive
       ansible.builtin.set_fact:
         grafana_plugins: "{{ [] if appliances_mode == 'configure' else grafana_plugins }}"
-    - name: Copy Grafana plugins installed in image into persistent grafana state
-      ansible.builtin.copy:
-        remote_src: true
-        src: /var/lib/grafana/plugins/ # trailing / means copy contents
-        dest: "{{ grafana_data_dir }}/plugins/"
-        # below matches what already exists:
+    - name: Ensure Grafana state directory
+      ansible.builtin.file:
+        path: "{{ grafana_data_dir }}"
         owner: root
         group: root
         mode: '0755'
+        state: directory
+      become: true
+    - name: Copy Grafana plugins installed in image into persistent grafana state
+      ansible.posix.synchronize:
+        src: /var/lib/grafana/plugins/ # trailing / means copy contents
+        dest: "{{ grafana_data_dir }}/plugins"
+        delete: true
+        recursive: true
+      # Workaround for synchronize module running rsync from deploy host even if targetting remote host,
+      # breaking when using SSH bastion
+      delegate_to: "{{ inventory_hostname }}"
       become: true
     - ansible.builtin.include_role:
         name: cloudalchemy.grafana
