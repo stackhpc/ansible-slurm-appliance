@@ -52,4 +52,4 @@ collections:
   - name: prometheus.prometheus
     source: https://github.com/stackhpc/prometheus-community-ansible
     type: git
-    version: 0.28.0+stackhpc.1
+    version: ft/configurable-download-host
