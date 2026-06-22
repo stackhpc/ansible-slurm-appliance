@@ -25,3 +25,7 @@ hpctests_hpl_arch: linux64
 # hpctests_partition:
 # hpctests_account:
 # hpctests_qos:
+hpctests_cuda_compute_level: 8.0
+hpctests_gpuburn_node_chunk_percent: 10  # seems safe to run on 10% of the nodes by default
+hpctests_gpuburn_minutes: 1
+hpctests_gpuburn_version: "671f4be92477ce01cd9b536bc534a006dbee058f" # latest commit in master at this time

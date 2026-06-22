@@ -4,6 +4,12 @@
   register: _sinfo_partitions
   changed_when: false
 
+- name: Check given hpctests_partition
+  ansible.builtin.assert:
+    that: hpctests_partition in (_sinfo_partitions.stdout_lines | map('replace', '*', ''))
+    fail_msg: "Please check hpctests_partition: {{ hpctests_partition }} not in sinfo: {{ _sinfo_partitions.stdout_lines | join(' ') | replace('*', '')}}"
+  when: hpctests_partition is defined
+
 - name: Select default partition if hpctests_partition not given
   ansible.builtin.set_fact:
     hpctests_partition: "{{ (_sinfo_partitions.stdout_lines | select('contains', '*') | first)[:-1] }}"
