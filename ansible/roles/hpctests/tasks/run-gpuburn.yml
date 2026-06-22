@@ -63,9 +63,9 @@
     chdir: "{{ hpctests_rootdir }}/gpuburn"
   register: hpctests_gpuburn_sbatch
   vars:
-    timeout_minutes: "{{ (hpctests_gpuburn_minutes | int) * (hpctests_gpuburn_node_chunk_count | int) }}"
-    timeout_h: "{{ ((timeout_minutes | int) // 60) }}"
-    timeout_m: "{{ ((timeout_minutes | int) % 60) }}"
+    timeout_minutes: "{{ ((hpctests_gpuburn_minutes | int) + 0.6) * (hpctests_gpuburn_node_chunk_count | int) }}"  # It takes 30s after burn to kill the kernels
+    timeout_h: "{{ ((timeout_minutes | float) // 60) | int }}"
+    timeout_m: "{{ ((timeout_minutes | float) % 60) | int }}"
   async: "{{ ((timeout_minutes | int) + 1) * 60 }}" # give async an extra minute after slurm
   poll: 15  # check every 15 seconds
 
