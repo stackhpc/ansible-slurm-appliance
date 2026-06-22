@@ -235,11 +235,11 @@ dnf_repos_default:
   grafana:
     '8':
       pulp_path: grafana/oss/rpm
-      pulp_timestamp: 20260529T211032
+      pulp_timestamp: 20260605T210001
       repo_file: grafana
     '9':
       pulp_path: grafana/oss/rpm
-      pulp_timestamp: 20260529T211032
+      pulp_timestamp: 20260605T210001
       repo_file: grafana
   ondemand-web:
     '8':
