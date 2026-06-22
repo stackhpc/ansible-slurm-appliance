@@ -50,11 +50,21 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 
 **CAUTION**
 
-> The default of `hpctests_hpl_mem_frac=0.3` will not significantly load nodes.
+> **[hpl-solo]** The default of `hpctests_hpl_mem_frac=0.3` will not significantly load nodes.
 > Values up to ~0.8 may be appropriate for a stress test but ensure cloud
 > operators are aware in case this overloads e.g. power supplies or cooling.
 > Values > 0.8 require longer runtimes and increase the risk of out-of-memory
 > errors without normally significantly increasing the stress on the node
+
+**CAUTION**
+
+> **[gpuburn]** `gpuburn` will bring GPU power consumption to the maximum. On bigger cards, this amounts to _700W_
+> times _gpu count_ of power draw per node. The default duration of `hpctests_gpuburn_minutes=1` will keep it to only one minute,
+> which should be acceptable. Making it longer will more accurately simulate a longer training but will stress power
+> supply and cooling. Use `hpctests_gpuburn_gres` to only run on a subset of GPUs per node.
+> Also note that `hpctests_gpuburn_node_chunk_percent=10` will run gpuburn on only 10% of selected
+> nodes at a time. Bringing it to 100% to run on all nodes at once will not only stress a node, but the whole power
+> and cooling delivery for the rack(s). Please use with caution.
 
 The following variables should not generally be changed:
 
