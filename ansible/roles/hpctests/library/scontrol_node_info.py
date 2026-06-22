@@ -33,7 +33,7 @@ options
 requirements:
     - "python >= 3.6"
 author:
-    - Steve Brasier, StackHPC
+    - Eric Le Lay, StackHPC
 """
 
 EXAMPLES = """
@@ -64,7 +64,8 @@ def run_module():  # pylint: disable=missing-function-docstring
         if "gres" in node_info:
             gres = node_info["gres"]
             for g in gres.split(","):
-                if m := re.match(r"""^gpu:(.+):([0-9]+)\(S:[0-9]+\)$""", g):
+                m = re.match(r"""^gpu:(.+):([0-9]+)\(S:[0-9]+\)$""", g)
+                if m:
                     resource, cnt = m.group(1), m.group(2)
                     node_info["gpus"][resource] = int(cnt)
     result["info"] = info.get("nodes", [])
