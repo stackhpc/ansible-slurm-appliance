@@ -114,6 +114,38 @@
     - name: Install Xfce desktop
       ansible.builtin.dnf:
         name: "@Xfce"
+    - name: Install Slurm packages
+      ansible.builtin.dnf:
+        name:
+          # Generic
+          - mariadb-connector-c
+          - hwloc-libs
+          # Control
+          - ohpc-slurm-server
+          - slurm-slurmctld-ohpc
+          - slurm-example-configs-ohpc
+          # batch
+          - ohpc-base-compute
+          - ohpc-slurm-client
+          # runtime
+          - slurm-ohpc
+          - munge
+          - slurm-slurmd-ohpc
+          - slurm-example-configs-ohpc
+          - lmod-ohpc
+          # database
+          - slurm-slurmdbd-ohpc
+          # openhpc_packages
+          - slurm-libpmi-ohpc
+          # other packages
+          - mysql
+          # environments/common openhpc_packages
+          - slurm-libpmi-ohpc
+          - ohpc-gnu12-openmpi4-perf-tools
+          - openblas-gnu12-ohpc
+          - nhc-ohpc
+          - apptainer
+          - podman-compose
 
 - hosts: builder
   become: true
