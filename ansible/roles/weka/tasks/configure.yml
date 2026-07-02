@@ -1,0 +1,53 @@
+---
+- name: Ensure mount directories exist
+  ansible.builtin.file:
+    path: "{{ item.get('mount_point', weka_client_mnt_point) }}"
+    state: directory
+  loop: "{{ weka_mounts }}"
+
+- name: Install WEKA client
+  ansible.builtin.shell: "curl http://{{ item.get('servers', weka_servers) | first }}:14000/dist/v1/install | WEKA_CGROUPS_MODE={{ weka_cgroups_mode }} sh"
+  args:
+    creates: "/usr/bin/weka"
+  loop: "{{ weka_mounts }}"
+
+- name: Ensure WEKA agent is enabled and running
+  ansible.builtin.systemd:
+    name: weka-agent
+    enabled: true
+    state: started
+
+- name: Ensure WEKA does not modify cpusets
+  ansible.builtin.lineinfile:
+    path: "/etc/wekaio/service.conf"
+    regexp: "^isolate_cpusets="
+    line: isolate_cpusets=false
+  register: isolate_cpusets
+
+- name: Restart weka-agent
+  ansible.builtin.systemd:
+    name: weka-agent
+    state: restarted
+  when: isolate_cpusets.changed
+
+- name: Check if WEKA client container is already active
+  command: "weka local ps --format csv --no-header --output name,state"
+  check_mode: false
+  changed_when: false
+  register: weka_containers
+
+- name: Mount WEKA file systems
+  ansible.posix.mount:
+    path: "{{ item.get('mount_point', weka_client_mnt_point) }}"
+    src: "{{ item.get('servers', weka_servers) | join(',') }}{{ item.get('export', weka_export) }}"
+    opts: "{{ item['mount_options'] | default(weka_client_mnt_options, true) | default(omit, true) }}" # for some reason items.get() here fails with "an incorrect mount option was specified"
+    fstype: wekafs
+    # only mount if client is not running, but still update the fstab
+    state: >-
+      {% set desired_state = item.get('mount_state', weka_client_mnt_state) %}
+      {% if ('client,Running' in weka_containers.stdout_lines) and desired_state == 'mounted' %}
+      present
+      {% else %}
+      {{ desired_state }}
+      {% endif %}
+  loop: "{{ weka_mounts }}"
