@@ -77,3 +77,23 @@
         cmd: rmmod ip6_tunnel
       failed_when: false
       changed_when: true
+
+- name: Apply pedit COW (CVE-2026-46331) mitigation
+  hosts: mitigate_cve_2026_46331
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Prevent modules loading
+      ansible.builtin.copy:
+        dest: /etc/modprobe.d/cve_2026_46331.conf
+        owner: root
+        group: root
+        mode: u=rw,go=r
+        content: |
+          install act_pedit /bin/false
+    # below probably is not needed but is safer
+    - name: Unload modules
+      ansible.builtin.command:
+        cmd: rmmod act_pedit
+      failed_when: false
+      changed_when: true

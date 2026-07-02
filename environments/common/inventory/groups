@@ -241,3 +241,4 @@ doca
 [mitigate_dirtyfrag]
 [mitigate_ssh_keysign_pwn]
 [mitigate_cve_2026_43037]
+[mitigate_cve_2026_46331]
