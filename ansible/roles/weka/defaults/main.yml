@@ -12,7 +12,7 @@ weka_client_mount_net_options:
 weka_client_mount_timeout: 240
 weka_client_mount_systemd_options: "x-systemd.requires=weka-agent.service,x-systemd.mount-timeout={{ weka_client_mount_timeout }},_netdev"
 # to be set by site if necessary
-weka_client_mount_other_options:
+weka_client_mount_extra_options:
 
 # Can be overridden entirely, or following the proposed variables
 weka_client_mount_options: >-
@@ -21,7 +21,7 @@ weka_client_mount_options: >-
       ("traces_capacity_mb=" ~ (weka_client_traces_capacity_mb | string)),
       weka_client_mount_net_options,
       weka_client_mount_systemd_options,
-      weka_client_mount_other_options,
+      weka_client_mount_extra_options,
     ] | select() | join(",")
   }}
 
