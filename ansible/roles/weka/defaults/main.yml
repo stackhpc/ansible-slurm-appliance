@@ -1,0 +1,16 @@
+---
+# Path to mountpoint on weka clients
+weka_client_mnt_point: "/mnt"
+
+# weka client mount options
+weka_client_mnt_options:
+
+weka_client_mnt_state: mounted
+
+weka_mounts: []
+
+weka_cgroups_mode: "force_v2"
+
+weka_servers: []
+
+weka_export:
