@@ -20,7 +20,7 @@ dnf_repos_default:
   OpenHPC-updates:
     '8':
       pulp_path: OpenHPC/2/updates/EL_8
-      pulp_timestamp: 20260622T230143
+      pulp_timestamp: 20250512T003315
       repo_file: OpenHPC
     '9':
       pulp_path: OpenHPC/3/updates/EL_9
