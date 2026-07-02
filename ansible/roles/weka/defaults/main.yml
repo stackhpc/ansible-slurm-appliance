@@ -2,8 +2,29 @@
 # Path to mountpoint on weka clients
 weka_client_mnt_point: "/mnt"
 
-# weka client mount options
-weka_client_mnt_options:
+# Configuration for virtual machines using SR-IOV, only one core can be bound.
+# Applies to login nodes in production and to all nodes in dev.
+weka_client_mount_core_options: "core={{ ansible_processor_vcpus | int - 1 }}"
+weka_client_traces_capacity_mb: 512
+# Set to your network device, eg net=ib0
+weka_client_mount_net_options:
+
+weka_client_mount_timeout: 240
+weka_client_mount_systemd_options: "x-systemd.requires=weka-agent.service,x-systemd.mount-timeout={{ weka_client_mount_timeout }},_netdev"
+# to be set by site if necessary
+weka_client_mount_other_options:
+
+# Can be overridden entirely, or following the proposed variables
+weka_client_mount_options: >-
+  {{
+    [ weka_client_mount_core_options,
+      ("traces_capacity_mb=" ~ (weka_client_traces_capacity_mb | string)),
+      weka_client_mount_net_options,
+      weka_client_mount_systemd_options,
+      weka_client_mount_other_options,
+    ] | select() | join(",")
+  }}
+
 
 weka_client_mnt_state: mounted
 

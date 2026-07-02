@@ -39,6 +39,7 @@ It is a dict with following keys, all optional:
 - `mount_state`: mount state, eg. `"mounted"` (default `weka_client_mnt_state`).
   See `ansible.posix.mount` allowed values.
   If the weka container is already running, the filesystem will not be remounted but the fstab still modified.
+
 ### defaults
 
 Defaults can be set for `weka_mounts` options:
@@ -46,16 +47,30 @@ Defaults can be set for `weka_mounts` options:
 - `weka_export`: Optional str. Default for `export` in `weka_mounts`.
   Generally it's specified per filesystem.
 - `weka_servers`: Optional array (default `[]`). Default for `servers` in `weka_mounts`.
+- `weka_client_mnt_options`: Optional str. Default for `mount_options`.
+  If a single filesystem is mounted per client, `weka_client_mnt_options` is generally not overridden per filesystem.
 - `weka_client_mnt_point`: Optional str (default `"/mnt"`). Default for `mount_point` in `weka_mounts`.
   Generally it's specified per filesystem.
-- `weka_client_mnt_options`: Optional str. Default for `mount_options`.
-  If a single filesystem is mounted per client, `weka_client_mnt_options` is generally not overriden per filesystem.
 - `weka_client_mnt_state`: Optional str (default `"mounted"`). Default for `mount_state`.
   Generally it's kept at the default `"mounted"` value globally.
 
+`weka_client_mnt_options` has been structured to expose relevant options:
+
+- `weka_client_mount_core_options`: Optional str (default `"core=<last vCPU on the system>"`). Good default for VMs.
+  Specify one or more cores to allocate to WEKA, in the format `"core=N,core=M"`.
+- `weka_client_traces_capacity_mb`: Optional int (default `512`).
+  If unspecified, traces will almost fill the disk. 512 is the minimal value, in production, maybe 50GB is more reasonable to be useful in debugging.
+- `weka_client_mount_net_options`: Optional str (default empty).
+  The network device to use, eg for first infiniband card: `"net=ib0"`.
+- `weka_client_mount_timeout`: Optional int (default `240`). Value for the `x-systemd.mount-timeout` mount option.
+  Mounting a WEKA filesystem can take a couple minutes.
+- `weka_client_mount_systemd_options`: Optional str (default `"x-systemd.requires=weka-agent.service,x-systemd.mount-timeout={{ weka_client_mount_timeout }},_netdev"`).
+  systemd-related options for the mount, and `_netdev` marker.
+- `weka_client_mount_other_options`: Optional str (default empty). For additional options
+
 ## Interactions with Slurm (stackhpc.openhpc role)
 
-Both Slurm and the WEKA client make a very controlled use of CPU resources, so we must 
+Both Slurm and the WEKA client make a very controlled use of CPU resources, so we must
 ensure a good configuration to avoid them stepping on each other.
 
 This [WEKA documentation page](https://docs.weka.io/best-practice-guides/weka-and-slurm-integration/avoid-conflicting-cpu-allocations)
@@ -64,7 +79,6 @@ is an excellent reference on the subject. Here is a short summary from our exper
 The WEKA client creates one **slot** per CPU core (2 hyperthreads is hyperthreading is configured)
 and runs a polling loop per slot, which saturates the CPU core. There is an extra slot 0,
 that utilises about 25% of one CPU but is not pinned to any.
-
 
 Slurm should not allocate jobs on these CPUs, so we must them in the `CPUSpecList` key in `node_params` for the nodegroup in `openhpc_nodegroups`.
 We usually declare the allocated cores plus an extra one for (system + slot 0) use but you must confirm
