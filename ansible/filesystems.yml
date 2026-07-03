@@ -51,7 +51,7 @@
   tags:
     - weka
   tasks:
-    - include_role:
+    - ansible.builtin.include_role:
         name: weka
         # install is done at runtime
         tasks_from: configure.yml

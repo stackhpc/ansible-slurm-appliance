@@ -41,7 +41,7 @@ It is a dict with following keys, all optional:
   See `ansible.posix.mount` allowed values.
   If the weka container is already running, the filesystem will not be remounted but the fstab still modified.
 
-### defaults
+### Defaults
 
 Defaults can be set for `weka_mounts` options:
 
@@ -83,7 +83,7 @@ the same core. Other issues will be slurmd failing on startup due to `CPUSpecLis
 This [WEKA documentation page](https://docs.weka.io/best-practice-guides/weka-and-slurm-integration/avoid-conflicting-cpu-allocations)
 is an excellent reference on the subject. Here is a short summary from our experience.
 
-The WEKA client creates one slot per given CPU core (2 hyperthreads is hyperthreading is configured)
+The WEKA client creates one slot per given CPU core (2 hyperthreads if hyperthreading is configured)
 and runs a polling loop per slot, which saturates the CPU core. There is an extra slot 0,
 that utilises about 25% of one CPU but is not pinned to any.
 
