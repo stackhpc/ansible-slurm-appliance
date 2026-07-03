@@ -237,6 +237,9 @@ doca
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
 
+[weka]
+# Hosts to install and mount WEKA filesystems on
+
 ## Vulnerability mitigation groups
 [mitigate_dirtyfrag]
 [mitigate_ssh_keysign_pwn]
