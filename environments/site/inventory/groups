@@ -217,6 +217,9 @@ compute
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
 
+[weka]
+# Hosts to install and mount WEKA filesystems on
+
 ## Vulnerability mitigation groups
 [mitigate_dirtyfrag:children]
 builder

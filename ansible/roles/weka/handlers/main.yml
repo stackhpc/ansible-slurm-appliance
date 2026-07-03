@@ -1,0 +1,5 @@
+---
+- name: Restart weka-agent
+  ansible.builtin.systemd:
+    name: weka-agent
+    state: restarted
