@@ -1,0 +1,19 @@
+---
+- name: Make root directory
+  ansible.builtin.file:
+    path: "{{ hpctests_rootdir }}/gpuburn"
+    state: directory
+    mode: "0755"
+
+- name: Create build job script
+  ansible.builtin.template:
+    src: "gpuburn-build.sh.j2"
+    dest: "{{ hpctests_rootdir }}/gpuburn/gpuburn-build-{{ hpctests_hpl_arch }}.sh"
+    mode: "0644"
+
+- name: Build gpuburn executable
+  ansible.builtin.command:
+    cmd: "sbatch --wait gpuburn-build-{{ hpctests_hpl_arch }}.sh"
+    chdir: "{{ hpctests_rootdir }}/gpuburn"
+    # Also creates the compare.ptx file, specific to given hpctests_cuda_compute_level
+    creates: "{{ hpctests_gpuburn_install_dir }}/gpu_burn"
