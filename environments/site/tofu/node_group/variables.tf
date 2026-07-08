@@ -65,7 +65,7 @@ variable "extra_volumes" {
         EOF
   type = map(
     object({
-      size        = number
+      size        = optional(number)
       volume_type = optional(string)
     })
   )

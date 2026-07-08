@@ -29,6 +29,7 @@ ${cluster_name}_${group_name}:
             networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
             node_fqdn: ${login_groups[group_name]["fqdns"][nodename]}
             node_fip: ${login_groups[group_name]["nodegroup_fips"][nodename]}
+            volumes: ${jsonencode(try(login_groups[group_name]["volumes"][nodename], {}))}
 %{ endfor ~}
 
 ${group_name}:
@@ -53,6 +54,7 @@ ${cluster_name}_${group_name}:
             instance_id: ${ node.id }
             networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
             node_fqdn: ${compute_groups[group_name]["fqdns"][nodename]}
+            volumes: ${jsonencode(try(compute_groups[group_name]["volumes"][nodename], {}))}
 %{ endfor ~}
     vars:
         # NB: this is the target image, not necessarily what is provisioned
