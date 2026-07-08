@@ -227,7 +227,7 @@ jobs:
           . environments/.stackhpc/activate
           ansible all -m wait_for_connection
           ansible-playbook ansible/adhoc/generate-passwords.yml
-          ansible-playbook -v ansible/site.yml
+          ansible-playbook -vv ansible/site.yml
           ansible-playbook -v ansible/ci/check_slurm.yml
 
       - name: Reimage compute nodes to image in current branch using slurm
