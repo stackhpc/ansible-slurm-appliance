@@ -37,3 +37,29 @@
     - hpl-solo
   block:
     - ansible.builtin.include_tasks: hpl-solo.yml
+
+- name: Fetch nvidia-hpl
+  become: true
+  become_user: "{{ hpctests_user }}"
+  tags:
+    - nvidia-hpl
+    - hpctests-gpu
+  block:
+    - ansible.builtin.include_tasks: fetch-nvidia-hpl.yml
+
+- name: Prepare nvidia-hpl
+  become: true
+  tags:
+    - nvidia-hpl
+    - hpctests-gpu
+  block:
+    - ansible.builtin.include_tasks: prepare-nvidia-hpl.yml
+
+- name: Run nvidia-hpl on individual nodes
+  become: true
+  become_user: "{{ hpctests_user }}"
+  tags:
+    - nvidia-hpl
+    - hpctests-gpu
+  block:
+    - ansible.builtin.include_tasks: run-nvidia-hpl.yml
