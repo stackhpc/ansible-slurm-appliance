@@ -323,7 +323,7 @@ ignore:
     package:
       location: /usr/sbin/ondemand-dex
 
-# CVE-2026-39834/GO-2026-5020: ssh doens't make progress for data > 4GB in single write call
+# CVE-2026-39834/GO-2026-5020: ssh doesn't make progress for data > 4GB in single write call
 # Ignore: Not using ssh
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
@@ -361,6 +361,43 @@ ignore:
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
       location: /usr/sbin/ondemand-dex
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/bin/apptainer
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/node_exporter
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/promtool
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/sbin/ondemand-dex-session
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/libexec/apptainer/bin/starter
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/libexec/apptainer/bin/gocryptfs
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/alertmanager
+  - vulnerability: GO-2026-5020
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/amtool
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/local/bin/prometheus
+  - vulnerability: GO-2026-5020
+    package:
+      location: /usr/sbin/ondemand-dex
+
 
 # CVE-2026-39821: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna
 # govulncheck -mode=binary found no issue:
@@ -539,42 +576,42 @@ ignore:
     package:
       location: /usr/sbin/ondemand-dex
 
-# CVE-2026-39831: Invoking bypass of FIDO/U2F security keys physical interaction in golang.org/x/crypto/ssh
+# CVE-2026-39831/GO-2026-5019: Invoking bypass of FIDO/U2F security keys physical interaction in golang.org/x/crypto/ssh
 # Ignore: not using ssh
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/bin/apptainer
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/local/bin/node_exporter
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/share/grafana/bin/grafana
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/local/bin/promtool
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/sbin/ondemand-dex-session
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/libexec/apptainer/bin/starter
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/libexec/apptainer/bin/gocryptfs
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/local/bin/alertmanager
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/local/bin/amtool
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/local/bin/prometheus
-  - vulnerability: GO-2026-5019
+  - vulnerability: GHSA-89gr-r52h-f8rx
     package:
       location: /usr/sbin/ondemand-dex
 
