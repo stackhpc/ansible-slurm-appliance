@@ -105,9 +105,6 @@ ohpc_default_extra_repos:
 # configure slurm database pre-upgrade backups:
 openhpc_slurm_accounting_storage_service: mysql
 openhpc_slurm_accounting_storage_backup_cmd: >-
-  echo $HOSTNAME &&
-  which openstack &&
-  echo $PATH &&
   openstack volume snapshot create
   --volume {{ openhpc_cluster_name }}-state
   --force
