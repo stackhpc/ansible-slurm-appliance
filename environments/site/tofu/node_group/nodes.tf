@@ -9,8 +9,8 @@ locals {
   # this is a mapping with
   # keys "compute-0-vol-a", "compute-0-vol-b" ...
   # values which are a mapping e.g. {"node"="compute-0", "volume"="vol-a"}
-  all_compute_volume_ids = {for k, v in local.all_compute_volumes: k => try(openstack_blockstorage_volume_v3.compute[k].id, data.openstack_blockstorage_volume_v3.compute[k].id) }
-  
+  all_compute_volume_ids = { for k, v in local.all_compute_volumes : k => try(openstack_blockstorage_volume_v3.compute[k].id, data.openstack_blockstorage_volume_v3.compute[k].id) }
+
 
   # Workaround for lifecycle meta-argument only taking static values
   compute_instances = var.ignore_image_changes ? openstack_compute_instance_v2.compute_fixed_image : openstack_compute_instance_v2.compute
@@ -37,13 +37,13 @@ locals {
 }
 
 data "openstack_blockstorage_volume_v3" "compute" {
-  for_each = {for k, v in local.all_compute_volumes: k => v if var.extra_volumes[v.volume].size == null}
-  name        = "${var.cluster_name}-${each.key}"
+  for_each = { for k, v in local.all_compute_volumes : k => v if var.extra_volumes[v.volume].size == null }
+  name     = "${var.cluster_name}-${each.key}"
 }
 
 resource "openstack_blockstorage_volume_v3" "compute" {
 
-  for_each = {for k, v in local.all_compute_volumes: k => v if var.extra_volumes[v.volume].size != null}
+  for_each = { for k, v in local.all_compute_volumes : k => v if var.extra_volumes[v.volume].size != null }
 
   name        = "${var.cluster_name}-${each.key}"
   description = "Compute node ${each.value.node} volume ${each.value.volume}"
@@ -247,5 +247,5 @@ output "nodegroup_fips" {
 }
 
 output "volumes" {
-  value = {for nn in var.nodes: nn => {for vn, vv in var.extra_volumes: vn => local.all_compute_volume_ids["${nn}-${vn}"]}}
+  value = { for nn in var.nodes : nn => { for vn, vv in var.extra_volumes : vn => local.all_compute_volume_ids["${nn}-${vn}"] } }
 }
