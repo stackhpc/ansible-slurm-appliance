@@ -167,6 +167,12 @@ variable "image_name_version" {
   default = "auto"
 }
 
+variable "playbook" {
+  type = string
+  description = "Playbook to use by the ansible provisionner"
+  default = "fatimage.yml"
+}
+
 source "openstack" "openhpc" {
   # Build VM:
   flavor = var.flavor
@@ -214,7 +220,7 @@ build {
   }
 
   provisioner "ansible" {
-    playbook_file = "${var.repo_root}/ansible/fatimage.yml"
+    playbook_file = "${var.repo_root}/ansible/${var.playbook}"
     groups = concat(["builder"], var.inventory_groups == "" ? [] : split(",", var.inventory_groups))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting
