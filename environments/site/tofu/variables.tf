@@ -65,12 +65,15 @@ variable "login" {
       vnic_types: Overrides variable vnic_types
       volume_backed_instances: Overrides variable volume_backed_instances
       root_volume_size: Overrides variable root_volume_size
-      extra_volumes: Mapping defining additional volumes to create and attach
-                     Keys are unique volume name.
-                     Values are a mapping with:
-                          size: Size of volume in GB
-                          volume_type: Optional. Type of volume, or cloud default
-                     **NB**: The order in /dev is not guaranteed to match the mapping
+      extra_volumes: Mapping defining additional volumes. Keys are a unique volume
+                     name. Values are a mapping with:
+                      - size: Optional. Size of volume to create in GB.
+                      - volume_type: Optional. Type of volume, or cloud default.
+                     If size is not given then a volume `cluster_name-node-volume_key`
+                     must already exist, where `node` is an entry in this group's
+                     `nodes` parameter. Such volumes will not be managed by the
+                     appliance.
+                     **NB**: The order in /dev is not guaranteed to match the mapping.
       fip_addresses: List of addresses of floating IPs to associate with
                      nodes, in the same order as nodes parameter. The
                      floating IPs must already be allocated to the project.
@@ -136,12 +139,15 @@ variable "compute" {
       ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
       volume_backed_instances: Overrides variable volume_backed_instances
       root_volume_size: Overrides variable root_volume_size
-      extra_volumes: Mapping defining additional volumes to create and attach
-                     Keys are unique volume name.
-                     Values are a mapping with:
-                          size: Size of volume in GB
-                          volume_type: Optional. Type of volume, or cloud default
-                     **NB**: The order in /dev is not guaranteed to match the mapping
+      extra_volumes: Mapping defining additional volumes. Keys are a unique volume
+                     name. Values are a mapping with:
+                      - size: Optional. Size of volume to create in GB.
+                      - volume_type: Optional. Type of volume, or cloud default.
+                     If size is not given then a volume `cluster_name-node-volume_key`
+                     must already exist, where `node` is an entry in this group's
+                     `nodes` parameter. Such volumes will not be managed by the
+                     appliance.
+                     **NB**: The order in /dev is not guaranteed to match the mapping.
       ip_addresses: Mapping of list of fixed IP addresses for nodes, keyed
                     by network name, in same order as nodes parameter.
                     For any networks not specified here the cloud will
