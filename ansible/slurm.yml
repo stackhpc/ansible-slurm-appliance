@@ -84,10 +84,6 @@
     - ansible.builtin.include_role:
         name: stackhpc.openhpc
         tasks_from: "{{ 'runtime.yml' if appliances_mode == 'configure' else 'main.yml' }}"
-      vars:
-        # We used python3.9 to install a recent pymysql version, with fixed SQL injection vulnerability
-        # It is needed in the stackhpc.openhpc/tasks/upgrade.yml
-        ansible_python_interpreter: /usr/bin/python3.9
 
     - name: Flush handler
       ansible.builtin.meta: flush_handlers # get fresh ansible_local.slurm facts
