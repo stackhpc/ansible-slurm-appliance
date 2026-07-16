@@ -73,6 +73,6 @@
   # base image may be newer than snapshots or vice versa. This can lead to
   # dependency hell.
   ansible.builtin.command:
-    cmd: dnf distro-sync -y
+    cmd: dnf distro-sync -y --allowerasing
   register: distro_sync_result
   changed_when: "'Nothing to do' not in distro_sync_result.stdout"
