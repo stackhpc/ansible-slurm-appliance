@@ -76,9 +76,9 @@
     - ansible_facts['distribution_major_version'] == "8"
     - "'builder' in group_names"
 
-- name: Reset Perl module on Rocky 8 (workaround for conflicting module streams)
+- name: Switch to Perl 5.24 module on Rocky 8 (workaround for conflicting module streams)
   ansible.builtin.command:
-    cmd: dnf module reset perl -y
+    cmd: dnf module enable perl:5.24 -y
   changed_when: false
   # NOTE: This can be dropped when the base image is bumped to a version with consistent
   #       Perl module streams, but currently a newer base image does not exist.
