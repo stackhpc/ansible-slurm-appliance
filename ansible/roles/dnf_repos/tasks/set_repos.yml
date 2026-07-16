@@ -67,3 +67,12 @@
     repo_values: "{{ item.value.get(repo_os, {}) }}"
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
+
+- name: Sync all packages to repo versions (distro-sync)
+  # NOTE(wszumski): Sync all packages after configuring repos as packages in
+  # base image may be newer than snapshots or vice versa. This can lead to
+  # dependency hell.
+  ansible.builtin.command:
+    cmd: dnf distro-sync -y
+  register: distro_sync_result
+  changed_when: "'Nothing to do' not in distro_sync_result.stdout"
