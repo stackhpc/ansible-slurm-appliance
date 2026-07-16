@@ -68,6 +68,14 @@
     repo_name: "{{ repo_values.repo_name | default(item.key) }}"
     repo_content_url: "{{ repo_values.pulp_content_url | default(dnf_repos_pulp_content_url) }}"
 
+- name: Disable all Perl module streams on Rocky 8
+  ansible.builtin.command:
+    cmd: dnf module disable perl -y
+  changed_when: false
+  when:
+    - ansible_facts['distribution_major_version'] == "8"
+    - "'builder' in group_names"
+
 - name: Reset Perl module on Rocky 8 (workaround for conflicting module streams)
   ansible.builtin.command:
     cmd: dnf module reset perl -y
@@ -76,6 +84,7 @@
   #       Perl module streams, but currently a newer base image does not exist.
   when:
     - ansible_facts['distribution_major_version'] == "8"
+    - "'builder' in group_names"
 
 - name: Sync all packages to repo versions (distro-sync)
   # NOTE(wszumski): Sync all packages after configuring repos as packages in
@@ -85,3 +94,5 @@
     cmd: dnf distro-sync -y --allowerasing
   register: distro_sync_result
   changed_when: "'Nothing to do' not in distro_sync_result.stdout"
+  when:
+    - "'builder' in group_names"
