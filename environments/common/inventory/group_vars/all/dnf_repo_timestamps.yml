@@ -89,7 +89,7 @@ dnf_repos_default:
   baseos:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/x86_64/os
-      pulp_timestamp: 20260714T215346
+      pulp_timestamp: 20260716T213030
       repo_file: Rocky-BaseOS
     '9.4':
       pulp_path: rocky/9.4/BaseOS/x86_64/os
@@ -114,7 +114,7 @@ dnf_repos_default:
   baseos-source:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/source/tree
-      pulp_timestamp: 20260714T211343
+      pulp_timestamp: 20260715T211522
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/BaseOS/source/tree

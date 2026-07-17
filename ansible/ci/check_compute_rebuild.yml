@@ -1,3 +1,13 @@
+- hosts: control
+  gather_facts: true
+  become: false
+  tasks:
+    - name: Set localhost fact for appliance image version
+      ansible.builtin.set_fact:
+        appliance_image_label: "RL{{ ansible_distribution_major_version }}"
+      delegate_to: localhost
+      delegate_facts: true
+
 - hosts: localhost
   become: false
   gather_facts: false
@@ -17,12 +27,19 @@
         chdir: "{{ appliances_repository_root }}"
       changed_when: true
 
-    - name: Check if current branch image differs from last release
+    - name: Get cluster image file contents at latest release
       ansible.builtin.command: # noqa: command-instead-of-module
-        cmd: "git diff {{ ci_latest_release_tag }} -- environments/.stackhpc/tofu/cluster_image.auto.tfvars.json"
-        chdir: "{{ appliances_repository_root }}"
-      changed_when: true
-      register: ci_diff_cluster_images
+        cmd: "git show {{ ci_latest_release_tag }}:environments/.stackhpc/tofu/cluster_image.auto.tfvars.json"
+      register: git_show_cluster_image
+      changed_when: false
+
+    - name: Check if current branch image differs from last release
+      ansible.builtin.set_fact:
+        ci_cluster_image_updated: "{{ latest_release_image != current_image }}"
+      vars:
+        latest_release_image: "{{ (git_show_cluster_image.stdout | from_json).cluster_image[appliance_image_label] }}"
+        current_image: "{{ (lookup('file', cluster_image_file_abspath) | from_json).cluster_image[appliance_image_label] }}"
+        cluster_image_file_abspath: "{{ appliances_repository_root }}/environments/.stackhpc/tofu/cluster_image.auto.tfvars.json"
 
 - ansible.builtin.import_playbook: ../adhoc/rebuild-status.yml
 
@@ -44,7 +61,7 @@
       ansible.builtin.assert:
         that: rebuild_status.rebuild_count == 1
         fail_msg: "Expected 1 rebuild, found {{ rebuild_status.rebuild_count }}"
-      when: hostvars['localhost'].ci_diff_cluster_images.stdout != ''
+      when: hostvars['localhost'].ci_cluster_image_updated
 
     - name: Check uptime shows rebuild or reboot occurred
       ansible.builtin.assert:
