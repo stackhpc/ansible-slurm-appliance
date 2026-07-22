@@ -1,0 +1,62 @@
+---
+- name: Check mount directories
+  ansible.builtin.stat:
+    path: "{{ item.get('mount_point', weka_client_mnt_point) }}"
+  register: _weka_mounts_mountpoints
+  loop: "{{ weka_mounts }}"
+
+- name: Ensure mount directories exist
+  ansible.builtin.file:
+    path: "{{ stat_result.item.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ _weka_mounts_mountpoints.results | default([]) }}"
+  loop_control:
+    loop_var: stat_result
+  # Only run when mountpoint is missing, to avoid resetting owner/mode on mounted directories
+  when: not stat_result.stat.exists
+
+- name: Install WEKA client
+  ansible.builtin.shell: |  # noqa: command-instead-of-module
+    set -o pipefail
+    curl http://{{ item.get('servers', weka_servers) | first }}:14000/dist/v1/install | WEKA_CGROUPS_MODE={{ weka_cgroups_mode }} sh
+  args:
+    creates: "/usr/bin/weka"
+  loop: "{{ weka_mounts }}"
+
+- name: Ensure WEKA agent is enabled and running
+  ansible.builtin.systemd:
+    name: weka-agent
+    enabled: true
+    state: started
+
+- name: Ensure WEKA does not modify cpusets
+  ansible.builtin.lineinfile:
+    path: "/etc/wekaio/service.conf"
+    regexp: "^isolate_cpusets="
+    line: isolate_cpusets=false
+  notify: Restart weka-agent
+
+- name: Check if WEKA client container is already active
+  ansible.builtin.command: "weka local ps --format csv --no-header --output name,state"
+  check_mode: false
+  changed_when: false
+  register: weka_containers
+
+- name: Mount WEKA file systems
+  ansible.posix.mount:
+    path: "{{ item.get('mount_point', weka_client_mnt_point) }}"
+    src: "{{ item.get('servers', weka_servers) | join(',') }}{{ item.get('export', weka_export) }}"
+    opts: "{{ item['mount_options'] | default(weka_client_mnt_options, true) | default(omit, true) }}" # for some reason items.get() here fails with "an incorrect mount option was specified"
+    fstype: wekafs
+    # only mount if client is not running, but still update the fstab
+    state: >-
+      {% set desired_state = item.get('mount_state', weka_client_mnt_state) %}
+      {% if ('client,Running' in weka_containers.stdout_lines) and desired_state == 'mounted' %}
+      present
+      {% else %}
+      {{ desired_state }}
+      {% endif %}
+  loop: "{{ weka_mounts }}"
