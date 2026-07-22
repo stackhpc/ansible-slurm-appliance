@@ -220,8 +220,6 @@ compute
 ## Vulnerability mitigation groups
 [mitigate_dirtyfrag:children]
 builder
-[mitigate_ssh_keysign_pwn:children]
-builder
 [mitigate_cve_2026_43037:children]
 builder
 [mitigate_cve_2026_46331:children]

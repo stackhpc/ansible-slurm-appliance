@@ -24,40 +24,6 @@
         cmd: echo 3 > /proc/sys/vm/drop_caches
       changed_when: true
 
-- name: Apply ssh-keysign-pwn mitigation
-  hosts: mitigate_ssh_keysign_pwn
-  become: true
-  gather_facts: false
-  tasks:
-    # See https://docs.kernel.org/admin-guide/LSM/Yama.html for explanation
-    # Implementation note: we've decided to not use ansible.posix.sysctl for
-    # this one because we wanted to show the command to run manually if need be
-    # and also wanted to have a comment in the generated sysctl.d file.
-    - name: Apply ssh-keysign-pwn mitigation to live system
-      ansible.builtin.command: sysctl kernel.yama.ptrace_scope=2
-      changed_when: true
-    - name: Get current ptrace_scope value
-      ansible.builtin.slurp:
-        src: /proc/sys/kernel/yama/ptrace_scope
-      check_mode: false
-      changed_when: false
-      register: ptrace_scope
-    - name: Show ptrace_scope after fix
-      ansible.builtin.debug:
-        msg: "/proc/sys/kernel/yama/ptrace_scope={{ ptrace_scope.content|b64decode }}"
-    - name: Prepare sysctl.d file to apply mitigation upon reboot
-      ansible.builtin.copy:
-        # beware: /usr/lib/sysctl.d/10-default-yama-scope.conf will set it to 0
-        # so filename prefix needs to be greater than 10.
-        dest: /etc/sysctl.d/99-prevent-ptrace_scope.conf
-        content: |
-          # this is a mitigation for ssh-keysign-pwn
-          # See https://seclists.org/oss-sec/2026/q2/529 for the announcement
-          kernel.yama.ptrace_scope=2
-        owner: root
-        group: root
-        mode: "0644"
-
 - name: Apply CVE-2026-43037 mitigation
   hosts: mitigate_cve_2026_43037
   gather_facts: false
