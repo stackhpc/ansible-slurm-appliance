@@ -1,0 +1,18 @@
+---
+- name: Check all hosts are on the same kernel
+  hosts: cluster
+  gather_facts: true
+  tasks:
+    - name: Check all hosts are running the same kernel
+      run_once: true
+      vars:
+        kernel_summary: >-
+          {% set result = {} %}
+          {% for host in ansible_play_hosts %}
+            {% set k = hostvars[host]['ansible_kernel'] | default('Unknown') %}
+            {% set _ = result.update({k: (result[k] | default([])) + [host]}) %}
+          {% endfor %}
+          {{ result }}
+      ansible.builtin.debug:
+        msg: "{{ (kernel_summary | from_yaml) | to_nice_yaml }}"
+      failed_when: (kernel_summary | from_yaml).keys() | length != 1

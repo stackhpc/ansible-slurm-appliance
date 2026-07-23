@@ -1,0 +1,87 @@
+---
+# TODO: to hide Ark creds, we could override dnf_repos_password
+# with $arkpassword and create an /etc/dnf/vars/arkpassword file
+
+- name: Enable Ark repos
+  hosts: cluster
+  become: true
+  tasks:
+    # Not reusing dnf_repos tooling because it assumes you're upgrading to a snaphost
+    # within the same minor version
+    - name: Enable repos
+      ansible.builtin.yum_repository:
+        file: "{{ item.repo_file }}"
+        name: "{{ item.repo_name }}"
+        baseurl: "{{ appliances_pulp_url }}/pulp/content/{{ item.subpath }}/{{ item.timestamp }}"
+        description: "{{ item.repo_name }}"
+        username: "{{ dnf_repos_username | default(omit) }}"
+        password: "{{ dnf_repos_password | default(omit) }}"
+        gpgcheck: "{{ not patch_cves_insecure_disable_gpg_check | default(true) }}"
+      loop: "{{ patch_cves_repos }}"
+
+- name: Sync local Pulp server if enabled
+  hosts: localhost # Supporting legacy pulp config before pulp_server group existed
+  tasks:
+    - name: Sync pulp
+      ansible.builtin.include_role:
+        name: pulp_site
+        tasks_from: sync.yml
+        # See above on supporting legacy config
+        apply:
+          delegate_to: "{{ groups['pulp_server'][0] if ('pulp_server' in groups and groups['pulp_server'] | length > 0) else 'localhost' }}"
+      vars:
+        _pulp_site_rpm_info:
+            # TODO would need to ensure rocky 8 and 9 snippets are communicated separately (or include in same list and prefix)
+          - pulp_repo_name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
+            pulp_path: "{{ repo.subpath }}"
+            pulp_timestamp: "{{ repo.timestamp }}"
+        # Legacy
+        pulp_site_rpm_info:
+          - name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
+            subpath: "{{ repo.subpath }}/{{ repo.timestamp }}"
+      loop: "{{ patch_cves_repos }}"
+      loop_control:
+        loop_var: repo
+      # See above on supporting legacy config
+      when: "{{
+          ('pulp_server' in groups and groups['pulp_server'] | length > 0)
+          or (pulp_site_upstream_password is defined and pulp_site_upstream_password | length > 0)
+        }}"
+
+- name: Enable Ark repos
+  hosts: cluster
+  become: true
+  tasks:
+    - name: Install packages
+      ansible.builtin.dnf:
+        name: "{{ patch_cves_packages }}"
+        state: latest
+    - name: Disable repos
+      ansible.builtin.yum_repository:
+        file: "{{ item.repo_file }}"
+        name: "{{ item.repo_name }}"
+        baseurl: "{{ appliances_pulp_url }}/pulp/content/{{ item.subpath }}/{{ item.timestamp }}"
+        description: "{{ item.repo_name }}"
+        gpgcheck: "{{ not patch_cves_insecure_disable_gpg_check | default(true) }}"
+        enabled: false
+      when: not dnf_repos_enabled | default(false) | bool
+      loop: "{{ patch_cves_repos }}"
+
+    - name: Check if reboot required
+      ansible.builtin.command:
+        cmd: needs-restarting -r
+      failed_when: false
+      register: _patch_cves_needs_reboot
+      changed_when: false
+
+- name: Submit reboot job
+  hosts: control[0]
+  become: true
+  tasks:
+    - name: Submit reboot job
+      ansible.builtin.command:
+        cmd: scontrol reboot ASAP nextstate=RESUME reason="maintenance" ALL
+      when: _patch_cves_needs_reboot.rc != 0
+      changed_when: true
+
+# TODO best way to update timestamps in version control
