@@ -20,21 +20,33 @@
       loop: "{{ patch_cves_repos }}"
 
 - name: Sync local Pulp server if enabled
-  hosts: pulp_server # TODO: support appliances before this was defined?, maybe call adhoc/sync-pulp.yml
+  hosts: localhost # Supporting legacy pulp config before pulp_server group existed
   tasks:
     - name: Sync pulp
       ansible.builtin.include_role:
         name: pulp_site
         tasks_from: sync.yml
+        # See above on supporting legacy config
+        apply:
+          delegate_to: "{{ groups['pulp_server'][0] if ('pulp_server' in groups and groups['pulp_server'] | length > 0) else 'localhost' }}"
       vars:
         _pulp_site_rpm_info:
             # TODO would need to ensure rocky 8 and 9 snippets are communicated separately (or include in same list and prefix)
           - pulp_repo_name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
             pulp_path: "{{ repo.subpath }}"
             pulp_timestamp: "{{ repo.timestamp }}"
+        # Legacy
+        pulp_site_rpm_info:
+          - name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
+            subpath: "{{ repo.subpath }}/{{ repo.timestamp }}"
       loop: "{{ patch_cves_repos }}"
       loop_control:
         loop_var: repo
+      # See above on supporting legacy config
+      when: "{{
+          ('pulp_server' in groups and groups['pulp_server'] | length > 0)
+          or (pulp_site_upstream_password is defined and pulp_site_upstream_password | length > 0)
+        }}"
 
 - name: Enable Ark repos
   hosts: cluster
