@@ -645,6 +645,12 @@ ignore:
   - vulnerability: CVE-2026-43037
     package:
       location: /var/lib/rpm/Packages
+  # CVE-2026-59873 Node.js tar tool in JupyterLab allowing zip bombs
+  # https://access.redhat.com/security/cve/cve-2026-59873
+  # FIXME: Prioritising releasing kernels for CVE-2026-64600
+  - vulnerability: GHSA-23hp-3jrh-7fpw
+    package:
+      location: /opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
