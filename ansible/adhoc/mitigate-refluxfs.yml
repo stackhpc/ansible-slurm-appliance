@@ -1,0 +1,54 @@
+---
+- name: Mitigate RefluXFS
+  hosts: cluster
+  become: true
+  tasks:
+    - name: Enable repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: set_repos.yml
+    - name: Install stap packages
+      ansible.builtin.dnf:
+        name:
+          - systemtap
+        state: present
+    - name: Run stap-prep (will take a while to install kernel-debuginfo)
+      ansible.builtin.command:
+        cmd: stap-prep
+    - name: Create stap script
+      ansible.builtin.copy:
+        content: |
+          probe begin {
+            printf("refluxfs mitigation loaded\n")
+          }
+
+          probe module("xfs").function("xfs_file_remap_range").call {
+                  $remap_flags = 0xffff
+          }
+
+          probe module("xfs").function("xfs_file_remap_range").return {
+                  $return = -95
+          }
+
+          probe end {
+                  printf("refluxfs mitigation unloaded\n")
+          }
+        dest: /tmp/refluxfs_mitigation.stp
+    - name: Compile mitigation module
+      ansible.builtin.command:
+        cmd: stap -g -p 4 -m refluxfs_mitigation /tmp/refluxfs_mitigation.stp
+        chdir: /tmp
+    - name: Fix ko file permissions
+      ansible.builtin.file:
+        path: /tmp/refluxfs_mitigation.ko
+        owner: root
+        group: root
+        mode: '0600'
+    - name: Load mitigation module
+      ansible.builtin.command:
+        cmd: staprun -L /tmp/refluxfs_mitigation.ko
+    - name: Disable repos
+      ansible.builtin.include_role:
+        name: dnf_repos
+        tasks_from: disable_repos.yml
+      when: not dnf_repos_enabled | default(false) | bool
