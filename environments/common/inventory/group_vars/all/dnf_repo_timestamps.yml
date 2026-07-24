@@ -109,12 +109,12 @@ dnf_repos_default:
       repo_file: rocky
     '9.8':
       pulp_path: rocky/9.8/BaseOS/x86_64/os
-      pulp_timestamp: 20260723T220206
+      pulp_timestamp: 20260724T095616
       repo_file: rocky
   baseos-source:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/source/tree
-      pulp_timestamp: 20260723T211605
+      pulp_timestamp: 20260724T095616
       repo_file: Rocky-Sources
     '9.6':
       pulp_path: rocky/9.6/BaseOS/source/tree
@@ -126,7 +126,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.8':
       pulp_path: rocky/9.8/BaseOS/source/tree
-      pulp_timestamp: 20260723T215614
+      pulp_timestamp: 20260724T095616
       repo_file: rocky
   cernvmfs_cfg:
     '8':
@@ -158,7 +158,7 @@ dnf_repos_default:
   crb:
     '8.10':
       pulp_path: rocky/8.10/PowerTools/x86_64/os
-      pulp_timestamp: 20260723T220750
+      pulp_timestamp: 20260724T095616
       repo_file: Rocky-PowerTools
       repo_name: powertools
     '9.4':
@@ -179,7 +179,7 @@ dnf_repos_default:
       repo_file: rocky
     '9.8':
       pulp_path: rocky/9.8/CRB/x86_64/os
-      pulp_timestamp: 20260723T212946
+      pulp_timestamp: 20260724T095616
       repo_file: rocky
   crb-source:
     '8.10':
