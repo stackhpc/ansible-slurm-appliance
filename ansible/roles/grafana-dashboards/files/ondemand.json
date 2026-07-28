@@ -116,9 +116,7 @@
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -212,12 +210,7 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -295,9 +288,7 @@
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -371,9 +362,7 @@
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -491,12 +480,7 @@
       "id": 24,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -592,12 +576,7 @@
       "id": 30,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -693,12 +672,7 @@
       "id": 32,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -794,12 +768,7 @@
       "id": 28,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -921,12 +890,7 @@
       "id": 34,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -1060,12 +1024,7 @@
       "id": 4,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -1195,12 +1154,7 @@
       "id": 14,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -1296,12 +1250,7 @@
       "id": 16,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -1391,15 +1340,7 @@
     "to": "now"
   },
   "timepicker": {
-    "refresh_intervals": [
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ]
+    "refresh_intervals": ["1m", "5m", "15m", "30m", "1h", "2h", "1d"]
   },
   "timezone": "",
   "title": "OnDemand",

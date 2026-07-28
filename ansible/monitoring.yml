@@ -98,7 +98,7 @@
         dest: "{{ grafana_data_dir }}/plugins"
         delete: true
         recursive: true
-      # Workaround for synchronize module running rsync from deploy host even if targetting remote host,
+      # Workaround for synchronize module running rsync from deploy host even if targeting remote host,
       # breaking when using SSH bastion
       delegate_to: "{{ inventory_hostname }}"
       become: true
