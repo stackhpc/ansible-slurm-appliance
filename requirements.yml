@@ -8,7 +8,7 @@ roles:
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
-    version: feat/unified-alerting
+    version: stackhpc-0.21.0
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
     version: v4.1.1
