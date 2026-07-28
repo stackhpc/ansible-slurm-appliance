@@ -52,7 +52,7 @@ These role variables apply to both `squid_conf_mode` settings.
 
 - `squid_acls`: Optional str, can be multiline. Define access lists. Default is
   `acl local_nodes src {{ squid_local_nodes_cidr }}`, i.e. only permit connections
-  from address in defined CIDR. In this mode acls for `SSL_ports` and `Safe_ports`
+  from address in defined CIDR. In this mode acls for `TLS_ports` and `Safe_ports`
   are also defined as is common practice.
 - `squid_http_access`: Optional str, can be multiline. Allow/deny access based
   on access lists. Default:
@@ -60,8 +60,8 @@ These role variables apply to both `squid_conf_mode` settings.
   ```text
   # Deny requests to certain unsafe ports
   http_access deny !Safe_ports
-  # Deny CONNECT to other than secure SSL ports
-  http_access deny CONNECT !SSL_ports
+  # Deny CONNECT to other than secure TLS ports
+  http_access deny CONNECT !TLS_ports
   # Only allow cachemgr access from localhost
   http_access allow localhost manager
   http_access deny manager

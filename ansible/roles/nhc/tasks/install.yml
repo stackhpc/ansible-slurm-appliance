@@ -1,0 +1,7 @@
+---
+- name: Patch nhc scripts for faster /proc/cpuinfo parsing
+  ansible.posix.patch:
+    src: 5e18b7f-speedup-read-cpuinfo.patch
+    strip: 1
+    basedir: /etc/nhc
+  become: true

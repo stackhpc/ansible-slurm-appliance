@@ -53,10 +53,7 @@ openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if applianc
 openhpc_config_extra: {}
 
 # additional default slurm.conf parameters for the appliance:
-openhpc_config_default:
-  TaskPlugin: task/cgroup,task/affinity
-  ProctrackType: proctrack/cgroup
-  JobAcctGatherType: jobacct_gather/cgroup
+openhpc_config_default: {}
 
 # additional default slurm.conf parameters when "rebuild" enabled:
 openhpc_config_rebuild:
