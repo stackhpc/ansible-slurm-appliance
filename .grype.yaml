@@ -225,7 +225,7 @@ ignore:
 # CVE-2026-1229: CIRCL has an incorrect calculation in secp384r1 CombinedMult in github.com/cloudflare/circl
 # https://osv.dev/vulnerability/GO-2026-4550
 # https://github.com/grafana/grafana/issues/120256
-# For grafana it is not vulerable:
+# For grafana it is not vulnerable:
 # - govulncheck finds it vulnerable, but
 # - go tool nm /usr/share/grafana/bin/grafana | grep "CombinedMult"
 #   does not find CombinedMult from circl/ecc/p384, only from
