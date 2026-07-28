@@ -15,6 +15,7 @@
     - name: Run stap-prep (will take a while to install kernel-debuginfo)
       ansible.builtin.command:
         cmd: stap-prep
+      changed_when: true
     - name: Create stap script
       ansible.builtin.copy:
         content: |
@@ -34,10 +35,14 @@
                   printf("refluxfs mitigation unloaded\n")
           }
         dest: /tmp/refluxfs_mitigation.stp
+        owner: root
+        group: root
+        mode: "0644"
     - name: Compile mitigation module
       ansible.builtin.command:
         cmd: stap -g -p 4 -m refluxfs_mitigation /tmp/refluxfs_mitigation.stp
         chdir: /tmp
+      changed_when: true
     - name: Fix ko file permissions
       ansible.builtin.file:
         path: /tmp/refluxfs_mitigation.ko
@@ -57,6 +62,7 @@
       ansible.builtin.command:
         cmd: staprun -L /tmp/refluxfs_mitigation.ko
       when: not stap_stat.stat.exists
+      changed_when: true
     - name: Disable repos
       ansible.builtin.include_role:
         name: dnf_repos
