@@ -41,8 +41,7 @@
         tasks_from: sync.yml
       vars:
         _pulp_site_rpm_info:
-            # TODO would need to ensure rocky 8 and 9 snippets are communicated separately (or include in same list and prefix)
-          - pulp_repo_name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
+          - pulp_repo_name: "{{ repo.repo_name }}-{{ ansible_distribution_major_version }}-{{ repo.timestamp }}"
             pulp_path: "{{ repo.subpath }}"
             pulp_timestamp: "{{ repo.timestamp }}"
       loop: "{{ patch_cves_repos }}"
@@ -58,7 +57,7 @@
         tasks_from: sync.yml
       vars:
         pulp_site_rpm_info:
-          - name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
+          - name: "{{ repo.repo_name }}-{{ ansible_distribution_major_version }}-{{ repo.timestamp }}"
             subpath: "{{ repo.subpath }}/{{ repo.timestamp }}"
       loop: "{{ patch_cves_repos }}"
       loop_control:
