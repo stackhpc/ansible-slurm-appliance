@@ -1,8 +1,8 @@
 ---
 # Example usage:
 #
-# ansible-playbook ansible/adhoc/patch-cves.yaml -e '{
-#   "patch_cves_repos": [
+# ansible-playbook ansible/adhoc/patch.yaml -e '{
+#   "patch_repos": [
 #     {
 #       "repo_name": "baseos",
 #       "subpath": "rocky/9.8/BaseOS/x86_64/os",
@@ -10,7 +10,7 @@
 #       "repo_file": "rocky"
 #     }
 #   ],
-#   "patch_cves_packages": [
+#   "patch_packages": [
 #     "kernel"
 #   ]
 # }'
@@ -29,8 +29,8 @@
         description: "{{ item.repo_name }}"
         username: "{{ dnf_repos_username | default(omit) }}"
         password: "{{ dnf_repos_password | default(omit) }}"
-        gpgcheck: "{{ not patch_cves_insecure_disable_gpg_check | default(true) }}"
-      loop: "{{ patch_cves_repos }}"
+        gpgcheck: "{{ not patch_insecure_disable_gpg_check | default(true) }}"
+      loop: "{{ patch_repos }}"
 
 - name: Sync local Pulp server if enabled
   hosts: pulp_server
@@ -44,7 +44,7 @@
           - pulp_repo_name: "{{ repo.repo_name }}-{{ ansible_distribution_major_version }}-{{ repo.timestamp }}"
             pulp_path: "{{ repo.subpath }}"
             pulp_timestamp: "{{ repo.timestamp }}"
-      loop: "{{ patch_cves_repos }}"
+      loop: "{{ patch_repos }}"
       loop_control:
         loop_var: repo
 
@@ -59,7 +59,7 @@
         pulp_site_rpm_info:
           - name: "{{ repo.repo_name }}-{{ ansible_distribution_major_version }}-{{ repo.timestamp }}"
             subpath: "{{ repo.subpath }}/{{ repo.timestamp }}"
-      loop: "{{ patch_cves_repos }}"
+      loop: "{{ patch_repos }}"
       loop_control:
         loop_var: repo
       when: "{{
@@ -73,7 +73,7 @@
   tasks:
     - name: Install packages
       ansible.builtin.dnf:
-        name: "{{ patch_cves_packages }}"
+        name: "{{ patch_packages }}"
         state: latest
     - name: Disable repos
       ansible.builtin.yum_repository:
@@ -81,16 +81,16 @@
         name: "{{ item.repo_name }}"
         baseurl: "{{ appliances_pulp_url }}/pulp/content/{{ item.subpath }}/{{ item.timestamp }}"
         description: "{{ item.repo_name }}"
-        gpgcheck: "{{ not patch_cves_insecure_disable_gpg_check | default(true) }}"
+        gpgcheck: "{{ not patch_insecure_disable_gpg_check | default(true) }}"
         enabled: false
       when: not dnf_repos_enabled | default(false) | bool
-      loop: "{{ patch_cves_repos }}"
+      loop: "{{ patch_repos }}"
 
     - name: Check if reboot required
       ansible.builtin.command:
         cmd: needs-restarting -r
       failed_when: false
-      register: _patch_cves_needs_reboot
+      register: _patch_needs_reboot
       changed_when: false
 
 - name: Submit reboot job
@@ -100,5 +100,5 @@
     - name: Submit reboot job
       ansible.builtin.command:
         cmd: scontrol reboot ASAP nextstate=RESUME reason="maintenance" ALL
-      when: _patch_cves_needs_reboot.rc != 0
+      when: _patch_needs_reboot.rc != 0
       changed_when: true
