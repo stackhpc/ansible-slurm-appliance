@@ -1,0 +1,11 @@
+kernel_module_denylist:
+  # CVE-2026-43500, CVE-2026-43284 (dirtyfrag)
+  - esp4
+  - esp6
+  - rxrpc
+  # CVE-2026-43037
+  - ip6_tunnel
+  # CVE-2026-46331 (pedit COW)
+  - act_pedit
+  # CVE-2026-64531 (ovswrap)
+  - openvswitch

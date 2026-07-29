@@ -1,28 +1,24 @@
-- name: Apply dirtyfrag mitigation
-  hosts: mitigate_dirtyfrag
+- name: Denylist kernel modules
+  hosts: kernel_modules
   gather_facts: false
   become: true
   tasks:
     - name: Prevent modules loading
       ansible.builtin.copy:
-        dest: /etc/modprobe.d/dirtyfrag.conf
+        dest: /etc/modprobe.d/appliance.conf
         owner: root
         group: root
         mode: u=rw,go=r
         content: |
-          install esp4 /bin/false
-          install esp6 /bin/false
-          install rxrpc /bin/false
-    # below probably is not needed but is safer
+          {% for module in kernel_module_denylist %}
+          install {{ module }} /bin/false
+          {% endfor %}
     - name: Unload modules
       ansible.builtin.command:
-        cmd: rmmod esp4 esp6 rxrpc
+        cmd: "rmmod {{ item }}"
       failed_when: false
       changed_when: true
-    - name: Clear page cache
-      ansible.builtin.command:
-        cmd: echo 3 > /proc/sys/vm/drop_caches
-      changed_when: true
+      loop: "{{ kernel_module_denylist }}"
 
 - name: Apply ssh-keysign-pwn mitigation
   hosts: mitigate_ssh_keysign_pwn
@@ -57,43 +53,3 @@
         owner: root
         group: root
         mode: "0644"
-
-- name: Apply CVE-2026-43037 mitigation
-  hosts: mitigate_cve_2026_43037
-  gather_facts: false
-  become: true
-  tasks:
-    - name: Prevent modules loading
-      ansible.builtin.copy:
-        dest: /etc/modprobe.d/cve_2026_43037.conf
-        owner: root
-        group: root
-        mode: u=rw,go=r
-        content: |
-          install ip6_tunnel /bin/false
-    # below probably is not needed but is safer
-    - name: Unload modules
-      ansible.builtin.command:
-        cmd: rmmod ip6_tunnel
-      failed_when: false
-      changed_when: true
-
-- name: Apply pedit COW (CVE-2026-46331) mitigation
-  hosts: mitigate_cve_2026_46331
-  gather_facts: false
-  become: true
-  tasks:
-    - name: Prevent modules loading
-      ansible.builtin.copy:
-        dest: /etc/modprobe.d/cve_2026_46331.conf
-        owner: root
-        group: root
-        mode: u=rw,go=r
-        content: |
-          install act_pedit /bin/false
-    # below probably is not needed but is safer
-    - name: Unload modules
-      ansible.builtin.command:
-        cmd: rmmod act_pedit
-      failed_when: false
-      changed_when: true
