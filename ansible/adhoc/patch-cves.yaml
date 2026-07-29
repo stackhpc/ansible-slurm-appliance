@@ -1,6 +1,19 @@
 ---
-# TODO: to hide Ark creds, we could override dnf_repos_password
-# with $arkpassword and create an /etc/dnf/vars/arkpassword file
+# Example usage:
+#
+# ansible-playbook ansible/adhoc/patch-cves.yaml -e '{
+#   "patch_cves_repos": [
+#     {
+#       "repo_name": "baseos",
+#       "subpath": "rocky/9.8/BaseOS/x86_64/os",
+#       "timestamp": "20260707T222716",
+#       "repo_file": "rocky"
+#     }
+#   ],
+#   "patch_cves_packages": [
+#     "kernel"
+#   ]
+# }'
 
 - name: Enable Ark repos
   hosts: cluster
@@ -20,32 +33,39 @@
       loop: "{{ patch_cves_repos }}"
 
 - name: Sync local Pulp server if enabled
-  hosts: localhost # Supporting legacy pulp config before pulp_server group existed
+  hosts: pulp_server
   tasks:
     - name: Sync pulp
       ansible.builtin.include_role:
         name: pulp_site
         tasks_from: sync.yml
-        # See above on supporting legacy config
-        apply:
-          delegate_to: "{{ groups['pulp_server'][0] if ('pulp_server' in groups and groups['pulp_server'] | length > 0) else 'localhost' }}"
       vars:
         _pulp_site_rpm_info:
             # TODO would need to ensure rocky 8 and 9 snippets are communicated separately (or include in same list and prefix)
           - pulp_repo_name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
             pulp_path: "{{ repo.subpath }}"
             pulp_timestamp: "{{ repo.timestamp }}"
-        # Legacy
+      loop: "{{ patch_cves_repos }}"
+      loop_control:
+        loop_var: repo
+
+- name: Sync local Pulp server if enabled with legacy config (< v2.5)
+  hosts: localhost
+  tasks:
+    - name: Sync pulp
+      ansible.builtin.include_role:
+        name: pulp_site
+        tasks_from: sync.yml
+      vars:
         pulp_site_rpm_info:
           - name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
             subpath: "{{ repo.subpath }}/{{ repo.timestamp }}"
       loop: "{{ patch_cves_repos }}"
       loop_control:
         loop_var: repo
-      # See above on supporting legacy config
       when: "{{
-          ('pulp_server' in groups and groups['pulp_server'] | length > 0)
-          or (pulp_site_upstream_password is defined and pulp_site_upstream_password | length > 0)
+          (not 'pulp_server' in groups)
+          and (pulp_site_upstream_password is defined and pulp_site_upstream_password | length > 0)
         }}"
 
 - name: Enable Ark repos
@@ -83,5 +103,3 @@
         cmd: scontrol reboot ASAP nextstate=RESUME reason="maintenance" ALL
       when: _patch_cves_needs_reboot.rc != 0
       changed_when: true
-
-# TODO best way to update timestamps in version control
