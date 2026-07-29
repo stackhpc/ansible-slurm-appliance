@@ -20,6 +20,13 @@
       failed_when: false
       changed_when: true
       loop: "{{ kernel_modules_denylist }}"
+    - name: Ensure modules cannot be loaded
+      ansible.builtin.command:
+        cmd: "modprobe {{ item }}"
+      register: _kernel_modules_modprobe
+      failed_when: _kernel_modules_modprobe.rc == 0
+      changed_when: false
+      loop: "{{ kernel_modules_denylist }}"
 
 - name: Apply ssh-keysign-pwn mitigation
   hosts: mitigate_ssh_keysign_pwn
