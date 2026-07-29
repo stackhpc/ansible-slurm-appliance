@@ -652,6 +652,15 @@ ignore:
     package:
       location: /opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
 
+# GHSA-r277-6w6q-xmqw: kin-openapi auth bypass
+# Not present in final binary https://github.com/grafana/grafana/pull/129271
+  - vulnerability: GHSA-r277-6w6q-xmqw
+    package:
+      location: /usr/share/grafana/bin/grafana
+  - vulnerability: GHSA-r277-6w6q-xmqw
+    package:
+      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
 exclude:

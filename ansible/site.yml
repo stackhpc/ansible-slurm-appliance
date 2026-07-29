@@ -13,6 +13,8 @@
 - ansible.builtin.import_playbook: validate.yml
   when: appliances_validate | default(true)
 
+- ansible.builtin.import_playbook: mitigations.yml
+
 - ansible.builtin.import_playbook: bootstrap.yml
 
 - name: Run post-bootstrap.yml hook
