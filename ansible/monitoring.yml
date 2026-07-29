@@ -34,7 +34,7 @@
   hosts: node_exporter
   tags: node_exporter
   tasks:
-    - ansible.builtin.import_role:
+    - ansible.builtin.include_role:
         name: prometheus.prometheus.node_exporter
 
 - name: Deploy Open OnDemand exporter
@@ -73,7 +73,7 @@
       ansible.builtin.set_fact:
         prometheus_skip_install: "{{ false if prometheus_version is defined else true }}"
       when: "(prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined]"
-    - ansible.builtin.import_role:
+    - ansible.builtin.include_role:
         name: prometheus.prometheus.prometheus
 
 - name: Deploy grafana
