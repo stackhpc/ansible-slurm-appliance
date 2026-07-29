@@ -1,5 +1,6 @@
 - name: Denylist kernel modules
   hosts: kernel_modules
+  tags: kernel_modules
   gather_facts: false
   become: true
   tasks:
@@ -10,7 +11,7 @@
         group: root
         mode: u=rw,go=r
         content: |
-          {% for module in kernel_module_denylist %}
+          {% for module in kernel_modules_denylist %}
           install {{ module }} /bin/false
           {% endfor %}
     - name: Unload modules
@@ -18,7 +19,7 @@
         cmd: "rmmod {{ item }}"
       failed_when: false
       changed_when: true
-      loop: "{{ kernel_module_denylist }}"
+      loop: "{{ kernel_modules_denylist }}"
 
 - name: Apply ssh-keysign-pwn mitigation
   hosts: mitigate_ssh_keysign_pwn

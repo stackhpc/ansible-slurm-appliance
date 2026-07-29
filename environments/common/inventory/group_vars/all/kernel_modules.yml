@@ -1,4 +1,4 @@
-kernel_module_denylist:
+kernel_modules_denylist:
   # CVE-2026-43500, CVE-2026-43284 (dirtyfrag)
   - esp4
   - esp6
