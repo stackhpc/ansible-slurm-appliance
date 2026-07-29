@@ -51,7 +51,7 @@
 - name: Sync local Pulp server if enabled with legacy config (< v2.5)
   hosts: localhost
   tasks:
-    - name: Sync pulp
+    - name: Sync pulp (legacy)
       ansible.builtin.include_role:
         name: pulp_site
         tasks_from: sync.yml
@@ -67,7 +67,7 @@
           and (pulp_site_upstream_password is defined and pulp_site_upstream_password | length > 0)
         }}"
 
-- name: Enable Ark repos
+- name: Install updated packages and disable repos if necessary
   hosts: cluster
   become: true
   tasks:
@@ -93,12 +93,40 @@
       register: _patch_needs_reboot
       changed_when: false
 
-- name: Submit reboot job
-  hosts: control[0]
-  become: true
+- name: Output reboot instructions if required
+  hosts: localhost
   tasks:
-    - name: Submit reboot job
-      ansible.builtin.command:
-        cmd: scontrol reboot ASAP nextstate=RESUME reason="maintenance" ALL
-      when: _patch_needs_reboot.rc != 0
-      changed_when: true
+    - name: Reboot instructions
+      ansible.builtin.debug:
+        msg: |
+          A reboot is required to load new packages.
+          1. Ensure that a RebootProgram is set in your Slurm config with
+
+               ansible login -m shell -a "scontrol show config | grep RebootProgram"`
+
+             if not, set
+
+               # environments/site/inventory/group_vars/all/openhpc.yml:
+               openhpc_config_extra:
+                 RebootProgram: /sbin/reboot
+
+             and apply this with
+
+               ansible-playbook ansible/slurm.yml --tags openhpc
+
+          2. From the control node, issue a command for compute nodes to reboot once they
+             have finished their current job
+
+               scontrol reboot ASAP nextstate=RESUME reason="maintenance" ALL
+
+             Change ALL to a subset of nodes if necessary. For more options (e.g rebooting
+             immediately without waiting for jobs to complete), see scontrol docs
+             https://slurm.schedmd.com/scontrol.html#OPT_reboot
+
+          3. Reboot the control and login nodes using
+
+               ansible login -m reboot --become
+               ansible control -m reboot --become
+
+             respectively
+      when: 1 in (groups['cluster'] | map('extract', hostvars, ['_patch_needs_reboot', 'rc']) | list)
