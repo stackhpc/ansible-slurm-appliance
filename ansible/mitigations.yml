@@ -18,7 +18,9 @@
       ansible.builtin.command:
         cmd: "rmmod {{ item }}"
       failed_when: false
-      changed_when: true
+      register: _kernel_modules_rmmod
+      changed_when: >
+         "ERROR: Module " + item + " is not currently loaded" not in _kernel_modules_rmmod.stderr
       loop: "{{ kernel_modules_denylist }}"
     - name: Ensure modules cannot be loaded
       ansible.builtin.command:
