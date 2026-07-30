@@ -9,7 +9,8 @@ mysql_podman_user: podman
 
 # Slurm recommends larger than default values: https://slurm.schedmd.com/accounting.html
 mysql_mysqld_options:
-  - innodb-buffer-pool-size=1024M
+  - >-
+    innodb-buffer-pool-size={{ [((ansible_facts.memtotal_mb | int) // 10), 4096] | max }}M
   - innodb-lock-wait-timeout=900
 
 mysql_root_password: "{{ vault_mysql_root_password }}"

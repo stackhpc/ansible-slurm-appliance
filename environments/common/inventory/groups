@@ -238,7 +238,5 @@ doca
 # Hosts to run opkssh to allow SSH via OIDC
 
 ## Vulnerability mitigation groups
-[mitigate_dirtyfrag]
+[kernel_modules]
 [mitigate_ssh_keysign_pwn]
-[mitigate_cve_2026_43037]
-[mitigate_cve_2026_46331]
