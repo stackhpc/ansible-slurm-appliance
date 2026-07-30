@@ -4,14 +4,14 @@
 # ansible-playbook ansible/adhoc/patch.yaml -e '{
 #   "patch_repos": [
 #     {
-#       "repo_name": "baseos",
-#       "subpath": "rocky/9.8/BaseOS/x86_64/os",
-#       "timestamp": "20260707T222716",
+#       "repo_name": "appstream",
+#       "subpath": "rocky/9.8/AppStream/x86_64/os",
+#       "timestamp": "20260717T213842",
 #       "repo_file": "rocky"
 #     }
 #   ],
 #   "patch_packages": [
-#     "kernel"
+#     "emacs"
 #   ]
 # }'
 
