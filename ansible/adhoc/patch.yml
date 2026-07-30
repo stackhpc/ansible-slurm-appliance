@@ -63,10 +63,9 @@
       loop: "{{ patch_repos }}"
       loop_control:
         loop_var: repo
-      when: "{{
+      when: >
           (not 'pulp_server' in groups)
           and (pulp_site_upstream_password is defined and pulp_site_upstream_password | length > 0)
-        }}"
 
 - name: Install updated packages and disable repos if necessary
   hosts: cluster
@@ -75,7 +74,7 @@
     - name: Install packages
       ansible.builtin.dnf:
         name: "{{ patch_packages }}"
-        state: latest
+        state: latest # noqa: package-latest
     - name: Disable repos
       ansible.builtin.yum_repository:
         file: "{{ item.repo_file }}"

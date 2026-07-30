@@ -4,7 +4,7 @@
   gather_facts: true
   tasks:
     - name: Check all hosts are running the same kernel
-      run_once: true
+      run_once: true # noqa: run-once[task]
       vars:
         kernel_summary: >-
           {% set result = {} %}
