@@ -104,6 +104,7 @@ appliances_extra_packages_default:
   - bash-completion
   - htop
   - nano
+  - patch
   - screen
   - tmux
   - wget
