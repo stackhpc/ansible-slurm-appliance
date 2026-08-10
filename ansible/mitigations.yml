@@ -6,26 +6,28 @@
   tasks:
     - name: Prevent modules loading
       ansible.builtin.copy:
+        # future note: If `hostonly=yes` is set in its configuration, dracut will copy `/etc/modprobe.d/*.conf`
+        # to the initramfs when installing a kernel. It has been tested on v2.23.0 of the appliance
+        # to NOT be the case (manual invocation and kernel reinstall), but could be the case on RL 10.2:
+        # See https://github.com/jnuyens/modulejail/issues/19.
+        # This means that removing a module from denylist that has been baked into the initramfs as a result
+        # of a kernel reinstall will not make it available  at boot time if the initramfs is not rebuilt.
+        # If this is the case, remember to run `sudo dracut --force --regenerate-all`.
         dest: /etc/modprobe.d/appliance.conf
         owner: root
         group: root
         mode: u=rw,go=r
+        # the softdep line works around a limitation/feature of modprobe that
+        # softdep lines take over install lines.
+        # Given some denylisted modules (eg. act_mpls) are in `/lib/modules/$(uname -r)/modules.softdep`
+        # we work around this by always adding a `softdep xxx A_MODULE_THAT_DOESNT_EXIST` line.
+        # This is not documented anywhere we could find.
+        # If it would not work anymore, we would catch it in the modprobe loop in unload_modules.
         content: |
           {% for module in kernel_modules_denylist %}
           install {{ module }} /bin/false
+          softdep {{ module }} stackhpc_fix_denylist
           {% endfor %}
-    - name: Unload modules
-      ansible.builtin.command:
-        cmd: "rmmod {{ item }}"
-      failed_when: false
-      register: _kernel_modules_rmmod
-      changed_when: >
-         "ERROR: Module " + item + " is not currently loaded" not in _kernel_modules_rmmod.stderr
-      loop: "{{ kernel_modules_denylist }}"
-    - name: Ensure modules cannot be loaded
-      ansible.builtin.command:
-        cmd: "modprobe {{ item }}"
-      register: _kernel_modules_modprobe
-      failed_when: _kernel_modules_modprobe.rc == 0
-      changed_when: false
-      loop: "{{ kernel_modules_denylist }}"
+    - name: Ensure denylisted modules are not loaded
+      unload_modules:
+        denylist: "{{ kernel_modules_denylist }}"
