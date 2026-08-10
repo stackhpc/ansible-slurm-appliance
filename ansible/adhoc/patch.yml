@@ -1,7 +1,7 @@
 ---
 # Example usage:
 #
-# ansible-playbook ansible/adhoc/patch.yaml -e '{
+# ansible-playbook ansible/adhoc/patch.yml -e '{
 #   "patch_repos": [
 #     {
 #       "repo_name": "appstream",
