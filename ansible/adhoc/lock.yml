@@ -1,0 +1,15 @@
+---
+# Lock cluster instances
+
+# Instances are automatically locked by site.yml but must be relocked once
+# reimaging has completed when using ansible/adhoc/rebuild-via-slurm.yml
+
+- hosts: "{{ unlock_hosts | default('cluster') }}"
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Lock instances
+      openstack.cloud.server_action:
+        action: lock
+        server: "{{ instance_id }}"
+      delegate_to: localhost

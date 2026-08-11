@@ -8,11 +8,16 @@
 
 # See docs/slurm-controlled-rebuild.md.
 
+- name: Unlock compute instances
+  vars:
+    unlock_hosts: compute
+  ansible.builtin.import_playbook: unlock.yml
+
 - hosts: login
   run_once: true
   gather_facts: false
   tasks:
-    - name: Run slurm-controlled rebuild
+    - name: Start slurm-controlled rebuild
       ansible.builtin.import_role:
         name: rebuild
         tasks_from: rebuild.yml

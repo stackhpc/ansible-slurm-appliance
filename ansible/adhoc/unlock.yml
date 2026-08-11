@@ -1,0 +1,21 @@
+---
+# Unlock cluster instances
+
+# A manual run is required before any action which will modify instances:
+# - ansible-playbook ansible/adhoc/rebuild.yml
+# - tofu apply
+# - tofu destroy
+# e.g.:
+#   ansible-playbook ansible/adhoc/lock.yml
+#
+# Instances are automatically locked by site.yml and unlocked by ansible/adhoc/rebuild-via-slurm.yml
+
+- hosts: "{{ unlock_hosts | default('cluster') }}"
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Unlock instances
+      openstack.cloud.server_action:
+        action: unlock
+        server: "{{ instance_id }}"
+      delegate_to: localhost
