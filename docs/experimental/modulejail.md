@@ -5,7 +5,7 @@ There has been multiple instances of CVEs found in less-used kernel modules thes
 Mitigating the vulnerability is as simple as adding it to [kernel_modules_vulnerable_denylist](../../environments/common/inventory/group_vars/all/kernel_modules.yml)
 and re-running the `ansible/mitigations.yml` playbook.
 
-But it doesn't protect the system 2 cases:
+But it doesn't protect the system in two cases:
 
 - the attacker tricked an admin into loading the vulnerable module before the vulnerability is known;
 - the attacker ran a command that automatically loaded the module (eg. sctp_diag is loaded by the `ss -S` command).
