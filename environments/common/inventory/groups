@@ -80,9 +80,8 @@ mysql
 [node_exporter]
 # All hosts to monitor for hardware and OS metrics.
 
-[selinux:children]
+[selinux]
 # All hosts requiring control of SELinux status.
-cluster
 
 [rebuild]
 # Enable rebuild of nodes on an OpenStack cloud; add 'control' group.
