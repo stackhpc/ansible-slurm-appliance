@@ -1,0 +1,70 @@
+- hosts: builder
+  become: true
+  gather_facts: true
+  tags: sbom
+  tasks:
+    - name: Cleanup /tmp # noqa: no-changed-when
+      ansible.builtin.shell: rm -rvf /tmp/*
+    - name: Delete files triggering vulnerability scans
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: # NB: items here MUST have a justification!
+        # ondemand install: raised at https://github.com/OSC/ondemand/security/advisories/GHSA-f7j8-ppqm-m5vw
+        # All declared not to be an issue by Open Ondemand as relevant packages not installed
+        - "/opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/{{ ondemand_package_version }}-1/gems/bootstrap_form-2.7.0/test/dummy/Gemfile.lock"
+        - "/opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/{{ ondemand_package_version }}-1/gems/bootstrap_form-5.0.0/demo/yarn.lock"
+        - /var/www/ood/apps/sys/dashboard/node_modules/data-confirm-modal/Gemfile.lock
+        # chrony role: only used for role dev, venv never created on disk
+        - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/poetry.lock
+        - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements.txt
+        - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements-dev.txt
+        # netbox collection: only used for role dev
+        - /usr/lib/ansible-init/lib/python3.9/site-packages/ansible_collections/netbox/netbox/poetry.lock
+        # esbuild in OOD
+        - /var/www/ood/apps/sys/dashboard/node_modules/@esbuild/linux-x64/bin/esbuild
+        - /usr/lib/rstudio-server/bin/quarto/bin/tools/x86_64/esbuild
+    - name: Replace rclone with a no-op script
+      ansible.builtin.copy:
+        content: |
+          #!/bin/sh
+          echo "The rclone executable has been removed in ansible-slurm-appliance images due to too many security warnings." 1>&2
+          exit 1
+        dest: /usr/bin/rclone
+        owner: root
+        group: root
+        mode: "0555"
+    - name: Ensure .grype.yaml is present
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../.grype.yaml"
+        dest: /tmp/.grype.yaml
+        owner: "{{ ansible_user }}"
+        mode: "0644"
+    - name: Set sbom filename
+      ansible.builtin.set_fact:
+        sbom_filename: "{{ ansible_hostname }}.syft-json"
+    - name: Install and run syft
+      become: true
+      ansible.builtin.shell: |
+        cd /tmp
+        set -eo pipefail
+        curl -L -o syft_1.51.0_linux_amd64.tar.gz  https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_linux_amd64.tar.gz
+        sha256sum -c <<<"2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f  syft_1.51.0_linux_amd64.tar.gz"
+        tar xf syft_1.51.0_linux_amd64.tar.gz syft
+        time ./syft scan \
+          --exclude ./dev --exclude ./proc --exclude ./sys --exclude ./run \
+          --config .grype.yaml \
+          --source-name "$sbom" --source-version 1 \
+          --output syft-json="$sbom" \
+          dir:/
+        ls -hl "$sbom"
+        zip "${sbom}.zip" "$sbom"
+        # dd if="$sbom" of="${sbom}.zip" bs=1M count=32
+        # no need to cleanup: cleanup.yml will wipe /tmp again.
+      environment:
+        sbom: "{{ sbom_filename }}"
+    - name: Fetch the sbom to the control host
+      ansible.builtin.fetch:
+        src: "/tmp/{{ sbom_filename }}.zip"
+        dest: "{{ playbook_dir }}/../sbom.zip"
+        flat: true

@@ -281,6 +281,8 @@
 
 - import_playbook: final.yml
 
+- import_playbook: gen-sbom.yml
+
 - hosts: builder
   become: true
   gather_facts: true
