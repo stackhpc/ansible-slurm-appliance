@@ -215,7 +215,7 @@ openondemand_apps_jupyter_default:
       template: "basic"
       script_wrapper: |
         module purge
-        export PATH=/opt/jupyter-py39/bin/:$PATH
+        export PATH=/opt/jupyter-py312/bin/:$PATH
         %s
     script:
       job_name: "ood-jupyter"

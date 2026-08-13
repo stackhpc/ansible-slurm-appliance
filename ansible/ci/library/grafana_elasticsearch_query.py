@@ -1,15 +1,12 @@
 #!/usr/bin/python
-# pylint: disable=missing-module-docstring
+
 
 # Copyright: (c) 2022 Steve Brasier steve@stackhpc.com
-from __future__ import absolute_import, division, print_function
 
 import json
 
-import requests  # pylint: disable=import-error
-from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
-
-__metaclass__ = type  # pylint: disable=invalid-name
+import requests
+from ansible.module_utils.basic import AnsibleModule
 
 DOCUMENTATION = r"""
 ---
@@ -44,7 +41,7 @@ docs:
 """
 
 
-def run_module():  # pylint: disable=missing-function-docstring
+def run_module():
     module_args = {
         "grafana_url": {
             "type": "str",
@@ -83,7 +80,7 @@ def run_module():  # pylint: disable=missing-function-docstring
     datasources = json.loads(r.text)
 
     # select required datasource:
-    ds = [s for s in datasources if s["name"] == module.params["datasource"]][0]
+    ds = next(s for s in datasources if s["name"] == module.params["datasource"])
 
     # get documents:
     datasource_proxy_url = (
@@ -107,7 +104,7 @@ def run_module():  # pylint: disable=missing-function-docstring
     module.exit_json(**result)
 
 
-def main():  # pylint: disable=missing-function-docstring
+def main():
     run_module()
 
 

@@ -21,8 +21,8 @@ squid_acls: "acl local_nodes src {{ squid_local_nodes_cidr }}"
 squid_http_access: |
   # Deny requests to certain unsafe ports
   http_access deny !Safe_ports
-  # Deny CONNECT to other than secure SSL ports
-  http_access deny CONNECT !SSL_ports
+  # Deny CONNECT to other than secure TLS ports
+  http_access deny CONNECT !TLS_ports
   # Only allow cachemgr access from localhost
   http_access allow localhost manager
   http_access deny manager

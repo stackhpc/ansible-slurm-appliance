@@ -97,6 +97,12 @@ variable "ssh_bastion_private_key_file" {
   default = null
 }
 
+variable "ssh_debug_public_key" {
+  type = string
+  description = "An additional public key to inject for the default user"
+  default = null
+}
+
 variable "floating_ip_network" {
   type = string
   default = null
@@ -176,6 +182,11 @@ source "openstack" "openhpc" {
   floating_ip_network = var.floating_ip_network
   floating_ip = var.floating_ip
   security_groups = var.security_groups
+  user_data = var.ssh_debug_public_key == null ? null : <<-EOT
+    #cloud-config
+    ssh_authorized_keys:
+    - ${var.ssh_debug_public_key}
+  EOT
   
   # Input image:
   source_image = "${var.source_image}"

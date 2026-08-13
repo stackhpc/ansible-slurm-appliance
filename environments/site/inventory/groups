@@ -232,7 +232,7 @@ builder
 openhpc
 
 ## Vulnerability mitigation groups
-[mitigate_dirtyfrag:children]
+[kernel_modules:children]
 builder
 [mitigate_ssh_keysign_pwn:children]
 builder

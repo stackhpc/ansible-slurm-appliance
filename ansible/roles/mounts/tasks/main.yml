@@ -19,7 +19,7 @@
     loop_var: stat_result
   # Only run when mountpoint is missing, to avoid resetting owner/mode on mounted directories
   # Also has to cope with .stat missing when enabled: false
-  when: not (stat_results.stat.exists | default(true))
+  when: not (stat_result.stat.exists | default(true))
 
 - name: Ensure tmp.mount mask status is correct
   # RL8-specific fix; otherwise rootfs comes up read-only after a reboot!

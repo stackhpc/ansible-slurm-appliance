@@ -28,6 +28,7 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
   `/home/{{ hpctests_user }}/hpctests`. **NB:** Do not use `~` in this path.
 - `hpctests_account`: Optional. Slurm account to use, otherwise no account is specified to Slurm.
 - `hpctests_partition`: Optional. Name of partition to use, otherwise default partition is used.
+- `hpctests_reservation`: Optional. Name of reservation to use.
 - `hpctests_qos`: Optional. Slurm QoS to use, otherwise no qos is specified to Slurm.
 - `hpctests_nodes`: Optional. A Slurm node expression, e.g. `'compute-[0-15,19]'` defining the nodes to use. If not set all nodes in the selected partition are used.
 - `hpctests_ucx_net_devices`: Optional. Control which network device/interface to use, e.g. `mlx5_1:0`.
