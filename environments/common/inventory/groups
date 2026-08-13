@@ -238,4 +238,3 @@ doca
 
 ## Vulnerability mitigation groups
 [kernel_modules]
-[mitigate_ssh_keysign_pwn]
