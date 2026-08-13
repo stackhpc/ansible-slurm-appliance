@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=invalid-name
 
 """
 Delete infrastructure for a cluster without using Terraform. Useful for CI clusters.
@@ -16,19 +15,23 @@ import json
 import subprocess
 import sys
 
-CLUSTER_RESOURCES = ["server", "port", "volume"]
+CLUSTER_RESOURCES = {
+    "server": [],
+    "port": [],
+    "volume": ["--purge"],  # remove volume with snapshots
+}
 
 
-# pylint: disable-next=missing-function-docstring, redefined-outer-name
 def delete_cluster(cluster_prefix, force=False):
 
     to_delete = {}
     for resource_type in CLUSTER_RESOURCES:
         to_delete[resource_type] = []
-        resource_list = subprocess.run(  # pylint: disable=subprocess-run-check
+        resource_list = subprocess.run(
             f"openstack {resource_type} list --format json",
             stdout=subprocess.PIPE,
             shell=True,
+            check=True,
         )
         resources = json.loads(resource_list.stdout)
         for item in resources:
@@ -41,15 +44,23 @@ def delete_cluster(cluster_prefix, force=False):
                 raise
 
     if force or input("Delete these (y/n)?:") == "y":
-        for resource_type in CLUSTER_RESOURCES:
+        for resource_type, extra_args in CLUSTER_RESOURCES.items():
             items = [v["ID"] for v in to_delete[resource_type]]
             if items:
+                cmd = ["openstack", resource_type, "delete", *extra_args, *items]
                 # delete all resources of each type in a single call for speed:
-                subprocess.run(  # pylint: disable=subprocess-run-check
-                    f"openstack {resource_type} delete {' '.join(items)}",
-                    stdout=subprocess.PIPE,
-                    shell=True,
-                )
+                try:
+                    subprocess.run(
+                        cmd,
+                        capture_output=True,
+                        check=True,
+                        encoding="utf-8",
+                    )
+                except subprocess.CalledProcessError as e:
+                    print(
+                        f"Error calling {e.cmd!r}: returncode={e.returncode} stdout={e.stdout} stderr={e.stderr}"
+                    )
+                    sys.exit(1)
                 print(f"Deleted {len(items)} {resource_type}s")
     else:
         print("Cancelled - no resources deleted")

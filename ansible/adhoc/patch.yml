@@ -1,0 +1,132 @@
+---
+# Example usage:
+#
+# ansible-playbook ansible/adhoc/patch.yaml -e '{
+#   "patch_repos": [
+#     {
+#       "repo_name": "appstream",
+#       "subpath": "rocky/9.8/AppStream/x86_64/os",
+#       "timestamp": "20260717T213842",
+#       "repo_file": "rocky"
+#     }
+#   ],
+#   "patch_packages": [
+#     "emacs"
+#   ]
+# }'
+
+- name: Enable Ark repos
+  hosts: cluster
+  become: true
+  tasks:
+    # Not reusing dnf_repos tooling because it assumes you're upgrading to a snaphost
+    # within the same minor version
+    - name: Enable repos
+      ansible.builtin.yum_repository:
+        file: "{{ item.repo_file }}"
+        name: "{{ item.repo_name }}"
+        baseurl: "{{ appliances_pulp_url }}/pulp/content/{{ item.subpath }}/{{ item.timestamp }}"
+        description: "{{ item.repo_name }}"
+        username: "{{ dnf_repos_username | default(omit) }}"
+        password: "{{ dnf_repos_password | default(omit) }}"
+        gpgcheck: "{{ not patch_insecure_disable_gpg_check | default(true) }}"
+      loop: "{{ patch_repos }}"
+
+- name: Sync local Pulp server if enabled
+  hosts: pulp_server
+  tasks:
+    - name: Sync pulp
+      ansible.builtin.include_role:
+        name: pulp_site
+        tasks_from: sync.yml
+      vars:
+        _pulp_site_rpm_info:
+            # TODO would need to ensure rocky 8 and 9 snippets are communicated separately (or include in same list and prefix)
+          - pulp_repo_name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
+            pulp_path: "{{ repo.subpath }}"
+            pulp_timestamp: "{{ repo.timestamp }}"
+      loop: "{{ patch_repos }}"
+      loop_control:
+        loop_var: repo
+
+- name: Sync local Pulp server if enabled with legacy config (< v2.5)
+  hosts: localhost
+  tasks:
+    - name: Sync pulp (legacy)
+      ansible.builtin.include_role:
+        name: pulp_site
+        tasks_from: sync.yml
+      vars:
+        pulp_site_rpm_info:
+          - name: "{{ repo.repo_name }}-{{ repo.timestamp }}"
+            subpath: "{{ repo.subpath }}/{{ repo.timestamp }}"
+      loop: "{{ patch_repos }}"
+      loop_control:
+        loop_var: repo
+      when: >
+          (not 'pulp_server' in groups)
+          and (pulp_site_upstream_password is defined and pulp_site_upstream_password | length > 0)
+
+- name: Install updated packages and disable repos if necessary
+  hosts: cluster
+  become: true
+  tasks:
+    - name: Install packages
+      ansible.builtin.dnf:
+        name: "{{ patch_packages }}"
+        state: latest # noqa: package-latest
+    - name: Disable repos
+      ansible.builtin.yum_repository:
+        file: "{{ item.repo_file }}"
+        name: "{{ item.repo_name }}"
+        baseurl: "{{ appliances_pulp_url }}/pulp/content/{{ item.subpath }}/{{ item.timestamp }}"
+        description: "{{ item.repo_name }}"
+        gpgcheck: "{{ not patch_insecure_disable_gpg_check | default(true) }}"
+        enabled: false
+      when: not dnf_repos_enabled | default(false) | bool
+      loop: "{{ patch_repos }}"
+
+    - name: Check if reboot required
+      ansible.builtin.command:
+        cmd: needs-restarting -r
+      failed_when: false
+      register: _patch_needs_reboot
+      changed_when: false
+
+- name: Output reboot instructions if required
+  hosts: localhost
+  tasks:
+    - name: Reboot instructions
+      ansible.builtin.debug:
+        msg: |
+          A reboot is required to load new packages.
+          1. Ensure that a RebootProgram is set in your Slurm config with
+
+               ansible login -m shell -a "scontrol show config | grep RebootProgram"`
+
+             if not, set
+
+               # environments/site/inventory/group_vars/all/openhpc.yml:
+               openhpc_config_extra:
+                 RebootProgram: /sbin/reboot
+
+             and apply this with
+
+               ansible-playbook ansible/slurm.yml --tags openhpc
+
+          2. From the control node, issue a command for compute nodes to reboot once they
+             have finished their current job
+
+               scontrol reboot ASAP nextstate=RESUME reason="maintenance" ALL
+
+             Change ALL to a subset of nodes if necessary. For more options (e.g rebooting
+             immediately without waiting for jobs to complete), see scontrol docs
+             https://slurm.schedmd.com/scontrol.html#OPT_reboot
+
+          3. Reboot the control and login nodes using
+
+               ansible login -m reboot --become
+               ansible control -m reboot --become
+
+             respectively
+      when: 1 in (groups['cluster'] | map('extract', hostvars, ['_patch_needs_reboot', 'rc']) | list)

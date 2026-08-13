@@ -33,6 +33,10 @@ control
 [node_exporter:children]
 cluster
 
+[selinux:children]
+# All hosts requiring control of SELinux status.
+fatimage
+
 [opensearch:children]
 control
 
@@ -218,7 +222,5 @@ compute
 # Hosts to run opkssh to allow SSH via OIDC
 
 ## Vulnerability mitigation groups
-[mitigate_dirtyfrag:children]
-builder
-[mitigate_ssh_keysign_pwn:children]
+[kernel_modules:children]
 builder

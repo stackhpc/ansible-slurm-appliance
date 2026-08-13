@@ -5,6 +5,9 @@
 #SBATCH --error=%x.%a.out
 #SBATCH --exclusive
 #SBATCH --partition={{ hpctests_partition }}
+{% if hpctests_reservation is defined %}
+#SBATCH --reservation={{ hpctests_reservation }}
+{% endif %}
 {%if hpctests_nodes is defined %}
 #SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}
 {% endif %}
