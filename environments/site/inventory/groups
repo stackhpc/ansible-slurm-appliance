@@ -33,6 +33,10 @@ control
 [node_exporter:children]
 cluster
 
+[selinux:children]
+# All hosts requiring control of SELinux status.
+fatimage
+
 [opensearch:children]
 control
 
@@ -219,6 +223,4 @@ compute
 
 ## Vulnerability mitigation groups
 [kernel_modules:children]
-builder
-[mitigate_ssh_keysign_pwn:children]
 builder
