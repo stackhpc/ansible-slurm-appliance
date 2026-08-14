@@ -25,7 +25,7 @@ scale_prepare_disable_firewall: false
 # being agr-vlan103 and therefore needed a 2nd routable name adding for
 # GPFS on the "baremetal-vlan". Now that is not the case but want to keep the
 # GPFS nodenames the same so it can restore GPFS cluster from backup.
-scale_daemon_nodename: "{{ inventory_hostname ~ '-data' if inventory_hostname in groups['control'] + groups['login'] else inventory_hostname }}"
+scale_daemon_nodename: "{{ inventory_hostname }}"
 
 # scale_remotemount_debug: true
 scale_remotemount_client_no_gui: true
@@ -59,7 +59,7 @@ _ib_device_map: # inventory group (or 'default') -> nodeclass name
   eri_gpu: mlx5_bond_0     # baremetal
 ib_device_group: "{{ group_names | intersect(_ib_device_map.keys()) | first | default('default') }}"
 scale_nodeclass:
-    - "{{ ib_device_map[ib_device_group] }}"
+    - "{{ _ib_device_map[ib_device_group] }}"
 
 # Define scale_config specifying nodeclasses:
 # NB: The spectrum_scale role fails if scale_config includes nodeclasses which don't match nodes in the cluster.
