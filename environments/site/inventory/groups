@@ -175,8 +175,8 @@ fatimage
 # Some roles do installs when in install mode/on build VM only:
 fatimage
 builder
-# allow cluster to install from local pulp
-cluster
+# note build doesn't disable repos as dnf_repos_enabled is set, so
+# cluster is allowed to install from local pulp too
 
 [cacerts]
 # Hosts to configure CA certificates and trusts on

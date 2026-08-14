@@ -1,3 +1,3 @@
 # manually-deployed pulp server, configured by appliance
 [pulp_server]
-pulp_host ansible_host=10.1.112.99
+pulp_host ansible_host=10.1.112.121
