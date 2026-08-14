@@ -41,9 +41,8 @@ All environments:
 - Pulp: A VM must be manually deployed for Pulp, e.g.:
 
     ```shell
-    nic_vlan112=$(openstack port create --network nesi-hpc-baremetal-vlan112 --fixed-ip ip-address=10.1.112.99 slurm-pulp-vlan112)
+    nic_vlan112=$(openstack port create -f value -c id --network nesi-hpc-baremetal-vlan112 --fixed-ip ip-address=10.1.112.99 slurm-pulp-vlan112)
     nic_vlan107=$(openstack port create -f value -c id --network agr-vlan107 --fixed-ip ip-address=10.29.107.113 slurm-pulp-vlan107)
-    openstack port create --network 
     openstack server create --key-name rocky_bastion_v2 \
         --image Rocky-8-GenericCloud-Base-8.9-20231119.0.x86_64.qcow2 \
         --flavor agr.memory1.2cpu8ram \
