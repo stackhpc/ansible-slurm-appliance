@@ -110,6 +110,16 @@
       ansible.builtin.meta: reset_connection
       become: false
 
+- hosts: cluster
+  gather_facts: false
+  become: true
+  tags:
+    - authorized_keys
+  tasks:
+    - name: Write authorized_keys for local users
+      ansible.builtin.include_role:
+        name: authorized_keys
+
 - hosts: systemd
   become: true
   gather_facts: false

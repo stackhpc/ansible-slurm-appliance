@@ -4,7 +4,9 @@ basic_users_users:
     # Hash the password with a salt that is different for each host
     password: "{{ vault_azimuth_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
     uid: 1005
-    public_key: "{{ cluster_user_ssh_public_key }}"
+    authorized_keys:
+      - public_key: "{{ lookup('env', 'CLUSTER_USER_SSH_PUBLIC_KEY') }}"
+        state: present
     shell: /bin/bash
     append: true
     groups:

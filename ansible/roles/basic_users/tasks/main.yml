@@ -86,9 +86,31 @@
     - item.create_home | default(true) | bool
     - ansible_hostname == basic_users_homedir_server
 
+- name: Normalise user key configuration
+  ansible.builtin.set_fact:
+    _basic_users_users: |
+      {%- set ns = namespace(users=[]) -%}
+      {%- for user in basic_users_users -%}
+      {# public_key is deprecated; include it for backward compatibility #}
+      {%-   set keys = namespace(items=[]) -%}
+      {%-   for key in user.authorized_keys | default([]) -%}
+      {%-     if key is mapping -%}
+      {%-       set _ = keys.items.append({'public_key': key.public_key, 'state': key.state | default('present')}) -%}
+      {%-     else -%}
+      {%-       set _ = keys.items.append({'public_key': key, 'state': 'present'}) -%}
+      {%-     endif -%}
+      {%-   endfor -%}
+      {%-   if user.public_key is defined -%}
+      {%-     set _ = keys.items.append({'public_key': user.public_key, 'state': 'present'}) -%}
+      {%-   endif -%}
+      {%-   set _ = ns.users.append(user | combine({'authorized_keys': keys.items})) -%}
+      {%- endfor -%}
+      {{ ns.users }}
+
 # The following tasks run on a single *client* node, so that home directory
 # paths are easily constructed, becoming each user so that root-squash
 # doesn't matter
+
 - name: Create ~/.ssh directories
   ansible.builtin.file:
     state: directory
@@ -98,12 +120,12 @@
     mode: u=rwX,go=
   become: true
   become_user: "{{ item.name }}"
-  loop: "{{ basic_users_users }}"
+  loop: "{{ _basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
   when:
     - item.state | default('present') == 'present'
-    - item.generate_ssh_key | default(basic_users_generate_ssh_key) | bool or item.public_key is defined
+    - item.generate_ssh_key | default(basic_users_generate_ssh_key) | bool or (item.authorized_keys | length > 0)
     - ansible_hostname == basic_users_homedir_client
 
 - name: Generate cluster ssh key
@@ -115,7 +137,7 @@
     _ssh_key_type: "{{ item.ssh_key_type | default('ed25519') }}"
   become: true
   become_user: "{{ item.name }}"
-  loop: "{{ basic_users_users }}"
+  loop: "{{ _basic_users_users }}"
   loop_control:
     label: "{{ item.name }}"
   when:
@@ -142,19 +164,18 @@
     - ansible_hostname == basic_users_homedir_client
     - item.public_key is defined # NB this is the *returned* public key
 
-- name: Write supplied public key to authorized_keys
+- name: Write supplied authorized_keys to authorized_keys
   ansible.posix.authorized_key:
-    user: "{{ item.name }}"
-    state: present
+    user: "{{ item.0.name }}"
+    state: "{{ item.1.state }}"
     manage_dir: false
-    key: "{{ item.public_key }}"
+    key: "{{ item.1.public_key }}"
     path: ~/.ssh/authorized_keys
   become: true
-  become_user: "{{ item.name }}"
-  loop: "{{ basic_users_users }}"
+  become_user: "{{ item.0.name }}"
+  loop: "{{ query('subelements', _basic_users_users, 'authorized_keys') }}"
   loop_control:
-    label: "{{ item.name }}"
+    label: "{{ item.0.name }}"
   when:
-    - item.state | default('present') == 'present'
-    - ansible_hostname == basic_users_homedir_client
-    - item.public_key is defined # NB this is the *provided* public key
+    - item.0.state | default('present') == 'present'
+    - item.1.public_key | string | length > 0 # NB this is a *provided* public key from authorized_keys
