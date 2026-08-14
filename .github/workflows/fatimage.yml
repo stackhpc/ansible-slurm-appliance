@@ -149,7 +149,7 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
-          IMAGE_CHECKSUM=$(openstack image show -f json -c properties "$IMAGE_ID" | jq '"\(.properties.os_hash_algo):\(.properties.os_hash_value)"')
+          IMAGE_CHECKSUM="$(openstack image show -f json -c properties "$IMAGE_ID" | jq -r '"\(.properties.os_hash_algo):\(.properties.os_hash_value)"')"
           echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           echo "image-id=$IMAGE_ID" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           echo "image-checksum=$IMAGE_CHECKSUM" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
