@@ -6,6 +6,7 @@ name: Release images
       - published # should work for both pre-releases and releases
 env:
   IMAGE_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+  S3_BUCKET_PUBLIC_URL: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images
 
 permissions: {}
 
@@ -40,5 +41,12 @@ jobs:
           TARGET_IMAGE=$(jq --arg version "${{ matrix.build }}" -r '.cluster_image[$version]' "${{ env.IMAGE_PATH }}")
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
 
-      - name: Copy image from pre-release to release bucket
-        run: s3cmd cp "s3://openhpc-images-prerelease/${TARGET_IMAGE}" s3://openhpc-images
+      - name: Copy SBOM and image from pre-release to release bucket
+        run: |
+          sbom_filename="${TARGET_IMAGE}.syft-json.zip"
+          sbom_url="${S3_BUCKET_PUBLIC_URL}/${sbom_filename}"
+          # TODO: confirm s3cmd cp copies metadata and overrides with the one we set manually
+          s3cmd cp "s3://openhpc-images-prerelease/${TARGET_IMAGE}.syft-json.zip" s3://openhpc-images
+          s3cmd cp \
+            --add-header "x-amz-meta-stackhpc-sbom-url: $sbom_url" \
+            "s3://openhpc-images-prerelease/${TARGET_IMAGE}" s3://openhpc-images
