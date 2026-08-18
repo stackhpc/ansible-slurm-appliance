@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2026, StackHPC
 # Apache 2 License
@@ -73,7 +72,8 @@ infiniband_ports:
                 type: str
                 sample: "ib0"
             net_device_gid_index:
-                description index N in /sys/class/infiniband/<net_device>/ports/<num>/gids/N with GID matching the net device's MAC address
+                description: index N in /sys/class/infiniband/<net_device>/ports/<num>/gids/N
+                with GID matching the net device's MAC address
                 returned: success
                 type: str
                 sample: "1"
@@ -87,7 +87,7 @@ EXAMPLES = """
 """
 
 
-def run_module():  # pylint: disable=missing-function-docstring
+def run_module():  # noqa: C901
     module_args = {}
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
@@ -122,19 +122,18 @@ def run_module():  # pylint: disable=missing-function-docstring
                     if len(ib_mac) == 59:
                         if module._debug:
                             module.log(
-                                "Removing %s from %s mac address to get gid=%s"
-                                % (ib_mac[:12], ibdev, ib_mac[12:])
+                                f"Removing {ib_mac[:12]} from {ibdev} mac address to get gid={ib_mac[12:]}"
                             )
                         ib_mac = ib_mac[12:]
                     # remove ':' because they are packed differently in port gids
                     ib_mac_addresses[ib_mac.replace(":", "")] = ibdev
             except Exception as e:
-                module.log("%s: exception reading/parsing: %r" % (a, e))
+                module.log(f"{a}: exception reading/parsing: {e!r}")
     for port_path in ports:
         port_num = os.path.basename(port_path)
         port_device = os.path.basename(os.path.dirname(os.path.dirname(port_path)))
         port_info = {
-            "name": "%s:%s" % (port_device, port_num),
+            "name": f"{port_device}:{port_num}",
             "num": port_num,
             "dev": port_device,
             "net_device": "",
@@ -155,21 +154,17 @@ def run_module():  # pylint: disable=missing-function-docstring
                 with open(os.path.join(port_path, info), encoding="utf-8") as f:
                     raw = f.read().strip()
                     if module._debug:
-                        module.log(
-                            "Port %s:%s %s=%r" % (port_device, port_num, info, raw)
-                        )
+                        module.log(f"Port {port_device}:{port_num} {info}={raw!r}")
                     m = extract.fullmatch(raw)
                     if m:
                         port_info[info] = m.group(1)
                     else:
                         module.log(
-                            "Port %s:%s unexpected %s=%r"
-                            % (port_device, port_num, info, raw)
+                            f"Port {port_device}:{port_num} unexpected {info}={raw!r}"
                         )
             except Exception as e:
                 module.log(
-                    "Port %s:%s unable to read %s: %r"
-                    % (port_device, port_num, info, e)
+                    f"Port {port_device}:{port_num} unable to read {info}: {e!r}"
                 )
         gids = glob.glob(os.path.join(port_path, "gids", "*"))
         for gid in gids:
@@ -181,21 +176,12 @@ def run_module():  # pylint: disable=missing-function-docstring
                     if gid_packed in ib_mac_addresses:
                         if module._debug:
                             module.log(
-                                "GID %s=%s matches ib net device %s",
-                                gid,
-                                raw,
-                                ib_mac_addresses[gid_packed],
+                                f"GID {gid}={raw} matches ib net device {ib_mac_addresses[gid_packed]}"
                             )
                         port_info["net_device_gid_index"] = os.path.basename(gid)
                         port_info["net_device"] = ib_mac_addresses[gid_packed]
             except Exception as e:
-                module.log(
-                    "GID %s unable to read: %r"
-                    % (
-                        gid,
-                        e,
-                    )
-                )
+                module.log(f"GID {gid} unable to read: {e!r}")
     module.exit_json(**result)
 
 
