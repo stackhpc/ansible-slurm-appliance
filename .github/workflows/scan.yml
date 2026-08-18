@@ -73,8 +73,7 @@ jobs:
           IMAGE_NAME=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$JSON_PATH")
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_ENV"
           echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
-          echo "SBOM_NAME=${IMAGE_NAME}-sbom.syft-json" >> "$GITHUB_ENV"
-          echo "sbom_name=${IMAGE_NAME}-sbom.syft-json" >> "$GITHUB_OUTPUT"
+          echo "sbom_name=${IMAGE_NAME}.syft-json" | tr '[:upper:]' '[:lower:]' | tee -a "$GITHUB_ENV" "$GITHUB_OUTPUT"
         env:
           MATRIX_BUILD: ${{ matrix.build }}
           JSON_PATH: ${{ env.JSON_PATH }}
@@ -86,42 +85,25 @@ jobs:
           path: ${{ steps.manifest.outputs.sbom_name }}
           key: ${{ steps.manifest.outputs.sbom_name }}
 
-      - name: Download image
+      - name: Download image SBOM
         # NB: use /mnt as that is a separate disk with more space
         if: steps.cache_restore.outputs.cache-hit != 'true'
         run: |
           . venv/bin/activate
-          sudo mkdir /mnt/images
-          sudo chmod 777 /mnt/images
-          openstack image save --file "/mnt/images/${IMAGE_NAME}" "${IMAGE_NAME}"
-
-      - name: Set up QEMU
-        if: steps.cache_restore.outputs.cache-hit != 'true'
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
-
-      - name: Install libguestfs
-        if: steps.cache_restore.outputs.cache-hit != 'true'
-        run: |
-          sudo apt -y update
-          sudo apt -y install libguestfs-tools
-
-      - name: Make directory for mount
-        if: steps.cache_restore.outputs.cache-hit != 'true'
-        run: sudo mkdir -p "./${IMAGE_NAME}"
-
-      - name: Mount image file
-        if: steps.cache_restore.outputs.cache-hit != 'true'
-        run: sudo guestmount -a "/mnt/images/${IMAGE_NAME}" -i --ro -o allow_other "./${IMAGE_NAME}"
-
-      - name: Generate sbom and attach to release if applicable
-        if: steps.cache_restore.outputs.cache-hit != 'true'
-        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
-        id: generate-sbom
-        with:
-          path: "./${{ steps.manifest.outputs.image-name }}"
-          artifact-name: ${{ steps.manifest.outputs.sbom_name }}
-          output-file: ${{ steps.manifest.outputs.sbom_name }}
-          format: syft-json
+          sbom_url="$(openstack image show --format json "${IMAGE_NAME}" | jq -r '.properties.stackhpc_sbom // ""')"
+          # be slightly robust to string injection
+          if [ -n "$sbom_url" ] && [[ "$sbom_url" == https://leafcloud.store* ]] && [[ "$sbom_url" == *syft-json.zip ]]; then
+            echo Downloading "$sbom_url..."
+            wget -nv "$sbom_url" -O sbom.zip
+            if ! unzip sbom.zip "${sbom_name}" || [ ! -e "${sbom_name}" ]; then
+              echo "Unexpected content in sbom zip: didn't produce ${sbom_name}"
+              unzip -l sbom.zip
+              exit 1
+            fi
+          else
+            echo "Missing or invalid sbom_url='$sbom_url' (quotes added)"
+            exit 1
+          fi
 
       - name: Save SBOM cache
         if: steps.cache_restore.outputs.cache-hit != 'true'

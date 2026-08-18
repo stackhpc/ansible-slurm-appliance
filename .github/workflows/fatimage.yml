@@ -34,10 +34,10 @@ jobs:
         build:
           - image_name: openhpc-RL8
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
-            inventory_groups: fatimage
+            inventory_groups: fatimage,sbom
           - image_name: openhpc-RL9
             source_image_name: Rocky-9-GenericCloud-Base-9.8-20260525.0.x86_64
-            inventory_groups: fatimage
+            inventory_groups: fatimage,sbom
     env:
       ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
@@ -45,6 +45,8 @@ jobs:
       ARK_PASSWORD: ${{ secrets.ARK_PASSWORD }}
       PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'true' && 'cleanup' || 'abort' }}
+      S3_BUCKET: openhpc-sboms-test
+      S3_BUCKET_PUBLIC_URL: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-sboms-test
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -147,8 +149,10 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
+          IMAGE_CHECKSUM="$(openstack image show -f json -c properties "$IMAGE_ID" | jq -r '"\(.properties.os_hash_algo):\(.properties.os_hash_value)"')"
           echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           echo "image-id=$IMAGE_ID" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "image-checksum=$IMAGE_CHECKSUM" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           echo "$IMAGE_ID" > image-id.txt
           echo "$IMAGE_NAME" > image-name.txt
 
@@ -159,12 +163,45 @@ jobs:
         env:
           STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
 
+      - name: Write s3cmd configuration
+        run: |
+          echo "$SECRETS_LEAFCLOUD_S3_CFG" > ~/.s3cfg
+        shell: bash
+        env:
+          SECRETS_LEAFCLOUD_S3_CFG: ${{ secrets.LEAFCLOUD_S3_CFG }}
+
+      - name: Install s3cmd
+        run: |
+          sudo apt-get update
+          sudo apt-get --yes install s3cmd
+
+      - name: Upload SBOM
+        run: |
+          . venv/bin/activate
+          sbom_filename="${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}.syft-json.zip"
+          sbom_url="${S3_BUCKET_PUBLIC_URL}/${sbom_filename}"
+          # `s3cmd --add-header 'If-None-Match: *'` doesn't work in multipart mode
+          s3cmd  put \
+            --add-header 'If-None-Match: *' --disable-multipart \
+            --add-header "x-amz-meta-github-run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --add-header "x-amz-meta-stackhpc-image-id: $STEPS_MANIFEST_OUTPUTS_IMAGE_ID" \
+            --add-header "x-amz-meta-stackhpc-image-name: $STEPS_MANIFEST_OUTPUTS_IMAGE_NAME" \
+            --add-header "x-amz-meta-stackhpc-image-checksum: $STEPS_MANIFEST_OUTPUTS_IMAGE_CHECKSUM" \
+            sbom.zip "s3://$S3_BUCKET/${sbom_filename}"
+          echo "sbom-url=${sbom_url}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          openstack image set --property "stackhpc_sbom=$sbom_url" "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}" || true
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
+          STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}
+          STEPS_MANIFEST_OUTPUTS_IMAGE_CHECKSUM: ${{ steps.manifest.outputs.image-checksum }}
+
       - name: Set image properties
         run: |
           . venv/bin/activate
           . dev/image-set-properties.sh "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
         env:
           STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
+          STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

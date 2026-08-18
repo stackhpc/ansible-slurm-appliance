@@ -6,44 +6,44 @@ ignore:
   # CVE-2025-68121 / GO-2026-4337
   - vulnerability: CVE-2025-68121
     package:
-      location: /usr/bin/ondemand_exporter
+      location: usr/bin/ondemand_exporter
   - vulnerability: GO-2026-4337
     package:
-      location: /usr/bin/ondemand_exporter
+      location: usr/bin/ondemand_exporter
   # prometheus 3.5.1 still has an older go runtime
   - vulnerability: CVE-2025-68121
     package:
-      location: "/usr/local/bin/prometheus"
+      location: "usr/local/bin/prometheus"
   - vulnerability: CVE-2025-68121
     package:
-      location: "/usr/local/bin/promtool"
+      location: "usr/local/bin/promtool"
   - vulnerability: CVE-2025-68121
     package:
-      location: "/usr/sbin/ondemand-dex"
+      location: "usr/sbin/ondemand-dex"
   - vulnerability: GO-2026-4337
     package:
-      location: "/usr/sbin/ondemand-dex"
+      location: "usr/sbin/ondemand-dex"
   - vulnerability: CVE-2025-68121
     package:
-      location: "/usr/sbin/ondemand-dex-session"
+      location: "usr/sbin/ondemand-dex-session"
   - vulnerability: GO-2026-4337
     package:
-      location: "/usr/sbin/ondemand-dex-session"
+      location: "usr/sbin/ondemand-dex-session"
   - vulnerability: CVE-2025-68121
     package:
-      location: "/usr/share/grafana/bin/grafana"
+      location: "usr/share/grafana/bin/grafana"
 
 #  go crypto/tls vulnerability: programs used with trusted TLS servers
 # CVE-2025-68121 / GO-2026-4337
   - vulnerability: CVE-2025-68121
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: CVE-2025-68121
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2026-4337
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # FIXME: go compiler bug introduces potential unverified memory access wr loops with induction variables on under or overflow
   - vulnerability: CVE-2026-27143
@@ -51,85 +51,85 @@ ignore:
 # go crypto/tls vulnerability: programs run by users not admins
   - vulnerability: CVE-2025-68121
     package:
-      location: "/usr/bin/apptainer"
+      location: "usr/bin/apptainer"
 
 # kernel rescue image: won't be booted
 # CVE-2021-43267, CVE-2021-47378, ...
   - package:
-      location: /boot/vmlinuz-0-rescue-*
+      location: boot/vmlinuz-0-rescue-*
 
 # CVE-2023-24531 `go env` command is not used
   - vulnerability: CVE-2023-24531
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2023-3128 grafana Azure AD auth bypass by spoofing -- not used
   - vulnerability: GHSA-mpv3-g8m3-3fjc
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2024-24790 IsPrivate, IsLoopback, etc broken for IPv4-mapped IPv6 addresses -- not affected
   - vulnerability: CVE-2024-24790
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2024-2887
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2024-8986 Grafana plugin SDK Information Leakage about git source repository -- not affected
   - vulnerability: GHSA-xxxw-3j6h-q7h6
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-xxxw-3j6h-q7h6
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2024-3140
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GO-2024-3140
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 
 # CVE-2025-22871 request smuggling in net/http server (bare LF) -- no server forwarding chunked data here
   - vulnerability: CVE-2025-22871
     package:
-      location: /usr/bin/ondemand_exporter
+      location: usr/bin/ondemand_exporter
   - vulnerability: CVE-2025-22871
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2025-3563
     package:
-      location: /usr/bin/ondemand_exporter
+      location: usr/bin/ondemand_exporter
   - vulnerability: GO-2025-3563
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 
 # CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not running go server
   - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GO-2026-4762
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2026-4762
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- no auth to start with
   - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
 
 # CVE-2026-33186 (GO-2026-4762) gRPC-Go server auth bypass -- not affected in our deployments
 # XXX: grpc version bump is in DEX master but it needs a new DEX release before OOD release to produce the ondemand-dex package
@@ -138,27 +138,27 @@ ignore:
 # Our deployments don't enable it. Check for the commented-out `grpc:` block in `/etc/ood/dex/config.yaml` to confirm.
   - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
   - vulnerability: GO-2026-4762
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
   - vulnerability: GHSA-p77j-4mvh-x3m3
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GO-2026-4762
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
 
 # CVE-2024-45337 (GO-2024-3321) Misuse of ServerConfig.PublicKeyCallback -- not using ssh
   - vulnerability: GHSA-v778-237x-gjrc
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-v778-237x-gjrc
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2024-3321
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2026-33937 Handlebars.compile() javascript injection
 # Handlebars.compile() is only used by the shell app via hbs. All uses seem safe:
@@ -166,20 +166,20 @@ ignore:
 #  - or from string by directly reading a file on disk
   - vulnerability: GHSA-2w6w-674q-4c4q
     package:
-      location: /var/www/ood/apps/sys/shell/yarn.lock
+      location: var/www/ood/apps/sys/shell/yarn.lock
 # Handlebars.compile() is only used by webpack.config.js and input from string by directly reading a file on disk
   - vulnerability: GHSA-2w6w-674q-4c4q
     package:
-      location: /opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
+      location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
 
 # CVE-2026-39324 Rack::Session::Cookie secrets: decrypt failure fallback enables secretless session forgery and Marshal deserialization
 # Preliminary checks indicate OOD is not affected, as a Ruby on Rails application.
   - vulnerability: GHSA-33qg-7wpp-89cq
     package:
-      location: /opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/rack-session-2.1.1.gemspec
+      location: opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/rack-session-2.1.1.gemspec
   - vulnerability: GHSA-33qg-7wpp-89cq
     package:
-      location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
+      location: var/www/ood/apps/sys/dashboard/Gemfile.lock
 
 # CVE-2026-39832/GO-2026-5006: # https://nvd.nist.gov/vuln/detail/CVE-2026-39832
 # Destination restrictions are stripped when adding ssh keys to remote agents,
@@ -187,40 +187,40 @@ ignore:
 # Ignore: Packages don't use ssh
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GHSA-f5wc-c3c7-36mc
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
 
 # CVE-2026-1229: CIRCL has an incorrect calculation in secp384r1 CombinedMult in github.com/cloudflare/circl
 # https://osv.dev/vulnerability/GO-2026-4550
@@ -236,402 +236,402 @@ ignore:
 #   so standard SSL using this library would be fine
   - vulnerability: GO-2026-4550
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
 
 # CVE-2026-46595/GO-2026-5023: Extension of CVE-2024-45337 to non-public-key callbacks
 # Ignore: Not using ssh
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GHSA-x527-x647-q7gg
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
 
 # CVE-2026-39830/GO-2026-5017: ssh connection blocked by unsolicited global request responses
 # Ignore: Not using ssh
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GHSA-vgwf-h737-ff37
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
 
 # CVE-2026-39834/GO-2026-5020: ssh doesn't make progress for data > 4GB in single write call
 # Ignore: Not using ssh
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GHSA-rm3j-f69w-wqmq
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GO-2026-5020
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GO-2026-5020
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
 
 
 # CVE-2026-39821: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna
 # govulncheck -mode=binary found no issue:
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
 # All paths below are reported as vulnerable by govulncheck, but considered acceptable risk from AI-based review:
 # apptainer: Very low risk. IDNA pulled transitively; no hostname ACL pattern.
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
 # apptainer dhpc: Negligible risk, no reason for IDNA use. False positive from transitive linking?
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/libexec/apptainer/cni/dhcp
+      location: usr/libexec/apptainer/cni/dhcp
 # alertmanager, amtool: Low risk. No hostname-based privilege separation
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
 # node_exporter: Negligible  risk. Metrics server only.
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
 # prometheus, promtool: Low risk. No IDNA-based access control
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
 # grafana: Low-Moderate risk. OAuth/auth proxy flows could theoretically touch this,
 # unlikely to be exploitable in actual config.
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
 # opensearch datasource: Very Low risk. Admin-configured endpoint only.
   - vulnerability: GO-2026-5026
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 # ondemand_exporter: Negligible risk. No hostname-based privilege checks, no IDNA normalisation in security path.
   - vulnerability: GO-2026-5026
     package:
-      location: /usr/bin/ondemand_exporter
+      location: usr/bin/ondemand_exporter
 
 # CVE-2026-39833/GO-2026-5005: Invoking key constraints not enforced in golang.org/x/crypto/ssh/agent
 # Ignore: Not using ssh
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GHSA-jppx-rxg9-jmrx
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
 
 # CVE-2026-39833: Invoking auth bypass via unenforced @revoked status in golang.org/x/crypto/ssh/knownhosts
 # Ignore: Not using ssh
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GO-2026-5005
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GO-2026-5005
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
 
 # CVE-2026-42508/GO-2026-5021: Invoking auth bypass via unenforced @revoked status in golang.org/x/crypto/ssh/knownhosts
 # Ignore: not using ssh
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GHSA-5cgq-3rg8-m6cv
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
 
 # CVE-2026-39831/GO-2026-5019: Invoking bypass of FIDO/U2F security keys physical interaction in golang.org/x/crypto/ssh
 # Ignore: not using ssh
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GO-2026-5019
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GO-2026-5019
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/bin/apptainer
+      location: usr/bin/apptainer
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/local/bin/node_exporter
+      location: usr/local/bin/node_exporter
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/local/bin/promtool
+      location: usr/local/bin/promtool
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/sbin/ondemand-dex-session
+      location: usr/sbin/ondemand-dex-session
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/libexec/apptainer/bin/starter
+      location: usr/libexec/apptainer/bin/starter
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/libexec/apptainer/bin/gocryptfs
+      location: usr/libexec/apptainer/bin/gocryptfs
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/local/bin/alertmanager
+      location: usr/local/bin/alertmanager
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/local/bin/amtool
+      location: usr/local/bin/amtool
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/local/bin/prometheus
+      location: usr/local/bin/prometheus
   - vulnerability: GHSA-89gr-r52h-f8rx
     package:
-      location: /usr/sbin/ondemand-dex
+      location: usr/sbin/ondemand-dex
 
 # CVE-2026-43037: buffer overflow vuln in ip6_tunnel kernel module
 # Module disabled in ansible/mitigations.yml
@@ -639,41 +639,41 @@ ignore:
 # FIXME: By kernel-5.14.0-687.15.1
   - vulnerability: CVE-2026-43037
     package:
-      location: /var/lib/rpm/rpmdb.sqlite
+      location: var/lib/rpm/rpmdb.sqlite
 # RockyLinux 8: https://access.redhat.com/errata/RHSA-2026:25121
 # FIXME: By kernel-4.18.0-553.132.1
   - vulnerability: CVE-2026-43037
     package:
-      location: /var/lib/rpm/Packages
+      location: var/lib/rpm/Packages
   # CVE-2026-59873 Node.js tar tool in JupyterLab allowing zip bombs
   # https://access.redhat.com/security/cve/cve-2026-59873
   # FIXME: Prioritising releasing kernels for CVE-2026-64600
   - vulnerability: GHSA-23hp-3jrh-7fpw
     package:
-      location: /opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
+      location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
 
 # GHSA-r277-6w6q-xmqw: kin-openapi auth bypass
 # Not present in final binary https://github.com/grafana/grafana/pull/129271
   - vulnerability: GHSA-r277-6w6q-xmqw
     package:
-      location: /usr/share/grafana/bin/grafana
+      location: usr/share/grafana/bin/grafana
   - vulnerability: GHSA-r277-6w6q-xmqw
     package:
-      location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
+      location: var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
 # CVE-2026-66066: ruby-on-rails ActiveStorage+libvips possible arbitrary file read + RCE
 # Not affected: libvips not present in the appliance + no found path to rendering user-provided images
   - vulnerability: GHSA-xr9x-r78c-5hrm
     package:
-      location: /opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/activestorage-7.1.6.gemspec
+      location: opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/activestorage-7.1.6.gemspec
   - vulnerability: GHSA-xr9x-r78c-5hrm
     package:
-      location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
+      location: var/www/ood/apps/sys/dashboard/Gemfile.lock
   - vulnerability: GHSA-xr9x-r78c-5hrm
     package:
-      location: /var/www/ood/apps/sys/myjobs/Gemfile.lock
+      location: var/www/ood/apps/sys/myjobs/Gemfile.lock
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
 exclude:
-  - /var/lib/podman/.local/share/**
+  - var/lib/podman/.local/share/**

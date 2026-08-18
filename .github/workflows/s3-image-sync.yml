@@ -8,6 +8,7 @@ name: Upload CI-tested images to Leafcloud S3 and sync clouds
       - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
 env:
   S3_BUCKET: openhpc-images-prerelease
+  S3_BUCKET_PUBLIC_URL: https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images-prerelease
   IMAGE_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
   RUNNER_IMAGE_DIR: /mnt/images
 
@@ -97,18 +98,39 @@ jobs:
       - name: Retrieve image name
         run: |
           TARGET_IMAGE=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$IMAGE_PATH")
-          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_ENV"
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" | tee -a "$GITHUB_ENV" "$GITHUB_STEP_SUMMARY"
         shell: bash
         env:
           MATRIX_BUILD: ${{ matrix.build }}
 
-      - name: Download image to runner
+      - name: Download image and SBOM to runner
         run: |
           . venv/bin/activate
           df -h
           sudo mkdir "$RUNNER_IMAGE_DIR"
           sudo chmod ugo=rwX "$RUNNER_IMAGE_DIR"
+
+          sbom_url="$(openstack image show --format json "${TARGET_IMAGE}" | jq -r '.properties.stackhpc_sbom // ""')"
+          if [ -n "$sbom_url" ] && [[ "$sbom_url" == https://leafcloud.store* ]]; then
+            echo Downloading "$sbom_url..."
+            wget -nv "$sbom_url" -O "${RUNNER_IMAGE_DIR}/sbom.zip"
+          else
+            echo "Missing or invalid sbom_url='$sbom_url' (quotes added)"
+            exit 1
+          fi
+          TARGET_IMAGE_SHA512="$(openstack image show -f json -c properties "${TARGET_IMAGE}" | jq -r '.properties.os_hash_value')"
+          SBOM_IMAGE_SHA512=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-checksum | sed 's/.*sha512://')
+          SBOM_GITHUB_RUN=$(curl -sS -I "$sbom_url" | grep x-object-meta-github-run | sed 's/.*://')
+          SBOM_IMAGE_ID=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-id | sed 's/.*://')
+          if [ "$TARGET_IMAGE_SHA512" != "$SBOM_IMAGE_SHA512" ]; then
+            echo "E: Image $TARGET_IMAGE checksum in OpenStack is $TARGET_IMAGE_SHA512 but recorded with sbom is $SBOM_IMAGE_SHA512"
+            exit 1
+          fi
+          echo "SBOM_IMAGE_SHA512=$SBOM_IMAGE_SHA512" | tee -a "$GITHUB_ENV" "$GITHUB_STEP_SUMMARY"
+          echo "SBOM_GITHUB_RUN=$SBOM_GITHUB_RUN" | tee -a "$GITHUB_ENV" "$GITHUB_STEP_SUMMARY"
+          echo "SBOM_IMAGE_ID=$SBOM_IMAGE_ID" | tee -a "$GITHUB_ENV" "$GITHUB_STEP_SUMMARY"
           openstack image save --file "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}.raw" "${TARGET_IMAGE}"
+          sha512sum -c <<<"${SBOM_IMAGE_SHA512} ${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}.raw"
           df -h
         shell: bash
 
@@ -120,8 +142,25 @@ jobs:
 
       - name: Upload Image to S3
         run: |
+          qcow2_image_sha512=$(sha512sum "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}.raw" | awk '{ print $1 }')
+          sbom_filename="${TARGET_IMAGE}.syft-json.zip"
+          sbom_url="${S3_BUCKET_PUBLIC_URL}/${sbom_filename}"
           echo "Uploading Image: ${TARGET_IMAGE} to S3..."
-          s3cmd --multipart-chunk-size-mb=150 put "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}" "s3://${S3_BUCKET}"
+          s3cmd --multipart-chunk-size-mb=150 put \
+            --add-header "x-amz-meta-github-run: $SBOM_GITHUB_RUN" \
+            --add-header "x-amz-meta-stackhpc-image-id: $SBOM_IMAGE_ID" \
+            --add-header "x-amz-meta-stackhpc-image-name: $TARGET_IMAGE" \
+            --add-header "x-amz-meta-stackhpc-image-sha512: $SBOM_IMAGE_SHA512" \
+            --add-header "x-amz-meta-stackhpc-qcow2-sha512: $qcow2_image_sha512" \
+            --add-header "x-amz-meta-stackhpc-sbom-url: $sbom_url" \
+            "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}" "s3://${S3_BUCKET}"
+          echo "Uploading SBOM: ${TARGET_IMAGE}.syft-json.zip to S3..."
+          s3cmd put \
+            --add-header "x-amz-meta-github-run: $SBOM_GITHUB_RUN" \
+            --add-header "x-amz-meta-stackhpc-image-id: $SBOM_IMAGE_ID" \
+            --add-header "x-amz-meta-stackhpc-image-name: $TARGET_IMAGE" \
+            --add-header "x-amz-meta-stackhpc-image-sha512: $SBOM_IMAGE_SHA512" \
+            "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}/sbom.zip" "s3://${S3_BUCKET}/${sbom_filename}"
         shell: bash
 
   image_sync:

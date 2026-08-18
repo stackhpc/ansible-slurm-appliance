@@ -1,0 +1,40 @@
+- hosts: sbom
+  become: true
+  gather_facts: true
+  tags: sbom
+  tasks:
+    - name: Ensure .grype.yaml is present
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../.grype.yaml"
+        dest: /tmp/.grype.yaml
+        owner: "{{ ansible_user }}"
+        mode: "0644"
+    - name: Set sbom filename
+      ansible.builtin.set_fact:
+        sbom_filename: "{{ ansible_hostname }}.syft-json"
+    - name: Install and run syft
+      become: true
+      changed_when: true
+      ansible.builtin.shell: |
+        cd /tmp
+        set -eo pipefail
+        curl -L -o syft_1.51.0_linux_amd64.tar.gz  https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_linux_amd64.tar.gz
+        sha256sum -c <<<"2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f  syft_1.51.0_linux_amd64.tar.gz"
+        tar xf syft_1.51.0_linux_amd64.tar.gz syft
+        time ./syft scan \
+          --exclude ./dev --exclude ./proc --exclude ./sys --exclude ./run \
+          --config .grype.yaml \
+          --source-name "$sbom" --source-version 1 \
+          --output syft-json="$sbom" \
+          dir:/
+        ls -hl "$sbom"
+        zip "${sbom}.zip" "$sbom"
+        # dd if="$sbom" of="${sbom}.zip" bs=1M count=32
+        # no need to cleanup: cleanup.yml will wipe /tmp again.
+      environment:
+        sbom: "{{ sbom_filename }}"
+    - name: Fetch the sbom to the control host
+      ansible.builtin.fetch:
+        src: "/tmp/{{ sbom_filename }}.zip"
+        dest: "{{ playbook_dir }}/../sbom.zip"
+        flat: true
