@@ -34,10 +34,10 @@ jobs:
         build:
           - image_name: openhpc-RL8
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
-            inventory_groups: fatimage
+            inventory_groups: fatimage,sbom
           - image_name: openhpc-RL9
             source_image_name: Rocky-9-GenericCloud-Base-9.8-20260525.0.x86_64
-            inventory_groups: fatimage
+            inventory_groups: fatimage,sbom
     env:
       ANSIBLE_FORCE_COLOR: 'true'
       OS_CLOUD: openstack
