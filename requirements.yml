@@ -19,9 +19,9 @@ roles:
     version: v0.1.4
 
 collections:
-  - name: https://github.com/IBM/ibm-spectrum-scale-install-infra.git
+  - name: https://github.com/stackhpc/ibm-spectrum-scale-install-infra.git
     type: git
-    version: v2.11.0
+    version: v2.11.0-stackhpc
   - name: containers.podman
     version: 1.16.2
   - name: community.grafana

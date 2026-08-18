@@ -1,0 +1,4 @@
+- name: Import parent hooks
+  vars:
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+  import_playbook: "{{ appliances_environment_root }}/../site/hooks/post-filesystems.yml"

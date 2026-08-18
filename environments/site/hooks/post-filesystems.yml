@@ -1,0 +1,16 @@
+- name: Setup SpectrumScale remotemount filesystem
+  hosts: spectrum_scale
+  become: yes
+  gather_facts: yes
+  tags: spectrum_scale
+  tasks:
+    - name: Install Spectrum Scale
+      ansible.builtin.include_role:
+       name: spectrum_scale
+       tasks_from: install.yml
+      when: "appliances_mode != 'configure'"
+    - name: Configure Spectrum Scale
+      ansible.builtin.include_role:
+       name: spectrum_scale
+       tasks_from: configure.yml
+      when: "appliances_mode != 'build'"

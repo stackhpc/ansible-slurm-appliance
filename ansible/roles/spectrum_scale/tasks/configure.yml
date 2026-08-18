@@ -1,0 +1,56 @@
+- name: Check spectrum scale version is set
+  ansible.builtin.assert:
+    that: scale_version is defined
+    fail_msg: "ibm.spectrum_scale variable 'scale_version' MUST be set"
+
+- include_role:
+    name: ibm.spectrum_scale.core_prepare
+
+- name: Check for spectrum scale backup
+  stat:
+    path: "{{ spectrum_scale_backup_path }}"
+  changed_when: false
+  register: _spectrum_scale_backup_stat
+  when: inventory_hostname == spectrum_scale_backup_host
+
+- name: Check spectrum scale cluster status
+  command: /usr/lpp/mmfs/bin/mmgetstate -a
+  register: _spectrum_scale_cluster_state
+  changed_when: false
+  failed_when:
+    - _spectrum_scale_cluster_state.rc > 0
+    - "'node does not belong to a GPFS cluster' not in _spectrum_scale_cluster_state.stderr"
+  when: inventory_hostname == spectrum_scale_backup_host
+
+- block:
+  - name: Restore spectrum scale configuration
+    command: "{{ spectrum_scale_binary_path }}/mmsdrrestore -F {{ spectrum_scale_backup_path }} -a"
+  when:
+    - inventory_hostname == spectrum_scale_backup_host
+    - _spectrum_scale_backup_stat.stat.exists
+    - "'node does not belong to a GPFS cluster' in _spectrum_scale_cluster_state.stderr"
+
+- include_role:
+    name: ibm.spectrum_scale.core_configure
+
+- include_role:
+    name: ibm.spectrum_scale.remotemount_configure
+  when:
+    - "scale_remotemount_filesystem_name | length > 0"
+
+- include_role:
+    name: ibm.spectrum_scale.core_verify
+
+- name: Ensure spectrum scale backup directory exists
+  file:
+    state: directory
+    path: "{{ spectrum_scale_backup_path | dirname }}"
+    owner: root
+    group: root
+    mode: u=rwX,go=
+  when: inventory_hostname == spectrum_scale_backup_host
+
+- name: Create/update spectrum scale backup
+  command:
+    cmd: "{{ spectrum_scale_binary_path }}/mmccr backup -F -A {{ spectrum_scale_backup_path }}"
+  when: inventory_hostname == spectrum_scale_backup_host

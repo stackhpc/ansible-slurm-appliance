@@ -1,0 +1,34 @@
+etc_hosts_hostvars:
+  - ansible_host
+  - node_fqdn
+  - inventory_hostname
+etc_hosts_extra_hosts: |
+  10.1.110.222   a02hda01-data  # DMF ACM/ Admin node
+  10.1.110.221   a02hdd03-data  # DMF DB/ Core nodes
+  10.1.110.220   a02hdd02-data
+  10.1.110.219   a02hdd01-data
+  10.1.110.229   a02hdm01-data  # DMF Data mover nodes
+  10.1.110.230   a02hdm02-data
+  10.1.110.206   a02hgs01-data  # PFSS Disk nodes
+  10.1.110.207   a02hgs02-data
+  10.1.110.208   a02hgs03-data
+  10.1.110.209   a02hgs04-data
+  10.1.110.210   a02hgs05-data
+  10.1.110.211   a02hgs06-data
+  10.1.110.212   a02hgs07-data
+  10.1.110.213   a02hgs08-data
+  10.1.110.214   a02hgs09-data
+  10.1.110.215   a02hgs10-data
+  10.1.110.216   a02hgf01-data  # PFSS Flash nodes
+  10.1.110.217   a02hgf02-data
+  10.1.110.218   a02hgf03-data
+  10.1.110.231   a02hgf04-data
+  10.1.110.232   a02hgf05-data
+  10.1.110.233   a02hgp01-data  # PFSS Protocol nodes
+  10.1.110.234   a02hgp02-data
+  10.1.110.235   a02hga01-data  # PFSS Admin node
+  10.1.110.71    a02lm01-data   # Client for pfss test
+  10.1.110.72    a02lm02-data
+  10.1.110.86    a02gc06-data
+  10.1.110.87    a02gc07-data
+  10.1.110.88    a02gc08-data
