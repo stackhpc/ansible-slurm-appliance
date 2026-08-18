@@ -1,4 +1,4 @@
-appliances_pulp_url: "http://10.1.112.121:8080"
+appliances_pulp_url: "http://10.1.112.99:8080"
 pulp_site_upstream_username: slurm-nesi
 pulp_site_upstream_password: "{{ vault_pulp_site_upstream_password }}"
 pulp_site_target_distribution_version: '8.10'
