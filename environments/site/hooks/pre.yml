@@ -10,19 +10,19 @@
         owner: root
         group: root
         mode: u=rw,go=
-      delegate_to: control
+      delegate_to: "{{ groups['control'] | first }}"
     - name: Find persisted hostkeys
       find:
         paths: "{{ hostvars[groups['control'].0].appliances_state_dir }}/hostkeys/{{ inventory_hostname }}/"
         patterns: '*key*'
       register: _find_persisted_hostkeys
-      delegate_to: control
+      delegate_to: "{{ groups['control'] | first }}"
     - name: Slurp persisted hostkeys
       slurp:
         src: "{{ item.path }}"
       loop: "{{ _find_persisted_hostkeys.files }}"
       register: _slurp_persisted_hostkeys
-      delegate_to: control
+      delegate_to: "{{ groups['control'] | first }}"
       when: _find_persisted_hostkeys.files | length > 0
     - name: Restore persisted hostkeys
       copy:
@@ -52,7 +52,7 @@
           group: "{{ item.item.gr_name }}"
           mode: "{{ item.item.mode }}"
         loop: "{{ _slurp_current_hostkeys.results }}"
-        delegate_to: control
+        delegate_to: "{{ groups['control'] | first }}"
       when: _find_persisted_hostkeys.files | length == 0
 
 
