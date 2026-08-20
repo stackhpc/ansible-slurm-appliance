@@ -1,0 +1,7 @@
+# Enable Pressure Stall Information (psi) for performance diagnostics.
+grubcmdline_kernel_cmdline:
+  - psi=1
+# note that if grubcmdline_kernel_cmdline_remove is empty, all arguments
+# not in grubcmdline_kernel_cmdline will be removed (they match the empty regex)
+grubcmdline_kernel_cmdline_remove:
+  - ^psi=
