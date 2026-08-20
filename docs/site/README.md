@@ -1,13 +1,16 @@
 # Site-specific Documentation
 
-## Progress
-- working on building new image via new pulp server, old destroyed by DC issues
-- working on post-filesystems.yml
+## WIP NOTES
 
-## Updates
+### Progress
+- post-filesystems.yml now works
 
-## Versions
-TODO: 
+### Production
+Things to copy across:
+- TF state
+- Secrets
+
+Will have to change the `compute` group to a different name ...
 
 ## Environment Overview
 
@@ -25,11 +28,87 @@ The staging and production clusters have:
 
 TODO: Set protected environments
 
-## Access
-TODO
+## Cluster Access
+
+Access to the cluster for all is through the interfaces on `agr-vlan107` -
+there are no floating IPs:
+- stg:
+    login: 10.29.107.120 TODO FQDN
+    ondemand: 10.29.107.130 TODO FQDN
+- prd: TODO
+
+Access for Ansible and admin is uses the `rocky` user via a jumphost:
+`rocky@slurm-bastion.eri.agresearch.co.nz`. The cluster uses the keypair
+`rocky_bastion_v2`.
+
+See below for suggested checkout configuration for Ansible.
 
 ## Deployment etc
-TODO
+
+The instructions here assume a local checkout will be used, rather than
+a shared checkout on the jumphost. This is the preferred configuration as it
+avoids confusing shared checkout state.
+
+### One-time setup
+
+1. Install python 3.12 and OpenTofu.
+
+2. Create a project access token and use this to clone the repository locally:
+
+```
+export GITLAB_PAT='<your token secret>'
+git clone https://token:${GITLAB_PAT}@gitlab.com/nesi1/agresearch/agr-eri-slurm.git
+```
+
+3. Retrieve ssh keys for the jumphost and cluster from your password manager
+
+### Use
+
+1. Checkout whichever branch is relevant
+
+2. Refresh the repo's dependencies:
+
+  ```shell
+  dev/setup-env.sh
+  ```
+
+3. Configure your environment. The details of this depend on file locations:
+
+   ```shell
+  # load python environment and activate relevant appliance environment
+  . venv/bin/activate
+  
+  export OS_CLIENT_CONFIG_FILE=$(realpath path_to_clouds.yaml)
+  export OS_CLOUD=openstack
+
+  export ANSIBLE_VAULT_PASSWORD_FILE=$(realpath path_to_vault_password)
+  export TF_VAR_gitlab_access_token=${GITLAB_PAT}
+
+  export ANSIBLE_SSH_COMMON_ARGS="-i $(realpath $path_to_jumphost_private_key) -J nesi-ansible"
+  export PKR_VAR_ssh_private_key_file=$(realpath $path_to_cluster_private_key)
+  export PKR_VAR_ssh_bastion_private_key_file=$(realpath $path_to_jumphost_private_key)
+  ssh-add ${path_to_cluster_private_key}
+
+4. Activate the relevant appliance environment, e.g.:
+
+  ```shell
+  . environments/stg/activate
+  ```
+
+5. If necessary, check/apply infrastructure changes:
+
+  ```shell
+  tofu apply
+  ```
+
+  NB: This should be run from the repository root - you no longer need to
+  change to the relevant `tofu/` directory.
+
+6. Configure the cluster:
+
+  ```shell
+  ansible-playbook ansible/site.yml
+  ```
 
 ## Prexisting OpenStack Resources
 
@@ -80,12 +159,34 @@ images to every node, this is split into various stages described below.
 Each build creates a VM on the `vlan-112` network; ssh configuration for access
 is defined in `environments/site/common.pkrvars.hcl`.
 
+Builds use the same ssh key as the cluster for convenience in debugging.
+
+### Initial setup
+
+Builds require the RockyLinux 8 StackHPC release image
+as given in `environments/.stackhpc/tofu/cluster_image.auto.tfvars.json` for
+the appropriate branch to be available on the cloud. E.g.:
+
+```shell
+STACKHPC_IMAGE=$(jq --raw-output .cluster_image.RL8 environments/.stackhpc/tofu/cluster_image.auto.tfvars.json)
+wget https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/openhpc-images/$STACKHPC_IMAGE
+qemu-img convert -O raw $STACKHPC_IMAGE $STACKHPC_IMAGE.raw
+qemu-img info $STACKHPC_IMAGE $STACKHPC_IMAGE.raw
+openstack image create --file $STACKHPC_IMAGE.raw --disk-format=raw --min-disk 20 $STACKHPC_IMAGE
+dev/image-set-properties.sh $STACKHPC_IMAGE
+```
+
+The Pulp server must have the DNF repo snapshots for the current branch synced:
+
+```shell
+ansible-playbook ansible/adhoc/sync-pulp.yml
+```
+
 ### base
-The base image installs NVIDIA DOCA-OFED, the FreeIPA client, and Spectrum Scale.
+The base image installs NVIDIA DOCA-OFED, FreeIPA and Spectrum Scale clients
+and various site-specific packages as defined in appliances_extra_packages_other.
 This should only need to be rebuilt when pulling in a new upstream release changes
 the upstream image (in environments/.stackhpc/tofu/cluster_image.auto.tfvars.json).
-As it will be used as the source image for subsequent stages, it produces a raw
-image.
 
 To build this run, from the repo root:
 
@@ -113,45 +214,27 @@ All nodes are on the `nesi-hpc-baremetal-vlan112` network. Login/OnDemand nodes
 are also on the `agr-vlan107` network. For `prd` and `stg` clusters fixed IPs
 are allocated with the last tuple as shown below:
 
-| Nodes       |  vlan112 | vlan107 | IPs for prd, stg
+| Nodes       | vlan112  | vlan107 | IPs for prd, stg
 | ----------- |--------- | ------- | -------
-| control     |  Y       | ?       | .10, .100
-| login       |  Y       | Y       | .2*, .12*,
-| ondemand    |  Y       | Y       | .30, .130
-| baremetal   |  Y       | -       | .4*, .14*
+| control     | Y        | ?       | .10, .100
+| login       | Y        | Y       | .2*, .12*,
+| ondemand    | Y        | Y       | .30, .130
+| baremetal   | Y        | -       | .4*, .14*
 | interactive | Y        | -       | .5*, .150*
 | hugemem     | Y        | -       | .6*, .160*
 | gpu         | Y        | -       | .7*, .170*
 | vmgpu       | Y        | -       | .8*, .180*
 
-TODO: squid? Will have to think about eessi too!
+Note no floating IPs are used.
+
+All compute nodes are proxied through a (non-appliance-controlled) squid on the
+jumphost. EESSI is proxied through squid on the control node, as per default.
 
 TODO: For dev, can we just start at e.g. 200 and go up consecutivly??
-
-Note no floating IPs are used.
 
 In addition a number of service VMs have ports on the same network:
 - Pulp (10.1.112.99): Manually provisioned, but configured via the appliance and
   used by all environments.
     TODO: Also has other ports, could get rid of these once moved over
 - Coldfront production (10.1.112.178, 10.29.107.178,): Provisioned/configured outside the appliance.
-- Bastion (10.1.112.119, 10.29.107.161): TODO, might go
-- Squid:
-    - should have prod/staging ones if needed
-- jumphost?
-
-Things to copy across:
-- TF state
-- Secrets
-
-
-Integrations:
-
-- freeipa via pkinit keys
-- gpfs
-- 
-
-
-
-
-## Features
+- Jumphost (10.1.112.119, 10.29.107.161)

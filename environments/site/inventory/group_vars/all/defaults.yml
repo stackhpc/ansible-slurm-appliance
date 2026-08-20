@@ -1,0 +1,108 @@
+# cluster will have pulp repos enabled
+dnf_repos_enabled: true
+
+appliances_extra_packages_other:
+  # from openhpc_packages_extra:
+  - freetds
+  # Extra packages for R
+  - pango-devel
+  - cairo-devel
+  - cairo-gobject-devel
+  - openmotif
+  ## nesi
+  # locales
+  - glibc-langpack-en
+  - compat-openssl10
+  # text editors
+  - vim-enhanced
+  - emacs
+  - emacs-nox
+  - gedit
+  - micro
+  - ed
+  - nano
+  - geany
+# parsing
+  - bison
+  - byacc
+  - flex
+# misc
+  - gnuplot
+  - intltool
+  - dos2unix
+  - GraphicsMagick
+  - jq
+# dev
+  - man-pages
+  - gdb
+  - ctags
+  - patchutils
+  - diffutils
+  - lmdb-devel
+# building
+  - libtool
+  - m4
+  - autoconf
+  - automake
+  - make
+  - patch
+  - lapack-devel
+# network
+  - wget
+  - curl
+  - rsync
+  - mailx
+  - telnet
+  - lynx
+# compression
+  - bzip2
+  - zip
+  - unzip
+  - bsdtar
+  - p7zip
+# system
+  - which
+  - time
+  - sudo
+  - strace
+  - ltrace
+  - lsof
+  - quota
+  - file
+  - patchelf
+  - psmisc
+# HPC
+#  - munge - provided by openhpc
+#  - Lmod  - provided by openhpc
+  - datamash
+  - stress
+  - pigz
+# interpreters
+  - perl
+  - ruby
+  - bc
+# version control
+  - subversion
+  - git
+  - git-lfs
+# shells
+  - fish
+  - zsh
+  - ksh
+  - tcsh
+  - bash-completion
+# terminal things
+  - tmux
+  - screen
+  - mc
+  - tree
+  - htop
+  - pspg
+  - expect
+# pdsh
+  - pdsh
+  - pdsh-rcmd-ssh
+# X11
+  - xterm
+  - xorg-x11-server-Xvfb
+
