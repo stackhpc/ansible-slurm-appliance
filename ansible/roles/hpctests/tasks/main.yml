@@ -37,3 +37,21 @@
     - hpl-solo
   block:
     - ansible.builtin.include_tasks: hpl-solo.yml
+
+- name: Build gpu_burn
+  become: true
+  become_user: "{{ hpctests_user }}"
+  tags:
+    - gpuburn
+    - hpctests-gpu
+  block:
+    - ansible.builtin.include_tasks: build-gpuburn.yml
+
+- name: Run gpu_burn on individual nodes
+  become: true
+  become_user: "{{ hpctests_user }}"
+  tags:
+    - gpuburn
+    - hpctests-gpu
+  block:
+    - ansible.builtin.include_tasks: run-gpuburn.yml

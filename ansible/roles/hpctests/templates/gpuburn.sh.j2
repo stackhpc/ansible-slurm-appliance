@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#SBATCH --gres={{ hpctests_gpuburn_gres }}
+#SBATCH --ntasks-per-gpu=1
+#SBATCH --cpus-per-gpu=1
+#SBATCH --mem-per-gpu=2G
+#SBATCH --output=%x.out
+#SBATCH --error=%x.out
+#SBATCH --nodes={{ hpctests_computes.stdout_lines | length }}
+#SBATCH --partition={{ hpctests_partition }}
+{%if hpctests_nodes is defined %}
+#SBATCH --nodelist={{ hpctests_computes.stdout_lines | join(',') }}
+{% endif %}
+{%if hpctests_account is defined %}
+#SBATCH --account={{ hpctests_account }}
+{% endif %}
+{%if hpctests_qos is defined %}
+#SBATCH --qos={{ hpctests_qos }}
+{% endif %}
+echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
+echo SLURM_JOB_ID: $SLURM_JOB_ID
+echo gpuburn install dir: {{ hpctests_gpuburn_install_dir }}
+{{ hpctests_pre_cmd }}
+
+# shellcheck gets confused about jinja templates
+for i in $(scontrol show hostnames | xargs -n {{ hpctests_gpuburn_node_chunk_size }} | sed 's/ /,/g'); do
+echo "Testing chunk of nodes $i..."
+#shellcheck disable=SC1036,SC1056
+srun --nodelist $i --nodes {{ hpctests_gpuburn_node_chunk_size }} --ntasks=$(( $SLURM_GPUS_ON_NODE * {{ hpctests_gpuburn_node_chunk_size }} )) --output=%x.$i.%t.out --error=%x.$i.%t.out \
+	"{{ hpctests_gpuburn_install_dir }}/gpu_burn" \
+		-c "{{ hpctests_gpuburn_install_dir }}/compare.ptx" \
+		-d \
+		{{ (hpctests_gpuburn_minutes | int) * 60 }}
+done
