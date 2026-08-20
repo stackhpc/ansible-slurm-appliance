@@ -121,7 +121,7 @@ openhpc
 cluster
 builder
 
-[proxy]
+[proxy:children]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
 compute
 

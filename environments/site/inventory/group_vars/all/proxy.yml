@@ -1,1 +1,13 @@
 proxy_http_proxy: "http://10.1.112.119:3128" # squid on jumphost on nesi-hpc-baremetal-vlan112
+
+# upstream PR https://github.com/stackhpc/ansible-slurm-appliance/pull/1025:
+# can't use 'cluster' as need pulp too
+proxy_no_proxy_defaults: "{{ ['localhost', '127.0.0.1', '169.254.169.254'] + groups['all'] + hostvars.values() | selectattr('ansible_host', 'defined') | map(attribute='ansible_host') }}"
+
+proxy_no_proxy_extra: >-
+  {{
+    [
+      openhpc_cluster_name ~ '.' ~ cluster_domain_suffix,
+      scale_remotemount_storage_gui_hostname,
+    ] + freeipa_servers + resolv_conf_nameservers
+  }}
