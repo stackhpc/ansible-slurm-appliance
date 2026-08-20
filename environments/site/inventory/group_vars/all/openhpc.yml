@@ -1,0 +1,62 @@
+openhpc_gres_autodetect: nvml
+
+openhpc_user_partitions:
+  # TODO: will have to change name
+  # - name: compute
+      # groups:
+      #   - baremetal
+  #   default: YES
+  #   maxtime: '336:00:00'
+  # NB: this is redundant as set globally anyway
+  #   partition_params:
+  #     DefMemPerCPU: 3500 # https://github.com/stackhpc/ansible-role-openhpc?tab=readme-ov-file#slurmconf
+  - name: gpu
+    default: NO
+    maxtime: '336:00:00'
+  - name: hugemem
+    default: NO
+    maxtime: '336:00:00'
+  - name: interactive
+    default: NO
+  - name: vgpu
+    default: NO
+
+# Indirection to define log paths on persistent storage
+# - override for environments without spectrum_scale enabled
+openhpc_slurmctld_log_file: /mnt/gpfs/persist/slurm/slurmctld.log
+openhpc_slurmd_log_file: /mnt/gpfs/persist/slurm/log/%h.log
+
+openhpc_config_extra:
+  Prolog: /opt/slurm-tools/bin/prolog.sh # deployed by post-hook
+
+  # -- TODO: all in this block are marked "Still to be reviewed" in https://nznesi.atlassian.net/browse/FS-2329
+  #JobAcctGatherType: jobacct_gather/cgroup # used in staging for another client
+  #JobContainerType: job_container/tmpfs
+  #AcctGatherProfileType: acct_gather_profile/hdf5
+  SchedulerParameters: # seem uncontroversial, so added anyway
+  # - enable_user_top
+  - requeue_setup_env_fail
+  # PrologFlags: ?
+  # PreemptMode: ? current default from stackhpc.openhpc is SUSPEND,GANG
+  # PriorityJobFactor & PriorityTier: ?
+  # -- end block "Still to be reviewed"
+
+  MessageTimeout: 60
+  UnkillableStepTimeout: 300 # must be >= 5x greater than above
+  SlurmctldLogFile: "{{ openhpc_slurmctld_log_file }}"
+  SlurmctldSyslogDebug: verbose
+  SlurmdLogFile: "{{ openhpc_slurmd_log_file }}"
+
+  # NB: new default is jobacct_gather/cgroup, is that OK?
+  #JobAcctGatherType: jobacct_gather/linux
+  SelectTypeParameters: CR_CORE_MEMORY
+  MaxArraySize: 100000
+  DependencyParameters: kill_invalid_depend
+  CommunicationParameters: block_null_hash
+  EnforcePartLimits: ANY
+  PriorityWeightPartition: 0
+  PriorityWeightFairShare: 1000
+  AccountingStorageEnforce: associations,limits,qos,safe
+  DefMemPerCPU: 3500
+  PrologFlags: X11 # Enable X11 forwarding
+  AccountingStoreFlags: job_comment # Store job comments in accounting
