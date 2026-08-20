@@ -32,6 +32,10 @@ control
 [node_exporter:children]
 cluster
 
+[selinux:children]
+# All hosts requiring control of SELinux status.
+fatimage
+
 [opensearch:children]
 control
 
@@ -223,16 +227,14 @@ compute
 [email:children]
 control
 
-## Vulnerability mitigation groups
-[mitigate_dirtyfrag:children]
-builder
-
 [spectrum_scale:children]
 # Hosts to run spectrum scale/GPFS
 openhpc
 
+[weka]
+# Hosts to install and mount WEKA filesystems on
+
 ## Vulnerability mitigation groups
 [kernel_modules:children]
 builder
-[mitigate_ssh_keysign_pwn:children]
-builder
+

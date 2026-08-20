@@ -661,6 +661,18 @@ ignore:
     package:
       location: /var/lib/grafana/plugins/grafana-opensearch-datasource/gpx_opensearch-datasource_linux_amd64
 
+# CVE-2026-66066: ruby-on-rails ActiveStorage+libvips possible arbitrary file read + RCE
+# Not affected: libvips not present in the appliance + no found path to rendering user-provided images
+  - vulnerability: GHSA-xr9x-r78c-5hrm
+    package:
+      location: /opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/activestorage-7.1.6.gemspec
+  - vulnerability: GHSA-xr9x-r78c-5hrm
+    package:
+      location: /var/www/ood/apps/sys/dashboard/Gemfile.lock
+  - vulnerability: GHSA-xr9x-r78c-5hrm
+    package:
+      location: /var/www/ood/apps/sys/myjobs/Gemfile.lock
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
 exclude:

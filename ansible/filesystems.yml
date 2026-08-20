@@ -44,3 +44,14 @@
         name: lustre
         # NB install is ONLY run in builder
         tasks_from: configure.yml
+
+- name: Setup WEKA clients
+  hosts: weka:!builder
+  become: true
+  tags:
+    - weka
+  tasks:
+    - ansible.builtin.include_role:
+        name: weka
+        # install is done at runtime
+        tasks_from: configure.yml

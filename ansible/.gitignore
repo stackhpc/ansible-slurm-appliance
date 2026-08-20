@@ -108,3 +108,5 @@ roles/*
 !roles/mounts/**
 !roles/opkssh/
 !roles/opkssh/**
+!roles/weka/
+!roles/weka/**

@@ -99,6 +99,7 @@
   vars:
     image_info:
       branch: "{{ lookup('pipe', 'git rev-parse --abbrev-ref HEAD') }}"
+      commit: "{{ lookup('pipe', 'git rev-parse HEAD') }}"
       build: "{{ ansible_nodename | split('.') | first }}" # hostname is image name, which contains build info
       os: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
       kernel: "{{ ansible_kernel }}"
