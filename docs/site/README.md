@@ -3,7 +3,9 @@
 ## WIP NOTES
 
 ### Progress
-- post-filesystems.yml now works
+- all works through to post hook
+- need to do post-monitoring hook
+- and actually check ondemand 
 
 ### Production
 Things to copy across:
@@ -11,6 +13,7 @@ Things to copy across:
 - Secrets
 
 Will have to change the `compute` group to a different name ...
+TODO: Set protected environments
 
 ## Environment Overview
 
@@ -26,7 +29,8 @@ The staging and production clusters have:
   attached to the control node, which are not deleted if the cluster is deleted.
 - Remote state for OpenTofu (i.e. infrastructure) in GitLab.
 
-TODO: Set protected environments
+There is also integration against Reannz's observability platform (Mimir and Loki)
+- see [docs](./README_external_observability.md).
 
 ## Cluster Access
 
@@ -37,7 +41,7 @@ there are no floating IPs:
     ondemand: 10.29.107.130 TODO FQDN
 - prd: TODO
 
-Access for Ansible and admin is uses the `rocky` user via a jumphost:
+Access for Ansible and admin uses the `rocky` user via a jumphost:
 `rocky@slurm-bastion.eri.agresearch.co.nz`. The cluster uses the keypair
 `rocky_bastion_v2`.
 
