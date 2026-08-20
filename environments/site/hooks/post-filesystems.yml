@@ -86,10 +86,3 @@
       src: "/mnt/gpfs/persist/legacy_datasets"
       dest: "/dataset"
       state: link
-
-  - name: Fix Lmod environment determination
-    lineinfile:
-      path: /etc/profile.d/lmod.sh
-      regexp: '^if \[ ! -z "\$SLURM_NODELIST" \] \| \[ ! -z "\$PBS_NODEFILE" \]; then'
-      line: 'if [ ! -z "$SLURM_NODELIST" ] || [ ! -z "$PBS_NODEFILE" ]; then'
-      state: present
