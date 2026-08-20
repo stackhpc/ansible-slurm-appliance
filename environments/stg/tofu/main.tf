@@ -111,7 +111,7 @@ module "cluster" {
         ]
       }
     }
-    vmgpu = {
+    vgpu = {
       nodes  = []
       flavor = "agr.gpu1.cpu32ram448.a10.1g.24gb"
       # image = TODO
