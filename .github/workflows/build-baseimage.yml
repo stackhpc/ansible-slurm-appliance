@@ -1,4 +1,4 @@
-name: Build fat image
+name: Build base image
 'on':
   workflow_dispatch:
     # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
@@ -32,10 +32,10 @@ jobs:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
         build:
-          - image_name: openhpc-RL8
+          - image_name: base-RL8
             source_image_name: Rocky-8-GenericCloud-Base-8.10-20240528.0.x86_64.qcow2
             inventory_groups: fatimage
-          - image_name: openhpc-RL9
+          - image_name: base-RL9
             source_image_name: Rocky-9-GenericCloud-Base-9.8-20260525.0.x86_64
             inventory_groups: fatimage
     env:
@@ -101,8 +101,8 @@ jobs:
           path: ~/.cache/pip
           key: pip-${{ hashFiles('requirements.txt') }}
 
-      - name: Install ansible etc
-        run: dev/setup-env.sh
+      - name: Install python requirements
+        run: SKIP_ANSIBLE_GALAXY=true dev/setup-env.sh
 
       - name: Write clouds.yaml
         run: |
@@ -112,29 +112,27 @@ jobs:
         env:
           SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
+      - name: Compute base image_name_version and check if already exists
+        id: compute_base_image_name_version
+        run: |
+          . venv/bin/activate
+          image_name_version="-$(sha256sum environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml | awk '{ print $1 }')"
+          echo image_name_version="$image_name_version" | tee -a "$GITHUB_OUTPUT"
+          full_image_name="${MATRIX_BUILD_IMAGE_NAME}${image_name_version}"
+          if openstack image show -f value -c id "$full_image_name"; then
+            echo "Image $full_image_name already exists, will build anyway"
+            echo "image_exists=true" | tee -a "$GITHUB_OUTPUT"
+          fi
+        env:
+          MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
+
+      - name: Install ansible etc
+        run: dev/setup-env.sh
+
       - name: Setup environment
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-
-      - name: Compute base image_name_version and check if already exists
-        id: compute_source_image_name
-        run: |
-          . venv/bin/activate
-          image_name_version="-$(sha256sum environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml | awk '{ print $1 }')"
-          full_image_name="base${MATRIX_BUILD_IMAGE_NAME#openhpc}${image_name_version}"
-          base_image_id="$(openstack image show -f value -c id "$full_image_name" || echo '-')"
-          if [ "$base_image_id" != "-" ]; then
-            echo "Base image $full_image_name exists with id $base_image_id, will use instead of $MATRIX_BUILD_SOURCE_IMAGE_NAME"
-            source_image_name="$full_image_name"
-          else
-            echo "Base image $full_image_name doesn't exist or not unique, will use $MATRIX_BUILD_SOURCE_IMAGE_NAME"
-            source_image_name="$MATRIX_BUILD_SOURCE_IMAGE_NAME"
-          fi
-          echo "source_image_name=$source_image_name" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
-        env:
-          MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
-          MATRIX_BUILD_SOURCE_IMAGE_NAME: ${{ matrix.build.source_image_name }}
 
       - name: Build fat image with packer
         id: packer_build
@@ -148,14 +146,17 @@ jobs:
           PACKER_LOG=1 packer build \
           -on-error="$PACKER_ON_ERROR" \
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
-          -var "source_image_name=$SOURCE_IMAGE_NAME" \
+          -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
           -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
+          -var "image_name_version=$STEP_IMAGE_NAME_VERSION" \
+          -var "playbook=baseimage.yml" \
           -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
           openstack.pkr.hcl
         env:
-          SOURCE_IMAGE_NAME: ${{ steps.compute_source_image_name.outputs.source_image_name }}
+          MATRIX_BUILD_SOURCE_IMAGE_NAME: ${{ matrix.build.source_image_name }}
           MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
           MATRIX_BUILD_INVENTORY_GROUPS: ${{ matrix.build.inventory_groups }}
+          STEP_IMAGE_NAME_VERSION: ${{ steps.compute_base_image_name_version.outputs.image_name_version }}
 
       - name: Get created image names from manifest
         id: manifest
@@ -171,6 +172,18 @@ jobs:
           echo "$IMAGE_ID" > image-id.txt
           echo "$IMAGE_NAME" > image-name.txt
 
+      - name: Delete existing image with same name
+        run: |
+          . venv/bin/activate
+          for img in $(openstack image list --name "$STEPS_MANIFEST_OUTPUTS_IMAGE_NAME" --status active -c id -f value | grep -v "$STEPS_MANIFEST_OUTPUTS_IMAGE_ID"); do
+            echo "Existing image with same name, deleting"
+            openstack image show "$img"
+            openstack image delete "$img"
+          done
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
+          STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}
+
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
@@ -182,11 +195,12 @@ jobs:
         run: |
           . venv/bin/activate
           . dev/image-set-properties.sh "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
+          openstack image set --property "gh_run=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID#GITHUB_RUN_ATTEMPT" "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
         env:
           STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
 
       - name: Upload manifest artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: image-details-${{ matrix.build.image_name }}
           path: |

@@ -4,6 +4,7 @@
 - ansible.builtin.meta: flush_handlers
 
 - name: Remove dnf caches # noqa: no-changed-when
+  when: appliances_fatimage_cleanup_dnf | default(True)
   ansible.builtin.command: dnf clean all
 
 # If image build happens on a Neutron subnet with property dns_namservers defined, then cloud-init
@@ -60,16 +61,25 @@
     - /var/www/ood/apps/sys/dashboard/node_modules/@esbuild/linux-x64/bin/esbuild
     - /usr/lib/rstudio-server/bin/quarto/bin/tools/x86_64/esbuild
 
-- name: Replace rclone with a no-op script
-  ansible.builtin.copy:
-    content: |
-      #!/bin/sh
-      echo "The rclone executable has been removed in ansible-slurm-appliance images due to too many security warnings." 1>&2
-      exit 1
-    dest: /usr/bin/rclone
-    owner: root
-    group: root
-    mode: "0555"
+- name: Replace rclone with a no-op script if it exists
+  block:
+    - name: Check rclone existence
+      ansible.builtin.stat:
+        path: /usr/bin/rclone
+        get_checksum: false
+        get_mime: false
+      register: rclone_present
+    - name: Replace rclone with a no-op script
+      when: rclone_present.stat.exists
+      ansible.builtin.copy:
+        content: |
+          #!/bin/sh
+          echo "The rclone executable has been removed in ansible-slurm-appliance images due to too many security warnings." 1>&2
+          exit 1
+        dest: /usr/bin/rclone
+        owner: root
+        group: root
+        mode: "0555"
 
 - name: Stop journald
   # Stop journald from writing data to the journal after we have cleared it.

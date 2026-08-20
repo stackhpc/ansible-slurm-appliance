@@ -39,7 +39,9 @@ fi
 pip install -U pip
 pip install -r requirements.txt
 ansible --version
-# Install or update ansible dependencies ...
-ansible-galaxy role install -fr requirements.yml -p ansible/roles
-ansible-galaxy collection install -fr requirements.yml -p ansible/collections
-cp requirements.yml requirements.yml.last
+if ! "${SKIP_ANSIBLE_GALAXY:-false}"; then
+  # Install or update ansible dependencies ...
+  ansible-galaxy role install -fr requirements.yml -p ansible/roles
+  ansible-galaxy collection install -fr requirements.yml -p ansible/collections
+  cp requirements.yml requirements.yml.last
+fi
