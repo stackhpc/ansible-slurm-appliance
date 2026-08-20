@@ -21,6 +21,9 @@ roles:
 collections:
   - name: https://github.com/stackhpc/ibm-spectrum-scale-install-infra.git
     type: git
+    # forked for
+    # https://github.com/IBM/ibm-spectrum-scale-install-infra/pull/1045
+    # https://github.com/IBM/ibm-spectrum-scale-install-infra/pull/1046
     version: v2.11.0-stackhpc
   - name: containers.podman
     version: 1.16.2
