@@ -1,0 +1,1 @@
+proxy_http_proxy: "http://10.1.112.119:3128" # squid on jumphost on nesi-hpc-baremetal-vlan112

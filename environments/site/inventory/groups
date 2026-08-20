@@ -123,6 +123,7 @@ builder
 
 [proxy]
 # Hosts to configure http/s proxies - see ansible/roles/proxy/README.md
+compute
 
 [manila]
 # Hosts to configure for manila fileshares
@@ -237,4 +238,3 @@ openhpc
 ## Vulnerability mitigation groups
 [kernel_modules:children]
 builder
-
