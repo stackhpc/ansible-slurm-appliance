@@ -1,0 +1,122 @@
+- hosts: compute:&spectrum_scale:!builder
+  tags: openhpc
+  become: yes
+  tasks:
+    - name: Create Slurm prolog
+      copy:
+        dest: /opt/slurm-tools/bin/prolog.sh
+        content: |
+          #!/bin/bash
+          for FS in /mnt/gpfs/scratch /mnt/gpfs/persist ; do
+            /bin/mountpoint -q "$FS" || exit 1
+          done
+        owner: root
+        group: root
+        mode: u=rwx,go=rx
+
+
+- hosts: login:!builder
+  tags:
+    - ssh
+  become: yes
+  tasks:
+    - ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^ClientAliveInterval
+        line: ClientAliveInterval 60
+        state: present
+      notify: reload-ssh
+    - ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^ClientAliveCountMax
+        line: ClientAliveCountMax 3
+        state: present
+      notify: reload-ssh
+  handlers:
+    - name: reload-ssh
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
+
+
+- name: Disable KCM and ensure kerberos credentials cache not set to homedir
+  hosts: freeipa_client:!builder
+  become: yes
+  gather_facts: no
+  tags: kerberos
+  tasks:
+    - name: Ensure Kerberos cache location not set to homedir
+      lineinfile:
+        path: /etc/krb5.conf
+        regexp: '^#?\s*default_ccache_name = DIR:/home/%{username}/\.krb5ccdir'
+        state: absent
+    
+    - name: Disable KCM
+      replace:
+        dest: /etc/krb5.conf.d/kcm_default_ccache
+        regexp: '^\s*default_ccache_name = '
+        replace: '#    default_ccache_name = KCM:'
+
+- name: Modify SSSD configuration on FreeIPA clients
+  hosts: freeipa_client:!builder
+  become: yes
+  gather_facts: no
+  tags: sssd
+  tasks:
+    - name: Remove _srv_ from ipa_server entry
+      lineinfile:
+        path: /etc/sssd/sssd.conf
+        line: 'ipa_server = {{ freeipa_servers[0] }}'
+        regexp: '^ipa_server ='
+      register: sssd_conf
+
+    - name: Restart sssd
+      systemd:
+        name: sssd
+        state: restarted
+      when: sssd_conf.changed
+
+
+- name: Modify Kerberos config on nodes requiring login
+  hosts: compute:login:eri_interactive:!builder # note login includes ondemand too
+  become: yes
+  gather_facts: no
+  tags: kerberos
+  tasks:
+    - name: KDC proxy (no longer needed since compute nodes can talk to AD)
+      # community.general.ini_file can't handle the weird multiline value format
+      blockinfile:
+        path: /etc/krb5.conf
+        insertafter: '\[realms\]'
+        state: absent
+        block: |
+          # comment added to get indentation correct
+            AGRESEARCH.CO.NZ = {
+                kdc = https://{{ freeipa_servers[0] }}/KdcProxy
+                kpasswd_server = https://{{ freeipa_servers[0] }}/KdcProxy
+            }
+
+            agresearch.co.nz = {
+                kdc = https://{{ freeipa_servers[0] }}/KdcProxy
+                kpasswd_server = https://{{ freeipa_servers[0] }}/KdcProxy
+            }
+      register: krb_conf
+
+    - name: Restart sssd
+      systemd:
+        name: sssd
+        state: restarted
+      when: krb_conf.changed
+
+- name: Access to eri_support group regardless of running jobs
+  hosts: compute:!builder
+  tags:
+    - ssh
+  become: yes
+  tasks:
+    - ansible.builtin.lineinfile:
+        path: /etc/security/access.conf
+        insertbefore: '-:ALL:ALL'
+        line: '+:eri_support:ALL'
+        regexp: 'eri_support' 
+        state: present
