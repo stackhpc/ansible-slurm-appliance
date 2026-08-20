@@ -1,0 +1,1 @@
+openondemand_servername: "{{ hostvars[ groups['openondemand'] | first].networks['agr-vlan107'].fixed_ip_v4 }}" # Use a SOCKS proxy to acccess

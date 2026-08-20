@@ -1,0 +1,3 @@
+openondemand_servername: ondemand.eri.agresearch.co.nz
+openondemand_ssl_cert: "/etc/pki/tls/ondemand.crt"
+openondemand_ssl_cert_key: "/etc/pki/tls/private/ondemand.key"
