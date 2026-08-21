@@ -84,7 +84,7 @@
 
     # shows blocked module count for information
     - ansible.builtin.debug:
-        var: "_modulejail.stdout_lines[0]"
+        msg: "{{ _modulejail.stdout_lines[0] }}"
 
     - name: Parse modulejail output
       ansible.builtin.set_fact:
