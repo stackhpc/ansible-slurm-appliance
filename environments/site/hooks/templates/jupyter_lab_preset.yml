@@ -1,0 +1,22 @@
+---
+cluster: "slurm"
+form:
+    - modules
+    - extra_jupyter_args
+    - bc_queue
+    - bc_num_hours
+    - num_cores
+    - node
+tile:
+    title: "Jupyter Lab"
+    border_color: "maroon"
+    sub_caption: |
+      Jupyter Lab Quick Launch
+
+attributes:
+  num_cores: 1
+  modules: ""
+  extra_jupyter_args: ""
+  bc_queue: interactive
+  node: ""
+  bc_num_hours: 1

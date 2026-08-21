@@ -1,0 +1,20 @@
+---
+cluster: "slurm"
+form:
+    - desktop
+    - bc_queue
+    - bc_num_hours
+    - num_cores
+    - node
+tile:
+    title: "Remote Desktop Quick Launch"
+    border_color: "green"
+    sub_caption: |
+      Launch Remote desktop with 1 core hour
+
+attributes:
+    desktop: xfce
+    bc_queue: vgpu 
+    bc_num_hours: 1
+    num_cores: 1
+    node: ""

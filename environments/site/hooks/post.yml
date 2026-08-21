@@ -1,3 +1,79 @@
+- hosts: login:compute
+  become: true
+  gather_facts: false
+  tags:  nesi
+  # From roles/nesi, ran from ansible/nesi.yml when is_interactive: True OR False
+  tasks:
+    - name: libcrypto symlink
+      ansible.builtin.file:
+        src: /usr/lib64/libcrypto.so.1.0.2o
+        dest: /usr/lib64/libcrypto.so.1.0.0
+        owner: root
+        group: root
+        state: link
+    - name: MOTD
+      template:
+        src: "motd"
+        dest: "/etc/motd"
+
+
+- hosts: login:interactive
+  become: true
+  gather_facts: false
+  tags: nesi
+  # From roles/nesi, ran from ansible/nesi.yml when is_interactive: True
+  tasks:
+    - name: User profile script
+      template:
+        src: "nesi.sh.j2"
+        dest: /etc/profile.d/nesi.sh
+    - name: nn_storage_quota
+      copy:
+        src: "nn_storage_quota"
+        dest: "/usr/local/bin/nn_storage_quota"
+        mode: "0755"
+    - name: nn_storage_quota init
+      ansible.builtin.command: "/usr/local/bin/nn_storage_quota -r"
+      when: "'spectrum_scale' in group_names"
+
+
+# From roles/nesi, ran from ansible/nesi.yml:
+- hosts: openondemand
+  become: true
+  gather_facts: false
+  name: Configure OnDemand
+  tags:
+    - openondemand
+    - openondemand_server
+  tasks:    
+    - name: Ensure destination directory exists
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items: 
+        - /etc/ood/config/apps/igv
+        - /etc/ood/config/apps/jupyter
+        - /etc/ood/config/apps/bc_desktop
+        - /etc/ood/config/apps/dashboard/views/layouts
+    - name: Embed Status and Override OpenOndemand html
+      template:
+        src: "application.html.erb"
+        dest: "/etc/ood/config/apps/dashboard/views/layouts/application.html.erb"
+        force: yes
+    - name: Create quick launch IGV
+      template:
+        src: "igv_preset.yml"
+        dest: "/etc/ood/config/apps/igv/preset.yml"
+    - name: Create quick launch Jupyter Lab
+      template:
+        src: "jupyter_lab_preset.yml"
+        dest: "/etc/ood/config/apps/jupyter/preset.yml"
+    - name: Create quick launch Remote Desktop
+      template:
+        src: "remote_desk_preset.yml"
+        dest: "/etc/ood/config/apps/bc_desktop/preset.yml"
+
+
 - hosts: compute:&spectrum_scale:!builder
   tags: openhpc
   become: yes

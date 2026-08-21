@@ -1,0 +1,15 @@
+---
+cluster: "slurm"
+form:
+    - bc_num_hours
+    - bc_queue
+    - num_of_cores
+attributes:
+    bc_queue: interactive 
+    bc_num_hours: 1
+    num_of_cores: 1
+tile:
+    title: "IGV Quick Launch"
+    border_color: "lightblue"
+    sub_caption: |
+      Launch an IGV with 1 core hour

@@ -1,0 +1,325 @@
+#!/usr/bin/bash
+#
+# file:        nn_storage_quota
+# description: AgR fileset quota report
+# author:      matt.pestle@nesi.org.nz
+# date:        Oct 2023
+#
+# Simple wrapper for mmlsquota for AgR fileset usage
+# Prints human readable report of number of files, disk usage, and quota for
+# a fileset, or for all filesets "matching" the requested filter,
+# or, if no arguments are given, all filesets for which the invoking user
+# is associated (note that the logic identifying these filesets is somewhat tenuous)
+#
+# Assumes reference file $PROJECT_LIST is up to date with a list of filesets.
+# Privileged users can call with -r option to update fileset list.
+# You could put that on cron once a day?
+# Haven't made it part of this script since it can take some time (10s or so).
+#
+# Assumes you have available:
+#   $MMLSQUOTA_CMD
+#   $MMLSFILESET_CMD
+# And assumes things about the output of $MMLS* commands, as per the docs
+# current at time of this writing.
+#
+# negative values of usage are modified to the string "pending"
+#
+# Environment:
+#    FILESET_OVERRIDE nominates the filesystem to use.
+#                By default the "persist" filesystem will be used.
+#    PROJECT_ETC nominates directory name where the project listings should be stored.
+#                default /etc/agr. Created if it doesn't already exist.
+#    TMP         A small temporary file is created and removed in this directory.
+#                Default /tmp
+#
+
+######## CONFIG #############
+VERSION_STRING="v0.1 Sep 2023"
+MMLSQUOTA_CMD=/usr/lpp/mmfs/bin/mmlsquota
+MMLSFILESET_CMD=/usr/lpp/mmfs/bin/mmlsfileset
+SCRIPT_NAME=$(basename $0)
+FILESET=${FILESET_OVERRIDE:="persist"}
+PROJECT_ETC=${PROJECT_ETC:=/etc/agr}
+PROJECT_LIST=$PROJECT_ETC/agr_project_list.$FILESET.txt
+MIN_FILTER_LENGTH=2
+MAX_MATCHES=100
+# Specific to us, and this script.
+# We expect to be running in default of "persist", but check
+# "scratch" for *_p filesets too - this will rely on the
+# naming convention we seem to have adopted.
+# See also the logic on the filesets_for_user function.
+FILESET_LIST="persist scratch"
+#############################
+
+
+
+# Initial setup ... depending on your umask and locations of $PROJECT_ETC
+# may need root, eg: sudo $0 -r
+[[ -d $PROJECT_ETC ]] || {
+	mkdir -p $PROJECT_ETC && chmod ugo+xr $PROJECT_ETC || {
+		echo "Configuration error with directory $PROJECT_ETC" 1>&2
+		exit 1
+	}
+}
+
+function print_version {
+	echo "$SCRIPT_NAME: $VERSION_STRING"
+}
+
+function print_usage {
+	cat <<EOF
+usage:
+   $SCRIPT_NAME
+   $SCRIPT_NAME [-s|h|v|r] [data_set_filter]
+   $SCRIPT_NAME -u <user>      # restricted
+
+   This is a NeSI AgR custom quota reporting
+
+   Calling with no arguments reports on all your filesets
+   -s suppress header line
+   -h show help message
+   -v show version info
+   -r refresh fileset file (privileged user only)
+
+   data_set_filter must be at least $MIN_FILTER_LENGTH characters long
+     and match a maximum of $MAX_MATCHES filesets
+
+examples:
+   $SCRIPT_NAME m_bov
+   $SCRIPT_NAME 2010
+   $SCRIPT_NAME moragar
+
+See $PROJECT_LIST for a list of filesets.
+
+EOF
+}
+
+function print_header {
+	((HEADER && USER_MODE)) && {
+		echo "Fileset quota report for filesets available to user $U"
+		echo
+	}
+	echo | awk ' \
+		{printf "%-55.55s %11.11s %7.7s %8.8s %8s\n", \
+			"Fileset","Available","Used","Use%","INodes"
+	}'
+}
+function adjust_display_name {
+	x=$1
+	# Only returns "scratch" if it's an _p name and FILESET is currently set to "scratch".
+	x=$(echo $x | awk -v fs=$FILESET '
+		$1 ~ /_p$/ {printf "%-37.37s %17.17s",substr($1,1,length($1)-2), fs=="scratch" ? "scratch" : "project"; exit;};
+		$1 ~ /_d$/ {printf "%-37.37s %17.17s",substr($1,1,length($1)-2),"dataset"; exit;};
+		$1 ~ /_h$/ {printf "%-37.37s %17.17s",substr($1,1,length($1)-2),"home   "; exit;};
+		{print $1}'
+			)
+	echo "$x"
+}
+
+# Refresh the $PROJECT_LIST file. May want to adjust this?
+# Takes 10s or so, so can't really do it with each call.
+# Make the file world readable at the end so everyone can access.
+function refresh_project_file {
+	for v in $FILESET_LIST
+	do
+		TMP_FILE=${TMP:=/tmp}/nn_storage_quota.$$
+		PROJECT_LIST=$PROJECT_ETC/agr_project_list.$v.txt
+		echo refreshing fileset list $PROJECT_LIST for $v...
+		$MMLSFILESET_CMD $v -Y > $TMP_FILE || {
+			echo error refreshing fileset list $PROJECT_LIST 1>&2
+			exit 1
+		}
+		trap 'rm -f $TMP_FILE' EXIT
+		awk -F: 'NR > 1 {print $8}' $TMP_FILE > $PROJECT_LIST && \
+			chmod guo+r $PROJECT_LIST || {
+				echo error refreshing fileset list $PROJECT_LIST 1>&2
+				exit 1
+			}
+	done
+	echo done
+}
+
+# Identify filesets "associated" with a user.
+# Split this out since it quite likely will need some work ...
+# Current logic: <user>_h is returned first.
+#      Then, get all UNIX groups the user is a member of, (ignoring AD groups)
+#      remove any trailing ".d", then add _d and _p, and dedup the resulting list
+function filesets_for_user {
+	GIDS=$(id -G $1)
+	echo ${1}_h
+	(
+	for g in $GIDS
+	do
+		G=$(getent group $g | cut -d: -f1)
+		[[ $G = *@agresearch.co.nz ]] && continue
+		#[[ $G = *.d ]] || continue
+		G=$(echo $G | sed 's/\.d$//')
+		echo ${G}_d
+		echo ${G}_p
+	done
+#	) | awk '!seen[$0]++'    # dedup method... print anything we haven't yet seen
+	) | sort -u              # This one sorts em, so I think we'll use it
+}
+
+# yeah yeah, maybe I should use getopt
+(($#==1)) && [[ "$1" == "-v" ]] && {
+	print_version
+	exit 0
+}
+(($#==1)) && [[ "$1" == "-h" ]] && {
+	print_usage
+	exit 0
+}
+(($#==1)) && [[ "$1" == "-?" ]] && {
+	print_usage
+	exit 0
+}
+(($#==1)) && [[ "$1" == "--help" ]] && {
+	print_usage
+	exit 0
+}
+
+# -r option to refresh the fileset list, only available to authorised user
+(($#==1)) && [[ "$1" == "-r" ]] && {
+	refresh_project_file
+	exit $?
+}
+
+# Check for the -s / silent option
+((HEADER=1))
+[[ "$1" == "-s" ]] && {
+	((HEADER=0))
+	shift
+}
+
+# If invoked with no arguments, run for each group the user is associated with
+# Allow the authorised user to query a user with a -u <user> option
+# We may not advertise this in the print_usage?
+(($#==0)) && {
+	USER_MODE=1
+	U=$USER
+}
+(($#==2)) && [[ "$1" == "-u" ]] && {
+	USER_MODE=1
+	U=$2
+}
+((USER_MODE)) && {
+	((HEADER)) && {
+		print_header
+	}
+	RC=0
+	L=$(filesets_for_user ${U})
+	for g in $L
+	do
+		$0 -s $g || RC=1
+	done
+	exit $RC
+}
+
+(($#==1)) || {
+	print_usage
+	exit 1
+}
+
+FILTER="$1"
+
+# First check for an exact matching name, and use it if we get one
+NUM_EXACT_MATCHES=$(awk -v filter="$FILTER" '$0 == filter' $PROJECT_LIST | wc -l)
+((NUM_EXACT_MATCHES==1)) && {
+	D=$(awk -v filter="$FILTER" '$0 == filter' $PROJECT_LIST)
+	DS_INFO=$($MMLSQUOTA_CMD -Y -j ${D} $FILESET | tail -1) || {
+		echo "Problem running $MMLSQUOTA_CMD" 1>&2
+		exit 1
+	}
+
+	# Will they ever change what columns are here ...?
+	NM=$(echo $DS_INFO | cut -d: -f10)
+	DU_USED=$(echo $DS_INFO | cut -d: -f11)
+	DU_QUOTA=$(echo $DS_INFO | cut -d: -f12)
+	FILES_USED=$(echo $DS_INFO | cut -d: -f16)
+	FILES_QUOTA=$(echo $DS_INFO | cut -d: -f17)
+
+	((DU_QUOTA==0)) || PCT=$(echo $DU_USED/$DU_QUOTA*100 | bc -l)
+	((DU_QUOTA==0)) && PCT=0
+	PCT="${PCT}%"
+
+	((HEADER)) && {
+		print_header
+	}
+
+	# mmlsquota without -Y and with --block-size auto gives nice human
+	# readable numbers in columns 3 and 4, so we jump through some hoops to get them here
+	# rather than trying to fabricate them ourselves
+	# ... unless the answer is "no limits", when we have to revert to the values
+	# from the -Y version above
+
+	# I don't like this step, just quietly.
+	DP=$(adjust_display_name $D)
+
+	$MMLSQUOTA_CMD -j ${D} --block-size auto $FILESET 2>/dev/null | \
+		tail -1 | \
+		awk -v FQ="$FILES_QUOTA" \
+		    -v FU="$FILES_USED" \
+		    -v PCT="$PCT" \
+		    -v DS="$DP" \
+		    -v DU_USED="$DU_USED" \
+	    '{
+	fupct = (FQ==0) ? 0 : FU/FQ*100
+	if ($3 == "no" && $4 == "limits") {
+		used=DU_USED
+		used=(used/1024/1024) # because DU_USED is hardcoded to K in this case...
+		used=sprintf("%dG",used)
+		avail="unlimited"
+	}
+	else {
+		used = $3
+		avail = $4
+	}
+	if (used ~ /-/) used = "pending"
+	printf( "%-55.55s %11.11s %7.7s %7.2f%s %8.8s\n", DS,avail,used,PCT,"%",FU)
+	}'
+	
+	# Hack alert ... this scratch requirement came along after the initial
+	# requirements gathering: We check any _p ones over in scratch too.
+	[[ $D = *_p && "$FILESET_OVERRIDE" != "scratch" ]] && {
+		export FILESET_OVERRIDE=scratch
+		$0 -s $D || exit 1
+		unset FILESET_OVERRIDE
+	}
+
+	exit 0
+}
+
+# If "filtering" (as opposed to exact matching) Filter should be at least yeah long. Necessary?
+((${#FILTER} < MIN_FILTER_LENGTH)) && {
+	echo filter too short 1>&2
+	exit 1
+}
+
+# Now check for more general "matches" (in the awk matching sense)
+NUM_MATCHES=$(awk -v filter="$FILTER" '$0 ~ filter' $PROJECT_LIST | wc -l)
+
+((NUM_MATCHES==0)) && {
+	((HEADER)) && echo "no fileset matches for $FILTER" 1>&2
+	# We're not going to consider it an error to ask for a fileset that doesn't exist.
+	# The report just won't have anything in it.
+	exit 0
+}
+
+((NUM_MATCHES>MAX_MATCHES)) && {
+	((HEADER)) && echo "too many fileset matches ($NUM_MATCHES) for filter $FILTER ..." 1>&2
+	((HEADER)) && sleep 2 && awk -v filter="$FILTER" '$0 ~ filter' $PROJECT_LIST | sort -u 1>&2
+	exit 1
+}
+
+((HEADER)) && {
+	print_header
+}
+
+DS_LIST=$(awk -v filter="$FILTER" '$0 ~ filter' $PROJECT_LIST | sort -u)
+((RC=0))
+for x in $DS_LIST
+do
+	$0 -s $x || RC=1
+done
+exit $RC

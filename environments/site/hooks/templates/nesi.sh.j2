@@ -1,0 +1,10 @@
+# configure user profile
+export SQUEUE_ALL=yes
+export SINFO_FORMAT="%9P %5a %8s %.10l %.6c %.6z %.7D %10T %N"
+export SACCT_FORMAT="jobid%-14,jobname%-14,elapsed%11,totalcpu%12,alloccpus%5,maxrss%8,state%-10"
+export SQUEUE_SORT="-t,e,S"
+export SQUEUE_FORMAT="%.8i %.8u %.7a %.14j %.3t %9r %19S %.10M %.10L %.5D %.4C"
+export SLURM_TIME_FORMAT="%b %d %H:%M"
+
+# Add our module stack
+export MODULEPATH=/agr/persist/apps/eri_rocky8/modules/all
