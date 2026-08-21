@@ -115,6 +115,15 @@ git clone https://token:${GITLAB_PAT}@gitlab.com/nesi1/agresearch/agr-eri-slurm.
   ansible-playbook ansible/site.yml
   ```
 
+## Recovering GPFS
+
+This seems to be flaky; when it loses the mounts it seems to need rebooting
+the node(s) then running:
+
+```shell
+ansible-playbook environments/site/hooks/post-filesystems.yml -e scale_remotemount_forceRun=true
+```
+
 ## Prexisting OpenStack Resources
 
 The following are required and are **not** defined by the appliance:

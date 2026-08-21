@@ -38,7 +38,7 @@
   - name: Assert GPFS filesystem mounted
     assert:
       that: "'on /mnt/gpfs/persist type' in _mount_persist.stdout"
-      fail_msg: "GPFS tdc_persist filesystem is not mounted at /gpfs/persist"
+      fail_msg: "GPFS tdc_persist filesystem is not mounted at /mnt/gpfs/persist"
 
   - name: Get info on /home
     shell:
