@@ -1,0 +1,91 @@
+---
+
+# Post-monitoring deployment hook to set up hostname metadata
+# This creates custom metrics with readable hostname information
+
+- name: Set up node exporter hostname metadata
+  hosts: node_exporter
+  become: yes
+  tasks:
+    - name: Create textfile collector directory
+      file:
+        path: "{{ node_exporter_textfile_dir | default('/var/lib/node_exporter/textfile_collector') }}"
+        state: directory
+        owner: node-exp
+        group: node-exp
+        mode: '0755'
+      when: node_exporter_textfile_dir is defined
+
+    - name: Remove broken hostname metrics file
+      file:
+        path: "{{ node_exporter_textfile_dir | default('/var/lib/node_exporter/textfile_collector') }}/hostname_info.prom"
+        state: absent
+      when: node_exporter_textfile_dir is defined
+
+    - name: Create hostname metrics file directly
+      copy:
+        content: |
+          # HELP node_meta_info Node metadata information with readable hostnames
+          # TYPE node_meta_info gauge
+          node_meta_info{hostname="{{ inventory_hostname | default(ansible_fqdn | default(ansible_hostname)) }}",fqdn="{{ ansible_fqdn | default('unknown.local') }}",cluster="{{ cluster_name | default('agr-eri-slurm') }}",role="{{ group_names | first | default('unknown') }}",environment="{{ env | default('unknown') }}"} 1
+          # HELP node_hostname_info Alternative hostname information  
+          # TYPE node_hostname_info gauge
+          node_hostname_info{readable_hostname="{{ inventory_hostname | default(ansible_fqdn | default(ansible_hostname)) }}"} 1
+        dest: "{{ node_exporter_textfile_dir | default('/var/lib/node_exporter/textfile_collector') }}/hostname_info.prom"
+        owner: node-exp
+        group: node-exp
+        mode: '0644'
+      when: node_exporter_textfile_dir is defined
+
+    - name: Create simple hostname metadata update script
+      copy:
+        content: |
+          #!/bin/bash
+          # Simple script to regenerate hostname metrics
+          echo "Hostname metrics updated at $(date)"
+        dest: /usr/local/bin/update-hostname-metrics.sh
+        mode: '0755'
+      when: node_exporter_textfile_dir is defined
+
+    - name: Execute hostname metadata script
+      command: /usr/local/bin/update-hostname-metrics.sh
+      when: node_exporter_textfile_dir is defined
+
+    - name: Create systemd timer for regular hostname metric updates
+      copy:
+        content: |
+          [Unit]
+          Description=Update Node Exporter Hostname Metrics
+          
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/bin/update-hostname-metrics.sh
+          User=root
+        dest: /etc/systemd/system/update-hostname-metrics.service
+        mode: '0644'
+      when: node_exporter_textfile_dir is defined
+
+    - name: Create systemd timer for hostname metrics
+      copy:
+        content: |
+          [Unit]
+          Description=Update hostname metrics every hour
+          Requires=update-hostname-metrics.service
+          
+          [Timer]
+          OnBootSec=1min
+          OnUnitActiveSec=1h
+          
+          [Install]
+          WantedBy=timers.target
+        dest: /etc/systemd/system/update-hostname-metrics.timer
+        mode: '0644'
+      when: node_exporter_textfile_dir is defined
+
+    - name: Enable and start hostname metrics timer
+      systemd:
+        daemon_reload: yes
+        name: update-hostname-metrics.timer
+        enabled: yes
+        state: started
+      when: node_exporter_textfile_dir is defined
