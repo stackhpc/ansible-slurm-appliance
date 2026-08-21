@@ -2,21 +2,6 @@
 - name: Prepare module denylist using modulejail
   hosts: modulejail_sample_hosts
   gather_facts: false
-  vars:
-    modulejail_version: v1.5.2
-    modulejail_checksum: "sha256:9acea2d83345b7034543ea783eef02cc09fda7bfea2870a7be5a9ef038029298"
-    modulejail_local_download_script: "/tmp/modulejail-{{ modulejail_version }}"
-    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
-    appliances_site_root: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') + '/environments/site' }}"
-    # choose where to put the excluded modules definition: in appliances_site_root or appliances_environment_root
-    modulejail_var_file: "{{ appliances_environment_root + '/inventory/group_vars/all/modulejail.yml' }}"
-    additional_modules:
-      # Whitelist modules transiently loaded at boot time and other known necessary modules
-      # boot time:
-      - amd64_edac
-      - amd_atl
-      - edac_mce_amd
-      - fmpm
   tasks:
     - name: "Download modulejail"
       become: false
@@ -64,7 +49,7 @@
         all_modules: "{{ all_modules | from_json }}"
       vars:
         all_modules: >-
-          {% set _all_modules = [] + additional_modules %}
+          {% set _all_modules = [] + modulejail_allowlist_modules %}
           {%- for h in ansible_play_hosts -%}
           {% set _ = _all_modules.extend(hostvars[h].loaded_modules | flatten) %}
           {%- endfor -%}
@@ -124,7 +109,7 @@
       delegate_to: localhost
       run_once: true # noqa: run-once[task]
       ansible.builtin.copy: # noqa: risky-file-permissions
-        dest: "{{ modulejail_var_file }}"
+        dest: "{{ modulejail_output_var_file }}"
         content: |
           # Ansible generated
           {% if all_denylist_modules %}
