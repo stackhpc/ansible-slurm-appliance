@@ -79,16 +79,17 @@ git clone https://token:${GITLAB_PAT}@gitlab.com/nesi1/agresearch/agr-eri-slurm.
 
 3. Configure your environment. The details of this depend on file locations:
 
-   ```shell
-  # load python environment and activate relevant appliance environment
+  ```shell
+  # load python
   . venv/bin/activate
   
+  # make credentials available
   export OS_CLIENT_CONFIG_FILE=$(realpath path_to_clouds.yaml)
   export OS_CLOUD=openstack
-
   export ANSIBLE_VAULT_PASSWORD_FILE=$(realpath path_to_vault_password)
   export TF_VAR_gitlab_access_token=${GITLAB_PAT}
-
+  
+  # setup ssh
   export ANSIBLE_SSH_COMMON_ARGS="-i $(realpath $path_to_jumphost_private_key) -J nesi-ansible"
   export PKR_VAR_ssh_private_key_file=$(realpath $path_to_cluster_private_key)
   export PKR_VAR_ssh_bastion_private_key_file=$(realpath $path_to_jumphost_private_key)
