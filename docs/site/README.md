@@ -4,8 +4,9 @@
 
 ### Progress
 - all works through to post hook
+- need to do monitoring
 - need to do post-monitoring hook
-- and actually check ondemand 
+- and actually check ondemand
 
 ### Production
 Things to copy across:
@@ -185,6 +186,8 @@ The Pulp server must have the DNF repo snapshots for the current branch synced:
 ```shell
 ansible-playbook ansible/adhoc/sync-pulp.yml
 ```
+
+**NB:** All builds should be run with the `stg` environment activated.
 
 ### base
 The base image installs NVIDIA DOCA-OFED, FreeIPA and Spectrum Scale clients
