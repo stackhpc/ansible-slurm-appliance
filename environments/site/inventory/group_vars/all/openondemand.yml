@@ -21,22 +21,38 @@ ood_install_apps:
 openondemand_apps_desktop_agr:
   title: Remote Desktop
   description: Request a desktop to run GUI applications.
-  cluster: slurm
+  cluster: "{{ openhpc_cluster_name }}"
   form:
     - desktop
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - num_cores
+    - gres
+    - gres_count
     - node
   attributes:
     desktop: xfce
     # bc_account: # i.e. slurm account
     #   value: root
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_desktop_partition | default(none) }}"
     num_cores:
       label: Number of cores
       value: 1
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
     node:
       label: Node name
       help: Select a particular node or leave empty to let Slurm pick the next available
@@ -46,27 +62,55 @@ openondemand_apps_desktop_agr:
     script:
       job_name: "ood-desktop"
       native:
+        - "--partition"
+        - "<%= auto_queues %>"
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
+        <% if node != '' %>
         - <%= "--nodelist=#{node}" %>
+        <% end %>
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
         - <%= "--export=ALL" %>
-
 openondemand_apps_jupyter_agr:
   title: Jupyter Lab
   description: Request a Jupyter Lab server
-  cluster: slurm
+  cluster: "{{ openhpc_cluster_name }}"
   form:
     - modules
     - extra_jupyter_args
-    - bc_queue
+    - auto_queues
     - bc_num_hours
     - num_cores
     - num_mem
+    - gres
+    - gres_count
     - node
   attributes:
     num_cores:
       label: Number of cores
+      value: 1
       widget: number_field
+    modules: ""
+    gres:
+      label: Resources
+      help: Select GPU or other Slurm GRES resources
+      required: true
+      widget: select
+      options: "{{ openondemand_gres_options }}"
+    gres_count:
+      label: Resource count
+      help: Count of GPU or other Slurm GRES resources
+      required: false
+      widget: number_field
+      value: 1
+      min: 1
+      step: 1
+    node:
+      label: Node name
+      help: Select a particular node or leave empty to let Slurm pick the next available
+      value: ""
     num_mem:
       label: Memory per job (GB)
       widget: number_field
@@ -74,22 +118,31 @@ openondemand_apps_jupyter_agr:
       min: 2
       max: 15
       step: 1
-    modules: ""
     extra_jupyter_args: ""
-    bc_queue:
+    auto_queues:
       value: "{{ openondemand_jupyter_partition | default(none) }}"
-    node: ""
   submit: |
     ---
     batch_connect:
       template: "basic"
+      script_wrapper: |
+        module purge
+        export PATH=/opt/jupyter-py312/bin/:$PATH
+        %s
     script:
       job_name: "ood-jupyter"
       native:
+        - "--partition"
+        - "<%= auto_queues %>"
         - <%= "--nodes=1" %>
         - <%= "--ntasks=#{num_cores}" %>
         - <%= "--mem=#{num_mem}gb" %>
+        <% if node != '' %>
         - <%= "--nodelist=#{node}" %>
+        <% end %>
+        <% if gres != 'none' %>
+        - <%= "--gres=#{gres}:#{gres_count}" %>
+        <% end %>
 
 openondemand_dashboard_support_url: 'https://nznesi.atlassian.net/servicedesk/customer/portal/1/group/18'
 openondemand_dashboard_docs_url: 'https://nznesi.atlassian.net/wiki/spaces/eRI/'
@@ -113,7 +166,7 @@ openondemand_apps_agr:
 openondemand_apps_igv_agr:
   title: IGV
   description: Request an igv server
-  cluster: slurm
+  cluster: "{{ openhpc_cluster_name }}"
   attributes:
     bc_vnc_resolution:
       required: true
