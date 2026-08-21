@@ -1,4 +1,4 @@
-kernel_modules_denylist:
+kernel_modules_vulnerable_denylist:
   # CVE-2026-43500, CVE-2026-43284 (dirtyfrag)
   - esp4
   - esp6
@@ -9,3 +9,8 @@ kernel_modules_denylist:
   - act_pedit
   # CVE-2026-64531 (ovswrap)
   - openvswitch
+
+# kernel_modules_modulejail_denylist will be defined in site inventory group_vars
+kernel_modules_modulejail_denylist: []
+
+kernel_modules_denylist: "{{ kernel_modules_vulnerable_denylist + (kernel_modules_modulejail_denylist | default([])) }}"
