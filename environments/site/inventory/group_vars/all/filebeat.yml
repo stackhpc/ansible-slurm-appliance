@@ -1,0 +1,5 @@
+# Filebeat configuration path override
+# Switch to External-enabled config when integration is active  
+filebeat_config_path_default: "{{ appliances_repository_root }}/environments/common/files/filebeat/filebeat.yml"
+filebeat_config_path_external: "{{ appliances_repository_root }}/environments/site/files/filebeat/filebeat_external.yml"
+filebeat_config_path: "{{ filebeat_config_path_external if external_integration_enabled else filebeat_config_path_default }}"

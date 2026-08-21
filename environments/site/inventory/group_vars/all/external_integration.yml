@@ -1,0 +1,27 @@
+---
+
+# External Integration Configuration for AgResearch Template
+
+# Enable External observability integration
+external_integration_enabled: false
+
+# Override in environment-specific settings:
+#cluster_name:
+#env:
+
+# Prometheus remote write configuration
+# Include prometheus_external.yml variables when enabled
+prometheus_remote_write: "{{ prometheus_remote_write_external if external_integration_enabled else [] }}"
+
+# Promtail configuration
+promtail_enabled: "{{ external_integration_enabled }}"
+
+# External observability platform endpoints
+external_mimir_url: "https://mimir.observability.flexi.nesi.org.nz/api/v1/push"
+external_loki_url: "https://loki.observability.flexi.nesi.org.nz/loki/api/v1/push"
+
+external_integration_validation:
+  required_vars:
+    - vault_external_mimir_username
+    - vault_external_mimir_password
+  when: external_integration_enabled

@@ -1,0 +1,10 @@
+---
+
+# External Integration Configuration for STG Environment
+
+# Enable External observability integration
+external_integration_enabled: true
+
+# Environment-specific settings  
+env: "stg"
+cluster_name: "slurm-stg"

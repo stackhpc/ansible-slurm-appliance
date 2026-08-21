@@ -1,0 +1,16 @@
+---
+
+# Node exporter configuration to enable textfile collector
+# This allows us to add custom hostname metadata metrics
+
+# Enable textfile collector for custom hostname metrics
+node_exporter_textfile_dir: /var/lib/node_exporter/textfile_collector
+
+# Enhanced node exporter collectors configuration
+node_exporter_enabled_collectors:
+  - systemd
+  - textfile:
+      directory: "{{ node_exporter_textfile_dir }}"
+  - filesystem:
+      ignored-mount-points: "^/(dev|proc|sys|var/lib/docker/.+|var/lib/containers/.+)($|/)"
+      ignored-fs-types: "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"

@@ -1,0 +1,48 @@
+---
+
+# Prometheus configuration for remote write to External Mimir
+# This extends the common configuration with remote_write settings
+
+# Remote write configuration for External Mimir
+# This variable is conditionally loaded via external_integration.yml
+prometheus_remote_write_external:
+  - url: "{{ external_mimir_url }}"
+    basic_auth:
+      username: "{{ vault_external_mimir_username }}"
+      password: "{{ vault_external_mimir_password }}"
+    remote_timeout: "30s"
+    queue_config:
+      capacity: 10000
+      max_shards: 50
+      min_shards: 1
+      max_samples_per_send: 2000
+      batch_send_deadline: "5s"
+      min_backoff: "30ms"
+      max_backoff: "100ms"
+    metadata_config:
+      send: true
+      send_interval: "1m"
+    # Add cluster identification labels to all metrics
+    write_relabel_configs:
+      - source_labels: [__name__]
+        target_label: cluster
+        replacement: "{{ cluster_name | default('agr-eri-slurm') }}"
+      - source_labels: [__name__]
+        target_label: environment
+        replacement: "{{ env | default('unknown') }}"
+
+# Add external labels to identify the Prometheus instance
+# These labels are added to all metrics from this Prometheus server
+prometheus_external_labels:
+  cluster: "{{ cluster_name | default('agr-eri-slurm') }}"
+  environment: "{{ env | default('unknown') }}"
+  prometheus_replica: "{{ inventory_hostname | default('prometheus-01') }}"
+
+# Add health check endpoints for monitoring integration status
+prometheus_remote_write_healthcheck_enabled: true
+prometheus_remote_write_continue_on_error: true
+
+# Optional: Reduce local retention since we're sending to remote
+# Uncomment these lines once you're confident in the remote setup
+# prometheus_storage_retention: "7d"
+# prometheus_storage_retention_size: "20GB"

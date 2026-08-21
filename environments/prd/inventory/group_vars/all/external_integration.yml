@@ -1,0 +1,10 @@
+---
+
+# External Integration Configuration for PRD Environment
+
+# Disable External observability integration for prd environment
+external_integration_enabled: false
+
+# Environment-specific settings
+#cluster_name: ?
+env: "prd"

@@ -1,0 +1,89 @@
+---
+
+# Promtail configuration for log forwarding to External Loki
+# This is a separate log shipper that runs alongside Filebeat
+
+promtail_enabled: "{{ external_integration_enabled }}"
+promtail_version: "2.8.2"
+promtail_port: 9080
+
+# Promtail configuration
+promtail_config:
+  server:
+    http_listen_port: "{{ promtail_port }}"
+    grpc_listen_port: 0
+
+  positions:
+    filename: /var/lib/promtail/positions.yaml
+
+  clients:
+    - url: "{{ external_loki_url }}"
+      basic_auth:
+        username: "{{ vault_external_loki_username }}"
+        password: "{{ vault_external_loki_password }}"
+      timeout: "30s"
+      backoff_config:
+        min_period: "100ms"
+        max_period: "10s"
+        max_retries: 10
+      # Add external labels to identify this cluster
+      external_labels:
+        cluster: "{{ cluster_name | default('slurm-cluster') }}"
+        environment: "{{ env | default('unknown') }}"
+
+  scrape_configs:
+    - job_name: slurm-stats
+      static_configs:
+        - targets:
+            - localhost
+          labels:
+            job: slurm-stats
+            cluster: "{{ cluster_name | default('slurm-cluster') }}"
+            __path__: /var/log/slurm-stats/*.json
+
+      pipeline_stages:
+        # Parse JSON log lines
+        - json:
+            expressions:
+              job_id: JobID
+              user: User
+              account: Account
+              partition: Partition
+              nodes: NNodes
+              cpus: NCPUS
+              elapsed: ElapsedRaw
+              start_time: Start
+              end_time: End
+              state: State
+        
+        # Add parsed fields as labels (be selective to avoid high cardinality)
+        - labels:
+            job_id: job_id
+            user: user
+            account: account
+            partition: partition
+            state: state
+        
+        # Convert timestamps
+        - timestamp:
+            source: end_time
+            format: "2006-01-02T15:04:05"
+        
+        # Output the log line with structured data
+        - output:
+            source: message
+
+# Add health check endpoints for monitoring integration status
+promtail_healthcheck_enabled: true
+promtail_continue_on_error: true
+
+# Promtail systemd service configuration
+promtail_systemd_service:
+  name: promtail
+  description: "Promtail log shipper for Loki"
+  user: promtail
+  group: promtail
+  working_directory: /var/lib/promtail
+  exec_start: "/usr/local/bin/promtail -config.file=/etc/promtail/config.yml"
+  restart: always
+  restart_sec: 5
