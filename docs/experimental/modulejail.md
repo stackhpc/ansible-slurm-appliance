@@ -61,7 +61,9 @@ As soon as they are provisionned, we run `ansible/site.yml` to configure them an
 
 ### With compute_init
 
-Applying the mitigation also copies the `kernel_modules_denylist` definition to the export on the control node.
+The `kernel_modules_denylist` variable is saved in the hostvars for each compute node on the cluster export of
+the control node when we run the compute_init `export.yml` tasks. This is run as part of `ansible/site.yml`
+(in `ansible/final.yml`).
 
 We submit Slurm jobs to upgrade compute nodes. When they boot, they fetch the current `kernel_modules_denylist` and
 apply it as part of compute_init.
@@ -83,7 +85,7 @@ With a different kernel version there might be changes to modules needed to run 
 2. Build an image (current denylist will be propagated to the image)
 3. Deploy and configure staging
 4. Run `ansible/adhoc/modulejail.yml` to create the new `kernel_modules_denylist`
-5. Apply the new denylist in staging and test it. In particular, it is advice to confirm that nodes still work after a reboot.
+5. Apply the new denylist in staging and test it. In particular, it is advised to confirm that nodes still work after a reboot.
 
 ### Deployment in production
 
@@ -91,9 +93,10 @@ With a different kernel version there might be changes to modules needed to run 
 
 1. Redeploy control and login nodes with the new image using OpenTofu.
 2. Run `ansible/site.yml` to patch all active nodes (with the new or the old image) and export the `kernel_modules_denylist` to
-   the control host.
+   the control host (`ansible-playbook --diff ansible/site.yml --tags compute_init,kernel_modules`).
 3. Run `ansible/adhoc/rebuild-via-slurm.yml` to schedule upgrade of compute nodes.
-4. When compute nodes boot they always apply the latest `kernel_modules_denylist`.
+4. When compute nodes boot they always apply the value of `kernel_modules_denylist` that was saved on the cluster
+   export of the control node.
 
 ### Deployment on clusters without compute-init
 
@@ -101,3 +104,10 @@ With a different kernel version there might be changes to modules needed to run 
 2. Run `ansible/site.yml` to patch all active nodes (with the new or the old image).
 3. Each time a node is reprovisionned with the new image, `ansible/site.yml` is rerun to configure it and it applies
    the latest `kernel_modules_denylist`.
+
+### Limitations
+
+Edge cases can arise when having a mixture of nodes running the old and new image.
+
+For instance when a module had to be blocked in a previous version but is needed on the new version, one must be careful
+to not remove the module from the denylist of existing nodes, but remove it from the cluster export, to be picked when nodes are rebuilt.
