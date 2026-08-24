@@ -70,10 +70,10 @@ apply it as part of compute_init.
 
 ## Enabling a module
 
-1. if a module happens to be needed, edit `/etc/modprobe.d/appliance.conf` to remove the 2 lines containing it;
+1. If a module happens to be needed, edit `/etc/modprobe.d/appliance.conf` to remove the 2 lines containing it;
    you can now `modprobe` the module.
-2. add it to `additional_modules` in `ansible/adhoc/modulejail.yml` and rerun the it
-3. run the `ansible/mitigations.yml` playbook to remove it from `/etc/modprobe.d/appliance.conf` on all hosts.
+2. Add it to `additional_modules` in `ansible/adhoc/modulejail.yml` and rerun the it
+3. Run the `ansible/mitigations.yml` playbook to remove it from `/etc/modprobe.d/appliance.conf` on all hosts.
 
 ## Sample workflow to do an appliance update
 
