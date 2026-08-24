@@ -65,14 +65,24 @@ def unload_modules(module, denylist, result):
     else:
         # really run rmmod
         try:
+            processed = []
             for m in denylist:
                 # could also model diff as loaded modules, before and after...
                 if rmmod(m):
                     result["unloaded"].append(m)
+                processed.append(m)
         except subprocess.CalledProcessError as e:
-            module.fail_json(msg=f"Failed calling rmmod: {e!r}", exception=e)
+            module.fail_json(
+                msg=f"Failed calling rmmod: {e!r}",
+                unloaded=result["unloaded"],
+                processed=processed,
+            )
         except subprocess.TimeoutExpired as e:
-            module.fail_json(msg=f"Timeout calling rmmod: {e!r}", exception=e)
+            module.fail_json(
+                msg=f"Timeout calling rmmod: {e!r}",
+                unloaded=result["unloaded"],
+                processed=processed,
+            )
 
     result["diff"]["after"] = "\n".join(result["unloaded"]) + "\n"
     result["changed"] = bool(result["unloaded"])
@@ -96,7 +106,7 @@ def try_loading_modules(module, denylist, result):
                     msg=f"Should not have been able to modprobe {m}: stdout={res.stdout} stderr={res.stderr}"
                 )
     except subprocess.TimeoutExpired as e:
-        module.fail_json(msg=f"Timeout calling modprobe {m}: {e!r}", exception=e)
+        module.fail_json(msg=f"Timeout calling modprobe {m}: {e!r}")
 
 
 def run_module():
