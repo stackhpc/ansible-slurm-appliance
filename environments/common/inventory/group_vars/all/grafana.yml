@@ -35,11 +35,8 @@ grafana_dashboards_default:
       - placeholder: DS_SLURMSTATS
         replacement: slurmstats
   # slurm exporter
-  - dashboard_id: 4323
-    replacements:
-      - placeholder: DS_PROMETHEUS
-        replacement: prometheus
-    revision_id: 3
+  - dashboard_file: slurm-exporter.json
+    replacements: []
 
 grafana_dashboards: "{{ grafana_dashboards_default + (openondemand_dashboard if groups.get('openondemand') else []) }}"
 
