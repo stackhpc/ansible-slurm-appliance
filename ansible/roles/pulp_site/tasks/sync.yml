@@ -6,8 +6,10 @@
     fail_msg: "Upstream password not set. Ensure `pulp_site_upstream_username` and `pulp_site_upstream_password` are overridden to your Ark credentials."
 
 - name: Install python3
-  ansible.builtin.package:
-    name: python3,git
+  ansible.builtin.dnf:
+    name:
+      - "{{ 'python39' if ansible_distribution_major_version == '8' else 'python3' }}"
+      - git
   become: true
 
 - name: Create virtualenv directory
@@ -28,7 +30,7 @@
   become: true
   block:
     - name: Upgrade pip
-    # This needs to a separate step so that we use the updated version
+    # This needs to be a separate step so that we use the updated version
     # to install the packages below.
       ansible.builtin.pip:
         name: pip

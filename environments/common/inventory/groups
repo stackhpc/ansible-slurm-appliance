@@ -80,9 +80,8 @@ mysql
 [node_exporter]
 # All hosts to monitor for hardware and OS metrics.
 
-[selinux:children]
+[selinux]
 # All hosts requiring control of SELinux status.
-cluster
 
 [rebuild]
 # Enable rebuild of nodes on an OpenStack cloud; add 'control' group.
@@ -237,8 +236,8 @@ doca
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
 
+[weka]
+# Hosts to install and mount WEKA filesystems on
+
 ## Vulnerability mitigation groups
-[mitigate_dirtyfrag]
-[mitigate_ssh_keysign_pwn]
-[mitigate_cve_2026_43037]
-[mitigate_cve_2026_46331]
+[kernel_modules]
