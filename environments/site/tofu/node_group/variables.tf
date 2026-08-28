@@ -22,9 +22,9 @@ variable "key_pair" {
   description = "Name of an existing keypair in OpenStack"
 }
 
-variable "image_id" {
+variable "image_label" {
   type        = string
-  description = "ID of image for the node group"
+  description = "Label (in environments/site/images/) of image for the node group"
 }
 
 variable "environment_root" {
@@ -92,7 +92,7 @@ variable "compute_init_enable" {
 
 variable "ignore_image_changes" {
   type        = bool
-  description = "Whether to ignore changes to the image_id parameter"
+  description = "Whether to ignore changes to the image ID and label"
   default     = false
   nullable    = false
 }
