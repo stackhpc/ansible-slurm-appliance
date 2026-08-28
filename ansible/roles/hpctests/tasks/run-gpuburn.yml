@@ -45,6 +45,12 @@
     dest: "{{ hpctests_rootdir }}/gpuburn/gpuburn.sh"
     mode: "0755"
 
+- name: Create task script
+  ansible.builtin.template:
+    src: gpuburn-task.sh.j2
+    dest: "{{ hpctests_rootdir }}/gpuburn/gpuburn-task.sh"
+    mode: "0755"
+
 - name: Remove previous outputs # noqa: no-changed-when
   ansible.builtin.shell:
     cmd: "rm -f {{ hpctests_rootdir }}/gpuburn/gpuburn.sh.*.out"
