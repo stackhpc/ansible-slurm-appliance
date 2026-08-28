@@ -16,12 +16,12 @@
 
 - name: Select GPUs
   ansible.builtin.set_fact:
-    hpctests_gpuburn_gres: "{% for gpu in (hpctests_nodeinfo.info[0].gpus | default({})) | dict2items %}{% if loop.index0 > 0 %},{% endif %}gpu:{{ gpu.key }}={{ gpu.value }}{% endfor %}"
-  when: hpctests_gpuburn_gres is not defined
+    hpctests_gres: "{% for gpu in (hpctests_nodeinfo.info[0].gpus | default({})) | dict2items %}{% if loop.index0 > 0 %},{% endif %}gpu:{{ gpu.key }}={{ gpu.value }}{% endfor %}"
+  when: hpctests_gres is not defined
 
 - name: Show selected GPUs
   ansible.builtin.debug:
-    msg: "Will run --gres={{ hpctests_gpuburn_gres }}"
+    msg: "Will run --gres={{ hpctests_gres }}"
 
 - name: Ensure node chunk size is not zero
   ansible.builtin.assert:
