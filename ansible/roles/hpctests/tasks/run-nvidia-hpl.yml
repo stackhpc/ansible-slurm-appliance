@@ -55,24 +55,24 @@
 
 - name: Select GPUs
   ansible.builtin.set_fact:
-    hpctests_nvidia_hpl_gres: >-
+    hpctests_gpu_gres: >-
       {%- if gpus | length == 1 -%}
         {# homogeneous node #}
         {%- set gpu = gpus | dict2items | first -%}
             gpu:{{ gpu.key }}:{{ gpu.value }}
       {%- else -%}
-        {{ notdefined | mandatory(msg="Unsupported: nodes with heterogeneous (MIG?) GPUs, please specify wanted hpctests_nvidia_hpl_gres") }}
+        {{ notdefined | mandatory(msg="Unsupported: nodes with heterogeneous (MIG?) GPUs, please specify wanted hpctests_gpu_gres") }}
       {%- endif -%}
   vars:
     gpus: hpctests_nodeinfo.info[0].gpus | default({})
-  when: hpctests_nvidia_hpl_gres is not defined
+  when: hpctests_gpu_gres is not defined
 
 - ansible.builtin.debug:
-    msg: "Will run --gres={{ hpctests_nvidia_hpl_gres }}"
+    msg: "Will run --gres={{ hpctests_gpu_gres }}"
 
-- name: Check hpctests_nvidia_hpl_gres
+- name: Check hpctests_gpu_gres
   ansible.builtin.assert:
-    that: hpctests_nvidia_hpl_gres is search('^gpu:.*=[0-9]+$')
+    that: hpctests_gpu_gres is search('^gpu:.+:[0-9]+$')
 
 - name: Select HPL.dat
   ansible.builtin.set_fact:
@@ -80,11 +80,16 @@
       {{ hpctests_nvidia_hpl_dat | default(hpctests_nvidia_hpl_dat_matrix.get(selected_gpu, hpctests_nvidia_hpl_dat_matrix.default).get(selected_gpu_count | int ) | mandatory(msg="Unsupported GPU count")) }}
     hpctests_ntasks: "{{ selected_gpu_count }}"
   vars:
-    selected_gpu: "{{ ((hpctests_nvidia_hpl_gres | split(':'))[1] | split('='))[0] }}"
-    selected_gpu_count: "{{ (hpctests_nvidia_hpl_gres | split('='))[1] | int }}"
+    selected_gpu: "{{ (hpctests_gpu_gres | split(':'))[1] }}"
+    selected_gpu_count: "{{ (hpctests_gpu_gres | split(':'))[2] | int }}"
 
 - ansible.builtin.debug:
-    var: hpctests_nvidia_hpl_dat
+    msg: "Using NVIDIA-HPL data file '{{ hpctests_nvidia_hpl_dat }}' for {{ (hpctests_gpu_gres | split(':'))[2] | int }} GPUs"
+
+- ansible.builtin.assert:
+    that:
+      - (hpctests_nvidia_hpl_dat | length) > 0
+    fail_msg: "Unable to detect the NVIDIA-HPL data file to use. Please set hpctests_nvidia_hpl_dat"
 
 # Templating a script to be run on each node by srun.
 # Contrary to sbatch, all slurm parameters must be given on the command-line.
@@ -148,7 +153,7 @@
       --tasks-per-node=1 \
       --cpu-bind=none \
       --time={{ timeout_h }}:{{ timeout_m }}:30 \
-      --gres={{ hpctests_nvidia_hpl_gres }} \
+      --gres={{ hpctests_gpu_gres }} \
       --mem={{ (0.8 * (hpctests_nodeinfo.info[0].free_mem.number | int)) | round(method='floor') | int }} \
       --cpus-per-gpu={{ hpctests_nodeinfo.info[0].effective_cpus // (hpctests_ntasks | int) }} \
       --nodes={{ hpctests_nodeinfo.info | length }} \
@@ -215,7 +220,7 @@
     # yamllint disable rule:line-length
     msg: |
       {%- set floats = perf.stdout_lines | map('float') -%}
-      Summary for nvidia-hpl on {{ hpctests_computes.stdout_lines | length }} nodes in '{{ hpctests_partition }}' partition, job ID {{ srun_job_id.stdout.split()[-1] }}, GPUs '{{ hpctests_nvidia_hpl_gres }}':
+      Summary for nvidia-hpl on {{ hpctests_computes.stdout_lines | length }} nodes in '{{ hpctests_partition }}' partition, job ID {{ srun_job_id.stdout.split()[-1] }}, GPUs '{{ hpctests_gpu_gres }}':
         Max:  {{ floats | max }} Gflops ({{ ((floats | max) / hpctests_ntasks | int) | round(1)  }} Gflops per GPU)
         Min:  {{ floats | min }} Gflops ({{ ((floats | min) / hpctests_ntasks | int) | round(1) }} Gflops per GPU)
         Mean: {{ ((floats | sum) / (hpctests_computes.stdout_lines | length)) | round(1) }} Gflops ({{ ((floats | sum) / (hpctests_computes.stdout_lines | length) / hpctests_ntasks | int) | round(1) }} Gflops per GPU)

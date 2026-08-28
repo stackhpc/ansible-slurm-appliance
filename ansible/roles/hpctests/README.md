@@ -42,7 +42,7 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
   **CAUTION: see note below**.
 - `hpctests_hpl_arch`: Optional, default 'linux64'. Arbitrary architecture name for HPL build. HPL is compiled on the first compute node of those selected (see `hpctests_nodes`), so this can be used to create different builds for different types of compute node.
 - `hpctests_nvidia_hpl_dat_matrix`: Optional. Matches GPU gres specification to a `.dat` file from the NVIDIA HPC Benchmarks image.
-- `hpctests_nvidia_hpl_gres`: Optional, all GPUs will be selected if absent. `srun --gres` option: needed on hosts with heterogeneous cards (incl. MIG). eg. `gpu:nvidia_h200=2gpu`
+- `hpctests_gpu_gres`: Optional, all GPUs will be selected if absent. `srun --gres` option: needed on hosts with heterogeneous cards (incl. MIG). eg. `gpu:nvidia_h200:2gpu`
 - `hpctests_nvidia_hpl_image`: Optional, default 'nvcr.io/nvidia/hpc-benchmarks'. Docker image of the nvidia HPC Benchmarks
 - `hpctests_nvidia_hpl_minutes`: Optional, default 20. Timeout for Slurm and the async task.
 - `hpctests_nvidia_hpl_sif_file`: Optional, default '{{ hpctests_rootdir }}/nvidia-hpl/nvidia-hpc-benchmarks-{{ hpctests_nvidia_hpl_version }}.sif'. Apptainer image to run: change it if you downloaded the image manually.

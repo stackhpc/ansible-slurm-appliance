@@ -26,7 +26,7 @@ hpctests_hpl_arch: linux64
 # hpctests_reservation:
 # hpctests_account:
 # hpctests_qos:
-# hpctests_nvidia_hpl_gres:
+# hpctests_gpu_gres:
 hpctests_nvidia_hpl_image: nvcr.io/nvidia/hpc-benchmarks
 hpctests_nvidia_hpl_install_dir: "{{ hpctests_rootdir }}/nvidia-hpl"
 hpctests_nvidia_hpl_minutes: 20
