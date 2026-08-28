@@ -23,19 +23,12 @@
   ansible.builtin.debug:
     msg: "Will run --gres={{ hpctests_gpuburn_gres }}"
 
-- name: Compute node chunk size
-  ansible.builtin.set_fact:
-    hpctests_gpuburn_node_chunk_size: >-
-      {{ ((hpctests_computes.stdout_lines | length) * (hpctests_gpuburn_node_chunk_percent | int) / 100) | round(method="ceil") | int }}
-  when: hpctests_gpuburn_node_chunk_size is  not defined
-
 - name: Ensure node chunk size is not zero
   ansible.builtin.assert:
     that: hpctests_gpuburn_node_chunk_size | int > 0
     fail_msg: >
       Can't run gpuburn on node chunks of size 0.
-      Please change hpctests_gpuburn_node_chunk_percent or specify
-      hpctests_gpuburn_node_chunk_size directly
+      Please change hpctests_gpuburn_node_chunk_size
 
 - name: Compute node chunk count
   ansible.builtin.set_fact:
