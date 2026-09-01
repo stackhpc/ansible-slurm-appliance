@@ -87,8 +87,8 @@
     - name: Ensure Grafana state directory
       ansible.builtin.file:
         path: "{{ grafana_data_dir }}"
-        owner: root
-        group: root
+        owner: grafana
+        group: grafana
         mode: '0755'
         state: directory
       become: true
