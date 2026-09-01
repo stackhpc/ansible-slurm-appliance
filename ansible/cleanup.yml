@@ -107,6 +107,7 @@
       doca: "{{ ansible_facts.packages[doca_profile | default('doca-ofed') ].0.version | default('-') }}"
       cuda: "{{ ansible_facts.packages['cuda-toolkit'].0.version | default('-') }}"
       slurm-ohpc: "{{ ansible_facts.packages['slurm-ohpc'].0.version | default('-') }}"
+      groups: "{{ group_names }}"
 
 - name: Show image summary # noqa: no-changed-when
   ansible.builtin.command: cat /var/lib/image/image.json
