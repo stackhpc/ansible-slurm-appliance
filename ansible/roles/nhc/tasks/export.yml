@@ -1,8 +1,15 @@
 ---
 # Used for compute-init
-- name: Template out host specific NHC config
-  ansible.builtin.template:
-    src: "{{ nhc_config_template }}"
+- name: Fetch current host NHC config
+  check_mode: false
+  failed_when: false
+  register: _nhc_current_host_config
+  ansible.builtin.slurp:
+    src: "/etc/nhc/nhc.conf"
+
+- name: Export current host NHC config
+  ansible.builtin.copy:
+    content: "{{ _nhc_current_host_config.content | b64decode }}"
     dest: "/exports/cluster/hostconfig/{{ inventory_hostname }}/nhc.conf"
     owner: ansible-init
     group: ansible-init

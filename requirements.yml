@@ -4,11 +4,11 @@ roles:
     version: v26.2.1
     name: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v1.6.0
+    version: v1.7.0
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
-    version: stackhpc-0.20.0
+    version: stackhpc-0.21.0
   - src: https://github.com/OSC/ood-ansible.git
     name: osc.ood
     version: v4.1.1
