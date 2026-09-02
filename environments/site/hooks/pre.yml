@@ -1,4 +1,4 @@
-- name: Set timezone to Europe/Paris
+- name: Set timezone to Pacific/Auckland
   hosts: cluster:builder
   become: true
   tags: timezone

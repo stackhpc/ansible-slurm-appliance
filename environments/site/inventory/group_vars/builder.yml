@@ -1,2 +1,5 @@
 # don't want them left in image as it breaks epel if we change the pulp IP
 dnf_repos_enabled: false
+
+# site definition uses 'networks' from tofu, not defined for builder:
+openondemand_servername: ''
