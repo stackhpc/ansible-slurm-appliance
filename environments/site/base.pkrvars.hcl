@@ -1,5 +1,5 @@
 # base build - will only be used for further builds:
-inventory_groups = "doca,freeipa_client,spectrum_scale,extra_packages"
+inventory_groups = "doca,freeipa_client,spectrum_scale,extra_packages,openondemand"
 
 image_name = "openhpc-agr-base"
 source_image_name = "openhpc-RL8-260818-0723-3f645271" # for v2.24.0
