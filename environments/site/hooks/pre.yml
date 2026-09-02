@@ -116,3 +116,135 @@
       when:
         - item.item.stat.exists
         - item.item.stat.uid == 1002
+
+
+- hosts: login
+  become: true
+  gather_facts: false
+  tags: cgroups
+  name: Configure login cgroups v2 limits
+  # Adapted from https://gitlab.com/nesi1/agresearch/agr-eri-slurm/-/merge_requests/46
+  vars:
+    systemd_cgroup_controllers: '+cpu +cpuset'
+    systemd_grub_cmdline_linux: 'systemd.unified_cgroup_hierarchy=1'
+    systemd_user_slice_config:
+      # Workaround for https://github.com/systemd/systemd/issues/9578
+      - path: /etc/systemd/system/user-0.slice
+        content:
+          - section: Unit
+            option: Before
+            value: systemd-logind.service
+          - section: Slice
+            option: Slice
+            value: user.slice
+          - section: Install
+            option: WantedBy
+            value: multi-user.target
+
+      - path: /etc/systemd/system/user-.slice.d/resources.conf
+        content:
+          - section: Slice
+            option: Slice
+            value: user.slice
+          - section: Slice
+            option: MemoryMax
+            value: 50G
+          - section: Slice
+            option: CPUQuota
+            value: 400%
+          - section: Slice
+            option: AllowedCPUs
+            value: 0-27
+  tasks:
+    - name: Ensure directory exists for user slice configuration files
+      ansible.builtin.file:
+        path: "{{ item.path | dirname }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      loop: "{{ systemd_user_slice_config }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Create user slice configuration files
+      community.general.ini_file:
+        path: "{{ item.0.path }}"
+        section: "{{ item.1.section }}"
+        option: "{{ item.1.option }}"
+        value: "{{ item.1.value }}"
+        no_extra_spaces: true
+        owner: root
+        group: root
+        mode: 0644
+      loop: "{{ systemd_user_slice_config | subelements('content') }}"
+      loop_control:
+        label: "{{ item.0.path }} -> {{ item.1.option }}={{ item.1.value }}"
+      register: _user_slice_configs
+
+    - name: Enable user-0.slice as required
+      # Workaround for https://github.com/systemd/systemd/issues/9578 @systemd v239
+      ansible.builtin.systemd:
+        name: user-0.slice
+        enabled: true
+        daemon_reload: true
+      when: _user_slice_configs.changed
+
+    - name: Configure GRUB for cgroups v2
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: '^(GRUB_CMDLINE_LINUX=".*?)( {{ systemd_grub_cmdline_linux }})?"$'
+        line: '\1 {{ systemd_grub_cmdline_linux }}"'
+        backrefs: true
+      register: _grub_config
+
+    - name: Apply GRUB configuration
+      ansible.builtin.command:
+        cmd: grub2-mkconfig -o /boot/grub2/grub.cfg
+      when: _grub_config.changed
+      register: _grub_applied
+
+    - name: Reboot system after GRUB changes
+      ansible.builtin.reboot:
+        post_reboot_delay: 30
+      when: _grub_config.changed
+
+    - name: Wait for connection after reboot
+      ansible.builtin.wait_for_connection:
+        delay: 10
+        timeout: 300
+      when: _grub_config.changed
+
+    - name: Configure systemd cgroup accounting
+      community.general.ini_file:
+        path: /etc/systemd/system.conf
+        section: Manager
+        option: "{{ item }}"
+        value: 'yes'
+        no_extra_spaces: true
+      loop:
+        - DefaultCPUAccounting
+        - DefaultTasksAccounting
+        - DefaultMemoryAccounting
+        - DefaultIOAccounting
+      register: _systemd_accounting_config
+
+    - name: Read enabled cgroup controllers for root control group
+      ansible.builtin.slurp:
+        src: /sys/fs/cgroup/cgroup.subtree_control
+      register: _systemd_current_cgroup_controllers
+
+    - name: Ensure cgroup controllers in root control group are enabled
+      ansible.builtin.command:
+        cmd: "echo {{ item }} >> /sys/fs/cgroup/cgroup.subtree_control"
+      loop: "{{ systemd_cgroup_controllers.split() }}"
+      when:
+        - systemd_cgroup_controllers | length > 0
+        - item[1:] not in (_systemd_current_cgroup_controllers.content | b64decode | split)
+      register: _cgroup_controllers_config
+
+    - name: Reload systemd if user slice or accounting configs changed
+      # NB: this is NOT shown as a change, but syslogs show reload happens
+      ansible.builtin.systemd:
+        daemon_reload: true
+      when: _user_slice_configs.changed or _systemd_accounting_config.changed
