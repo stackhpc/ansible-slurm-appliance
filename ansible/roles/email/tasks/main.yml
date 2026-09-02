@@ -1,0 +1,21 @@
+---
+- name: Install postfix
+  package:
+    name: postfix
+    state: present
+
+# remove all relay_host definitions except correct one
+- name: Remove any existing relay hosts
+  lineinfile:
+    path: /etc/postfix/main.cf
+    regexp: "^relayhost = \\[(?!{{ email_relay_host | regex_escape() }}\\]:{{ email_relay_port }}).*"
+    state: absent
+
+- name: Configure postfix relay host
+  lineinfile:
+    path: /etc/postfix/main.cf
+    insertbefore: "#relayhost"
+    firstmatch: yes
+    line: 'relayhost = [{{ email_relay_host }}]:{{ email_relay_port }}'
+    state: present
+  notify: reload-postfix
