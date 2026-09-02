@@ -2536,8 +2536,8 @@
     ]
   },
   "time": {
-    "from": "now-25h",
-    "to": "now-23h"
+    "from": "now-2d",
+    "to": "now"
   },
   "timepicker": {
     "nowDelay": "1s",
