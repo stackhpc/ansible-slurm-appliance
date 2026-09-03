@@ -1,14 +1,14 @@
 # Limiting the loadable module list to mitigate future CVEs
 
-There has been multiple instances of CVEs found in less-used kernel modules these past months.
+There have been multiple instances of CVEs found in less-used kernel modules these past months.
 
 Mitigating the vulnerability is as simple as adding it to [kernel_modules_vulnerable_denylist](../../environments/common/inventory/group_vars/all/kernel_modules.yml)
 and re-running the `ansible/mitigations.yml` playbook to patch your live cluster and/or rebuilding the image.
 
-But it doesn't protect the system in two cases:
+However this does not protect the system in two cases:
 
-- the attacker tricked an admin into loading the vulnerable module before the vulnerability is known;
-- the attacker ran a command that automatically loaded the module (eg. sctp_diag is loaded by the `ss -S` command).
+- The attacker tricked an admin into loading the vulnerable module before the vulnerability is known.
+- The attacker ran a command that automatically loaded the module (eg. sctp_diag is loaded by the `ss -S` command).
 
 We propose to be proactive and ban any unused module at the time from being loaded.
 
