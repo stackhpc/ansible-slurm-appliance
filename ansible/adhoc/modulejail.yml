@@ -3,7 +3,7 @@
   hosts: modulejail_sample_hosts
   gather_facts: false
   tasks:
-    - name: "Download modulejail"
+    - name: Download modulejail
       become: false
       delegate_to: localhost
       tags:
@@ -20,7 +20,7 @@
       run_once: true # noqa: run-once[task]
       check_mode: false
 
-    - name: "Install modulejail on hosts"
+    - name: Install modulejail on hosts
       become: true
       tags:
         - install
