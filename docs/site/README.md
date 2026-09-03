@@ -176,6 +176,25 @@ is defined in `environments/site/common.pkrvars.hcl`.
 
 Builds use the same ssh key as the cluster for convenience in debugging.
 
+Each build is defined by a pkrvars file in `environments/site/<image>.pkrvars.hcl`
+- all builds also the `common.pkrvars.hcl` file there too.
+
+The following image build are defined:
+- `base`: This installs NVIDIA DOCA-OFED, FreeIPA and Spectrum Scale clients
+  on top of the upstream StackHPC release images. It should only need to be
+  rebuilt when pulling in a new upstream release changes the upstream image defined
+  in `environments/.stackhpc/tofu/cluster_image.auto.tfvars.json`. It is only
+  used for further builds and is not referenced from OpenTofu configurations.
+- `std`: This installs additional site-specific packages and OpenOndemand
+  server-side apps on top of the `base` build. It is used for VM and BM non-GPU
+  control/login/compute nodes. It should be set as the default cluster image for
+  all environments using `cluster_image_id` in `environments/site/tofu/variables.tf`.
+- `gpu`: This installs additional site-specific packages, NVIDIA drivers
+  and cuda packages on top of the `base` build. It is used for VM and BM GPU
+  compute nodes. It should be set as the image for each relevant node group
+  using the `image_id` override in the environment-specific `environments/*/tofu/main.tf`.
+
+
 ### Initial setup
 
 Builds require the RockyLinux 8 StackHPC release image
@@ -197,33 +216,39 @@ The Pulp server must have the DNF repo snapshots for the current branch synced:
 ansible-playbook ansible/adhoc/sync-pulp.yml
 ```
 
+### Building an image
+
 **NB:** All builds should be run with the `stg` environment activated.
 
-### base
-The base image installs NVIDIA DOCA-OFED, FreeIPA and Spectrum Scale clients
-and various site-specific packages as defined in appliances_extra_packages_other.
-This should only need to be rebuilt when pulling in a new upstream release changes
-the upstream image (in environments/.stackhpc/tofu/cluster_image.auto.tfvars.json).
+1. Update the `source_image_name` in the relevant pkrvars file in 
+   `environments/site/$BUILD.pkrvars.hcl`
+   and commit that.
 
-To build this run, from the repo root:
+2. Build the image:
 
-```shell
-packer build -color=false -on-error=ask \
-    -var-file=environments/site/common.pkrvars.hcl \
-    -var-file=environments/site/base.pkrvars.hcl \
-    packer/openstack.pkr.hcl | tee environments/site/base.build.log
-```
+  ```shell
+  dev/image-build $BUILD
+  ```
 
-then set properties:
+  where `$BUILD` is the build name as above, e.g. `base`.
 
-```shell
-dev/image-set-properties.sh openhpc-agr-base...
-```
+  This will log to stdout and also `environments/site/$BUILD.build.log`.
 
-TODO: where should the output image be set?
+  Make a note of the image name and ID output at the end of the log.
 
-TODO: subsequent stages - extra packages (for non-GPU nodes - qcow2), gpu (qcow2)
+3. Commit the log file.
 
+4. Set image properties:
+
+  ```shell
+  dev/image-set-properties.sh <image name or id>
+  ```
+
+5. Update the source image for the next image in the chain in its pkrvars file.
+
+6. Where relevant, update the OpenTofu config with the new image ID.
+
+7. Commit changes for 5/6.
 
 ## Networking
 
