@@ -16,7 +16,7 @@
 
 - name: Set compute node batches to DRAIN state
   ansible.builtin.command:
-    cmd: "echo scontrol update state=DRAIN nodename={{ item.stdout }}"
+    cmd: "scontrol update state=DRAIN nodename={{ item.stdout }}"
   loop: "{{ _rebuild_hostlists.results[rebuild_batch_start | int:] }}"
   loop_control:
     label: "{{ item.stdout }}"
@@ -24,7 +24,7 @@
 
 - name: Request rebuild of compute node batches
   ansible.builtin.command:
-    cmd: "echo scontrol reboot ASAP {{ _rebuild_nextstate }} {{ _rebuild_reason }} {{ item.stdout }}"
+    cmd: "scontrol reboot ASAP {{ _rebuild_nextstate }} {{ _rebuild_reason }} {{ item.stdout }}"
   loop: "{{ _rebuild_hostlists.results[rebuild_batch_start | int:] }}"
   loop_control:
     label: "{{ item.stdout }}"

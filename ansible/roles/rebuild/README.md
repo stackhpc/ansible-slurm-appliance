@@ -20,12 +20,14 @@ An OpenStack clouds.yaml file containing credentials for a cloud under the
 "openstack" key.
 
 ## Role Variables for main.yml task file
+
 This is relevant when running the `ansible/site.yml` or `ansible/slurm.yml` playbooks:
 
 - `rebuild_clouds_path`: Optional. Path to `clouds.yaml` file on the deploy
   host, default `~/.config/openstack/clouds.yaml`.
 
 ## Role Variables for rebuild.yml task file
+
 These are relevant when running the `ansible/adhoc/rebuild-via-slurm.yml` playbook.
 
 - `rebuild_reason`: Optional, default `update`. The reason for the rebuild/reboot,
