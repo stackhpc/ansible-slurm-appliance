@@ -1,11 +1,35 @@
 ---
-- name: Create rebuild jobs for partition
-  ansible.builtin.include_tasks:
-    file: rebuild_partition.yml
-  args:
-    apply:
-      become: true
-      become_user: "{{ rebuild_job_user }}"
-  loop: "{{ rebuild_job_partitions | split(',') }}"
+- name: Get list of compute nodes
+  # `scontrol show nodes` includes e.g. login nodes running slurmd, don't want that
+  # but this will include duplicates for nodes in multiple partitions
+  ansible.builtin.command:
+    cmd: "sinfo --noheader --Node --format='%N'"
+  register: _sinfo_all_nodes
+  changed_when: false
+
+- name: Create hostlist batches from all unique compute nodes
+  ansible.builtin.command:
+    cmd: "scontrol show hostlist {{ item | join(',') }}"
+  register: _rebuild_hostlists
+  changed_when: false
+  loop: "{{ _sinfo_all_nodes.stdout_lines | unique | sort | batch(rebuild_batch_size | int) }}"
+
+- name: Set compute node batches to DRAIN state
+  ansible.builtin.command:
+    cmd: "echo scontrol update state=DRAIN nodename={{ item.stdout }}"
+  loop: "{{ _rebuild_hostlists.results[rebuild_batch_start | int:] }}"
   loop_control:
-    loop_var: _rebuild_job_current_partition
+    label: "{{ item.stdout }}"
+  changed_when: true
+
+- name: Request rebuild of compute node batches
+  ansible.builtin.command:
+    cmd: "echo scontrol reboot ASAP {{ _rebuild_nextstate }} {{ _rebuild_reason }} {{ item.stdout }}"
+  loop: "{{ _rebuild_hostlists.results[rebuild_batch_start | int:] }}"
+  loop_control:
+    label: "{{ item.stdout }}"
+    pause: "{{ rebuild_batch_delay }}"
+  changed_when: true
+  vars:
+    _rebuild_reason: "{% if rebuild_reason != '' %}reason='{{ rebuild_reason }}'{% else %}''{% endif %}"
+    _rebuild_nextstate: "{% if rebuild_nextstate != '' %}nextstate={{ rebuild_nextstate.upper() }}{% else %}''{% endif %}"
