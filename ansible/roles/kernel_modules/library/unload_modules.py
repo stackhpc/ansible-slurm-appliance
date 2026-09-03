@@ -36,8 +36,13 @@ DEFAULT_TIMEOUT = 10  # how long to wait for a module to unload
 def rmmod(m, timeout=DEFAULT_TIMEOUT):
     """returns True if the module was unloaded, false if it wasn't loaded, raise otherwise"""
     cmd = ["rmmod", m]
-    res = subprocess.run(
-        cmd, capture_output=True, encoding="utf-8", timeout=timeout, check=False
+    res = subprocess.run(  # noqa: UP022
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding="utf-8",
+        timeout=timeout,
+        check=False,
     )
     if res.returncode == 0:
         return True
@@ -94,9 +99,10 @@ def try_loading_modules(module, denylist, result):
     try:
         for m in denylist:
             cmd = ["modprobe", m]
-            res = subprocess.run(
+            res = subprocess.run(  # noqa: UP022
                 cmd,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 encoding="utf-8",
                 timeout=DEFAULT_TIMEOUT,
                 check=False,
