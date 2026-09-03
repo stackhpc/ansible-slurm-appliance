@@ -16,7 +16,7 @@ This has been integrated using the [modulejail](https://github.com/jnuyens/modul
 
 ## Using modulejail
 
-1. Add hosts in the `modulejail_sample_hosts` group in your staging inventory.
+Add hosts in the `modulejail_sample_hosts` group in your staging inventory.
 
 Pick one from each hardware/VM kind to cover all combinations of loaded modules.
 
@@ -38,12 +38,14 @@ On smaller deployments it can be run on all nodes:
 cluster
 ```
 
-2. Run `ansible-playbook --diff ansible/adhoc/modulejail.yml`. It:
-   2.1 installs the modulejail script
-   2.2 collects all loaded modules to constitute an allowlist of needed modules
-   2.3 runs modulejail in dry-mode with this allowlist and collects the result
-   2.4 generates the `kernel_modules_modulejail_denylist` variable in `environments/site/inventory/group_vars/all/modulejail.yml`.
-3. Keep `environments/site/inventory/group_vars/all/modulejail_denylist.yml` under Git control.
+Then, run `ansible-playbook --diff ansible/adhoc/modulejail.yml`. It:
+
+1. installs the modulejail script on sample nodes;
+2. collects all loaded modules to compute an allowlist of needed modules;
+3. runs modulejail in dry-run mode with this allowlist and collects the result;
+4. generates the `kernel_modules_modulejail_denylist` variable in `environments/site/inventory/group_vars/all/modulejail_denylist.yml`.
+
+Finally, remember to keep `environments/site/inventory/group_vars/all/modulejail_denylist.yml` under Git control.
 
 ## Applying the denylist
 
@@ -71,9 +73,10 @@ apply it as part of compute_init.
 ## Enabling a module
 
 1. If a module happens to be needed, edit `/etc/modprobe.d/appliance.conf` to remove the 2 lines containing it;
-   you can now `modprobe` the module.
-2. Add it to `additional_modules` in `ansible/adhoc/modulejail.yml` and rerun the it
-3. Run the `ansible/mitigations.yml` playbook to remove it from `/etc/modprobe.d/appliance.conf` on all hosts.
+   you can now `modprobe` the module. This is a stopgap measure.
+2. For a permanent fix, add it to the `modulejail_allowlist_modules_extra` in `environments/site/inventory/group_vars/all/modulejail.yml`
+   and rerun `ansible/adhoc/modulejail.yml` to have the module removed from `kernel_modules_modulejail_denylist`.
+3. Run the `ansible/mitigations.yml` playbook to update `/etc/modprobe.d/appliance.conf` on all hosts.
 
 ## Sample workflow to do an appliance update
 
