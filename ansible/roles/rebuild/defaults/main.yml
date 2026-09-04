@@ -6,4 +6,3 @@ rebuild_reason: "update"
 rebuild_nextstate: "UNDRAIN"
 rebuild_batch_size: 50
 rebuild_batch_delay: 60
-rebuild_batch_start: 0
