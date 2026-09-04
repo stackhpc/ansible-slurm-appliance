@@ -5,7 +5,7 @@
   register: _rebuild_server_info
   delegate_to: localhost
 
-- name: Create list of compue nodes requiring rebuild
+- name: Create list of compute nodes requiring rebuild
   ansible.builtin.set_fact:
     _rebuild_targets: "{{ (_rebuild_target_yaml | from_yaml).result }}"
   vars:
@@ -45,6 +45,7 @@
   loop_control:
     index_var: batch_idx
     label: "batch {{ batch_idx + 1 }} of {{ _rebuild_hostlists.results | length }}: {{ item.stdout }}"
+  become: true
   changed_when: true
 
 - name: Request rebuild of compute nodes
@@ -60,4 +61,5 @@
     index_var: batch_idx
     label: "batch {{ batch_idx + 1 }} of {{ _rebuild_hostlists.results | length }}: {{ item.stdout }}"
     pause: "{{ rebuild_batch_delay | int }}"
+  become: true
   changed_when: true
