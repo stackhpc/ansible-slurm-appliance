@@ -72,7 +72,7 @@ def unload_modules(module, denylist, result):
         try:
             processed = []
             for m in denylist:
-                # could also model diff as loaded modules, before and after...
+                # could also include all loaded modules in the diff before and after
                 if rmmod(m):
                     result["unloaded"].append(m)
                 processed.append(m)
