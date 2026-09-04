@@ -34,6 +34,7 @@ cluster
 
 [rebuild:children]
 control
+fatimage
 
 [cacerts:children]
 cluster
