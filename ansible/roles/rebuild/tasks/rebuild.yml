@@ -23,7 +23,7 @@
       {%  endif %}
       {% endfor %}
       result: {{ rebuild_required_hosts }}
-  
+
 - name: Create hostlist expressions for compute node batches requiring rebuild
   ansible.builtin.command:
     cmd: "scontrol show hostlist {{ item | join(',') }}"
