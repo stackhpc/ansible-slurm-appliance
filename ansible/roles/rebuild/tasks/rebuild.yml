@@ -40,6 +40,7 @@
       scontrol update
       state=DRAIN
       nodename={{ item.stdout }}
+      reason='{{ rebuild_reason }}'
   loop: "{{ _rebuild_hostlists.results }}"
   loop_control:
     index_var: batch_idx
@@ -52,7 +53,7 @@
       {% if rebuild_dryrun | bool %}echo{% endif %}
       scontrol reboot ASAP
       {% if rebuild_nextstate != '' %}nextstate={{ rebuild_nextstate.upper() }}{% else %}''{% endif %}
-      {% if rebuild_reason != '' %}reason='{{ rebuild_reason }}'{% else %}''{% endif %}
+      reason='{{ rebuild_reason }}'
       {{ item.stdout }}
   loop: "{{ _rebuild_hostlists.results }}"
   loop_control:
