@@ -35,7 +35,11 @@
 
 - name: Set compute nodes requiring rebuild to DRAIN state
   ansible.builtin.command:
-    cmd: "echo scontrol update state=DRAIN nodename={{ item.stdout }}"
+    cmd: >-
+      {% if rebuild_dryrun | bool %}echo{% endif %}
+      scontrol update
+      state=DRAIN
+      nodename={{ item.stdout }}
   loop: "{{ _rebuild_hostlists.results }}"
   loop_control:
     index_var: batch_idx
@@ -44,13 +48,15 @@
 
 - name: Request rebuild of compute nodes
   ansible.builtin.command:
-    cmd: "echo scontrol reboot ASAP {{ _rebuild_nextstate }} {{ _rebuild_reason }} {{ item.stdout }}"
+    cmd: >-
+      {% if rebuild_dryrun | bool %}echo{% endif %}
+      scontrol reboot ASAP
+      {% if rebuild_nextstate != '' %}nextstate={{ rebuild_nextstate.upper() }}{% else %}''{% endif %}
+      {% if rebuild_reason != '' %}reason='{{ rebuild_reason }}'{% else %}''{% endif %}
+      {{ item.stdout }}
   loop: "{{ _rebuild_hostlists.results }}"
   loop_control:
     index_var: batch_idx
     label: "batch {{ batch_idx + 1 }} of {{ _rebuild_hostlists.results | length }}: {{ item.stdout }}"
     pause: "{{ rebuild_batch_delay | int }}"
   changed_when: true
-  vars:
-    _rebuild_reason: "{% if rebuild_reason != '' %}reason='{{ rebuild_reason }}'{% else %}''{% endif %}"
-    _rebuild_nextstate: "{% if rebuild_nextstate != '' %}nextstate={{ rebuild_nextstate.upper() }}{% else %}''{% endif %}"

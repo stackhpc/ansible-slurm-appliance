@@ -2,6 +2,7 @@
 
 rebuild_clouds_path: ~/.config/openstack/clouds.yaml
 
+rebuild_dryrun: false
 rebuild_reason: "update"
 rebuild_nextstate: "UNDRAIN"
 rebuild_batch_size: 50
