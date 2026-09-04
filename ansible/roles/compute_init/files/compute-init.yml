@@ -6,6 +6,7 @@
     os_metadata: "{{ lookup('url', 'http://169.254.169.254/openstack/latest/meta_data.json') | from_json }}"
     server_node_ip: "{{ os_metadata.meta.control_address }}"
     enable_compute: "{{ os_metadata.meta.compute | default(false) | bool }}"
+    enable_kernel_modules: "{{ os_metadata.meta.kernel_modules | default(false) | bool }}"
     enable_resolv_conf: "{{ os_metadata.meta.resolv_conf | default(false) | bool }}"
     enable_etc_hosts: "{{ os_metadata.meta.etc_hosts | default(false) | bool }}"
     enable_cacerts: "{{ os_metadata.meta.cacerts | default(false) | bool }}"
@@ -116,6 +117,12 @@
       # this is higher priority than vars block = normal ansible's hostvars
       ansible.builtin.include_vars:
         file: "/var/tmp/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
+
+    - name: Apply kernel module denylist
+      ansible.builtin.include_role:
+        name: kernel_modules
+        tasks_from: runtime.yml
+      when: enable_kernel_modules
 
     - name: Run journald role
       ansible.builtin.include_role:

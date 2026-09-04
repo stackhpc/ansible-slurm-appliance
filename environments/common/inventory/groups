@@ -241,3 +241,8 @@ doca
 
 ## Vulnerability mitigation groups
 [kernel_modules]
+
+[modulejail_sample_hosts]
+# Hosts to get loaded modules and run modulejail onto (doesn't modify the host's modprobe.d)
+# Add at least one host per hardware kind. Don't forget VMs.
+# Can add the whole cluster if you want.

@@ -448,6 +448,8 @@ environments which should be unique, e.g. production and staging.
   # environments/site/inventory/group_vars/all/defaults.yml:
   appliances_enable_pam_slurm_adopt: true
   ```
+- Consider limiting the list of loadable modules on your nodes, to prevent possible future CVEs.
+  See [modulejail.md](experimental/modulejail.md).
 
 ### Applying configuration
 

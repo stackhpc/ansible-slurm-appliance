@@ -66,6 +66,7 @@ it also requires an image build with the role name added to the
 | bootstrap.yml            | ofed                          | Not relevant during boot        | Yes                 |
 | bootstrap.yml            | ansible_init (install)        | Not relevant during boot        | n/a                 |
 | bootstrap.yml            | k3s (install)                 | Not relevant during boot        | n/a                 |
+| mitigations.yml          | kernel_modules                | Fully supported                 | No                  |
 | hooks/post-bootstrap.yml | ?                             | None at present                 | n/a                 |
 | iam.yml                  | freeipa_client                | None at present [4]             | Yes                 |
 | iam.yml                  | freeipa_server                | Not relevant for compute nodes  | n/a                 |
