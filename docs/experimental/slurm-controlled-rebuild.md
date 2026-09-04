@@ -24,24 +24,24 @@ In summary, the way this functionality works is as follows:
      [compute_init](../../ansible/roles/compute_init/README.md) role.
    - Configures an application credential and helper programs on the control
      node, using the [rebuild](../../ansible/roles/rebuild/README.md) role.
-4. The `ansible/adhoc/rebuild-via-slurm.yml` playbook is run to submit
-   `scontrol rebuild ASAP ...` commands. Each node is drained, so it completes
-   its current job, then a [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram)
-   compares the current image for each node to the one in the cluster. If it does
-   not match the RebootProgram uses OpenStack to rebuild the node to the desired
-   (updated) image, else it is simply rebooted.
+4. An admin submits Slurm jobs, one for each node, to a special "rebuild"
+   partition using an Ansible playbook. Because this partition has higher
+   priority than the partitions normal users can use, these rebuild jobs become
+   the next job in the queue for every node (although any jobs currently
+   running will complete as normal).
+5. Because these rebuild jobs have the `--reboot` flag set, before launching them
+   the Slurm control node runs a [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram)
+   which compares the current image for the node to the one in the cluster
+   configuration, and if it does not match, uses OpenStack to rebuild the
+   node to the desired (updated) image.
+   TODO: Describe the logic if they DO match
 6. After a rebuild, the compute node runs various Ansible tasks during boot,
    controlled by the [compute_init](../../ansible/roles/compute_init/README.md)
    role, to fully configure the node again. It retrieves the required cluster
    configuration information from the control node via an NFS mount.
 7. Once the `slurmd` daemon starts on a compute node, the Slurm controller
-   registers the node as having finished "rebooting". By default, this undrains
-   the node so that normally (e.g. unless it was previously set to DOWN state)
-   it can start running jobs again. If the node does not actually reboot (as
-   determined by uptime - e.g. the OpenStack rebuild call fails) then the reboot
-   flag should not be cleared and the node will not be undrained. If the node does
-   reboot but the slurmd fails to come back for some reason (e.g. compute_init
-   failure) the node will be set DOWN.
+   registers the node as having finished rebooting. It then launches the actual
+   job, which does not do anything.
 
 ## Prerequisites
 

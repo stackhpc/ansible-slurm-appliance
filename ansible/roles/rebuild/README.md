@@ -1,50 +1,52 @@
 # rebuild
 
-This role:
-- Installs and configures the `reboot.py` tool from https://github.com/stackhpc/slurm-openstack-tools
-  on the control node. This allows compute nodes to be rebuilt or rebooted via
-  Slurm's `scontrol rebuild ASAP ...` command.
-- Provides a `rebuild.yml` task file to automate issuing of those commands.
-
-Note that whether a node is rebuilt to a new image or simply rebooted depends
-on whether a node's current image matches the desired one or not. See the
-[Slurm controlled rebuild](docs/experimental/slurm-controlled-rebuild.md) docs
-for more details.
-
-To avoid overloading OpenStack APIs, `scontrol reboot ...` commands are issued
-in batches.
+Enables reboot tool from <https://github.com/stackhpc/slurm-openstack-tools.git>
+to be run from control node.
 
 ## Requirements
 
 An OpenStack clouds.yaml file containing credentials for a cloud under the
 "openstack" key.
 
-## Role Variables for main.yml task file
+## Role Variables
 
-This is relevant when running the `ansible/site.yml` or `ansible/slurm.yml` playbooks:
+The below is only used by this role's `main.yml` task file, i.e. when running
+the `ansible/site.yml` or `ansible/slurm.yml` playbooks:
 
 - `rebuild_clouds_path`: Optional. Path to `clouds.yaml` file on the deploy
   host, default `~/.config/openstack/clouds.yaml`.
 
-## Role Variables for rebuild.yml task file
+The below are only used by this role's `rebuild.yml` task file, i.e. when
+running the `ansible/adhoc/rebuild-via-slurm.yml` playbook:
 
-These are relevant when running the `ansible/adhoc/rebuild-via-slurm.yml` playbook.
+- `rebuild_job_partitions`: Optional. Comma-separated list of names of rebuild
+  partitions defined in `openhpc_partitions`. Useful as an extra-var for
+  limiting rebuilds. Default `rebuild`.
 
-- `rebuild_reason`: Optional, default `update`. The reason for the rebuild/reboot,
-  shown in `sinfo` output.
-- `rebuild_nextstate`: Optional, default `UNDRAIN`. The next state for the node
-  once the slurmd has re-registered after the rebuild/reboot. Generally the default
-  is appropriate to allow any pre-existing state (e.g. `DOWN`) to persist.
-- `rebuild_batch_size`: Optional, default `50`. The number of nodes to rebuild
-  at once.
-- `rebuild_batch_delay`: Optional, default `60`. The number of seconds to wait
-  between issuing `scontrol reboot` commands for each batch. Note it does not
-  wait for the rebuilt to complete before moving to the next batch.
-- `rebuild_batch_start`: Optional, default `0`. The index of the first batch to
-  start from. This allows skipping successful batches if trying to recover failed
-  batches.
+- `rebuild_job_name`: Optional. Name of rebuild jobs. Default is `rebuild-`
+  suffixed with the node name.
 
-For further information on reason and nextstate behaviour see the [scontrol reboot
-documentation](https://slurm.schedmd.com/scontrol.html#lbAF). Note that to avoid
-multi-node jobs landing on a mix of pre- and post-rebuild nodes it is not
-possible to specify nodes via a NodeList or NodeSet here.
+- `rebuild_job_command`: Optional. String giving command to run in job after
+  node has been rebuilt. Default is to sleep for 5 seconds. Note job output is
+  send to `/dev/null` by default, as the root user running this has no shared
+  directory for job output.
+
+- `rebuild_job_reboot`: Optional. A bool controlling whether to add the
+  `--reboot` flag to the job to actually trigger a rebuild. Useful for e.g.
+  testing partition configurations. Default `true`.
+
+- `rebuild_job_options`: Optional. A string giving any other options to pass to
+  [sbatch](https://slurm.schedmd.com/sbatch.html). Default is empty string.
+
+- `rebuild_job_user`: Optional. The user to run the rebuild setup and job as.
+  Default `root`.
+
+- `rebuild_job_template`: Optional. The string to use to submit the job. See
+  [defaults.yml](defaults/main.yml).
+
+- `rebuild_job_hostlist`: String with a Slurm hostlist expression to restrict
+  a rebuild to only those nodes (e.g. `tux[1-3]` or `tux1,tux2`). If set,
+  `rebuild_partitions` must only define a single partition and that partition
+  must contain those nodes. Not for routine use, but may be useful to e.g.
+  reattempt a rebuild if this failed on specific nodes. Default is all nodes
+  in the relevant partition.
