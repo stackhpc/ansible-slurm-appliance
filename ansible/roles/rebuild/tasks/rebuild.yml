@@ -1,11 +1,68 @@
 ---
-- name: Create rebuild jobs for partition
-  ansible.builtin.include_tasks:
-    file: rebuild_partition.yml
-  args:
-    apply:
-      become: true
-      become_user: "{{ rebuild_job_user }}"
-  loop: "{{ rebuild_job_partitions | split(',') }}"
+
+- name: Get current instance images
+  openstack.cloud.server_info:
+  register: _rebuild_server_info
+  delegate_to: localhost
+
+- name: Create list of compute nodes requiring rebuild
+  ansible.builtin.set_fact:
+    _rebuild_targets: "{{ (_rebuild_target_yaml | from_yaml).result }}"
+  vars:
+    # a dict keyed by server ID, with image info
+    _images_by_server_id: "{{ _rebuild_server_info.servers | items2dict(key_name='id', value_name='image') }}"
+    _rebuild_nodes: "{{ groups.compute_init }}" # TODO: move to var?
+    _rebuild_target_yaml: |
+      {% set rebuild_required_hosts = [] %}
+      {% for host in _rebuild_nodes | sort | unique %}
+      {#  must look up image from instance **id** in case hosts in different environments have the same name #}
+      {%  set current_image_id = _images_by_server_id[hostvars[host].instance_id].id %}
+      {%  set desired_image_id = hostvars[host].image_id %}
+      {%  if current_image_id != desired_image_id %}
+      {{    rebuild_required_hosts.append(host) }}
+      {%  endif %}
+      {% endfor %}
+      result: {{ rebuild_required_hosts }}
+
+- name: Create hostlist expressions for compute node batches requiring rebuild
+  ansible.builtin.command:
+    cmd: "scontrol show hostlist {{ item | join(',') }}"
+  register: _rebuild_hostlists
+  changed_when: false
+  loop: "{{ _rebuild_targets | batch(rebuild_batch_size | int) }}"
   loop_control:
-    loop_var: _rebuild_job_current_partition
+    label: "{{ _rebuild_hostlists.stdout }}"
+
+- name: Set compute nodes requiring rebuild to DRAIN state
+  # NB: This must be done separately from the reboot call loop so that only rebuilt
+  # nodes are eligible to run new jobs
+  ansible.builtin.command:
+    cmd: >-
+      {% if rebuild_dryrun | bool %}echo{% endif %}
+      scontrol update
+      state=DRAIN
+      nodename={{ item.stdout }}
+      reason='{{ rebuild_reason }}'
+  loop: "{{ _rebuild_hostlists.results }}"
+  loop_control:
+    index_var: batch_idx
+    label: "batch {{ batch_idx + 1 }} of {{ _rebuild_hostlists.results | length }}: {{ item.stdout }}"
+  become: true
+  changed_when: true
+
+- name: Request rebuild of compute nodes
+  # NB: cannot actually specify nextstate=UNDRAIN but that is the default if omitted
+  ansible.builtin.command:
+    cmd: >-
+      {% if rebuild_dryrun | bool %}echo{% endif %}
+      scontrol reboot ASAP
+      {% if rebuild_nextstate.upper() in ('RESUME', 'DOWN') %}nextstate={{ rebuild_nextstate.upper() }}{% else %}''{% endif %}
+      reason='{{ rebuild_reason }}'
+      {{ item.stdout }}
+  loop: "{{ _rebuild_hostlists.results }}"
+  loop_control:
+    index_var: batch_idx
+    label: "batch {{ batch_idx + 1 }} of {{ _rebuild_hostlists.results | length }}: {{ item.stdout }}"
+    pause: "{{ rebuild_batch_delay | int }}"
+  become: true
+  changed_when: true

@@ -376,11 +376,3 @@
         name: nhc
         tasks_from: boot.yml
       when: enable_nhc
-
-    - name: Ensure node is resumed # noqa: no-changed-when
-      # TODO: consider if this is always safe for all job states?
-      ansible.builtin.command: scontrol update state=resume nodename={{ ansible_hostname }}
-      register: _scontrol_update
-      failed_when:
-        - _scontrol_update.rc > 0
-        - "'slurm_update error: Invalid node state transition' not in _scontrol_update.stderr"
