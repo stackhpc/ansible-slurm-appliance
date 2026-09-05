@@ -34,6 +34,8 @@
     label: "{{ _rebuild_hostlists.stdout }}"
 
 - name: Set compute nodes requiring rebuild to DRAIN state
+  # NB: This must be done separately from the reboot call loop so that only rebuilt
+  # nodes are eligible to run new jobs
   ansible.builtin.command:
     cmd: >-
       {% if rebuild_dryrun | bool %}echo{% endif %}
@@ -49,11 +51,12 @@
   changed_when: true
 
 - name: Request rebuild of compute nodes
+  # NB: cannot actually specify nextstate=UNDRAIN but that is the default if omitted
   ansible.builtin.command:
     cmd: >-
       {% if rebuild_dryrun | bool %}echo{% endif %}
       scontrol reboot ASAP
-      {% if rebuild_nextstate != '' %}nextstate={{ rebuild_nextstate.upper() }}{% else %}''{% endif %}
+      {% if rebuild_nextstate.upper() in ('RESUME', 'DOWN') %}nextstate={{ rebuild_nextstate.upper() }}{% else %}''{% endif %}
       reason='{{ rebuild_reason }}'
       {{ item.stdout }}
   loop: "{{ _rebuild_hostlists.results }}"
