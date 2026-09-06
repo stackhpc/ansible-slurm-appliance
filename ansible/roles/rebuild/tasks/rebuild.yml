@@ -56,7 +56,7 @@
     cmd: >-
       {% if rebuild_dryrun | bool %}echo{% endif %}
       scontrol reboot ASAP
-      {% if rebuild_nextstate.upper() in ('RESUME', 'DOWN') %}nextstate={{ rebuild_nextstate.upper() }}{% else %}''{% endif %}
+      {% if rebuild_nextstate.upper() in ('RESUME', 'DOWN') %}nextstate={{ rebuild_nextstate.upper() }}{% endif %}
       reason='{{ rebuild_reason }}'
       {{ item.stdout }}
   loop: "{{ _rebuild_hostlists.results }}"
