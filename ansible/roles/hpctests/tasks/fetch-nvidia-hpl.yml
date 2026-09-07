@@ -1,0 +1,18 @@
+---
+- name: Make root directory
+  ansible.builtin.file:
+    path: "{{ hpctests_rootdir }}/nvidia-hpl"
+    state: directory
+    mode: "0755"
+
+- name: Create fetch hpl script
+  ansible.builtin.template:
+    src: "nvidia-hpl-fetch.sh.j2"
+    dest: "{{ hpctests_rootdir }}/nvidia-hpl/nvidia-hpl-fetch.sh"
+    mode: "0755"
+
+- name: Fetch nvidia-hpl docker image
+  ansible.builtin.command:
+    cmd: sbatch --wait ./nvidia-hpl-fetch.sh
+    chdir: "{{ hpctests_rootdir }}/nvidia-hpl"
+    creates: "{{ hpctests_nvidia_hpl_sif_file }}"
