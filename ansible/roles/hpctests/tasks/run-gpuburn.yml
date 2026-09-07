@@ -16,8 +16,12 @@
 
 - name: Select GPUs
   ansible.builtin.set_fact:
-    hpctests_gpu_gres: "{% for gpu in (hpctests_nodeinfo.info[0].gpus | default({})) | dict2items %}{% if loop.index0 > 0 %},{% endif %}gpu:{{ gpu.key }}={{ gpu.value }}{% endfor %}"
+    hpctests_gpu_gres: "{% for gpu in (hpctests_nodeinfo.info[0].gpus | default({})) | dict2items %}{% if loop.index0 > 0 %},{% endif %}gpu:{{ gpu.key }}:{{ gpu.value }}{% endfor %}"
   when: hpctests_gpu_gres is not defined
+
+- name: Compute GPU count per node
+  ansible.builtin.set_fact:
+    hpctests_gpus_per_node: "{{ hpctests_gpu_gres | split(',') | map('regex_replace', '^.*:([0-9]+)$', '\\1') | map('int') | sum }}"
 
 - name: Show selected GPUs
   ansible.builtin.debug:
