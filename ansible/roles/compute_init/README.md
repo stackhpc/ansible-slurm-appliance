@@ -17,7 +17,7 @@ To enable this:
    compute
    ```
 
-2. Review the compability table below and if necessary, [build an image](../../../docs/image-build.md)
+2. Review the compatibility table below and if necessary, [build an image](../../../docs/image-build.md)
    to add any required functionality, e.g.
 
    ```hcl

@@ -11,13 +11,14 @@ are rebuilt between jobs, so the job queue is not affected during a cluster
 upgrade.
 
 This functionality involves several roles in the appliance:
+
 - `rebuild`: This deploys and configures a Slurm [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram)
   which allows Slurm to reboot or rebuild compute nodes via OpenStack. Which
   action is taken depends on whether the current instance image matches the
   desired image or not. The role also contains automation for triggering rebuilds.
 - `compute_init`: This provides machinery to apply cluster-specific configuration
   to a newly-reimaged compute node on first boot, allowing it to rejoin the cluster.
-- `stackhpc.openhpc`: When slurm controlled rebuild is enabled, additional
+- `stackhpc.openhpc`: When Slurm controlled rebuild is enabled, additional
   Slurm configuration is automatically set via this role.
 
 ## Initial setup
@@ -36,34 +37,34 @@ This functionality involves several roles in the appliance:
    For each relevant node group in the OpenTofu `compute` variable, set the
    parameter `ignore_image_changes: true`. E.g.
 
-    ```terraform
-    # environments/$ENV/main.tf:
-    ...
-    compute = {
-        general = {
-            nodes = ["general-0", "general-1"]
-            ignore_image_changes = true
-            ...
-        }
-        gpu = {
-            node = ["a100-0", "a100-1"]
-            ignore_image_changes = true
-            ...
-        }
-    }
-    ...
-    ```
+   ```terraform
+   # environments/$ENV/main.tf:
+   ...
+   compute = {
+       general = {
+           nodes = ["general-0", "general-1"]
+           ignore_image_changes = true
+           ...
+       }
+       gpu = {
+           node = ["a100-0", "a100-1"]
+           ignore_image_changes = true
+           ...
+       }
+   }
+   ...
+   ```
 
-    This means that changes to the OpenTofu variables `cluster_image_id` or
-    nodegroup overrides `image_id` will no longer cause OpenTofu to rebuild nodes
-    on `tofu apply`.
+   This means that changes to the OpenTofu variables `cluster_image_id` or
+   nodegroup overrides `image_id` will no longer cause OpenTofu to rebuild nodes
+   on `tofu apply`.
 
-3. Follow the [compute_init role README](../../ansible/roles/compute_init/README.md)
+3. Follow the [compute_init role readme](../../ansible/roles/compute_init/README.md)
    to configure that role:
-    - Add nodes into the `compute_init` group.
-    - Potentially, build an image.
-    - Configure the OpenTofu variable `compute_init_enable` to enable specific
-      functionality on boot.
+   - Add nodes into the `compute_init` group.
+   - Potentially, build an image.
+   - Configure the OpenTofu variable `compute_init_enable` to enable specific
+     functionality on boot.
 
 4. If a new image was built, update image references in the OpenTofu configuration.
    Normally these should be in:
@@ -72,14 +73,14 @@ This functionality involves several roles in the appliance:
    - `environments/$ENV/tofu/main.tf`: parameter `image_id` in `compute` nodegroups,
      for nodegroup specific overrides.
 
-5. Follow the [rebuild role README](../../ansible/roles/rebuild/README.md) to
+5. Follow the [rebuild role readme](../../ansible/roles/rebuild/README.md) to
    configure that role:
    - Add the `control` node into the `rebuild` group.
    - Ensure an application credential to use for rebuilding nodes is available
      on the deploy host (default location `~/.config/openstack/clouds.yaml`) and
      if necessary set `rebuild_clouds_path`
 
-6. Some defaults may need to be overriden based on testing. In particular the
+6. Some defaults may need to be overridden based on testing. In particular the
    `rebuild` role variables for batch size and delay may need modifying to avoid
    overloading OpenStack. The Slurm parameter [ResumeTimeout](https://slurm.schedmd.com/slurm.conf.html#OPT_ResumeTimeout)
    may need increasing from the default of 300 seconds, e.g. for high-memory
@@ -88,7 +89,7 @@ This functionality involves several roles in the appliance:
    ```yaml
    # environments/site/inventory/group_vars/all/openhpc.yml:
    openhpc_config_extra:
-    ResumeTimeout: 600 # seconds
+     ResumeTimeout: 600 # seconds
    ```
 
 7. Run `tofu apply` as usual to apply the new OpenTofu configuration.
@@ -108,7 +109,6 @@ This functionality involves several roles in the appliance:
 The cluster is now ready to perform slurm-controlled upgrades as described in
 the next section.
 
-
 ## Upgrade Process
 
 This section explains both the steps required and what happens at each step. Note
@@ -119,19 +119,19 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
 2. Run `tofu apply`: This rebuilds login and control nodes only to the new
    image(s), and also updates the `hosts.yml` inventory file with the new compute
    node image IDs. The login nodes are unavailable to users at this stage and
-   slurm jobs cannot be submitted. Running jobs will continue, but will not be
+   Slurm jobs cannot be submitted. Running jobs will continue, but will not be
    able to complete.
 3. Run the `site.yml` playbook. This reconfigures the cluster as normal. At this
    point the cluster is functional again; login nodes are available, running jobs
    can complete and new jobs can be submitted. In this point the cluster is running
    in a split state:
-    - Login and control nodes are on the new image, with new configuration
-    - Compute nodes are on the old image, with new configuration
+   - Login and control nodes are on the new image, with new configuration
+   - Compute nodes are on the old image, with new configuration
 
    This playbook also
-      - Writes cluster configuration to an NFS share `/exports/cluster` on the
-      control node (via the `compute_init` role).
-      - Deploys and configures the RebootProgram (via the `rebuild` role).
+   - Writes cluster configuration to an NFS share `/exports/cluster` on the
+     control node (via the `compute_init` role).
+   - Deploys and configures the RebootProgram (via the `rebuild` role).
 
 4. Submit rebuild requests using:
 
@@ -140,20 +140,20 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
    ```
 
    This will:
-    - Find all "rebuildable" nodes which are not currently on the latest image.
-    - In batches (to avoid avoid overloading OpenStack APIs):
-      - Set nodes to the DRAIN state, so that they can complete existing jobs
-        but not run new ones.
-      - Issue `scontrol reboot ASAP` commands to request a rebuild once their
-        current job has completed.
+   - Find all "rebuildable" nodes which are not currently on the latest image.
+   - In batches (to avoid avoid overloading OpenStack APIs):
+     - Set nodes to the DRAIN state, so that they can complete existing jobs
+       but not run new ones.
+     - Issue `scontrol reboot ASAP` commands to request a rebuild once their
+       current job has completed.
 
-    The DRAIN state is necessary to avoid the scheduler backfilling jobs onto
-    nodes running non-exclusive jobs, which could lead to multi-node jobs running
-    on a mix of "old" and "new" nodes.
+   The DRAIN state is necessary to avoid the scheduler backfilling jobs onto
+   nodes running non-exclusive jobs, which could lead to multi-node jobs running
+   on a mix of "old" and "new" nodes.
 
-    See the [rebuild](../../ansible/roles/rebuild/README.md) role variables
-    for additional options. In particular note appending `-e rebuild_dryrun=true`
-    may be useful to see what commands will be issued.
+   See the [rebuild](../../ansible/roles/rebuild/README.md) role variables
+   for additional options. In particular note appending `-e rebuild_dryrun=true`
+   may be useful to see what commands will be issued.
 
 5. When the rebuilt instance boots, the `compute_init` machinery in the image
    will load configuration from the control node's NFS share and apply it before
@@ -162,7 +162,6 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
    default, the state is then set to UNDRAIN which makes it eligible for jobs
    unless the pre-reboot state prevented this (e.g. it was set DOWN). Again the `rebuild`
    role variables can modify this behaviour.
-
 
 ## Testing
 

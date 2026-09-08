@@ -8,14 +8,13 @@ This provides two sets of functionality:
 - `tasks/rebuild.yml`: Submit batched `scontrol reboot` commands to trigger
   the above.
 
-See [docs/experimental/slurm-controlled-rebuild.md]() for interaction with other
-roles and how to enable this.
+See [docs/experimental/slurm-controlled-rebuild.md](../../../docs/experimental/slurm-controlled-rebuild.md)
+for interaction with other roles and how to enable this.
 
 ## Requirements
 
 An OpenStack clouds.yaml file containing credentials for a cloud under the
 "openstack" key.
-
 
 ## Role Variables for tasks/main.yml
 
@@ -24,11 +23,10 @@ An OpenStack clouds.yaml file containing credentials for a cloud under the
 
 ## Role Variables for tasks/rebuild.yml
 
-
 - `rebuild_nodes`: Optional list. Inventory hostnames/nodenames to consider
   submitting for rebuild. The default is all nodes in the `compute_init` group.
   **IMPORTANT:** to avoid jobs landing on a mix of updated and non-updated nodes,
-  this group must contain *all* nodes in partitions for which it includes nodes.
+  this group must contain _all_ nodes in partitions for which it includes nodes.
 - `rebuild_dryrun`: Optional bool. If `true` it will echo commands instead of
   issuing them. Default `false`.
 - `rebuild_reason`: Optional string. A message to show in e.g. `sinfo` describing
