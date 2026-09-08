@@ -1,0 +1,11 @@
+- hosts: builder
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Delete test CA cacerts
+      ansible.builtin.file:
+        path: /etc/pki/ca-trust/source/anchors/myCA.pem
+        state: absent
+    - name: Update trust store # noqa: no-changed-when
+      ansible.builtin.command: update-ca-trust extract
+      changed_when: true

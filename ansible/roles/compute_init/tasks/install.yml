@@ -58,6 +58,8 @@
       dest: roles/
     - src: ../../journald
       dest: roles/
+    - src: ../../kernel_modules
+      dest: roles/
 
 - name: Add filter_plugins to ansible.cfg
   ansible.builtin.lineinfile:
