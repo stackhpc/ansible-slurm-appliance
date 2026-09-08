@@ -1,7 +1,7 @@
 ---
 # Example usage:
 #
-# ansible-playbook ansible/adhoc/patch.yaml -e '{
+# ansible-playbook ansible/adhoc/patch.yml -e '{
 #   "patch_repos": [
 #     {
 #       "repo_name": "appstream",
@@ -102,7 +102,7 @@
           A reboot is required to load new packages.
           1. Ensure that a RebootProgram is set in your Slurm config with
 
-               ansible login -m shell -a "scontrol show config | grep RebootProgram"`
+               ansible login -m shell -a "scontrol show config | grep RebootProgram"
 
              if not, set
 

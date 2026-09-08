@@ -226,4 +226,4 @@ compute
 
 ## Vulnerability mitigation groups
 [kernel_modules:children]
-builder
+cluster
