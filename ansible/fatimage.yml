@@ -142,6 +142,7 @@
       ansible.builtin.include_role:
         name: rebuild
         tasks_from: install.yml
+      when: "'rebuild' in group_names"
 
     - name: Install OpenHPC
       ansible.builtin.import_role:

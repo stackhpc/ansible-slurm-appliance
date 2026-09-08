@@ -1,52 +1,40 @@
 # rebuild
 
-Enables reboot tool from <https://github.com/stackhpc/slurm-openstack-tools.git>
-to be run from control node.
+This provides two sets of functionality:
+
+- `tasks/main.yml`: Install and configure the the `reboot.py` tool from
+  [stackhpc.slurm-openstack-tools](https://github.com/stackhpc/slurm-openstack-tools.git)
+  as a Slurm [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram) on the control node.
+- `tasks/rebuild.yml`: Submit batched `scontrol reboot` commands to trigger
+  the above.
+
+See [docs/experimental/slurm-controlled-rebuild.md](../../../docs/experimental/slurm-controlled-rebuild.md)
+for interaction with other roles and how to enable this.
 
 ## Requirements
 
 An OpenStack clouds.yaml file containing credentials for a cloud under the
 "openstack" key.
 
-## Role Variables
-
-The below is only used by this role's `main.yml` task file, i.e. when running
-the `ansible/site.yml` or `ansible/slurm.yml` playbooks:
+## Role Variables for tasks/main.yml
 
 - `rebuild_clouds_path`: Optional. Path to `clouds.yaml` file on the deploy
   host, default `~/.config/openstack/clouds.yaml`.
 
-The below are only used by this role's `rebuild.yml` task file, i.e. when
-running the `ansible/adhoc/rebuild-via-slurm.yml` playbook:
+## Role Variables for tasks/rebuild.yml
 
-- `rebuild_job_partitions`: Optional. Comma-separated list of names of rebuild
-  partitions defined in `openhpc_partitions`. Useful as an extra-var for
-  limiting rebuilds. Default `rebuild`.
-
-- `rebuild_job_name`: Optional. Name of rebuild jobs. Default is `rebuild-`
-  suffixed with the node name.
-
-- `rebuild_job_command`: Optional. String giving command to run in job after
-  node has been rebuilt. Default is to sleep for 5 seconds. Note job output is
-  send to `/dev/null` by default, as the root user running this has no shared
-  directory for job output.
-
-- `rebuild_job_reboot`: Optional. A bool controlling whether to add the
-  `--reboot` flag to the job to actually trigger a rebuild. Useful for e.g.
-  testing partition configurations. Default `true`.
-
-- `rebuild_job_options`: Optional. A string giving any other options to pass to
-  [sbatch](https://slurm.schedmd.com/sbatch.html). Default is empty string.
-
-- `rebuild_job_user`: Optional. The user to run the rebuild setup and job as.
-  Default `root`.
-
-- `rebuild_job_template`: Optional. The string to use to submit the job. See
-  [defaults.yml](defaults/main.yml).
-
-- `rebuild_job_hostlist`: String with a Slurm hostlist expression to restrict
-  a rebuild to only those nodes (e.g. `tux[1-3]` or `tux1,tux2`). If set,
-  `rebuild_partitions` must only define a single partition and that partition
-  must contain those nodes. Not for routine use, but may be useful to e.g.
-  reattempt a rebuild if this failed on specific nodes. Default is all nodes
-  in the relevant partition.
+- `rebuild_nodes`: Optional list. Inventory hostnames/nodenames to consider
+  submitting for rebuild. The default is all nodes in the `compute_init` group.
+  **IMPORTANT:** to avoid jobs landing on a mix of updated and non-updated nodes,
+  this group must contain _all_ nodes in partitions for which it includes nodes.
+- `rebuild_dryrun`: Optional bool. If `true` it will echo commands instead of
+  issuing them. Default `false`.
+- `rebuild_reason`: Optional string. A message to show in e.g. `sinfo` describing
+  the reason for the rebuild. Default `update`.
+- `rebuild_nextstate`: Optional string, one of `RESUME`, `DOWN` or `UNDRAIN` (default).
+  The state rebuilt nodes should go to after they are back up.
+- `rebuild_batch_size`: Optional integer. The number of nodes to rebuild per batch.
+  Default 50.
+- `rebuild_batch_delay`: Optional integer. The number of seconds to wait between
+  batched rebuild commands. Note this this does not wait for rebuilds to complete
+  before moving to the next batch.
