@@ -59,7 +59,7 @@ The `kernel_modules` inventory group covers the whole `cluster`, so all active n
 Without `compute_init` usage on a cluster, nodes are inactive until a first run of the `ansible/site.yml` playbook to configure them.
 In particular they are not accessible to non-admin users before that, so any LPE vulnerability would be inapplicable.
 
-As soon as they are provisionned, we run `ansible/site.yml` to configure them and apply the module denylist.
+As soon as they are provisioned, we run `ansible/site.yml` to configure them and apply the module denylist.
 
 ### With compute_init
 
