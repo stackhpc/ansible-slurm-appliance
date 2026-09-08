@@ -2,8 +2,10 @@
 
 rebuild_clouds_path: ~/.config/openstack/clouds.yaml
 
+rebuild_nodes: "{{ groups.compute_init | default([]) }}"
 rebuild_dryrun: false
 rebuild_reason: "update"
 rebuild_nextstate: "UNDRAIN"
+# Below based on testing:
 rebuild_batch_size: 50
 rebuild_batch_delay: 60

@@ -9,9 +9,26 @@ Allow compute nodes to rejoin the cluster after a reboot without running the
 
 To enable this:
 
-1. Add the `compute` group (or a subset) into the `compute_init` group.
-2. Build an image which includes the `compute_init` group. This is the case
-   for StackHPC-built release images.
+1. Add the `compute` group (or a subset) into the `compute_init` group, e.g.:
+
+   ```ini
+   # environments/site/inventory/groups:
+   [compute_init:children]
+   compute
+   ```
+
+2. Review the compability table below and if necessary, [build an image](../../../docs/image-build.md)
+   to add any required functionality, e.g.
+
+   ```hcl
+   # environments/site/builder.pkrvars.hcl
+   inventory_groups = "lustre,vgpu"
+   ...
+   ```
+
+   Note StackHPC-provided release images already include the `compute_init` group
+   so if using these images as the source image then this does not need to be included.
+
 3. Enable the required functionalities during boot, by setting the
    `compute_init_enable` property for a compute group in the
    OpenTofu `compute` variable to a list which includes "compute", plus the
