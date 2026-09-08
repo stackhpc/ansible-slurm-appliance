@@ -1,0 +1,18 @@
+---
+# configuration for the ansible/adhoc/modulejail.yml playbook
+
+modulejail_version: v1.5.2
+modulejail_checksum: "sha256:9acea2d83345b7034543ea783eef02cc09fda7bfea2870a7be5a9ef038029298"
+modulejail_local_download_script: "/tmp/modulejail-{{ modulejail_version }}"
+# output file for the modulejail playbook's denylist
+modulejail_output_var_file: "{{ lookup('env', 'APPLIANCES_REPO_ROOT') + '/environments/site/inventory/group_vars/all/modulejail_denylist.yml' }}"
+modulejail_allowlist_modules_default:
+  # Never block those modules transiently loaded at boot time and other known necessary modules
+  - amd64_edac
+  - amd_atl
+  - edac_mce_amd
+  - fmpm
+
+modulejail_allowlist_modules_extra: []
+
+modulejail_allowlist_modules: "{{ modulejail_allowlist_modules_default + modulejail_allowlist_modules_extra }}"
