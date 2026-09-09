@@ -180,16 +180,18 @@ jobs:
           . venv/bin/activate
           sbom_filename="${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}.syft-json.zip"
           sbom_url="${S3_BUCKET_PUBLIC_URL}/${sbom_filename}"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           # `s3cmd --add-header 'If-None-Match: *'` doesn't work in multipart mode
           s3cmd  put \
             --add-header 'If-None-Match: *' --disable-multipart \
-            --add-header "x-amz-meta-github-run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --add-header "x-amz-meta-github-run: $run_url" \
             --add-header "x-amz-meta-stackhpc-image-id: $STEPS_MANIFEST_OUTPUTS_IMAGE_ID" \
             --add-header "x-amz-meta-stackhpc-image-name: $STEPS_MANIFEST_OUTPUTS_IMAGE_NAME" \
             --add-header "x-amz-meta-stackhpc-image-checksum: $STEPS_MANIFEST_OUTPUTS_IMAGE_CHECKSUM" \
             sbom.zip "s3://$S3_BUCKET/${sbom_filename}"
           echo "sbom-url=${sbom_url}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           openstack image set --property "stackhpc_sbom=$sbom_url" "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}" || true
+          openstack image set --property "stackhpc_github_run=$run_url" "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}" || true
         env:
           STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
           STEPS_MANIFEST_OUTPUTS_IMAGE_NAME: ${{ steps.manifest.outputs.image-name }}

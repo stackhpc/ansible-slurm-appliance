@@ -119,6 +119,7 @@ jobs:
             exit 1
           fi
           TARGET_IMAGE_SHA512="$(openstack image show -f json -c properties "${TARGET_IMAGE}" | jq -r '.properties.os_hash_value')"
+          TARGET_IMAGE_GITHUB_RUN="$(openstack image show -f json -c properties "${TARGET_IMAGE}" | jq -r '.properties.stackhpc_github_run')"
           SBOM_IMAGE_SHA512=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-checksum | sed 's/.*sha512://')
           SBOM_GITHUB_RUN=$(curl -sS -I "$sbom_url" | grep x-object-meta-github-run | sed 's/.*://')
           SBOM_IMAGE_ID=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-id | sed 's/.*://')
@@ -129,6 +130,7 @@ jobs:
           echo "SBOM_IMAGE_SHA512=$SBOM_IMAGE_SHA512" | tee -a "$GITHUB_ENV" "$GITHUB_STEP_SUMMARY"
           echo "SBOM_GITHUB_RUN=$SBOM_GITHUB_RUN" | tee -a "$GITHUB_ENV" "$GITHUB_STEP_SUMMARY"
           echo "SBOM_IMAGE_ID=$SBOM_IMAGE_ID" | tee -a "$GITHUB_ENV" "$GITHUB_STEP_SUMMARY"
+          echo "TARGET_IMAGE_GITHUB_RUN=$TARGET_IMAGE_GITHUB_RUN" | tee -a "$GITHUB_ENV" "$GITHUB_STEP_SUMMARY"
           openstack image save --file "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}.raw" "${TARGET_IMAGE}"
           sha512sum -c <<<"${SBOM_IMAGE_SHA512} ${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}.raw"
           df -h
@@ -147,7 +149,7 @@ jobs:
           sbom_url="${S3_BUCKET_PUBLIC_URL}/${sbom_filename}"
           echo "Uploading Image: ${TARGET_IMAGE} to S3..."
           s3cmd --multipart-chunk-size-mb=150 put \
-            --add-header "x-amz-meta-github-run: $SBOM_GITHUB_RUN" \
+            --add-header "x-amz-meta-github-run: $TARGET_IMAGE_GITHUB_RUN" \
             --add-header "x-amz-meta-stackhpc-image-id: $SBOM_IMAGE_ID" \
             --add-header "x-amz-meta-stackhpc-image-name: $TARGET_IMAGE" \
             --add-header "x-amz-meta-stackhpc-image-sha512: $SBOM_IMAGE_SHA512" \
