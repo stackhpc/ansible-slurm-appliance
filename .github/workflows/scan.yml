@@ -93,9 +93,11 @@ jobs:
           # be slightly robust to string injection
           if [ -n "$sbom_url" ] && [[ "$sbom_url" == https://leafcloud.store* ]] && [[ "$sbom_url" == *syft-json.zip ]]; then
             TARGET_IMAGE_SHA512="$(openstack image show -f json -c properties "${IMAGE_NAME}" | jq -r '.properties.os_hash_value')"
-            SBOM_IMAGE_SHA512=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-checksum | sed 's/.*sha512://')
-            if [ "$TARGET_IMAGE_SHA512" != "$SBOM_IMAGE_SHA512" ]; then
-              echo "E: Image $IMAGE_NAME checksum in OpenStack is $TARGET_IMAGE_SHA512 but recorded with sbom is $SBOM_IMAGE_SHA512"
+            SBOM_IMAGE_SHA512=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-checksum | sed 's/.*sha512://;s/\r//')
+            if [ "$TARGET_IMAGE_SHA512" = "$SBOM_IMAGE_SHA512" ]; then
+              echo "Image checksum matches SBOM: $TARGET_IMAGE_SHA512"
+            else
+              echo "E: Image $IMAGE_NAME checksum in OpenStack is '$TARGET_IMAGE_SHA512' but recorded with sbom is '$SBOM_IMAGE_SHA512'"
               exit 1
             fi
             echo Downloading "$sbom_url..."

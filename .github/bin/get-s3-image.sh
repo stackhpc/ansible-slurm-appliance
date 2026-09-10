@@ -19,9 +19,9 @@ else
   image_url="https://leafcloud.store/swift/v1/AUTH_f39848421b2747148400ad8eeae8d536/$bucket_name/$image_name"
   wget "$image_url" --progress=dot:giga
 
-  image_id=$(curl -sS -I "$image_url" | grep x-object-meta-stackhpc-image-id | sed 's/.*://')
-  image_sha512=$(curl -sS -I "$image_url" | grep x-object-meta-stackhpc-image-sha512 | sed 's/.*://')
-  qcow2_sha512=$(curl -sS -I "$image_url" | grep x-object-meta-stackhpc-qcow2-sha512 | sed 's/.*://')
+  image_id=$(curl -sS -I "$image_url" | grep x-object-meta-stackhpc-image-id | sed 's/.*://;s/\r//')
+  image_sha512=$(curl -sS -I "$image_url" | grep x-object-meta-stackhpc-image-sha512 | sed 's/.*://;s/\r//')
+  qcow2_sha512=$(curl -sS -I "$image_url" | grep x-object-meta-stackhpc-qcow2-sha512 | sed 's/.*://;s/\r//')
   sbom_url=$(curl -sS -I "$image_url" | grep x-object-meta-stackhpc-sbom-url | sed 's/.*://')
 
   sha512sum -c <<<"$qcow2_sha512 $image_name"

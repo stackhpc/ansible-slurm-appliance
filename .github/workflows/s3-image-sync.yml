@@ -120,9 +120,9 @@ jobs:
           fi
           TARGET_IMAGE_SHA512="$(openstack image show -f json -c properties "${TARGET_IMAGE}" | jq -r '.properties.os_hash_value')"
           TARGET_IMAGE_GITHUB_RUN="$(openstack image show -f json -c properties "${TARGET_IMAGE}" | jq -r '.properties.stackhpc_github_run')"
-          SBOM_IMAGE_SHA512=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-checksum | sed 's/.*sha512://')
-          SBOM_GITHUB_RUN=$(curl -sS -I "$sbom_url" | grep x-object-meta-github-run | sed 's/.*://')
-          SBOM_IMAGE_ID=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-id | sed 's/.*://')
+          SBOM_IMAGE_SHA512=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-checksum | sed 's/.*sha512://;s/\r//')
+          SBOM_GITHUB_RUN=$(curl -sS -I "$sbom_url" | grep x-object-meta-github-run | sed 's/.*://;s/\r//')
+          SBOM_IMAGE_ID=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-id | sed 's/.*://;s/\r//')
           if [ "$TARGET_IMAGE_SHA512" != "$SBOM_IMAGE_SHA512" ]; then
             echo "E: Image $TARGET_IMAGE checksum in OpenStack is $TARGET_IMAGE_SHA512 but recorded with sbom is $SBOM_IMAGE_SHA512"
             exit 1
