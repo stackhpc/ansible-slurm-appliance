@@ -7,3 +7,46 @@
     - ansible.builtin.include_role:
         name: kernel_modules
         tasks_from: runtime.yml
+
+- name: Install OHPC OBS repositories
+  hosts: builder
+  tags: ohpc_obs
+  become: true
+  tasks:
+    - name: Create GPG key for OHPC
+      ansible.builtin.copy:
+        dest: "{{ item.value[ansible_distribution_major_version].path }}"
+        content: |
+          {{ item.value[ansible_distribution_major_version].key }}
+        owner: root
+        group: root
+        mode: u=rw,go=r
+      loop: "{{ appliances_ohpc_factory_keys | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      when: "'key' in item.value[ansible_distribution_major_version]"
+    - name: Import GPG keys
+      # Don't need fingerprint as actual key hardcoded in repo
+      ansible.builtin.rpm_key:
+        key: "{{ item.value[ansible_distribution_major_version].path }}"
+      loop: "{{ appliances_ohpc_factory_keys | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+    - name: Install OHPC OBS repository
+      ansible.builtin.yum_repository:
+        file: "{{ repo_values.repo_file }}"
+        name: "{{ repo_name }}"
+        baseurl: "{{ repo_content_url }}"
+        description: "{{ repo_name }}"
+        gpgcheck: "{{ repo_values.gpgcheck | default(true) }}"
+        includepkgs: "{{ repo_values.includepkgs }}"
+      loop: "{{ appliances_ohpc_factory_repos | dict2items }}"
+      loop_control:
+        label: "{{ repo_name }}[{{ repo_os }}]: {{ repo_values }}"
+      when:
+        - repo_values | length > 0
+      vars:
+        repo_os: "{{ ansible_distribution_version if ansible_distribution_version in item.value else ansible_distribution_major_version }}"
+        repo_values: "{{ item.value.get(repo_os, {}) }}"
+        repo_name: "{{ repo_values.repo_name | default(item.key) }}"
+        repo_content_url: "{{ repo_values.url }}"
