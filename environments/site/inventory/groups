@@ -227,3 +227,7 @@ compute
 ## Vulnerability mitigation groups
 [kernel_modules:children]
 cluster
+
+[systemtap:children]
+login
+compute

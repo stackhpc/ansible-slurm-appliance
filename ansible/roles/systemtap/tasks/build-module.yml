@@ -20,6 +20,7 @@
     owner: root
     group: root
     mode: "0600"
+    remote_src: true
 
 - name: Create systemd service
   ansible.builtin.template:

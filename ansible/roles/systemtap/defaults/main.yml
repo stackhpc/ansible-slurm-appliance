@@ -7,4 +7,4 @@ systemtap_modules_directory: /var/lib/appliance-stap-modules
 #   script - multiline string defining script content
 #   persist - bool indicating whether to load module
 #             at boot (use with caution)
-systemtap_scripts:
+systemtap_scripts: []
