@@ -1,0 +1,10 @@
+# Directory to store modules
+systemtap_modules_directory: /var/lib/appliance-stap-modules
+# List of objects defining systemtap scripts
+# to compile to modules and run. Each object is in
+# the form:
+# - name - unique identifier for module
+#   script - multiline string defining script content
+#   persist - bool indicating whether to load module
+#             at boot (use with caution)
+systemtap_scripts:
