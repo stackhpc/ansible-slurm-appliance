@@ -1,0 +1,37 @@
+---
+- name: Create script file
+  ansible.builtin.copy:
+    dest: "/tmp/{{ _systemtap_script.name }}.stp"
+    content: "{{ _systemtap_script.script }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Compile script to module
+  ansible.builtin.command:
+    cmd: stap -p 4 -g -m {{ _systemtap_script.name }} {{ _systemtap_script.name }}.stp
+    chdir: /tmp
+  changed_when: true
+
+- name: Move module to modules directory
+  ansible.builtin.copy:
+    src: "/tmp/{{ _systemtap_script.name }}.ko"
+    dest: "{{ systemtap_modules_directory }}/{{ _systemtap_script.name }}.ko"
+    owner: root
+    group: root
+    mode: "0600"
+    remote_src: true
+
+- name: Create systemd service
+  ansible.builtin.template:
+    src: stap-unit.service.j2
+    dest: "/etc/systemd/system/stap-{{ _systemtap_script.name }}.service"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Start systemd service
+  ansible.builtin.systemd_service:
+    enabled: "{{ _systemtap_script.persist }}"
+    state: started
+    name: "stap-{{ _systemtap_script.name }}.service"
