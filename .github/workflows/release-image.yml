@@ -45,7 +45,7 @@ jobs:
         run: |
           sbom_filename="${TARGET_IMAGE}.syft-json.zip"
           sbom_url="${S3_BUCKET_PUBLIC_URL}/${sbom_filename}"
-          # TODO: confirm s3cmd cp copies metadata and overrides with the one we set manually
+          # s3cmd cp copies metadata and overrides with the one we set manually
           s3cmd cp "s3://openhpc-images-prerelease/${TARGET_IMAGE}.syft-json.zip" s3://openhpc-images
           s3cmd cp \
             --add-header "x-amz-meta-stackhpc-sbom-url: $sbom_url" \
