@@ -142,7 +142,7 @@ jobs:
           qemu-img convert -f raw -O qcow2 -c "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}.raw" "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}"
         shell: bash
 
-      - name: Upload Image to S3
+      - name: Upload Image and SBOM to S3
         run: |
           qcow2_image_sha512=$(sha512sum "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}" | awk '{ print $1 }')
           sbom_filename="${TARGET_IMAGE}.syft-json.zip"
@@ -162,7 +162,7 @@ jobs:
             --add-header "x-amz-meta-stackhpc-image-id: $SBOM_IMAGE_ID" \
             --add-header "x-amz-meta-stackhpc-image-name: $TARGET_IMAGE" \
             --add-header "x-amz-meta-stackhpc-image-sha512: $SBOM_IMAGE_SHA512" \
-            "${RUNNER_IMAGE_DIR}/${TARGET_IMAGE}/sbom.zip" "s3://${S3_BUCKET}/${sbom_filename}"
+            "${RUNNER_IMAGE_DIR}/sbom.zip" "s3://${S3_BUCKET}/${sbom_filename}"
         shell: bash
 
   image_sync:
