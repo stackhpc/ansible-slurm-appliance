@@ -13,11 +13,11 @@ cuda_packages_default:
 cuda_packages_fabricmanager:
   - "nvidia-fabricmanager-{{ cuda_nvidia_driver_version }}"
 cuda_packages: "{{ cuda_packages_default + ( cuda_packages_fabricmanager if cuda_install_nvidiafabricmanger | bool else [] ) }}"
+# variables for cuda-samples
 cuda_samples_release_url: "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v{{ cuda_version_short }}.tar.gz"
+cuda_samples_build_concurrency: "{{ ansible_processor_vcpus }}"
 cuda_samples_path: "/var/lib/{{ ansible_user }}/cuda_samples"
-cuda_samples_programs:
-  - deviceQuery
-  - bandwidthTest
+cuda_samples_run_tests_concurrency: 1
 # cuda_devices: # discovered from deviceQuery run
 cuda_persistenced_state: started
 cuda_install_nvidiafabricmanger: false
