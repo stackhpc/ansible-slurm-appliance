@@ -8,6 +8,8 @@ name: Scan image for vulnerabilities
 'on':
   workflow_call:
   workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'  # Run at 7AM - to get fresh vulnerability reports
 
 permissions: {}
 
@@ -154,3 +156,19 @@ jobs:
           sarif_file: ${{ steps.scan.outputs.sarif }}
           # Useful if you are running this in a matrix
           category: "${{ matrix.build }}"
+
+      - name: Send message to Slack via Incoming Webhook
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        with:
+          errors: true
+          payload: |
+            text: "Failed Grype scan"
+            channel-id: C08GYBU3S93  # #slurm
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "Grype scan of ${{ steps.manifest.outputs.image-name }} failed. See <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run ${{ github.run_id }}>\n"
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+        if: ${{ failure() && github.event.schedule }}
