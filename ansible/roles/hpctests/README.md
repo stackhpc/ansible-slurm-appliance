@@ -30,6 +30,7 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 - `hpctests_partition`: Optional. Name of partition to use, otherwise default partition is used.
 - `hpctests_reservation`: Optional. Name of reservation to use.
 - `hpctests_qos`: Optional. Slurm QoS to use, otherwise no qos is specified to Slurm.
+- `hpctests_time`: Optional. Max time for Slurm jobs, in the same format as the `--time` option of srun and sbatch (eg to fit in QoS limits or allocated cpu quotas)
 - `hpctests_nodes`: Optional. A Slurm node expression, e.g. `'compute-[0-15,19]'` defining the nodes to use. If not set all nodes in the selected partition are used.
 - `hpctests_ucx_net_devices`: Optional. Control which network device/interface to use, e.g. `mlx5_1:0`.
   The default of `all` (as per UCX) may not be appropriate for multi-rail nodes with different bandwidths on each device. See [here](https://openucx.readthedocs.io/en/master/faq.html#what-is-the-default-behavior-in-a-multi-rail-environment) and [here](https://github.com/openucx/ucx/wiki/UCX-environment-parameters#setting-the-devices-to-use).
