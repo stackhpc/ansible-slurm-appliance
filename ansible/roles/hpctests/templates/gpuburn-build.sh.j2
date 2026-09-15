@@ -4,7 +4,6 @@
 #SBATCH --error=%x.%a.out
 #SBATCH --cpus-per-task=4
 #SBATCH --partition={{ hpctests_partition }}
-#SBATCH --time=00:30:00
 {%if hpctests_nodes is defined %}
 #SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}
 {% endif %}
@@ -13,6 +12,9 @@
 {% endif %}
 {%if hpctests_qos is defined %}
 #SBATCH --qos={{ hpctests_qos }}
+{% endif %}
+{%if hpctests_time is defined %}
+#SBATCH --time={{ hpctests_time }}
 {% endif %}
 
 echo "arch: {{ hpctests_hpl_arch }}"
