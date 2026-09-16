@@ -56,7 +56,7 @@ For either a site-specific fat-image build or an extra-build:
    flavor = "general.v1.small"                           # VM flavor to use for builder VMs
    networks = ["26023e3d-bc8e-459c-8def-dbd47ab01756"]   # List of network UUIDs to attach the VM to
    source_image_name = "Rocky-9-GenericCloud-Base-9.4"   # Name of image to create VM with, i.e. starting image
-   inventory_groups = "doca,cuda,extra_packages"         # Build VM inventory groups => functionality to add to image
+   inventory_groups = "doca,cuda,extra_packages,sbom"         # Build VM inventory groups => functionality to add to image
    ```
 
    See the top of [packer/openstack.pkr.hcl](../packer/openstack.pkr.hcl)
@@ -101,6 +101,9 @@ For either a site-specific fat-image build or an extra-build:
        and also enables installation of packages defined in the
        `appliances_extra_packages_other` variable (see
        [docs/operations.md](./operations.md#adding-additional-packages)).
+
+     - to generate a Software Build Of Materials (SBOM), add the `sbom` group to `inventory_groups`.
+       It will produce `sbom.zip` at the root of the Git checkout.
 
 4. Activate the venv and the relevant environment.
 
