@@ -5,8 +5,8 @@ This provides two sets of functionality:
 - `tasks/main.yml`: Install and configure the the `reboot.py` tool from
   [stackhpc.slurm-openstack-tools](https://github.com/stackhpc/slurm-openstack-tools.git)
   as a Slurm [RebootProgram](https://slurm.schedmd.com/slurm.conf.html#OPT_RebootProgram) on the control node.
-- `tasks/rebuild.yml`: Submit batched `scontrol reboot` commands to trigger
-  the above.
+- `tasks/rebuild.yml`: Submit batched [scontrol reboot](https://slurm.schedmd.com/scontrol.html#OPT_reboot)
+  commands to trigger the above.
 
 See [docs/experimental/slurm-controlled-rebuild.md](../../../docs/experimental/slurm-controlled-rebuild.md)
 for interaction with other roles and how to enable this.
@@ -32,8 +32,12 @@ An OpenStack clouds.yaml file containing credentials for a cloud.
   issuing them. Default `false`.
 - `rebuild_reason`: Optional string. A message to show in e.g. `sinfo` describing
   the reason for the rebuild. Default `update`.
-- `rebuild_nextstate`: Optional string, one of `RESUME`, `DOWN` or `UNDRAIN` (default).
-  The state rebuilt nodes should go to after they are back up.
+- `rebuild_nextstate`: Optional string, `RESUME` (default), `DOWN` or ``.
+  The state rebuilt nodes should go to when a rebuild completes successfully. Note
+  the empty string will provide scontrol's default `nextstate=UNDRAIN` option, but
+  this will result in nodes remaining in DRAIN state as this role explicitly drains
+  nodes to prevent multinode jobs being backfilled onto onto a mix of "old" and
+  "new" nodes.
 - `rebuild_batch_size`: Optional integer. The number of nodes to rebuild per batch.
   Default 50.
 - `rebuild_batch_delay`: Optional integer. The number of seconds to wait between

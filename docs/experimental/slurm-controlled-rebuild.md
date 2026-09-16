@@ -149,24 +149,23 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
    - In batches (to avoid avoid overloading OpenStack APIs):
      - Set nodes to the DRAIN state, so that they can complete existing jobs
        but not run new ones.
-     - Issue `scontrol reboot ASAP` commands to request a rebuild once their
-       current job has completed.
+     - Issue `scontrol reboot ASAP` ([docs](https://slurm.schedmd.com/scontrol.html#OPT_reboot))
+      commands to request a rebuild once their current job has completed.
 
-   The DRAIN state is necessary to avoid the scheduler backfilling jobs onto
-   nodes running non-exclusive jobs, which could lead to multi-node jobs running
-   on a mix of "old" and "new" nodes.
+    Setting the DRAIN state first is necessary to prevent multinode jobs being
+    backfilled onto mixtures of "old" and "new" nodes. By default, nodes are put
+    into the RESUME state after the rebuild has completed. Note the explict
+    DRAIN state prevents the default "nexstate=UNDRAIN" parameter for
+    `scontrol reboot` from being effective.
 
    See the [rebuild](../../ansible/roles/rebuild/README.md) role variables
-   for additional options. In particular note appending `-e rebuild_dryrun=true`
-   may be useful to see what commands will be issued.
+   for additional options. E.g. appending `-e rebuild_dryrun=true`
+   may be useful during testing to see what commands will be issued.
 
-5. When the rebuilt instance boots, the `compute_init` machinery in the image
+5. When a rebuilt instance boots, the `compute_init` machinery in the image
    will load configuration from the control node's NFS share and apply it before
    starting `slurmd`. If node health checks are configured (via the
-   [nhc](../../ansible/roles/nhc/README.md) role) these then run once. By
-   default, the state is then set to UNDRAIN which makes it eligible for jobs
-   unless the pre-reboot state prevented this (e.g. it was set DOWN). Again the `rebuild`
-   role variables can modify this behaviour.
+   [nhc](../../ansible/roles/nhc/README.md) role) these then run once.
 
 ## Testing
 
