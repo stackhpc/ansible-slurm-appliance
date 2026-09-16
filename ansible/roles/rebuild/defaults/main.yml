@@ -1,6 +1,7 @@
 ---
 
 rebuild_clouds_path: ~/.config/openstack/clouds.yaml
+rebuild_clouds_key: openstack
 
 rebuild_nodes: "{{ groups.compute_init | default([]) }}"
 rebuild_dryrun: false

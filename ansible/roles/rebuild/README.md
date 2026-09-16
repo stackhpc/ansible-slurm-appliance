@@ -13,13 +13,14 @@ for interaction with other roles and how to enable this.
 
 ## Requirements
 
-An OpenStack clouds.yaml file containing credentials for a cloud under the
-"openstack" key.
+An OpenStack clouds.yaml file containing credentials for a cloud.
 
 ## Role Variables for tasks/main.yml
 
 - `rebuild_clouds_path`: Optional. Path to `clouds.yaml` file on the deploy
   host, default `~/.config/openstack/clouds.yaml`.
+- `rebuild_clouds_key`: Optional. Name of key under `clouds:` entry in above
+  to use, default `openstack`.
 
 ## Role Variables for tasks/rebuild.yml
 
