@@ -102,12 +102,18 @@ This functionality involves several roles in the appliance:
    > to cluster operations and so this should be planned as part of a normal
    > upgrade cycle.
    >
-   > Alternatively, it is possible to work around this via `tofu state mv` commands.
-
-
-   tofu state move \
-    'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute["extra-0"]' \
-    'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute_fixed_image["extra-0"]'
+   > Alternatively, it is possible to work around this by modifying OpenTofu state
+   > before running the `apply`, e.g.
+   >
+   > ```shell
+   > tofu state list
+   >
+   > tofu state move \
+   > 'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute["extra-0"]' \
+   > 'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute_fixed_image["extra-0"]'
+   > ...
+   > tofu apply
+   > ```
 
 8. Run the `site.yml` playbook as normal to configure the cluster.
 
@@ -150,13 +156,13 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
      - Set nodes to the DRAIN state, so that they can complete existing jobs
        but not run new ones.
      - Issue `scontrol reboot ASAP` ([docs](https://slurm.schedmd.com/scontrol.html#OPT_reboot))
-      commands to request a rebuild once their current job has completed.
+       commands to request a rebuild once their current job has completed.
 
-    Setting the DRAIN state first is necessary to prevent multinode jobs being
-    backfilled onto mixtures of "old" and "new" nodes. By default, nodes are put
-    into the RESUME state after the rebuild has completed. Note the explict
-    DRAIN state prevents the default "nexstate=UNDRAIN" parameter for
-    `scontrol reboot` from being effective.
+   Setting the DRAIN state first is necessary to prevent multinode jobs being
+   backfilled onto mixtures of "old" and "new" nodes. By default, nodes are put
+   into the RESUME state after the rebuild has completed. Note the explicit
+   DRAIN state prevents the default "nexstate=UNDRAIN" parameter for
+   `scontrol reboot` from being effective.
 
    See the [rebuild](../../ansible/roles/rebuild/README.md) role variables
    for additional options. E.g. appending `-e rebuild_dryrun=true`
@@ -168,33 +174,6 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
    [nhc](../../ansible/roles/nhc/README.md) role) these then run once.
 
 ## Testing
-
-Reimage the cluster (e.g. using ansible/adhoc/rebuild.yml) your cluster to an
-older image.
-- using v2.24.0 image openhpc-RL9-260818-0723-3f645271
-- DONE: tofu deploy using dev key
-- DONE: check connectivity
-- DONE: ewatch install
-- FAILED: site
-  - don't have metadata server, on login/control/compute nodes I checked
-  - Jack fixed
-- DONE: tf destroy
-- DONE: TF apply
-- FAILED: site - grafana install!
-  - ah b/c control is on old image
-- DONE reimage control/login via TF
-- DONE: site
-- FAILED: testing
-  - app cred had lapsed
-- DONE: fixed, via allowing setting this
-- DONE: rebuild compute back to v2.24.0 image
-    ansible-playbook --limit compute ansible/adhoc/rebuild.yml -e rebuild_image=openhpc-RL9-260818-0723-3f645271
-- DONE: site
-- FAILED: retest with updated instructions below
-  - nodes didn't come back from DRAIN
-- DONE: rebuild compute to v2.25.0 image
-- DONE: trying to fix rebuild logic - just set default to resume
-- TODO: test again
 
 The below demonstrates testing this using the `.stackhpc` CI environment, using:
 
@@ -217,11 +196,12 @@ partition:
 [demo_user@RL9-login-0 ~]$ sbatch -N2 --exclusive --job-name=JobA --wrap "sleep 60" && sbatch -N2 --exclusive  --job-name=JobB --wrap "sleep 30"
 ```
 
-On the ansible deploy host, trigger the rebuild:
+On the Ansible deploy host, trigger the rebuild:
 
 ```shell
 .stackhpc/ (venv) [rocky@steveb-dev slurm-app-rl9]$ ansible-playbook ansible/adhoc/rebuild-via-slurm.yml
 ```
+
 Once this has completed, back in the second terminal, submit another (non-exclusive) job to either partition:
 
 ```shell

@@ -32,9 +32,9 @@ An OpenStack clouds.yaml file containing credentials for a cloud.
   issuing them. Default `false`.
 - `rebuild_reason`: Optional string. A message to show in e.g. `sinfo` describing
   the reason for the rebuild. Default `update`.
-- `rebuild_nextstate`: Optional string, `RESUME` (default), `DOWN` or ``.
-  The state rebuilt nodes should go to when a rebuild completes successfully. Note
-  the empty string will provide scontrol's default `nextstate=UNDRAIN` option, but
+- `rebuild_nextstate`: Optional string, `RESUME` (default), `DOWN` or the empty string.
+  The state rebuilt nodes should go to when a rebuild completes successfully. Note the
+  empty string will provide scontrol's default `nextstate=UNDRAIN` option, but
   this will result in nodes remaining in DRAIN state as this role explicitly drains
   nodes to prevent multinode jobs being backfilled onto onto a mix of "old" and
   "new" nodes.
