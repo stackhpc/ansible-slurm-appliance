@@ -6,7 +6,7 @@ rebuild_clouds_key: openstack
 rebuild_nodes: "{{ groups.compute_init | default([]) }}"
 rebuild_dryrun: false
 rebuild_reason: "update"
-rebuild_nextstate: "UNDRAIN"
+rebuild_nextstate: "RESUME"
 # Below based on testing:
 rebuild_batch_size: 50
 rebuild_batch_delay: 60

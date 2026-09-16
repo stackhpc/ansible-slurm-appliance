@@ -104,6 +104,11 @@ This functionality involves several roles in the appliance:
    >
    > Alternatively, it is possible to work around this via `tofu state mv` commands.
 
+
+   tofu state move \
+    'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute["extra-0"]' \
+    'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute_fixed_image["extra-0"]'
+
 8. Run the `site.yml` playbook as normal to configure the cluster.
 
 The cluster is now ready to perform slurm-controlled upgrades as described in
@@ -165,99 +170,139 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
 
 ## Testing
 
-TODO: update
+Reimage the cluster (e.g. using ansible/adhoc/rebuild.yml) your cluster to an
+older image.
+- using v2.24.0 image openhpc-RL9-260818-0723-3f645271
+- DONE: tofu deploy using dev key
+- DONE: check connectivity
+- DONE: ewatch install
+- FAILED: site
+  - don't have metadata server, on login/control/compute nodes I checked
+  - Jack fixed
+- DONE: tf destroy
+- DONE: TF apply
+- FAILED: site - grafana install!
+  - ah b/c control is on old image
+- DONE reimage control/login via TF
+- DONE: site
+- FAILED: testing
+  - app cred had lapsed
+- DONE: fixed, via allowing setting this
+- DONE: rebuild compute back to v2.24.0 image
+    ansible-playbook --limit compute ansible/adhoc/rebuild.yml -e rebuild_image=openhpc-RL9-260818-0723-3f645271
+- DONE: site
+- FAILED: retest with updated instructions below
+  - nodes didn't come back from DRAIN
+- DONE: rebuild compute to v2.25.0 image
+- DONE: trying to fix rebuild logic - just set default to resume
+- TODO: test again
 
 The below demonstrates testing this using the `.stackhpc` CI environment, using:
 
 - A 2-node default "standard" partition.
 - A 2-node "extra" partition (note this does not usually have any nodes by default).
 
-In one terminal launch a watch of job state:
+In one terminal launch a watch of job and node states:
 
 ```shell
-[root@RL9-control rocky]# clear && ~/ewatch/ewatch.py -n 1 -i '\d+:\d+' 'squeue --all --Format=PARTITION,NAME:25,USERNAME:11,STATE:12,NUMNODES:8,NODELIST'
+[root@RL9-control rocky]# clear && ~/ewatch/ewatch.py -n 1 -i '\d+:\d+' 'squeue --all && sinfo -R'
 ```
 
 This uses [ewatch](https://github.com/sjpb/ewatch) to summarise changes in
 output.
 
-In a second terminal, launch 2x normal jobs into the default ("standard")
+In a second terminal, launch 2x exclusive jobs into the default ("standard")
 partition:
 
 ```shell
-[demo_user@RL9-login-0 ~]$ sbatch -N2 --job-name=JobA --wrap "sleep 60" && sbatch -N2 --job-name=JobB --wrap "sleep 30"
+[demo_user@RL9-login-0 ~]$ sbatch -N2 --exclusive --job-name=JobA --wrap "sleep 60" && sbatch -N2 --exclusive  --job-name=JobB --wrap "sleep 30"
 ```
 
-In a third terminal, trigger rebuild jobs:
+On the ansible deploy host, trigger the rebuild:
 
 ```shell
 .stackhpc/ (venv) [rocky@steveb-dev slurm-app-rl9]$ ansible-playbook ansible/adhoc/rebuild-via-slurm.yml
 ```
-
-Back in the second terminal, submit more user jobs to either partition:
+Once this has completed, back in the second terminal, submit another (non-exclusive) job to either partition:
 
 ```shell
-[demo_user@RL9-login-0 ~]$ sbatch -N2 --job-name=JobC --partition,standard,extra --wrap "sleep 10"
+[demo_user@RL9-login-0 ~]$ sbatch -N2 --job-name=JobC --partition standard,extra --wrap "sleep 10"
 ```
 
 The output from the first terminal should show:
 
 - Job A runs on submission in the default "standard" partition.
-- Job B pends for the default "standard" partition.
-- Rebuild jobs runs on submission in the "extra" partition and pend for the "standard" partition
+- Job B pends for the default "standard" partition due to lack of resources.
+- The "extra" nodes go to "boot" and "standard" go to drain.
 - Job C pends for both partitions
 - Job A completes
-- Rebuild jobs run on the "standard" partition, jumping ahead of JobB and JobC
-- Rebuild jobs complete in the "extra" partition
-- JobC runs in the "extra" partition
-- JobC completes
-- Rebuild jobs complete in the "standard" partition
+- The "standard" nodes go to "boot".
+- Job C runs in the "extra" partition
 - Job B runs in the "standard" partition
 
-Example output:
+See example output below. Note for each timestamp the first block comes from `squeue` and the second from `sinfo -R`.
 
 ```text
-[2025-03-28T14:26:34.510466]
-PARTITION           NAME                     USER       STATE       NODES   NODELIST
-standard            JobB                     demo_user  PENDING     2
-standard            JobA                     demo_user  RUNNING     2       RL9-compute-[0-1]
+[2026-09-16T15:56:58.042243]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 8  standard     JobB    rocky PD       0:00      2 (Resources)
+                 7  standard     JobA    rocky  R       0:01      2 dev-compute-[0-1]
+REASON               USER      TIMESTAMP           NODELIST
 
-[2025-03-28T14:26:38.530213]
-PARTITION           NAME                     USER       STATE       NODES   NODELIST
-rebuild             rebuild-RL9-compute-1    root       PENDING     1
-rebuild             rebuild-RL9-compute-0    root       PENDING     1
-rebuild             rebuild-RL9-extra-0      root       RUNNING     1       RL9-extra-0
-rebuild             rebuild-RL9-extra-1      root       RUNNING     1       RL9-extra-1
-standard            JobB                     demo_user  PENDING     2
-standard            JobA                     demo_user  RUNNING     2       RL9-compute-[0-1]
-standard,extra      JobC                     demo_user  PENDING     2
+[2026-09-16T15:57:16.175957]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 8  standard     JobB    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED or reserved for jobs in higher priority partitions)
+                 7  standard     JobA    rocky  R       0:19      2 dev-compute-[0-1]
+REASON               USER      TIMESTAMP           NODELIST
+update               root      2026-09-16T15:57:15 dev-compute-[0-1],dev-extra-[0-1]
 
-[2025-03-28T14:26:54.609651]
-PARTITION           NAME                     USER       STATE       NODES   NODELIST
-rebuild             rebuild-RL9-compute-0    root       RUNNING     1       RL9-compute-0
-rebuild             rebuild-RL9-compute-1    root       RUNNING     1       RL9-compute-1
-rebuild             rebuild-RL9-extra-0      root       RUNNING     1       RL9-extra-0
-rebuild             rebuild-RL9-extra-1      root       RUNNING     1       RL9-extra-1
-standard            JobB                     demo_user  PENDING     2
-standard,extra      JobC                     demo_user  PENDING     2
+[2026-09-16T15:57:18.191325]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 8  standard     JobB    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED or reserved for jobs in higher priority partitions)
+                 7  standard     JobA    rocky  R       0:21      2 dev-compute-[0-1]
+REASON               USER      TIMESTAMP           NODELIST
+update : reboot issu slurm     2026-09-16T15:57:17 dev-extra-[0-1]
+update               root      2026-09-16T15:57:17 dev-compute-[0-1]
 
-[2025-03-28T14:28:39.091571]
-PARTITION           NAME                     USER       STATE       NODES   NODELIST
-extra               JobC                     demo_user  RUNNING     2       RL9-extra-[0-1]
-rebuild             rebuild-RL9-compute-0    root       RUNNING     1       RL9-compute-0
-rebuild             rebuild-RL9-compute-1    root       RUNNING     1       RL9-compute-1
-standard            JobB                     demo_user  PENDING     2
+[2026-09-16T15:57:24.236222]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 8  standard     JobB    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED, REBOOTING or reserved for jobs in higher priority partitions)
+                 7  standard     JobA    rocky  R       0:27      2 dev-compute-[0-1]
+                 9 standard,     JobC    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED, REBOOTING or reserved for jobs in higher priority partitions)
+REASON               USER      TIMESTAMP           NODELIST
+update : reboot issu slurm     2026-09-16T15:57:17 dev-extra-[0-1]
+update               root      2026-09-16T15:57:17 dev-compute-[0-1]
 
-[2025-03-28T14:28:49.139349]
-PARTITION           NAME                     USER       STATE       NODES   NODELIST
-rebuild             rebuild-RL9-compute-0    root       RUNNING     1       RL9-compute-0
-rebuild             rebuild-RL9-compute-1    root       RUNNING     1       RL9-compute-1
-standard            JobB                     demo_user  PENDING     2
+[2026-09-16T15:57:58.503340]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 8  standard     JobB    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED, REBOOTING or reserved for jobs in higher priority partitions)
+                 9 standard,     JobC    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED, REBOOTING or reserved for jobs in higher priority partitions)
+REASON               USER      TIMESTAMP           NODELIST
+update : reboot issu slurm     2026-09-16T15:57:17 dev-extra-[0-1]
+update : reboot issu slurm     2026-09-16T15:57:57 dev-compute-[0-1]
 
-[2025-03-28T14:28:55.168264]
-PARTITION           NAME                     USER       STATE       NODES   NODELIST
-standard            JobB                     demo_user  RUNNING     2       RL9-compute-[0-1]
+[2026-09-16T16:00:21.648057]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 8  standard     JobB    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED, REBOOTING or reserved for jobs in higher priority partitions)
+                 9 standard,     JobC    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED, REBOOTING or reserved for jobs in higher priority partitions)
+REASON               USER      TIMESTAMP           NODELIST
+update : reboot issu slurm     2026-09-16T15:57:57 dev-compute-[0-1]
 
-[2025-03-28T14:29:05.216346]
-PARTITION           NAME                     USER       STATE       NODES   NODELIST
+[2026-09-16T16:00:23.662996]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 9     extra     JobC    rocky  R       0:02      2 dev-extra-[0-1]
+                 8  standard     JobB    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED, REBOOTING or reserved for jobs in higher priority partitions)
+REASON               USER      TIMESTAMP           NODELIST
+update : reboot issu slurm     2026-09-16T15:57:57 dev-compute-[0-1]
+
+[2026-09-16T16:00:33.745300]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 8  standard     JobB    rocky PD       0:00      2 (Nodes required for job are DOWN, DRAINED, REBOOTING or reserved for jobs in higher priority partitions)
+REASON               USER      TIMESTAMP           NODELIST
+update : reboot issu slurm     2026-09-16T15:57:57 dev-compute-[0-1]
+
+[2026-09-16T16:01:03.977346]
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 8  standard     JobB    rocky  R       0:01      2 dev-compute-[0-1]
+REASON               USER      TIMESTAMP           NODELIST
 ```
