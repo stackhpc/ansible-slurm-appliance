@@ -31,7 +31,9 @@ An OpenStack `clouds.yaml` file containing credentials for a cloud.
 - `rebuild_dryrun`: Optional bool. If `true` it will echo commands instead of
   issuing them. Default `false`.
 - `rebuild_reason`: Optional string. A message to show in e.g. `sinfo` describing
-  the reason for the rebuild. Default `update`.
+  the reason for the rebuild. Default `update`. **NB:** If passing this via extravars,
+  you will need to use [JSON format](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html#json-string-format)
+  if the string contains spaces, quotes or other special characters.
 - `rebuild_nextstate`: Optional string, `RESUME` (default), `DOWN` or the empty string.
   The state rebuilt nodes should go to when a rebuild completes successfully. Note the
   empty string will provide scontrol's default `nextstate=UNDRAIN` option, but

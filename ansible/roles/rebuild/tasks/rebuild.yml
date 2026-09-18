@@ -38,12 +38,12 @@
   # jobs (before that runs on their batch), which could lead to
   # a multi-node job running on a mix of old and new nodes.
   ansible.builtin.command:
-    cmd: >-
-      {% if rebuild_dryrun | bool %}echo{% endif %}
-      scontrol update
-      state=DRAIN
-      nodename={{ item.stdout }}
-      reason='{{ rebuild_reason | quote }}'
+    argv: >-
+      {{
+        (['echo'] if (rebuild_dryrun | bool) else [])
+        + ['scontrol', 'update', 'state=DRAIN', 'nodename=' + item.stdout,
+           'reason=' + rebuild_reason]
+      }}
   loop: "{{ _rebuild_hostlists.results }}"
   loop_control:
     index_var: batch_idx
@@ -54,12 +54,14 @@
 - name: Request rebuild of compute nodes
   # NB: cannot actually specify nextstate=UNDRAIN but that is the default if omitted
   ansible.builtin.command:
-    cmd: >-
-      {% if rebuild_dryrun | bool %}echo{% endif %}
-      scontrol reboot ASAP
-      {% if rebuild_nextstate.upper() in ('RESUME', 'DOWN') %}nextstate={{ rebuild_nextstate.upper() }}{% endif %}
-      reason='{{ rebuild_reason | quote }}'
-      {{ item.stdout }}
+    argv: >-
+      {{
+        (['echo'] if (rebuild_dryrun | bool) else [])
+        + ['scontrol', 'reboot', 'ASAP']
+        + (['nextstate=' + rebuild_nextstate.upper()]
+           if rebuild_nextstate.upper() in ('RESUME', 'DOWN') else [])
+        + ['reason=' + rebuild_reason, item.stdout]
+      }}
   loop: "{{ _rebuild_hostlists.results }}"
   loop_control:
     index_var: batch_idx
