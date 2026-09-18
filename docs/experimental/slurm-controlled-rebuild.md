@@ -94,26 +94,23 @@ This functionality involves several roles in the appliance:
 
 7. Run `tofu apply` as usual to apply the new OpenTofu configuration.
 
-   > [!CAUTION]
-   > Due to OpenTofu/Terraform state limitations, this will plan to delete and
-   > recreate all compute nodes in node groups where `ignore_image_changes: true`.
-   > was not previously set. This is a one-time issue with adding this parameter,
-   > i.e. subsequent applies will not require this. This is clearly disruptive
-   > to cluster operations and so this should be planned as part of a normal
-   > upgrade cycle.
-   >
-   > Alternatively, it is possible to work around this by modifying OpenTofu state
-   > before running the `apply`, e.g.
-   >
-   > ```shell
-   > tofu state list
-   >
-   > tofu state move \
-   > 'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute["extra-0"]' \
-   > 'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute_fixed_image["extra-0"]'
-   > ...
-   > tofu apply
-   > ```
+   **CAUTION:** Due to OpenTofu/Terraform state limitations, this will plan to
+   delete and recreate all compute nodes in node groups where
+   `ignore_image_changes: true` was not previously set. This is a one-time issue
+   with adding this parameter, i.e. subsequent applies will not require this. This
+   is clearly disruptive to cluster operations and so this should be planned as
+   part of a normal upgrade cycle. Alternatively, it is possible to work around
+   this by modifying OpenTofu state before running the `apply`, e.g.:
+
+   ```shell
+   tofu state list
+
+   tofu state move \
+   'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute["extra-0"]' \
+   'module.cluster.module.compute["extra"].openstack_compute_instance_v2.compute_fixed_image["extra-0"]'
+   ...
+   tofu apply
+   ```
 
 8. Run the `site.yml` playbook as normal to configure the cluster.
 
@@ -142,7 +139,7 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
    This playbook also
    - Writes cluster configuration to an NFS share `/exports/cluster` on the
      control node (via the `compute_init` role).
-   - Deploys and configures the RebootProgram (via the `rebuild` role).
+   - Configures the RebootProgram (via the `rebuild` and `openhpc` roles).
 
 4. Submit rebuild requests using:
 
@@ -152,11 +149,11 @@ this supplements the standard [upgrade docs](../../docs/upgrades.md).
 
    This will:
    - Find all "rebuildable" nodes which are not currently on the latest image.
-   - In batches (to avoid avoid overloading OpenStack APIs):
-     - Set nodes to the DRAIN state, so that they can complete existing jobs
-       but not run new ones.
-     - Issue `scontrol reboot ASAP` ([docs](https://slurm.schedmd.com/scontrol.html#OPT_reboot))
-       commands to request a rebuild once their current job has completed.
+   - Set nodes to the DRAIN state, so that they can complete existing jobs but
+     not run new ones.
+   - In batches (to avoid avoid overloading OpenStack APIs), issue
+     `scontrol reboot ASAP` ([docs](https://slurm.schedmd.com/scontrol.html#OPT_reboot))
+     commands to request a rebuild once their current job has completed.
 
    Setting the DRAIN state first is necessary to prevent multinode jobs being
    backfilled onto mixtures of "old" and "new" nodes. By default, nodes are put

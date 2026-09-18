@@ -13,7 +13,7 @@ for interaction with other roles and how to enable this.
 
 ## Requirements
 
-An OpenStack clouds.yaml file containing credentials for a cloud.
+An OpenStack `clouds.yaml` file containing credentials for a cloud.
 
 ## Role Variables for tasks/main.yml
 
@@ -25,7 +25,7 @@ An OpenStack clouds.yaml file containing credentials for a cloud.
 ## Role Variables for tasks/rebuild.yml
 
 - `rebuild_nodes`: Optional list. Inventory hostnames/nodenames to consider
-  submitting for rebuild. The default is all nodes in the `compute_init` group.
+  submitting for rebuild. The default is all nodes in the `compute_init` group.  
   **IMPORTANT:** to avoid jobs landing on a mix of updated and non-updated nodes,
   this group must contain _all_ nodes in partitions for which it includes nodes.
 - `rebuild_dryrun`: Optional bool. If `true` it will echo commands instead of
@@ -36,8 +36,7 @@ An OpenStack clouds.yaml file containing credentials for a cloud.
   The state rebuilt nodes should go to when a rebuild completes successfully. Note the
   empty string will provide scontrol's default `nextstate=UNDRAIN` option, but
   this will result in nodes remaining in DRAIN state as this role explicitly drains
-  nodes to prevent multinode jobs being backfilled onto onto a mix of "old" and
-  "new" nodes.
+  nodes to prevent multinode jobs being backfilled onto a mix of "old" and "new" nodes.
 - `rebuild_batch_size`: Optional integer. The number of nodes to rebuild per batch.
   Default 50.
 - `rebuild_batch_delay`: Optional integer. The number of seconds to wait between
