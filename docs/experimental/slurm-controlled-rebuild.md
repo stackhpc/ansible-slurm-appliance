@@ -35,7 +35,7 @@ This functionality involves several roles in the appliance:
 2. Configure OpenTofu not to manage image changes on rebuildable nodes.
 
    For each relevant node group in the OpenTofu `compute` variable, set the
-   parameter `ignore_image_changes: true`. E.g.
+   parameter `ignore_image_changes = true`. E.g.
 
    ```terraform
    # environments/$ENV/main.tf:
