@@ -9,6 +9,14 @@ kernel_modules_vulnerable_denylist:
   - act_pedit
   # CVE-2026-64531 (ovswrap)
   - openvswitch
+  # CVE-2026-68121
+  - pppoe
+  # CVE-2026-74469
+  - sctp_diag
+  # CVE-2026-80844
+  - ah6
+  # CVE-2026-81000
+  - tun
 
 # kernel_modules_modulejail_denylist will be defined in site inventory group_vars
 kernel_modules_modulejail_denylist: []
