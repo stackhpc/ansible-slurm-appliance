@@ -42,5 +42,5 @@ An OpenStack `clouds.yaml` file containing credentials for a cloud.
 - `rebuild_batch_size`: Optional integer. The number of nodes to rebuild per batch.
   Default 50.
 - `rebuild_batch_delay`: Optional integer. The number of seconds to wait between
-  batched rebuild commands. Note this this does not wait for rebuilds to complete
-  before moving to the next batch.
+  issuing batched `scontrol reboot ASAP ...` commands. Note this this does not wait for
+  the node to start rebooting before moving to the next batch.
