@@ -8,7 +8,7 @@ cuda_package_version: '13.4.1-1'
 cuda_version_short: "{{ (cuda_package_version | split('.'))[0:2] | join('.') }}" # major.minor
 cuda_packages_default:
   - "cuda-toolkit-{{ cuda_package_version }}"
-  - nvidia-gds
+  - nvidia-gds-13.4.1-1 # workaround nvidia-fs-dkms-2.30.1-1.x86_64 missing from repo for nvidia-gds-13.4.2-1 TODO: remove when we can
   - cmake
 cuda_packages_fabricmanager:
   - "nvidia-fabricmanager-{{ cuda_nvidia_driver_version }}"

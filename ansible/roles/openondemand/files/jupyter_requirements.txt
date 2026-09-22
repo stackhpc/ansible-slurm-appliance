@@ -1,5 +1,5 @@
 # Python3.12, pip 26.1.2
-anyio==4.14.1
+anyio==4.14.2
 argon2-cffi==25.1.0
 argon2-cffi-bindings==25.1.0
 arrow==1.4.0
