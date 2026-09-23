@@ -10,13 +10,16 @@
 #SBATCH --reservation={{ hpctests_reservation }}
 {% endif %}
 {%if hpctests_nodes is defined %}
-#SBATCH --nodelist={{ hpctests_computes.stdout_lines[0] }}
+#SBATCH --nodelist={{ hpctests_nodes }}
 {% endif %}
 {%if hpctests_account is defined %}
 #SBATCH --account={{ hpctests_account }}
 {% endif %}
 {%if hpctests_qos is defined %}
 #SBATCH --qos={{ hpctests_qos }}
+{% endif %}
+{%if hpctests_time is defined %}
+#SBATCH --time={{ hpctests_time }}
 {% endif %}
 
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
