@@ -163,30 +163,12 @@ jobs:
           GRYPE_ANALYSE_MATRIX: ${{ matrix.build }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Fake Slack to try conditions (not grype-analyse)
-      #   run: |
-      #     echo "It is not grype-analyse that failed"
-      #   if: ${{ failure() && steps.grype_analyse.conclusion != 'failure' }}
-
-      # - name: Fake Slack to try conditions
-      #   run: |
-      #     echo "It is grype-analyse that failed and there was:"
-      #     echo ${{ toJSON(steps.grype_analyse.outputs.grype_analyse_output) }}
-      #   if: ${{ failure() && steps.grype_analyse.conclusion == 'failure' && contains(steps.grype_analyse.outputs.grype_analyse_output, 'ERROR:')  }}
-
-      # - name: Fake Slack to try conditions (no output)
-      #   run: |
-      #     echo "It is grype-analyse step that failed, but no ERROR:"
-      #     echo ${{ toJSON(steps.grype_analyse.outputs.grype_analyse_output) }}
-      #   if: ${{ failure() && steps.grype_analyse.conclusion == 'failure' && !contains(steps.grype_analyse.outputs.grype_analyse_output, 'ERROR:')  }}
-
       - name: Upload SARIF scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
           # Useful if you are running this in a matrix
           category: "${{ matrix.build }}"
-        if: false
 
       - name: Send Failure message to Slack
         uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
@@ -194,7 +176,6 @@ jobs:
           errors: true
           payload: |
             text: "Failed Vulnerability scan"
-            channel-id: C08GYBU3S93  # #slurm
             blocks:
               - type: "section"
                 text:
@@ -210,16 +191,15 @@ jobs:
           errors: true
           payload: |
             text: "Vulnerability found during scan of the appliance"
-            #channel-id: C08GYBU3S93  # #slurm
             blocks:
               - type: "section"
                 text:
                   type: "mrkdwn"
-                  text: "Grype scan of ${{ steps.manifest.outputs.image-name }} found errors. See <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run ${{ github.run_id }}>\n"
+                  text: "Grype scan of ${{ steps.manifest.outputs.image-name }} found vulnerabilities. See <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run ${{ github.run_id }}>\n"
               - type: "section"
                 text:
                   type: "mrkdwn"
                   text: ${{ toJSON(steps.grype_analyse.outputs.grype_analyse_output) }}
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
-        if: ${{ failure() && steps.grype_analyse.conclusion == 'failure' && contains(steps.grype_analyse.outputs.grype_analyse_output, 'ERROR:')  }}
+        if: ${{ failure() && github.event.schedule && steps.grype_analyse.conclusion == 'failure' && contains(steps.grype_analyse.outputs.grype_analyse_output, 'ERROR:')  }}
