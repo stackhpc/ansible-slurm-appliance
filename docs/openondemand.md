@@ -81,3 +81,13 @@ Other users can be defined by overriding the `basic_users_users` variable in you
 
 The default configuration uses a self-signed certificate. Instead, you can bring your own certificate and key, or use Let's Encrypt to generate the initial certificate.
 See [../ansible/roles/openondemand/README.md](../ansible/roles/openondemand/README.md) for more details.
+
+## Extra applications
+
+You can add extra Open OnDemand applications via 2 variables:
+
+- `ood_install_apps_extra`, to list applications to install and their source
+- `ood_apps_extra`, to list batch_connect application parameters.
+
+Please see documentation of the `ood_install_apps` and `ood_apps` in the [osc.ood](https://github.com/OSC/ood-ansible#ood_install_apps-example)
+Ansible collection.
