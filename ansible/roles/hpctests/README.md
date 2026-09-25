@@ -9,6 +9,7 @@ Tests (with corresponding tags) are:
 - `pingpong`: Runs Intel MPI Benchmark's IMB-MPI1 pingpong between a pair of (scheduler-selected) nodes. Reports zero-size message latency and maximum bandwidth.
 - `pingmatrix`: Runs a similar pingpong test but between all pairs of nodes. Reports zero-size message latency & maximum bandwidth.
 - `hpl-solo`: Runs the HPL benchmark individually on all nodes. Reports Gflops.
+- `gpuburn`: Runs the [gpuburn](https://github.com/wilicc/gpu-burn/) utility to load-test GPUs. Reports Gflops.
 
 All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 
@@ -40,17 +41,30 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
   be selected to target using this fraction of each node's memory -
   **CAUTION: see note below**.
 - `hpctests_hpl_arch`: Optional, default 'linux64'. Arbitrary architecture name for HPL build. HPL is compiled on the first compute node of those selected (see `hpctests_nodes`), so this can be used to create different builds for different types of compute node.
+- `hpctests_cuda_compute_level`: Optional, default '8.0' which is good for A100 and newer. Cuda compute level used for gpuburn's compare kernel. Check <https://developer.nvidia.com/cuda/GPUs> for compatibility with target hardware.
+- `hpctests_gpu_gres`: Optional, all GPUs will be selected if absent. `srun --gres` option: needed on hosts with heterogeneous cards (incl. MIG). eg. `gpu:nvidia_h200=2gpu`
+- `hpctests_gpuburn_minutes`: Optional, default 1. Duration in minutes of gpuburn's GPU load (the job takes slightly longer to run).
+- `hpctests_gpuburn_node_chunk_size`: Optional, default 1. How many nodes to run gpuburn on at a time
 
 ---
 
 **CAUTION**
 
-> The default of `hpctests_hpl_mem_frac=0.3` will not significantly load nodes.
+> **[hpl-solo]** The default of `hpctests_hpl_mem_frac=0.3` will not significantly load nodes.
 > Values up to ~0.8 may be appropriate for a stress test but ensure cloud
 > operators are aware in case this overloads e.g. power supplies or cooling.
 > Values > 0.8 require longer runtimes and increase the risk of out-of-memory
+> errors without normally significantly increasing the stress on the node
 
-## errors without normally significantly increasing the stress on the node
+**CAUTION**
+
+> **[gpuburn]** `gpuburn` will bring GPU power consumption to the maximum. On bigger cards, this amounts to _700W_
+> times _gpu count_ of power draw per node. The default duration of `hpctests_gpuburn_minutes=1` will keep it to only one minute,
+> which should be acceptable. Making it longer will more accurately simulate a longer training but will stress power
+> supply and cooling. Use `hpctests_gpu_gres` to only run on a subset of GPUs per node.
+> Also note that the default `hpctests_gpuburn_node_chunk_size=1` will run gpuburn one host after the other.
+> Increasing `hpctests_gpuburn_node_chunk_size` will not only stress each node, but the whole power
+> and cooling delivery for the rack(s). Please use with caution.
 
 The following variables should not generally be changed:
 
