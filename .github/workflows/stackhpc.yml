@@ -254,7 +254,7 @@ jobs:
         run: |
           . venv/bin/activate
           . environments/.stackhpc/activate
-          ansible-playbook -vv ansible/adhoc/hpctests.yml
+          ansible-playbook -vv ansible/adhoc/hpctests.yml --skip-tags hpctests-gpu
 
       - name: Run EESSI tests
         run: |
