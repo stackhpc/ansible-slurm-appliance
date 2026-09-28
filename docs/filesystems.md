@@ -72,7 +72,7 @@ is required then override the package version by setting:
 
 ```yaml
 # environments/site/inventory/group_vars/manila.yml:
-os_manila_mount_ceph_version: "18.2.4"
+os_manila_mount_ceph_version: "19.2.6"
 ```
 
 and run a [site-specific image build](image-build.md) with `manila` included in the
