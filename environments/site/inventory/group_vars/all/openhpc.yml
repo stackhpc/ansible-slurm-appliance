@@ -1,25 +1,21 @@
 openhpc_gres_autodetect: nvml
 
 openhpc_user_partitions:
-  # TODO: will have to change name
-  # - name: compute
-      # groups:
-      #   - baremetal
-  #   default: YES
-  #   maxtime: '336:00:00'
-  # NB: this is redundant as set globally anyway
-  #   partition_params:
-  #     DefMemPerCPU: 3500 # https://github.com/stackhpc/ansible-role-openhpc?tab=readme-ov-file#slurmconf
+  - name: cpu # TODO: agree name change from compute!
+    nodegroups:
+      - baremetal
+    default: 'YES'
+    maxtime: '336:00:00'
   - name: gpu
-    default: NO
+    default: 'NO'
     maxtime: '336:00:00'
   - name: hugemem
-    default: NO
+    default: 'NO'
     maxtime: '336:00:00'
   - name: interactive
-    default: NO
+    default: 'NO'
   - name: vgpu
-    default: NO
+    default: 'NO'
 
 # Indirection to define log paths on persistent storage
 # - override for environments without spectrum_scale enabled
