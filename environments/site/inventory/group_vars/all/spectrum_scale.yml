@@ -74,6 +74,11 @@ scale_config_all:
   # auto building this via a jinja template doesn't work as
   # https://github.com/IBM/ibm-spectrum-scale-install-infra/blob/b5edb870417332845e9cc41f77e09a244ae8b5ff/roles/core_configure/tasks/config.yml#L85
   # accesses it via hostvars, which means it gets the template string, not the result!
+  - group: all
+    scale_config:
+      nodeclass: all
+      params:
+        - autoload: yes
   - group: eri_compute # baremetal
     scale_config:
       nodeclass: mlx5_bond_0
