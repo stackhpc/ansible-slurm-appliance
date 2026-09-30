@@ -131,3 +131,4 @@ appliances_packages_uninstall:
   - cockpit-bridge
   # Installed in RL8 genericcloud, but vulnerable
   - python3-unbound
+  - unbound-libs
