@@ -1,0 +1,8 @@
+Summary for pingpong using 2x scheduler-selected nodes in 'interactive' partition, job ID 93, device 'mlx5_0:1':
+
+Nodes: interactive-[0-1]
+Zero-size msg latency: 5.59 us
+Max bandwidth: 11944.55 Mbytes/s (95.5564 Gbit/s)
+
+See plot on localhost:
+/home/steve/Documents/reannz/ansible-slurm-appliance/environments/stg/hpctests/pingpong/93/pingpong.png

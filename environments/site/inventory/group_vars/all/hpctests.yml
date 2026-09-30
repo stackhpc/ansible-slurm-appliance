@@ -1,0 +1,10 @@
+hpctests_ucx_net_devices:
+  cpu: mlx5_bond_0:1
+  interactive: mlx5_0:1
+hpctests_user: stackhpc
+hpctests_pingpong_sbatch_options:
+  # cluster default DefMemPerCPU is too large for interactive nodes
+  - '--mem=0'
+# want to use OpenHPC modules, not Agr:
+hpctests_pre_cmd: |
+  export MODULEPATH=/opt/ohpc/pub/modulefiles
