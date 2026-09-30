@@ -196,3 +196,23 @@
         line: '+:eri_support:ALL'
         regexp: 'eri_support' 
         state: present
+
+- name: Ensure test account can run jobs
+  hosts: control
+  tags: sacctmgr
+  become: true
+  tasks:
+    # check first rather than accepting "nothing added" errors to avoid masking other errors
+    - name: Check for existing association
+      ansible.builtin.command: >
+        sacctmgr -n -P show assoc user={{ hpctests_user }}
+        account=2023-stackhpc_testing format=user
+      register: sacctmgr_assoc
+      changed_when: false
+
+    - name: Ensure test account can run jobs
+      ansible.builtin.command: >
+        sacctmgr -i add user {{ hpctests_user }}
+        account=2023-stackhpc_testing DefaultAccount=2023-stackhpc_testing
+      when: sacctmgr_assoc.stdout | trim == ""
+      changed_when: true
