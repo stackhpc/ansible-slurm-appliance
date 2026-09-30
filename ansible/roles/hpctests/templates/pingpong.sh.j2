@@ -18,7 +18,9 @@
 {%if hpctests_qos is defined %}
 #SBATCH --qos={{ hpctests_qos }}
 {% endif %}
-
+{% for option in hpctests_pingpong_sbatch_options | default([]) %}
+#SBATCH {{ option }}
+{% endfor %}
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
 echo SLURM_JOB_ID: $SLURM_JOB_ID
