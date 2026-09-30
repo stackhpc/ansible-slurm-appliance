@@ -1,0 +1,2 @@
+openhpc_slurmctld_log_file: '/mnt/gpfs/persist/slurm/slurmctld.log'
+openhpc_slurmd_log_file: '/mnt/gpfs/persist/slurm/log/%h.log'

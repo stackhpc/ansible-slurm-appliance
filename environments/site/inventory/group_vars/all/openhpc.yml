@@ -17,21 +17,21 @@ openhpc_user_partitions:
   - name: vgpu
     default: 'NO'
 
-# Indirection to define log paths on persistent storage
-# - override for environments without spectrum_scale enabled
-openhpc_slurmctld_log_file: /mnt/gpfs/persist/slurm/slurmctld.log
-openhpc_slurmd_log_file: /mnt/gpfs/persist/slurm/log/%h.log
+# Indirection to define production log paths on persistent storage
+# default of 'omit' uses Slurm default, i.e. syslog
+openhpc_slurmctld_log_file: 'omit'
+openhpc_slurmd_log_file: 'omit'
 
 openhpc_config_extra:
   Prolog: /opt/slurm-tools/bin/prolog.sh # deployed by post-hook
 
   # -- TODO: all in this block are marked "Still to be reviewed" in https://nznesi.atlassian.net/browse/FS-2329
-  #JobAcctGatherType: jobacct_gather/cgroup # used in staging for another client
-  #JobContainerType: job_container/tmpfs
-  #AcctGatherProfileType: acct_gather_profile/hdf5
+  # JobAcctGatherType: jobacct_gather/cgroup # used in staging for another client
+  # JobContainerType: job_container/tmpfs
+  # AcctGatherProfileType: acct_gather_profile/hdf5
   SchedulerParameters: # seem uncontroversial, so added anyway
-  # - enable_user_top
-  - requeue_setup_env_fail
+    # - enable_user_top
+    - requeue_setup_env_fail
   # PrologFlags: ?
   # PreemptMode: ? current default from stackhpc.openhpc is SUSPEND,GANG
   # PriorityJobFactor & PriorityTier: ?
@@ -43,8 +43,7 @@ openhpc_config_extra:
   SlurmctldSyslogDebug: verbose
   SlurmdLogFile: "{{ openhpc_slurmd_log_file }}"
 
-  # NB: new default is jobacct_gather/cgroup, is that OK?
-  #JobAcctGatherType: jobacct_gather/linux
+  # JobAcctGatherType: jobacct_gather/linux # NB: new default is jobacct_gather/cgroup, is that OK?
   SelectTypeParameters: CR_CORE_MEMORY
   MaxArraySize: 100000
   DependencyParameters: kill_invalid_depend
