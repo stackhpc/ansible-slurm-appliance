@@ -3,8 +3,8 @@
   ansible.builtin.file:
     path: "{{ opensearch_config_path }}/certs"
     state: directory
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: ug=rwx,o=
 
 # Cert generation based on https://opensearch.org/docs/latest/security-plugin/configuration/generate-certificates/
@@ -12,8 +12,8 @@
 - name: Generate root private key
   community.crypto.openssl_privatekey:
     path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: ug=rw,o=
     return_content: false
 
@@ -32,8 +32,8 @@
     privatekey_path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
     path: "{{ opensearch_config_path }}/certs/root-ca.pem"
     csr_content: "{{ _opensearch_root_csr.csr }}"
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: ug=rw,o=
     return_content: false
 
@@ -41,8 +41,8 @@
   community.crypto.openssl_privatekey:
     path: "{{ opensearch_config_path }}/certs/esnode-key.pem"
     format: pkcs8
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: ug=rw,o=
     return_content: false
 
@@ -65,7 +65,7 @@
     ownca_privatekey_path: "{{ opensearch_config_path }}/certs/root-ca-key.pem"
     path: "{{ opensearch_config_path }}/certs/esnode.pem"
     csr_content: "{{ _opensearch_node_csr.csr }}"
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: ug=rw,o=
     return_content: false

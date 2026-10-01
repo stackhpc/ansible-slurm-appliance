@@ -14,6 +14,15 @@
     path: /etc/systemd/system/opendistro.service
     state: absent
 
+- name: Collect usernamespace facts
+  user_namespace_facts:
+
+- name: Set facts containing group_ids
+  ansible.builtin.set_fact:
+    # Elastic search user is 1000
+    opensearch_host_user_id: "{{ opensearch_host_user_id | default(ansible_facts.subuid[opensearch_podman_user]['start'] + 1000 - 1) }}"
+    opensearch_host_group_id: "{{ opensearch_host_group_id | default(ansible_facts.subgid[opensearch_podman_user]['start'] + 1000 - 1) }}"
+
 - name: Enumerate files in data directory
   ansible.builtin.find:
     path: "{{ opensearch_data_path }}"
@@ -29,8 +38,8 @@
   ansible.builtin.file:
     state: directory
     path: "{{ item }}"
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: "0770"
   become: true
   loop:
@@ -43,8 +52,8 @@
     content: |
       This is a flag file to indicate that filebeat is pushing data
       indexed by Slurm JobID to prevent duplicate OpenSearch records
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: "0644"
 
 - name: Create certs
@@ -53,10 +62,8 @@
   ansible.builtin.template:
     src: opensearch.yml.j2
     dest: "{{ opensearch_config_path }}/opensearch.yml"
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
-    # NOTE: root user in container maps to user on host, so this will appear as
-    # owned by root in the container.
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: "0660"
   notify: Restart opensearch service
   become: true
@@ -65,16 +72,15 @@
   ansible.builtin.template:
     src: "{{ opensearch_internal_users_path }}"
     dest: "{{ opensearch_config_path }}/internal_users.yml"
-    owner: "{{ opensearch_podman_user }}"
-    group: "{{ opensearch_podman_user }}"
-    # NOTE: root user in container maps to user on host, so this will appear as
-    # owned by root in the container.
+    owner: "{{ opensearch_host_user_id }}"
+    group: "{{ opensearch_host_group_id }}"
     mode: "0660"
   notify: Restart opensearch service
   become: true
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
+
 - name: Ensure opensearch service state
   ansible.builtin.systemd:
     name: opensearch.service

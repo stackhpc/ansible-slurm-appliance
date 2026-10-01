@@ -75,11 +75,15 @@
     - openhpc
   tasks:
     - ansible.builtin.include_role:
+        name: stackhpc.openhpc
+        tasks_from: validate.yml
+      when: appliances_mode != 'build'
+    - ansible.builtin.include_role:
         name: topology
       # Gated on topology group having compute nodes but role also
       # needs to run on control and login nodes
       when:
-        - appliances_mode == 'configure'
+        - appliances_mode != 'build'
         - groups['topology'] | length > 0
     - ansible.builtin.include_role:
         name: stackhpc.openhpc

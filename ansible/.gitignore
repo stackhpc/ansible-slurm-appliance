@@ -4,6 +4,8 @@ roles/*
 # Whitelist roles that are checked into this repository.
 !roles/filebeat/
 !roles/filebeat/**
+!roles/kernel_modules/
+!roles/kernel_modules/**
 !roles/opensearch/
 !roles/opensearch/**
 !roles/podman/

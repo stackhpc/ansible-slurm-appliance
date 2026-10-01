@@ -8,10 +8,12 @@
     group: root
     mode: u=rX,g=rwX
 
-- name: Copy out clouds.yaml
+- name: Write clouds.yaml
   ansible.builtin.copy:
-    src: "{{ rebuild_clouds_path }}"
+    content: "{{ {'clouds': {'openstack': _rebuild_clouds_yaml.clouds[rebuild_clouds_key]}} | to_nice_yaml(indent=2) }}"
     dest: /etc/openstack/clouds.yaml
     owner: slurm
     group: root
     mode: u=r,g=rw
+  vars:
+    _rebuild_clouds_yaml: "{{ lookup('file', rebuild_clouds_path) | from_yaml }}"

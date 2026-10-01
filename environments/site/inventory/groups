@@ -49,7 +49,8 @@ control
 [filebeat:children]
 slurm_stats
 
-# NB: [rebuild] not defined here as likely to need features not currently supported
+[rebuild]
+# Enable rebuild of nodes on an OpenStack cloud; add 'control' group.
 
 [update:children]
 fatimage
@@ -226,4 +227,7 @@ compute
 
 ## Vulnerability mitigation groups
 [kernel_modules:children]
-builder
+cluster
+
+[sbom]
+# Add builder to this group to run syft on the site-built image

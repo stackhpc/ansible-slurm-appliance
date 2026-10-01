@@ -61,20 +61,10 @@
   hosts: prometheus
   tags: prometheus
   tasks:
-    - name: Check for existing prometheus binaries
-      ansible.builtin.stat:
-        path: /usr/local/bin/{{ item }}
-      register: prometheus_binaries
-      loop:
-        - prometheus
-        - promtool
-    - name: Skip prometheus install if prometheus binaries exist and prometheus_version not defined
-      # i.e. if prometheus_version isn't defined we don't care, so use what's already there
-      ansible.builtin.set_fact:
-        prometheus_skip_install: "{{ false if prometheus_version is defined else true }}"
-      when: "(prometheus_binaries.results | map(attribute='stat') | map(attribute='exists')) + [prometheus_skip_install is not defined]"
     - ansible.builtin.include_role:
         name: prometheus.prometheus.prometheus
+      vars:
+        prometheus_skip_install: "{{ true if appliances_mode == 'configure' else false }}"
 
 - name: Deploy grafana
   hosts: grafana
@@ -84,15 +74,23 @@
       # done during fatimage - can't do this in vars block as that is recursive
       ansible.builtin.set_fact:
         grafana_plugins: "{{ [] if appliances_mode == 'configure' else grafana_plugins }}"
-    - name: Copy Grafana plugins installed in image into persistent grafana state
-      ansible.builtin.copy:
-        remote_src: true
-        src: /var/lib/grafana/plugins/ # trailing / means copy contents
-        dest: "{{ grafana_data_dir }}/plugins/"
-        # below matches what already exists:
-        owner: root
-        group: root
+    - name: Ensure Grafana state directory
+      ansible.builtin.file:
+        path: "{{ grafana_data_dir }}"
+        owner: grafana
+        group: grafana
         mode: '0755'
+        state: directory
+      become: true
+    - name: Copy Grafana plugins installed in image into persistent grafana state
+      ansible.posix.synchronize:
+        src: /var/lib/grafana/plugins/ # trailing / means copy contents
+        dest: "{{ grafana_data_dir }}/plugins"
+        delete: true
+        recursive: true
+      # Workaround for synchronize module running rsync from deploy host even if targeting remote host,
+      # breaking when using SSH bastion
+      delegate_to: "{{ inventory_hostname }}"
       become: true
     - ansible.builtin.include_role:
         name: cloudalchemy.grafana

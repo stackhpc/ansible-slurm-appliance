@@ -16,7 +16,7 @@
       ansible.builtin.command:
         cmd: "openstack server event list -f json {{ instance_id }}"
       delegate_to: localhost
-      changed_when: true
+      changed_when: false
       register: server_event_list
 
     - name: Set fact for update status

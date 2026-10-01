@@ -10,7 +10,7 @@
     cluster_prefix: "{{ undef(hint='cluster_prefix must be defined') }}" # e.g. slurmci-RL8-1030
     ci_vars_file: "{{ appliances_environment_root + '/tofu/' + lookup('env', 'CI_CLOUD') }}.tfvars"
     network_regex: 'network = "(.+)"$'
-    cluster_network: "{{ lookup('ansible.builtin.file', ci_vars_file) | ansible.builtin.regex_search(network_regex, '\\1', multiline=True) }}"
+    cluster_network: "{{ lookup('ansible.builtin.file', ci_vars_file) | ansible.builtin.regex_search(network_regex, '\\1', multiline=True) | first }}"
   tasks:
     - name: Get control host IP
       ansible.builtin.set_fact:

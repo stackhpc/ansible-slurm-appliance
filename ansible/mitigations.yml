@@ -4,28 +4,6 @@
   gather_facts: false
   become: true
   tasks:
-    - name: Prevent modules loading
-      ansible.builtin.copy:
-        dest: /etc/modprobe.d/appliance.conf
-        owner: root
-        group: root
-        mode: u=rw,go=r
-        content: |
-          {% for module in kernel_modules_denylist %}
-          install {{ module }} /bin/false
-          {% endfor %}
-    - name: Unload modules
-      ansible.builtin.command:
-        cmd: "rmmod {{ item }}"
-      failed_when: false
-      register: _kernel_modules_rmmod
-      changed_when: >
-         "ERROR: Module " + item + " is not currently loaded" not in _kernel_modules_rmmod.stderr
-      loop: "{{ kernel_modules_denylist }}"
-    - name: Ensure modules cannot be loaded
-      ansible.builtin.command:
-        cmd: "modprobe {{ item }}"
-      register: _kernel_modules_modprobe
-      failed_when: _kernel_modules_modprobe.rc == 0
-      changed_when: false
-      loop: "{{ kernel_modules_denylist }}"
+    - ansible.builtin.include_role:
+        name: kernel_modules
+        tasks_from: runtime.yml
