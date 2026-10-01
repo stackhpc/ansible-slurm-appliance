@@ -100,7 +100,7 @@ jobs:
               echo "E: Image $IMAGE_NAME checksum in OpenStack is '$TARGET_IMAGE_SHA512' but recorded with sbom is '$SBOM_IMAGE_SHA512'"
               exit 1
             fi
-            echo Downloading "$sbom_url..."
+            echo Downloading "$sbom_url ..."
             wget -nv "$sbom_url" -O sbom.zip
             if ! unzip sbom.zip "${sbom_name}" || [ ! -e "${sbom_name}" ]; then
               echo "Unexpected content in sbom zip: didn't produce ${sbom_name}"
