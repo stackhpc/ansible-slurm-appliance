@@ -8,6 +8,7 @@
       register: sinfo
       changed_when: false
       until: sinfo.stdout_lines == expected_sinfo
+      # TODO: cap this to the reboottimeout?
       retries: 200
       delay: 5
       vars:

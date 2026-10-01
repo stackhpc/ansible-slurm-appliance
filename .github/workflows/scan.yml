@@ -106,7 +106,7 @@ jobs:
               echo "E: Image $IMAGE_NAME checksum in OpenStack is '$TARGET_IMAGE_SHA512' but recorded with sbom is '$SBOM_IMAGE_SHA512'"
               exit 1
             fi
-            echo Downloading "$sbom_url..."
+            echo Downloading "$sbom_url ..."
             wget -nv "$sbom_url" -O sbom.zip
             if ! unzip sbom.zip "${sbom_name}" || [ ! -e "${sbom_name}" ]; then
               echo "Unexpected content in sbom zip: didn't produce ${sbom_name}"
@@ -141,7 +141,7 @@ jobs:
         # anchore/scan-action installs grype to tmpdir, reuse for speed
         run: |
           . venv/bin/activate
-          pip install git+https://github.com/stackhpc/grype-analyse@main
+          pip install git+https://github.com/stackhpc/grype-analyse@v1.1
           GRYPE=$(find /tmp -name grype -type f 2>/dev/null | head -1)
           if [ -z "$GRYPE" ]; then
             echo "grype binary not found in /tmp"
