@@ -134,7 +134,7 @@ jobs:
         # anchore/scan-action installs grype to tmpdir, reuse for speed
         run: |
           . venv/bin/activate
-          pip install git+https://github.com/stackhpc/grype-analyse@main
+          pip install git+https://github.com/stackhpc/grype-analyse@reporting
           GRYPE=$(find /tmp -name grype -type f 2>/dev/null | head -1)
           if [ -z "$GRYPE" ]; then
             echo "grype binary not found in /tmp"
