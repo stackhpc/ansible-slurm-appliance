@@ -18,6 +18,9 @@
 {%if hpctests_qos is defined %}
 #SBATCH --qos={{ hpctests_qos }}
 {% endif %}
+{%if hpctests_time is defined %}
+#SBATCH --time={{ hpctests_time }}
+{% endif %}
 
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
