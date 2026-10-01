@@ -21,7 +21,7 @@
 {%if hpctests_time is defined %}
 #SBATCH --time={{ hpctests_time }}
 {% endif %}
-{% for option in hpctests_pingpong_sbatch_options | default([]) %}
+{% for option in hpctests_sbatch_options %}
 #SBATCH {{ option }}
 {% endfor %}
 

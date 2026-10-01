@@ -31,6 +31,7 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 - `hpctests_reservation`: Optional. Name of reservation to use.
 - `hpctests_qos`: Optional. Slurm QoS to use, otherwise no qos is specified to Slurm.
 - `hpctests_time`: Optional. Max time for Slurm jobs, in the same format as the `--time` option of srun and sbatch (eg to fit in QoS limits or allocated CPU quotas)
+- `hpctests_sbatch_options`: Optional. List of [sbatch options](https://slurm.schedmd.com/sbatch.html) to set for jobs.
 - `hpctests_nodes`: Optional. A Slurm node expression, e.g. `'compute-[0-15,19]'` defining the nodes to use. If not set all nodes in the selected partition are used.
 - `hpctests_ucx_net_devices`: Optional. Control which network device/interface to use, e.g. `mlx5_1:0`.
   The default of `all` (as per UCX) may not be appropriate for multi-rail nodes with different bandwidths on each device. See [here](https://openucx.readthedocs.io/en/master/faq.html#what-is-the-default-behavior-in-a-multi-rail-environment) and [here](https://github.com/openucx/ucx/wiki/UCX-environment-parameters#setting-the-devices-to-use).
@@ -44,14 +45,12 @@ All tests use GCC 9 and OpenMPI 4 with UCX. The HPL-based tests use OpenBLAS.
 
 ---
 
-**CAUTION**
-
+> [!CAUTION]
 > The default of `hpctests_hpl_mem_frac=0.3` will not significantly load nodes.
 > Values up to ~0.8 may be appropriate for a stress test but ensure cloud
 > operators are aware in case this overloads e.g. power supplies or cooling.
 > Values > 0.8 require longer runtimes and increase the risk of out-of-memory
-
-## errors without normally significantly increasing the stress on the node
+> errors without normally significantly increasing the stress on the node.
 
 The following variables should not generally be changed:
 
