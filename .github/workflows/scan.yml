@@ -7,7 +7,13 @@
 name: Scan image for vulnerabilities
 'on':
   workflow_call:
+    secrets:
+      SLACK_WEBHOOK_URL:
+        description: 'slack secret webhook url'
+        required: true
   workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'  # Run at 7AM - to get fresh vulnerability reports
 
 permissions: {}
 
@@ -131,6 +137,7 @@ jobs:
           grype-version: ${{ env.GRYPE_VERSION }}
 
       - name: Analyse scan and fail workflow if fixed CRITICAL vulnerabilities are not ignored
+        id: grype_analyse
         # anchore/scan-action installs grype to tmpdir, reuse for speed
         run: |
           . venv/bin/activate
@@ -141,7 +148,15 @@ jobs:
             exit 1
           fi
           $GRYPE --only-fixed "sbom:${SBOM}" -o json > "${GRYPE_OUTPUT}"
-          grype-analyse --config .grype.yaml --github-checks "${GRYPE_OUTPUT}"
+          set +e
+          set -o pipefail
+          printf 'grype_analyse_output<<THIS_MARKER_TO_SUPPORT_MULTILINE_STRING\n```\n' >> "$GITHUB_OUTPUT"
+          grype-analyse --config .grype.yaml --github-checks "${GRYPE_OUTPUT}" | tee grype-analyse.log
+          grype_exit=$?
+          # only output ERROR: and rest to Slack
+          awk '/ERROR:/ { f=1 } (f==1) { print }' < grype-analyse.log >> "$GITHUB_OUTPUT"
+          printf '```\nTHIS_MARKER_TO_SUPPORT_MULTILINE_STRING\n' >> "$GITHUB_OUTPUT"
+          exit $grype_exit
         env:
           GRYPE_OUTPUT: "${{ steps.manifest.outputs.image-name }}.grype.json"
           SBOM: ${{ steps.manifest.outputs.sbom_name }}
@@ -154,3 +169,37 @@ jobs:
           sarif_file: ${{ steps.scan.outputs.sarif }}
           # Useful if you are running this in a matrix
           category: "${{ matrix.build }}"
+
+      - name: Send Failure message to Slack
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        with:
+          errors: true
+          payload: |
+            text: "Failed Vulnerability scan"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "There was an error during scan of ${{ steps.manifest.outputs.image-name }}. See <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run ${{ github.run_id }}>\n"
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+        if: ${{ failure() && github.event.schedule && (steps.grype_analyse.conclusion != 'failure' || !contains(steps.grype_analyse.outputs.grype_analyse_output, 'ERROR:'))  }}
+
+      - name: Send Vulnerability Found message to Slack
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        with:
+          errors: true
+          payload: |
+            text: "Vulnerability found during scan of the appliance"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "Grype scan of ${{ steps.manifest.outputs.image-name }} found vulnerabilities. See <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run ${{ github.run_id }}>\n"
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: ${{ toJSON(steps.grype_analyse.outputs.grype_analyse_output) }}
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+        if: ${{ failure() && github.event.schedule && steps.grype_analyse.conclusion == 'failure' && contains(steps.grype_analyse.outputs.grype_analyse_output, 'ERROR:')  }}
