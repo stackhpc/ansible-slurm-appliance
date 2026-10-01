@@ -1,10 +1,10 @@
 - hosts: login:compute
   become: true
   gather_facts: false
-  tags:  nesi
+  tags: nesi
   # From roles/nesi, ran from ansible/nesi.yml when is_interactive: True OR False
   tasks:
-    - name: libcrypto symlink
+    - name: Symlink libcrypto
       ansible.builtin.file:
         src: /usr/lib64/libcrypto.so.1.0.2o
         dest: /usr/lib64/libcrypto.so.1.0.0
@@ -12,10 +12,23 @@
         group: root
         state: link
     - name: MOTD
-      template:
+      ansible.builtin.template:
         src: "motd"
         dest: "/etc/motd"
-
+        owner: root
+        group: root
+        mode: u=rw,go=r
+    - name: Ensure Lmod works inside Slurm jobs launched from Open Ondemand
+      ansible.builtin.copy:
+        content: |
+          # Initialise Lmod inside Slurm jobs if it wasn't inherited from the submit host
+          if [ -n "$SLURM_NODELIST" ] && ! command -v module >/dev/null 2>&1; then
+              . /opt/ohpc/admin/lmod/lmod/init/sh
+          fi
+        dest: /etc/profile.d/z01_lmod_in_jobs.sh
+        owner: root
+        group: root
+        mode: u=rw,go=r
 
 - hosts: login:interactive
   become: true
