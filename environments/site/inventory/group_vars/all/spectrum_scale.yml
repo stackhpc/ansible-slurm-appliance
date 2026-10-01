@@ -78,7 +78,8 @@ scale_config_all:
     scale_config:
       nodeclass: all
       params:
-        - autoload: yes
+        # Akber: Every rejoin triggers recovery, so a node stuck in a reboot loop can disrupt everyone. GPFS can also start before the network or DNS is ready.
+        - autoload: no
   - group: eri_compute # baremetal
     scale_config:
       nodeclass: mlx5_bond_0
