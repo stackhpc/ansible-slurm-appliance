@@ -50,6 +50,11 @@
   tags: install
   ansible.builtin.dnf:
     name: "@Xfce"
+    # avoid "chrome" CVEs CVE-2026-(17653|9893|9892|8510)
+    exclude:
+      - evolution-data-server-ui
+      - libproxy-webkitgtk4
+      - webkit2gtk3*
   when: appliances_mode != 'configure' # dnf group/module installs aren't idempotent so only run during build
 
 # - name: Ensure python3.9 installed
