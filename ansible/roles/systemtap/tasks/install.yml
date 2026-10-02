@@ -1,0 +1,9 @@
+---
+- name: Install systemtap and required kernel packages
+  ansible.builtin.dnf:
+    name:
+      - systemtap
+      - "kernel-debuginfo-{{ ansible_kernel }}"
+      - "kernel-debuginfo-common-{{ ansible_architecture }}-{{ ansible_kernel }}"
+      - "kernel-devel-{{ ansible_kernel }}"
+    state: present

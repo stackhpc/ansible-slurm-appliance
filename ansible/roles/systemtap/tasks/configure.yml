@@ -1,0 +1,14 @@
+---
+- name: Ensure stap module directory
+  ansible.builtin.file:
+    path: "{{ systemtap_modules_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Build modules from stap scripts
+  ansible.builtin.include_tasks: build-module.yml
+  loop: "{{ systemtap_scripts }}"
+  loop_control:
+    loop_var: _systemtap_script

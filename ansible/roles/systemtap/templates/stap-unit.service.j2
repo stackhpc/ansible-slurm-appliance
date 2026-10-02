@@ -1,0 +1,12 @@
+[Unit]
+Description=Appliance created stap probe - {{ _systemtap_script.name }}
+After=sysinit.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/staprun {{ systemtap_modules_directory }}/{{ _systemtap_script.name }}.ko
+ExecStop=/usr/bin/staprun -d {{ _systemtap_script.name }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

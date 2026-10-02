@@ -247,5 +247,8 @@ doca
 # Add at least one host per hardware kind. Don't forget VMs.
 # Can add the whole cluster if you want.
 
+[systemtap]
+# Hosts to install systemtap and run probes on
+
 [sbom]
 # Add builder to this group to run syft on the site-built image
