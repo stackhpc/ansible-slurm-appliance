@@ -3,44 +3,46 @@
 ## WIP NOTES
 
 ### Progress
-- all works through to post hook
-- need to do monitoring
-- need to do post-monitoring hook
-- and actually check ondemand
+- `site.yml` playbook is functional for staging
+- Open Ondemand IGV app is not working
+- Post-monitoring hook not tested
+- Need to replicate production's OIDC ondemand login
 
 ### Production
-Things to copy across:
-- TF state
-- Secrets
-
-Will have to change the `compute` group to a different name ...
-TODO: Set protected environments
+- Things to copy across:
+  - TF state
+  - Secrets
+- Need to set protected environment
+- Need to enable external monitoring?
 
 ## Environment Overview
 
-This provides for 4x environments:
+This provides for 32x environments:
 - `site`: AgR-specific customisations
 - TODO: `prd`: Single production cluster
 - `stg`: Single staging cluster
 
 The staging and production clusters have:
-- A GPFS remotemount for home directories (See `environments/site/hooks/post-filesystems.yml`)
-- Nodes enroled with FreeIPA using PKINIT, i.e. certs/keys.
-- Cluster state (slurmdbd, slurmctld, monitoring etc) persisted via Cinder volumes
+- A GPFS remotemount for home directories (See `environments/site/hooks/post-filesystems.yml`).
+- Nodes enroled with FreeIPA using pkinit (i.e. certs/keys).
+- Cluster state (slurmdbd, slurmctld, monitoring etc) persisted via Cinder volumes.
   attached to the control node, which are not deleted if the cluster is deleted.
 - Remote state for OpenTofu (i.e. infrastructure) in GitLab.
 
-There is also integration against Reannz's observability platform (Mimir and Loki)
-- see [docs](./README_external_observability.md).
+There is also integration against Reannz's observability platform (Mimir and Loki), see
+[docs](./README_external_observability.md).
 
 ## Cluster Access
 
-Access to the cluster for all is through the interfaces on `agr-vlan107` -
+Access to the cluster for all is through the interfaces on `agr-vlan107,`,
 there are no floating IPs:
 - stg:
-    login: 10.29.107.120 TODO FQDN
-    ondemand: 10.29.107.130 TODO FQDN
-- prd: TODO
+    - login-0: 10.29.107.120
+    - Open OnDemand: https://10.29.107.130 (self-signed cert)
+- prd:
+    - login-0 SSH: 10.29.107.20
+    - login-1 SSH: 10.29.107.21
+    - Open OnDemand: https://ondemand.eri.agresearch.co.nz
 
 Access for Ansible and admin uses the `rocky` user via a jumphost:
 `rocky@slurm-bastion.eri.agresearch.co.nz`. The cluster uses the keypair
@@ -65,7 +67,7 @@ export GITLAB_PAT='<your token secret>'
 git clone https://token:${GITLAB_PAT}@gitlab.com/nesi1/agresearch/agr-eri-slurm.git
 ```
 
-3. Retrieve ssh keys for the jumphost and cluster from your password manager
+3. Retrieve ssh keys for the jumphost and cluster from your password manager.
 
 ### Use
 
@@ -83,17 +85,23 @@ git clone https://token:${GITLAB_PAT}@gitlab.com/nesi1/agresearch/agr-eri-slurm.
   # load python
   . venv/bin/activate
   
-  # make credentials available
-  export OS_CLIENT_CONFIG_FILE=$(realpath path_to_clouds.yaml)
-  export OS_CLOUD=openstack
+  # Load openstack credentials - cannot use app cred due to
+  # Ironic configuration
+  . openrc.sh
+  unset OS_CLOUD
+  unset OS_PROJECT_NAME
+  unset OS_PROJECT_ID
+
+  # Load other credentials:
   export ANSIBLE_VAULT_PASSWORD_FILE=$(realpath path_to_vault_password)
   export TF_VAR_gitlab_access_token=${GITLAB_PAT}
   
-  # setup ssh
+  # Setup ssh
   export ANSIBLE_SSH_COMMON_ARGS="-i $(realpath $path_to_jumphost_private_key) -J nesi-ansible"
   export PKR_VAR_ssh_private_key_file=$(realpath $path_to_cluster_private_key)
   export PKR_VAR_ssh_bastion_private_key_file=$(realpath $path_to_jumphost_private_key)
   ssh-add ${path_to_cluster_private_key}
+  ```
 
 4. Activate the relevant appliance environment, e.g.:
 
@@ -188,8 +196,9 @@ The following image build are defined:
 - `std`: This installs additional site-specific packages and OpenOndemand
   server-side apps on top of the `base` build. It is used for VM and BM non-GPU
   control/login/compute nodes. It should be set as the default cluster image for
-  all environments using `cluster_image_id` in `environments/site/tofu/variables.tf`.
-- `gpu`: This installs additional site-specific packages, NVIDIA drivers
+  all environments by updating the default for `cluster_image_id` in
+  `environments/site/tofu/variables.tf`.
+- TODO: `gpu`: This installs additional site-specific packages, NVIDIA drivers
   and cuda packages on top of the `base` build. It is used for VM and BM GPU
   compute nodes. It should be set as the image for each relevant node group
   using the `image_id` override in the environment-specific `environments/*/tofu/main.tf`.
