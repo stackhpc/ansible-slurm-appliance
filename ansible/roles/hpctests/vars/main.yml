@@ -1,2 +1,3 @@
 ---
 hpctests_hpl_srcdir: "{{ hpctests_rootdir }}/hpl/hpl-{{ hpctests_hpl_version }}"
+hpctests_gpuburn_install_dir: "{{ hpctests_rootdir }}/gpuburn/install/{{ hpctests_hpl_arch }}-{{ hpctests_cuda_compute_level }}"

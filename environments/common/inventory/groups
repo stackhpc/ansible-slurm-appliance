@@ -249,3 +249,6 @@ doca
 
 [systemtap]
 # Hosts to install systemtap and run probes on
+
+[sbom]
+# Add builder to this group to run syft on the site-built image
