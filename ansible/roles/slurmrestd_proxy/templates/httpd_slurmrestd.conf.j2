@@ -24,8 +24,8 @@ SSLHonorCipherOrder On
 SSLCompression off
 SSLSessionTickets Off
 
-ProxyPass "/" "http://{{ slurmrestd_proxy_listens | first }}/"
-ProxyPassReverse "/" "http://{{ slurmrestd_proxy_listens | first }}/"
+ProxyPass "/" "http://{{ openhpc_slurmrestd_listen_endpoints | first }}/"
+ProxyPassReverse "/" "http://{{ openhpc_slurmrestd_listen_endpoints | first }}/"
 ProxyPreserveHost On
 
 {% if slurmrestd_proxy_certbot and _slurmrestd_proxy_certbot.stat.exists %}
