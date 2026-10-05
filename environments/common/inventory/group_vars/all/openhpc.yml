@@ -101,3 +101,7 @@ openhpc_slurm_accounting_storage_backup_cmd: >-
   {{ openhpc_cluster_name }}-state-{{ ansible_date_time.iso8601_basic_short }}
 openhpc_slurm_accounting_storage_backup_host: localhost
 openhpc_slurm_accounting_storage_backup_become: false
+
+# This is also used by slurmrestd_proxy
+openhpc_slurmrestd_listen_endpoints:
+  - 127.0.0.1:6282
