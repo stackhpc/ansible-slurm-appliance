@@ -1,0 +1,44 @@
+---
+- name: Check if certificates already available
+  register: _slurmrestd_proxy_certbot
+  ansible.builtin.stat:
+    path: /etc/letsencrypt/live/{{ slurmrestd_proxy_servername }}/fullchain.pem
+    get_checksum: false
+    get_mime: false
+
+- name: Ensure httpd slurmrestd reverse proxy config
+  notify: Restart httpd
+  ansible.builtin.template:
+    src: httpd_slurmrestd.conf.j2
+    dest: /etc/httpd/conf.d/slurmrestd.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Generate Let's Encrypt certificate
+  # We use the localhost certificates in the apache conf until certbot is enabled
+  # and has generated the certificate, so when certbot start apache the first time
+  # the configuration is valid.
+  ansible.builtin.command:
+    cmd: >
+      certbot
+        --non-interactive --agree-tos --verbose
+        --apache --no-eff-email
+        --domains {{ slurmrestd_proxy_servername }}
+        {% if slurmrestd_proxy_certbot_staging | bool %}
+        --staging
+        {% endif %}
+        --email {{ slurmrestd_proxy_certbot_email }}
+  register: _slurmrestd_proxy_certbot
+  changed_when: "'Certificate not yet due for renewal' not in _slurmrestd_proxy_certbot.stdout"
+  when:
+    - slurmrestd_proxy_certbot | bool
+    - appliances_mode != 'build'
+
+- ansible.builtin.meta: flush_handlers
+
+- name: Ensure httpd is running and enabled
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true

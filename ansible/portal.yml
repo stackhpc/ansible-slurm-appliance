@@ -57,3 +57,15 @@
         name: openondemand
         tasks_from: codeserver_compute.yml
       when: appliances_mode != 'configure' # is run during build
+
+- name: Setup Slurm REST API reverse proxy
+  hosts: slurmrestd
+  tags: slurmrestd_proxy
+  become: true
+  tasks:
+    - ansible.builtin.include_role:
+        name: slurmrestd_proxy
+        tasks_from: runtime.yml
+      when:
+        - appliances_mode != 'build'
+        - appliances_enable_slurmrestd_proxy
