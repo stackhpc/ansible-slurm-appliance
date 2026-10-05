@@ -34,6 +34,7 @@ openhpc_packages_default:
   - podman-compose
 openhpc_packages_extra: []
 openhpc_packages: "{{ (openhpc_packages_default + openhpc_packages_extra) | select | list }}"
+openhpc_jwt_key_b64: "{{ vault_openhpc_jwt_key_b64 }}"
 openhpc_munge_key_b64: "{{ vault_openhpc_mungekey }}"
 openhpc_login_only_nodes: login
 openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if appliances_state_dir is defined else '/var/spool' }}"
