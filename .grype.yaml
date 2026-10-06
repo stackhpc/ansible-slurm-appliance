@@ -227,18 +227,6 @@ ignore:
   - vulnerability: GO-2026-5026
     package:
       location: usr/local/bin/node_exporter
-# All paths below are reported as vulnerable by govulncheck, but considered acceptable risk from AI-based review:
-# apptainer: Very low risk. IDNA pulled transitively; no hostname ACL pattern.
-  - vulnerability: GO-2026-5026
-    package:
-      location: usr/bin/apptainer
-  - vulnerability: GO-2026-5026
-    package:
-      location: usr/libexec/apptainer/bin/starter
-# apptainer dhpc: Negligible risk, no reason for IDNA use. False positive from transitive linking?
-  - vulnerability: GO-2026-5026
-    package:
-      location: usr/libexec/apptainer/cni/dhcp
 # alertmanager, amtool: Low risk. No hostname-based privilege separation
   - vulnerability: GO-2026-5026
     package:
