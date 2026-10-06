@@ -1,6 +1,6 @@
 [Unit]
 Description=Appliance created stap probe - {{ _systemtap_script.name }}
-After=sysinit.target
+After=network-online.target
 
 [Service]
 Type=simple
