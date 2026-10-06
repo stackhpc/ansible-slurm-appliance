@@ -105,8 +105,12 @@ openondemand_osc_ood_defaults:
 
   # Auth:
   oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if (openondemand_auth | lower) in ['oidc', 'dex'] else none }}"
+  oidc_crypto_passphrase: "{{ openondemand_oidc_crypto_passphrase if (openondemand_auth | lower) in ['oidc', 'dex'] else none }}"
   ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
   httpd_auth: "{{ openondemand_auth_defaults[openondemand_auth | lower].httpd_auth }}"
+  # FIXME: remove this workaround after migrating to OOD 4.2 (the fix for wrong variable name is in the 4.2 branch only)
+  # https://github.com/OSC/ood-ansible/commit/29dfbc7993cf48ae7553551c13bdf1406fa218ad
+  ood_oidc_crypto_passphrase: "{{ openondemand_oidc_crypto_passphrase if (openondemand_auth | lower) in ['oidc', 'dex'] else none }}"
 
   # Use gpgkey and repo file provided by dnf_repos by default:
   ood_use_existing_repo_file: true
