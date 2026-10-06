@@ -412,6 +412,19 @@ ignore:
     package:
       location: var/www/ood/apps/sys/myjobs/Gemfile.lock
 
+# CVE-2026-90711: node.js proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet
+# https://github.com/jshttp/proxy-addr/security/advisories/GHSA-jqcg-44mw-7w3h
+  - vulnerability: CVE-2026-90711
+  # proxy-addr is reachable only via @jupyterlab/buildutils -> verdaccio -> express in an unused build-time lockfile.
+  # No node_modules are installed, and the code is never executed at runtime.
+    package:
+      location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
+# FIXME: fix is in OSC/ondemand master (6e8dc2be), pending release.
+# shell app does not enable trust proxy
+  - vulnerability: CVE-2026-90711
+    package:
+      location: var/www/ood/apps/sys/shell/yarn.lock
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
 exclude:
