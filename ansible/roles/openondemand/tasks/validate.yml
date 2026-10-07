@@ -16,3 +16,10 @@
       - openondemand_certbot_email | length > 0
     fail_msg: openondemand_certbot_email must be set when openondemand_certbot is true
   when: openondemand_certbot | bool
+
+- name: Check that openondemand_oidc_crypto_passphrase is set for dex or oidc
+  ansible.builtin.assert:
+    that:
+      - openondemand_oidc_crypto_passphrase | length > 0
+    fail_msg: openondemand_oidc_crypto_passphrase mus be set (even for DEX) since osc.ood 4.1.6
+  when: (openondemand_auth | lower) in ['oidc', 'dex']
