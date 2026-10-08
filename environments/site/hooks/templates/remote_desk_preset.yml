@@ -1,5 +1,6 @@
 ---
-cluster: "slurm"
+cluster: "{{ openhpc_cluster_name }}"
+title: "Remote Desktop Quick Launch"
 form:
     - desktop
     - bc_queue
@@ -10,8 +11,7 @@ tile:
     title: "Remote Desktop Quick Launch"
     border_color: "green"
     sub_caption: |
-      Launch Remote desktop with 1 core hour
-
+      Launch Remote desktop on vgpu partition with 1 core for 1 hour
 attributes:
     desktop: xfce
     bc_queue: vgpu 

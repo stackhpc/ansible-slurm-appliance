@@ -1,5 +1,6 @@
 ---
-cluster: "slurm"
+cluster: "{{ openhpc_cluster_name }}"
+title: "Jupyter Lab Quick Launch"
 form:
     - modules
     - extra_jupyter_args
