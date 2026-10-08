@@ -293,6 +293,17 @@ jobs:
         env:
           DEMO_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
+      - name: Confirm slurmrestd_proxy is up
+        run: |
+          . venv/bin/activate
+          . environments/.stackhpc/activate
+
+          # shellcheck disable=SC2016
+          ping_response=$(ansible -m shell -ba 'eval $(scontrol token) && curl -k -v -H "X-SLURM-USER-TOKEN:$SLURM_JWT" https://127.0.0.1/slurm/v0.0.42/ping' slurmrestd)
+
+          (echo "$ping_response" | grep "200 OK") || (echo "$ping_response"  && exit 1)
+          (echo "$ping_response" | grep '"pinged": "UP"') || (echo "$ping_response"  && exit 1)
+
       - name: Delete possible volume snapshot from slurm upgrade
         run: |
           . venv/bin/activate
