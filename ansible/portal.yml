@@ -65,7 +65,5 @@
   tasks:
     - ansible.builtin.include_role:
         name: slurmrestd_proxy
-        tasks_from: runtime.yml
       when:
-        - appliances_mode != 'build'
         - appliances_enable_slurmrestd_proxy

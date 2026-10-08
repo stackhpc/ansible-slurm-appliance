@@ -1,0 +1,8 @@
+---
+- ansible.builtin.include_tasks:
+    file: install.yml
+  when: appliances_mode != 'configure'
+
+- ansible.builtin.include_tasks:
+    file: runtime.yml
+  when: appliances_mode != 'build'

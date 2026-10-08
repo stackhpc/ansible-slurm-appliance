@@ -1,0 +1,6 @@
+---
+- name: Install Apache ssl module
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - mod_ssl
