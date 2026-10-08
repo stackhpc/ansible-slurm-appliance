@@ -1,0 +1,25 @@
+---
+- name: Check slurmrestd_proxy servername is defined
+  ansible.builtin.assert:
+    that: slurmrestd_proxy_servername != ''
+    fail_msg: "Variable `slurmrestd_proxy_servername` must be set on slurmrestd hosts. See docs/slurmrestd.md"
+
+- name: Check slurmrestd_proxy servername is not the same as openondemand
+  ansible.builtin.assert:
+    that: openondemand_servername != slurmrestd_proxy_servername
+    fail_msg: "Variable `slurmrestd_proxy_servername` must be different than openondemand_servername when deployed on the same host. See docs/slurmrestd.md"
+  when: "'openondemand' in group_names"
+
+
+- name: Check slurmrestd_proxy servername is not IP for certbot
+  ansible.builtin.assert:
+    that: "[slurmrestd_proxy_servername] | ansible.utils.ipv4 | length == 0"
+    fail_msg: "slurmrestd_proxy_servername ({{ slurmrestd_proxy_servername }}) must not be an IP when slurmrestd_proxy_certbot is true"
+  when: slurmrestd_proxy_certbot | bool
+
+- name: Check that email address is set for certbot
+  ansible.builtin.assert:
+    that:
+      - slurmrestd_proxy_certbot_email | length > 0
+    fail_msg: slurmrestd_proxy_certbot_email must be set when slurmrestd_proxy_certbot is true
+  when: slurmrestd_proxy_certbot | bool
