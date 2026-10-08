@@ -1,0 +1,7 @@
+---
+slurmrestd_proxy_certbot: false
+slurmrestd_proxy_certbot_staging: false
+slurmrestd_proxy_certbot_email: ''
+slurmrestd_proxy_ssl_cert: /etc/pki/tls/certs/localhost.crt
+slurmrestd_proxy_ssl_cert_key: /etc/pki/tls/private/localhost.key
+slurmrestd_proxy_servername: "{{ hostvars[groups['slurmrestd'].0].ansible_host if groups['slurmrestd'] else '' }}"

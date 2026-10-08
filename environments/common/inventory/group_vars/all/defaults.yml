@@ -62,6 +62,17 @@ appliances_local_users_default:
       system: true
 
   - group:
+      name: slurmrestd
+      gid: 203
+    user:
+      name: slurmrestd
+      comment: SLURM REST API daemon
+      home: /etc/slurm
+      shell: /sbin/nologin
+      uid: 203
+      system: true
+
+  - group:
       name: prometheus
       gid: 976
     user:
@@ -132,3 +143,6 @@ appliances_packages_uninstall:
   # Installed in RL8 genericcloud, but vulnerable
   - python3-unbound
   - unbound-libs
+
+# It is recommended to run slurmrestd behind a TLS reverse proxy
+appliances_enable_slurmrestd_proxy: true

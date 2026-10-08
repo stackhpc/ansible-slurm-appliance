@@ -222,6 +222,9 @@ compute
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
 
+[slurmrestd]
+# Hosts to run slurmrestd on, usually co-located with Open OnDemand
+
 [weka]
 # Hosts to install and mount WEKA filesystems on
 

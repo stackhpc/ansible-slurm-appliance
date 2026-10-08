@@ -7,6 +7,7 @@ openhpc_enable:
   control: "{{ inventory_hostname in groups['control'] }}"
   batch: "{{ inventory_hostname in groups['compute'] }}"
   database: "{{ inventory_hostname in groups['control'] }}"
+  rest: "{{ inventory_hostname in groups['slurmrestd'] }}"
   runtime: true
 openhpc_slurm_service_enabled: true
 openhpc_slurm_accounting_storage_type: "accounting_storage/slurmdbd"
@@ -34,6 +35,8 @@ openhpc_packages_default:
   - podman-compose
 openhpc_packages_extra: []
 openhpc_packages: "{{ (openhpc_packages_default + openhpc_packages_extra) | select | list }}"
+openhpc_jwt_enabled: "{{ groups.get('slurmrestd', []) | length > 0 }}"
+openhpc_jwt_key_b64: "{{ vault_openhpc_jwt_key_b64 }}"
 openhpc_munge_key_b64: "{{ vault_openhpc_mungekey }}"
 openhpc_login_only_nodes: login
 openhpc_state_save_location: "{{ appliances_state_dir + '/slurmctld' if appliances_state_dir is defined else '/var/spool' }}"
@@ -98,3 +101,7 @@ openhpc_slurm_accounting_storage_backup_cmd: >-
   {{ openhpc_cluster_name }}-state-{{ ansible_date_time.iso8601_basic_short }}
 openhpc_slurm_accounting_storage_backup_host: localhost
 openhpc_slurm_accounting_storage_backup_become: false
+
+# This is also used by slurmrestd_proxy
+openhpc_slurmrestd_listen_endpoints:
+  - 127.0.0.1:6282

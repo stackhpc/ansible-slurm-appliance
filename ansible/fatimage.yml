@@ -184,6 +184,11 @@
       ansible.builtin.dnf:
         name: mod_authnz_pam
 
+    - name: Install Apache and SSL module  # likely already installed by openondemand
+      ansible.builtin.include_role:
+        name: slurmrest_proxy
+      when: "'slurmrestd' in group_names"
+
     # - import_playbook: monitoring.yml:
     - ansible.builtin.import_role:
         name: opensearch

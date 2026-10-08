@@ -44,3 +44,6 @@ compute
 
 [topology:children]
 compute
+
+[slurmrestd:children]
+login

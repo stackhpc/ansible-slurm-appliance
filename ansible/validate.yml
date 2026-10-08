@@ -109,6 +109,23 @@
         - openondemand_server
         - grafana
 
+- name: Validate slurmrestd_proxy configuration
+  hosts:
+    - slurmrestd
+  gather_facts: false
+  tags:
+    - validate
+    - slurmrestd_proxy
+  tasks:
+    - ansible.builtin.import_role:
+        name: slurmrestd_proxy
+        tasks_from: validate.yml
+      when:
+        - "'slurmrestd' in groups"
+        - groups['slurmrestd'] | length > 0
+      tags:
+        - slurmrestd_proxy
+
 - name: Validate freeipa configuration
   hosts: freeipa_client
   gather_facts: false

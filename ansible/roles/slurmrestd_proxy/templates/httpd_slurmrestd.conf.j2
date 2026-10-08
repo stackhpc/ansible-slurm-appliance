@@ -1,0 +1,39 @@
+<VirtualHost *:80>
+ServerName {{ slurmrestd_proxy_servername }}
+
+RewriteEngine On
+RewriteRule ^(.*) https://%{HTTP_HOST}:443$1 [R=301,NE,L]
+RewriteCond %{SERVER_NAME} ={{ slurmrestd_proxy_servername }}
+RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+<VirtualHost *:443>
+ServerName {{ slurmrestd_proxy_servername }}
+
+ErrorLog  "/var/log/httpd/slurmrestd_proxy_error_ssl.log"
+CustomLog "/var/log/httpd/slurmrestd_proxy_access_ssl.log" combined
+
+TraceEnable off
+
+# Header always set Content-Security-Policy "frame-ancestors https://192.168.51.189;"
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+
+SSLEngine On
+SSLProtocol all -TLSv1.1 -TLSv1 -SSLv2 -SSLv3
+SSLCipherSuite ALL:+HIGH:!ADH:!EXP:!SSLv2:!SSLv3:!MEDIUM:!LOW:!NULL:!aNULL
+SSLHonorCipherOrder On
+SSLCompression off
+SSLSessionTickets Off
+
+ProxyPass "/" "http://{{ openhpc_slurmrestd_listen_endpoints | first }}/"
+ProxyPassReverse "/" "http://{{ openhpc_slurmrestd_listen_endpoints | first }}/"
+ProxyPreserveHost On
+
+{% if slurmrestd_proxy_certbot and _slurmrestd_proxy_certbot.stat.exists %}
+Include /etc/letsencrypt/options-ssl-apache.conf
+SSLCertificateFile /etc/letsencrypt/live/{{ slurmrestd_proxy_servername }}/fullchain.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/{{ slurmrestd_proxy_servername }}/privkey.pem
+{% else %}
+SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+{% endif %}
+</VirtualHost>
