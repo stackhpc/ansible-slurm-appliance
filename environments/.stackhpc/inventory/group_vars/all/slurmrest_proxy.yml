@@ -1,0 +1,3 @@
+---
+# Need to be different than the hostname, already used by Open OnDemand portal.
+slurmrestd_proxy_servername: 127.0.0.1
