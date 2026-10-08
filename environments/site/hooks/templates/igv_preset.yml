@@ -1,15 +1,21 @@
 ---
-cluster: "slurm"
+cluster: "{{ openhpc_cluster_name }}"
+title: "IGV Quick Launch"
 form:
-    - bc_num_hours
+    - modules
     - bc_queue
+    - bc_num_hours
     - num_of_cores
+    - num_mem
 attributes:
-    bc_queue: interactive 
+    modules: "{{ openondemand_apps_igv_module  }}"
+    bc_queue: "interactive"
     bc_num_hours: 1
     num_of_cores: 1
+    num_mem: 5
+submit: submit/submit.yml.erb
 tile:
     title: "IGV Quick Launch"
     border_color: "lightblue"
     sub_caption: |
-      Launch an IGV with 1 core hour
+      Launch IGV with 1 core and 5 GB for 1 hour

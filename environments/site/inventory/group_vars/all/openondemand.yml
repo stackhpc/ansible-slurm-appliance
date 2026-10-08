@@ -8,13 +8,49 @@ openondemand_filesapp_paths:
 
 user_map_cmd: /usr/local/bin/ondemand-usermap # see post-bootstrap hook
 
+# Override default cluster configuration to set script wrappers to make AgR modules available
+openondemand_cluster:
+  v2:
+    metadata:
+      title: "{{ openhpc_cluster_name }}" # interpolation here works as openondemand is lexically after openhpc
+    login:
+      host: "{{ openondemand_login_host }}"
+      default: true
+    job:
+      adapter: slurm
+    batch_connect:
+      basic:
+        script_wrapper: |
+          . /opt/ohpc/admin/lmod/lmod/init/bash
+          export MODULEPATH=/mnt/gpfs/persist/apps/eri_rocky8/modules/all
+          module purge
+          %s
+        set_host: host=$(hostname -s)
+      vnc:
+        script_wrapper: |
+          . /opt/ohpc/admin/lmod/lmod/init/bash
+          export MODULEPATH=/mnt/gpfs/persist/apps/eri_rocky8/modules/all
+          module purge
+
+          export PATH=/opt/TurboVNC/bin:$PATH
+          # avoid "Failed to create secure directory (/run/user/*/pulse)"
+          export XDG_RUNTIME_DIR="$TMPDIR/xdg_runtime"
+
+          # Workaround to avoid "Unable to contact settings server" when
+          # launching xfce4-session
+          xfce4-session() { /bin/dbus-launch /bin/xfce4-session $@ ; }
+          export -f xfce4-session
+          %s
+        set_host: host=$(hostname -s)
+    custom: "{{ openondemand_cluster_grafana if groups['grafana'] | length > 0 else {} }}"
+
 ood_install_apps:
   jupyter:  # repo currently named "eRI Jupyter"
     repo: "https://ignored:{{ vault_jupyter_ood_apps_glpat }}@gitlab.com/nesi1/ood-apps/bc_example_jupyter.git"
     version: staging
   igv: # repo currently named "IGV"
     repo: "https://ignored:{{ vault_igv_ood_apps_glpat }}@gitlab.com/nesi1/ood-apps/igv.git"
-    version: staging
+    version: staging-oct-2026 # TODO: update when merged:
 
 # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
 # also https://osc.github.io/ood-documentation/latest/enable-desktops/custom-job-submission.html#enable-desktops-custom-job-submission
@@ -73,6 +109,7 @@ openondemand_apps_desktop_agr:
         - <%= "--gres=#{gres}:#{gres_count}" %>
         <% end %>
         - <%= "--export=ALL" %>
+
 openondemand_apps_jupyter_agr:
   title: Jupyter Lab
   description: Request a Jupyter Lab server
@@ -163,25 +200,34 @@ openondemand_apps_agr:
       ood_brand_bg_color: "#1b262b"
       ood_dashboard_title: "eRI OnDemand"
 
+
+openondemand_apps_igv_module: "IGV/2.17.4"
 openondemand_apps_igv_agr:
   title: IGV
-  description: Request an igv server
+  description: Request an IGV server
   cluster: "{{ openhpc_cluster_name }}"
   attributes:
+    modules:
+      widget: hidden_field
+      value: "{{ openondemand_apps_igv_module  }}"
     bc_vnc_resolution:
       required: true
     bc_queue: "interactive"
-    bc_num_hours: 
+    bc_num_hours:
+      value: 1
       min: 1
       max: 8
       step: 1
     num_of_cores: 1
+    num_mem:
+      max: 14 # GB
   form:
+    - modules
+    - bc_queue
     - bc_num_hours
     - bc_vnc_resolution
-    - bc_queue
     - num_of_cores
-    - modules
+    - num_mem
   tile:
     title: "IGV"
     sub_caption: |
@@ -193,11 +239,10 @@ openondemand_apps_igv_agr:
     script:
       job_name: "ood-igv"
       native:
-        - "-n"
-        - "<%= num_of_cores %>"
-        - "--mem"
-        - "5gb"
-        - <%= "--export=ALL" %>
+        - "--ntasks=1"
+        - "--cpus-per-task=<%= num_of_cores %>"
+        - "--mem=<%= num_mem %>G"
+        - "--export=ALL"
 
 openondemand_apps_interactive_agr:
   bc_desktop: "{{ openondemand_apps_desktop_agr }}"
@@ -205,3 +250,9 @@ openondemand_apps_interactive_agr:
   igv: "{{ openondemand_apps_igv_agr }}"
 
 ood_apps: "{{ openondemand_apps_agr | combine(openondemand_apps_interactive_agr) }}"
+
+# Make the app presets (see environments/site/hooks/post.yml) appear as quick-launch tiles on the dashboard:
+pinned_apps:
+  - sys/igv/preset
+  - sys/jupyter/preset
+  - sys/bc_desktop/preset

@@ -51,45 +51,59 @@
 
 
 # From roles/nesi, ran from ansible/nesi.yml:
-- hosts: openondemand
+- name: AgR OnDemand customisations
+  hosts: openondemand
   become: true
   gather_facts: false
-  name: Configure OnDemand
   tags:
     - openondemand
     - openondemand_server
-  tasks:    
+  tasks:
     - name: Ensure destination directory exists
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-      with_items: 
+        owner: root
+        group: root
+        mode: u=rwx,go=rx
+      with_items:
         - /etc/ood/config/apps/igv
         - /etc/ood/config/apps/jupyter
         - /etc/ood/config/apps/bc_desktop
         - /etc/ood/config/apps/dashboard/views/layouts
     - name: Embed Status and Override OpenOndemand html
-      template:
+      ansible.builtin.template:
         src: "application.html.erb"
         dest: "/etc/ood/config/apps/dashboard/views/layouts/application.html.erb"
-        force: yes
+        force: true
+        owner: root
+        group: root
+        mode: u=rw,go=r
     - name: Create quick launch IGV
-      template:
+      ansible.builtin.template:
         src: "igv_preset.yml"
         dest: "/etc/ood/config/apps/igv/preset.yml"
+        owner: root
+        group: root
+        mode: u=rw,go=r
     - name: Create quick launch Jupyter Lab
-      template:
+      ansible.builtin.template:
         src: "jupyter_lab_preset.yml"
         dest: "/etc/ood/config/apps/jupyter/preset.yml"
+        owner: root
+        group: root
+        mode: u=rw,go=r
     - name: Create quick launch Remote Desktop
-      template:
+      ansible.builtin.template:
         src: "remote_desk_preset.yml"
         dest: "/etc/ood/config/apps/bc_desktop/preset.yml"
-
+        owner: root
+        group: root
+        mode: u=rw,go=r
 
 - hosts: compute:&spectrum_scale:!builder
   tags: openhpc
-  become: yes
+  become: true
   tasks:
     - name: Create Slurm prolog
       copy:
