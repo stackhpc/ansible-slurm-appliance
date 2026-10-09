@@ -227,18 +227,6 @@ ignore:
   - vulnerability: GO-2026-5026
     package:
       location: usr/local/bin/node_exporter
-# All paths below are reported as vulnerable by govulncheck, but considered acceptable risk from AI-based review:
-# apptainer: Very low risk. IDNA pulled transitively; no hostname ACL pattern.
-  - vulnerability: GO-2026-5026
-    package:
-      location: usr/bin/apptainer
-  - vulnerability: GO-2026-5026
-    package:
-      location: usr/libexec/apptainer/bin/starter
-# apptainer dhpc: Negligible risk, no reason for IDNA use. False positive from transitive linking?
-  - vulnerability: GO-2026-5026
-    package:
-      location: usr/libexec/apptainer/cni/dhcp
 # alertmanager, amtool: Low risk. No hostname-based privilege separation
   - vulnerability: GO-2026-5026
     package:
@@ -411,6 +399,19 @@ ignore:
   - vulnerability: GHSA-xr9x-r78c-5hrm
     package:
       location: var/www/ood/apps/sys/myjobs/Gemfile.lock
+
+# CVE-2026-90711: node.js proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet
+# https://github.com/jshttp/proxy-addr/security/advisories/GHSA-jqcg-44mw-7w3h
+  - vulnerability: GHSA-jqcg-44mw-7w3h
+  # proxy-addr is reachable only via @jupyterlab/buildutils -> verdaccio -> express in an unused build-time lockfile.
+  # No node_modules are installed, and the code is never executed at runtime.
+    package:
+      location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
+# FIXME: fix is in OSC/ondemand master (6e8dc2be), pending release.
+# shell app does not enable trust proxy
+  - vulnerability: GHSA-jqcg-44mw-7w3h
+    package:
+      location: var/www/ood/apps/sys/shell/yarn.lock
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
