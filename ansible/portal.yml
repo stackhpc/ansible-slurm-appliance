@@ -4,10 +4,15 @@
     - openondemand
     - openondemand_server
   become: true
-  gather_facts: true # TODO
+  gather_facts: false # TODO
   tasks:
     - ansible.builtin.import_role:
         name: openondemand
+      vars:
+        ansible_facts:
+          selinux:
+            status: "{{ selinux_state }}"
+        ansible_os_family: RedHat
 
 - hosts: openondemand_desktop:openondemand_matlab
   tags:
@@ -15,7 +20,7 @@
     - openondemand_desktop
     - openondemand_matlab
   become: true
-  gather_facts: true
+  gather_facts: false # TODO
   tasks:
     - ansible.builtin.import_role:
         name: openondemand
@@ -27,7 +32,7 @@
     - openondemand
     - openondemand_jupyter
   become: true
-  gather_facts: true
+  gather_facts: false # TODO
   tasks:
     - ansible.builtin.import_role:
         name: openondemand
@@ -39,7 +44,7 @@
     - openondemand
     - openondemand_rstudio
   become: true
-  gather_facts: true
+  gather_facts: false # TODO
   tasks:
     - ansible.builtin.import_role:
         name: openondemand
@@ -51,7 +56,7 @@
     - openondemand
     - openondemand_codeserver
   become: true
-  gather_facts: true
+  gather_facts: false # TODO
   tasks:
     - ansible.builtin.import_role:
         name: openondemand

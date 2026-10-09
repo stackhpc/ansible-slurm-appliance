@@ -3,6 +3,7 @@
 - name: Setup custom mounts
   hosts: mounts
   become: true
+  gather_facts: false # TODO?
   tags: mounts
   tasks:
     - ansible.builtin.include_role:
@@ -11,6 +12,7 @@
 - name: Setup block devices
   hosts: block_devices
   become: true
+  gather_facts: false # TODO?
   tags: block_devices
   tasks:
     - ansible.builtin.include_role:
@@ -19,6 +21,7 @@
 - name: Setup NFS
   hosts: nfs
   become: true
+  gather_facts: false # TODO?
   tags:
     - nfs
   tasks:
@@ -28,6 +31,7 @@
 - name: Setup Manila share mounts
   hosts: manila
   become: true
+  gather_facts: false # TODO?
   tags: manila
   tasks:
     - ansible.builtin.include_role:
@@ -38,6 +42,7 @@
 - name: Setup Lustre clients
   hosts: lustre
   become: true
+  gather_facts: false # TODO?
   tags: lustre
   tasks:
     - ansible.builtin.include_role:
@@ -48,6 +53,7 @@
 - name: Setup WEKA clients
   hosts: weka:!builder
   become: true
+  gather_facts: false # TODO?
   tags:
     - weka
   tasks:

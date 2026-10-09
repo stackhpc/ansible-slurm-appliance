@@ -10,7 +10,7 @@ Requires Ark credentials if using StackHPC's upstream Ark server.
 ## Role Variables
 
 Some variables in this role are also required by `pulp_site` role, so defaults
-are empty here and constructed by `environments/common/inventory/groups_vars/all/dnf_repos*`.
+are empty here and constructed by `environments/common/inventory/group_vars/all/dnf_repo*`.
 
 - `dnf_repos_repos`: Optional dict of dicts defining DNF repofiles referencing
   a Pulp server by repository snapshot timestamp. Structure is e.g.:

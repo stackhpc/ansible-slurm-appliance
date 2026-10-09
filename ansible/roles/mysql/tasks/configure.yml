@@ -12,9 +12,9 @@
 - name: Ensure mysql service state
   ansible.builtin.systemd:
     name: mysql
-    state: "{{ mysql_state | default('restarted' if _mysql_unitfile.changed else 'started') }}"
+    state: "{{ mysql_state | default('restarted' if (_mysql_unitfile.changed | default(false)) else 'started') }}"
     enabled: "{{ mysql_systemd_service_enabled }}"
-    daemon_reload: "{{ _mysql_unitfile.changed }}"
+    daemon_reload: "{{ _mysql_unitfile.changed | default(false) }}"
 
 - when: "mysql_state | default('unspecified') != 'stopped'"
   vars:

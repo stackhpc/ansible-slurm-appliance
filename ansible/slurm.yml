@@ -2,15 +2,22 @@
 - name: Setup DB
   hosts: mysql
   become: true
+  gather_facts: true
+  gather_subset:
+    - '!all'
+    - '!min'
+    - 'hardware' # memtotal_mb
   tags:
     - mysql
   tasks:
     - ansible.builtin.include_role:
         name: mysql
+        tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
 - name: Setup slurm-driven rebuild
   hosts: rebuild:!builder
   become: true
+  gather_facts: false # TODO?
   tags:
     - rebuild
     - openhpc
@@ -24,6 +31,7 @@
     - compute
     - login
   become: true
+  gather_facts: false # TODO?
   tags:
     - openhpc
   tasks:
@@ -36,6 +44,7 @@
 - name: Block ssh to compute nodes for non-privileged users without running jobs
   hosts: compute
   become: true
+  gather_facts: false # TODO?
   tags:
     - openhpc
   tasks:
@@ -71,6 +80,11 @@
 - name: Setup slurm
   hosts: openhpc
   become: true
+  gather_facts: true
+  gather_subset:
+    - '!all'
+    - '!min'
+    - 'hardware' # memory, cpu info for compute nodes
   tags:
     - openhpc
   tasks:
@@ -108,6 +122,12 @@
   # Has to be done here as it requires openhpc repos etc for installation
   hosts: nhc
   become: true
+  gather_facts: true
+  gather_subset:
+    - "!all"
+    - "!min"
+    - network # ansible_interfaces
+    - mounts # ansible_mounts
   tags: nhc
   tasks:
     - ansible.builtin.include_role:
