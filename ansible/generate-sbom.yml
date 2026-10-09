@@ -1,0 +1,39 @@
+- hosts: sbom
+  become: true
+  gather_facts: true
+  tags: sbom
+  tasks:
+    - name: Ensure .grype.yaml is present
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../.grype.yaml"
+        dest: /tmp/.grype.yaml
+        owner: "{{ ansible_user }}"
+        mode: "0644"
+    - name: Set sbom filename
+      ansible.builtin.set_fact:
+        sbom_filename: "{{ ansible_hostname }}.syft-json"
+    - name: Install and run syft
+      become: true
+      changed_when: true
+      ansible.builtin.shell: |
+        cd /tmp
+        set -eo pipefail
+        curl -L -o syft_{{ appliances_generate_sbom_syft_version }}_linux_amd64.tar.gz  https://github.com/anchore/syft/releases/download/v{{ appliances_generate_sbom_syft_version }}/syft_{{ appliances_generate_sbom_syft_version }}_linux_amd64.tar.gz
+        sha256sum -c <<<"{{ appliances_generate_sbom_syft_sha256 }}  syft_{{ appliances_generate_sbom_syft_version }}_linux_amd64.tar.gz"
+        tar xf syft_{{ appliances_generate_sbom_syft_version }}_linux_amd64.tar.gz syft
+        time ./syft scan \
+          --exclude ./dev --exclude ./proc --exclude ./sys --exclude ./run \
+          --config .grype.yaml \
+          --source-name "$sbom" --source-version 1 \
+          --output syft-json="$sbom" \
+          dir:/
+        ls -hl "$sbom"
+        zip "${sbom}.zip" "$sbom"
+        # no need to cleanup: cleanup.yml will wipe /tmp again.
+      environment:
+        sbom: "{{ sbom_filename }}"
+    - name: Fetch the sbom to the control host
+      ansible.builtin.fetch:
+        src: "/tmp/{{ sbom_filename }}.zip"
+        dest: "{{ playbook_dir }}/../sbom.zip"
+        flat: true

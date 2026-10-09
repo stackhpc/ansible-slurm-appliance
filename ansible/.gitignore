@@ -6,6 +6,8 @@ roles/*
 !roles/spectrum_scale/**
 !roles/filebeat/
 !roles/filebeat/**
+!roles/kernel_modules/
+!roles/kernel_modules/**
 !roles/opensearch/
 !roles/opensearch/**
 !roles/podman/

@@ -1,6 +1,6 @@
 # StackHPC Slurm Appliance
 
-[![Test deployment and image build on OpenStack](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/stackhpc.yml/badge.svg)](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/stackhpc.yml)
+[![Test on OpenStack](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/main.yml/badge.svg)](https://github.com/stackhpc/ansible-slurm-appliance/actions/workflows/main.yml)
 
 This repository contains playbooks and configuration to define a Slurm-based HPC environment. This includes:
 

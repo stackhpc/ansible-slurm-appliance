@@ -7,7 +7,7 @@
 
 - name: Ensure mount directories exist
   ansible.builtin.file:
-    path: "{{ stat_result.item.path }}"
+    path: "{{ stat_result.item.mount_point }}"
     state: directory
     owner: root
     group: root
@@ -53,10 +53,10 @@
     fstype: wekafs
     # only mount if client is not running, but still update the fstab
     state: >-
-      {% set desired_state = item.get('mount_state', weka_client_mnt_state) %}
-      {% if ('client,Running' in weka_containers.stdout_lines) and desired_state == 'mounted' %}
+      {%- set desired_state = item.get('mount_state', weka_client_mnt_state) -%}
+      {%- if ('client,Running' in weka_containers.stdout_lines) and desired_state == 'mounted' -%}
       present
-      {% else %}
+      {%- else -%}
       {{ desired_state }}
-      {% endif %}
+      {%- endif -%}
   loop: "{{ weka_mounts }}"

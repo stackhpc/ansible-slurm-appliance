@@ -92,6 +92,10 @@ def run_module():
         + "/_search"
     )
     r = requests.get(datasource_proxy_url, auth=auth)
+    if r.status_code != 200:
+        raise Exception(
+            f"Invalid status returned by {datasource_proxy_url}: {r.status_code} ({r.reason})\n{r.text}"
+        )
     search = json.loads(r.text)
     # see
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html#search-api-response-body:

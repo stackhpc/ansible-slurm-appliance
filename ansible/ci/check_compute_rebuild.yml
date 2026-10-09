@@ -63,7 +63,8 @@
         fail_msg: "Expected 1 rebuild, found {{ rebuild_status.rebuild_count }}"
       when: hostvars['localhost'].ci_cluster_image_updated
 
-    - name: Check uptime shows rebuild or reboot occurred
+    - name: Check uptime shows rebuild or reboot occurred, if target image differs from last release
       ansible.builtin.assert:
         that: rebuild_status.uptime_seconds < uptime_max_seconds | int
         fail_msg: "Expected uptime < {{ uptime_max_seconds }}s, actual {{ rebuild_status.uptime_seconds }}s"
+      when: hostvars['localhost'].ci_cluster_image_updated

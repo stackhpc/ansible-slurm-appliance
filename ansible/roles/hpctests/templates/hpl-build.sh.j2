@@ -17,6 +17,9 @@
 {%if hpctests_qos is defined %}
 #SBATCH --qos={{ hpctests_qos }}
 {% endif %}
+{%if hpctests_time is defined %}
+#SBATCH --time={{ hpctests_time }}
+{% endif %}
 
 echo HPL arch: {{ hpctests_hpl_arch }}
 {{ hpctests_pre_cmd }}

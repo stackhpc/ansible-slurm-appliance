@@ -7,3 +7,6 @@
 - name: Set nhc_autofs_mounts fact
   ansible.builtin.set_fact:
     nhc_autofs_mounts: "{{ ansible_facts.aggregate_mounts | selectattr('fstype', 'equalto', 'autofs') | map(attribute='mount') | list }}"
+
+- name: Collect infiniband facts
+  infiniband_facts:
