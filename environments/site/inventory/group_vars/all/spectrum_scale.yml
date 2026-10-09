@@ -44,6 +44,7 @@ scale_remotemount_filesystem_name:
 
 # Identify quorum nodes - don't want default of 1st 7x hosts in inventory,
 # use specific baremetals:
+# NB: for staging these don't exist, so it will use above default instead
 _scale_cluster_quorum_nodes:
   - compute-0
   - hugemem-0
