@@ -1,4 +1,14 @@
 ---
+- name: Enable baseos-debuginfo repo
+  community.general.ini_file:
+    path: /etc/yum.repos.d/rocky.repo
+    section: baseos-debuginfo
+    option: enabled
+    value: "1"
+    mode: '0644'
+    owner: root
+    group: root
+
 - name: Install systemtap and required kernel packages
   ansible.builtin.dnf:
     name:
