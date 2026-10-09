@@ -12,6 +12,14 @@ appliances_mode: configure
 appliances_pulp_url: https://ark.stackhpc.com
 appliances_validate_tofu_vars: true
 
+# Provided to make compute-init work, don't change this:
+ansible_hostname: "{{ inventory_hostname }}"
+# TODO: I'm not sure if there's some subtlety here ...
+
+# Default to latest distro defined in environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml:
+ansible_distribution_version: "{{ dnf_repos_repos['baseos'].keys() | community.general.version_sort | last }}"
+ansible_distribution_major_version: "{{ ansible_distribution_version.split('.')[0] }}"
+
 # Address(ip/dns) for internal communication between services. This is
 # normally traffic you do no want to expose to users.
 internal_address: "{{ inventory_hostname }}"

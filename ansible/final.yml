@@ -1,6 +1,7 @@
 - hosts: dnf_repos
   become: true
   tags: dnf_repos
+  gather_facts: false # TODO:
   tasks:
     - name: Disable pulp repos
       ansible.builtin.include_role:
@@ -13,6 +14,7 @@
   # NB: done last so other roles can prepare configuration etc
   tags: compute_init
   become: true
+  gather_facts: false # TODO:
   tasks:
     - ansible.builtin.include_role:
         name: compute_init

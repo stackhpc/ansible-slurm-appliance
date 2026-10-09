@@ -63,6 +63,7 @@
 - hosts: chrony
   tags: chrony
   become: true
+  gather_facts: false # TODO: ?
   tasks:
     - ansible.builtin.import_role:
         name: mrlesmithjr.chrony
@@ -143,6 +144,7 @@
 - hosts: dnf_repos
   become: true
   tags: dnf_repos
+  gather_facts: false # TODO: ?
   tasks:
     - name: Check that creds won't be leaked to users
       ansible.builtin.assert:
@@ -162,7 +164,7 @@
 
 - hosts: squid
   tags: squid
-  gather_facts: true
+  gather_facts: false # TODO: ?
   become: true
   tasks:
     # - Installing squid requires working dnf repos
@@ -180,7 +182,7 @@
 
 - hosts: dnf_repos
   tags: dnf_repos
-  gather_facts: true
+  gather_facts: false # TODO: ?
   become: true
   tasks:
     - name: Replace system repos with pulp repos
@@ -192,6 +194,10 @@
 - hosts: tuned
   tags: tuned
   gather_facts: true
+  gather_subset:
+    - '!all'
+    - '!min'
+    - virtual # ansible_virtualization_role
   become: true
   tasks:
     - name: Install and configure tuneD
@@ -299,7 +305,7 @@
       ansible.builtin.setup:
 
 - hosts: ofed
-  gather_facts: true
+  gather_facts: false # TODO: ?
   become: true
   tags: ofed
   tasks:
@@ -307,7 +313,7 @@
         name: ofed
 
 - hosts: ansible_init
-  gather_facts: true
+  gather_facts: false # TODO: ?
   become: true
   tags: linux_ansible_init
   tasks:

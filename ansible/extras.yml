@@ -1,11 +1,12 @@
 - hosts: raid
   become: true
   tags: raid
-  gather_facts: true
+  gather_facts: false # TODO:
   tasks:
     - ansible.builtin.include_role:
         name: raid
 
+# could remove
 - hosts: k3s_server:!builder
   become: true
   tags: k3s
@@ -15,6 +16,7 @@
         name: k3s
         tasks_from: server-runtime.yml
 
+# could remove
 # technically should be part of bootstrap.yml but hangs waiting on failed mounts
 # if runs before filesystems.yml after the control node has been reimaged
 - hosts: k3s_agent:!builder
@@ -31,7 +33,7 @@
   tags:
     - basic_users
     - users
-  gather_facts: true
+  gather_facts: false # TODO:
   tasks:
     - ansible.builtin.import_role:
         name: basic_users
@@ -50,7 +52,7 @@
 - name: Setup CUDA
   hosts: cuda
   become: true
-  gather_facts: true
+  gather_facts: false # TODO?
   tags: cuda
   tasks:
     - ansible.builtin.include_role:
@@ -60,7 +62,7 @@
 - name: Setup vGPU
   hosts: vgpu
   become: true
-  gather_facts: true
+  gather_facts: false # TODO?
   tags: vgpu
   tasks:
     - ansible.builtin.include_role:
@@ -71,6 +73,7 @@
       ansible.builtin.fail:
         msg: Reboot handler for stackhpc.linux.vgpu role fired unexpectedly. This was supposed to be unreachable.
 
+# could remove
 - name: Install k9s
   become: true
   hosts: k9s
@@ -81,6 +84,7 @@
 
 - hosts: extra_packages
   become: true
+  gather_facts: false # TODO:
   tags:
     - extra_packages
   tasks:

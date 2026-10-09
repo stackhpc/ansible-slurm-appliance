@@ -126,7 +126,7 @@
   tags:
     - validate
     - opkssh
-  gather_facts: true
+  gather_facts: false # TODO: ?
   become: true
   tasks:
     - ansible.builtin.import_role:
@@ -135,6 +135,7 @@
 
 - name: Validate lustre configuration
   hosts: lustre
+  gather_facts: false # TODO: ?
   tags:
     - validate
     - lustre
@@ -146,7 +147,7 @@
 - name: Validate vGPU configuration
   hosts: vgpu
   become: true
-  gather_facts: true
+  gather_facts: false # TODO: ?
   tags: vgpu
   tasks:
     - ansible.builtin.include_role:
