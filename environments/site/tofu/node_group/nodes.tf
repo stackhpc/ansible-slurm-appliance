@@ -42,7 +42,13 @@ locals {
 
   trunk_subports = {
     for n in var.nodes :
-    n => var.use_trunk ? openstack_networking_port_v2.trunk_subport : {}
+    n => [
+      for i in range(var.use_trunk ? length(var.trunk_subport_network_ids) : 0) : {
+        fixed_ip_v4 = openstack_networking_port_v2.trunk_subport["${n}-${i}"].all_fixed_ips[0]
+        network_id  = openstack_networking_port_v2.trunk_subport["${n}-${i}"].network_id
+        vlan_id     = var.trunk_subport_vlan_ids[i]
+      }
+    ]
   }
 }
 

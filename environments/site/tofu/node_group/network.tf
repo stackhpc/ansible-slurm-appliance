@@ -23,9 +23,12 @@ resource "openstack_networking_port_v2" "trunk_parent" {
 }
 
 resource "openstack_networking_port_v2" "trunk_subport" {
-  for_each = var.use_trunk ? toset(var.nodes) : []
-  name = "${split(".", local.fqdns[each.key])[0]}-trunk-subport"
-  network_id = var.trunk_subport_network_id
+  for_each = {
+    for pair in var.use_trunk ? setproduct(var.nodes, range(length(var.trunk_subport_network_ids))) : [] :
+    "${pair[0]}-${pair[1]}" => pair
+  }
+  name       = "${split(".", local.fqdns[each.value[0]])[0]}-trunk-subport-${each.value[1]}"
+  network_id = var.trunk_subport_network_ids[each.value[1]]
   lifecycle {
     ignore_changes = [extra_dhcp_option]
   }
@@ -37,9 +40,12 @@ resource "openstack_networking_trunk_v2" "trunk" {
   admin_state_up = "true"
   port_id        = openstack_networking_port_v2.trunk_parent[each.key].id
 
-  sub_port {
-    port_id           = openstack_networking_port_v2.trunk_subport[each.key].id
-    segmentation_id   = var.trunk_subport_vlan_id
-    segmentation_type = "vlan"
+  dynamic "sub_port" {
+    for_each = range(var.use_trunk ? length(var.trunk_subport_network_ids) : 0)
+    content {
+      port_id           = openstack_networking_port_v2.trunk_subport["${each.key}-${sub_port.value}"].id
+      segmentation_id   = var.trunk_subport_vlan_ids[sub_port.value]
+      segmentation_type = "vlan"
+    }
   }
 }

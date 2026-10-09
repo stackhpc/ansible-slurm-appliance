@@ -90,9 +90,9 @@ variable "login" {
       nodename_template: Overrides variable cluster_nodename_template
       server_group_id: String ID of server group to use for scheduler hint
       trunk_parent_network_id: ID of the network to use as the parent port of the trunk. This controls the access (native) VLAN ID implicitly
-      trunk_subport_network_id: ID of the network to use as the subport of the trunk
-      trunk_subport_vlan_id: VLAN ID of the network used as the subport of the trunk
-      use_trunk: Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_id, and trunk_subport_vlan_id must also be set
+      trunk_subport_network_ids: List of IDs of the networks to use as subports of the trunk
+      trunk_subport_vlan_ids: List of VLAN IDs of the networks used as subports of the trunk, in the same order as trunk_subport_network_ids
+      use_trunk: Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_ids, and trunk_subport_vlan_ids must also be set
   EOF
 
   type = any
@@ -163,9 +163,9 @@ variable "compute" {
       nodename_template: Overrides variable cluster_nodename_template
       server_group_id: String ID of server group to use for scheduler hint
       trunk_parent_network_id: ID of the network to use as the parent port of the trunk. This controls the access (native) VLAN ID implicitly
-      trunk_subport_network_id: ID of the network to use as the subport of the trunk
-      trunk_subport_vlan_id: VLAN ID of the network used as the subport of the trunk
-      use_trunk: Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_id, and trunk_subport_vlan_id must also be set
+      trunk_subport_network_ids: List of IDs of the networks to use as subports of the trunk
+      trunk_subport_vlan_ids: List of VLAN IDs of the networks used as subports of the trunk, in the same order as trunk_subport_network_ids
+      use_trunk: Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_ids, and trunk_subport_vlan_ids must also be set
 
     Nodes are added to the following inventory groups:
     - $group_name

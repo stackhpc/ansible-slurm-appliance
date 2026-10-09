@@ -221,21 +221,21 @@ variable "trunk_parent_network_id" {
   default = null
 }
 
-variable "trunk_subport_network_id" {
-  type    = string
-  description = "ID of the network to use as the subport of the trunk."
-  default = null
+variable "trunk_subport_network_ids" {
+  type        = list(string)
+  description = "IDs of the networks to use as the subports of the trunk."
+  default     = []
 }
 
-variable "trunk_subport_vlan_id" {
-  type    = string
-  description = "VLAN ID of the network used as the subport of the trunk."
-  default = null
+variable "trunk_subport_vlan_ids" {
+  type        = list(string)
+  description = "VLAN IDs of the networks used as the subports of the trunk, in the same order as trunk_subport_network_ids."
+  default     = []
 }
 
 variable "use_trunk" {
   type    = bool
-  description = "Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_id, and trunk_subport_vlan_id must also be set."
+  description = "Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_ids, and trunk_subport_vlan_ids must also be set."
   default = false
   nullable = false
 }

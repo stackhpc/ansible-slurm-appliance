@@ -36,8 +36,8 @@ module "compute" {
   ip_addresses         = lookup(each.value, "ip_addresses", null)
   server_group_id      = lookup(each.value, "server_group_id", null)
   trunk_parent_network_id = lookup(each.value, "trunk_parent_network_id", null)
-  trunk_subport_network_id = lookup(each.value, "trunk_subport_network_id", null)
-  trunk_subport_vlan_id = lookup(each.value, "trunk_subport_vlan_id", null)
+  trunk_subport_network_ids = lookup(each.value, "trunk_subport_network_ids", [])
+  trunk_subport_vlan_ids    = lookup(each.value, "trunk_subport_vlan_ids", [])
   use_trunk = lookup(each.value, "use_trunk", false)
 
   # computed
@@ -71,8 +71,8 @@ module "compute" {
     "additional_cloud_config_vars",
     "server_group_id",
     "trunk_parent_network_id",
-    "trunk_subport_network_id",
-    "trunk_subport_vlan_id",
+    "trunk_subport_network_ids",
+    "trunk_subport_vlan_ids",
     "use_trunk"
   ]
 
