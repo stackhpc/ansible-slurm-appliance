@@ -1,3 +1,3 @@
 [codespell]
-ignore-words-list=aNULL,nd,TE,showIn,TRIMed
+ignore-words-list=aNULL,nd,TE,showIn,TRIMed,stap
 skip=*~,./ansible/collections,./venv,/github/workspace/ansible/collections

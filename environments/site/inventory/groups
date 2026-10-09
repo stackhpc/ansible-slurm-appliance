@@ -229,5 +229,9 @@ compute
 [kernel_modules:children]
 cluster
 
+[systemtap:children]
+login
+compute
+
 [sbom]
 # Add builder to this group to run syft on the site-built image
