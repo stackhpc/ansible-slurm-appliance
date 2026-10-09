@@ -7,6 +7,22 @@
     group: root
     mode: "0600"
 
+- name: Get existing probes
+  ansible.builtin.find:
+    paths: "{{ systemtap_modules_directory }}"
+    file_type: file
+  register: _stap_found_files
+
+- name: Remove probes not in systemtap_scripts
+  vars:
+    _stap_existing_probes: "{{ _stap_found_files.files | map(attribute='path') | map('basename') | map('split','.') | map('first') }}"
+    _stap_new_probes: "{{ systemtap_scripts | map(attribute='name') | list }}"
+    _stap_remove_probes: "{{ _stap_existing_probes | difference(_stap_new_probes) }}"
+  ansible.builtin.include_tasks: delete-probe.yml
+  loop: "{{ _stap_remove_probes }}"
+  loop_control:
+    loop_var: _stap_remove_probe
+
 - name: Build modules from stap scripts
   ansible.builtin.include_tasks: build-module.yml
   loop: "{{ systemtap_scripts }}"

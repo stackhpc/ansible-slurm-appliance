@@ -1,5 +1,5 @@
 ---
-- name: Create script file
+- name: Create script file for {{ _systemtap_script.name }}
   ansible.builtin.copy:
     dest: "/tmp/{{ _systemtap_script.name }}.stp"
     content: "{{ _systemtap_script.script }}"
@@ -22,7 +22,7 @@
     mode: "0600"
     remote_src: true
 
-- name: Create systemd service
+- name: Create systemd service for {{ _systemtap_script.name }}
   ansible.builtin.template:
     src: stap-unit.service.j2
     dest: "/etc/systemd/system/stap-{{ _systemtap_script.name }}.service"

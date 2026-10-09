@@ -106,6 +106,15 @@
   ansible.builtin.import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Install SystemTap
+  become: true
+  hosts: systemtap
+  tags: systemtap
+  tasks:
+    - ansible.builtin.import_role:
+        name: systemtap
+        tasks_from: install.yml
+
 - import_playbook: extras.yml
 
 # TODO: is this the right place?

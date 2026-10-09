@@ -79,14 +79,6 @@
     - ansible.builtin.import_role:
         name: k9s
 
-- name: Install SystemTap
-  become: true
-  hosts: systemtap
-  tags: systemtap
-  tasks:
-    - ansible.builtin.import_role:
-        name: systemtap
-
 - hosts: extra_packages
   become: true
   tags:
