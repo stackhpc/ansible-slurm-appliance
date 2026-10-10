@@ -15,7 +15,7 @@ module "compute" {
   config_drive          = var.config_drive
 
   # can be set for group, defaults to top-level value:
-  image_id                     = lookup(each.value, "image_id", var.cluster_image_id)
+  image_label                  = lookup(each.value, "image_label", var.cluster_image_label)
   vnic_types                   = lookup(each.value, "vnic_types", var.vnic_types)
   volume_backed_instances      = lookup(each.value, "volume_backed_instances", var.volume_backed_instances)
   root_volume_size             = lookup(each.value, "root_volume_size", var.root_volume_size)
@@ -49,7 +49,7 @@ module "compute" {
   allowed_keys = [
     "nodes",
     "flavor",
-    "image_id",
+    "image_label",
     "extra_networks",
     "vnic_types",
     "compute_init_enable",
