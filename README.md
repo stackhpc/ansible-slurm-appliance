@@ -89,39 +89,51 @@ And generate secrets for it:
 ansible-playbook ansible/adhoc/generate-passwords.yml
 ```
 
+### Download appliance image to cloud
+
+TOOD
+
 ### Define and deploy infrastructure
 
-Create an OpenTofu variables file to define the required infrastructure, e.g.:
+Modify the cookiecutter-gerated OpenTofu configuration to set the `null`
+values to define the required
+infrastructure, e.g.:
 
-```text
-# environments/$ENV/tofu/terraform.tfvars:
-cluster_name = "mycluster"
-cluster_networks = [
-  {
-    network = "some_network" # *
-    subnet = "some_subnet" # *
+```hcl
+# environments/$ENV/tofu/main.tf:
+
+module "cluster" {
+  source           = "../../site/tofu/"
+  environment_root = var.environment_root
+
+  cluster_name        = "mycluster"
+  cluster_image_id    = "ddf666dd-977b-4a70-a83e-6272122d2fd8" # see above
+  control_node_flavor = "m1.medium"                            # * Typically min. 2x vcpus / 4GB RAM
+  cluster_networks = [
+    {
+      network = "network-name" # * must be able to connect to this from the deploy host
+      subnet  = "subnet-name"  # *
+    }
+  ]
+  key_pair = "my-keypair-name" # *
+  login = {
+    head = {
+      nodes  = ["login-0"]
+      flavor = "m1.small" # * Typically min. 1x vpcu / 2GB RAM
+    }
   }
-]
-key_pair = "my_key" # *
-control_node_flavor = "some_flavor_name"
-login = {
-    # Arbitrary group name for these login nodes
-    interactive = {
-        nodes: ["login-0"]
-        flavor: "login_flavor_name" # *
-    }
-}
-cluster_image_id = "rocky_linux_9_image_uuid"
-compute = {
-    # Group name used for compute node partition definition
+  compute = {
     general = {
-        nodes: ["compute-0", "compute-1"]
-        flavor: "compute_flavor_name" # *
+      nodes  = ["compute-0", "compute-1"]
+      flavor = "m1.small" # * Typically min. 1x vpcu / 2GB RAM
     }
+  }
 }
 ```
 
-Variables marked `*` refer to OpenStack resources which must already exist. The above is a minimal configuration - for all variables and descriptions see `environments/$ENV/tofu/variables.tf`.
+Variables marked `*` refer to OpenStack resources which must already exist. The
+above is a minimal configuration - for all variables and descriptions see
+`environments/site/tofu/variables.tf`.
 
 To deploy this infrastructure, ensure the venv and the environment are [activated](#create-a-new-environment) and run:
 
