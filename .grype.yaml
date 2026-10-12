@@ -412,6 +412,14 @@ ignore:
   - vulnerability: GHSA-jqcg-44mw-7w3h
     package:
       location: var/www/ood/apps/sys/shell/yarn.lock
+# CVE-2026-106445: Handlebars library's templating can bypass denylist rules
+# Not affected: No obvious use of vulnerable functions or user-controlled templating
+  - vulnerability: GHSA-p8wg-vrv2-v86f
+    package:
+      location: var/www/ood/apps/sys/shell/yarn.lock
+  - vulnerability: GHSA-p8wg-vrv2-v86f
+    package:
+      location: var/www/ood/apps/sys/shell/yarn.lock
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
