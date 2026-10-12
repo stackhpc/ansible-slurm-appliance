@@ -9,7 +9,7 @@
     owner: root
     group: root
   vars:
-    _debuginfo_repofile: "{{ 'rocky.repo' if ansible_distribution_version_major == '9' else 'Rocky-Debuginfo.repo' }}"
+    _debuginfo_repofile: "{{ 'rocky.repo' if ansible_distribution_major_version == '9' else 'Rocky-Debuginfo.repo' }}"
 
 - name: Install systemtap and required kernel packages
   ansible.builtin.dnf:
