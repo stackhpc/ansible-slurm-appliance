@@ -1,9 +1,16 @@
 
 locals {
+  # Name of the cluster network the trunk parent port is attached to, if any
+  trunk_parent_network = one([
+    for net in var.networks :
+    net.network
+    if data.openstack_networking_network_v2.network[net.network].id == var.trunk_parent_network_id
+  ])
+
   # Map node names to trunk parent port IP addresses from var.ip_addresses by node index
   trunk_parent_ips = {
     for idx, n in var.nodes :
-    n => try(var.ip_addresses[var.trunk_parent_network_id][idx], null)
+    n => try(var.ip_addresses[coalesce(local.trunk_parent_network, var.trunk_parent_network_id)][idx], null)
   }
   # Map "<node>-<subport index>" keys to trunk subport IP addresses from var.ip_addresses
   trunk_subport_ips = {

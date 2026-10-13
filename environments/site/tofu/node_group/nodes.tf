@@ -77,7 +77,7 @@ resource "openstack_compute_volume_attach_v2" "compute" {
 
 resource "openstack_networking_port_v2" "compute" {
 
-  for_each = { for item in setproduct(var.nodes, var.networks) :
+  for_each = var.use_trunk ? {} : { for item in setproduct(var.nodes, var.networks) :
     "${item[0]}-${item[1].network}" => {
       node_idx = index(var.nodes, item[0])
       net      = item[1]
@@ -131,9 +131,9 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
   }
 
   dynamic "network" {
-    for_each = { for net in var.networks : net.network => net }
+    for_each = var.use_trunk ? { for net in [var.networks[0]] : net.network => net } : { for net in var.networks : net.network => net }
     content {
-      port           = var.use_trunk ? openstack_networking_trunk_v2.trunk["${each.key}"].port_id : openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
+      port           = var.use_trunk ? openstack_networking_port_v2.trunk_parent["${each.key}"].id : openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
       access_network = var.use_trunk ? true : network.key == var.networks[0].network
     }
   }
@@ -149,7 +149,7 @@ resource "openstack_compute_instance_v2" "compute_fixed_image" {
     {
       environment_root = var.environment_root
       control_address  = var.control_address
-      access_ip        = openstack_networking_port_v2.compute["${each.key}-${var.networks[0].network}"].all_fixed_ips[0]
+      access_ip        = var.use_trunk ? openstack_networking_port_v2.trunk_parent["${each.key}"].all_fixed_ips[0] : openstack_networking_port_v2.compute["${each.key}-${var.networks[0].network}"].all_fixed_ips[0]
       gateway_ip       = var.gateway_ip
     },
     { for e in var.compute_init_enable : e => true }
@@ -199,9 +199,9 @@ resource "openstack_compute_instance_v2" "compute" {
   }
 
   dynamic "network" {
-    for_each = { for net in var.networks : net.network => net }
+    for_each = var.use_trunk ? { for net in [var.networks[0]] : net.network => net } : { for net in var.networks : net.network => net }
     content {
-      port           = var.use_trunk ? openstack_networking_trunk_v2.trunk["${each.key}"].port_id : openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
+      port           = var.use_trunk ? openstack_networking_port_v2.trunk_parent["${each.key}"].id : openstack_networking_port_v2.compute["${each.key}-${network.key}"].id
       access_network = var.use_trunk ? true : network.key == var.networks[0].network
     }
   }
@@ -217,7 +217,7 @@ resource "openstack_compute_instance_v2" "compute" {
     {
       environment_root = var.environment_root
       control_address  = var.control_address
-      access_ip        = openstack_networking_port_v2.compute["${each.key}-${var.networks[0].network}"].all_fixed_ips[0]
+      access_ip        = var.use_trunk ? openstack_networking_port_v2.trunk_parent["${each.key}"].all_fixed_ips[0] : openstack_networking_port_v2.compute["${each.key}-${var.networks[0].network}"].all_fixed_ips[0]
       gateway_ip       = var.gateway_ip
     },
     { for e in var.compute_init_enable : e => true }
@@ -242,7 +242,7 @@ resource "openstack_networking_floatingip_associate_v2" "fip" {
   for_each = { for idx in range(length(var.fip_addresses)) : var.nodes[idx] => var.fip_addresses[idx] } # zip, fip_addresses can be shorter
 
   floating_ip = each.value
-  port_id     = openstack_networking_port_v2.compute["${each.key}-${length(var.networks) == 1 ? var.networks[0].network : var.fip_network}"].id
+  port_id     = var.use_trunk ? openstack_networking_port_v2.trunk_parent["${each.key}"].id : openstack_networking_port_v2.compute["${each.key}-${length(var.networks) == 1 ? var.networks[0].network : var.fip_network}"].id
 
 }
 
