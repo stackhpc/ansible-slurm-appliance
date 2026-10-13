@@ -29,6 +29,22 @@ compute
 Probes can be configured to run on additional hosts by adding them as a child
 of the group.
 
+## Role variables
+
+- `systemtap_scripts`: Optional list of mappings defining systemtap scripts to
+  be compiled to modules and run, with keys:
+  - `name`: Required str. Name of the module and systemd service to create for
+    the script. Ensure this doesn't conflict with existing systemd services.
+  - `script`: Required multiline str. Systemtap script to be compiled to module
+    and run.
+  - `persist`: Required bool. Indicates whether to load the script's module on
+    boot. Use with caution for probes which have the potential to disrupt the
+    cluster. Note that scripts with this variable set to `true` will persist on
+    reboot but not reimage of the node.
+
+  Note that the role will remove modules based on scripts which were previously
+  defined in the list but are no longer present.
+
 ## Example configuration
 
 For the example RefluXFS mitigation above, `systemtap_scripts` entry would be:
