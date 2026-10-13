@@ -412,6 +412,7 @@ ignore:
   - vulnerability: GHSA-jqcg-44mw-7w3h
     package:
       location: var/www/ood/apps/sys/shell/yarn.lock
+
 # CVE-2026-106445: Handlebars library's templating can bypass denylist rules
 # Not affected: No obvious use of vulnerable functions or user-controlled templating
   - vulnerability: GHSA-p8wg-vrv2-v86f
@@ -419,7 +420,23 @@ ignore:
       location: var/www/ood/apps/sys/shell/yarn.lock
   - vulnerability: GHSA-p8wg-vrv2-v86f
     package:
+      location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
+# CVE-2026-106445: Handlebars templating AST validation bypass
+# Not affected: No user-controlled templating
+  - vulnerability: GHSA-8r5x-fm3f-whwj
+    package:
       location: var/www/ood/apps/sys/shell/yarn.lock
+  - vulnerability: GHSA-8r5x-fm3f-whwj
+    package:
+      location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
+
+# CVE-2026-78663: Go HTTP/2 receive buffer limit bypass allowing for DoS
+# Downgraded to medium by Red Hat as stream level limits still limit DoS
+  - vulnerability: GO-2026-6612
+
+# CVE-2026-56857: Go directory creation outside of permitted scope
+# Unaffected: Windows only
+  - vulnerability: GO-2026-6604
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
