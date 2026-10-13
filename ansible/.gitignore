@@ -110,3 +110,5 @@ roles/*
 !roles/opkssh/**
 !roles/weka/
 !roles/weka/**
+!roles/systemtap/
+!roles/systemtap/**
