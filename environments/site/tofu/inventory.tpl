@@ -54,6 +54,9 @@ ${cluster_name}_${group_name}:
             instance_id: ${ node.id }
             networks: ${jsonencode({for n in node.network: n.name => {"fixed_ip_v4": n.fixed_ip_v4, "fixed_ip_v6": n.fixed_ip_v6}})}
             node_fqdn: ${compute_groups[group_name]["fqdns"][nodename]}
+            trunk_subport_fixed_ip_v4: ${jsonencode([for sp in compute_groups[group_name]["trunk_subports"][nodename] : sp["fixed_ip_v4"]])}
+            trunk_subport_network_ids: ${jsonencode([for sp in compute_groups[group_name]["trunk_subports"][nodename] : sp["network_id"]])}
+            trunk_subport_vlan_ids: ${jsonencode([for sp in compute_groups[group_name]["trunk_subports"][nodename] : sp["vlan_id"]])}
             volumes: ${jsonencode(try(compute_groups[group_name]["volumes"][nodename], {}))}
 %{ endfor ~}
     vars:

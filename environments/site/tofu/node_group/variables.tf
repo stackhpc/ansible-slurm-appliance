@@ -126,16 +126,20 @@ variable "ip_addresses" {
   type        = map(list(string))
   description = <<-EOT
         Mapping of list of fixed IP addresses for nodes, keyed by network name,
-        in same order as nodes parameter. For any networks not specified here
-        the cloud will select addresses.
+        or by trunk parent/subport network ID, in same order as nodes parameter.
+        For any networks not specified here the cloud will select addresses.
 
         NB: Changing IP addresses after deployment may hit terraform provider bugs.
     EOT
   default     = {}
   nullable    = false
   validation {
-    condition     = length(setsubtract(keys(var.ip_addresses), var.networks[*].network)) == 0
-    error_message = "Keys in ip_addresses for nodegroup \"${var.group_name}\" must match network names"
+    condition = length(setsubtract(keys(var.ip_addresses), concat(
+      var.networks[*].network,
+      var.trunk_parent_network_id != null ? [var.trunk_parent_network_id] : [],
+      var.trunk_subport_network_ids
+    ))) == 0
+    error_message = "Keys in ip_addresses for nodegroup \"${var.group_name}\" must match network names or the trunk parent/subport network IDs"
   }
   validation {
     condition     = alltrue([for v in values(var.ip_addresses) : length(v) >= length(var.nodes)])
@@ -213,4 +217,29 @@ variable "additional_cloud_config_vars" {
 variable "server_group_id" {
   type    = string
   default = null
+}
+
+variable "trunk_parent_network_id" {
+  type    = string
+  description = "ID of the network to use as the parent port of the trunk. This controls the access (native) VLAN ID implicitly."
+  default = null
+}
+
+variable "trunk_subport_network_ids" {
+  type        = list(string)
+  description = "IDs of the networks to use as the subports of the trunk."
+  default     = []
+}
+
+variable "trunk_subport_vlan_ids" {
+  type        = list(string)
+  description = "VLAN IDs of the networks used as the subports of the trunk, in the same order as trunk_subport_network_ids."
+  default     = []
+}
+
+variable "use_trunk" {
+  type    = bool
+  description = "Whether to use a trunk port for the node's networking. trunk_parent_network_id, trunk_subport_network_ids, and trunk_subport_vlan_ids must also be set."
+  default = false
+  nullable = false
 }
