@@ -62,7 +62,6 @@ module "cluster" {
   compute = {
     baremetal = {
       nodes             = ["compute-1"] # TODO: move to production?
-      image_id = "1262a762-1367-43e2-9196-cdc6709b045c" # openhpc-agr-std-260902-1338-ed430a09.qcow2
       flavor            = "agr.metal1.compute"
       vnic_types = {
         nesi-hpc-baremetal-vlan112 = "baremetal"
