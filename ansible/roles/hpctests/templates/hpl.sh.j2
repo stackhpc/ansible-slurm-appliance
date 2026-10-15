@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+#SBATCH --ntasks={{ hpctests_hpl_ntasks | int * hpctests_nodes | int }}
+#SBATCH --nodes={{ hpctests_nodes }}
+#SBATCH --output=%x.%a.out
+#SBATCH --error=%x.%a.out
+#SBATCH --exclusive
+#SBATCH --partition={{ hpctests_partition }}
+{% if hpctests_reservation is defined %}
+#SBATCH --reservation={{ hpctests_reservation }}
+{% endif %}
+{% if hpctests_hplsolo_excluded_nodes | length > 0 %}
+#SBATCH --exclude={{ hpctests_hplsolo_excluded_nodes | join(',') }}
+{% endif %}
+{%if hpctests_account is defined %}
+#SBATCH --account={{ hpctests_account }}
+{% endif %}
+{%if hpctests_qos is defined %}
+#SBATCH --qos={{ hpctests_qos }}
+{% endif %}
+{%if hpctests_time is defined %}
+#SBATCH --time={{ hpctests_time }}
+{% endif %}
+
+export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
+echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
+echo SLURM_JOB_ID: $SLURM_JOB_ID
+echo UCX_NET_DEVICES: $UCX_NET_DEVICES
+echo HPL arch: {{ hpctests_hpl_arch }}
+{{ hpctests_pre_cmd }}
+module load {{ hpctests_hpl_modules | join(' ' ) }}
+mpirun ./xhpl-{{ hpctests_hpl_arch }}

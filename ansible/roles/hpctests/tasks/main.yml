@@ -27,9 +27,11 @@
   become_user: "{{ hpctests_user }}"
   tags:
     - hpl-solo
+    - hpl
 
   block:
     - ansible.builtin.include_tasks: build-hpl.yml
+
 - name: Run HPL on individual nodes
   become: true
   become_user: "{{ hpctests_user }}"
@@ -37,6 +39,14 @@
     - hpl-solo
   block:
     - ansible.builtin.include_tasks: hpl-solo.yml
+
+- name: Run distributed HPL
+  become: true
+  become_user: "{{ hpctests_user }}"
+  block:
+    - ansible.builtin.include_tasks: hpl.yml
+  tags:
+    - hpl
 
 - name: Build gpu_burn
   become: true
