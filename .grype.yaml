@@ -433,6 +433,7 @@ ignore:
 # CVE-2026-78663: Go HTTP/2 receive buffer limit bypass allowing for DoS
 # Downgraded to medium by Red Hat as stream level limits still limit DoS
   - vulnerability: GO-2026-6612
+  - vulnerability: CVE-2026-78663
 
 # CVE-2026-56857: Go directory creation outside of permitted scope
 # Unaffected: Windows only
