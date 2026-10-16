@@ -382,12 +382,6 @@ ignore:
     package:
       location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
 
-# GHSA-r277-6w6q-xmqw: kin-openapi auth bypass
-# Not present in final binary https://github.com/grafana/grafana/pull/129271
-  - vulnerability: GHSA-r277-6w6q-xmqw
-    package:
-      location: usr/share/grafana/bin/grafana
-
 # CVE-2026-66066: ruby-on-rails ActiveStorage+libvips possible arbitrary file read + RCE
 # Not affected: libvips not present in the appliance + no found path to rendering user-provided images
   - vulnerability: GHSA-xr9x-r78c-5hrm
