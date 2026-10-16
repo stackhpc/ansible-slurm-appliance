@@ -110,6 +110,7 @@ appliances_extra_packages_default:
   - wget
   - bind-utils
   - net-tools
+  - pciutils
   - postfix
   - git
   - "{{ 'python36' if ansible_distribution_version == '8.9' else 'python312' }}"
