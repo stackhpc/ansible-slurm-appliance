@@ -2,7 +2,7 @@
 inventory_groups = "extra_packages,openondemand"
 
 image_name = "openhpc-agr-std"
-source_image_name = "openhpc-agr-base-260902-1205-0b665db5" # from base build
+source_image_name = "openhpc-agr-base-261013-0855-b6ad88f8" # from base build
 volume_size = 20 # GB
 
 flavor = "agr.compute1.8cpu16ram"
