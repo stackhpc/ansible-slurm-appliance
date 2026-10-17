@@ -35,14 +35,17 @@
 - name: Deploy node_exporter
   hosts: node_exporter
   tags: node_exporter
-  gather_facts: true # TODO
-  gather_subset:
-    # can't turn it off entirely and fake via vars.ansible_facts
-    # because prometheus uses ansible.builtin.getent which *writes* to ansible_facts
-    # which doesn't work if gather_facts is overriden in vars
-    - '!all'   # leaves 'min': system, architecture, service_mgr, pkg_mgr, distribution...
-    - 'mounts'
+  gather_facts: false # TODO
+  # can't fake via vars.ansible_facts
+  # because prometheus uses ansible.builtin.getent which *writes* to ansible_facts
+  # which doesn't work if gather_facts is overriden in vars
   tasks:
+    - ansible.builtin.setup:
+        gather_subset:
+          - '!all'
+          - 'min'
+          - mounts
+      when: appliances_mode != 'build'
     - ansible.builtin.include_role:
         name: prometheus.prometheus.node_exporter
       # vars:
@@ -78,12 +81,15 @@
 - name: Setup core monitoring software
   hosts: prometheus
   tags: prometheus
-  gather_facts: true # TODO
-  gather_subset:
-    # see filebeat comments
-    - '!all'   # leaves 'min': system, architecture, service_mgr, pkg_mgr, distribution...
-    - processor
+  gather_facts: false # TODO
   tasks:
+    # see comment for node_exporter above re. why faking via vars.ansible_facts doesn't work
+    - ansible.builtin.setup:
+        gather_subset:
+          - '!all'
+          - 'min'
+          - processor
+      when: appliances_mode != 'build'
     - ansible.builtin.include_role:
         name: prometheus.prometheus.prometheus
       vars:

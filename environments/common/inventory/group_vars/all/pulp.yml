@@ -1,5 +1,7 @@
 ---
 pulp_site_port: 8080
+# FIXME: I think this is confusing, as it should be the target sync version, not the host version.
+# FIXME: maybe would be better to indirect via appliances_distribution_version etc
 pulp_site_target_distribution_version: "{{ ansible_distribution_version }}"
 
 # If using Ark directly (no local Pulp server), override the following with Ark creds

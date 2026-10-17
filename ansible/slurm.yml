@@ -80,14 +80,18 @@
 - name: Setup slurm
   hosts: openhpc
   become: true
-  gather_facts: true
-  gather_subset:
-    - '!all'
-    - '!min'
-    - 'hardware' # memory, cpu info for compute nodes
+  gather_facts: false # TODO
   tags:
     - openhpc
+    - openhpc-only
   tasks:
+    - name: Gather memory and cpu info
+      ansible.builtin.setup:
+        gather_subset:
+          - "!all"
+          - "!min"
+          - hardware
+      when: appliances_mode != 'build'
     - ansible.builtin.include_role:
         name: stackhpc.openhpc
         tasks_from: validate.yml
@@ -122,7 +126,7 @@
   # Has to be done here as it requires openhpc repos etc for installation
   hosts: nhc
   become: true
-  gather_facts: true
+  gather_facts: false # TODO
   gather_subset:
     - "!all"
     - "!min"
@@ -130,6 +134,14 @@
     - mounts # ansible_mounts
   tags: nhc
   tasks:
+    - name: Gather memory and cpu info
+      ansible.builtin.setup:
+        gather_subset:
+          - '!all'
+          - '!min'
+          - network # ansible_interfaces
+          - mounts # ansible_mounts
+      when: appliances_mode != 'build'
     - ansible.builtin.include_role:
         name: nhc
         tasks_from: install.yml
