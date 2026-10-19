@@ -23,6 +23,7 @@
     enable_chrony: "{{ os_metadata.meta.chrony | default(false) | bool }}"
     enable_vgpu: "{{ os_metadata.meta.vpgu | default(false) | bool }}"
     enable_nhc: "{{ os_metadata.meta.nhc | default(false) | bool }}"
+    enable_persist_hostkeys: "{{ os_metadata.meta.persist_hostkeys | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
     resolv_conf_nameservers: []
@@ -190,6 +191,12 @@
     - name: Configure tuned
       ansible.builtin.include_tasks: tasks/tuned.yml
       when: enable_tuned
+
+    - name: Persist hostkeys
+      ansible.builtin.include_role:
+        name: persist_hostkeys
+        tasks_from: boot.yml
+      when: enable_persist_hostkeys
 
     - name: Configure sssd
       ansible.builtin.include_role:
