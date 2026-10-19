@@ -223,7 +223,7 @@ compute
 # Hosts to run opkssh to allow SSH via OIDC
 
 [slurmrestd:children]
-# Hosts to run slurmrestd on, usually co-located with Open OnDemand
+# Hosts to run slurmrestd on, usually the `openondemand` group
 fatimage
 
 [weka]
