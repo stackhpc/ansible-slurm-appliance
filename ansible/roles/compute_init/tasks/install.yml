@@ -38,6 +38,8 @@
       dest: roles/
     - src: ../../cacerts
       dest: roles/
+    - src: ../../persist_hostkeys
+      dest: roles/
     - src: ../../sssd
       dest: roles/
     - src: ../../sshd
