@@ -159,6 +159,12 @@
         tasks_from: install-ohpc.yml
       when: "'openhpc' in group_names"
 
+    - name: Install Apache and SSL module  # slurmrestd
+      ansible.builtin.include_role:
+        name: slurmrestd_proxy
+        tasks_from: install.yml
+      when: "'slurmrestd' in group_names"
+
     # - import_playbook: portal.yml
     - name: Install Open OnDemand server and apps
       ansible.builtin.include_role:
@@ -192,11 +198,6 @@
     - name: Install Apache PAM module # Extracted from start of roles/openondemand/tasks/pam_auth.yml to ensure only installed during build
       ansible.builtin.dnf:
         name: mod_authnz_pam
-
-    - name: Install Apache and SSL module  # likely already installed by openondemand
-      ansible.builtin.include_role:
-        name: slurmrestd_proxy
-      when: "'slurmrestd' in group_names"
 
     # - import_playbook: monitoring.yml:
     - ansible.builtin.import_role:

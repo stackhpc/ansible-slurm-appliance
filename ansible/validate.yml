@@ -120,9 +120,6 @@
     - ansible.builtin.import_role:
         name: slurmrestd_proxy
         tasks_from: validate.yml
-      when:
-        - "'slurmrestd' in groups"
-        - groups['slurmrestd'] | length > 0
       tags:
         - slurmrestd_proxy
 

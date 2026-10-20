@@ -11,6 +11,12 @@ by the [ansible-role-openhpc](https://github.com/stackhpc/ansible-role-openhpc) 
 Add host(s) to the **slurmrestd** group. It is recommended to use either a separate host, or the
 host running Open OnDemand.
 
+```ini
+# environments/site/inventory/groups
+[slurmrestd:children]
+openondemand
+```
+
 This will automatically enable JWT as an alternate method of authentication.
 
 Add the `vault_openhpc_jwt_key_b64` secret to your environment's secrets:
@@ -32,4 +38,4 @@ self-signed certificate by default.
 If running on the same host as Open OnDemand, it needs a different hostname for httpd routing.
 Set `slurmrestd_proxy_servername` to the chosen FQDN.
 
-See [../ansible/roles/slurmrestd_proxy/README.md](../ansible/roles/slurmrestd_proxy/README.md) for more details.
+See [ansible/roles/slurmrestd_proxy/README.md](../ansible/roles/slurmrestd_proxy/README.md) for more details.

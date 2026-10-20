@@ -118,3 +118,17 @@
         name: nhc
         tasks_from: runtime.yml
       when: appliances_mode != 'build'
+
+- name: Setup Slurm REST API
+  hosts: slurmrestd
+  tags: slurmrestd
+  become: true
+  tasks:
+    - ansible.builtin.include_role:
+        name: slurmrestd_proxy
+        tasks_from: install.yml
+      when: appliances_mode != 'configure'
+    - ansible.builtin.include_role:
+        name: slurmrestd_proxy
+        tasks_from: runtime.yml
+      when: appliances_mode != 'build'

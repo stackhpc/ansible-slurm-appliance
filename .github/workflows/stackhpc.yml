@@ -298,6 +298,7 @@ jobs:
           . venv/bin/activate
           . environments/.stackhpc/activate
 
+          # scontrol token produces output "SLURM_JWT=xxx.yyyy.zzz"
           # shellcheck disable=SC2016
           ping_response=$(ansible -m shell -ba 'eval $(scontrol token) && curl -k -v -H "X-SLURM-USER-TOKEN:$SLURM_JWT" https://127.0.0.1/slurm/v0.0.42/ping' slurmrestd)
 
