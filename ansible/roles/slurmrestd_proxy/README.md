@@ -36,6 +36,6 @@ If using Let's Encrypt:
 ## Other variables
 
 - `slurmrestd_proxy_port_80_redirect_enabled`: Optional. Default `true`. Set to `false` to disable listen on port 80 and redirecting to the TLS port
-- `slurmrestd_proxy_servername`: Required. Default the `ansible_host`. `ServerName` for the slurmrestd_proxy apache config. Need to be different than openondemand_servername or use a different `slurmrestd_proxy_tls_port`.
-- `slurmrestd_proxy_ssl_options`: Optional. Default same set of options than openondemand. List of apache configuration options like `SSLProtocol`, etc.
+- `slurmrestd_proxy_servername`: Optional. Default `ansible_host` (i.e. IP address) of `slurmrestd` host. `ServerName` for the slurmrestd_proxy apache config. Needs to be different to `openondemand_servername` or use a different port via `slurmrestd_proxy_tls_port`.
+- `slurmrestd_proxy_ssl_options`: Optional. Default is the options as openondemand. List of apache configuration options like `SSLProtocol`, etc.
 - `slurmrestd_proxy_tls_port`: Optional. Default `443`. Main port for slurmrestd_proxy, where it will forward requests to slurmrestd.
