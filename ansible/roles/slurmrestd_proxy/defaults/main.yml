@@ -5,3 +5,15 @@ slurmrestd_proxy_certbot_email: ''
 slurmrestd_proxy_ssl_cert: /etc/pki/tls/certs/localhost.crt
 slurmrestd_proxy_ssl_cert_key: /etc/pki/tls/private/localhost.key
 slurmrestd_proxy_servername: "{{ hostvars[groups['slurmrestd'].0].ansible_host if groups['slurmrestd'] else '' }}"
+
+slurmrestd_proxy_port_80_redirect_enabled: true
+
+slurmrestd_proxy_tls_port: 443
+# identical defaults to the openondemand role
+slurmrestd_proxy_ssl_options:
+  # following based on https://grok.lsu.edu/article.aspx?articleid=17596
+  - SSLProtocol all -TLSv1.1 -TLSv1 -SSLv2 -SSLv3
+  - SSLCipherSuite ALL:+HIGH:!ADH:!EXP:!SSLv2:!SSLv3:!MEDIUM:!LOW:!NULL:!aNULL
+  - SSLHonorCipherOrder On
+  - SSLCompression off
+  - SSLSessionTickets Off
