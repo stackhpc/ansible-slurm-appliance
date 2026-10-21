@@ -32,7 +32,7 @@ It requires an OpenStack cloud, and an Ansible "deploy host" with access to that
 Before starting ensure that:
 
 - You have root access on the deploy host.
-- You can create instances from the [latest Slurm appliance image](https://github.com/stackhpc/ansible-slurm-appliance/releases), which already contains the required packages. This is built and tested in StackHPC's CI.
+- You can create instances on the cloud.
 - You have an SSH keypair defined in OpenStack, with the private key available on the deploy host.
 - Created instances have access to internet (note proxies can be setup through the appliance if necessary).
 - Created instances have accurate/synchronised time (for VM instances this is usually provided by the hypervisor; if not or for bare metal instances it may be necessary to configure a time service via the appliance).
@@ -44,11 +44,12 @@ The following operating systems are supported for the deploy host:
 
 - Rocky Linux 9
 - Rocky Linux 8
+- Ubuntu 24
 
-These instructions assume the deployment host is running Rocky Linux 8:
+These instructions assume the deployment host is running Rocky Linux:
 
 ```shell
-sudo yum install -y git python38
+sudo yum install -y git python3.12
 git clone https://github.com/stackhpc/ansible-slurm-appliance
 cd ansible-slurm-appliance
 git checkout ${latest-release-tag}
@@ -89,9 +90,23 @@ And generate secrets for it:
 ansible-playbook ansible/adhoc/generate-passwords.yml
 ```
 
-### Download appliance image to cloud
+### Copy appliance image to cloud
 
-TOOD
+StackHPC provide images with the required packages, which can be downloaded from the links
+in the [release notes](https://github.com/stackhpc/ansible-slurm-appliance/releases). The
+configuration for the image builds is defined in this repository and they are built and tested
+in StackHPC's CI. They can be modified, e.g. to include site-specific packages for production
+deployments.
+
+The appropriate image must be copied to the cloud and Glance properties set:
+
+```shell
+wget <url for appropriate release image>
+openstack image create --disk-format qcow2 --file ./<image name> <image name>
+dev/image-set-properties.sh
+```
+
+Make a note of the UUID for the new OpenStack image.
 
 ### Define and deploy infrastructure
 
