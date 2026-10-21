@@ -127,8 +127,12 @@
     - ansible.builtin.include_role:
         name: slurmrestd_proxy
         tasks_from: install.yml
-      when: appliances_mode != 'configure'
+      when:
+        - appliances_enable_slurmrestd_proxy
+        - appliances_mode != 'configure'
     - ansible.builtin.include_role:
         name: slurmrestd_proxy
         tasks_from: runtime.yml
-      when: appliances_mode != 'build'
+      when:
+        - appliances_enable_slurmrestd_proxy
+        - appliances_mode != 'build'
