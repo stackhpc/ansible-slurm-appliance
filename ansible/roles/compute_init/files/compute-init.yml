@@ -118,6 +118,72 @@
       ansible.builtin.include_vars:
         file: "/var/tmp/cluster/hostvars/{{ ansible_hostname }}/hostvars.yml"
 
+    # prevents the need to update known_hosts after rebuild
+    - name: Replace new ssh keys with old ssh keys (rsa pub)
+      ansible.builtin.copy:
+        dest: "/etc/ssh/ssh_host_rsa_key.pub"
+        content: "{{ ssh_host_rsa_key_pub }}"
+        mode: "0644"
+        owner: "root"
+        group: "root"
+      become: true
+      when: ssh_host_rsa_key_pub is defined
+
+    - name: Replace new ssh keys with old ssh keys (rsa priv)
+      ansible.builtin.copy:
+        dest: "/etc/ssh/ssh_host_rsa_key"
+        content: "{{ ssh_host_rsa_key }}"
+        mode: "0640"
+        owner: "root"
+        group: "ssh_keys"
+      become: true
+      when: ssh_host_rsa_key is defined
+    - name: Replace new ssh keys with old ssh keys (ed25519 pub)
+      ansible.builtin.copy:
+        dest: "/etc/ssh/ssh_host_ed25519_key.pub"
+        content: "{{ ssh_host_ed25519_key_pub }}"
+        mode: "0644"
+        owner: "root"
+        group: "root"
+      become: true
+      when: ssh_host_ed25519_key_pub is defined
+
+    - name: Replace new ssh keys with old ssh keys (ed25519 priv)
+      ansible.builtin.copy:
+        dest: "/etc/ssh/ssh_host_ed25519_key"
+        content: "{{ ssh_host_ed25519_key }}"
+        mode: "0640"
+        owner: "root"
+        group: "ssh_keys"
+      become: true
+      when: ssh_host_ed25519_key is defined
+
+    - name: Replace new ssh keys with old ssh keys (ecdsa pub)
+      ansible.builtin.copy:
+        dest: "/etc/ssh/ssh_host_ecdsa_key.pub"
+        content: "{{ ssh_host_ecdsa_key_pub }}"
+        mode: "0644"
+        owner: "root"
+        group: "root"
+      become: true
+      when: ssh_host_ecdsa_key_pub is defined
+
+    - name: Replace new ssh keys with old ssh keys (ecdsa priv)
+      ansible.builtin.copy:
+        dest: "/etc/ssh/ssh_host_ecdsa_key"
+        content: "{{ ssh_host_ecdsa_key }}"
+        mode: "0640"
+        owner: "root"
+        group: "ssh_keys"
+      become: true
+      when: ssh_host_ecdsa_key is defined
+
+    - name: Restart sshd
+      ansible.builtin.service:
+        name: sshd
+        state: "restarted"
+      become: true
+
     - name: Apply kernel module denylist
       ansible.builtin.include_role:
         name: kernel_modules

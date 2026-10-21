@@ -1,0 +1,68 @@
+- hosts: compute
+  tasks:
+    - name: Check destination for inventory file exists
+      ansible.builtin.file:
+        path: "{{ lookup('ansible.builtin.env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/host_vars/{{ ansible_hostname }}"
+        state: "directory"
+      delegate_to: localhost
+
+    - name: Collect host key from each node (rsa pub)
+      ansible.builtin.slurp:
+        src: /etc/ssh/ssh_host_rsa_key.pub
+      register: host_keys_rsa_pub
+      become: true
+
+    - name: Collect host key from each node (rsa priv)
+      ansible.builtin.slurp:    
+        src: /etc/ssh/ssh_host_rsa_key
+      register: host_keys_rsa
+      become: true
+
+    - name: Collect host key from each node (ecdsa pub)
+      ansible.builtin.slurp:
+        src: /etc/ssh/ssh_host_ecdsa_key.pub
+      register: host_keys_ecdsa_pub
+      become: true
+
+    - name: Collect host key from each node (ecdsa priv)
+      ansible.builtin.slurp:
+        src: /etc/ssh/ssh_host_ecdsa_key
+      register: host_keys_ecdsa
+      become: true
+
+    - name: Collect host key from each node (ed25519 pub)
+      ansible.builtin.slurp:
+        src: /etc/ssh/ssh_host_ed25519_key.pub
+      register: host_keys_ed25519_pub
+      become: true
+
+    - name: Collect host key from each node (ed25519 priv)
+      ansible.builtin.slurp:
+        src: /etc/ssh/ssh_host_ed25519_key
+      register: host_keys_ed25519
+      become: true
+
+    - name: Copy host keys to yaml file
+      vars:
+        ssh_keys:
+          ssh_host_rsa_key_pub: "{{ host_keys_rsa_pub['content'] | b64decode }}"
+          ssh_host_rsa_key: "{{ host_keys_rsa['content'] | b64decode }}"
+          ssh_host_ecdsa_key_pub: "{{ host_keys_ecdsa_pub['content'] | b64decode }}"
+          ssh_host_ecdsa_key: "{{ host_keys_ecdsa['content'] | b64decode }}"
+          ssh_host_ed25519_key_pub: "{{ host_keys_ed25519_pub['content'] | b64decode }}"
+          ssh_host_ed25519_key: "{{ host_keys_ed25519['content'] | b64decode }}"
+      ansible.builtin.copy:
+        dest: "{{ lookup('ansible.builtin.env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/host_vars/{{ ansible_hostname }}/ssh-host-keys"
+        content: "{{ ssh_keys | to_nice_yaml }}"
+      delegate_to: localhost
+
+    - name: Encrypt the key files in-place
+      ansible.builtin.copy:
+        content: "{{ lookup('ansible.builtin.file', host_keys_path) | ansible.builtin.vault(ansible_vault_password) }}"
+        dest: "{{ host_keys_path }}"
+        decrypt: false
+      vars:
+        host_keys_path: "{{ lookup('ansible.builtin.env', 'APPLIANCES_ENVIRONMENT_ROOT') }}/inventory/host_vars/{{ ansible_hostname }}/ssh-host-keys"
+        ansible_vault_path: "{{ lookup('ansible.builtin.env', 'ANSIBLE_VAULT_PASSWORD_FILE') }}"
+        ansible_vault_password: "{{ lookup('ansible.builtin.file', ansible_vault_path) }}"
+      delegate_to: localhost
