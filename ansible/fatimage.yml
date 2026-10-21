@@ -159,6 +159,12 @@
         tasks_from: install-ohpc.yml
       when: "'openhpc' in group_names"
 
+    - name: Install slurmrestd_proxy dependencies
+      ansible.builtin.include_role:
+        name: slurmrestd_proxy
+        tasks_from: install.yml
+      when: "'slurmrestd_proxy' in group_names"
+
     # - import_playbook: portal.yml
     - name: Install Open OnDemand server and apps
       ansible.builtin.include_role:
