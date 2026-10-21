@@ -143,6 +143,3 @@ appliances_packages_uninstall:
   # Installed in RL8 genericcloud, but vulnerable
   - python3-unbound
   - unbound-libs
-
-# It is recommended to run slurmrestd behind a TLS reverse proxy
-appliances_enable_slurmrestd_proxy: true

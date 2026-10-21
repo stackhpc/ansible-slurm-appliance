@@ -46,4 +46,4 @@ compute
 compute
 
 [slurmrestd:children]
-login
+openondemand

@@ -120,19 +120,15 @@
       when: appliances_mode != 'build'
 
 - name: Setup Slurm REST API
-  hosts: slurmrestd
-  tags: slurmrestd
+  hosts: slurmrestd_proxy
+  tags: slurmrestd_proxy
   become: true
   tasks:
     - ansible.builtin.include_role:
         name: slurmrestd_proxy
         tasks_from: install.yml
-      when:
-        - appliances_enable_slurmrestd_proxy
-        - appliances_mode != 'configure'
+      when: appliances_mode != 'configure'
     - ansible.builtin.include_role:
         name: slurmrestd_proxy
         tasks_from: runtime.yml
-      when:
-        - appliances_enable_slurmrestd_proxy
-        - appliances_mode != 'build'
+      when: appliances_mode != 'build'

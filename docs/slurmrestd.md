@@ -30,7 +30,9 @@ ansible-vault encrypt environments/staging/inventory/group_vars/all/secrets.yml
 ## Enabling the reverse proxy
 
 slurmrestd is configured to listen on `127.0.0.1` by default (`openhpc_slurmrestd_listen_endpoints`)
-and the reverse proxy is enabled by default (`appliances_enable_slurmrestd_proxy`).
+and the reverse proxy is enabled by default (`slurmrestd` nodes are children of the `slurmrestd_proxy` group).
+
+This is the recommended setup because the HTTP REST API sends JWT tokens in cleartext.
 
 It supports the same Let's Encrypt integration as the openondemand role and will use the same
 self-signed certificate by default.

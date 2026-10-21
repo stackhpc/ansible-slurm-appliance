@@ -111,7 +111,7 @@
 
 - name: Validate slurmrestd_proxy configuration
   hosts:
-    - slurmrestd
+    - slurmrestd_proxy
   gather_facts: false
   tags:
     - validate
@@ -120,8 +120,6 @@
     - ansible.builtin.import_role:
         name: slurmrestd_proxy
         tasks_from: validate.yml
-      tags:
-        - slurmrestd_proxy
 
 - name: Validate freeipa configuration
   hosts: freeipa_client

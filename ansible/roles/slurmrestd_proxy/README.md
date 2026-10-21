@@ -30,12 +30,12 @@ If using Let's Encrypt:
 
 - Leave `slurmrestd_proxy_ssl_cert` and `slurmrestd_proxy_ssl_cert_key` set to their default values.
 - `slurmrestd_proxy_servername` must be a valid DNS name, not an IP.
-- Port 80 on the `slurmrestd` host must be externally accessible.
+- Port 80 on the `slurmrestd_proxy` host must be externally accessible.
 - Certificates will be renewed automatically by the systemd timer `certbot-renew.timer`.
 
 ## Other variables
 
 - `slurmrestd_proxy_port_80_redirect_enabled`: Optional. Default `true`. Set to `false` to disable listen on port 80 and redirecting to the TLS port
-- `slurmrestd_proxy_servername`: Optional. Default `ansible_host` (i.e. IP address) of `slurmrestd` host. `ServerName` for the slurmrestd_proxy apache config. Needs to be different to `openondemand_servername` or use a different port via `slurmrestd_proxy_tls_port`.
-- `slurmrestd_proxy_ssl_options`: Optional. Default is the options as openondemand. List of apache configuration options like `SSLProtocol`, etc.
-- `slurmrestd_proxy_tls_port`: Optional. Default `443`. Main port for slurmrestd_proxy, where it will forward requests to slurmrestd.
+- `slurmrestd_proxy_servername`: Optional. Default `ansible_host` (i.e. IP address) of `slurmrestd_proxy` host. `ServerName` for the `slurmrestd.conf` apache config. Needs to be different than `openondemand_servername` or use a different port via `slurmrestd_proxy_tls_port`.
+- `slurmrestd_proxy_ssl_options`: Optional. Default is the same options as openondemand. List of apache configuration options like `SSLProtocol`, etc.
+- `slurmrestd_proxy_tls_port`: Optional. Default `443`. Main port for `slurmrestd.conf`, where it will forward requests to slurmrestd.

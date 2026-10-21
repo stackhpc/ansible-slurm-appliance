@@ -31,9 +31,7 @@
         --email {{ slurmrestd_proxy_certbot_email }}
   register: _slurmrestd_proxy_certbot
   changed_when: "'Certificate not yet due for renewal' not in _slurmrestd_proxy_certbot.stdout"
-  when:
-    - slurmrestd_proxy_certbot | bool
-    - appliances_mode != 'build'
+  when: slurmrestd_proxy_certbot | bool
 
 - ansible.builtin.meta: flush_handlers
 

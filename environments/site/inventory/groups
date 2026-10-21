@@ -226,6 +226,10 @@ compute
 # Hosts to run slurmrestd on, usually the `openondemand` group
 fatimage
 
+[slurmrestd_proxy:children]
+# It is recommended to run slurmrestd behind a local TLS-terminating reverse-proxy
+slurmrestd
+
 [weka]
 # Hosts to install and mount WEKA filesystems on
 
