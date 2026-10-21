@@ -1,0 +1,16 @@
+---
+- name: Stop systemd service for {{ _stap_remove_probe }}
+  ansible.builtin.systemd_service:
+    enabled: false
+    state: stopped
+    name: "stap-{{ _stap_remove_probe }}.service"
+
+- name: Remove systemd service
+  ansible.builtin.file:
+    path: "/etc/systemd/system/stap-{{ _stap_remove_probe }}.service"
+    state: absent
+
+- name: Delete module for {{ _stap_remove_probe }}
+  ansible.builtin.file:
+    path: "{{ systemtap_modules_directory }}/{{ _stap_remove_probe }}.ko"
+    state: absent
