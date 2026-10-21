@@ -236,6 +236,12 @@ doca
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
 
+[slurmrestd]
+# Hosts to run slurmrestd on, usually the `openondemand` group
+
+[slurmrestd_proxy]
+# Hosts to run slurmrestd_proxy on. Should contain the `slurmrestd` group
+
 [weka]
 # Hosts to install and mount WEKA filesystems on
 
