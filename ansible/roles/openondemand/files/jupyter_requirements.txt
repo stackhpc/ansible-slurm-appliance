@@ -9,7 +9,7 @@ attrs==26.1.0
 babel==2.18.0
 beautifulsoup4==4.15.0
 bleach==6.4.0
-certifi==2026.10.18
+certifi==2026.10.19
 cffi==2.0.0
 charset-normalizer==3.4.7
 comm==0.2.3
