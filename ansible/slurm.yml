@@ -119,7 +119,7 @@
         tasks_from: runtime.yml
       when: appliances_mode != 'build'
 
-- name: Setup Slurm REST API
+- name: Setup Slurm REST API Proxy
   hosts: slurmrestd_proxy
   tags: slurmrestd_proxy
   become: true
