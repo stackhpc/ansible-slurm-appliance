@@ -154,12 +154,13 @@ To deploy this infrastructure, ensure the venv and the environment are [activate
 
 ```shell
 export OS_CLOUD=openstack
-cd environments/$ENV/tofu/
 tofu init
 tofu apply
 ```
 
-and follow the prompts. Note the OS_CLOUD environment variable assumes that OpenStack credentials are defined using a [clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml) file in a default location with the default cloud name of `openstack`.
+and follow the prompts. Note the `OS_CLOUD` environment variable assumes that OpenStack credentials are defined using a
+[clouds.yaml](https://docs.openstack.org/python-openstackclient/latest/configuration/index.html#clouds-yaml) file
+in a default location with the default cloud name of `openstack`.
 
 ### Configure appliance
 
