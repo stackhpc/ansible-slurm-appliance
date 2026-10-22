@@ -6,6 +6,7 @@ hpctests_pre_cmd: ""
 hpctests_pingmatrix_modules:
   - gnu12
   - openmpi4
+hpctests_sbatch_options: []
 hpctests_pingpong_modules:
   - gnu12
   - openmpi4
