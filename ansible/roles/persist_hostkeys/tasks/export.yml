@@ -1,22 +1,22 @@
 ---
-# Even if all hosts in the persist_hostkeys role currently share the same keys,
-# these tasks don't make the assumption
 - name: Find hostkeys
+  delegate_to: "{{ persist_hostkeys_state_server }}"
   register: _found_hostkeys
   ansible.builtin.find:
-    path: /etc/ssh
+    path: "{{ persist_hostkeys_state_dir }}/"
     patterns:
       - ssh_host_*_key
       - ssh_host_*_key.pub
 
 - name: Create in-memory copies of keys
+  delegate_to: "{{ persist_hostkeys_state_server }}"
   ansible.builtin.slurp:
     src: "{{ item.path }}"
   loop: "{{ _found_hostkeys.files }}"
   register: _slurp_keys
 
 - name: Ensure hostkeys export directory
-  delegate_to: "{{ groups['control'] | first }}"
+  delegate_to: "{{ persist_hostkeys_state_server }}"
   ansible.builtin.file:
     path: /exports/cluster/hostconfig/{{ ansible_hostname }}/hostkeys
     state: directory
@@ -25,7 +25,7 @@
     mode: "0750"
 
 - name: Export hostkey
-  delegate_to: "{{ groups['control'] | first }}"
+  delegate_to: "{{ persist_hostkeys_state_server }}"
   ansible.builtin.copy:
     content: "{{ item.content | b64decode }}"
     dest: /exports/cluster/hostconfig/{{ ansible_hostname }}/hostkeys/{{ item.source | basename }}
