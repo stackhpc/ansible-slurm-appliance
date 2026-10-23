@@ -103,7 +103,7 @@ The appropriate image must be copied to the cloud and Glance properties set:
 ```shell
 wget <url for appropriate release image>
 openstack image create --disk-format qcow2 --file ./<image name> <image name>
-dev/image-set-properties.sh
+dev/image-set-properties.sh <image name>
 ```
 
 Make a note of the UUID for the new OpenStack image.
