@@ -8,15 +8,15 @@ Any site-specific instructions in [docs/site/README.md](site/README.md) should b
 This document assumes the deployment repository has:
 
 - Remotes:
-   - `origin` referring to the site-specific remote repository.
-   - `stackhpc` referring to the StackHPC repository at <https://github.com/stackhpc/ansible-slurm-appliance.git>.
+  - `origin` referring to the site-specific remote repository.
+  - `stackhpc` referring to the StackHPC repository at <https://github.com/stackhpc/ansible-slurm-appliance.git>.
 - Branches:
-   - `main` - following `main/origin`, the current site-specific code deployed to production.
-   - `upstream` - following `main/stackhpc`, i.e. the upstream `main` branch from `stackhpc`.
+  - `main` - following `main/origin`, the current site-specific code deployed to production.
+  - `upstream` - following `main/stackhpc`, i.e. the upstream `main` branch from `stackhpc`.
 - The following environments:
-   - `$PRODUCTION`: a production environment, as defined by e.g. `environments/production/`.
-   - `$STAGING`: a production environment, as defined by e.g. `environments/staging/`.
-   - `$SITE_ENV`: a base site-specific environment, as defined by e.g. `environments/mysite/`.
+  - `$PRODUCTION`: a production environment, as defined by e.g. `environments/production/`.
+  - `$STAGING`: a production environment, as defined by e.g. `environments/staging/`.
+  - `$SITE_ENV`: a base site-specific environment, as defined by e.g. `environments/mysite/`.
 
 **NB:** Commands which should be run on the Slurm login node are shown below prefixed `[LOGIN]$`.
 All other commands should be run on the Ansible deploy host.
@@ -50,10 +50,9 @@ All other commands should be run on the Ansible deploy host.
 
    Note that if upgrading from a release prior to v2.3, you will likely have merge conflicts
    with existing site OpenTofu configurations in `environments/site/tofu`. Generally
-
    - Changes to `default` values in `environments/site/tofu.variables.tf` should be rejected.
    - All other changes to the OpenTofu configuration should be accepted, unless they overwrite
-   site-specific additional resources.
+     site-specific additional resources.
 
 5. Push this branch and create a PR:
 
@@ -93,44 +92,44 @@ All other commands should be run on the Ansible deploy host.
 11. Commit changes and push to the PR created above.
 
 12. Declare a future outage window to cluster users. A [Slurm reservation](https://slurm.schedmd.com/scontrol.html#lbAQ) can be
-   used to prevent jobs running during that window, e.g.:
+    used to prevent jobs running during that window, e.g.:
 
-   ```shell
-   [LOGIN]$  sudo scontrol create reservation Flags=MAINT ReservationName="upgrade-vX.Y" StartTime=2024-10-16T08:00:00 EndTime=2024-10-16T10:00:00 Nodes=ALL Users=root
-   ```
+    ```shell
+    [LOGIN]$  sudo scontrol create reservation Flags=MAINT ReservationName="upgrade-vX.Y" StartTime=2024-10-16T08:00:00  EndTime=2024-10-16T10:00:00 Nodes=ALL Users=root
+    ```
 
-   Note a reservation cannot be created if it may overlap with currently running jobs (defined by job or partition time limits).
+    Note a reservation cannot be created if it may overlap with currently running jobs (defined by job or partition time limits).
 
 13. At the outage window, check there are no jobs running:
 
-   ```shell
-   [LOGIN]$ squeue
-   ```
+    ```shell
+    [LOGIN]$ squeue
+    ```
 
 14. Deploy the branch created above to production, i.e. activate the production environment, run OpenTofu to reimage or
-   delete/recreate instances with the new images (depending on how the root disk is defined), and run Ansible's `site.yml`
-   playbook to reconfigure the cluster, e.g. as described in the main [README.md](../README.md).
+    delete/recreate instances with the new images (depending on how the root disk is defined), and run Ansible's `site.yml`
+    playbook to reconfigure the cluster, e.g. as described in the main [README.md](../README.md).
 
 15. Check Slurm is up:
 
-   ```shell
-   [LOGIN]$ sinfo -R
-   ```
+    ```shell
+    [LOGIN]$ sinfo -R
+    ```
 
-   The `-R` shows the reason for any nodes being down.
+    The `-R` shows the reason for any nodes being down.
 
 16. If the above shows nodes done for having been "unexpectedly rebooted", set them up again:
 
-   ```shell
-   [LOGIN]$ sudo scontrol update state=RESUME nodename=$HOSTLIST_EXPR
-   ```
+    ```shell
+    [LOGIN]$ sudo scontrol update state=RESUME nodename=$HOSTLIST_EXPR
+    ```
 
-   where the hostlist expression might look like e.g. `general-[0-1]` to reset state for nodes 0 and 1 of the general partition.
+    where the hostlist expression might look like e.g. `general-[0-1]` to reset state for nodes 0 and 1 of the general partition.
 
 17. Delete the reservation:
 
-   ```shell
-   [LOGIN]$ sudo scontrol delete ReservationName="upgrade-slurm-v1.160"
-   ```
+    ```shell
+    [LOGIN]$ sudo scontrol delete ReservationName="upgrade-slurm-v1.160"
+    ```
 
 18. Tell users the cluster is available again.
