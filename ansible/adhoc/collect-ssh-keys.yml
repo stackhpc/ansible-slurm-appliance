@@ -13,7 +13,7 @@
       become: true
 
     - name: Collect host key from each node (rsa priv)
-      ansible.builtin.slurp:    
+      ansible.builtin.slurp:
         src: /etc/ssh/ssh_host_rsa_key
       register: host_keys_rsa
       become: true

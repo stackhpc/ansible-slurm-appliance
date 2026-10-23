@@ -138,6 +138,7 @@
         group: "ssh_keys"
       become: true
       when: ssh_host_rsa_key is defined
+
     - name: Replace new ssh keys with old ssh keys (ed25519 pub)
       ansible.builtin.copy:
         dest: "/etc/ssh/ssh_host_ed25519_key.pub"
