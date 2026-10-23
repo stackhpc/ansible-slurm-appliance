@@ -16,7 +16,7 @@ roles:
     name: stackhpc.os-manila-mount
     version: v29.0.0
   - src: mrlesmithjr.chrony
-    version: v0.1.4
+    version: v0.2.0
 
 collections:
   - name: containers.podman
