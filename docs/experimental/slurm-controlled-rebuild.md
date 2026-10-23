@@ -62,6 +62,7 @@ This functionality involves several roles in the appliance:
 3. Follow the [compute_init role readme](../../ansible/roles/compute_init/README.md)
    to configure that role:
    - Add nodes into the `compute_init` group.
+   - Run `ansible-playbook ansible/adhoc/collect-ssh-keys.yml` to persist host keys after rebuild.
    - Potentially, build an image.
    - Configure the OpenTofu variable `compute_init_enable` to enable specific
      functionality on boot.
