@@ -35,7 +35,8 @@ It sets image properties for best performance.
 Options:
 
   -h  show this help message
-  -i  Force a specific image id, instead of reusing the one of the source image
+  -i  Force a specific image id, instead of reusing the one of the source image.
+      You can use 'uuidgen --random' to pick a new image id.
   -k  keep downloaded and intermediate files
   -r  convert the image to raw before creating it
 
@@ -133,7 +134,7 @@ else
     "$image_name" || true
 
   mydir="$(realpath "$(dirname "$0")")"
-  "$mydir/../../dev/image-set-properties.sh" "$expected_image_id"
+  "$mydir/image-set-properties.sh" "$expected_image_id"
 
   if ! $keep; then
       echo "Cleaning files"
