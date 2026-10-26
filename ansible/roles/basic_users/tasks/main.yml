@@ -83,8 +83,7 @@
     label: "{{ item.name }}"
   when:
     - item.state | default('present') == 'present'
-    - item.create_home | default(true) | bool
-    - ansible_hostname == basic_users_homedir_server
+    - item.create_home | default(ansible_hostname == basic_users_homedir_server) | bool
 
 # The following tasks run on a single *client* node, so that home directory
 # paths are easily constructed, becoming each user so that root-squash
