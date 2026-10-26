@@ -439,6 +439,14 @@ ignore:
     package:
       location: usr/lib/ansible-init/lib/python3.9/site-packages/ansible_collections/community/digitalocean/poetry.lock
 
+# DOMPurify SAFE_FOR_TEMPLATES bypass
+# SAFE_FOR_TEMPLATES not enabled anywhere in the served JupyterLab bundle or labextensions
+# FIXME: Remove when JupyterLab ships dompurify >= 3.4.17
+  - vulnerability: GHSA-cg2g-xh64-v4q7
+    package:
+      name: dompurify
+      location: "opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock"
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
 exclude:
