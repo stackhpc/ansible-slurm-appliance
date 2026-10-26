@@ -47,7 +47,7 @@
 
 - hosts: builder
   become: true
-  gather_facts: false
+  gather_facts: true
   tasks:
     - name: Ensure psi=1 on boot
       ansible.builtin.include_role:
