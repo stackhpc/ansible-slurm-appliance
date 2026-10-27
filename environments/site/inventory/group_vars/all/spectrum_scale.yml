@@ -5,10 +5,10 @@
 #   scale_*: From IBM role, see ansible/collections/ansible_collections/ibm/spectrum_scale/roles/docs/VARIABLES.md
 
 # --- Installation ---
-scale_version: '5.1.8.2' # TODO: add validation that this is set?
+scale_version: "5.1.9.12"
 spectrum_scale_s3cfg: "{{ vault_spectrum_scale_s3cfg }}"
-spectrum_scale_installer_s3path: s3://spectrum_scale/Storage_Scale_Advanced-5.1.8.2-x86_64-Linux-install
-spectrum_scale_installer_md5sum: 149d315d5caa091d88bc22a57b8a00ad
+spectrum_scale_installer_s3path: s3://spectrum_scale/Storage_Scale_Erasure_Code-5.1.9.12-x86_64-Linux-install
+spectrum_scale_installer_md5sum: "cf18bdeaaadb2276e7b03280e078e08b"
 
 # --- Node preparation ---
 scale_prepare_enable_ssh_login: true
