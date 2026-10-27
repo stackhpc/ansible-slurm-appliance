@@ -115,7 +115,7 @@
       instance_id: "{{ instance_id }}"
       image_id: "{{ image_id }}"
 
-- name: Export persist_hostkeys files
+- name: Export persisted hostkeys
   ansible.builtin.import_role:
     name: persist_hostkeys
     tasks_from: export.yml

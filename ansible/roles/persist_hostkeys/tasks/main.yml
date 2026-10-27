@@ -1,11 +1,11 @@
 ---
 - name: Generate persistent hostkeys in state directory
   vars:
-    persist_hostkeys_mode: "shared" # or "individual"
-    _persist_hostkeys_keyhost: "{{ ansible_hostname if persist_hostkeys_mode == 'individual' else groups['login'] | first }}"
+    _persist_hostkeys_keyhost: "{{ groups['login'] if persist_hostkeys_mode == 'shared' else omit }}"
   block:
     - name: Ensure hostkeys directory exists on persistent storage
       delegate_to: "{{ persist_hostkeys_state_server }}"
+      run_once: true
       ansible.builtin.file:
         path: "{{ persist_hostkeys_state_dir }}"
         state: directory
@@ -13,8 +13,17 @@
         group: root
         mode: "0600"
 
+    - name: Ensure hostkeys state directory per-host
+      delegate_to: "{{ persist_hostkeys_state_server }}"
+      ansible.builtin.file:
+        path: "{{ persist_hostkeys_state_dir }}/{{ inventory_hostname }}/hostkeys"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
     - name: Find hostkeys
-      delegate_to: "{{ _persist_hostkeys_keyhost }}"
+      delegate_to: "{{ _persist_hostkeys_keyhost | default(omit) }}"
       ansible.builtin.find:
         path: /etc/ssh
         patterns:
@@ -23,45 +32,36 @@
       register: _found_hostkeys
 
     - name: Create in-memory copies of keys
-      delegate_to: "{{ _persist_hostkeys_keyhost }}"
+      delegate_to: "{{ _persist_hostkeys_keyhost | default(omit) }}"
       ansible.builtin.slurp:
         src: "{{ item.path }}"
       loop: "{{ _found_hostkeys.files }}"
       register: _slurp_keys
 
-    - name: Ensure hostkeys state directory per-host
-      delegate_to: "{{ persist_hostkeys_state_server }}"
-      ansible.builtin.file:
-        path: "{{ persist_hostkeys_state_dir }}/{{ ansible_hostname }}/hostkeys"
-        state: directory
-        owner: root
-        group: root
-        mode: "0750"
+- name: Save hostkeys to state directory
+  delegate_to: "{{ persist_hostkeys_state_server }}"
+  ansible.builtin.copy:
+    content: "{{ item.content | b64decode }}"
+    dest: "{{ persist_hostkeys_state_dir }}/{{ inventory_hostname }}/hostkeys/{{ item.source | basename }}"
+    remote_src: true
+    force: false # does not overwrite existing file
+    owner: root
+    group: root
+    mode: "0440"
+  loop: "{{ _slurp_keys.results }}"
 
-    - name: Export hostkey
-      delegate_to: "{{ persist_hostkeys_state_server }}"
-      ansible.builtin.copy:
-        content: "{{ item.content | b64decode }}"
-        dest: "{{ persist_hostkeys_state_dir }}/{{ ansible_hostname }}/hostkeys/{{ item.source | basename }}"
-        remote_src: true
-        force: false # does not overwrite existing file
-        owner: root
-        group: root
-        mode: "0440"
-      loop: "{{ _slurp_keys.results }}"
+- name: Get created key names
+  delegate_to: "{{ persist_hostkeys_state_server }}"
+  ansible.builtin.find:
+    path: "{{ persist_hostkeys_state_dir }}/{{ inventory_hostname }}/"
+  register: _find_ssh_keys
 
-    - name: Get created key names
-      delegate_to: "{{ persist_hostkeys_state_server }}"
-      ansible.builtin.find:
-        path: "{{ persist_hostkeys_state_dir }}/"
-      register: _find_ssh_keys
-
-    - name: Create in-memory copies of keys
-      delegate_to: "{{ persist_hostkeys_state_server }}"
-      ansible.builtin.slurp:
-        src: "{{ item.path }}"
-      loop: "{{ _find_ssh_keys.files }}"
-      register: _slurp_keys
+- name: Create in-memory copies of keys
+  delegate_to: "{{ persist_hostkeys_state_server }}"
+  ansible.builtin.slurp:
+    src: "{{ item.path }}"
+  loop: "{{ _find_ssh_keys.files }}"
+  register: _slurp_keys
 
 - name: Copy keys to hosts
   no_log: true
