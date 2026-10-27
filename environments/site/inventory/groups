@@ -128,7 +128,7 @@ openhpc
 # Hosts to configure for manila fileshares
 
 [persist_hostkeys:children]
-# Hosts to use common set of hostkeys which persist across reimaging.
+# Hosts to persist hostkeys for across reimaging.
 login
 openondemand
 

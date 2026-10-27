@@ -9,20 +9,36 @@
     mode: "0600"
     owner: root
     group: ssh_keys
+  no_log: true
 
-# copy creates permissions 640 instead of 600
-- name: Find hostkeys
-  register: _found_hostkeys
+# private keys need permission 600
+- name: Find private hostkeys
+  register: _found_private_hostkeys
   ansible.builtin.find:
     path: /etc/ssh
     patterns:
       - ssh_host_*_key
-      - ssh_host_*_key.pub
 
-- name: Ensure hostkey permissions
+- name: Ensure private hostkey permissions
   ansible.builtin.file:
     path: "{{ item.path }}"
     mode: "0600"
     owner: root
     group: ssh_keys
-  loop: "{{ _found_hostkeys.files }}"
+  loop: "{{ _found_private_hostkeys.files }}"
+
+# public keys need permission 644
+- name: Find public hostkeys
+  register: _found_public_hostkeys
+  ansible.builtin.find:
+    path: /etc/ssh
+    patterns:
+      - ssh_host_*_key.pub
+
+- name: Ensure public hostkey permissions
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: "0644"
+    owner: root
+    group: ssh_keys
+  loop: "{{ _found_public_hostkeys.files }}"
