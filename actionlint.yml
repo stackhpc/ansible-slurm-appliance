@@ -1,1 +1,4 @@
 ---
+self-hosted-runner:
+  labels:
+    - ansible-slurm-appliance
