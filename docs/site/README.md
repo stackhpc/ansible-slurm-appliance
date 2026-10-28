@@ -100,6 +100,8 @@ git clone https://token:${GITLAB_PAT}@gitlab.com/nesi1/agresearch/agr-eri-slurm.
   export ANSIBLE_SSH_COMMON_ARGS="-i $(realpath $path_to_jumphost_private_key) -J nesi-ansible"
   export PKR_VAR_ssh_private_key_file=$(realpath $path_to_cluster_private_key)
   export PKR_VAR_ssh_bastion_private_key_file=$(realpath $path_to_jumphost_private_key)
+  export PKR_VAR_ssh_bastion_host = "slurm-bastion.eri.agresearch.co.nz"
+  export PKR_VAR_ssh_bastion_username = "rocky"
   ssh-add ${path_to_cluster_private_key}
   ```
 
