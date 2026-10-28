@@ -110,6 +110,7 @@ ood_install_apps: >-
     | combine(openondemand_install_app_rstudio if openondemand_rstudio_partition else {})
     | combine(openondemand_install_app_matlab if openondemand_matlab_partition else {})
     | combine(openondemand_install_app_codeserver if openondemand_codeserver_partition else {})
+    | combine(ood_install_apps_extra | default({}))
   }}
 
 # https://github.com/OSC/ondemand/tree/master/apps/bc_desktop
@@ -506,6 +507,7 @@ ood_apps: >-
     | combine(openondemand_apps_rstudio)
     | combine(openondemand_apps_matlab)
     | combine(openondemand_apps_codeserver)
+    | combine(ood_apps_extra | default({}))
   }}
 
 # Prometheus config for Open Ondemand exporter

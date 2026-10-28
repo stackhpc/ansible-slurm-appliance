@@ -236,6 +236,12 @@ doca
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
 
+[slurmrestd]
+# Hosts to run slurmrestd on, usually the `openondemand` group
+
+[slurmrestd_proxy]
+# Hosts to run slurmrestd_proxy on. Should contain the `slurmrestd` group
+
 [weka]
 # Hosts to install and mount WEKA filesystems on
 
@@ -246,6 +252,9 @@ doca
 # Hosts to get loaded modules and run modulejail onto (doesn't modify the host's modprobe.d)
 # Add at least one host per hardware kind. Don't forget VMs.
 # Can add the whole cluster if you want.
+
+[systemtap]
+# Hosts to install systemtap and run probes on
 
 [sbom]
 # Add builder to this group to run syft on the site-built image

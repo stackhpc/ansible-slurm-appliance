@@ -16,7 +16,7 @@ import subprocess
 import sys
 
 CLUSTER_RESOURCES = {
-    "server": [],
+    "server": ["--wait"],
     "port": [],
     "volume": ["--purge"],  # remove volume with snapshots
 }

@@ -4,7 +4,7 @@ roles:
     version: v26.2.1
     name: stackhpc.nfs
   - src: https://github.com/stackhpc/ansible-role-openhpc.git
-    version: v1.8.0
+    version: v1.9.0
     name: stackhpc.openhpc
   - src: https://github.com/stackhpc/ansible-grafana.git
     name: cloudalchemy.grafana
@@ -14,7 +14,7 @@ roles:
     version: v4.1.1
   - src: https://github.com/stackhpc/ansible-role-os-manila-mount.git
     name: stackhpc.os-manila-mount
-    version: v26.1.1
+    version: v29.0.0
   - src: mrlesmithjr.chrony
     version: v0.1.4
 
@@ -52,4 +52,4 @@ collections:
   - name: prometheus.prometheus
     source: https://github.com/stackhpc/prometheus-community-ansible
     type: git
-    version: 0.28.0+stackhpc.1
+    version: 0.30.1+stackhpc.1

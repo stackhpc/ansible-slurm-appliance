@@ -222,12 +222,24 @@ compute
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
 
+[slurmrestd:children]
+# Hosts to run slurmrestd on, usually the `openondemand` group
+fatimage
+
+[slurmrestd_proxy:children]
+# It is recommended to run slurmrestd behind a local TLS-terminating reverse-proxy
+slurmrestd
+
 [weka]
 # Hosts to install and mount WEKA filesystems on
 
 ## Vulnerability mitigation groups
 [kernel_modules:children]
 cluster
+
+[systemtap:children]
+login
+compute
 
 [sbom]
 # Add builder to this group to run syft on the site-built image
