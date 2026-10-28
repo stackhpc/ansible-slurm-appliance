@@ -1,0 +1,30 @@
+stages:
+  - build
+
+default:
+  tags: [bastion]   # whatever tags your project runner has
+
+packer-build:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"   # manual "Run pipeline" only
+  script:
+    - dev/setup-env.sh
+    - . venv/bin/activate
+    - export ANSIBLE_VAULT_PASSWORD_FILE=$VAULT_PASSWORD
+    - . environments/stg/activate # TODO make flexible!
+    # TODO: ssh setup
+    - export PKR_VAR_ssh_private_key_file=/home/rocky/.ssh/id_rsa
+    # don't need to set on ansible side as a default path
+
+    # assumes stackhpc image is already there
+    - which -a packer
+    - cd packer
+    - packer init .
+    - cd --
+    - dev/image-build std # TODO: make flexible
+  artifacts:
+    when: always          # upload even if the job fails
+    paths:
+      - environments/stg/std.build.log # TODO: make flexible
+    expire_in: 30 days
