@@ -1,0 +1,9 @@
+---
+
+- name: Configure SystemTap probes
+  become: true
+  hosts: systemtap
+  tasks:
+    - ansible.builtin.import_role:
+        name: systemtap
+        tasks_from: configure.yml

@@ -382,12 +382,6 @@ ignore:
     package:
       location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
 
-# GHSA-r277-6w6q-xmqw: kin-openapi auth bypass
-# Not present in final binary https://github.com/grafana/grafana/pull/129271
-  - vulnerability: GHSA-r277-6w6q-xmqw
-    package:
-      location: usr/share/grafana/bin/grafana
-
 # CVE-2026-66066: ruby-on-rails ActiveStorage+libvips possible arbitrary file read + RCE
 # Not affected: libvips not present in the appliance + no found path to rendering user-provided images
   - vulnerability: GHSA-xr9x-r78c-5hrm
@@ -412,6 +406,46 @@ ignore:
   - vulnerability: GHSA-jqcg-44mw-7w3h
     package:
       location: var/www/ood/apps/sys/shell/yarn.lock
+
+# CVE-2026-106445: Handlebars library's templating can bypass denylist rules
+# Not affected: No obvious use of vulnerable functions or user-controlled templating
+  - vulnerability: GHSA-p8wg-vrv2-v86f
+    package:
+      location: var/www/ood/apps/sys/shell/yarn.lock
+  - vulnerability: GHSA-p8wg-vrv2-v86f
+    package:
+      location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
+# CVE-2026-106445: Handlebars templating AST validation bypass
+# Not affected: No user-controlled templating
+  - vulnerability: GHSA-8r5x-fm3f-whwj
+    package:
+      location: var/www/ood/apps/sys/shell/yarn.lock
+  - vulnerability: GHSA-8r5x-fm3f-whwj
+    package:
+      location: opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock
+
+# CVE-2026-78663: Go HTTP/2 receive buffer limit bypass allowing for DoS
+# Downgraded to medium by Red Hat as stream level limits still limit DoS
+  - vulnerability: GO-2026-6612
+  - vulnerability: CVE-2026-78663
+
+# CVE-2026-56857: Go directory creation outside of permitted scope
+# Unaffected: Windows only
+  - vulnerability: GO-2026-6604
+
+# Compromised eMudhra CA certs in DigitalOcean collection in ansible-init
+# Unaffected: DigitalOcean collection not used
+  - vulnerability: GHSA-6q48-6c7w-9gw2
+    package:
+      location: usr/lib/ansible-init/lib/python3.9/site-packages/ansible_collections/community/digitalocean/poetry.lock
+
+# DOMPurify SAFE_FOR_TEMPLATES bypass
+# SAFE_FOR_TEMPLATES not enabled anywhere in the served JupyterLab bundle or labextensions
+# FIXME: Remove when JupyterLab ships dompurify >= 3.4.17
+  - vulnerability: GHSA-cg2g-xh64-v4q7
+    package:
+      name: dompurify
+      location: "opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock"
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches

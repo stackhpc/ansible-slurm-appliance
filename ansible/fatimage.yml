@@ -45,6 +45,22 @@
         pulp_site_target_distribution_version: "{{ hostvars[groups['pulp_site'][0]]['ansible_facts']['distribution_version'] }}"
       when: appliances_mode != 'configure'
 
+- hosts: builder
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Ensure psi=1 on boot
+      ansible.builtin.include_role:
+        name: stackhpc.linux.grubcmdline
+      vars:
+        kernel_cmdline: "{{ grubcmdline_kernel_cmdline }}"
+        kernel_cmdline_remove: "{{ grubcmdline_kernel_cmdline_remove }}"
+  handlers:
+    - name: reboot  # noqa: name[casing]
+      ansible.builtin.debug:
+        msg: no need to reboot when building
+
+
 - import_playbook: bootstrap.yml
 
 - hosts: doca
@@ -106,6 +122,15 @@
   ansible.builtin.import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- name: Install SystemTap
+  become: true
+  hosts: systemtap
+  tags: systemtap
+  tasks:
+    - ansible.builtin.import_role:
+        name: systemtap
+        tasks_from: install.yml
+
 - import_playbook: extras.yml
 
 # TODO: is this the right place?
@@ -149,6 +174,12 @@
         name: stackhpc.openhpc
         tasks_from: install-ohpc.yml
       when: "'openhpc' in group_names"
+
+    - name: Install slurmrestd_proxy dependencies
+      ansible.builtin.include_role:
+        name: slurmrestd_proxy
+        tasks_from: install.yml
+      when: "'slurmrestd_proxy' in group_names"
 
     # - import_playbook: portal.yml
     - name: Install Open OnDemand server and apps

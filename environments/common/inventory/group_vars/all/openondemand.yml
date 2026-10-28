@@ -93,7 +93,7 @@ openondemand_install_app_jupyter:
 openondemand_install_app_rstudio:  # mapping, values as for ansible.builtin.git: repo (required)/dest/version(default main)/umask
   rstudio:
     repo: https://github.com/stackhpc/ood-stackhpc-rstudio.git
-    version: 2025.08.1
+    version: 2026.09.1
 openondemand_install_app_matlab:
   matlab:
     repo: https://github.com/stackhpc/ood-stackhpc-matlab.git
