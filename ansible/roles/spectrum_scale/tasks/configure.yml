@@ -40,17 +40,17 @@
 - when: not spectrum_scale_restore | bool
   block:
     - ansible.builtin.include_role:
-      name: ibm.spectrum_scale.core_configure
+        name: ibm.spectrum_scale.core_configure
     - ansible.builtin.include_role:
-      name: ibm.spectrum_scale.remotemount_configure
+        name: ibm.spectrum_scale.remotemount_configure
       when:
         - "scale_remotemount_filesystem_name | length > 0"
 
-- include_role:
+- ansible.builtin.include_role:
     name: ibm.spectrum_scale.core_verify
 
 - name: Ensure spectrum scale backup directory exists
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ spectrum_scale_backup_path | dirname }}"
     owner: root
@@ -59,6 +59,7 @@
   when: inventory_hostname == spectrum_scale_backup_host
 
 - name: Create/update spectrum scale backup
-  command:
+  ansible.builtin.command:
     cmd: "{{ spectrum_scale_binary_path }}/mmccr backup -F -A {{ spectrum_scale_backup_path }}"
+  changed_when: true
   when: inventory_hostname == spectrum_scale_backup_host
