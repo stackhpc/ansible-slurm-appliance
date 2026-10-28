@@ -19,8 +19,10 @@ fi
 BUILD="$1"
 VAR_FILE="environments/site/${BUILD}.pkrvars.hcl"
 LOG_FILE="environments/site/${BUILD}.build.log"
+PACKER_BIN="${PACKER_BIN:-packer}"
+PACKER_ON_ERROR="${PACKER_ON_ERROR:-ask}"
  
-packer build -color=false -on-error=ask \
+"$PACKER_BIN" build -color=false -on-error="$PACKER_ON_ERROR" \
     -var-file=environments/site/common.pkrvars.hcl \
     -var-file="$VAR_FILE" \
     packer/openstack.pkr.hcl | (trap '' INT; tee "$LOG_FILE")
