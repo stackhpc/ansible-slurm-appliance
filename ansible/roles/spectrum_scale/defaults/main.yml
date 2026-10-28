@@ -11,6 +11,7 @@ spectrum_scale_prerequisite_packages:
   - binutils
   - elfutils-libelf-devel
 
+spectrum_scale_restore: true
 spectrum_scale_backup_path: "{{ appliances_state_dir }}/spectrum_scale/CCRBackup.tar.gz"
 spectrum_scale_backup_host: "{{ groups['control'] | first }}"
 spectrum_scale_binary_path: /usr/lpp/mmfs/bin

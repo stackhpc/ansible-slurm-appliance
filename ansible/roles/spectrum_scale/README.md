@@ -15,6 +15,7 @@ image build and cluster configuration respectively.
 - `spectrum_scale_installer_md5sum`: Required. md5sum of installer
 - `spectrum_scale_s3cfg`: Required. A multiline string providing the contents
   of an s3cfg file with access to the above path.
+- `spectrum_scale_restore`: Optional. Bool, whether to restore configuration from backup instead of running tasks.
 - `spectrum_scale_backup_path`: Optional. Path for backup. Default uses persistent state directory `appliances_state_dir`.
 - `spectrum_scale_backup_host`: Optional. Host with `spectrum_scale_backup_path` to to use for backup/restore. Defaults to control node.
 - `spectrum_scale_binary_path`: Optional. Path to installed spectrum scale binaries. Default `/usr/lpp/mmfs/bin`.
