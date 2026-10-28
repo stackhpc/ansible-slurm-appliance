@@ -43,9 +43,6 @@ jobs:
     outputs:
       # The 'stackhpc' output will be 'true' if either of the two stackhpc filters below matched
       stackhpc: ${{ toJson(fromJson(steps.filter_on_every.outputs.stackhpc) || fromJson(steps.filter_on_some.outputs.stackhpc)) }}
-      extra_on_push: ${{ steps.filter_on_some.outputs.extra_on_push }}
-      extra_on_pull_request: ${{ steps.filter_on_some.outputs.extra_on_pull_request }}
-      scan: ${{ steps.filter_on_some.outputs.scan }}
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -98,21 +95,6 @@ jobs:
             stackhpc:
               - 'dev/setup-env.sh'
               - '.github/workflows/stackhpc.yml'
-            extra_on_push:
-              - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
-              - 'ansible/roles/doca/**'
-              - 'ansible/roles/cuda/**'
-              - 'ansible/roles/slurm_recompile/**' # runs on cuda group
-              - 'ansible/roles/lustre/**'
-              - '.github/workflows/extra.yml'
-            extra_on_pull_request:
-              - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
-              - 'ansible/roles/doca/**'
-              - 'ansible/roles/cuda/**'
-              - 'ansible/roles/lustre/**'
-              - '.github/workflows/extra.yml'
-            scan:
-              - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
 
       - name: Paths matched output
         # NOTE: This is a debug step, it shows what files were matched by the filters.
@@ -120,15 +102,9 @@ jobs:
         run: >
           echo '{ "stackhpc_every_files": '"${STEPS_FILTER_ON_EVERY_OUTPUTS_STACKHPC_FILES}"' }' | jq -r '.';
           echo '{ "stackhpc_some_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_STACKHPC_FILES}"' }' | jq -r '.';
-          echo '{ "extra_on_push_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PUSH_FILES}"' }' | jq -r '.';
-          echo '{ "extra_on_pull_request_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PULL_REQUEST_FILES}"' }' | jq -r '.';
-          echo '{ "scan_files": '"${STEPS_FILTER_ON_SOME_OUTPUTS_SCAN_FILES}"' }' | jq -r '.'
         env:
           STEPS_FILTER_ON_EVERY_OUTPUTS_STACKHPC_FILES: ${{ steps.filter_on_every.outputs.stackhpc_files }}
           STEPS_FILTER_ON_SOME_OUTPUTS_STACKHPC_FILES: ${{ steps.filter_on_some.outputs.stackhpc_files }}
-          STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PUSH_FILES: ${{ steps.filter_on_some.outputs.extra_on_push_files }}
-          STEPS_FILTER_ON_SOME_OUTPUTS_EXTRA_ON_PULL_REQUEST_FILES: ${{ steps.filter_on_some.outputs.extra_on_pull_request_files }}
-          STEPS_FILTER_ON_SOME_OUTPUTS_SCAN_FILES: ${{ steps.filter_on_some.outputs.scan_files }}
 
   stackhpc:
     name: Test deployment and reimage on OpenStack
@@ -140,25 +116,3 @@ jobs:
     uses: ./.github/workflows/stackhpc.yml
     # uses most secrets, dynamically, so silence the warning
     secrets: inherit # zizmor: ignore[secrets-inherit]
-
-  extra:
-    name: Test extra build
-    needs: files_changed
-    if: |
-      github.event_name != 'pull_request' && needs.files_changed.outputs.extra_on_push == 'true' ||
-      github.event_name == 'pull_request' && needs.files_changed.outputs.extra_on_pull_request == 'true'
-    uses: ./.github/workflows/extra.yml
-    # uses most secrets, dynamically, so silence the warning
-    secrets: inherit # zizmor: ignore[secrets-inherit]
-
-  scan:
-    name: Scan image for vulnerabilities
-    needs: files_changed
-    if: |
-      needs.files_changed.outputs.scan == 'true' || github.event_name != 'pull_request'
-    uses: ./.github/workflows/scan.yml
-    secrets: inherit  # zizmor: ignore[secrets-inherit]
-    permissions:
-      security-events: write # to upload to security tab
-      contents: write # to upload sbom
-      checks: write # to write check-runs statuses

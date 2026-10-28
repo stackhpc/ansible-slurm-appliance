@@ -6,11 +6,16 @@
 
 name: Scan image for vulnerabilities
 'on':
-  workflow_call:
-    secrets:
-      SLACK_WEBHOOK_URL:
-        description: 'slack secret webhook url'
-        required: true
+  push:
+    branches:
+      - main
+    paths:
+      - environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+      - .github/workflows/scan.yml
+  pull_request:
+    paths:
+      - environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+      - .github/workflows/scan.yml
   workflow_dispatch:
   schedule:
     - cron: '0 7 * * *'  # Run at 7AM - to get fresh vulnerability reports
