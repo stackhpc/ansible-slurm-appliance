@@ -74,6 +74,7 @@ jobs:
             changed:
               - 'dev/setup-env.sh'
               - '.github/workflows/stackhpc.yml'
+              - '.github/workflows/main.yml'
 
       - name: Show paths matching filters for debugging
         run: >
