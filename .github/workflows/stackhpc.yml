@@ -277,6 +277,7 @@ jobs:
           # setup ssh proxying:
           sudo apt-get update
           sudo apt-get --yes install proxychains
+          sudo apt-get --yes install wget
           echo proxychains installed
           ssh -v -fN -D 9050 -i "${BASTION_KEYFILE}" "${BASTION_USER}@${BASTION_HOST}"
           echo port 9050 forwarded
