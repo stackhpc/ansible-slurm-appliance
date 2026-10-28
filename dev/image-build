@@ -22,8 +22,19 @@ LOG_FILE="environments/site/${BUILD}.build.log"
 PACKER_BIN="${PACKER_BIN:-packer}"
 PACKER_ON_ERROR="${PACKER_ON_ERROR:-ask}"
 
+# build the image:
 "$PACKER_BIN" init packer/openstack.pkr.hcl
 "$PACKER_BIN" build -color=false -on-error="$PACKER_ON_ERROR" \
     -var-file=environments/site/common.pkrvars.hcl \
     -var-file="$VAR_FILE" \
     packer/openstack.pkr.hcl | (trap '' INT; tee "$LOG_FILE")
+
+# set properties:
+IMAGE_ID=$(awk '/An image was created:/ {id=$NF} END {print id}' "$LOG_FILE")
+if [ -z "$IMAGE_ID" ]; then
+    echo "Could not find image ID in $LOG_FILE" >&2
+    exit 1
+fi
+dev/image-set-properties.sh $IMAGE_ID
+
+echo "done."
