@@ -9,6 +9,10 @@ variables:
     value: "cleanup"
     options: ["cleanup", "abort"]
     description: "On build failure: cleanup (delete resources) or abort (leave instance for debugging)"
+  BUILD_NAME:
+    value: "base"
+    options: ["base", "std"] # TODO: gpu
+    description: "Name of build: environments/site/$BUILD_NAME.pkrvars.hcl"
   OS_AUTH_TYPE: v3applicationcredential
   OS_AUTH_URL: https://keystone.akl-1.cloud.nesi.org.nz
   OS_APPLICATION_CREDENTIAL_ID: 5a5cd31f211e46d09744c7111fb0a526
@@ -16,6 +20,7 @@ variables:
 
 packer-build:
   variables:
+    ANSIBLE_VAULT_PASSWORD_FILE: $VAULT_PASSWORD
     PACKER_BIN: /usr/bin/packer # otherwise get cracklib one
   stage: build
   rules:
@@ -24,17 +29,16 @@ packer-build:
     # setup environment:
     - dev/setup-env.sh
     - . venv/bin/activate
-    - export ANSIBLE_VAULT_PASSWORD_FILE=$VAULT_PASSWORD
-    - . environments/stg/activate # TODO make flexible!
+    - . environments/stg/activate
 
     # setup ssh:
     - export PKR_VAR_ssh_private_key_file=/home/rocky/.ssh/id_rsa
     # don't need to set on ansible side as a default path
 
     # assumes stackhpc image is already there:
-    - dev/image-build std # TODO: make flexible
+    - dev/image-build "$BUILD_NAME"
   artifacts:
     when: always          # upload even if the job fails
     paths:
-      - environments/site/std.build.log # TODO: make flexible
+      - environments/site/$BUILD_NAME.build.log
     expire_in: 30 days
