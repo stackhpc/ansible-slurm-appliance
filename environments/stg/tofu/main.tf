@@ -61,7 +61,7 @@ module "cluster" {
   # compute nodes - mix of VM and BM:
   compute = {
     baremetal = {
-      nodes             = ["compute-1"] # TODO: move to production?
+      nodes             = [] #"compute-1" # TODO: move to production?
       flavor            = "agr.metal1.compute"
       vnic_types = {
         nesi-hpc-baremetal-vlan112 = "baremetal"
