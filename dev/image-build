@@ -21,7 +21,8 @@ VAR_FILE="environments/site/${BUILD}.pkrvars.hcl"
 LOG_FILE="environments/site/${BUILD}.build.log"
 PACKER_BIN="${PACKER_BIN:-packer}"
 PACKER_ON_ERROR="${PACKER_ON_ERROR:-ask}"
- 
+
+"$PACKER_BIN" init packer/openstack.pkr.hcl
 "$PACKER_BIN" build -color=false -on-error="$PACKER_ON_ERROR" \
     -var-file=environments/site/common.pkrvars.hcl \
     -var-file="$VAR_FILE" \
