@@ -5,6 +5,9 @@ default:
   tags: [bastion]   # whatever tags your project runner has
 
 packer-build:
+  variables:
+    PACKER_BIN: /usr/bin/packer # otherwise get cracklib one
+    PACKER_ON_ERROR: abort # manual cleanup required, but can debug
   stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE == "web"   # manual "Run pipeline" only
@@ -18,13 +21,12 @@ packer-build:
     # don't need to set on ansible side as a default path
 
     # assumes stackhpc image is already there
-    - which -a packer
     - cd packer
     - packer init .
-    - cd --
+    - cd ..
     - dev/image-build std # TODO: make flexible
   artifacts:
     when: always          # upload even if the job fails
     paths:
-      - environments/stg/std.build.log # TODO: make flexible
+      - environments/site/std.build.log # TODO: make flexible
     expire_in: 30 days
