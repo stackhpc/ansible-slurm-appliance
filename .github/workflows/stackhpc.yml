@@ -275,6 +275,7 @@ jobs:
           source "$APPLIANCES_ENVIRONMENT_ROOT/vars.txt"
 
           # setup ssh proxying:
+          sudo apt-get update
           sudo apt-get --yes install proxychains
           echo proxychains installed
           ssh -v -fN -D 9050 -i "${BASTION_KEYFILE}" "${BASTION_USER}@${BASTION_HOST}"
