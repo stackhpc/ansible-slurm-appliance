@@ -12,6 +12,8 @@ Define custom mount points using fstab.
   - `fstype`: Required string. Filesystem type.
   - `state`: Required string. Mount state e.g. `mounted`, `unmounted`.
   - `opts`: Optional string. Mount options. **NB:** These are exposed in logs.
+  - `passno`: Optional string. Order in which `fsck` carries out check at boot.
+    Either "0" to skip check (default) or "2" to check after the rootfs.
   - `enabled`: Optional bool. Whether this mount definition is used. Default `true`.
 
   Except for `enabled`, all options are as for [ansible.posix/mount](https://docs.ansible.com/projects/ansible/latest/collections/ansible/posix/mount_module.html).
