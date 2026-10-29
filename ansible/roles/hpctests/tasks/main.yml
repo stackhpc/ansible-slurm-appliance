@@ -49,6 +49,7 @@
     - hpctests-gpu
   block:
     - ansible.builtin.include_tasks: build-gpuburn.yml
+      when: "'cuda' in group_names"
 
 - name: Run gpu_burn on individual nodes
   become: true
@@ -58,3 +59,4 @@
     - hpctests-gpu
   block:
     - ansible.builtin.include_tasks: run-gpuburn.yml
+      when: "'cuda' in group_names"
