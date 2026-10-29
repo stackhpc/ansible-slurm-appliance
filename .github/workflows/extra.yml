@@ -178,6 +178,8 @@ jobs:
       - name: Build fat image with packer
         id: packer_build
         run: |
+          sudo apt-get update
+          sudo apt-get --yes install packer
           set -x
           . venv/bin/activate
           . environments/.stackhpc/activate
