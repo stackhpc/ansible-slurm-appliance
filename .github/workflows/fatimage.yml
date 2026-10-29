@@ -27,7 +27,11 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
       cancel-in-progress: true
-    runs-on: ubuntu-24.04
+    runs-on: >-
+      ${{
+        ((github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud || vars.CI_CLOUD) == 'LEAFCLOUD')
+        && 'ansible-slurm-appliance' || 'ubuntu-24.04'
+      }}
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
