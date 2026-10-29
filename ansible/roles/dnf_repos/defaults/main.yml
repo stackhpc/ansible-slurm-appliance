@@ -4,8 +4,10 @@ dnf_repos_pulp_content_url: "{{ appliances_pulp_url }}/pulp/content"
 dnf_repos_username: "{{ omit }}"
 dnf_repos_password: "{{ omit }}"
 
-# Define GPG keys for repos handled by this role (only)
-dnf_repos_gpg_keys:
+# Define GPG keys for repos handled by this role
+dnf_repos_gpg_keys_extra: {}
+dnf_repos_gpg_keys: "{{ dnf_repos_gpg_keys_default | combine(dnf_repos_gpg_keys_extra) }}"
+dnf_repos_gpg_keys_default:
   rocky:
     # keys are already present in genericcloud image, but not imported
     '8':

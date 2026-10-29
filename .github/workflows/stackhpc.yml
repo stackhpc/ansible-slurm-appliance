@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   openstack:
     name: openstack-ci
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_CLOUD == 'LEAFCLOUD' && 'ansible-slurm-appliance' || 'ubuntu-24.04' }}
     permissions:
       contents: read
     strategy:
@@ -275,7 +275,9 @@ jobs:
           source "$APPLIANCES_ENVIRONMENT_ROOT/vars.txt"
 
           # setup ssh proxying:
+          sudo apt-get update
           sudo apt-get --yes install proxychains
+          sudo apt-get --yes install wget
           echo proxychains installed
           ssh -v -fN -D 9050 -i "${BASTION_KEYFILE}" "${BASTION_USER}@${BASTION_HOST}"
           echo port 9050 forwarded
