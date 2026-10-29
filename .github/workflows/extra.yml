@@ -145,6 +145,10 @@ jobs:
           BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
           SSH_DEBUG_PUBLIC_KEY: ${{ vars.SSH_DEBUG_PUBLIC_KEY}}
 
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
       - name: Cache pip
         # Don't cache galaxy/requirements.yml as during dev its common for this
         # to use branch names
