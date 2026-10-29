@@ -73,6 +73,8 @@ jobs:
           pip install -U pip
           pip install -r requirements.txt
         shell: bash
+        env:
+          PYTHON_VERSION: python3
 
       - name: Write clouds.yaml
         run: |

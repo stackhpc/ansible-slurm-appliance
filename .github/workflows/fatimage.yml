@@ -113,6 +113,8 @@ jobs:
 
       - name: Install ansible etc
         run: dev/setup-env.sh
+        env:
+          PYTHON_VERSION: python3
 
       - name: Write clouds.yaml
         run: |
