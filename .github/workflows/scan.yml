@@ -105,6 +105,8 @@ jobs:
       - name: Download image SBOM
         if: steps.cache_restore.outputs.cache-hit != 'true'
         run: |
+          sudo apt-get update
+          sudo apt-get --yes install wget
           . venv/bin/activate
           sbom_url="$(openstack image show --format json "${IMAGE_NAME}" | jq -r '.properties.stackhpc_sbom // ""')"
           # be slightly robust to string injection
