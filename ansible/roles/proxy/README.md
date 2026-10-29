@@ -9,7 +9,7 @@ Define http/s proxy configuration.
   first host in that group and the configured port. See `environments/common/inventory/group_vars/all/proxy.yml`
   for other convenience variables to configure this.
 - `proxy_https_proxy`: Optional string. Address of https proxy. Default is `{{ proxy_http_proxy }}`.
-- `proxy_no_proxy_extra`: Optional list. Additional addresses not to proxy. Will
+- `proxy_no_proxy_extras`: Optional list. Additional addresses not to proxy. Will
   be combined with default list which includes `inventory_hostname` (for hostnames)
   and `ansible_host` (for host IPs) for all Ansible hosts.
 - `proxy_dnf`: Optional bool. Whether to configure yum/dnf proxying through `proxy_http_proxy`.
