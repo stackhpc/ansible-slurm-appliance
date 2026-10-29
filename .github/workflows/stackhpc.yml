@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   openstack:
     name: openstack-ci
-    runs-on: ansible-slurm-appliance
+    runs-on: ${{ vars.CI_CLOUD == 'LEAFCLOUD' && 'ansible-slurm-appliance' || 'ubuntu-24.04' }}
     permissions:
       contents: read
     strategy:
