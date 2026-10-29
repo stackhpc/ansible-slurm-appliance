@@ -66,8 +66,9 @@
     state: started
   when: _stop_sssd is changed # noqa: no-handler
 
-# This task runs only on the home directory server so it can handle
-# root-squashed exports
+# This task runs only on the host where the home directory is actually present
+# (i.e. the server for network filesystems, or every host for local ones)
+# so it can handle root-squashed NFS exports
 - name: Create home directories
   # doesn't delete with state=absent, same as ansible.builtin.user
   ansible.builtin.copy:
