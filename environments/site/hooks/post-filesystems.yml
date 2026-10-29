@@ -1,24 +1,24 @@
 - name: Setup SpectrumScale remotemount filesystem
   hosts: spectrum_scale
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tags: spectrum_scale
   tasks:
     - name: Install Spectrum Scale
       ansible.builtin.include_role:
-       name: spectrum_scale
-       tasks_from: install.yml
+        name: spectrum_scale
+        tasks_from: install.yml
       when: "appliances_mode != 'configure'"
     - name: Configure Spectrum Scale
       ansible.builtin.include_role:
-       name: spectrum_scale
-       tasks_from: configure.yml
+        name: spectrum_scale
+        tasks_from: configure.yml
       when: "appliances_mode != 'build'"
 
 - name: Add root symlinks for GPFS tdc_persist filesystem
   hosts: openhpc:!builder
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tags:
     - filesystems
   vars:
@@ -27,62 +27,62 @@
       - projects
       - datasets
   tasks:
-  - name: Get info on GPFS tdc_persist filesystem mounts
-    shell:
-      cmd: "mount | grep persist"
-    register: _mount_persist
-    failed_when: _mount_persist.rc > 1 # i.e. ignore found or not found here
-    changed_when: false
-    check_mode: no # means it runs in check mode!
-  
-  - name: Assert GPFS filesystem mounted
-    assert:
-      that: "'on /mnt/gpfs/persist type' in _mount_persist.stdout"
-      fail_msg: "GPFS tdc_persist filesystem is not mounted at /mnt/gpfs/persist"
+    - name: Get info on GPFS tdc_persist filesystem mounts
+      ansible.builtin.shell:
+        cmd: "mount | grep persist"
+      register: _mount_persist
+      failed_when: _mount_persist.rc > 1 # i.e. ignore found or not found here
+      changed_when: false
+      check_mode: false # means it runs in check mode!
 
-  - name: Get info on /home
-    shell:
-      cmd: file /home && ls /home
-    changed_when: false
-    register: home_dir
-    check_mode: no
+    - name: Assert GPFS filesystem mounted
+      ansible.builtin.assert:
+        that: "'on /mnt/gpfs/persist type' in _mount_persist.stdout"
+        fail_msg: "GPFS tdc_persist filesystem is not mounted at /mnt/gpfs/persist"
 
-  - name: Delete /home if unlinked and empty
-    file:
-      path: /home
-      state: absent
-    when: "home_dir.stdout == '/home: directory'"
+    - name: Get info on /home
+      ansible.builtin.stat:
+        path: /home
+      register: _home_stat
 
-  - name: Create symlinks to GPFS tdc_persist directories
-    # NB: This will fail if /home is a non-empty directory!
-    file:
-      src: "/mnt/gpfs/persist/{{ item }}"
-      dest: "/{{ item }}"
-      state: link
-    loop: "{{ bindmounts }}"
-  
-  - name: Ensure /agr exists
-    file:
-      path: /agr
-      state: directory
+    - name: Remove /home if it is an unlinked empty directory
+      ansible.builtin.command: rmdir /home   # refuses if non-empty: safe
+      changed_when: true
+      when:
+        - _home_stat.stat.exists
+        - _home_stat.stat.isdir
+        - not _home_stat.stat.islnk
 
-  - name: Create /agr symlinks
-    file:
-      src: "/mnt/gpfs/{{ item }}"
-      dest: "/agr/{{ item }}"
-      state: link
-    loop:
-      - persist
-      - scratch
+    - name: Create symlinks to GPFS tdc_persist directories
+      # NB: This will fail if /home is a non-empty directory!
+      ansible.builtin.file:
+        src: "/mnt/gpfs/persist/{{ item }}"
+        dest: "/{{ item }}"
+        state: link
+      loop: "{{ bindmounts }}"
 
-  - name: Create /scratch symlink
-    file:
-      src: "/mnt/gpfs/scratch/projects"
-      dest: "/scratch"
-      state: link
+    - name: Ensure /agr exists
+      ansible.builtin.file:
+        path: /agr
+        state: directory
 
-  - name: Create legacy symlinks
-    file:
-      src: "/mnt/gpfs/persist/legacy_datasets"
-      dest: "/dataset"
-      state: link
+    - name: Create /agr symlinks
+      ansible.builtin.file:
+        src: "/mnt/gpfs/{{ item }}"
+        dest: "/agr/{{ item }}"
+        state: link
+      loop:
+        - persist
+        - scratch
+
+    - name: Create /scratch symlink
+      ansible.builtin.file:
+        src: "/mnt/gpfs/scratch/projects"
+        dest: "/scratch"
+        state: link
+
+    - name: Create legacy symlinks
+      ansible.builtin.file:
+        src: "/mnt/gpfs/persist/legacy_datasets"
+        dest: "/dataset"
+        state: link
