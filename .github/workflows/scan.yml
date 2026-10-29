@@ -24,7 +24,7 @@ permissions: {}
 
 jobs:
   scan:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_CLOUD == 'LEAFCLOUD' && 'ansible-slurm-appliance' || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -62,6 +62,10 @@ jobs:
         run: |
           echo CI_CLOUD: "${CI_CLOUD}"
 
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
       - name: Setup Python environment
         run: |
           python3 -m venv venv
@@ -69,6 +73,8 @@ jobs:
           pip install -U pip
           pip install -r requirements.txt
         shell: bash
+        env:
+          PYTHON_VERSION: python3
 
       - name: Write clouds.yaml
         run: |
@@ -99,6 +105,8 @@ jobs:
       - name: Download image SBOM
         if: steps.cache_restore.outputs.cache-hit != 'true'
         run: |
+          sudo apt-get update
+          sudo apt-get --yes install wget
           . venv/bin/activate
           sbom_url="$(openstack image show --format json "${IMAGE_NAME}" | jq -r '.properties.stackhpc_sbom // ""')"
           # be slightly robust to string injection

@@ -27,7 +27,11 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build.image_name }} # to branch/PR + OS
       cancel-in-progress: true
-    runs-on: ubuntu-24.04
+    runs-on: >-
+      ${{
+        ((github.event.inputs.ci_cloud == 'default' && vars.CI_CLOUD || github.event.inputs.ci_cloud || vars.CI_CLOUD) == 'LEAFCLOUD')
+        && 'ansible-slurm-appliance' || 'ubuntu-24.04'
+      }}
     strategy:
       fail-fast: false # allow other matrix jobs to continue even if one fails
       matrix: # build RL8, RL9
@@ -95,6 +99,10 @@ jobs:
           BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
           SSH_DEBUG_PUBLIC_KEY: ${{ vars.SSH_DEBUG_PUBLIC_KEY}}
 
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
       - name: Cache pip
         # Don't cache galaxy/requirements.yml as during dev its common for this
         # to use branch names
@@ -105,6 +113,8 @@ jobs:
 
       - name: Install ansible etc
         run: dev/setup-env.sh
+        env:
+          PYTHON_VERSION: python3
 
       - name: Write clouds.yaml
         run: |
@@ -122,6 +132,10 @@ jobs:
       - name: Build fat image with packer
         id: packer_build
         run: |
+          sudo apt update && sudo apt install --yes wget rsync
+          wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+          sudo apt update && sudo apt install --yes packer
           set -x
           . venv/bin/activate
           . environments/.stackhpc/activate
