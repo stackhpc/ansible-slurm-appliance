@@ -114,3 +114,8 @@
     reboot_vars:
       instance_id: "{{ instance_id }}"
       image_id: "{{ image_id }}"
+
+- name: Export persisted hostkeys
+  ansible.builtin.import_role:
+    name: persist_hostkeys
+    tasks_from: export.yml

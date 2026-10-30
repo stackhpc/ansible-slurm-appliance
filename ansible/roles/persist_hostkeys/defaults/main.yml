@@ -1,3 +1,4 @@
 ---
 persist_hostkeys_state_server: "{{ groups['control'] | first }}"
 persist_hostkeys_state_dir: "{{ hostvars[persist_hostkeys_state_server]['appliances_state_dir'] }}/hostkeys"
+persist_hostkeys_mode: "shared" # or "individual"
