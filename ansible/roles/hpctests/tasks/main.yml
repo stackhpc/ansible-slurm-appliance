@@ -1,35 +1,38 @@
 ---
+# This file is full of blocks because it ensures that the
+# included tasks inherit the tags
+
 - name: Setup
   become: true
   become_user: "{{ hpctests_user }}"
   tags: always
-
   block:
     - ansible.builtin.include_tasks: setup.yml
+
 - name: Pingpong
   become: true
   become_user: "{{ hpctests_user }}"
   tags: pingpong
-
   block:
     - ansible.builtin.include_tasks: pingpong.yml
       when: hpctests_computes.stdout_lines | length > 1
+
 - name: Pingmatrix
   become: true
   become_user: "{{ hpctests_user }}"
   tags: pingmatrix
-
   block:
     - ansible.builtin.include_tasks: pingmatrix.yml
       when: hpctests_computes.stdout_lines | length > 1
+
 - name: Build HPL
   become: true
   become_user: "{{ hpctests_user }}"
   tags:
     - hpl-solo
-
   block:
     - ansible.builtin.include_tasks: build-hpl.yml
+
 - name: Run HPL on individual nodes
   become: true
   become_user: "{{ hpctests_user }}"
@@ -46,6 +49,7 @@
     - hpctests-gpu
   block:
     - ansible.builtin.include_tasks: build-gpuburn.yml
+      when: "'cuda' in group_names"
 
 - name: Run gpu_burn on individual nodes
   become: true
@@ -55,3 +59,4 @@
     - hpctests-gpu
   block:
     - ansible.builtin.include_tasks: run-gpuburn.yml
+      when: "'cuda' in group_names"
