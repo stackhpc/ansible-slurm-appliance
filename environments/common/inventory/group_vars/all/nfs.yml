@@ -6,7 +6,7 @@
 nfs_server_default: "{{ groups['control'] | first }}" # avoid using hostvars for compute-init
 
 # create a space-separated list of nfs group IPs:
-_nfs_node_ips: "{{ groups['nfs'] | map('extract', hostvars, 'ansible_host') | join(' ') }}"
+_nfs_node_ips: "{{ groups['nfs'] | map('extract', hostvars, 'ansible_host') | sort | join(' ') }}"
 
 # default *all* entries in nfs_configurations to only permitting mounts from above IPs:
 nfs_export_clients: "{{ _nfs_node_ips }}"
