@@ -95,3 +95,31 @@ jobs:
     uses: ./.github/workflows/stackhpc.yml
     # uses most secrets, dynamically, so silence the warning
     secrets: inherit # zizmor: ignore[secrets-inherit]
+
+  deploy-status-check:
+    name: Check whether deploy succeeded
+    # stackhpc.yml may be skipped if no relevant files changed so cannot be used as a status check directly
+    needs: [lint, files_changed, stackhpc]
+    if: always()
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - name: Check results of required jobs
+        run: |
+          echo "lint:          ${LINT_RESULT}"
+          echo "files_changed: ${FILES_CHANGED_RESULT}"
+          echo "stackhpc:      ${STACKHPC_RESULT}"
+
+          # These must always succeed
+          [ "${LINT_RESULT}" = "success" ] || { echo "::error::Lint did not succeed"; exit 1; }
+          [ "${FILES_CHANGED_RESULT}" = "success" ] || { echo "::error::files_changed did not succeed"; exit 1; }
+
+          # stackhpc may be legitimately skipped by the path logic, but must not have failed or been cancelled
+          case "${STACKHPC_RESULT}" in
+            success|skipped) ;;
+            *) echo "::error::stackhpc result was ${STACKHPC_RESULT}"; exit 1 ;;
+          esac
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          FILES_CHANGED_RESULT: ${{ needs.files_changed.result }}
+          STACKHPC_RESULT: ${{ needs.stackhpc.result }}

@@ -42,7 +42,7 @@ jobs:
           s3cmd rm "s3://$S3_BUCKET" --recursive --force
 
   image_upload:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.CI_CLOUD == 'LEAFCLOUD' && 'ansible-slurm-appliance' || 'ubuntu-24.04' }}
     needs: s3_cleanup
     concurrency: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.build }}
     strategy:
@@ -67,6 +67,10 @@ jobs:
         run: |
           echo "CI_CLOUD=${CI_CLOUD}" >> "$GITHUB_OUTPUT"
 
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
       - name: Setup environment
         run: |
           python3 -m venv venv
@@ -90,10 +94,10 @@ jobs:
         env:
           SECRETS_LEAFCLOUD_S3_CFG: ${{ secrets.LEAFCLOUD_S3_CFG }}
 
-      - name: Install s3cmd and qemu-utils
+      - name: Install required CLI tools
         run: |
           sudo apt-get update
-          sudo apt-get --yes install s3cmd qemu-utils
+          sudo apt-get --yes install s3cmd qemu-utils jq wget curl
 
       - name: Retrieve image name
         run: |
