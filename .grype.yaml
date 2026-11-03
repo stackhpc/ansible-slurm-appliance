@@ -30,11 +30,6 @@ ignore:
 # FIXME: go compiler bug introduces potential unverified memory access wr loops with induction variables on under or overflow
   - vulnerability: CVE-2026-27143
 
-# kernel rescue image: won't be booted
-# CVE-2021-43267, CVE-2021-47378, ...
-  - package:
-      location: boot/vmlinuz-0-rescue-*
-
 # CVE-2025-22871 request smuggling in net/http server (bare LF) -- no server forwarding chunked data here
   - vulnerability: CVE-2025-22871
     package:
