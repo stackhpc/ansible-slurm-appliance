@@ -3,6 +3,14 @@
 
 - ansible.builtin.meta: flush_handlers
 
+- name: Remove packages for or dependent on old kernels
+  ansible.builtin.command: dnf -y remove --oldinstallonly
+  register: oldkern
+  changed_when: "'No old installonly packages' not in oldkern.stderr"
+  failed_when:
+    - oldkern.rc != 0
+    - "'No old installonly packages' not in oldkern.stderr"
+
 - name: Remove dnf caches # noqa: no-changed-when
   ansible.builtin.command: dnf clean all
 
