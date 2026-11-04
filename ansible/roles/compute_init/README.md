@@ -97,7 +97,7 @@ it also requires an image build with the role name added to the
 | extras.yml               | eessi                         | All functionality [7]           | No                  |
 | extras.yml               | cuda                          | None required - use image build | Yes [8]             |
 | extras.yml               | vgpu                          | All functionality               | Yes                 |
-| extras.yml               | persist_hostkeys              | Not relevant for compute nodes  | n/a                 |
+| extras.yml               | persist_hostkeys              | Fully supported                 | No                  |
 | extras.yml               | compute_init (export)         | Not relevant for compute nodes  | n/a                 |
 | extras.yml               | k9s (install)                 | Not relevant during boot        | n/a                 |
 | extras.yml               | extra_packages                | None at present [9]             | -                   |
