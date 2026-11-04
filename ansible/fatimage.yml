@@ -45,6 +45,22 @@
         pulp_site_target_distribution_version: "{{ hostvars[groups['pulp_site'][0]]['ansible_facts']['distribution_version'] }}"
       when: appliances_mode != 'configure'
 
+- hosts: builder
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Ensure psi=1 on boot
+      ansible.builtin.include_role:
+        name: stackhpc.linux.grubcmdline
+      vars:
+        kernel_cmdline: "{{ grubcmdline_kernel_cmdline }}"
+        kernel_cmdline_remove: "{{ grubcmdline_kernel_cmdline_remove }}"
+  handlers:
+    - name: reboot  # noqa: name[casing]
+      ansible.builtin.debug:
+        msg: no need to reboot when building
+
+
 - import_playbook: bootstrap.yml
 
 - hosts: doca
@@ -338,6 +354,14 @@
         owner: root
         group: root
         mode: "0555"
+    - name: Remove packages for or dependent on old kernels
+      # needs to be before generate-sbom.yml
+      ansible.builtin.command: dnf -y remove --oldinstallonly
+      register: oldkern
+      changed_when: "'No old installonly packages' not in oldkern.stderr"
+      failed_when:
+        - oldkern.rc != 0
+        - "'No old installonly packages' not in oldkern.stderr"
 
 - import_playbook: generate-sbom.yml
 

@@ -5,7 +5,7 @@ _systemd_requiresmount_statedir: |
   RequiresMountsFor={{ appliances_state_dir | default('') }}
   {% endif %}
 
-systemd_dropins:
+systemd_dropins_default:
   # NB: mysql does not need _systemd_requiresmount_statedir as role handles state dir correctly
   opensearch:
     group: opensearch
@@ -22,3 +22,6 @@ systemd_dropins:
   prometheus:
     group: prometheus
     content: "{{ _systemd_requiresmount_statedir }}"
+
+systemd_dropins_extra: {}
+systemd_dropins: "{{ systemd_dropins_default | combine(systemd_dropins_extra) }}"

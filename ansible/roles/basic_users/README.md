@@ -21,7 +21,7 @@ without requiring LDAP etc. Features:
   group defining the host to use to create home directories. If the home
   directory export is root squashed, this host _must_ be the home directory
   server. Default is the `control` node which is appropriate for the default
-  appliance configuration. Not relevant if `create_home` is false for all users.
+  appliance configuration. Not relevant if `create_home` is specified.
 - `basic_users_homedir_server_path`: Optional path prefix for home directories on
   the `basic_users_homedir_server`, i.e. on the "server-side". Default is
   `/exports/home` which is appropriate for the default appliance configuration.
@@ -55,6 +55,8 @@ without requiring LDAP etc. Features:
     user.
   - `ssh_key_type` defaults to `ed25519` instead of the `ansible.builtin.user`
     default of `rsa`.
+  - `create_home` can be set `true` or `false`, but if unspecified it is only
+    true on the `basic_users_homedir_server` host.
   - Any other keys may present for other purposes (i.e. not used by this role).
 - `basic_users_generate_ssh_key`: Optional bool. Default for `generate_ssh_key`
   parameter in `basic_users_users` above. Default `true`.

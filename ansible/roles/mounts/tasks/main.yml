@@ -42,5 +42,6 @@
     fstype: "{{ item.value.fstype }}"
     state: "{{ item.value.state }}"
     opts: "{{ item.value.opts | default(omit) }}"
+    passno: "{{ item.value.passno | default(omit) }}"
   loop: "{{ mounts | dict2items }}"
   when: item.value.enabled | default(true)

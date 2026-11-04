@@ -21,6 +21,9 @@
 {%if hpctests_time is defined %}
 #SBATCH --time={{ hpctests_time }}
 {% endif %}
+{% for option in hpctests_sbatch_options %}
+#SBATCH {{ option }}
+{% endfor %}
 
 export UCX_NET_DEVICES={{ hpctests_ucx_net_devices }}
 echo SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST
