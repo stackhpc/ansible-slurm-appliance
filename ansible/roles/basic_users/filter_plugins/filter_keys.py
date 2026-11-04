@@ -11,9 +11,7 @@ USER_MODULE_PARAMS = (
 ).split()
 
 
-class FilterModule(
-    object
-):  # pylint: disable=missing-class-docstring, useless-object-inheritance
+class FilterModule:  # pylint: disable=missing-class-docstring, useless-object-inheritance
 
     def filters(self):  # pylint: disable=missing-function-docstring
         return {"filter_user_params": self.filter_user_params}

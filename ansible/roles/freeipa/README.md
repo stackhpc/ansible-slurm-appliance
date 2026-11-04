@@ -1,75 +1,137 @@
 # freeipa
 
-Support FreeIPA in the appliance. In production use it is expected the FreeIPA server(s) will be external to the cluster, implying that hosts and users are managed outside the appliance. However for testing and development the role can also deploy an "in-appliance" FreeIPA server, add hosts to it and manage users in FreeIPA.
+Support enroling nodes with FreeIPA in the appliance. The FreeIPA server(s) are
+external to the appliance and hosts and users must pre-exist.
 
-## FreeIPA Client
+## Usage
 
-### FreeIPA Client Usage
+- Ensure client node hostnames are fully qualified and match the domain name.
+  By default (using site/tofu/ templates) hostnames are of the form
+  `nodename.cluster_name.cluster_domain_suffix` where `cluster_name` and
+  `cluster_domain_suffix` are OpenTofu variables.
+- Define client nodes as hosts in FreeIPA. This is outside the scope of this
+  document but some hints are provided below.
+- Add client hosts to the `freeipa_client` group and set role variables as
+  described below.
+- Run (at a minimum) the `ansible/iam.yml` playbook.
 
-- Add hosts to the `freeipa_client` group and run (at a minimum) the `ansible/iam.yml` playbook.
-- Hostnames must match the domain name. By default (using the site OpenTofu) hostnames are of the form `nodename.cluster_name.cluster_domain_suffix` where `cluster_name` and `cluster_domain_suffix` are OpenTofu variables.
-- Hosts discover the FreeIPA server FQDN (and their own domain) from DNS records. If DNS servers are not set this is not set from DHCP, then use the `resolv_conf` role to configure this. For example when using the in-appliance FreeIPA development server:
+The method used to manage host enrolment depends on `freeipa_enrol_method`:
 
-  ```ini
-  # environments/<env>/groups
-  ...
-  [resolv_conf:children]
-  freeipa_client
-  ...
+- `otp`: Default. Hosts are initially enroled using a random one-time password
+  (OTP). On enrolment the keytabs are stored in the control node's `appliances_state_dir`
+  and used to re-enrol after rebuild/reimage of nodes.
+- `pkinit`: Hosts are enroled and re-enroled using [PKINIT](https://www.freeipa.org/page/V4/Kerberos_PKINIT),
+  i.e. host certificates and keys stored (Ansible Vault-encrypted) in the
+  appliance repository.
+
+Neither method requires the appliance to have access to the FreeIPA administrator
+password.
+
+### OTP enrolment mode
+
+In this mode hosts discover the FreeIPA server FQDN (and their own domain) from
+DNS records. If DNS servers are not provided via DHCP, use the `resolv_conf` role
+to configure this, e.g.:
+
+```ini
+# environments/site/groups
+...
+[resolv_conf:children]
+freeipa_client
+...
+```
+
+```yaml
+# environments/site/inventory/group_vars/all/resolv_conf.yml
+resolv_conf_nameservers:
+  - "192.0.2.200"
+```
+
+When adding the hosts to FreeIPA generate a random one-time password (OTP), e.g
+
+```shell
+ipa host-add --random ...
+```
+
+This password must be set as a hostvar `freeipa_host_password`. Once this role
+has run (via the `iam.yml` playbook) and enroled hosts this becomes irrelevant
+so it should not be committed to Git. A stored keytab takes precedence over
+`freeipa_host_password`.
+
+When re-enroling, the host record in FreeIPA host record is updated with the
+current hostkey. The `persist_hostkeys` role may be used if rebuilds/reimages
+should not change keys.
+
+There are no other role variables in this mode.
+
+### pkinit enrolment mode
+
+1. Set role variables as necessary:
+   - `freeipa_servers`: Required. List of FreeIPA server addresses.
+   - `node_fqdn`: Required hostvar giving FQDN for each node. Default is set in
+     `environments/$ENV/inventory/hosts.yml` by default OpenTofu templates.
+   - `freeipa_realm`: Required. Realm to join. Default is set in
+     `environments/common/inventory/group_vars/all/freeipa.yml` based on
+     cluster name and suffix.
+   - `freeipa_domain`: Optional. Domain to join. Default is lowercase of `freeipa_realm`.
+   - `freeipa_cert_path`: Optional. Path to directory on localhost containing
+     client certs/keys and CA cert. Default `{{ appliances_environment_root }}/freeipa/`.
+
+   Note that:
+   - In this mode DNS autodiscovery of FreeIPA servers is disabled.
+   - Use of the `resolv_conf` role role may be required to make `freeipa_servers`
+     resolvable, e.g. by adding the FreeIPA server IP(s) as nameserver(s).
+   - It appears that SSSD still uses DNS to determine its `ipa_server`
+     setting, so using a different IPA server for DNS (e.g. a production one for a
+     development cluster) will fail; hosts will enrol but SSSD will not be able to
+     authenticate.
+
+2. Add the client host certs/keys to `freeipa_cert_path` in the form:
+   - `$HOSTNAME.key` for the key
+   - `$HOSTNAME.pem` for the certificate
+
+   **NB**: These **MUST** be Ansible Vault encrypted!
+
+3. Add the FreeIPA server's CA certificate to `freeipa_cert_path` as `ca.crt`.
+
+## Defining hosts in FreeIPA
+
+Generally the FreeIPA documentation should be consulted. This section provides
+some notes for commands to run on the FreeIPA server - they may not be complete.
+
+- Create a DNS zone for hosts
+
+  ```shell
+  ipa dnszone-add $CLUSTER_DNS_ZONE
   ```
 
-  ```yaml
-  # environments/<env>/inventory/group_vars/all/resolv_conf.yml
-  resolv_conf_nameservers:
-    - "{{ hostvars[groups['freeipa_server'] | first].ansible_host }}"
+  Where $CLUSTER_DNS_ZONE is (jinja) `"{{ openhpc_cluster_name }}.{{ cluster_domain_suffix }}"`
+
+- Create a host in FreeIPA
+
+  ```shell
+  echo $FREEIPA_ADMIN_PASSWORD | kinit admin
+  ipa host-add $NODE_FQDN --ip-address=$FREEIPA_CLIENT_IP --no-reverse
   ```
 
-- For production use with an external FreeIPA server, a random one-time password (OTP) must be generated when adding hosts to FreeIPA (e.g. using `ipa host-add --random ...`).
-  This password should be set as a hostvar `freeipa_host_password`.
-  Initial host enrolment will use this OTP to enrol the host. After this it becomes irrelevant so it does not need to be committed to Git.
-  This approach means the appliance does not require the FreeIPA administrator password.
-- For development use with the in-appliance FreeIPA server, `freeipa_host_password` will be automatically generated in memory.
-- The `control` host must define `appliances_state_dir` (on persistent storage). This is used to back-up keytabs to allow FreeIPA clients to automatically re-enrol after e.g. reimaging. Note that:
-  - This is implemented when using the site OpenTofu; on the control node `appliances_state_dir` defaults to `/var/lib/state` which is mounted from a volume.
-  - Nodes are not re-enroled by a [Slurm-driven reimage](../../collections/ansible_collections/stackhpc/slurm_openstack_tools/roles/rebuild/README.md) (as that does not run this role).
-  - If both a backed-up keytab and `freeipa_host_password` exist, the former is used.
-  - When re-enroling, the host record in FreeIPA host record is updated with the
-    current hostkey. The `persist_hostkeys` role may be used if rebuilds/reimages
-    should not change keys.
+The following are specific to pkinit enrolment:
 
-### Role Variables for Clients
+- Generate CSR
 
-- `freeipa_host_password`. Required for initial enrolment only, FreeIPA host password as described above.
-- `freeipa_setup_dns`: Optional, whether to use the FreeIPA server as the client's nameserver. Defaults to `true` when `freeipa_server` contains a host, otherwise `false`.
-- `freeipa_ca_cert_file`: Optional, path **on the Ansible deploy host** to FreeIPA server cert. Else this will be downloaded (insecurely) from the FreeIPA server over http.
+  ```shell
+  cd /var/lib/ipa/certs/
+  openssl req -new -days 3650 -newkey rsa:2048 -nodes \
+    -keyout $INVENTORY_HOSTNAME.key -out INVENTORY_HOSTNAME.csr \
+    -subj '/CN=$NODE_FQDN/O=$FREEIPA_REALM'
+  ```
 
-See also use of `appliances_state_dir` on the control node as described above.
+- Sign the cert
 
-## FreeIPA Server
+  ```shell
+  cd /var/lib/ipa/certs/
+  ipa cert-request INVENTORY_HOSTNAME.csr \
+    --principal=host/$NODE_FQDN \
+    --certificate-out=$INVENTORY_HOSTNAME.pem
+  ```
 
-As noted above this is only intended for development and testing. Note it cannot be run on the `openondemand` node as no other virtual servers must be defined in the Apache configuration.
-
-### FreeIPA Server Usage
-
-- Add a single host to the `freeipa_server` group and run (at a minimum) the `ansible/bootstrap.yml` and `ansible/iam.yml` playbooks.
-- As well as configuring the FreeIPA server, the role will also:
-  - Add Ansible hosts in the group `freeipa_client` as FreeIPA hosts.
-  - Optionally control users in FreeIPA - see `freeipa_users` below.
-
-The FreeIPA GUI will be available on `https://<freeipa_server_ip>/ipa/ui`.
-
-### Role Variables for Server
-
-These role variables are only required when using `freeipa_server`:
-
-- `freeipa_realm`: Optional, name of realm. Default is `{{ openhpc_cluster_name | upper }}.INVALID`
-- `freeipa_domain`: Optional, name of domain. Default is lowercased `freeipa_realm`.
-- `freeipa_ds_password`: Optional, password to be used by the Directory Server for the Directory Manager user (`ipa-server-install --ds-password`). Default is generated in `environments/<environment>/inventory/group_vars/all/secrets.yml`
-- `freeipa_admin_password`: Optional, password for the IPA `admin` user. Default is generated as for `freeipa_ds_password`.
-- `freeipa_server_ip`: Optional, IP address of freeipa_server host. Default is `ansible_host` of the `freeipa_server` host. Default `false`.
-- `freeipa_setup_dns`: Optional bool, whether to configure the FreeIPA server as an integrated DNS server and define a zone and records. NB: This also controls whether `freeipa_client` hosts use the `freeipa_server` host for name resolution. Default `true` when `freeipa_server` contains a host.
-- `freeipa_client_ip`: Optional, IP address of FreeIPA client. Default is `ansible_host`.
-- `freeipa_users`: A list of dicts defining users to add, with keys/values as for [community.general.ipa_user](https://docs.ansible.com/ansible/latest/collections/community/general/ipa_user_module.html): Note that:
-  - `name`, `givenname` (firstname) and `sn` (surname) are required.
-  - `ipa_host`, `ipa_port`, `ipa_prot`, `ipa_user`, `validate_certs` are automatically provided and cannot be overridden.
-  - If `password` is set, the value should _not_ be a hash (unlike `ansible.builtin.user` as used by the `basic_users` role), and it must be changed on first login. `krbpasswordexpiration` does not appear to be able to override this.
+The FreeIPA server cert is available at `/etc/ipa/ca.crt`.

@@ -27,10 +27,10 @@ Although most of the inventory uses the group convention described above there a
 - The `control`, `login` and `compute` groups are special as they need to contain actual hosts rather than child groups, and so should generally be defined in the templated-out `hosts` file.
 - The cluster name must be set on all hosts using `openhpc_cluster_name`. Using an `[all:vars]` section in the `hosts` file is usually convenient.
 - `environments/common/inventory/group_vars/all/defaults.yml` contains some variables which are not associated with a specific role/feature. These are unlikely to need changing, but if necessary that could be done using a `environments/<environment>/inventory/group_vars/all/overrides.yml` file.
-- The `ansible/adhoc/generate-passwords.yml` playbook sets secrets for all hosts in `environments/<environent>/inventory/group_vars/all/secrets.yml`.
+- The `ansible/adhoc/generate-passwords.yml` playbook sets secrets for all hosts in `environments/<environment>/inventory/group_vars/all/secrets.yml`.
 - The Packer-based pipeline for building compute images creates a VM in groups `builder` and `compute`, allowing build-specific properties to be set in `environments/common/inventory/group_vars/builder/defaults.yml` or the equivalent inventory-specific path.
 - Each Slurm partition must have:
-  - An inventory group `<cluster_name>_<partition_name>` defining the hosts it contains - these must be homogenous w.r.t CPU and memory.
+  - An inventory group `<cluster_name>_<partition_name>` defining the hosts it contains - these must be homogeneous w.r.t CPU and memory.
   - An entry in the `openhpc_slurm_partitions` mapping in `environments/<environment>/inventory/group_vars/openhpc/overrides.yml`.
     See the [openhpc role documentation](https://github.com/stackhpc/ansible-role-openhpc#slurmconf) for more options.
 - On an OpenStack cloud, rebuilding/reimaging compute nodes from Slurm can be enabled by defining a `rebuild` group containing the relevant compute hosts (e.g. in the generated `hosts` file).

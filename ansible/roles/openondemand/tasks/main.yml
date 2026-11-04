@@ -35,6 +35,15 @@
     - openondemand_auth | lower == 'basic_pam'
     - appliances_mode != 'build'
 
+- name: Install certbot
+  ansible.builtin.dnf:
+    name:
+      - certbot
+      - python3-certbot-apache
+  when:
+    - openondemand_certbot | bool
+    - appliances_mode != 'configure'
+
 - ansible.builtin.include_role:
     name: osc.ood
     tasks_from: install-apps.yml
@@ -43,3 +52,26 @@
 - ansible.builtin.include_tasks:
     file: configure.yml
   when: appliances_mode != 'build'
+
+- name: Generate Let's Encrypt certificate
+  # A note on ordering: Running certbot --apache will start apache if necessary.
+  # If this task is moved before the ondemand startup and the LE cert paths are
+  # set in `openondemand_ssl_cert{,.key}`, then apache will fail to start as
+  # the cert/key do not exist. The cleanest way to break the cycle is to simply
+  # start ondemand first, and always have the self-signed certs defined in the
+  # ondemand configuration.
+  ansible.builtin.command:
+    cmd: >
+      certbot
+        --non-interactive --agree-tos --verbose
+        --apache --no-eff-email
+        --domains {{ openondemand_servername }}
+        {% if openondemand_certbot_staging | bool %}
+        --staging
+        {% endif %}
+        --email {{ openondemand_certbot_email }}
+  register: _openondemand_certbot
+  changed_when: "'Certificate not yet due for renewal' not in _openondemand_certbot.stdout"
+  when:
+    - openondemand_certbot | bool
+    - appliances_mode != 'build'

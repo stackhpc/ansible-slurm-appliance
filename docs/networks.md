@@ -30,7 +30,7 @@ problems harder to debug.
 This page describes supported configurations and how to implement them using
 the OpenTofu variables. These will normally be set in
 `environments/site/tofu/terraform.tfvars` for the site base environment. If they
-need to be overriden for specific environments, this can be done via an OpenTofu
+need to be overridden for specific environments, this can be done via an OpenTofu
 module as discussed [here](./production.md).
 
 Note that if an OpenStack subnet has a gateway IP defined then by default nodes
@@ -53,7 +53,7 @@ cluster_networks = [
 ...
 ```
 
-## Multiple homogenous networks
+## Multiple homogeneous networks
 
 This is similar to the above, except each node has multiple networks. The first
 network, "netA" is the access network. Note that only one subnet must have a
@@ -121,7 +121,7 @@ compute = {
 In some multiple network configurations it may be necessary to manage default
 routes rather than them being automatically created from a subnet gateway.
 This can be done using the tofu variable `gateway_ip` which can be set for the
-cluster and/or overriden on the compute and login groups. If this is set:
+cluster and/or overridden on the compute and login groups. If this is set:
 
 - a default route via that address will be created on the appropriate interface
   during boot if it does not exist

@@ -3,8 +3,6 @@ import requests  # pylint: disable=import-error
 from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
 from bs4 import BeautifulSoup  # pylint: disable=import-error, wrong-import-order
 
-__metaclass__ = type  # pylint: disable=invalid-name
-
 DOCUMENTATION = r"""
 ---
 module: latest_timestamps

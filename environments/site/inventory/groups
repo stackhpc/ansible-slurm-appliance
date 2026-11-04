@@ -33,6 +33,10 @@ control
 [node_exporter:children]
 cluster
 
+[selinux:children]
+# All hosts requiring control of SELinux status.
+fatimage
+
 [opensearch:children]
 control
 
@@ -45,7 +49,8 @@ control
 [filebeat:children]
 slurm_stats
 
-# NB: [rebuild] not defined here as likely to need features not currently supported
+[rebuild]
+# Enable rebuild of nodes on an OpenStack cloud; add 'control' group.
 
 [update:children]
 fatimage
@@ -216,3 +221,25 @@ compute
 
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
+
+[slurmrestd:children]
+# Hosts to run slurmrestd on, usually the `openondemand` group
+fatimage
+
+[slurmrestd_proxy:children]
+# It is recommended to run slurmrestd behind a local TLS-terminating reverse-proxy
+slurmrestd
+
+[weka]
+# Hosts to install and mount WEKA filesystems on
+
+## Vulnerability mitigation groups
+[kernel_modules:children]
+cluster
+
+[systemtap:children]
+login
+compute
+
+[sbom]
+# Add builder to this group to run syft on the site-built image

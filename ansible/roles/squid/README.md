@@ -23,9 +23,9 @@ Where noted these map to squid parameters of the same name without the `squid_` 
 
 These role variables apply to both `squid_conf_mode` settings.
 
-- `squid_conf_mode`: Optional str, `default` (the default) or `eessi`. See above.
+- `squid_conf_mode`: Optional str, `general` or `eessi` (the default). See above.
 - `squid_conf_template`: Optional str. Path (using Ansible search paths) to
-  squid.conf template. Default is in-role templates. If this is overriden then
+  squid.conf template. Default is in-role templates. If this is overridden then
   `squid_conf_mode` has no effect.
 - `squid_http_port`: Optional str. Socket addresses to listen for client requests,
   default '3128'. See squid parameter.
@@ -52,7 +52,7 @@ These role variables apply to both `squid_conf_mode` settings.
 
 - `squid_acls`: Optional str, can be multiline. Define access lists. Default is
   `acl local_nodes src {{ squid_local_nodes_cidr }}`, i.e. only permit connections
-  from address in defined CIDR. In this mode acls for `SSL_ports` and `Safe_ports`
+  from address in defined CIDR. In this mode acls for `TLS_ports` and `Safe_ports`
   are also defined as is common practice.
 - `squid_http_access`: Optional str, can be multiline. Allow/deny access based
   on access lists. Default:
@@ -60,8 +60,8 @@ These role variables apply to both `squid_conf_mode` settings.
   ```text
   # Deny requests to certain unsafe ports
   http_access deny !Safe_ports
-  # Deny CONNECT to other than secure SSL ports
-  http_access deny CONNECT !SSL_ports
+  # Deny CONNECT to other than secure TLS ports
+  http_access deny CONNECT !TLS_ports
   # Only allow cachemgr access from localhost
   http_access allow localhost manager
   http_access deny manager

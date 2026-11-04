@@ -1,6 +1,6 @@
 ---
 # Checks Slurm jobs from hpctests are shown in Grafana.
-# Can't actually check the dashboard programatically so this queries the datasource used by the dashboard instead.
+# Can't actually check the dashboard programmatically so this queries the datasource used by the dashboard instead.
 
 - hosts: control # so proxying etc is irrelevant
   gather_facts: false

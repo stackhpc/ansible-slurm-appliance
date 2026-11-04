@@ -52,7 +52,7 @@ if [ -n "$(git status --short)" ]; then
   git status
 
   # NOTE(scott): The GitHub create-pull-request action does
-  # the commiting for us, so we only need to make branches
+  # the committing for us, so we only need to make branches
   # and commits if running outside of GitHub actions.
   if [ ! "$GITHUB_ACTIONS" ]; then
     echo "[INFO] Checking out temporary branch '$BRANCH_NAME'..."

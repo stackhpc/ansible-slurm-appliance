@@ -78,7 +78,7 @@ See also: - `common/inventory/groups` for a list of all groups.
 ## Overriding configuration
 
 The common environment defines a set of sensible defaults, which may or may not be applicable
-to your target environment. It is sometimes necessary to overide a particular setting. As
+to your target environment. It is sometimes necessary to override a particular setting. As
 inventories that are specified later in the chain take precedence, you can simply redefine
 that variable in the more specific inventory.
 
@@ -90,7 +90,7 @@ The pattern we use is that the role is run against an Ansible inventory group ma
 the name of the role. The role variables are defined as group variables in a file matching
 the role name. These files are in placed in `group_vars/all` so that they have the lowest
 precedence and more easily overridable. This convention makes it easier to find where the
-varibles are set e.g role variables for the `stackhpc.nfs` role can be found in
+variables are set e.g role variables for the `stackhpc.nfs` role can be found in
 `common/group_vars/all/nfs.yml`.
 
 ## Parent pointers
@@ -105,7 +105,7 @@ This allows you to follow the chain more easily:
     (venv-enroll) [stack@seed parent]$ pwd
     /home/stack/will/ansible-slurm-appliance/environments/production/parent/parent
 
-    # Determing which element this path refers to
+    # Determnining which element this path refers to
     (venv-enroll) [stack@seed parent]$ realpath .
     /home/stack/will/ansible-slurm-appliance/environments/common
 

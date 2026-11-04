@@ -1,0 +1,122 @@
+---
+- name: Prepare module denylist using modulejail
+  hosts: modulejail_sample_hosts
+  gather_facts: false
+  tasks:
+    - name: Download modulejail
+      become: false
+      delegate_to: localhost
+      tags:
+        - install
+      ansible.builtin.get_url:
+        url: "https://raw.githubusercontent.com/jnuyens/modulejail/{{ modulejail_version }}/modulejail"
+        dest: "{{ modulejail_local_download_script }}"
+        mode: "0644"
+        checksum: "{{ modulejail_checksum }}"
+      register: _modulejail_download
+      until: _modulejail_download is succeeded
+      retries: 5
+      delay: 2
+      run_once: true # noqa: run-once[task]
+      check_mode: false
+
+    - name: Install modulejail on hosts
+      become: true
+      tags:
+        - install
+      ansible.builtin.copy:
+        src: "{{ modulejail_local_download_script }}"
+        dest: "/usr/local/bin/modulejail"
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Run lsmod
+      ansible.builtin.command: lsmod
+      register: _lsmod
+      changed_when: false
+
+    - name: Parse module names from lsmod output
+      ansible.builtin.set_fact:
+        loaded_modules: >-
+          {{ _lsmod.stdout_lines[1:]
+             | map('split')
+             | map('first')
+             | list }}
+
+    - name: Aggregate and deduplicate modules across all hosts
+      ansible.builtin.set_fact:
+        all_modules: "{{ all_modules | from_json }}"
+      vars:
+        all_modules: >-
+          {% set _all_modules = [] + modulejail_allowlist_modules %}
+          {%- for h in ansible_play_hosts -%}
+          {% set _ = _all_modules.extend(hostvars[h].loaded_modules | flatten) %}
+          {%- endfor -%}
+          {{ _all_modules | unique | sort | list | to_json }}
+
+    - name: Ensure allowlist on hosts
+      become: true
+      ansible.builtin.copy:
+        dest: /var/cache/modulejail_allowlist.txt
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          {% for m in all_modules %}
+          {{ m }}
+          {% endfor %}
+
+    - name: Run modulejail
+      # Choose a profile: default is conservative, but I prefer switching to none
+      # and adding modules to the allowlist instead to get no surprise when bumping modulejail.
+      # See https://github.com/jnuyens/modulejail/blob/v1.5.2/modulejail#L126 for the definition
+      ansible.builtin.command: >-
+          /usr/local/bin/modulejail --whitelist-file /var/cache/modulejail_allowlist.txt
+          --dry-run
+          --no-syslog-logging -f
+          --profile none
+      environment:
+        MODULEJAIL_NO_UPDATE_CHECK: "1"
+      register: _modulejail
+      changed_when: false
+      become: false
+
+    # shows blocked module count for information
+    - ansible.builtin.debug:
+        msg: "{{ _modulejail.stdout_lines[0] }}"
+
+    - name: Parse modulejail output
+      ansible.builtin.set_fact:
+        denylist_modules: >-
+          {{ _modulejail.stderr_lines
+             | select('match', '^install ([^ ]+) /bin/false$')
+             | map('regex_replace', '^install ([^ ]+) /bin/false$', '\1')
+             | list }}
+
+    - name: Aggregate and deduplicate denylist modules across all hosts
+      ansible.builtin.set_fact:
+        all_denylist_modules: "{{ all_denylist_modules | from_json }}"
+      vars:
+        all_denylist_modules: >-
+          {% set _all_modules = [] %}
+          {%- for h in ansible_play_hosts -%}
+          {% set _ = _all_modules.extend(hostvars[h].denylist_modules | flatten) %}
+          {%- endfor -%}
+          {{ _all_modules | unique | sort | list | to_json }}
+
+    - name: Generate denylist
+      delegate_to: localhost
+      run_once: true # noqa: run-once[task]
+      ansible.builtin.copy: # noqa: risky-file-permissions
+        dest: "{{ modulejail_output_var_file }}"
+        content: |
+          # Ansible generated
+          {% if all_denylist_modules %}
+          kernel_modules_modulejail_denylist:
+          {% for m in all_denylist_modules %}
+            - {{ m }}
+          {% endfor %}
+          {% else %}
+          # all_denylist_modules is empty
+          {% endif %}

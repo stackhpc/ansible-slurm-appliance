@@ -80,9 +80,8 @@ mysql
 [node_exporter]
 # All hosts to monitor for hardware and OS metrics.
 
-[selinux:children]
+[selinux]
 # All hosts requiring control of SELinux status.
-cluster
 
 [rebuild]
 # Enable rebuild of nodes on an OpenStack cloud; add 'control' group.
@@ -129,16 +128,8 @@ grafana
 control
 prometheus
 
-[freeipa_server]
-# Hosts to be a FreeIPA server. **NB**: Intended only for test/development use. See ansible/roles/freeipa/README.md
-
 [freeipa_client]
 # Hosts to be a FreeIPA client. See ansible/roles/freeipa/README.md
-
-[freeipa:children]
-# Allows defining variables common to freeipa_server and _client
-freeipa_server
-freeipa_client
 
 [doca]
 # Add `builder` to install NVIDIA DOCA during image build
@@ -244,3 +235,26 @@ doca
 
 [opkssh]
 # Hosts to run opkssh to allow SSH via OIDC
+
+[slurmrestd]
+# Hosts to run slurmrestd on, usually the `openondemand` group
+
+[slurmrestd_proxy]
+# Hosts to run slurmrestd_proxy on. Should contain the `slurmrestd` group
+
+[weka]
+# Hosts to install and mount WEKA filesystems on
+
+## Vulnerability mitigation groups
+[kernel_modules]
+
+[modulejail_sample_hosts]
+# Hosts to get loaded modules and run modulejail onto (doesn't modify the host's modprobe.d)
+# Add at least one host per hardware kind. Don't forget VMs.
+# Can add the whole cluster if you want.
+
+[systemtap]
+# Hosts to install systemtap and run probes on
+
+[sbom]
+# Add builder to this group to run syft on the site-built image

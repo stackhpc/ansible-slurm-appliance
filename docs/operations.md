@@ -84,8 +84,9 @@ This means that when running the `site.yml` playbook, by default:
 The recommended way to resolve both of these issues is by carrying out a
 site-specific [image build](./image-build.md).
 
-By default, the following utility packages are installed in StackHPC images:
+By default, the following utility packages are installed in StackHPC images (see `appliances_extra_packages_default`):
 
+- bash-completion
 - htop
 - nano
 - screen
@@ -134,7 +135,7 @@ an urgent patch), it is possible to install packages directly during the
 `extra_packages` group. An error will occur if Ark credentials are defined in
 this case, as they are readable by unprivileged users in the `.repo` files. A
 local Pulp mirror must be used instead, which also has the advantage of making
-this approach more reproducable.
+this approach more reproducible.
 
 If additional repositories are required, these could be added/enabled as necessary in a play added to `environments/$SITE_ENV/hooks/{pre,post}.yml` as appropriate.
 Note such a play should NOT exclude the builder group, so that the repositories are also added to built images.

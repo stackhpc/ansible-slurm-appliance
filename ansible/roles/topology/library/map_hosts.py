@@ -12,7 +12,7 @@ DOCUMENTATION = """
 module: map_hosts
 short_description: Creates map of OpenStack VM network topology
 description:
-    - Creates map representing the network topology tree of an OpenStack project with a heirarchy
+    - Creates map representing the network topology tree of an OpenStack project with a hierarchy
       of: Availability Zone -> Hypervisors -> VMs/Baremetal instances
 options:
     compute_vms:

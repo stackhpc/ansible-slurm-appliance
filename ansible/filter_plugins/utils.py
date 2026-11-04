@@ -12,7 +12,7 @@ from ansible.utils.display import Display  # pylint: disable=import-error
 
 
 def prometheus_node_exporter_targets(hosts, hostvars, env_key, group):
-    """Return a mapping in cloudalchemy.nodeexporter prometheus_targets
+    """Return a mapping in prometheus.prometheus.prometheus prometheus_targets
     format.
 
     hosts: list of inventory_hostnames
@@ -59,7 +59,7 @@ def to_ood_regex(items):
 
 
 # pylint: disable=useless-object-inheritance
-class FilterModule(object):
+class FilterModule:
     """Ansible core jinja2 filters"""
 
     # pylint: disable=missing-function-docstring

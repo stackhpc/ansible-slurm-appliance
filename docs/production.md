@@ -247,7 +247,7 @@ either for a specific environment within the cluster module block in
 default in `environments/site/tofu/variables.tf`.
 
 For a development environment allowing OpenTofu to manage the volumes using the
-default value of `"manage"` for those varibles is usually appropriate, as it
+default value of `"manage"` for those variables is usually appropriate, as it
 allows for multiple clusters to be created with this environment.
 
 If no home volume at all is required because the home directories are provided
@@ -292,6 +292,24 @@ if your cluster does not include any baremetal nodes. This can be enabled by:
 
 Consider whether mapping of baremetal nodes to ironic nodes is required. See
 [PR 485](https://github.com/stackhpc/ansible-slurm-appliance/pull/485).
+
+Consider whether any Open Ondemand server (by default, the first login node)
+will use Let's Encrypt for certificates. If so the OpenTofu variable
+`login_security_groups` must be modified to include a pre-existing security
+group allowing inbound access to port 80, e.g.:
+
+```hcl
+# environments/site/tofu/variables.tf:
+variable "login_security_groups" {
+  ...
+  default = [
+    "default", # allow all in-cluster services
+    "SSH",     # access via ssh
+    "HTTP",    # HTTP-01 challenge for Let's Encrypt
+    "HTTPS",   # access OpenOndemand
+  ]
+}
+```
 
 To deploy this infrastructure, ensure the venv and the environment are
 [activated](#cookiecutter-instructions) and run:
@@ -340,7 +358,7 @@ environments which should be unique, e.g. production and staging.
   instances) it may be necessary to [configure chrony](./chrony.md).
 
 - Consider the appropriate configuration for `/tmp`. By default nodes in `login` and
-  `compute` groups will use a tmpfs with 10% of total memory. This can be modifed
+  `compute` groups will use a tmpfs with 10% of total memory. This can be modified
   by overriding `mounts_tmp_size` with either a size in bytes or a percentage
   of memory (as for 'size' parameter in `man tmpfs`), e.g.:
 
@@ -417,6 +435,21 @@ environments which should be unique, e.g. production and staging.
   not be sufficient for the control node (e.g. issues have been seen with
   ~300 nodes). Consider adding `control` to the `sshd` group to [mitigate these
   issues](../environments/site/inventory/group_vars/all/sshd.yml).
+
+- Consider using the [pam_slurm_adopt.so](https://slurm.schedmd.com/pam_slurm_adopt.html) PAM plugin.
+  It replaces the default `pam_slurm.so`. Like `pam_slurm.so` it prevents users from ssh-ing into compute nodes
+  they don't have jobs running on. It also ensures users ssh-ing into a compute node will have their session bound
+  to their job's cgroup: they won't be able to use more CPU or memory than was allocated to the job.  
+  WARNING: This plugin conflicts with `pam_systemd.so`. We disable `pam_systemd.so` in `/etc/pam.d/password-auth`
+  during deployment but it will be reverted if `authselect` is later run.
+  Due to the ordering (`slurm.yml` is after `iam.yml` in `site.yml`) it should not happen during a playbook run.
+  It will happen if administrators re-run `authselect sssd --force` manually.
+  ```yaml
+  # environments/site/inventory/group_vars/all/defaults.yml:
+  appliances_enable_pam_slurm_adopt: true
+  ```
+- Consider limiting the list of loadable modules on your nodes, to prevent possible future CVEs.
+  See [modulejail.md](experimental/modulejail.md).
 
 ### Applying configuration
 

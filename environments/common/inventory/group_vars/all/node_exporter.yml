@@ -1,0 +1,7 @@
+---
+
+# See: https://github.com/stackhpc/prometheus-community-ansible
+# for variable definitions
+
+node_exporter_version: 1.11.1 # latest at the time of writing. Usually nothing prevents bumping it.
+node_exporter_checksum: 9f5ea48e5bc7b656f8a91a32e7d7deb89f70f73dabd0d974418aca15f37d6810

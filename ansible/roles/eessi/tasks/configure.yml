@@ -6,7 +6,7 @@
     src: cvmfs.config.j2
     mode: u=rw,go=r
     owner: root
-  register: cvmfs_config
+  register: cvmfs_config_out
 
 # NOTE: Not clear how to make this idempotent
 - name: Ensure CVMFS config is setup # noqa: no-changed-when
@@ -16,7 +16,7 @@
 - name: Reload CVMFS config
   ansible.builtin.command:
     cmd: cvmfs_config reload
-  when: cvmfs_config.changed # noqa: no-handler
+  when: cvmfs_config_out.changed # noqa: no-handler
   changed_when: true # workaround ansible-lint
 
 # configure gpus

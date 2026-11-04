@@ -23,9 +23,13 @@ api_address: "{{ inventory_hostname }}"
 opensearch_address: "127.0.0.1"
 prometheus_address: "{{ hostvars[groups['prometheus'].0].api_address }}"
 openondemand_address: "{{ hostvars[groups['openondemand'].0].api_address if groups['openondemand'] | count > 0 else '' }}"
-grafana_address: "{{ hostvars[groups['grafana'].0].api_address }}"
+grafana_address: "{{ hostvars[groups['grafana'].0].ansible_host }}"
 k3s_server_name: "{{ hostvars[groups['k3s_server'] | first].ansible_host }}"
 alertmanager_address: "{{ hostvars[groups['alertmanager'].0].api_address }}"
+
+# Enable pam_slurm_adopt instead of default pam_slurm. See docs/operations.yml for discussion.
+appliances_enable_pam_slurm_adopt: false
+
 ############################# bootstrap: local user configuration #########################
 
 # Note RockyLinux 8.5 defines system user/groups in range 201-999
@@ -55,6 +59,17 @@ appliances_local_users_default:
       home: /etc/slurm
       shell: /sbin/nologin
       uid: 202
+      system: true
+
+  - group:
+      name: slurmrestd
+      gid: 203
+    user:
+      name: slurmrestd
+      comment: SLURM REST API daemon
+      home: /etc/slurm
+      shell: /sbin/nologin
+      uid: 203
       system: true
 
   - group:
@@ -90,7 +105,7 @@ appliances_local_users_default:
       system: true
     enable: "{{ 'ansible_init' in group_names }}"
 
-# Overide this to add extra users whilst keeping the defaults.
+# Override this to add extra users whilst keeping the defaults.
 appliances_local_users_extra: [] # see format of appliances_local_users_default above
 appliances_local_users: "{{ (appliances_local_users_default + appliances_local_users_extra) | select | list }}"
 
@@ -100,11 +115,13 @@ appliances_extra_packages_default:
   - bash-completion
   - htop
   - nano
+  - patch
   - screen
   - tmux
   - wget
   - bind-utils
   - net-tools
+  - pciutils
   - postfix
   - git
   - "{{ 'python36' if ansible_distribution_version == '8.9' else 'python312' }}"
@@ -117,3 +134,13 @@ appliances_extra_packages: "{{ (appliances_extra_packages_default + appliances_e
 # to compute nodes even if they have no job running.
 appliances_admin_user_groups:
   - adm
+
+# Packages to REMOVE on build, e.g. from genericcloud image.
+appliances_packages_uninstall:
+  # Don't want these:
+  - cockpit-ws
+  - cockpit-system
+  - cockpit-bridge
+  # Installed in RL8 genericcloud, but vulnerable
+  - python3-unbound
+  - unbound-libs

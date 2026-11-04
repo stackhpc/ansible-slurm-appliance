@@ -1,0 +1,219 @@
+---
+
+# Scan the built image for vulnerabilities using Grype.
+# This workflow can run standalone or as part of the main CI workflow.
+# See the workflow file 'main.yml' for how this is CI triggered.
+
+name: Scan image for vulnerabilities
+'on':
+  push:
+    branches:
+      - main
+    paths:
+      - environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+      - .github/workflows/scan.yml
+  pull_request:
+    paths:
+      - environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+      - .github/workflows/scan.yml
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'  # Run at 7AM - to get fresh vulnerability reports
+
+permissions: {}
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        build: ["RL8", "RL9"]
+    permissions:
+      security-events: write # to upload to security tab
+      contents: write # to upload sbom
+      checks: write # to write check-runs statuses
+    env:
+      JSON_PATH: environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
+      OS_CLOUD: openstack
+      CI_CLOUD: ${{ vars.CI_CLOUD }}
+      GRYPE_VERSION: v0.113.0
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Override CI_CLOUD if PR label is present
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          # Iterate over the labels
+          echo "$LABELS"
+          for label in $LABELS; do
+             if [[ $label == CI_CLOUD=* ]]; then
+              # Extract the value after 'CI_CLOUD='
+              CI_CLOUD_OVERRIDE="${label#CI_CLOUD=}"
+              echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
+            fi
+          done
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+
+      - name: Record settings for CI cloud
+        run: |
+          echo CI_CLOUD: "${CI_CLOUD}"
+
+      - name: Setup Python environment
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip
+          pip install -r requirements.txt
+        shell: bash
+
+      - name: Write clouds.yaml
+        run: |
+          mkdir -p ~/.config/openstack/
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
+        shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
+
+      - name: Parse image name json
+        id: manifest
+        run: |
+          IMAGE_NAME=$(jq --arg version "$MATRIX_BUILD" -r '.cluster_image[$version]' "$JSON_PATH")
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_ENV"
+          echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "sbom_name=${IMAGE_NAME}.syft-json" | tr '[:upper:]' '[:lower:]' | tee -a "$GITHUB_ENV" "$GITHUB_OUTPUT"
+        env:
+          MATRIX_BUILD: ${{ matrix.build }}
+          JSON_PATH: ${{ env.JSON_PATH }}
+
+      - name: Restore SBOM cache
+        id: cache_restore
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.manifest.outputs.sbom_name }}
+          key: ${{ steps.manifest.outputs.sbom_name }}
+
+      - name: Download image SBOM
+        if: steps.cache_restore.outputs.cache-hit != 'true'
+        run: |
+          . venv/bin/activate
+          sbom_url="$(openstack image show --format json "${IMAGE_NAME}" | jq -r '.properties.stackhpc_sbom // ""')"
+          # be slightly robust to string injection
+          if [ -n "$sbom_url" ] && [[ "$sbom_url" == https://leafcloud.store* ]] && [[ "$sbom_url" == *syft-json.zip ]]; then
+            TARGET_IMAGE_SHA512="$(openstack image show -f json -c properties "${IMAGE_NAME}" | jq -r '.properties.os_hash_value')"
+            SBOM_IMAGE_SHA512=$(curl -sS -I "$sbom_url" | grep x-object-meta-stackhpc-image-checksum | sed 's/.*sha512://;s/\r//')
+            if [ "$TARGET_IMAGE_SHA512" = "$SBOM_IMAGE_SHA512" ]; then
+              echo "Image checksum matches SBOM: $TARGET_IMAGE_SHA512"
+            else
+              echo "E: Image $IMAGE_NAME checksum in OpenStack is '$TARGET_IMAGE_SHA512' but recorded with sbom is '$SBOM_IMAGE_SHA512'"
+              exit 1
+            fi
+            echo Downloading "$sbom_url ..."
+            wget -nv "$sbom_url" -O sbom.zip
+            if ! unzip sbom.zip "${sbom_name}" || [ ! -e "${sbom_name}" ]; then
+              echo "Unexpected content in sbom zip: didn't produce ${sbom_name}"
+              unzip -l sbom.zip
+              exit 1
+            fi
+          else
+            echo "Missing or invalid sbom_url='$sbom_url' (quotes added)"
+            exit 1
+          fi
+
+      - name: Save SBOM cache
+        if: steps.cache_restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.manifest.outputs.sbom_name }}
+          key: ${{ steps.manifest.outputs.sbom_name }}
+
+      - name: Generate SARIF Scan Report
+        uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
+        id: scan
+        with:
+          sbom: ${{ steps.manifest.outputs.sbom_name }}
+          severity-cutoff: low  # want everything for the Security Tab
+          only-fixed: true
+          output-format: sarif # format required for github security tab
+          fail-build: false # don't stop workflow if vulns are found
+          grype-version: ${{ env.GRYPE_VERSION }}
+
+      - name: Analyse scan and fail workflow if fixed CRITICAL vulnerabilities are not ignored
+        id: grype_analyse
+        # anchore/scan-action installs grype to tmpdir, reuse for speed
+        run: |
+          . venv/bin/activate
+          pip install git+https://github.com/stackhpc/grype-analyse@v1.1
+          GRYPE=$(find /tmp -name grype -type f 2>/dev/null | head -1)
+          if [ -z "$GRYPE" ]; then
+            echo "grype binary not found in /tmp"
+            exit 1
+          fi
+          $GRYPE --only-fixed "sbom:${SBOM}" -o json > "${GRYPE_OUTPUT}"
+          set +e
+          set -o pipefail
+          printf 'grype_analyse_output<<THIS_MARKER_TO_SUPPORT_MULTILINE_STRING\n```\n' >> "$GITHUB_OUTPUT"
+          grype-analyse --config .grype.yaml --github-checks "${GRYPE_OUTPUT}" | tee grype-analyse.log
+          grype_exit=$?
+          # only output ERROR: and rest to Slack, truncated to fit Slack limits
+          awk -v maxlen="${SLACK_MAX_CHARS:-1800}" '
+            /ERROR:/ { f=1 }
+            f {
+              if (total + length($0) + 1 > maxlen) { truncated=1; exit }
+              print
+              total += length($0) + 1
+            }
+            END { if (truncated) print "... (truncated, see workflow logs for full output)" }
+          ' grype-analyse.log >> "$GITHUB_OUTPUT"
+          printf '```\nTHIS_MARKER_TO_SUPPORT_MULTILINE_STRING\n' >> "$GITHUB_OUTPUT"
+          exit $grype_exit
+        env:
+          GRYPE_OUTPUT: "${{ steps.manifest.outputs.image-name }}.grype.json"
+          SBOM: ${{ steps.manifest.outputs.sbom_name }}
+          GRYPE_ANALYSE_MATRIX: ${{ matrix.build }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_MAX_CHARS: "1800"
+
+      - name: Upload SARIF scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+          # Useful if you are running this in a matrix
+          category: "${{ matrix.build }}"
+
+      - name: Send Failure message to Slack
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        with:
+          errors: true
+          payload: |
+            text: "Failed Vulnerability scan"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "There was an error during scan of ${{ steps.manifest.outputs.image-name }}. See <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run ${{ github.run_id }}>\n"
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+        if: ${{ failure() && github.event.schedule && (steps.grype_analyse.conclusion != 'failure' || !contains(steps.grype_analyse.outputs.grype_analyse_output, 'ERROR:'))  }}
+
+      - name: Send Vulnerability Found message to Slack
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95  # v3.0.1
+        with:
+          errors: true
+          payload: |
+            text: "Vulnerability found during scan of the appliance"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "Grype scan of ${{ steps.manifest.outputs.image-name }} found vulnerabilities. See <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|run ${{ github.run_id }}>\n"
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: ${{ toJSON(steps.grype_analyse.outputs.grype_analyse_output) }}
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+        if: ${{ failure() && github.event.schedule && steps.grype_analyse.conclusion == 'failure' && contains(steps.grype_analyse.outputs.grype_analyse_output, 'ERROR:')  }}

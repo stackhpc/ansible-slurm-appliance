@@ -3,7 +3,7 @@ name: "slurm"
 label: "Slurm"
 description: >-
   Batch cluster running the Slurm workload manager, the Open  OnDemand web interface, and custom monitoring.
-logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
+logo: https://github.com/stackhpc/ansible-slurm-appliance/raw/main/environments/.caas/assets/slurm-logo.png
 
 requires_ssh_key: true
 
@@ -132,7 +132,7 @@ usage_template: |-
 
   Note that home directories are deleted when the platform is destroyed.
 
-  If configured by the adminstrator, a project filesystem may be mounted at `/project`.
+  If configured by the administrator, a project filesystem may be mounted at `/project`.
   Content stored there will be available to all such configured workstations and Slurm
   clusters, and will persist after deletion of workstations/clusters.
 

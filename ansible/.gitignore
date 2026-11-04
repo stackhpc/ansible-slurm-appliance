@@ -4,10 +4,14 @@ roles/*
 # Whitelist roles that are checked into this repository.
 !roles/filebeat/
 !roles/filebeat/**
+!roles/kernel_modules/
+!roles/kernel_modules/**
 !roles/opensearch/
 !roles/opensearch/**
 !roles/podman/
 !roles/podman/**
+!roles/slurmrestd_proxy/
+!roles/slurmrestd_proxy/**
 !roles/grafana-dashboards/
 !roles/grafana-dashboards/**
 !roles/passwords/
@@ -106,3 +110,7 @@ roles/*
 !roles/mounts/**
 !roles/opkssh/
 !roles/opkssh/**
+!roles/weka/
+!roles/weka/**
+!roles/systemtap/
+!roles/systemtap/**

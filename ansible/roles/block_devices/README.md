@@ -6,7 +6,7 @@ This is a convenience wrapper around the Ansible modules:
 
 - community.general.parted
 - community.general.filesystem
-- ansible.buildin.file
+- ansible.builtin.file
 - ansible.posix.mount
 
 To avoid issues with device names changing after e.g. reboots, devices are identified by serial number and mounted by filesystem UUID.
@@ -29,8 +29,8 @@ N/A.
 - `block_devices_filesystem_state`: Optional. Whether filesystem should be 'present' (default) or 'absent', or 'skip'.
 - `block_devices_path`: Required. Path to mount point, e.g. '/mnt/files'.
 - `block_devices_mount_state`: Optional. Mount state, 'absent', 'mounted' (default), 'present', 'unmounted' or 'remounted' - see `ansible.posix.mount:state`
-- `block_devices_owner`: Optional. Name of owner for mounted directory (as for `ansible.buildin.file:owner`), or omitted.
-- `block_devices_group`: Optional. Name of group for mounted directory (as for `ansible.buildin.file.group`), or omitted.
+- `block_devices_owner`: Optional. Name of owner for mounted directory (as for `ansible.builtin.file:owner`), or omitted.
+- `block_devices_group`: Optional. Name of group for mounted directory (as for `ansible.builtin.file.group`), or omitted.
 
 Multiple NFS client/server configurations may be provided by defining `block_devices_configurations`. This should be a list of mappings with keys/values are as per the variables above without the `block_devices_` prefix. Omitted keys/values are filled from the corresponding variable.
 

@@ -1,9 +1,15 @@
 ---
-- name: Install pip
+- name: Ensure python3.9 and pip installed
   ansible.builtin.dnf:
-    name: python3-pip
+    name:
+      - python39  # RL8
+      - python3-pip  # RL9
+  tags: install
 
 - name: Install python mysql client
+  vars:
+    # use python3.9 to install a recent pymysql version, with fixed SQL injection vulnerability
+    ansible_python_interpreter: /usr/bin/python3.9
   ansible.builtin.pip:
     name:
       - pymysql

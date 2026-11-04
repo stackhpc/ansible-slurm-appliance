@@ -3,5 +3,5 @@
 # Nvidia driver is provided by cuda role.
 vgpu_nvidia_driver_install_enabled: false
 
-# Explitly enable MIG support for the image build
+# Explicitly enable MIG support for the image build
 vgpu_mig_enabled: true

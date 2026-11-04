@@ -1,8 +1,7 @@
-# pylint: disable=missing-module-docstring
 import os
 
-import matplotlib.pyplot as plt  # pylint: disable=import-error
-from matplotlib import ticker  # pylint: disable=import-error
+import matplotlib.pyplot as plt
+from matplotlib import ticker
 
 
 def sizeof_fmt(num, suffix="B"):
@@ -10,14 +9,9 @@ def sizeof_fmt(num, suffix="B"):
     # from https://stackoverflow.com/a/1094933/916373
     for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
         if abs(num) < 1024.0:
-            # pylint: disable-next=consider-using-f-string
-            return "%3.1f%s%s" % (
-                num,
-                unit,
-                suffix,
-            )
+            return f"{num:3.1f}{unit}{suffix}"
         num /= 1024.0
-    return "%.1f%s%s" % (num, "Yi", suffix)  # pylint: disable=consider-using-f-string
+    return f"{num:.1f}Yi{suffix}"
 
 
 def read_imb_out(path):
@@ -33,7 +27,7 @@ def read_imb_out(path):
 
     data = {}
 
-    COLTYPES = {  # all benchmark names here should be lowercase # pylint: disable=invalid-name
+    COLTYPES = {  # all benchmark names here should be lowercase
         # #bytes #repetitions Mbytes/sec Msg/sec
         "uniband": (int, int, float, int),
         "biband": (int, int, float, int),
@@ -48,17 +42,16 @@ def read_imb_out(path):
         ),  # #bytes #repetitions t_min[usec] t_max[usec] t_avg[usec]
     }
 
-    with open(path) as f:  # pylint: disable=unspecified-encoding
+    with open(path) as f:
         for line in f:
             if line.startswith("# Benchmarking "):
                 benchmark = line.split()[-1].lower()
                 if benchmark not in COLTYPES:
                     raise ValueError(
-                        "Do not know how to read %r benchmark in %s"  # pylint: disable=consider-using-f-string
-                        % (benchmark, path)
+                        f"Do not know how to read {benchmark!r} benchmark in {path}"
                     )
                 converters = COLTYPES[benchmark]
-                line = next(f)
+                line = next(f)  # noqa: PLW2901
                 expected = "# #processes = "
                 if not line.startswith(expected):
                     raise ValueError(f"expected {expected}, got {line}")
@@ -66,10 +59,10 @@ def read_imb_out(path):
                 while line.startswith("#"):
                     # may or may not include line "# .. additional processes
                     # waiting in MPI_Barrier", plus other # lines
-                    line = next(f)
+                    line = next(f)  # noqa: PLW2901
                 rows = []
                 while True:
-                    line = next(f).strip()
+                    line = next(f).strip()  # noqa: PLW2901
                     if line == "":
                         break
                     rows.append([f(v) for (f, v) in zip(converters, line.split())])

@@ -1,12 +1,27 @@
 ---
 
 # Test building extra images on OpenStack.
-# This workflow can run standalone or as part of the main CI workflow.
-# See the workflow file 'main.yml' for how this is CI triggered.
 
 name: Test extra build
 'on':
-  workflow_call:
+  push:
+    branches:
+      - main
+    paths:
+      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
+      - 'ansible/roles/doca/**'
+      - 'ansible/roles/cuda/**'
+      - 'ansible/roles/slurm_recompile/**'
+      - 'ansible/roles/lustre/**'
+      - '.github/workflows/extra.yml'
+  pull_request:
+    paths:
+      - 'environments/.stackhpc/tofu/cluster_image.auto.tfvars.json'
+      - 'ansible/roles/doca/**'
+      - 'ansible/roles/cuda/**'
+      - 'ansible/roles/slurm_recompile/**'
+      - 'ansible/roles/lustre/**'
+      - '.github/workflows/extra.yml'
   workflow_dispatch:
     # checkov:skip=CKV_GHA_7: "The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty. "
     inputs:
@@ -26,11 +41,7 @@ name: Test extra build
         required: true
         default: true
 
-permissions:
-  contents: read
-  packages: write
-  # To report GitHub Actions status checks
-  statuses: write
+permissions: {}
 
 jobs:
   doca:
@@ -42,11 +53,11 @@ jobs:
         build:
           - image_name: openhpc-extra-RL8
             source_image_name_key: RL8 # key into environments/.stackhpc/tofu/cluster_image.auto.tfvars.json
-            inventory_groups: doca,cuda # lustre disabled due to https://github.com/stackhpc/ansible-slurm-appliance/pull/759
+            inventory_groups: doca,cuda,lustre
             volume_size: 35 # needed for cuda
           - image_name: openhpc-extra-RL9
             source_image_name_key: RL9
-            inventory_groups: doca,cuda,lustre
+            inventory_groups: doca,cuda
             volume_size: 35 # needed for cuda
     env:
       ANSIBLE_FORCE_COLOR: 'true'
@@ -57,7 +68,9 @@ jobs:
       PACKER_ON_ERROR: ${{ github.event.inputs.cleanup_on_failure == 'false' && 'abort' || vars.PACKER_ON_ERROR }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
 
       - name: Load current fat images into GITHUB_ENV
         # see https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#example-of-a-multiline-string
@@ -72,37 +85,69 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           # Iterate over the labels
-          labels=$(echo '${{ toJSON(github.event.pull_request.labels) }}' | jq -r '.[].name')
-          echo "$labels"
-          for label in $labels; do
+          echo "$LABELS"
+          for label in $LABELS; do
              if [[ $label == CI_CLOUD=* ]]; then
               # Extract the value after 'CI_CLOUD='
-              CI_CLOUD_OVERRIDE=${label#CI_CLOUD=}
+              CI_CLOUD_OVERRIDE="${label#CI_CLOUD=}"
               echo "CI_CLOUD=${CI_CLOUD_OVERRIDE}" >> "$GITHUB_ENV"
             fi
           done
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
 
       - name: Record settings
         run: |
-          echo CI_CLOUD: ${{ env.CI_CLOUD }}
-          echo PACKER_ON_ERROR: ${{ env.PACKER_ON_ERROR}}
+          (
+          echo "CI_CLOUD: ${CI_CLOUD}"
+          echo "PACKER_ON_ERROR: ${PACKER_ON_ERROR}"
           echo "FAT_IMAGES: ${FAT_IMAGES}"
+          ) | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Setup ssh
         run: |
           set -x
-          mkdir ~/.ssh
-          echo "${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }}" > ~/.ssh/id_rsa
-          chmod 0600 ~/.ssh/id_rsa
-          ssh-keygen -f ~/.ssh/id_rsa -y # tests key format is correct
-        shell: bash
+          mkdir -p ~/.ssh
 
-      - name: Add bastion ssh fingerprints to known_hosts
-        run: |
-          cat >> ~/.ssh/known_hosts << 'EOF'
-          ${{ vars.BASTION_FINGERPRINTS }}
-          EOF
-        shell: bash
+          # setup bastion private key:
+          echo "$SECRETS_SSH_KEY" > "${BASTION_KEYFILE}"
+          chmod 0600 "${BASTION_KEYFILE}"
+          ssh-keygen -f "${BASTION_KEYFILE}" -y # tests key format is correct
+
+          # accept bastion hostkeys
+          cat >> ~/.ssh/known_hosts <<< "${BASTION_FINGERPRINTS}"
+
+          {
+            # setup bastion for Ansible:
+            # NB Do NOT change this to use ProxyJump, it doesn't pickup the key
+            echo "ANSIBLE_SSH_COMMON_ARGS=-o ProxyCommand='ssh -i ${BASTION_KEYFILE} -W %h:%p ${BASTION_USER}@${BASTION_HOST}'"
+
+            # setup bastion for Packer:
+            echo "PKR_VAR_ssh_bastion_host=${BASTION_HOST}"
+            echo "PKR_VAR_ssh_bastion_username=${BASTION_USER}"
+            echo "PKR_VAR_ssh_bastion_private_key_file=${BASTION_KEYFILE}"
+
+            # setup additional debug key for Packer:
+            echo "PKR_VAR_ssh_debug_public_key=${SSH_DEBUG_PUBLIC_KEY}"
+          } >> "$GITHUB_ENV"
+
+          echo "bastion details:"
+          cat "$GITHUB_ENV"
+        env:
+          BASTION_KEYFILE: /home/runner/.ssh/bastion_key
+          SECRETS_SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
+          BASTION_HOST: ${{ vars[format('{0}_BASTION_HOST', env.CI_CLOUD)] }}
+          BASTION_USER: slurm-app-ci # currently same for both CI clouds
+          BASTION_FINGERPRINTS: ${{ vars.BASTION_FINGERPRINTS }}
+          SSH_DEBUG_PUBLIC_KEY: ${{ vars.SSH_DEBUG_PUBLIC_KEY}}
+
+      - name: Cache pip
+        # Don't cache galaxy/requirements.yml as during dev its common for this
+        # to use branch names
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
 
       - name: Install ansible etc
         run: dev/setup-env.sh
@@ -110,8 +155,10 @@ jobs:
       - name: Write clouds.yaml
         run: |
           mkdir -p ~/.config/openstack/
-          echo "${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }}" > ~/.config/openstack/clouds.yaml
+          echo "$SECRETS_CLOUD" > ~/.config/openstack/clouds.yaml
         shell: bash
+        env:
+          SECRETS_CLOUD: ${{ secrets[format('{0}_CLOUDS_YAML', env.CI_CLOUD)] }} # zizmor: ignore[overprovisioned-secrets]
 
       - name: Setup environment
         run: |
@@ -128,13 +175,18 @@ jobs:
           packer init .
 
           PACKER_LOG=1 packer build \
-          -on-error=${{ env.PACKER_ON_ERROR }} \
-          -var-file="$PKR_VAR_environment_root/${{ env.CI_CLOUD }}.pkrvars.hcl" \
-          -var "source_image_name=${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}" \
-          -var "image_name=${{ matrix.build.image_name }}" \
-          -var "inventory_groups=${{ matrix.build.inventory_groups }}" \
-          -var "volume_size=${{ matrix.build.volume_size }}" \
+          -on-error="${PACKER_ON_ERROR}" \
+          -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
+          -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
+          -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
+          -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
+          -var "volume_size=$MATRIX_BUILD_VOLUME_SIZE" \
           openstack.pkr.hcl
+        env:
+          MATRIX_BUILD_SOURCE_IMAGE_NAME: ${{ fromJSON(env.FAT_IMAGES)['cluster_image'][matrix.build.source_image_name_key] }}
+          MATRIX_BUILD_IMAGE_NAME: ${{ matrix.build.image_name }}
+          MATRIX_BUILD_INVENTORY_GROUPS: ${{ matrix.build.inventory_groups }}
+          MATRIX_BUILD_VOLUME_SIZE: ${{ matrix.build.volume_size }}
 
       - name: Get created image names from manifest
         id: manifest
@@ -145,24 +197,28 @@ jobs:
             sleep 5
           done
           IMAGE_NAME=$(openstack image show -f value -c name "$IMAGE_ID")
-          echo "image-name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
-          echo "image-id=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo "image-name=${IMAGE_NAME}" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
+          echo "image-id=$IMAGE_ID" | tee -a "$GITHUB_OUTPUT" "$GITHUB_STEP_SUMMARY"
           echo "$IMAGE_ID" > image-id.txt
           echo "$IMAGE_NAME" > image-name.txt
 
       - name: Make image usable for further builds
         run: |
           . venv/bin/activate
-          openstack image unset --property signature_verified "${{ steps.manifest.outputs.image-id }}" || true
+          openstack image unset --property signature_verified "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}" || true
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
 
       - name: Delete image for automatically-run workflows
         run: |
           . venv/bin/activate
-          openstack image delete "${{ steps.manifest.outputs.image-id }}"
+          openstack image delete "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
         if: ${{ github.event_name != 'workflow_dispatch' }}
+        env:
+          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
 
       - name: Upload manifest artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: image-details-${{ matrix.build.image_name }}
           path: |

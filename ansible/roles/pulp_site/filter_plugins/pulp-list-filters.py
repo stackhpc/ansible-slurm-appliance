@@ -1,6 +1,6 @@
 # pylint: disable=invalid-name, missing-module-docstring
 # pylint: disable-next=missing-class-docstring, useless-object-inheritance
-class FilterModule(object):
+class FilterModule:
 
     def filters(self):  # pylint: disable=missing-function-docstring
         return {
@@ -27,10 +27,7 @@ class FilterModule(object):
             elif target_distro_ver_major in dnf_repos[repokey]:
                 selected_ver = target_distro_ver_major
             else:
-                raise ValueError(
-                    # pylint: disable-next=line-too-long
-                    f"No key matching {target_distro_ver_major} or {target_distro_ver} found in f{repokey}"
-                )
+                continue  # e.g. epel-cisco-openh264 only relevant for RL9
             repo_data = dnf_repos[repokey][selected_ver]
             repo_data["pulp_repo_name"] = (
                 f"{repokey}-{selected_ver}-{dnf_repos[repokey][selected_ver]['pulp_timestamp']}"
@@ -46,7 +43,7 @@ class FilterModule(object):
         for repo_data in rpm_info:
             rpm_data = (
                 repo_defaults.copy()
-            )  # NB: this changes behaviour vs before, so now defaults can correctly be overriden
+            )  # NB: this changes behaviour vs before, so now defaults can correctly be overridden
             rpm_data["name"] = repo_data["pulp_repo_name"]
             rpm_data["url"] = "/".join(
                 [content_url, repo_data["pulp_path"], repo_data["pulp_timestamp"]]

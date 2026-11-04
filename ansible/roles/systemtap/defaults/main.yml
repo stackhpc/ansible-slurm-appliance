@@ -1,0 +1,11 @@
+# Directory to store modules
+systemtap_modules_directory: /var/lib/appliance-stap-modules
+# List of objects defining systemtap scripts
+# to compile to modules and run. Each object is in
+# the form:
+# - name - Name of module and systemd service to create.
+#          Ensure this doesn't conflict with existing services.
+#   script - Multiline string defining script content
+#   persist - Bool indicating whether to load module
+#             at boot (use with caution)
+systemtap_scripts: []

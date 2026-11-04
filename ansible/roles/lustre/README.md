@@ -11,7 +11,7 @@ Install and configure a Lustre client. This builds RPM packages from source.
 The following variables control configuration of Lustre clients.
 
 - `lustre_lnet_label`: Optional str. The "lnet label" part of the host's NID, e.g. `tcp0`. Only the `tcp` protocol type is currently supported. Default `tcp`.
-- `lustre_mgs_nid`: Required str. The NID(s) for the MGS, e.g. `192.168.227.11@tcp1` (separate mutiple MGS NIDs using `:`).
+- `lustre_mgs_nid`: Required str. The NID(s) for the MGS, e.g. `192.168.227.11@tcp1` (separate multiple MGS NIDs using `:`).
 - `lustre_mounts`: Required list. Define Lustre filesystems and mountpoints as a list of dicts with keys:
   - `fs_name`: Required str. The name of the filesystem to mount
   - `mount_point`: Required str. Path to mount filesystem at.

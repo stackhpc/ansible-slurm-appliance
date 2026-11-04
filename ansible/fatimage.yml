@@ -28,15 +28,38 @@
   import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
   when: hook_path | exists
 
+- ansible.builtin.import_playbook: validate-galaxy.yml
+
+- ansible.builtin.import_playbook: mitigations.yml
+
 - name: Sync pulp repos with upstream
   hosts: pulp_site
+  gather_facts: true
   tasks:
     - ansible.builtin.include_role:
         name: pulp_site
         tasks_from: sync.yml
         apply:
           delegate_to: localhost
+      vars:
+        pulp_site_target_distribution_version: "{{ hostvars[groups['pulp_site'][0]]['ansible_facts']['distribution_version'] }}"
       when: appliances_mode != 'configure'
+
+- hosts: builder
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Ensure psi=1 on boot
+      ansible.builtin.include_role:
+        name: stackhpc.linux.grubcmdline
+      vars:
+        kernel_cmdline: "{{ grubcmdline_kernel_cmdline }}"
+        kernel_cmdline_remove: "{{ grubcmdline_kernel_cmdline_remove }}"
+  handlers:
+    - name: reboot  # noqa: name[casing]
+      ansible.builtin.debug:
+        msg: no need to reboot when building
+
 
 - import_playbook: bootstrap.yml
 
@@ -92,6 +115,22 @@
         tasks_from: install.yml
       when: "'lustre' in group_names"
 
+- name: Run post-filesystems.yml hook
+  vars:
+    appliances_environment_root: "{{ lookup('env', 'APPLIANCES_ENVIRONMENT_ROOT') }}"
+    hook_path: "{{ appliances_environment_root }}/hooks/post-filesystems.yml"
+  ansible.builtin.import_playbook: "{{ hook_path if hook_path | exists else 'noop.yml' }}"
+  when: hook_path | exists
+
+- name: Install SystemTap
+  become: true
+  hosts: systemtap
+  tags: systemtap
+  tasks:
+    - ansible.builtin.import_role:
+        name: systemtap
+        tasks_from: install.yml
+
 - import_playbook: extras.yml
 
 # TODO: is this the right place?
@@ -128,12 +167,19 @@
       ansible.builtin.include_role:
         name: rebuild
         tasks_from: install.yml
+      when: "'rebuild' in group_names"
 
     - name: Install OpenHPC
       ansible.builtin.import_role:
         name: stackhpc.openhpc
         tasks_from: install-ohpc.yml
       when: "'openhpc' in group_names"
+
+    - name: Install slurmrestd_proxy dependencies
+      ansible.builtin.include_role:
+        name: slurmrestd_proxy
+        tasks_from: install.yml
+      when: "'slurmrestd_proxy' in group_names"
 
     # - import_playbook: portal.yml
     - name: Install Open OnDemand server and apps
@@ -145,7 +191,7 @@
       ansible.builtin.include_role:
         name: openondemand
         tasks_from: vnc_compute.yml
-      when: "'openondemand_desktop' or 'openondemand_matlab' in group_names"
+      when: "'openondemand_desktop' in group_names or 'openondemand_matlab' in group_names"
 
     - name: Open OnDemand Jupyter node
       ansible.builtin.include_role:
@@ -186,12 +232,12 @@
       when: "'filebeat' in group_names"
 
     - ansible.builtin.import_role:
-        # can't only run cloudalchemy.node_exporter/tasks/install.yml as needs vars from preflight.yml and triggers service start
+        # no prometheus.prometheus.node_exporter/tasks/install.yml
         # however starting node exporter is ok
-        name: cloudalchemy.node_exporter
+        name: prometheus.prometheus.node_exporter
       when: "'node_exporter' in group_names"
 
-    - name: Openondemand exporter
+    - name: Open Ondemand exporter
       ansible.builtin.dnf:
         name: ondemand_exporter
       when: "'openondemand' in group_names"
@@ -204,8 +250,15 @@
 
     - name: Install alertmanager
       ansible.builtin.include_role:
-        name: alertmanager
-        tasks_from: install.yml
+        name: prometheus.prometheus.alertmanager
+      vars:
+        alertmanager_skip_configure: true
+        # must be overridden because the alertmanager password is undefined at this staged
+        # so it won't pass "Validating arguments against arg spec 'main'"
+        alertmanager_web_config:
+          basic_auth_users: {}
+          http_server_config: {}
+          tls_server_config: {}
       when: "'alertmanager' in group_names"
 
     - name: Download HPL source
@@ -219,58 +272,12 @@
   gather_facts: true
   tasks:
     - ansible.builtin.import_role:
-        name: cloudalchemy.prometheus
-        tasks_from: preflight.yml
-
-    # can't run cloudalchemy.prometheus/tasks/install.yml as it triggers a unit start
-    # so below is a partial extraction of this:
-    - name: Create prometheus system group
-      ansible.builtin.group:
-        name: prometheus
-        system: true
-        state: present
-
-    - name: Create prometheus system user
-      ansible.builtin.user:
-        name: prometheus
-        system: true
-        shell: "/usr/sbin/nologin"
-        group: prometheus
-        createhome: false
-        home: "{{ prometheus_db_dir }}"
-
-    - name: Download prometheus binary to local folder
-      become: false
-      ansible.builtin.get_url:
-        # yamllint disable-line rule:line-length
-        url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
-        dest: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
-        checksum: "sha256:{{ __prometheus_checksum }}"
-        mode: "0644"
-      register: _download_archive
-      until: _download_archive is succeeded
-      retries: 5
-      delay: 2
-
-    - name: Unpack prometheus binaries
-      become: false
-      ansible.builtin.unarchive:
-        remote_src: true
-        src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
-        dest: "/tmp"
-        creates: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/prometheus"
-
-    - name: Propagate official prometheus and promtool binaries
-      ansible.builtin.copy:
-        remote_src: true
-        src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}"
-        dest: "{{ _prometheus_binary_install_dir }}/{{ item }}"
-        mode: "0755"
-        owner: root
-        group: root
-      with_items:
-        - prometheus
-        - promtool
+        name: prometheus.prometheus.prometheus
+      vars:
+        prometheus_skip_configure: true
+        # prometheus_alert_rules contain undefined variables at this time, causing
+        # an assertion failure in arg check
+        prometheus_alert_rules: []
 
 - hosts: grafana
   become: true
@@ -305,6 +312,58 @@
   when: hook_path | exists
 
 - import_playbook: final.yml
+
+- name: Cleanup dubious files with respect to security
+  hosts: builder
+  become: true
+  gather_facts: true
+  tags: sbom
+  tasks:
+    - name: Cleanup /tmp # noqa: no-changed-when
+      ansible.builtin.shell: rm -rvf /tmp/*
+    - name: Delete files triggering vulnerability scans
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: # NB: items here MUST have a justification!
+        # ondemand install: raised at https://github.com/OSC/ondemand/security/advisories/GHSA-f7j8-ppqm-m5vw
+        # All declared not to be an issue by Open Ondemand as relevant packages not installed
+        - "/opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/{{ ondemand_package_version }}-1/gems/bootstrap_form-2.7.0/test/dummy/Gemfile.lock"
+        - "/opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/{{ ondemand_package_version }}-1/gems/bootstrap_form-5.0.0/demo/yarn.lock"
+        - /var/www/ood/apps/sys/dashboard/node_modules/data-confirm-modal/Gemfile.lock
+        # chrony role: only used for role dev, venv never created on disk
+        - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/poetry.lock
+        - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements.txt
+        - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements-dev.txt
+        # netbox collection: only used for role dev
+        - /usr/lib/ansible-init/lib/python3.9/site-packages/ansible_collections/netbox/netbox/poetry.lock
+        # esbuild in OOD
+        - /var/www/ood/apps/sys/dashboard/node_modules/@esbuild/linux-x64/bin/esbuild
+        - /usr/lib/rstudio-server/bin/quarto/bin/tools/x86_64/esbuild
+    - name: Delete unwanted packages
+      ansible.builtin.dnf:
+        name: "{{ appliances_packages_uninstall }}"
+        state: absent
+    - name: Replace rclone with a no-op script
+      ansible.builtin.copy:
+        content: |
+          #!/bin/sh
+          echo "The rclone executable has been removed in ansible-slurm-appliance images due to too many security warnings." 1>&2
+          exit 1
+        dest: /usr/bin/rclone
+        owner: root
+        group: root
+        mode: "0555"
+    - name: Remove packages for or dependent on old kernels
+      # needs to be before generate-sbom.yml
+      ansible.builtin.command: dnf -y remove --oldinstallonly
+      register: oldkern
+      changed_when: "'No old installonly packages' not in oldkern.stderr"
+      failed_when:
+        - oldkern.rc != 0
+        - "'No old installonly packages' not in oldkern.stderr"
+
+- import_playbook: generate-sbom.yml
 
 - hosts: builder
   become: true

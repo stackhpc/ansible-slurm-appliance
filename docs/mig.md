@@ -217,5 +217,5 @@ openhpc_nodegroups:
 ```
 
 Making sure the types (the identifier after `gpu:`) match those collected with `slurmd -G`. Substrings
-of this type are also permissable, see the [Slurm docs](https://slurm.schedmd.com/gres.html#MIG_Management)
+of this type are also permissible, see the [Slurm docs](https://slurm.schedmd.com/gres.html#MIG_Management)
 for more details.

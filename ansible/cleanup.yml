@@ -14,9 +14,9 @@
   ansible.builtin.file:
     path: /etc/resolv.conf
     state: absent
-  when: "'resolv_conf' not in group_names" # if its been overriden, deleting it is the wrong thing to do
+  when: "'resolv_conf' not in group_names" # if its been overridden, deleting it is the wrong thing to do
 
-- name: Reenable NetworkManager control of resolv.conf
+- name: Re-enable NetworkManager control of resolv.conf
   # NB: This *doesn't* delete the 90-dns-none.conf file created by the resolv_conf role
   # as if nameservers are explicitly being set by that role we don't want to allow NM
   # to override it again.
@@ -38,21 +38,7 @@
   ansible.builtin.command: cloud-init clean --logs --seed
 
 - name: Cleanup /tmp # noqa: no-changed-when
-  ansible.builtin.command: rm -rf /tmp/*
-
-- name: Delete files triggering vulnerability scans
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop: # NB: items here MUST have a justification!
-    # ondemand install: raised at https://github.com/OSC/ondemand/security/advisories/GHSA-f7j8-ppqm-m5vw
-    # All declared not to be an issue by Open Ondemand as relevant packages not installed
-    - "/opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/{{ ondemand_package_version }}-1/gems/bootstrap_form-2.7.0/test/dummy/Gemfile.lock"
-    - "/opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/{{ ondemand_package_version }}-1/gems/bootstrap_form-5.0.0/demo/yarn.lock"
-    - /var/www/ood/apps/sys/dashboard/node_modules/data-confirm-modal/Gemfile.lock
-    # chrony role: only used for role dev, venv never created on disk
-    - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/poetry.lock
-    - /etc/ansible-init/playbooks/roles/mrlesmithjr.chrony/requirements.txt
+  ansible.builtin.shell: rm -rvf /tmp/*
 
 - name: Stop journald
   # Stop journald from writing data to the journal after we have cleared it.
@@ -82,6 +68,7 @@
   vars:
     image_info:
       branch: "{{ lookup('pipe', 'git rev-parse --abbrev-ref HEAD') }}"
+      commit: "{{ lookup('pipe', 'git rev-parse HEAD') }}"
       build: "{{ ansible_nodename | split('.') | first }}" # hostname is image name, which contains build info
       os: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
       kernel: "{{ ansible_kernel }}"
@@ -89,6 +76,7 @@
       doca: "{{ ansible_facts.packages[doca_profile | default('doca-ofed') ].0.version | default('-') }}"
       cuda: "{{ ansible_facts.packages['cuda-toolkit'].0.version | default('-') }}"
       slurm-ohpc: "{{ ansible_facts.packages['slurm-ohpc'].0.version | default('-') }}"
+      groups: "{{ group_names }}"
 
 - name: Show image summary # noqa: no-changed-when
   ansible.builtin.command: cat /var/lib/image/image.json

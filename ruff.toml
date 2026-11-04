@@ -1,0 +1,41 @@
+line-length = 120
+target-version = "py37"  # closest version to python 3.6 for RL8
+
+# Store the cache in a temporary location
+cache-dir = "/tmp/.ruff_cache"
+
+# as for azimuth-cloud python repos, e.g. azimuth-caas-operator
+# + pylint rules
+[lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # flake8-builtins
+    "A",
+    # Ruff rules
+    "RUF",
+    # flake8-async
+    "ASYNC",
+    # pyupgrade
+    "UP",
+    # tidy imports
+    "TID",
+    # sorted imports
+    "I",
+    # check complexity
+    "C90",
+    # TODO: fix pep8 naming
+    # "N",
+    # pylint rules
+    "PLE",
+    "PLW",
+]
+ignore = [
+    "UP017", # remove and fix once CI not running 3.10 tests
+]
+# Disable E402 for ansible/library modules where imports may come after docstrings
+per-file-ignores = {
+    "ansible/library/*.py" = ["E402"],
+}

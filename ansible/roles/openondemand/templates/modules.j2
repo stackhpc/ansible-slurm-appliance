@@ -1,1 +1,1 @@
-{{ _openondemand_spider.stdout }}
+{{ _openondemand_spider.stdout | from_json | to_nice_json }}{# to_nice_json is necessary to get stable sorting #}

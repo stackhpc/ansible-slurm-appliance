@@ -48,7 +48,7 @@ variable "control_node_flavor" {
 variable "login" {
   default     = {}
   description = <<-EOF
-    Mapping defining homogenous groups of login nodes. Multiple groups may
+    Mapping defining homogeneous groups of login nodes. Multiple groups may
     be useful for e.g. separating nodes for ssh and Open Ondemand usage, or
     to define login nodes with different capabilities such as high-memory.
 
@@ -65,12 +65,15 @@ variable "login" {
       vnic_types: Overrides variable vnic_types
       volume_backed_instances: Overrides variable volume_backed_instances
       root_volume_size: Overrides variable root_volume_size
-      extra_volumes: Mapping defining additional volumes to create and attach
-                     Keys are unique volume name.
-                     Values are a mapping with:
-                          size: Size of volume in GB
-                          volume_type: Optional. Type of volume, or cloud default
-                     **NB**: The order in /dev is not guaranteed to match the mapping
+      extra_volumes: Mapping defining additional volumes. Keys are a unique volume
+                     name. Values are a mapping with:
+                      - size: Optional. Size of volume to create in GB.
+                      - volume_type: Optional. Type of volume, or cloud default.
+                     If size is not given then a volume `cluster_name-node-volume_key`
+                     must already exist, where `node` is an entry in this group's
+                     `nodes` parameter. Such volumes will not be managed by the
+                     appliance.
+                     **NB**: The order in /dev is not guaranteed to match the mapping.
       fip_addresses: List of addresses of floating IPs to associate with
                      nodes, in the same order as nodes parameter. The
                      floating IPs must already be allocated to the project.
@@ -82,7 +85,7 @@ variable "login" {
                     select addresses.
       match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
       availability_zone: Name of availability zone. If undefined, defaults to 'nova' 
-                         if match_ironic_node is true, defered to OpenStack otherwise
+                         if match_ironic_node is true, deferred to OpenStack otherwise
       gateway_ip: Address to add default route via
       nodename_template: Overrides variable cluster_nodename_template
       server_group_id: String ID of server group to use for scheduler hint
@@ -118,7 +121,7 @@ variable "cluster_image_id" {
 variable "compute" {
   default     = {}
   description = <<-EOF
-    Mapping defining homogenous groups of compute nodes. Groups are used
+    Mapping defining homogeneous groups of compute nodes. Groups are used
     in Slurm partition definitions.
 
     Keys are names of groups, and cannot be 'compute', 'login', 'control', 'default'
@@ -136,19 +139,22 @@ variable "compute" {
       ignore_image_changes: Ignore changes to the image_id parameter (see docs/experimental/compute-init.md)
       volume_backed_instances: Overrides variable volume_backed_instances
       root_volume_size: Overrides variable root_volume_size
-      extra_volumes: Mapping defining additional volumes to create and attach
-                     Keys are unique volume name.
-                     Values are a mapping with:
-                          size: Size of volume in GB
-                          volume_type: Optional. Type of volume, or cloud default
-                     **NB**: The order in /dev is not guaranteed to match the mapping
+      extra_volumes: Mapping defining additional volumes. Keys are a unique volume
+                     name. Values are a mapping with:
+                      - size: Optional. Size of volume to create in GB.
+                      - volume_type: Optional. Type of volume, or cloud default.
+                     If size is not given then a volume `cluster_name-node-volume_key`
+                     must already exist, where `node` is an entry in this group's
+                     `nodes` parameter. Such volumes will not be managed by the
+                     appliance.
+                     **NB**: The order in /dev is not guaranteed to match the mapping.
       ip_addresses: Mapping of list of fixed IP addresses for nodes, keyed
                     by network name, in same order as nodes parameter.
                     For any networks not specified here the cloud will
                     select addresses.
       match_ironic_node: Set true to launch instances on the Ironic node of the same name as each cluster node
       availability_zone: Name of availability zone. If undefined, defaults to 'nova'
-                         if match_ironic_node is true, defered to OpenStack otherwise
+                         if match_ironic_node is true, deferred to OpenStack otherwise
       gateway_ip: Address to add default route via
       nodename_template: Overrides variable cluster_nodename_template
       server_group_id: String ID of server group to use for scheduler hint
@@ -172,7 +178,7 @@ variable "compute" {
 variable "additional_nodegroups" {
   default     = {}
   description = <<-EOF
-    Mapping defining homogenous groups of nodes for arbitrary purposes.
+    Mapping defining homogeneous groups of nodes for arbitrary purposes.
     These nodes are not in the compute or login inventory groups so they
     will not run slurmd.
 

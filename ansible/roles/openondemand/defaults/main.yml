@@ -11,7 +11,10 @@ openondemand_oidc_crypto_passphrase:
 openondemand_oidc_remote_user_claim: preferred_username
 openondemand_oidc_scope: openid profile preferred_username
 
-# SSL Certificates
+# SSL Configuration:
+openondemand_certbot: false
+openondemand_certbot_staging: false
+openondemand_certbot_email: ''
 openondemand_ssl_cert: /etc/pki/tls/certs/localhost.crt
 openondemand_ssl_cert_key: /etc/pki/tls/private/localhost.key
 
@@ -32,14 +35,16 @@ openondemand_module_file_dir: /etc/ood/modules
 openondemand_exporter: true
 
 # Synonyms for osc:ood role vars:
-openondemand_clusters: {} # synonym for osc.ood:clusters
+openondemand_cluster: {} # single entry for the osc.ood:clusters role variable.
+openondemand_clusters: "{{ {'slurm': openondemand_cluster} }}" # synonym for osc.ood:clusters; deprecated; the key will be replaced by openhpc_cluster_name
+openondemand_cluster_name: "{{ openhpc_cluster_name }}"
 openondemand_servername: ""
 openondemand_host_regex:
 # Other:
 openondemand_node_proxy_directives: "" # Added to Apache directives for `node_uri` forwarding.
 
 openondemand_auth_defaults:
-  # Defaults for OIDC auth - keys are osc.ood vars & can be overriden using the osc.ood var name in inventory
+  # Defaults for OIDC auth - keys are osc.ood vars & can be overridden using the osc.ood var name in inventory
   oidc:
     oidc_uri: /oidc # has to be set separately to trigger oidc integration!
     ood_auth_openidc:
@@ -75,11 +80,11 @@ openondemand_auth_defaults:
       - 'ProxyPreserveHost On' # see under https://grafana.com/blog/2022/02/08/grafana-7.5.15-and-8.3.5-released-with-moderate-severity-security-fixes/
 
 # The below mapping is used to override osc.ood defaults. Keys are osc.ood variable names.
-# If you need to override *these* defaults (i.e. this role's vars are not sufficent) just set the corresponding osc.ood var as normal.
+# If you need to override *these* defaults (i.e. this role's vars are not sufficient) just set the corresponding osc.ood var as normal.
 openondemand_osc_ood_defaults:
 
   # Synonyms:
-  clusters: "{{ openondemand_clusters }}"
+  clusters: "{{ {openondemand_cluster_name: openondemand_cluster} }}"
   servername: "{{ openondemand_servername }}"
   host_regex: "{{ openondemand_host_regex }}"
   node_uri: "{{ '/node' if openondemand_host_regex else none }}"
@@ -100,8 +105,12 @@ openondemand_osc_ood_defaults:
 
   # Auth:
   oidc_uri: "{{ openondemand_auth_defaults.oidc.oidc_uri if (openondemand_auth | lower) in ['oidc', 'dex'] else none }}"
+  oidc_crypto_passphrase: "{{ openondemand_oidc_crypto_passphrase if (openondemand_auth | lower) in ['oidc', 'dex'] else none }}"
   ood_auth_openidc: "{{ openondemand_auth_defaults.oidc.ood_auth_openidc if (openondemand_auth | lower) == 'oidc' else none }}"
   httpd_auth: "{{ openondemand_auth_defaults[openondemand_auth | lower].httpd_auth }}"
+  # FIXME: remove this workaround after migrating to OOD 4.2 (the fix for wrong variable name is in the 4.2 branch only)
+  # https://github.com/OSC/ood-ansible/commit/29dfbc7993cf48ae7553551c13bdf1406fa218ad
+  ood_oidc_crypto_passphrase: "{{ openondemand_oidc_crypto_passphrase if (openondemand_auth | lower) in ['oidc', 'dex'] else none }}"
 
   # Use gpgkey and repo file provided by dnf_repos by default:
   ood_use_existing_repo_file: true

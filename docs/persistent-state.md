@@ -7,6 +7,7 @@ At present this will affect the following:
 - `slurmctld` state, i.e. the Slurm queue.
 - The MySQL database for `slurmdbd`, i.e. Slurm accounting information as shown by the `sacct` command.
 - Prometheus database
+- Alertmanager database
 - Grafana data
 - OpenDistro/Elasticsearch data
 
@@ -23,7 +24,7 @@ The `site` environment supports persistent state in the default OpenTofu (see `e
 
 **NB: The default OpenTofu is provided as a working example and for internal CI use - therefore this volume is deleted when running `tofu destroy` - this may not be appropriate for a production environment.**
 
-In general, the Prometheus data is likely to be the only sizeable state stored. The size of this can be influenced through [Prometheus role variables](https://github.com/cloudalchemy/ansible-prometheus#role-variables), e.g.:
+In general, the Prometheus data is likely to be the only sizeable state stored. The size of this can be influenced through [Prometheus role variables](https://prometheus-community.github.io/ansible/branch/main/prometheus_role.html#ansible-collections-prometheus-prometheus-prometheus-role), e.g.:
 
 - `prometheus_storage_retention` - [default](../environments/common/inventory/group_vars/all/prometheus.yml) 31d
 - `prometheus_storage_retention_size` - [default](../environments/common/inventory/group_vars/all/prometheus.yml) 100GB

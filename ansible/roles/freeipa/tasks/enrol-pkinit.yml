@@ -1,0 +1,60 @@
+# based on https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/installing_identity_management/assembly_installing-an-idm-client_installing-identity-management
+
+- name: Check if FreeIPA client is enrolled
+  ansible.builtin.stat:
+    path: /var/lib/ipa-client/sysrestore/sysrestore.index
+  register: _stat_ipa_client_lib
+
+- name: Transfer FreeIPA client certs etc
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /root/ipa/
+    mode: u=r,go=
+    owner: root
+    group: root
+  loop:
+    - "{{ freeipa_cert_path }}/{{ inventory_hostname }}.key"
+    - "{{ freeipa_cert_path }}/{{ inventory_hostname }}.pem"
+    - "{{ freeipa_cert_path }}/ca.crt"
+
+- name: Get FreeIPA cert info
+  community.crypto.x509_certificate_info:
+    path: "/root/ipa/{{ item }}"
+  register: freeipa_cert_results
+  loop:
+    - "{{ inventory_hostname }}.pem"
+    - "ca.crt"
+
+- name: Assert FreeIPA certs are not expired
+  ansible.builtin.assert:
+    that: "not item.expired"
+    fail_msg: "{{ item.item }} has already expired: {{ item.not_after | to_datetime('%Y%m%d%H%M%SZ') }}"
+    quiet: true # avoid splatting the loop contents out on success
+  loop: "{{ freeipa_cert_results.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Enrole/reenrole FreeIPA client
+  ansible.builtin.command:
+    cmd: >
+      ipa-client-install
+      --pkinit-identity=FILE:/root/ipa/{{ inventory_hostname }}.pem,/root/ipa/{{ inventory_hostname }}.key
+      --pkinit-anchor=FILE:/root/ipa/ca.crt
+      --hostname {{ node_fqdn }}
+      --fixed-primary
+      {% for server in freeipa_servers %}
+      --server {{ server }}
+      {% endfor %}
+      --domain {{ freeipa_domain }}
+      --unattended
+  when: not _stat_ipa_client_lib.stat.exists
+  changed_when: true
+
+- name: Ensure NFS RPC security service is running
+  # This service is installed by nfs-utils, which attempts to start it.
+  # It has ConditionPathExists=/etc/krb5.keytab which fails if host is not enroled.
+  # This task avoids a reboot.
+  ansible.builtin.systemd:
+    name: rpc-gssd.service
+    state: started
+    enabled: true

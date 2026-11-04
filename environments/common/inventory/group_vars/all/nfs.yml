@@ -25,7 +25,7 @@ nfs_configuration_home_volume: # volume-backed home directories
     nfs_client_mnt_point: "/home"
     # prevent tunnelling and setuid binaries:
     # NB: this is stackhpc.nfs role defaults but are set here to prevent being
-    # accidently overriden via default options
+    # accidentally overridden via default options
     nfs_export_options: "rw,secure,root_squash"
 
 nfs_configuration_compute_nodes: # cluster configuration for compute_init/slurm-controlled rebuild

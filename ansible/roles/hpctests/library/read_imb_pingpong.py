@@ -1,12 +1,10 @@
 #!/usr/bin/python
-# pylint: disable=missing-module-docstring
-# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2020, StackHPC
 # Apache 2 License
 
 
-from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
+from ansible.module_utils.basic import AnsibleModule
 
 ANSIBLE_METADATA = {
     "metadata_version": "0.1",
@@ -43,7 +41,7 @@ CONVERTERS = (int, int, float, float)
 COLUMNS = ("bytes", "repetitions", "latency", "bandwidth")
 
 
-def run_module():  # pylint: disable=missing-function-docstring
+def run_module():
     module_args = {
         "path": {
             "type": "str",
@@ -59,11 +57,11 @@ def run_module():  # pylint: disable=missing-function-docstring
         module.exit_json(**result)
 
     columns = ([], [], [], [])
-    with open(path) as f:  # pylint: disable=unspecified-encoding
+    with open(path) as f:
         for line in f:
             if line == "       #bytes #repetitions      t[usec]   Mbytes/sec\n":
                 while True:
-                    line = next(f).strip()
+                    line = next(f).strip()  # noqa: PLW2901
                     if line == "":
                         break
                     for ix, v in enumerate(line.split()):
@@ -78,7 +76,7 @@ def run_module():  # pylint: disable=missing-function-docstring
     module.exit_json(**result)
 
 
-def main():  # pylint: disable=missing-function-docstring
+def main():
     run_module()
 
 

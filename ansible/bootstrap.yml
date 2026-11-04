@@ -199,26 +199,13 @@
         name: tuned
         tasks_from: "{{ 'configure.yml' if appliances_mode == 'configure' else 'main.yml' }}"
 
-- hosts: freeipa_server
-  # Done here as it might be providing DNS
-  tags:
-    - freeipa
-    - freeipa_server
-  gather_facts: true
-  become: true
-  tasks:
-    - name: Install FreeIPA server
-      ansible.builtin.import_role:
-        name: freeipa
-        tasks_from: server.yml
-
 - hosts: cluster
   gather_facts: false
   become: true
   tags: cockpit
   tasks:
     - name: Remove RHEL cockpit # noqa: no-changed-when
-      ansible.builtin.command: dnf -y remove cockpit-ws
+      ansible.builtin.command: dnf -y remove cockpit-ws cockpit-system cockpit-bridge
       register: dnf_remove_output
       ignore_errors: true # Avoid failing if a lock or other error happens
 
