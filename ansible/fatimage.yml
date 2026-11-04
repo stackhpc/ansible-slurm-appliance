@@ -354,6 +354,14 @@
         owner: root
         group: root
         mode: "0555"
+    - name: Remove packages for or dependent on old kernels
+      # needs to be before generate-sbom.yml
+      ansible.builtin.command: dnf -y remove --oldinstallonly
+      register: oldkern
+      changed_when: "'No old installonly packages' not in oldkern.stderr"
+      failed_when:
+        - oldkern.rc != 0
+        - "'No old installonly packages' not in oldkern.stderr"
 
 - import_playbook: generate-sbom.yml
 
