@@ -110,8 +110,8 @@ Make a note of the UUID for the new OpenStack image.
 
 ### Define and deploy infrastructure
 
-Modify the cookiecutter-gerated OpenTofu configuration to set the `null`
-values to define the required
+Modify the cookiecutter-generated OpenTofu configuration to set the `null`
+values to define the required infrastructure, e.g.
 infrastructure, e.g.:
 
 ```hcl
