@@ -112,7 +112,6 @@ Make a note of the UUID for the new OpenStack image.
 
 Modify the cookiecutter-generated OpenTofu configuration to set the `null`
 values to define the required infrastructure, e.g.
-infrastructure, e.g.:
 
 ```hcl
 # environments/$ENV/tofu/main.tf:
