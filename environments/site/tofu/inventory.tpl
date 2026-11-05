@@ -16,6 +16,7 @@ control:
             node_fqdn: ${control_fqdn}
     vars:
         appliances_state_dir: ${state_dir} # NB needs to be set on group not host otherwise it is ignored in packer build!
+        state_volume_size: ${state_volume_size}
 
 # --- login nodes ---
 %{ for group_name in keys(login_groups) ~}
