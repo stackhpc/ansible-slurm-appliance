@@ -220,12 +220,7 @@ jobs:
       - name: Download latest image if missing
         run: |
           . venv/bin/activate
-          bash .github/bin/get-s3-image.sh "${TARGET_IMAGE}" "${S3_BUCKET}"
-
-      - name: Set Glance image properties correctly for Slurm images
-        run: |
-          . venv/bin/activate
-          . dev/image-set-properties.sh "${TARGET_IMAGE}"
+          bash dev/get-s3-image.sh "${TARGET_IMAGE}" "${S3_BUCKET}"
 
       - name: Cleanup OpenStack Image (on error or cancellation)
         if: cancelled() || failure()
