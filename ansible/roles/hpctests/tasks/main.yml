@@ -41,6 +41,7 @@
 - name: Build gpu_burn
   become: true
   become_user: "{{ hpctests_user }}"
+  when: hpctests_has_cuda
   tags:
     - gpuburn
     - hpctests-gpu
@@ -50,6 +51,7 @@
 - name: Run gpu_burn on individual nodes
   become: true
   become_user: "{{ hpctests_user }}"
+  when: hpctests_has_cuda
   tags:
     - gpuburn
     - hpctests-gpu

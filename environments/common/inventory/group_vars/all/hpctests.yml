@@ -3,3 +3,4 @@
 # for variable definitions.
 
 # hpctests_user:
+hpctests_has_cuda: "{{ group_names['cuda'] > 0 }}"
