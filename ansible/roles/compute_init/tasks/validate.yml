@@ -1,0 +1,9 @@
+- name: Check nodes do not mount NFS shares from servers within the cluster
+  ansible.builtin.assert:
+    that: _in_cluster_nfs_mounts | length == 0
+    fail_msg: |
+      compute_init nodes must not mount NFS shares from servers within the cluster
+      as these shares will go down during upgrade. Affected mounts:
+      {{ _in_cluster_nfs_mounts | to_nice_yaml }}
+  vars:
+    _in_cluster_nfs_mounts: "{{ nfs_configurations | selectattr('nfs_enable.clients') | selectattr('nfs_server', 'defined') | selectattr('nfs_server', 'in', groups['cluster']) }}"
