@@ -135,6 +135,8 @@
           - lmod-ohpc
           # database
           - slurm-slurmdbd-ohpc
+          # rest
+          - slurm-ohpc-slurmrestd
           # openhpc_packages
           - slurm-libpmi-ohpc
           # other packages
