@@ -344,16 +344,25 @@
       ansible.builtin.dnf:
         name: "{{ appliances_packages_uninstall }}"
         state: absent
-    - name: Replace rclone with a no-op script
-      ansible.builtin.copy:
-        content: |
-          #!/bin/sh
-          echo "The rclone executable has been removed in ansible-slurm-appliance images due to too many security warnings." 1>&2
-          exit 1
-        dest: /usr/bin/rclone
-        owner: root
-        group: root
-        mode: "0555"
+    - name: Replace rclone with a no-op script if it exists
+      block:
+        - name: Check rclone existence
+          ansible.builtin.stat:
+            path: /usr/bin/rclone
+            get_checksum: false
+            get_mime: false
+          register: rclone_present
+        - name: Replace rclone with a no-op script
+          when: rclone_present.stat.exists
+          ansible.builtin.copy:
+            content: |
+              #!/bin/sh
+              echo "The rclone executable has been removed in ansible-slurm-appliance images due to too many security warnings." 1>&2
+              exit 1
+            dest: /usr/bin/rclone
+            owner: root
+            group: root
+            mode: "0555"
     - name: Remove packages for or dependent on old kernels
       # needs to be before generate-sbom.yml
       ansible.builtin.command: dnf -y remove --oldinstallonly
