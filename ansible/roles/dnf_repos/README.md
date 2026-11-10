@@ -42,6 +42,7 @@ are empty here and constructed by `environments/common/inventory/groups_vars/all
   - `pulp_content_url`: Optional string, override `dnf_repos_pulp_content_url`.
   - `gpgcheck`: Optional bool, whether to check GPG signature (same as
     `ansible.builtin.yum_repository`). Default `true`.
+  - `includepkgs`. Optional list, only use specified packages from this repository. Default omitted.
 
   Note the playbook `ansible/ci/update_timestamps.yml` will update the timestamps
   defined in `environments/common/inventory/group_vars/all/dnf_repo_timestamps.yml`
@@ -53,8 +54,10 @@ are empty here and constructed by `environments/common/inventory/groups_vars/all
   Pulp server, but omitted if using local Pulp server (see `ansible/roles/pulp_site`)
 - `dnf_repos_password`: Optional str. Password for Ark. Should be set if using upstream StackHPC Ark
   Pulp server, but omitted if using local Pulp server (see `ansible/roles/pulp_site`)
-- `dnf_repos_gpg_keys`: Optional dict of dicts defining GPG keys to import to allow
-  installation from repositories configured by this role. Structure is e.g.:
+- `dnf_repos_gpg_keys_default`: Optional dict of dicts defining a default set of GPG keys to import
+  to allow installation from repositories configured by this role. The default includes the Rocky 8
+  and 9 GPG keys which are already present in "genericcloud" images but are not installed.
+  Structure is e.g.:
   ```yaml
   epel:
     "8":
@@ -71,3 +74,6 @@ are empty here and constructed by `environments/common/inventory/groups_vars/all
   - `key:`: Optional string, public key. If this is not given then `path` must
     already exist (e.g. for `rocky` key which is present in GenericCloud
     images but not imported by default).
+- `dnf_repos_gpg_keys_extra`: Optional dict of additional GPG keys to import. As
+  for `dnf_repos_gpg_keys_default`.
+- `dnf_repos_gpg_keys`: Final combination of `dnf_repos_gpg_keys_default` and `dnf_repos_gpg_keys_extra`.

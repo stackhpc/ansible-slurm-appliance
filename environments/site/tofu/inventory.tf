@@ -14,6 +14,7 @@ resource "local_file" "hosts" {
       "compute_groups" : module.compute
       "additional_groups" : module.additional
       "state_dir" : var.state_dir
+      "state_volume_size" : var.state_volume_size
       "cluster_home_volume" : var.home_volume_provisioning != "none"
       "cluster_subnets" : [for net in var.cluster_networks : { for k, v in data.openstack_networking_subnet_v2.cluster_subnet[net.network] : k => v if contains(local.subnet_keys, k) }]
     },

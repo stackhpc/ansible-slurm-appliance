@@ -10,6 +10,8 @@ roles/*
 !roles/opensearch/**
 !roles/podman/
 !roles/podman/**
+!roles/slurmrestd_proxy/
+!roles/slurmrestd_proxy/**
 !roles/grafana-dashboards/
 !roles/grafana-dashboards/**
 !roles/passwords/
