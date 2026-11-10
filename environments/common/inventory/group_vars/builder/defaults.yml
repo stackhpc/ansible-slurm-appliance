@@ -37,5 +37,5 @@ openondemand_certbot: true
 mounts_tmp_enabled: false # don't have /tmp in memory
 
 # for ansible/generate-sbom.yml
-appliances_generate_sbom_syft_version: 1.51.0
-appliances_generate_sbom_syft_sha256: 2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f
+appliances_generate_sbom_syft_version: 1.57.1
+appliances_generate_sbom_syft_sha256: bf52519eb57f675d47c07d43213cb6dff6449f3d6d1147ff6701ed91f44eef0c # for linux_amd64.tar.gz
