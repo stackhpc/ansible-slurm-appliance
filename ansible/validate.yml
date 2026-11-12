@@ -164,3 +164,12 @@
     - ansible.builtin.include_role:
         name: stackhpc.linux.vgpu
         tasks_from: validate.yml
+
+- name: Validate compute_init configuration
+  hosts: compute_init
+  become: false
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_role:
+        name: compute_init
+        tasks_from: validate.yml
