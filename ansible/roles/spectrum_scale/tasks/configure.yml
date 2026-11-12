@@ -3,63 +3,119 @@
     that: scale_version is defined
     fail_msg: "ibm.spectrum_scale variable 'scale_version' MUST be set"
 
-- ansible.builtin.include_role:
-    name: ibm.spectrum_scale.core_prepare
-
 - name: Check for spectrum scale backup
   ansible.builtin.stat:
     path: "{{ spectrum_scale_backup_path }}"
   changed_when: false
   register: _spectrum_scale_backup_stat
-  when:
-    - spectrum_scale_restore | bool
-    - inventory_hostname == spectrum_scale_backup_host
+  delegate_to: "{{ spectrum_scale_backup_host }}"
+  run_once: true
 
-- name: Check spectrum scale cluster status
-  ansible.builtin.command: /usr/lpp/mmfs/bin/mmgetstate -a
+# NB: this is the state of the node, not of the whole cluster
+- name: Check spectrum scale cluster state
+  ansible.builtin.command: "{{ spectrum_scale_binary_path }}/mmgetstate"
   register: _spectrum_scale_cluster_state
   changed_when: false
   failed_when:
     - _spectrum_scale_cluster_state.rc > 0
     - "'node does not belong to a GPFS cluster' not in _spectrum_scale_cluster_state.stderr"
-  when:
-    - spectrum_scale_restore | bool
-    - inventory_hostname == spectrum_scale_backup_host
+  delegate_to: "{{ spectrum_scale_backup_host }}"
+  run_once: true
+
+- name: Decide what to do
+  ansible.builtin.set_fact:
+    _spectrum_scale_cluster_absent: "{{ 'node does not belong to a GPFS cluster' in _spectrum_scale_cluster_state.stderr }}"
+    _spectrum_scale_restore: >-
+      {{ spectrum_scale_restore | bool and
+         'node does not belong to a GPFS cluster' in _spectrum_scale_cluster_state.stderr and
+         _spectrum_scale_backup_stat.stat.exists }}
+    _spectrum_scale_configure: >-
+      {{ not (spectrum_scale_restore | bool) or
+         ('node does not belong to a GPFS cluster' in _spectrum_scale_cluster_state.stderr and
+          not _spectrum_scale_backup_stat.stat.exists) }}
+
+- name: Report what will be done
+  ansible.builtin.debug:
+    msg: >-
+      cluster {{ 'absent' if _spectrum_scale_cluster_absent else 'present' }},
+      backup {{ 'exists' if _spectrum_scale_backup_stat.stat.exists else 'does not exist' }}:
+      {{ 'restoring from backup' if _spectrum_scale_restore | bool else
+         'configuring cluster' if _spectrum_scale_configure | bool else
+         'no cluster configuration required' }}
+  run_once: true
+
+# Nodes need to be able to reach each other as root for both restoring and configuring.
+- name: Prepare nodes for spectrum scale
+  ansible.builtin.include_role:
+    name: ibm.spectrum_scale.core_prepare
+  when: _spectrum_scale_cluster_absent | bool or _spectrum_scale_configure | bool
 
 - name: Restore spectrum scale configuration
   ansible.builtin.command:
     cmd: "{{ spectrum_scale_binary_path }}/mmsdrrestore -F {{ spectrum_scale_backup_path }} -a"
   changed_when: true
+  when: _spectrum_scale_restore | bool
+  delegate_to: "{{ spectrum_scale_backup_host }}"
+  run_once: true
+
+# Restoring does not start GPFS
+- name: Start spectrum scale after restore
+  ansible.builtin.command:
+    cmd: "{{ spectrum_scale_binary_path }}/mmstartup -a"
+  changed_when: true
+  when: _spectrum_scale_restore | bool
+  delegate_to: "{{ spectrum_scale_backup_host }}"
+  run_once: true
+
+- name: Wait for spectrum scale to be active on all nodes after restore
+  ansible.builtin.shell: |
+    {{ spectrum_scale_binary_path }}/mmgetstate -a -Y | awk -F: '$3=="0" && $9!="active" {n++} END {exit n>0}'
+  register: _spectrum_scale_restored_state
+  until: _spectrum_scale_restored_state.rc == 0
+  retries: 30
+  delay: 10
+  changed_when: false
+  when: _spectrum_scale_restore | bool
+  delegate_to: "{{ spectrum_scale_backup_host }}"
+  run_once: true
+
+- name: Configure spectrum scale cluster
+  ansible.builtin.include_role:
+    name: ibm.spectrum_scale.core_configure
+  when: _spectrum_scale_configure | bool
+
+- name: Configure spectrum scale remote mount
+  ansible.builtin.include_role:
+    name: ibm.spectrum_scale.remotemount_configure
   when:
-    - spectrum_scale_restore | bool
-    - inventory_hostname == spectrum_scale_backup_host
-    - _spectrum_scale_backup_stat.stat.exists
-    - "'node does not belong to a GPFS cluster' in _spectrum_scale_cluster_state.stderr"
-    - not (scale_remotemount_forceRun | default(false) | bool )
-
-- when: not spectrum_scale_restore | bool
-  block:
-    - ansible.builtin.include_role:
-        name: ibm.spectrum_scale.core_configure
-    - ansible.builtin.include_role:
-        name: ibm.spectrum_scale.remotemount_configure
-      when:
-        - "scale_remotemount_filesystem_name | length > 0"
-
-- ansible.builtin.include_role:
-    name: ibm.spectrum_scale.core_verify
+    - "scale_remotemount_filesystem_name | length > 0"
 
 - name: Ensure spectrum scale backup directory exists
   ansible.builtin.file:
     state: directory
-    path: "{{ spectrum_scale_backup_path | dirname }}"
+    path: "{{ spectrum_scale_backup_path | dirname }}/previous"
     owner: root
     group: root
     mode: u=rwX,go=
-  when: inventory_hostname == spectrum_scale_backup_host
+  delegate_to: "{{ spectrum_scale_backup_host }}"
+  run_once: true
+
+# So a bad backup can't destroy the only good one
+- name: Keep previous spectrum scale backup
+  ansible.builtin.copy:
+    src: "{{ spectrum_scale_backup_path }}"
+    dest: "{{ spectrum_scale_backup_path | dirname }}/previous/{{ spectrum_scale_backup_path | basename }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: u=rw,go=
+  when: _spectrum_scale_backup_stat.stat.exists
+  delegate_to: "{{ spectrum_scale_backup_host }}"
+  run_once: true
 
 - name: Create/update spectrum scale backup
   ansible.builtin.command:
     cmd: "{{ spectrum_scale_binary_path }}/mmccr backup -F -A {{ spectrum_scale_backup_path }}"
   changed_when: true
-  when: inventory_hostname == spectrum_scale_backup_host
+  delegate_to: "{{ spectrum_scale_backup_host }}"
+  run_once: true

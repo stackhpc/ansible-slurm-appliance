@@ -24,6 +24,7 @@ collections:
     # forked for
     # https://github.com/IBM/ibm-spectrum-scale-install-infra/pull/1045
     # https://github.com/IBM/ibm-spectrum-scale-install-infra/pull/1046
+    # and fixes to handling remotemount and key state
     version: v2.11.0-stackhpc
   - name: containers.podman
     version: 1.16.2
