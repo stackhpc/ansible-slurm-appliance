@@ -315,7 +315,8 @@ variable "login_security_groups" {
     "default", # allow all in-cluster services
     "SSH",     # access via ssh
     "HTTPS",   # access OpenOndemand
-    "gpfs"
+    "gpfs",    # access Spectrum Scale storage cluster
+    "mosh",    # ssh replacement
   ]
 }
 
