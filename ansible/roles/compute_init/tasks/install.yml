@@ -51,6 +51,8 @@
       __tmp_inject_files/tasks/tuned.yml
   args:
     chdir: "{{ role_path }}/../.."  # this is $APPLIANCES_REPO_ROOT/ansible
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Inject files from roles
   ansible.posix.synchronize:
@@ -69,6 +71,8 @@
   ansible.builtin.file:
     path: "{{ role_path }}/../../__tmp_inject_files"
     state: absent
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Add filter_plugins to ansible.cfg
   ansible.builtin.lineinfile:
