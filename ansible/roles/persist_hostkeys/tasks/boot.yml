@@ -1,0 +1,28 @@
+---
+# Restore saved hostkeys
+
+- name: Restore saved hostkeys
+  ansible.builtin.copy:
+    src: /var/tmp/cluster/hostconfig/{{ ansible_hostname }}/hostkeys/
+    dest: /etc/ssh/
+    remote_src: true
+    mode: "0600"
+    owner: root
+    group: ssh_keys
+
+# copy creates permissions 640 instead of 600
+- name: Find hostkeys
+  register: _found_hostkeys
+  ansible.builtin.find:
+    path: /etc/ssh
+    patterns:
+      - ssh_host_*_key
+      - ssh_host_*_key.pub
+
+- name: Ensure hostkey permissions
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: "0600"
+    owner: root
+    group: ssh_keys
+  loop: "{{ _found_hostkeys.files }}"
