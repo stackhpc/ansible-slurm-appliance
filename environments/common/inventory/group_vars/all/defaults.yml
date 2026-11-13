@@ -144,3 +144,5 @@ appliances_packages_uninstall:
   # Installed in RL8 genericcloud, but vulnerable
   - python3-unbound
   - unbound-libs
+  # Not serving http2, fixes CVE-2026-119618:
+  - mod_http2
