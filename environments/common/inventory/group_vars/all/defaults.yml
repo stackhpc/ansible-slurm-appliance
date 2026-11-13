@@ -152,7 +152,7 @@ appliances_packages_uninstall_distro:
 appliances_packages_uninstall_extra: []
 appliances_packages_uninstall: >
   {{
-    appliances_packages_uninstall_default |
-    combine(appliances_packages_uninstall_distro[ansible_distribution_major_version]) |
-    combine(appliances_packages_uninstall_extra)
+    appliances_packages_uninstall_default +
+    appliances_packages_uninstall_distro[ansible_distribution_major_version] +
+    appliances_packages_uninstall_extra
   }}
