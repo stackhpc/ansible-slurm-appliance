@@ -136,7 +136,7 @@ appliances_admin_user_groups:
   - adm
 
 # Packages to REMOVE on build, e.g. from genericcloud image.
-appliances_packages_uninstall:
+appliances_packages_uninstall_default:
   # Don't want these:
   - cockpit-ws
   - cockpit-system
@@ -144,5 +144,15 @@ appliances_packages_uninstall:
   # Installed in RL8 genericcloud, but vulnerable
   - python3-unbound
   - unbound-libs
-  # Not serving http2, fixes CVE-2026-119618:
-  - mod_http2
+appliances_packages_uninstall_distro:
+  '9':
+    # Not serving http2, fixes CVE-2026-119618:
+    - mod_http2 # pulled in as weak dep for httpd
+  '8': []
+appliances_packages_uninstall_extra: []
+appliances_packages_uninstall: >
+  {{
+    appliances_packages_uninstall_default |
+    combine(appliances_packages_uninstall_distro[ansible_distribution_major_version]) |
+    combine(appliances_packages_uninstall_extra)
+  }}
