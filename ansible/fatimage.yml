@@ -271,6 +271,13 @@
   become: true
   gather_facts: true
   tasks:
+    - name: Debug disk space
+      ansible.builtin.shell: |
+        df -h
+        find /tmp -type f -exec ls -hl '{}' ';'
+      register: _df
+    - debug:
+        var: _df.stdout
     - ansible.builtin.import_role:
         name: prometheus.prometheus.prometheus
       vars:
