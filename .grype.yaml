@@ -460,6 +460,28 @@ ignore:
     package:
       name: "ruby.*"
 
+# GHSA-f3w6-w445-fwh9 / CVE-2026-122006: Claude-assisted review:
+# activestorage present only as a transitive dep of the rails metagem.
+# active_storage/engine is commented out in
+# dashboard/myjobs config/application.rb (verified 2026-11-13), so the
+# vulnerable analyzer is never loaded. No 7.1.x fix exists upstream.
+# Revisit when OOD ships Rails 8.x.
+  - vulnerability: GHSA-f3w6-w445-fwh9
+    package:
+      name: activestorage
+      location: opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/activestorage-7.1.6.gemspec
+      version: 7.1.6
+  - vulnerability: GHSA-f3w6-w445-fwh9
+    package:
+      name: activestorage
+      location: var/www/ood/apps/sys/dashboard/Gemfile.lock
+      version: 7.1.6
+  - vulnerability: GHSA-f3w6-w445-fwh9
+    package:
+      name: activestorage
+      location: var/www/ood/apps/sys/myjobs/Gemfile.lock
+      version: 7.1.6
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
 exclude:
