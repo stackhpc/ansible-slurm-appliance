@@ -233,9 +233,11 @@ jobs:
           sbom_filename="${STEPS_MANIFEST_OUTPUTS_IMAGE_NAME}.syft-json.zip"
           sbom_url="${S3_BUCKET_PUBLIC_URL}/${sbom_filename}"
           run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-          # Uses If-None-Match header to prevent over-writing - this does not work in multipart mode
+          # Contrary to the fatimage build that changes name every time it's run,
+          # the image name is based on the timestamp hash, so it's reused when rebuild.
+          # We therefore omit `--add-header 'If-None-Match: *' --disable-multipart`
+
           s3cmd  put \
-            --add-header 'If-None-Match: *' --disable-multipart \
             --add-header "x-amz-meta-github-run: $run_url" \
             --add-header "x-amz-meta-stackhpc-image-id: $STEPS_MANIFEST_OUTPUTS_IMAGE_ID" \
             --add-header "x-amz-meta-stackhpc-image-name: $STEPS_MANIFEST_OUTPUTS_IMAGE_NAME" \
