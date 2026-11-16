@@ -92,6 +92,23 @@
         msg: |
           {{ updates.results | length }} changes to packages
           {{ updates.results | join('\n') }}
+    - name: Check for pending reboot from package updates
+      ansible.builtin.command:
+        cmd: dnf needs-restarting -r
+      register: update_reboot_required
+      failed_when: "update_reboot_required.rc not in [0, 1]"
+      changed_when: false
+    - name: Reboot to cover package upgrades
+      ansible.builtin.reboot:
+        post_reboot_delay: 30
+      when: (update_reboot_required.rc == 1)
+    - name: Wait for hosts to be reachable
+      ansible.builtin.wait_for_connection:
+        sleep: 5
+    - name: Clear facts
+      ansible.builtin.meta: clear_facts
+    - name: Update facts
+      ansible.builtin.setup:
 
 - hosts: builder
   become: true
@@ -148,6 +165,10 @@
           - nhc-ohpc
           - apptainer
           - podman-compose
+    - name: Install Systemtap
+      ansible.builtin.include_role:
+        name: systemtap
+        tasks_from: install.yml
 
 - hosts: builder
   become: true
