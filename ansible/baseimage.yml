@@ -20,6 +20,26 @@
           {{ ansible_ssh_extra_args | default('') }}
           -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
           {{ ansible_user }}@{{ ansible_host }}
+    - name: Get ncdu
+      become: true
+      ansible.builtin.shell: |
+        set -e
+        curl --silent -o ncdu-2.9.1-linux-x86_64.tar.gz https://dev.yorhel.nl/download/ncdu-2.9.1-linux-x86_64.tar.gz
+        sha256sum -c <<<"0c6c84b3f763c33baa051c8327f0e736f46f33a8cc061bb951d24517a8c5d73e  ncdu-2.9.1-linux-x86_64.tar.gz"
+        tar xvf ncdu-2.9.1-linux-x86_64.tar.gz ncdu
+        rm ncdu-2.9.1-linux-x86_64.tar.gz
+        mkdir /opt/ncdu-reports
+        chmod a+rwx /opt/ncdu-reports
+      args:
+        executable: /bin/bash
+        chdir: /opt
+        creates: /opt/ncdu
+    - name: Initial ncdu
+      ansible.builtin.command: "/opt/ncdu -x -O /opt/ncdu-reports/{{ _ncdu_report }} /"
+      args:
+        creates: "/opt/ncdu-reports/{{ _ncdu_report }}"
+      vars:
+        _ncdu_report: 00-initial.ncdu
 
 - hosts: cluster
   gather_facts: false
@@ -109,6 +129,12 @@
       ansible.builtin.meta: clear_facts
     - name: Update facts
       ansible.builtin.setup:
+    - name: Report du
+      ansible.builtin.command: "/opt/ncdu -x -O /opt/ncdu-reports/{{ _ncdu_report }} /"
+      args:
+        creates: "/opt/ncdu-reports/{{ _ncdu_report }}"
+      vars:
+        _ncdu_report: 01-updates.ncdu
 
 - hosts: builder
   become: true
@@ -165,10 +191,22 @@
           - nhc-ohpc
           - apptainer
           - podman-compose
+    - name: Report du
+      ansible.builtin.command: "/opt/ncdu -x -O /opt/ncdu-reports/{{ _ncdu_report }} /"
+      args:
+        creates: "/opt/ncdu-reports/{{ _ncdu_report }}"
+      vars:
+        _ncdu_report: 02-installs.ncdu
     - name: Install Systemtap
       ansible.builtin.include_role:
         name: systemtap
         tasks_from: install.yml
+    - name: Report du
+      ansible.builtin.command: "/opt/ncdu -x -O /opt/ncdu-reports/{{ _ncdu_report }} /"
+      args:
+        creates: "/opt/ncdu-reports/{{ _ncdu_report }}"
+      vars:
+        _ncdu_report: 03-systemtap.ncdu
 
 - hosts: builder
   become: true
@@ -190,7 +228,28 @@
   vars:
     appliances_fatimage_cleanup_dnf: false
   tasks:
+    - name: Report du
+      ansible.builtin.command: "/opt/ncdu -x -O /opt/ncdu-reports/{{ _ncdu_report }} /"
+      args:
+        creates: "/opt/ncdu-reports/{{ _ncdu_report }}"
+      vars:
+        _ncdu_report: 04-sbom.ncdu
     - name: Cleanup image
       ansible.builtin.import_tasks: cleanup.yml
+    - name: Report du
+      ansible.builtin.command: "/opt/ncdu -x -O /opt/ncdu-reports/{{ _ncdu_report }} /"
+      args:
+        creates: "/opt/ncdu-reports/{{ _ncdu_report }}"
+      vars:
+        _ncdu_report: 09-shutdown.ncdu
+    - name: Archive ncdu reports in one file
+      become: true
+      ansible.builtin.command: "tar cvf /opt/ncdu-reports.tar /opt/ncdu-reports"
+      args:
+        creates: "/opt/ncdu-reports.tar"
+    - name: Fetch ncdu reports
+      ansible.builtin.fetch:
+        src: /opt/ncdu-reports.tar
+        dest: "{{ playbook_dir }}/../ncdu-reports.tar"
     - name: Shutdown Packer VM
       community.general.shutdown:
