@@ -7,6 +7,15 @@
     name: R
     state: present
 
+- name: Mitigate CVE-2026-114938 for R/rJava
+  ansible.builtin.lineinfile:
+    path: /usr/lib64/R/etc/Renviron.site
+    line: "JAVA_TOOL_OPTIONS=${JAVA_TOOL_OPTIONS} -XX:-UseBASE64Intrinsics"
+    create: true
+    owner: root
+    group: root
+    mode: u=rw,go=r
+
 - name: Install RStudio GPG key
   ansible.builtin.copy:
     content: "{{ openondemand_rstudio_gpg_key }}"
