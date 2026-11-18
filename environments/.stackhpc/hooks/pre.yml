@@ -1,4 +1,14 @@
 ---
+- hosts: builder
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Set dnf maximum parallel downloads
+      ansible.builtin.lineinfile:
+        path: /etc/dnf/dnf.conf
+        regexp: '^max_parallel_downloads'
+        line: 'max_parallel_downloads=10'
+
 - hosts: control:!builder
   become: true
   gather_facts: false
