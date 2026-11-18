@@ -11,6 +11,16 @@
   vars:
     _debuginfo_repofile: "{{ 'rocky.repo' if ansible_distribution_major_version == '9' else 'Rocky-Debuginfo.repo' }}"
 
+- name: Add Rocky 9.8 vault debuginfo repo (FIXME - remove once snapshot has it)
+  ansible.builtin.yum_repository:
+    name: rocky-vault-98-baseos-debug
+    description: Rocky 9.8 BaseOS debuginfo (vault)
+    baseurl: https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/$basearch/debug/tree/
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+    gpgcheck: true
+    enabled: false
+  when: ansible_distribution_major_version == "9"
+
 - name: Install systemtap and required kernel packages
   ansible.builtin.dnf:
     name:
@@ -18,4 +28,5 @@
       - "kernel-debuginfo-{{ ansible_kernel }}"
       - "kernel-debuginfo-common-{{ ansible_architecture }}-{{ ansible_kernel }}"
       - "kernel-devel-{{ ansible_kernel }}"
+    enablerepo: "{{ 'rocky-vault-98-baseos-debug' if ansible_distribution_major_version == '9' else omit }}"
     state: present
