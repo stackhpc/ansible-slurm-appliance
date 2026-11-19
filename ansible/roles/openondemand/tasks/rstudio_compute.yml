@@ -7,14 +7,66 @@
     name: R
     state: present
 
-- name: Mitigate CVE-2026-114938 for R/rJava
-  ansible.builtin.lineinfile:
-    path: /usr/lib64/R/etc/Renviron.site
-    line: "JAVA_TOOL_OPTIONS=${JAVA_TOOL_OPTIONS} -XX:-UseBASE64Intrinsics"
-    create: true
-    owner: root
-    group: root
-    mode: u=rw,go=r
+- name: Check if vulnerable Java version is present
+  # RL8: java-1.8.0-openjdk-headless-1:1.8.0.504.b01-1.1.el8_10.x86_64
+  # RL9 current vulnerable: java-17-openjdk-headless-1:17.0.21.0.9-2.2.el9_8.x86_64
+  ansible.builtin.command: rpm -q java-17-openjdk-headless # noqa: command-instead-of-module
+  register: _java17_rpm
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Mitigate CVE-2026-114938 (Java4Shell)
+  when: _java17_rpm.rc == 0
+  block:
+    - name: Mitigate CVE-2026-114938 for R/rJava
+      # Covers any use from R
+      ansible.builtin.blockinfile:
+        path: /usr/lib64/R/etc/Renviron.site
+        create: true
+        owner: root
+        group: root
+        mode: u=rw,go=r
+        marker: "# {mark} CVE-2026-114938 mitigation"
+        block: |
+          # Remove once java-17-openjdk is patched.
+          JAVA_TOOL_OPTIONS=${JAVA_TOOL_OPTIONS} -XX:-UseBASE64Intrinsics
+
+    - name: Mitigate CVE-2026-114938 for interactive shells
+      ansible.builtin.copy:
+        dest: /etc/profile.d/java4shell.sh
+        content: |
+          # Mitigation for CVE-2026-114938 (Java4Shell). Remove once java-17-openjdk is patched.
+          case " ${JAVA_TOOL_OPTIONS} " in
+            *" -XX:-UseBASE64Intrinsics "*) ;;
+            *) export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+${JAVA_TOOL_OPTIONS} }-XX:-UseBASE64Intrinsics" ;;
+          esac
+        owner: root
+        group: root
+        mode: u=rw,go=r
+
+    - name: Find real Java 17 directory
+      ansible.builtin.command: readlink -f /usr/lib/jvm/java-17-openjdk
+      register: _java17_home
+      changed_when: false
+
+    - name: Move real java binary aside
+      # needs to be in same directory due to RPATH etc issues
+      ansible.builtin.command:
+        cmd: mv bin/java bin/java.real
+        chdir: "{{ _java17_home.stdout }}"
+        creates: "{{ _java17_home.stdout }}/bin/java.real"
+
+    - name: Install java wrapper (CVE-2026-114938 mitigation)
+      ansible.builtin.copy:
+        dest: "{{ _java17_home.stdout }}/bin/java"
+        owner: root
+        group: root
+        mode: '0755'
+        content: |
+          #!/bin/sh
+          # Mitigation for CVE-2026-114938 (Java4Shell). Remove once java-17-openjdk is patched.
+          exec "{{ _java17_home.stdout }}/bin/java.real" -XX:-UseBASE64Intrinsics "$@"
 
 - name: Install RStudio GPG key
   ansible.builtin.copy:
