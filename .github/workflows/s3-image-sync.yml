@@ -72,7 +72,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install "$(grep -E 'python-openstackclient|openstacksdk' requirements.txt)"
+          pip install -r <(grep -E 'python-openstackclient|openstacksdk' requirements.txt)
         shell: bash
 
       - name: Write clouds.yaml
