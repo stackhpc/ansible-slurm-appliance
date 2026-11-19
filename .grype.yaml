@@ -482,6 +482,19 @@ ignore:
       location: var/www/ood/apps/sys/myjobs/Gemfile.lock
       version: 7.1.6
 
+# GHSA-5hrj-7fc3-cmx9 / CVE-2026-130001: Mustache for Ruby up to 1.1.2 allows
+# for RCE from an attacker-controlled template string.
+# OOD PUN runs as authenticated user with templates either from user or admin
+# Remove when OnDemand ships mustache >= 1.1.3.
+  - vulnerability: GHSA-5hrj-7fc3-cmx9
+    package:
+      name: mustache
+      location: opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/mustache-1.1.1.gemspec
+  - vulnerability: GHSA-5hrj-7fc3-cmx9
+    package:
+      name: mustache
+      location: var/www/ood/apps/sys/myjobs/Gemfile.lock
+
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
 exclude:
