@@ -57,7 +57,7 @@
         chdir: "{{ _java17_home.stdout }}"
         creates: "{{ _java17_home.stdout }}/bin/java.real"
 
-    - name: Install java wrapper (CVE-2026-114938 mitigation)
+    - name: Install java wrapper
       ansible.builtin.copy:
         dest: "{{ _java17_home.stdout }}/bin/java"
         owner: root
@@ -85,12 +85,14 @@
     url: "https://download2.rstudio.org/server/rhel{{ ansible_distribution_major_version }}/x86_64/rstudio-server-rhel-{{ openondemand_rstudio_version }}-x86_64.rpm" # noqa: yaml[line-length]
     dest: /tmp/rstudio-server.rpm
     mode: '0644'
+  tags: openondemand_rstudio_install
 
 - name: Install RStudio Server
   # checkov:skip=CKV2_ANSIBLE_4: "Ensure that packages with untrusted or missing GPG signatures are not used by dnf"
   ansible.builtin.dnf:
     name: /tmp/rstudio-server.rpm
     state: present
+  tags: openondemand_rstudio_install
 
 - name: Create module directory for RStudio Server
   ansible.builtin.file:
