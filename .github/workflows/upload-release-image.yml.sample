@@ -55,7 +55,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install -U pip
-          pip install $(grep -o 'python-openstackclient[><=0-9\.]*' requirements.txt)
+          pip install -r <(grep -E 'python-openstackclient|openstacksdk' requirements.txt)
           bash .github/bin/get-s3-image.sh ${{ inputs.image_name }} ${{ inputs.bucket_name }}
 
       - name: Cleanup OpenStack Image (on error or cancellation)
