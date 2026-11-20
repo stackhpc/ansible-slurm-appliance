@@ -362,18 +362,6 @@ ignore:
     package:
       location: usr/sbin/ondemand-dex
 
-# CVE-2026-43037: buffer overflow vuln in ip6_tunnel kernel module
-# Module disabled in ansible/mitigations.yml
-# RockyLinux 9: https://access.redhat.com/errata/RHSA-2026:25217
-# FIXME: By kernel-5.14.0-687.15.1
-  - vulnerability: CVE-2026-43037
-    package:
-      location: var/lib/rpm/rpmdb.sqlite
-# RockyLinux 8: https://access.redhat.com/errata/RHSA-2026:25121
-# FIXME: By kernel-4.18.0-553.132.1
-  - vulnerability: CVE-2026-43037
-    package:
-      location: var/lib/rpm/Packages
 
 # CVE-2026-59873 Node.js tar tool in JupyterLab allowing zip bombs
 # https://access.redhat.com/security/cve/cve-2026-59873
@@ -446,6 +434,66 @@ ignore:
     package:
       name: dompurify
       location: "opt/jupyter-py312/lib/python3.12/site-packages/jupyterlab/staging/yarn.lock"
+
+# Ruby compilation of an attacker-controlled regular expression.
+# IDs assigned by GitLab. Open OnDemand 4.1.0 depends on the system Ruby (ruby:3.3 module) via ondemand-passenger.
+# Claude grep review of OnDemand v4.1.0 source found no regex compiled from untrusted input:
+# - The root-run nginx_stage builds patterns only from admin configuration
+# - ood_auth_map escapes the username with Regexp.quote
+# - dashboard-side patterns come from site or app configuration and run as the authenticated user.
+# OnDemand is only reachable after authentication. Gem dependencies and Passenger were not reviewed.
+# Can be removed once RockyLinux ships a patched ruby:3.3 build.
+# FIXME:
+  - vulnerability: CVE-2026-97229
+    package:
+      name: "ruby.*"
+# FIXME:
+  - vulnerability: CVE-2026-110264
+    package:
+      name: "ruby.*"
+# FIXME:
+  - vulnerability: CVE-2026-93577
+    package:
+      name: "ruby.*"
+# FIXME:
+  - vulnerability: CVE-2026-89078
+    package:
+      name: "ruby.*"
+
+# GHSA-f3w6-w445-fwh9 / CVE-2026-122006: Claude-assisted review:
+# activestorage present only as a transitive dep of the rails metagem.
+# active_storage/engine is commented out in
+# dashboard/myjobs config/application.rb (verified 2026-11-13), so the
+# vulnerable analyzer is never loaded. No 7.1.x fix exists upstream.
+# Revisit when OOD ships Rails 8.x.
+  - vulnerability: GHSA-f3w6-w445-fwh9
+    package:
+      name: activestorage
+      location: opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/activestorage-7.1.6.gemspec
+      version: 7.1.6
+  - vulnerability: GHSA-f3w6-w445-fwh9
+    package:
+      name: activestorage
+      location: var/www/ood/apps/sys/dashboard/Gemfile.lock
+      version: 7.1.6
+  - vulnerability: GHSA-f3w6-w445-fwh9
+    package:
+      name: activestorage
+      location: var/www/ood/apps/sys/myjobs/Gemfile.lock
+      version: 7.1.6
+
+# GHSA-5hrj-7fc3-cmx9 / CVE-2026-130001: Mustache for Ruby up to 1.1.2 allows
+# for RCE from an attacker-controlled template string.
+# OOD PUN runs as authenticated user with templates either from user or admin
+# Remove when OnDemand ships mustache >= 1.1.3.
+  - vulnerability: GHSA-5hrj-7fc3-cmx9
+    package:
+      name: mustache
+      location: opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.1.4-1/specifications/mustache-1.1.1.gemspec
+  - vulnerability: GHSA-5hrj-7fc3-cmx9
+    package:
+      name: mustache
+      location: var/www/ood/apps/sys/myjobs/Gemfile.lock
 
 # Exclude podman images from scan, pending MySQL+OpenSearch+Filebeat upgrade
 # NB: these do not even show in grype's ignored matches
