@@ -22,13 +22,13 @@ data "openstack_identity_auth_scope_v3" "scope" {
 data "openstack_networking_secgroup_v2" "login" {
   for_each = toset(var.login_security_groups)
 
-  name      = each.key
+  name      = templatestring(each.key, {cluster_name = var.cluster_name})
   tenant_id = data.openstack_identity_auth_scope_v3.scope.project_id
 }
 
 data "openstack_networking_secgroup_v2" "nonlogin" {
   for_each = toset(var.nonlogin_security_groups)
 
-  name      = each.key
+  name      = templatestring(each.key, {cluster_name = var.cluster_name})
   tenant_id = data.openstack_identity_auth_scope_v3.scope.project_id
 }
