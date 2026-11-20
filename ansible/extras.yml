@@ -87,3 +87,9 @@
     - name: Install additional packages
       ansible.builtin.dnf:
         name: "{{ appliances_extra_packages }}"
+    - name: Report du
+      ansible.builtin.command: "/opt/ncdu -x -O /opt/ncdu-reports/{{ _ncdu_report }} /"
+      args:
+        creates: "/opt/ncdu-reports/{{ _ncdu_report }}"
+      vars:
+        _ncdu_report: 45-extras.ncdu
