@@ -413,6 +413,10 @@
         creates: "/opt/ncdu-reports/{{ _ncdu_report }}"
       vars:
         _ncdu_report: 99-shutdown.ncdu
+    - name: Ensure ncdu reports archive is absent
+      ansible.builtin.file:
+        path: /opt/ncdu-reports.tar
+        state: absent
     - name: Archive ncdu reports in one file
       become: true
       ansible.builtin.command: "tar cvf /opt/ncdu-reports.tar -C /opt ncdu-reports"

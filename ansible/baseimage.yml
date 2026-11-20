@@ -251,5 +251,9 @@
       ansible.builtin.fetch:
         src: /opt/ncdu-reports.tar
         dest: "{{ playbook_dir }}/../ncdu-reports.tar"
+    - name: Remove ncdu reports archive
+      ansible.builtin.file:
+        path: /opt/ncdu-reports.tar
+        state: absent
     - name: Shutdown Packer VM
       community.general.shutdown:
