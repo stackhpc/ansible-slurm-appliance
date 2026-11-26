@@ -196,7 +196,7 @@ jobs:
           -var-file="$PKR_VAR_environment_root/${CI_CLOUD}.pkrvars.hcl" \
           -var "source_image_name=$MATRIX_BUILD_SOURCE_IMAGE_NAME" \
           -var "image_name=$MATRIX_BUILD_IMAGE_NAME" \
-          -var "image_name_version=PR${GITHUB_PR_ID}" \
+          -var "image_name_version=-PR${GITHUB_PR_ID}" \
           -var "inventory_groups=$MATRIX_BUILD_INVENTORY_GROUPS" \
           -var "volume_size=$MATRIX_BUILD_VOLUME_SIZE" \
           openstack.pkr.hcl
