@@ -55,6 +55,16 @@ variable "control_node_flavor" {}
 # tflint-ignore: terraform_typed_variables
 variable "other_node_flavor" {}
 
+variable "gpu_node_flavor" {
+  type    = string
+  default = null
+}
+
+variable "gpu_node_count" {
+  type    = number
+  default = 0
+}
+
 # tflint-ignore: terraform_typed_variables
 variable "volume_backed_instances" {
   default = false
@@ -99,6 +109,10 @@ module "cluster" {
       nodes = []
       #nodes = ["extra-0", "extra-1"]
       flavor = var.other_node_flavor
+    }
+    gpu = {
+      nodes  = [for i in range(var.gpu_node_count) : "gpu-${i}"]
+      flavor = var.gpu_node_flavor
     }
   }
 
