@@ -221,21 +221,6 @@ jobs:
           echo "$IMAGE_ID" > image-id.txt
           echo "$IMAGE_NAME" > image-name.txt
 
-      - name: Make image usable for further builds
-        run: |
-          . venv/bin/activate
-          openstack image unset --property signature_verified "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}" || true
-        env:
-          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
-
-      - name: Delete image for automatically-run workflows
-        run: |
-          . venv/bin/activate
-          openstack image delete "${STEPS_MANIFEST_OUTPUTS_IMAGE_ID}"
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        env:
-          STEPS_MANIFEST_OUTPUTS_IMAGE_ID: ${{ steps.manifest.outputs.image-id }}
-
       - name: Upload manifest artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
