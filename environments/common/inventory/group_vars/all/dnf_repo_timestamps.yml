@@ -315,11 +315,21 @@ dnf_repos_default:
       pulp_timestamp: 20260903T201749
       repo_file: ondemand-web
   security:
-    '8':
+    '8.10':
       pulp_path: rocky/8.10/security/x86_64/os
       pulp_timestamp: 20261125T201828
       repo_file: Rocky-Security
-    '9':
+    '9.9':
       pulp_path: rocky/9.9/security/x86_64/os
       pulp_timestamp: 20261125T203209
       repo_file: rocky-security
+  baseos-debuginfo:
+    '8.10':
+      pulp_path: rocky/8.10/security/x86_64/debug/tree
+      pulp_timestamp: 20261127T085248
+      repo_file: Rocky-Debuginfo
+    '9.9':
+      pulp_path: rocky/9.9/security/x86_64/debug/tree
+      pulp_timestamp: 20261127T085248
+      repo_file: rocky
+
