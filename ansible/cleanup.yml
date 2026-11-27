@@ -4,6 +4,7 @@
 - ansible.builtin.meta: flush_handlers
 
 - name: Remove dnf caches # noqa: no-changed-when
+  when: appliances_fatimage_cleanup_dnf | default(True)
   ansible.builtin.command: dnf clean all
 
 # If image build happens on a Neutron subnet with property dns_namservers defined, then cloud-init

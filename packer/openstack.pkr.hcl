@@ -131,7 +131,7 @@ variable "volume_type" {
 
 variable "volume_size" {
   type = number
-  default = 20
+  default = 22
 }
 
 variable "volume_name" {
@@ -165,6 +165,12 @@ variable "image_name_version" {
   type = string
   description = "Suffix for image name giving version. Default of 'auto' appends timestamp + short commit"
   default = "auto"
+}
+
+variable "playbook" {
+  type = string
+  description = "Playbook to use by the ansible provisionner"
+  default = "fatimage.yml"
 }
 
 source "openstack" "openhpc" {
@@ -214,7 +220,7 @@ build {
   }
 
   provisioner "ansible" {
-    playbook_file = "${var.repo_root}/ansible/fatimage.yml"
+    playbook_file = "${var.repo_root}/ansible/${var.playbook}"
     groups = concat(["builder"], var.inventory_groups == "" ? [] : split(",", var.inventory_groups))
     keep_inventory_file = true # for debugging
     use_proxy = false # see https://www.packer.io/docs/provisioners/ansible#troubleshooting

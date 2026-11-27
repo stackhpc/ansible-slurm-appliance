@@ -17,3 +17,8 @@ pulp_site_upstream_password: "{{ lookup('ansible.builtin.env', 'ARK_PASSWORD') }
 # Open Ondemand osc.ood package installs - see ansible/roles/osc.ood/tasks/install-package.yml
 install_ondemand_dex: true # install DEX
 oidc_uri: '' # install mod_auth_openidc for OIDC
+
+# Speed-up build by avoiding copying binaries from runner to packer VM
+alertmanager_download_host: "{{ inventory_hostname }}"
+node_exporter_download_host: "{{ inventory_hostname }}"
+prometheus_download_host: "{{ inventory_hostname }}"
