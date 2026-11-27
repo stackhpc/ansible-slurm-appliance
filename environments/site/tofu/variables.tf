@@ -303,7 +303,11 @@ variable "vnic_types" {
 
 variable "login_security_groups" {
   type        = list(string)
-  description = "Name of preexisting security groups to apply to login nodes"
+  description = <<-EOT
+    Name of preexisting security groups to apply to login nodes.
+    The following interpolations can be used:
+      $${cluster_name}: From var.cluster_name
+    EOT
   default = [
     "default", # allow all in-cluster services
     "SSH",     # access via ssh
@@ -313,7 +317,11 @@ variable "login_security_groups" {
 
 variable "nonlogin_security_groups" {
   type        = list(string)
-  description = "Name of preexisting security groups to apply to non-login nodes"
+  description = <<-EOT
+    Name of preexisting security groups to apply to non-login nodes.
+    The following interpolations can be used:
+      $${cluster_name}: From var.cluster_name
+    EOT
   default = [
     "default", # allow all in-cluster services
   ]
