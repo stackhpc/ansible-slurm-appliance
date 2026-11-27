@@ -77,3 +77,16 @@
     owner: root
     group: root
     mode: "0644"
+
+- name: Install collections needed at boot time
+  tags: compute-init-collections
+  become: true
+  when: ansible_init_target_collections | default([]) | length > 0
+  ansible.builtin.command: /usr/lib/ansible-init/bin/ansible-galaxy collection install --force --requirements-file /dev/stdin
+  changed_when: true
+  args:
+    stdin: |
+      ---
+      {{ {"collections": ansible_init_target_collections} | to_yaml }}
+  environment:
+    ANSIBLE_CONFIG: /etc/ansible-init/ansible.cfg
