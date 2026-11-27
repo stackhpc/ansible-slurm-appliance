@@ -8,3 +8,9 @@ ansible_init_pip_packages:
   - requests
   # custom:
   - netaddr # required for gateway role
+
+ansible_init_target_collections_names:
+  # for vgpu
+  - stackhpc.linux
+
+ansible_init_target_collections: "{{ (lookup('file', appliances_repository_root ~ '/requirements.yml') | from_yaml).collections | selectattr('name', 'in', ansible_init_target_collections_names) }}"
