@@ -21,7 +21,7 @@
     enable_basic_users: "{{ os_metadata.meta.basic_users | default(false) | bool }}"
     enable_eessi: "{{ os_metadata.meta.eessi | default(false) | bool }}"
     enable_chrony: "{{ os_metadata.meta.chrony | default(false) | bool }}"
-    enable_vgpu: "{{ os_metadata.meta.vpgu | default(false) | bool }}"
+    enable_vgpu: "{{ os_metadata.meta.vgpu | default(false) | bool }}"
     enable_nhc: "{{ os_metadata.meta.nhc | default(false) | bool }}"
 
     # TODO: "= role defaults" - could be moved to a vars_file: on play with similar precedence effects
