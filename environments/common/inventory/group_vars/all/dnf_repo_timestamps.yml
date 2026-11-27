@@ -123,6 +123,15 @@ dnf_repos_default:
       pulp_path: rocky/9.9/BaseOS/x86_64/os
       pulp_timestamp: 20261126T203600
       repo_file: rocky
+  baseos-debuginfo:
+    '8.10':
+      pulp_path: rocky/8.10/security/x86_64/debug/tree
+      pulp_timestamp: 20261127T085248
+      repo_file: Rocky-Debuginfo
+    '9.9':
+      pulp_path: rocky/9.9/security/x86_64/debug/tree
+      pulp_timestamp: 20261127T085248
+      repo_file: rocky
   baseos-source:
     '8.10':
       pulp_path: rocky/8.10/BaseOS/source/tree
@@ -323,13 +332,3 @@ dnf_repos_default:
       pulp_path: rocky/9.9/security/x86_64/os
       pulp_timestamp: 20261125T203209
       repo_file: rocky-security
-  baseos-debuginfo:
-    '8.10':
-      pulp_path: rocky/8.10/security/x86_64/debug/tree
-      pulp_timestamp: 20261127T085248
-      repo_file: Rocky-Debuginfo
-    '9.9':
-      pulp_path: rocky/9.9/security/x86_64/debug/tree
-      pulp_timestamp: 20261127T085248
-      repo_file: rocky
-
